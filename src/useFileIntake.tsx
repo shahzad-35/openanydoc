@@ -11,6 +11,8 @@ export type OpenedFile = {
 type FileIntakeOptions = {
   acceptedExtensions: string[]
   onFileLoaded: (file: File, fileContents: ArrayBuffer) => void
+  // Pasting CSV text opens it as a file. Off where pasting must stay a normal paste, e.g. on the file page.
+  allowPaste?: boolean
 }
 
 export function formatFileSize(byteCount: number) {
@@ -25,13 +27,13 @@ export function getLargeFileWarning(file: File) {
 }
 
 // Everything a drop zone needs, with no markup of its own, so each layout can build its own UI.
-export function useFileIntake({ acceptedExtensions, onFileLoaded }: FileIntakeOptions) {
+export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true }: FileIntakeOptions) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [largeFileWarning, setLargeFileWarning] = useState<string | null>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [isReading, setIsReading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const acceptsPastedText = acceptedExtensions.includes('.csv')
+  const acceptsPastedText = allowPaste && acceptedExtensions.includes('.csv')
 
   function hasAcceptedExtension(fileName: string) {
     const lowerCaseFileName = fileName.toLowerCase()

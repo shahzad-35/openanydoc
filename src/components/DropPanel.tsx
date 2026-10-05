@@ -60,6 +60,23 @@ export function ExtensionPill({ extension }: { extension: string }) {
   )
 }
 
+function ExtensionList({ className }: { className: string }) {
+  return (
+    <ul className={className}>
+      {viewers.map((viewer) => (
+        <li key={viewer.id} className="grid grid-cols-[6rem_1fr] items-start gap-x-3">
+          <span className="py-0.5 text-sm text-ink-soft">{viewer.label}</span>
+          <span className="flex flex-wrap gap-1.5">
+            {viewer.extensions.map((extension) => (
+              <ExtensionPill key={extension} extension={extension} />
+            ))}
+          </span>
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 const steps = ['Choose a file', 'Read in your browser', 'View it']
 
 // The big centered drop panel plus the slim three-step strip. The whole home screen is the drop target (see HomePage);
@@ -75,18 +92,7 @@ export default function DropPanel({ intake }: { intake: ReturnType<typeof useFil
         <p className="type-h3 text-3xl md:text-4xl">{intake.promptText}</p>
         <p className="mt-2 text-ink-soft">or pick one from your device.</p>
 
-        <ul className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-left md:grid-cols-2">
-          {viewers.map((viewer) => (
-            <li key={viewer.id} className="grid grid-cols-[6rem_1fr] items-start gap-x-3">
-              <span className="py-0.5 text-sm text-ink-soft">{viewer.label}</span>
-              <span className="flex flex-wrap gap-1.5">
-                {viewer.extensions.map((extension) => (
-                  <ExtensionPill key={extension} extension={extension} />
-                ))}
-              </span>
-            </li>
-          ))}
-        </ul>
+        <ExtensionList className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-left md:grid-cols-2" />
 
         {intake.fileInput}
         <div className="mt-6">

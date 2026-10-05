@@ -13,7 +13,9 @@ export const features = [
   'Drag and drop, click to browse, or paste CSV text.',
   'Files are read in your browser and never uploaded.',
   'CSV files: automatic delimiter detection (comma, semicolon, tab, pipe) with a manual override, a first-row-is-header toggle, column sorting and search.',
-  'Large CSV files stay smooth because only the visible rows are drawn.',
+  'Large CSV files stay smooth because only the visible rows are drawn, including while you edit.',
+  'Edit CSV files in your browser: change cells, add or delete rows and columns, rename headers, find and replace, with undo and redo.',
+  'Download what you see (the edits, the current sort and only the rows your search shows) as CSV or JSON, or copy it for Excel or Google Sheets.',
   'UTF-8 (with or without a BOM), UTF-16 and Arabic text are read correctly, and Arabic cells display right-to-left.',
   'Files over 50 MB show a warning, and OpenAnyDoc still tries to open them.',
   'Light and dark themes, with keyboard-friendly controls.',
@@ -36,7 +38,8 @@ export const faqItems = [
   },
   {
     question: 'Can I edit my file or save changes?',
-    answer: 'No. OpenAnyDoc is a viewer. It shows your file and does not change or save it.',
+    answer:
+      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Other formats cannot be edited yet.',
   },
   {
     question: 'Which CSV delimiters are supported?',

@@ -27,7 +27,8 @@ function drawMoon(sketch: RoughSketch, roughness: number) {
   return [sketch.path(MOON_PATH, getSketchOptions(roughness))]
 }
 
-export default function ThemeToggle() {
+// `compact` is for the file page: smaller on a mouse, still 44px on touch screens.
+export default function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
 
   function toggleTheme() {
@@ -47,9 +48,9 @@ export default function ThemeToggle() {
       type="button"
       onClick={toggleTheme}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="control-shape solid-box grid min-h-11 min-w-11 cursor-pointer place-items-center border-ink bg-paper text-ink transition-colors duration-200 hover:bg-paper-raised active:scale-[0.98]"
+      className={`control-shape solid-box grid cursor-pointer place-items-center ${compact ? 'min-h-9 min-w-9 pointer-coarse:min-h-11 pointer-coarse:min-w-11' : 'min-h-11 min-w-11'} border-ink bg-paper text-ink transition-colors duration-200 hover:bg-paper-raised active:scale-[0.98]`}
     >
-      <RoughIcon drawShapes={isDark ? drawSun : drawMoon} className="size-7 overflow-visible" />
+      <RoughIcon drawShapes={isDark ? drawSun : drawMoon} className={`${compact ? 'size-5 pointer-coarse:size-7' : 'size-7'} overflow-visible`} />
     </button>
   )
 }
