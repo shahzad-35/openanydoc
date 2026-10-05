@@ -4,26 +4,26 @@ import ThemeToggle from './ThemeToggle'
 
 export default function Layout() {
   return (
-    <div className="flex min-h-screen flex-col bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-50">
+    <div className="flex min-h-dvh flex-col bg-paper text-ink">
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:rounded-md focus:bg-blue-700 focus:px-4 focus:py-2 focus:text-white"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-10 focus:rounded-lg focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
       >
         Skip to content
       </a>
 
-      <header className="border-b border-slate-300 dark:border-slate-700">
-        <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-6 gap-y-3 px-4 py-3">
-          <Link to="/" className="text-xl font-bold">
+      <header className="border-b border-rule">
+        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-3 px-5 py-4">
+          <Link to="/" className="font-display text-2xl font-semibold tracking-[-0.02em]">
             OpenAnyDoc
           </Link>
           <nav aria-label="Viewers" className="order-last w-full sm:order-none sm:w-auto">
-            <ul className="flex flex-wrap gap-x-5 gap-y-2">
+            <ul className="flex flex-wrap gap-x-6 gap-y-2">
               {viewers.map((viewer) => (
                 <li key={viewer.path}>
                   <NavLink
                     to={viewer.path}
-                    className="font-medium text-blue-700 underline-offset-4 hover:underline aria-[current=page]:text-slate-900 aria-[current=page]:underline dark:text-blue-300 dark:aria-[current=page]:text-slate-50"
+                    className="inline-flex min-h-11 items-center font-medium text-ink-soft decoration-accent decoration-2 underline-offset-8 transition-colors duration-200 hover:text-accent aria-[current=page]:text-ink aria-[current=page]:underline"
                   >
                     {viewer.label}
                   </NavLink>
@@ -35,12 +35,12 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="main" className="mx-auto w-full max-w-5xl flex-1 px-4 py-10">
+      <main id="main" className="mx-auto w-full max-w-6xl flex-1 px-5 pb-24 pt-14 sm:pt-24">
         <Outlet />
       </main>
 
-      <footer className="border-t border-slate-300 dark:border-slate-700">
-        <p className="mx-auto max-w-5xl px-4 py-4 text-sm text-slate-700 dark:text-slate-300">
+      <footer className="border-t border-rule">
+        <p className="mx-auto max-w-6xl px-5 py-6 text-sm text-ink-soft">
           OpenAnyDoc is free. Your files never leave your device.
         </p>
       </footer>

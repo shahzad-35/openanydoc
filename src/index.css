@@ -1,12 +1,79 @@
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/newsreader";
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+:root {
+  --paper: #f4f1ea;
+  --paper-raised: #ebe6da;
+  --ink: #1c1a17;
+  --ink-soft: #4a453e;
+  --rule: #cdc5b5;
+  --accent: #a8381a;
+}
+
+.dark {
+  --paper: #171512;
+  --paper-raised: #201d19;
+  --ink: #f1ede4;
+  --ink-soft: #b8b1a5;
+  --rule: #3a362f;
+  --accent: #e8845f;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-rule: var(--rule);
+  --color-accent: var(--accent);
+}
+
+@theme {
+  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Newsreader Variable", ui-serif, Georgia, serif;
+  --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+html {
+  scroll-behavior: smooth;
+  accent-color: var(--accent);
+  scrollbar-color: var(--rule) transparent;
+}
+
+::selection {
+  background: var(--accent);
+  color: var(--paper);
+}
+
 :focus-visible {
-  outline: 2px solid var(--color-blue-700);
+  outline: 2px solid var(--accent);
   outline-offset: 2px;
 }
 
-.dark :focus-visible {
-  outline-color: var(--color-blue-300);
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  ::before,
+  ::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transform: none !important;
+  }
 }
