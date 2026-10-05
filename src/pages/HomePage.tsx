@@ -1,119 +1,54 @@
-import { Link } from 'react-router-dom'
-import { viewers } from '../viewers'
+import AboutContent from '../components/AboutContent'
+import DropPanel from '../components/DropPanel'
+import ThemeToggle from '../components/ThemeToggle'
+import ThreeCanvas from '../backdrop/ThreeCanvas'
+import { createAuroraDust } from '../backdrop/AuroraDust'
+import { footerText, heroSubtitle, heroTitle } from '../content'
+import { useFileIntake } from '../useFileIntake'
+import { supportedExtensions } from '../viewers'
 
-export default function HomePage() {
+// The whole screen is the drop target: a file dropped anywhere on the page opens, over a slow field of drifting particles.
+export default function HomePage({ onFileLoaded }: { onFileLoaded: (file: File, fileContents: ArrayBuffer) => void }) {
+  const intake = useFileIntake({ acceptedExtensions: supportedExtensions, onFileLoaded })
+
   return (
-    <>
-      <section className="mb-16 max-w-4xl animate-rise sm:mb-24">
-        <h1 className="text-balance font-display text-5xl font-medium leading-[1.05] tracking-[-0.02em] sm:text-7xl">
-          View CSV, Excel, Word and PowerPoint files online — free, instant, private.
-        </h1>
-        <p className="mt-8 max-w-[65ch] text-lg leading-relaxed text-ink-soft">
-          Your files never leave your device.
-        </p>
-      </section>
+    <div {...intake.dropTargetProps} className="relative min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink">
+      <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
+        <ThreeCanvas createScene={createAuroraDust} className="h-full w-full" />
+      </div>
+      {intake.isDraggingOver && (
+        <div aria-hidden="true" className="pointer-events-none fixed inset-3 z-20 box-shape border-2 border-dashed border-accent" />
+      )}
 
-      <section aria-labelledby="viewers-heading">
-        <h2 id="viewers-heading" className="sr-only">
-          Choose a viewer
-        </h2>
-        <ul className="border-b border-rule">
-          {viewers.map((viewer) => (
-            <li key={viewer.path} className="border-t border-rule">
-              <Link
-                to={viewer.path}
-                className="group grid gap-x-8 gap-y-2 px-2 py-7 transition-colors duration-200 hover:bg-paper-raised sm:grid-cols-[9rem_1fr_auto] sm:items-baseline"
-              >
-                <span className="font-mono text-sm text-ink-soft">{viewer.extensions.join('  ')}</span>
-                <span>
-                  <span className="block font-display text-3xl font-medium tracking-[-0.01em]">
-                    {viewer.label} viewer
-                  </span>
-                  <span className="mt-2 block max-w-[55ch] text-ink-soft">{viewer.description}</span>
-                </span>
-                <span className="inline-flex items-center gap-1.5 pt-1 font-medium text-accent">
-                  Open
-                  <svg
-                    aria-hidden="true"
-                    viewBox="0 0 16 16"
-                    className="size-4 transition-transform duration-200 group-hover:translate-x-1"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.75"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M3 8h10M9 4l4 4-4 4" />
-                  </svg>
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+      >
+        Skip to content
+      </a>
 
-      <section id="about" aria-labelledby="about-heading" className="mt-24 grid gap-x-16 gap-y-10 lg:grid-cols-[1fr_2fr]">
-        <div>
-          <h2 id="about-heading" className="font-display text-4xl font-medium tracking-[-0.02em]">
-            About OpenAnyDoc
-          </h2>
-          <p className="mt-4 max-w-[45ch] leading-relaxed text-ink-soft">
-            OpenAnyDoc opens CSV, Excel, Word and PowerPoint files in your browser. Pick a file, read it, close the tab.
-          </p>
-        </div>
+      <div className="relative z-10">
+        <header className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5">
+          <p className="type-h3">OpenAnyDoc</p>
+          <ThemeToggle />
+        </header>
 
-        <div className="space-y-12">
-          <div>
-            <h3 className="font-display text-2xl font-medium">Private by design</h3>
-            <p className="mt-3 max-w-[65ch] leading-relaxed text-ink-soft">
-              Many online viewers send your file to a server before showing it. OpenAnyDoc does not. Your browser reads the
-              file and displays it on your own screen, and the file is never uploaded anywhere.
-            </p>
+        <main id="main" className="mx-auto max-w-5xl px-4 pb-20">
+          <section className="flex min-h-[calc(100dvh-6rem)] flex-col justify-center py-8 text-center">
+            <h1 className="type-h1 mx-auto max-w-3xl text-balance">{heroTitle}</h1>
+            <p className="mb-8 mt-3 text-ink-soft">{heroSubtitle}</p>
+            <DropPanel intake={intake} />
+          </section>
+
+          <div className="box-shape mt-12 bg-paper-raised/90 p-6 backdrop-blur-md md:p-10">
+            <AboutContent />
           </div>
+        </main>
 
-          <div>
-            <h3 className="font-display text-2xl font-medium">How it works</h3>
-            <ol className="mt-3 max-w-[65ch] list-decimal space-y-2 pl-5 leading-relaxed text-ink-soft marker:text-ink">
-              <li>Choose a file from your device.</li>
-              <li>Your browser reads it locally. Nothing is sent over the network.</li>
-              <li>The contents appear on the page. Close the tab and nothing is kept.</li>
-            </ol>
-          </div>
-
-          <div>
-            <h3 className="font-display text-2xl font-medium">Supported files</h3>
-            <ul className="mt-3 grid max-w-[65ch] gap-2 text-ink-soft sm:grid-cols-2">
-              {viewers.map((viewer) => (
-                <li key={viewer.path}>
-                  {viewer.label}: <span className="font-mono text-sm">{viewer.extensions.join('  ')}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="font-display text-2xl font-medium">Questions</h3>
-            <dl className="mt-3 max-w-[65ch] divide-y divide-rule border-y border-rule">
-              <div className="py-4">
-                <dt className="font-medium">Is OpenAnyDoc free?</dt>
-                <dd className="mt-1 leading-relaxed text-ink-soft">Yes.</dd>
-              </div>
-              <div className="py-4">
-                <dt className="font-medium">Does my file leave my device?</dt>
-                <dd className="mt-1 leading-relaxed text-ink-soft">
-                  No. Files are opened and displayed by your browser only.
-                </dd>
-              </div>
-              <div className="py-4">
-                <dt className="font-medium">Can I edit my file here?</dt>
-                <dd className="mt-1 leading-relaxed text-ink-soft">
-                  No. OpenAnyDoc is a viewer. It shows your file and does not change or save it.
-                </dd>
-              </div>
-            </dl>
-          </div>
-        </div>
-      </section>
-    </>
+        <footer className="border-t border-rule">
+          <p className="mx-auto max-w-5xl px-4 py-6 text-sm text-ink-soft">{footerText}</p>
+        </footer>
+      </div>
+    </div>
   )
 }

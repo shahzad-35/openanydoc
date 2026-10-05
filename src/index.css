@@ -1,25 +1,89 @@
-@import "@fontsource-variable/geist";
-@import "@fontsource-variable/newsreader";
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
+/* Neutral base: color on this page comes from the file types below. */
 :root {
-  --paper: #f4f1ea;
-  --paper-raised: #ebe6da;
-  --ink: #1c1a17;
-  --ink-soft: #4a453e;
-  --rule: #cdc5b5;
-  --accent: #a8381a;
+  --paper: #eef3fb;
+  --paper-raised: #ffffff;
+  --ink: #0f1a33;
+  --ink-soft: #4a5878;
+  --rule: #d4dcec;
+  --accent: #2b50c8;
+  --on-accent: #ffffff;
+  --font-display: "Avenir Next", Avenir, "Century Gothic", "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
+  --radius-box: 20px;
+  --danger: #b3261e;
+  --edit-mark: #b45309;
+  --icon-roughness: 0;
+
+  --type-csv: #6a46b0;
+  --type-excel: #1b7a43;
+  --type-word: #2459b5;
+  --type-pdf: #b0214f;
+  --type-powerpoint: #c2441a;
+
+  /* Ten hues for the extension pills in the "Choose a file" box; shuffled on every page load. */
+  --ext-1: #c2441a;
+  --ext-2: #a15c07;
+  --ext-3: #5b7a0a;
+  --ext-4: #1b7a43;
+  --ext-5: #0f766e;
+  --ext-6: #0b6e99;
+  --ext-7: #2459b5;
+  --ext-8: #6a46b0;
+  --ext-9: #a3238f;
+  --ext-10: #b0214f;
 }
 
 .dark {
-  --paper: #171512;
-  --paper-raised: #201d19;
-  --ink: #f1ede4;
-  --ink-soft: #b8b1a5;
-  --rule: #3a362f;
-  --accent: #e8845f;
+  --paper: #0a1128;
+  --paper-raised: #121c3a;
+  --ink: #e8eeff;
+  --ink-soft: #a3b1d6;
+  --rule: #26335c;
+  --accent: #8fb0ff;
+  --on-accent: #0a1128;
+  --danger: #ff8a80;
+  --edit-mark: #fbbf24;
+
+  --type-csv: #b79bff;
+  --type-excel: #5fd08b;
+  --type-word: #7fb0ff;
+  --type-pdf: #ff7a9f;
+  --type-powerpoint: #ff8f66;
+
+  --ext-1: #ff8f66;
+  --ext-2: #f2b04c;
+  --ext-3: #b9d85a;
+  --ext-4: #5fd08b;
+  --ext-5: #4fd6c6;
+  --ext-6: #5cc8e6;
+  --ext-7: #7fb0ff;
+  --ext-8: #b79bff;
+  --ext-9: #f08ae0;
+  --ext-10: #ff7a9f;
+}
+
+/* An element with data-file-type gets --file-color for itself and everything inside it. */
+[data-file-type="csv"] {
+  --file-color: var(--type-csv);
+}
+
+[data-file-type="excel"] {
+  --file-color: var(--type-excel);
+}
+
+[data-file-type="word"] {
+  --file-color: var(--type-word);
+}
+
+[data-file-type="pdf"] {
+  --file-color: var(--type-pdf);
+}
+
+[data-file-type="powerpoint"] {
+  --file-color: var(--type-powerpoint);
 }
 
 @theme inline {
@@ -29,22 +93,57 @@
   --color-ink-soft: var(--ink-soft);
   --color-rule: var(--rule);
   --color-accent: var(--accent);
+  --color-on-accent: var(--on-accent);
+  --color-danger: var(--danger);
+  --color-edit-mark: var(--edit-mark);
 }
 
 @theme {
-  --font-sans: "Geist Variable", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Newsreader Variable", ui-serif, Georgia, serif;
-  --animate-rise: rise 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  --font-sans: "SF Pro Display", -apple-system, BlinkMacSystemFont, "San Francisco", "Helvetica Neue", Helvetica, Ubuntu, Roboto, Noto, "Segoe UI", Arial, sans-serif;
+  --font-rounded: ui-rounded, "SF Pro Rounded", "Hiragino Maru Gothic ProN", Quicksand, Nunito, "Segoe UI", system-ui, sans-serif;
+}
 
-  @keyframes rise {
-    from {
-      opacity: 0;
-      transform: translateY(12px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
-    }
+@utility type-h1 {
+  font-family: var(--font-display, var(--font-rounded));
+  font-size: clamp(2.4rem, 5.5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+@utility type-h3 {
+  font-family: var(--font-display, var(--font-rounded));
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+}
+
+@utility type-button {
+  font-family: var(--font-display, var(--font-rounded));
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+@utility box-shape {
+  border-radius: var(--radius-box, 24px);
+}
+
+@utility control-shape {
+  border-radius: var(--radius-control, 9999px);
+}
+
+@utility solid-box {
+  border-width: 1px;
+  border-style: solid;
+}
+
+@utility rule-list {
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+
+  & > * + * {
+    border-top: 1px solid var(--rule);
   }
 }
 
@@ -56,7 +155,7 @@ html {
 
 ::selection {
   background: var(--accent);
-  color: var(--paper);
+  color: var(--on-accent);
 }
 
 :focus-visible {
@@ -72,7 +171,6 @@ html {
   *,
   ::before,
   ::after {
-    animation: none !important;
     transition-duration: 0.01ms !important;
     transform: none !important;
   }
