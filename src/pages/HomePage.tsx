@@ -24,7 +24,7 @@ export default function HomePage() {
                 to={viewer.path}
                 className="group grid gap-x-8 gap-y-2 px-2 py-7 transition-colors duration-200 hover:bg-paper-raised sm:grid-cols-[9rem_1fr_auto] sm:items-baseline"
               >
-                <span className="font-mono text-sm text-ink-soft">{viewer.fileTypes}</span>
+                <span className="font-mono text-sm text-ink-soft">{viewer.extensions.join('  ')}</span>
                 <span>
                   <span className="block font-display text-3xl font-medium tracking-[-0.01em]">
                     {viewer.label} viewer
@@ -85,7 +85,7 @@ export default function HomePage() {
             <ul className="mt-3 grid max-w-[65ch] gap-2 text-ink-soft sm:grid-cols-2">
               {viewers.map((viewer) => (
                 <li key={viewer.path}>
-                  {viewer.label}: <span className="font-mono text-sm">{viewer.fileTypes}</span>
+                  {viewer.label}: <span className="font-mono text-sm">{viewer.extensions.join('  ')}</span>
                 </li>
               ))}
             </ul>

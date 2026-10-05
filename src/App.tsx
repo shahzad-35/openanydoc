@@ -13,7 +13,7 @@ export default function App() {
           <Route
             key={viewer.path}
             path={viewer.path}
-            element={<ViewerPlaceholderPage viewerLabel={viewer.label} />}
+            element={<ViewerPlaceholderPage viewer={viewer} />}
           />
         ))}
       </Route>
