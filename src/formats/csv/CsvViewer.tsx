@@ -27,13 +27,16 @@ import {
 import type { CellPosition, CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
 import type { ChangeRow, CsvEditingComponents } from './csvEditing'
 
-const ROW_HEIGHT_PX = 36
-const COLUMN_MIN_WIDTH_PX = 180
+// Rows are 28px for a mouse so more data fits on screen, and 36px on touch screens where cells are tapped.
+const ROW_HEIGHT_PX = window.matchMedia('(pointer: coarse)').matches ? 36 : 28
+const COLUMN_MIN_WIDTH_PX = 140
 const ROW_NUMBER_MIN_WIDTH_PX = 56
 const MAX_LISTED_CHANGES = 200
 
 type EditingCell = CellPosition & { draft: string; source: 'cell' | 'bar' }
 type SortState = { columnId: number; direction: 'asc' | 'desc' } | null
+// Which way an expanded cell grows: away from the table's right and bottom edges, so it never adds scroll width or height.
+type ExpandAnchor = CellPosition & { fromRight: boolean; fromBottom: boolean }
 
 const cellCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 const noRows: string[][] = []
@@ -92,6 +95,17 @@ function SearchIcon() {
   )
 }
 
+// A value that does not fit is cut off with an ellipsis. While the pointer is over the cell (or the cell is selected, which is
+// how a tap works on a touch screen) the text grows over the neighbouring cells to show everything, wrapping onto more lines;
+// a very long value stops growing (EXPANDED_MAX_*) and scrolls inside the cell. Nothing around it moves.
+const EXPANDED_MAX_WIDTH_PX = 448 // = max-w-md
+const EXPANDED_MAX_HEIGHT_PX = 192 // = max-h-48
+const restingCellTextClassName = 'block h-full w-full truncate'
+const expandedCellTextClassName =
+  'z-[5] block h-auto max-h-48 min-h-full w-max min-w-full max-w-md overflow-auto whitespace-pre-wrap break-words py-[3px] leading-5'
+const hoverExpandedCellTextClassName =
+  'group-hover:z-[5] group-hover:h-auto group-hover:max-h-48 group-hover:min-h-full group-hover:w-max group-hover:min-w-full group-hover:max-w-md group-hover:overflow-auto group-hover:whitespace-pre-wrap group-hover:break-words group-hover:bg-paper-raised group-hover:py-[3px] group-hover:leading-5 group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule'
+
 const selectedCellTint = 'bg-[color-mix(in_srgb,var(--file-color)_14%,var(--paper-raised))]'
 
 // The CSV table. In view mode it only reads; in edit mode the editing components (loaded on first Edit) add the value bar,
@@ -117,6 +131,7 @@ export default function CsvViewer({
   const [pickedCell, setPickedCell] = useState<CellPosition | null>(null)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [renamingColumn, setRenamingColumn] = useState<{ columnId: number; draft: string } | null>(null)
+  const [expandAnchor, setExpandAnchor] = useState<ExpandAnchor | null>(null)
   const [columnMenu, setColumnMenu] = useState<{ columnId: number; left: number; top: number } | null>(null)
   const [isFindOpen, setIsFindOpen] = useState(false)
   const [findText, setFindText] = useState('')
@@ -292,6 +307,19 @@ export default function CsvViewer({
   }
 
   // The menu opens right under the header, lined up with the name.
+  function anchorCellExpansion(cellElement: HTMLElement, position: CellPosition) {
+    const containerBox = scrollContainerRef.current?.getBoundingClientRect()
+    if (!containerBox) return
+    const cellBox = cellElement.getBoundingClientRect()
+    const fromRight = cellBox.left + EXPANDED_MAX_WIDTH_PX > containerBox.right
+    const fromBottom = cellBox.top + EXPANDED_MAX_HEIGHT_PX > containerBox.bottom
+    setExpandAnchor((current) =>
+      current?.rowId === position.rowId && current.columnId === position.columnId && current.fromRight === fromRight && current.fromBottom === fromBottom
+        ? current
+        : { ...position, fromRight, fromBottom },
+    )
+  }
+
   function openColumnMenu(columnId: number, nameButton: HTMLElement) {
     const headerBottom = nameButton.closest('[role="columnheader"]')?.getBoundingClientRect().bottom ?? nameButton.getBoundingClientRect().bottom
     setColumnMenu({ columnId, left: nameButton.getBoundingClientRect().left, top: headerBottom + 2 })
@@ -482,9 +510,9 @@ export default function CsvViewer({
   )
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col text-[16px]">
+    <div className="flex min-h-0 flex-1 flex-col text-[13px]">
       {readableCsv && (
-        <div className="flex items-center gap-2 overflow-x-auto border-b border-rule bg-paper px-4 py-1.5 md:flex-wrap md:overflow-visible">
+        <div className="flex items-center gap-2 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
           {isEditable && (
             <editing.EditBar
               selectedCellLabel={selectedCellLabel}
@@ -609,10 +637,10 @@ export default function CsvViewer({
               aria-colcount={displayColumnIds.length + 1}
               style={{ minWidth: tableMinWidthPx }}
             >
-              <div role="row" aria-rowindex={1} className="sticky top-0 z-20 flex border-b-2 border-(--file-color) bg-paper">
+              <div role="row" aria-rowindex={1} className="sticky top-0 z-20 flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
                 <div
                   role="columnheader"
-                  className="sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule bg-paper px-3 text-sm text-ink-soft"
+                  className="sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule bg-paper px-3 text-xs text-ink-soft"
                   style={{ width: rowNumberWidthPx, height: ROW_HEIGHT_PX }}
                 >
                   <span aria-hidden="true">#</span>
@@ -628,11 +656,15 @@ export default function CsvViewer({
                       key={columnId}
                       role="columnheader"
                       aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
-                      className={`relative min-w-0 border-r border-rule/60 ${isSelectedColumn ? selectedCellTint : ''}`}
+                      className={`group relative min-w-0 border-r border-rule/60 ${isSelectedColumn ? selectedCellTint : ''}`}
                       style={{ flex: `1 0 ${COLUMN_MIN_WIDTH_PX}px`, height: ROW_HEIGHT_PX }}
                     >
-                      <div className="flex h-full items-center gap-2 px-3">
-                        <span aria-hidden="true" className="font-mono text-xs font-normal text-ink-soft">
+                      {/* The name is cut off to fit the column. While the pointer is over the header (or it has focus) this strip grows to
+                          show the whole name, over the neighbouring headers, and shrinks back when the pointer leaves. */}
+                      <div
+                        className={`absolute inset-y-0 ${columnPosition === displayColumnIds.length - 1 ? 'right-0' : 'left-0'} flex w-full items-center gap-1.5 px-2 group-focus-within:z-10 group-focus-within:w-max group-focus-within:max-w-96 group-focus-within:min-w-full group-focus-within:bg-paper-raised group-hover:z-10 group-hover:w-max group-hover:max-w-96 group-hover:min-w-full group-hover:bg-paper-raised group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule`}
+                      >
+                        <span aria-hidden="true" className="font-mono text-[10px] font-normal text-ink-soft">
                           {columnLabel(columnPosition)}
                         </span>
                         {isEditable ? (
@@ -643,12 +675,12 @@ export default function CsvViewer({
                             aria-expanded={columnMenu?.columnId === columnId}
                             title={`Column actions for ${columnName}`}
                             onClick={(event) => openColumnMenu(columnId, event.currentTarget)}
-                            className="min-w-0 flex-1 cursor-pointer truncate text-start font-semibold hover:underline"
+                            className="min-w-0 flex-1 cursor-pointer truncate text-start text-xs font-semibold hover:underline"
                           >
                             {columnName}
                           </button>
                         ) : (
-                          <span dir="auto" className="min-w-0 flex-1 truncate font-semibold">
+                          <span dir="auto" className="min-w-0 flex-1 truncate text-xs font-semibold">
                             {columnName}
                           </span>
                         )}
@@ -657,7 +689,7 @@ export default function CsvViewer({
                           onClick={() => cycleSort(columnId)}
                           aria-label={`Sort by ${columnName}`}
                           title={`Sort by ${columnName}`}
-                          className="grid size-7 pointer-coarse:size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 hover:bg-paper-raised"
+                          className="grid size-5 pointer-coarse:size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 hover:bg-paper-raised"
                         >
                           <SortChevron direction={columnDirection} />
                         </button>
@@ -709,7 +741,7 @@ export default function CsvViewer({
                     >
                       <div
                         role="rowheader"
-                        className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-sm tabular-nums ${
+                        className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
                           isSelectedRow ? `${selectedCellTint} font-semibold text-(--file-color)` : 'bg-paper text-ink-soft'
                         } ${isNewRow ? 'italic' : ''}`}
                         style={{ width: rowNumberWidthPx }}
@@ -729,8 +761,9 @@ export default function CsvViewer({
                             role="gridcell"
                             aria-selected={isSelected}
                             dir="auto"
-                            title={isEditingHere ? undefined : cellText}
-                            onClick={() => {
+                            onMouseEnter={(event) => anchorCellExpansion(event.currentTarget, { rowId, columnId })}
+                            onClick={(event) => {
+                              anchorCellExpansion(event.currentTarget, { rowId, columnId })
                               setPickedCell({ rowId, columnId })
                               scrollContainerRef.current?.focus({ preventScroll: true })
                             }}
@@ -739,7 +772,7 @@ export default function CsvViewer({
                               setPickedCell({ rowId, columnId })
                               beginEditing({ rowId, columnId }, 'cell')
                             }}
-                            className={`relative min-w-0 ${isEditable ? 'cursor-cell' : 'cursor-default'} truncate border-r border-rule/60 px-3 leading-9 tabular-nums ${
+                            className={`group relative min-w-0 ${isEditable ? 'cursor-cell' : 'cursor-default'} border-r border-rule/60 tabular-nums ${
                               isSelected
                                 ? `z-[1] ${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)`
                                 : isFindMatch
@@ -748,7 +781,7 @@ export default function CsvViewer({
                                     ? 'bg-edit-mark/10'
                                     : ''
                             }`}
-                            style={{ flex: `1 0 ${COLUMN_MIN_WIDTH_PX}px` }}
+                            style={{ flex: `1 0 ${COLUMN_MIN_WIDTH_PX}px`, lineHeight: `${ROW_HEIGHT_PX}px` }}
                           >
                             {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
                             {isEditable && isEditingHere && editingCell?.source === 'cell' ? (
@@ -766,7 +799,16 @@ export default function CsvViewer({
                                 }}
                               />
                             ) : (
-                              cellText
+                              <span
+                                dir="auto"
+                                className={`absolute px-3 ${
+                                  expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId && expandAnchor.fromRight ? 'right-0' : 'left-0'
+                                } ${
+                                  expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId && expandAnchor.fromBottom ? 'bottom-0' : 'top-0'
+                                } ${isSelected ? `${expandedCellTextClassName} ${selectedCellTint}` : `${restingCellTextClassName} ${hoverExpandedCellTextClassName}`}`}
+                              >
+                                {cellText}
+                              </span>
                             )}
                             {isEdited && <span className="sr-only">(edited)</span>}
                           </div>
@@ -783,7 +825,7 @@ export default function CsvViewer({
       </main>
 
       {readableCsv && (
-        <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-1 text-sm">
+        <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
           <p aria-live="polite" className="whitespace-nowrap font-semibold">
             {isSearching
               ? `${visibleRowIds.length.toLocaleString()} of ${totalRowCount.toLocaleString()} rows`
@@ -803,7 +845,7 @@ export default function CsvViewer({
               ))}
             </select>
           </label>
-          <label className="flex min-h-9 pointer-coarse:min-h-11 items-center gap-2">
+          <label className="flex min-h-8 pointer-coarse:min-h-11 items-center gap-2">
             <input
               type="checkbox"
               checked={hasHeaderRow}

@@ -6,8 +6,8 @@ export const secondaryButtonClassName =
 
 // Text boxes and selects on the file page: compact for a mouse, the full 44px for touch screens.
 export const textControlClassName =
-  'control-shape solid-box min-h-9 pointer-coarse:min-h-11 border-ink-soft bg-paper-raised px-3 text-sm text-ink'
+  'control-shape solid-box min-h-8 pointer-coarse:min-h-11 border-ink-soft bg-paper-raised px-3 text-[13px] text-ink'
 
 // Buttons on the file page, same sizing rule as textControlClassName.
 export const compactSecondaryButtonClassName =
-  'control-shape solid-box min-h-9 pointer-coarse:min-h-11 cursor-pointer border-ink px-3 text-sm font-medium text-ink transition duration-200 hover:bg-paper-raised active:scale-[0.98]'
+  'control-shape solid-box min-h-8 pointer-coarse:min-h-11 cursor-pointer border-ink px-3 text-[13px] font-medium text-ink transition duration-200 hover:bg-paper-raised active:scale-[0.98]'

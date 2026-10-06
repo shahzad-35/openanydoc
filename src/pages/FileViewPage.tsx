@@ -97,7 +97,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const Viewer = format.ViewerComponent
 
   return (
-    <div data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[16px] leading-normal text-ink">
+    <div data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[14px] leading-normal text-ink">
       <FileViewHeader
         openedFile={openedFile}
         onClose={onClose}

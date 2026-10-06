@@ -45,8 +45,8 @@ export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onO
       >
         Skip to content
       </a>
-      <div className="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-1.5">
-        <button type="button" onClick={clearIfAllowed} className="type-h3 cursor-pointer text-lg!">
+      <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-1">
+        <button type="button" onClick={clearIfAllowed} className="type-h3 cursor-pointer text-base!">
           OpenAnyDoc
         </button>
         <div className="order-3 flex min-w-0 basis-full items-center gap-3 sm:order-none sm:flex-1 sm:basis-24">

@@ -104,7 +104,7 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
     <>
       <p
         aria-label="Selected cell"
-        className="control-shape solid-box flex min-h-9 pointer-coarse:min-h-11 min-w-16 shrink-0 items-center justify-center border-rule bg-paper-raised px-3 font-mono text-sm"
+        className="control-shape solid-box flex min-h-8 pointer-coarse:min-h-11 min-w-16 shrink-0 items-center justify-center border-rule bg-paper-raised px-3 font-mono text-sm"
       >
         {selectedCellLabel}
       </p>
@@ -207,7 +207,7 @@ function FindReplaceBar({
         <span className="text-sm text-ink-soft">Replace with</span>
         <input dir="auto" value={replaceText} onChange={(event) => onReplaceChange(event.target.value)} className={`${textControlClassName} w-44`} />
       </label>
-      <label className="flex min-h-9 pointer-coarse:min-h-11 items-center gap-2 text-sm">
+      <label className="flex min-h-8 pointer-coarse:min-h-11 items-center gap-2 text-sm">
         <input type="checkbox" checked={matchCase} onChange={(event) => onMatchCaseChange(event.target.checked)} className="size-4 pointer-coarse:size-5" />
         Match case
       </label>
@@ -218,11 +218,11 @@ function FindReplaceBar({
         type="button"
         disabled={findText === '' || matchCount === 0}
         onClick={onReplaceAll}
-        className="control-shape solid-box min-h-9 pointer-coarse:min-h-11 cursor-pointer border-ink px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50"
+        className="control-shape solid-box min-h-8 pointer-coarse:min-h-11 cursor-pointer border-ink px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50"
       >
         Replace all
       </button>
-      <button type="button" onClick={onClose} className="control-shape min-h-9 pointer-coarse:min-h-11 cursor-pointer px-3 text-sm transition-colors duration-200 hover:bg-paper-raised">
+      <button type="button" onClick={onClose} className="control-shape min-h-8 pointer-coarse:min-h-11 cursor-pointer px-3 text-sm transition-colors duration-200 hover:bg-paper-raised">
         Close
       </button>
     </div>
@@ -264,7 +264,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
         aria-expanded={isOpen && hasChanges}
         disabled={!hasChanges}
         onClick={() => setIsOpen(true)}
-        className="control-shape solid-box min-h-9 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-sm transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50"
+        className="control-shape solid-box min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-sm transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50"
       >
         Review changes
       </button>
@@ -312,7 +312,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
                   type="button"
                   aria-label={`Revert ${change.address}`}
                   onClick={() => onRevertCell(change.key)}
-                  className="control-shape min-h-9 pointer-coarse:min-h-11 shrink-0 cursor-pointer px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper"
+                  className="control-shape min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper"
                 >
                   Revert
                 </button>
@@ -371,7 +371,7 @@ function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfte
   }
 
   const itemClassName =
-    'min-h-9 pointer-coarse:min-h-11 w-full cursor-pointer rounded px-3 text-start text-sm transition-colors duration-200 hover:bg-paper focus-visible:bg-paper disabled:cursor-not-allowed disabled:opacity-50'
+    'min-h-8 pointer-coarse:min-h-11 w-full cursor-pointer rounded px-3 text-start text-sm transition-colors duration-200 hover:bg-paper focus-visible:bg-paper disabled:cursor-not-allowed disabled:opacity-50'
 
   return (
     <div

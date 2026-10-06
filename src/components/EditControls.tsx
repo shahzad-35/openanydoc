@@ -3,7 +3,7 @@ import type { EditSession } from '../formats/useEditSession'
 import type { OpenedFile } from '../useFileIntake'
 
 const toolbarButtonClassName =
-  'control-shape solid-box min-h-9 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-sm transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50'
+  'control-shape solid-box min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-[13px] transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50'
 
 // "sales.csv" -> "sales-edited.csv" (or "sales-edited.json" when converting); an untouched copy keeps its name.
 function buildDownloadName(fileName: string, hasEdits: boolean, newExtension: string | null) {
@@ -18,7 +18,7 @@ function ModeIcon({ mode }: { mode: ViewMode }) {
     <svg
       aria-hidden="true"
       viewBox="0 0 24 24"
-      className="size-5 pointer-coarse:size-6"
+      className="size-4 pointer-coarse:size-6"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.8"
@@ -63,7 +63,7 @@ export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (
           aria-pressed={mode === optionMode}
           title={label}
           onClick={() => onChange(optionMode)}
-          className={`control-shape relative grid min-h-8 min-w-11 pointer-coarse:min-h-10 pointer-coarse:min-w-14 cursor-pointer place-items-center transition-colors duration-300 ${
+          className={`control-shape relative grid min-h-7 min-w-10 pointer-coarse:min-h-10 pointer-coarse:min-w-14 cursor-pointer place-items-center transition-colors duration-300 ${
             mode === optionMode ? 'text-on-accent' : 'text-ink hover:text-accent'
           }`}
         >
@@ -121,9 +121,9 @@ function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEd
       onClick={downloadWhatYouSee}
       aria-label={downloadLabel}
       title={downloadLabel}
-      className="control-shape grid size-9 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center bg-accent text-on-accent transition duration-200 hover:bg-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+      className="control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center bg-accent text-on-accent transition duration-200 hover:bg-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 pointer-coarse:size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 4v11" />
         <path d="m7 11 5 5 5-5" />
         <path d="M5 20h14" />
@@ -144,7 +144,7 @@ type EditToolbarProps = {
 // Shown in Edit mode: undo, redo and revert all for every format, then this format's own tools and the Download icon.
 export function EditToolbar({ openedFile, session, editingModule, selection, viewerCommands, exportSource }: EditToolbarProps) {
   return (
-    <div role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1.5">
+    <div role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto md:flex-wrap md:overflow-visible">
       <button type="button" disabled={!session.canUndo} onClick={session.undo} title="Undo (Ctrl+Z)" className={toolbarButtonClassName}>
         Undo

@@ -48,9 +48,9 @@ export default function ThemeToggle({ compact = false }: { compact?: boolean }) 
       type="button"
       onClick={toggleTheme}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className={`control-shape solid-box grid cursor-pointer place-items-center ${compact ? 'min-h-9 min-w-9 pointer-coarse:min-h-11 pointer-coarse:min-w-11' : 'min-h-11 min-w-11'} border-ink bg-paper text-ink transition-colors duration-200 hover:bg-paper-raised active:scale-[0.98]`}
+      className={`control-shape solid-box grid cursor-pointer place-items-center ${compact ? 'min-h-8 min-w-8 pointer-coarse:min-h-11 pointer-coarse:min-w-11' : 'min-h-11 min-w-11'} border-ink bg-paper text-ink transition-colors duration-200 hover:bg-paper-raised active:scale-[0.98]`}
     >
-      <RoughIcon drawShapes={isDark ? drawSun : drawMoon} className={`${compact ? 'size-5 pointer-coarse:size-7' : 'size-7'} overflow-visible`} />
+      <RoughIcon drawShapes={isDark ? drawSun : drawMoon} className={`${compact ? 'size-4 pointer-coarse:size-7' : 'size-7'} overflow-visible`} />
     </button>
   )
 }
