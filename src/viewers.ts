@@ -32,6 +32,17 @@ export function findTableFormat(fileName: string): TableFormat {
 
 export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions)
 
+const LEGACY_FILE_VIEW_PATH = '/view'
+
+// Each kind of file has its own address while it is open: /view-csv, /view-text, /view-excel, /view-word, /view-pdf, /view-powerpoint.
+export function getFileViewPath(fileName: string) {
+  return `/view-${findViewerForFileName(fileName)?.id ?? 'file'}`
+}
+
+export function isFileViewPath(pathname: string) {
+  return pathname === LEGACY_FILE_VIEW_PATH || viewers.some((viewer) => pathname === `/view-${viewer.id}`)
+}
+
 export function findViewerForFileName(fileName: string) {
   const lowerCaseFileName = fileName.toLowerCase()
   return viewers.find((viewer) => viewer.extensions.some((extension) => lowerCaseFileName.endsWith(extension)))

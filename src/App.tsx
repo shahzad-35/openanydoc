@@ -3,14 +3,14 @@ import DiscardEditsDialog from './components/DiscardEditsDialog'
 import FileViewPage from './pages/FileViewPage'
 import HomePage from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
-
-const FILE_VIEW_PATH = '/view'
+import { getFileViewPath, isFileViewPath } from './viewers'
 
 export default function App() {
   const [openedFile, setOpenedFile] = useState<OpenedFile | null>(null)
   const [discardRequest, setDiscardRequest] = useState<{ answer: (shouldDiscard: boolean) => void } | null>(null)
   const [fileKey, setFileKey] = useState(0)
   const hasUnsavedEditsRef = useRef(false)
+  const openedFilePathRef = useRef('/')
 
   // Shows the "Discard your edits?" dialog and resolves with the visitor's choice.
   const confirmDiscardEdits = useCallback(
@@ -27,16 +27,16 @@ export default function App() {
     hasUnsavedEditsRef.current = hasUnsavedEdits
   }, [])
 
-  // The file only lives in memory, so /view never shows without one: a reload or Forward lands on home instead.
+  // The file only lives in memory, so a file address (/view-csv, /view-pdf ...) never shows without one: a reload or Forward lands on home instead.
   useEffect(() => {
     function sendHomeIfOnFileViewPath() {
-      if (window.location.pathname === FILE_VIEW_PATH) window.history.replaceState(null, '', '/')
+      if (isFileViewPath(window.location.pathname)) window.history.replaceState(null, '', '/')
     }
 
     function handleBrowserNavigation() {
       if (hasUnsavedEditsRef.current) {
         // Back or Forward with unsaved edits: stay on the file page and ask first.
-        window.history.pushState({ fromHomePage: true }, '', FILE_VIEW_PATH)
+        window.history.pushState({ fromHomePage: true }, '', openedFilePathRef.current)
         confirmDiscardEdits().then((shouldDiscard) => {
           if (!shouldDiscard) return
           hasUnsavedEditsRef.current = false
@@ -56,13 +56,17 @@ export default function App() {
   function openFile(file: File, fileContents: ArrayBuffer) {
     setOpenedFile({ file, contents: fileContents })
     setFileKey((currentKey) => currentKey + 1)
-    window.history.pushState({ fromHomePage: true }, '', FILE_VIEW_PATH)
+    openedFilePathRef.current = getFileViewPath(file.name)
+    window.history.pushState({ fromHomePage: true }, '', openedFilePathRef.current)
   }
 
-  // Another file on the same file page: no new history entry. The new key gives the page a fresh edit session and mode.
+  // Another file on the same file page: no new history entry, but the address follows the new file's type. The new key gives
+  // the page a fresh edit session and mode.
   function replaceFile(file: File, fileContents: ArrayBuffer) {
     setOpenedFile({ file, contents: fileContents })
     setFileKey((currentKey) => currentKey + 1)
+    openedFilePathRef.current = getFileViewPath(file.name)
+    window.history.replaceState(window.history.state, '', openedFilePathRef.current)
   }
 
   function closeFile() {
