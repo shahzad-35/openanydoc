@@ -3,6 +3,8 @@ import type { ComponentType, LazyExoticComponent } from 'react'
 import type { OpenedFile } from '../useFileIntake'
 import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
+import { countExcelEdits, createEmptyExcelEdits, describeExcelChanges } from './excel/excelEdits'
+import type { ExcelEdits } from './excel/excelEdits'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
 import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, jsonEditingModule } from './json/jsonModel'
@@ -43,7 +45,8 @@ export type ExportOption = {
   // null keeps the original file's extension.
   extension: string | null
   getMimeType(exportSource: unknown): string
-  createFile(edits: unknown, exportSource: unknown, settings: ExportSettings): string
+  // Text for CSV, TSV and JSON; bytes for a workbook.
+  createFile(edits: unknown, exportSource: unknown, settings: ExportSettings): BlobPart | Promise<BlobPart>
 }
 
 // Loaded the first time Edit is used, so viewing never pays for editing code.
@@ -53,6 +56,8 @@ export type EditingModule = {
   // What the Download icon will save, for its tooltip, e.g. "visible rows (2)".
   describeDownload(exportSource: unknown): string
   getDefaultByteOrderMark(exportSource: unknown): boolean
+  // Extra toolbar content for this format (menus), drawn in the edit toolbar's single row after Undo and Redo.
+  ToolbarContent?: ComponentType<{ selection: unknown; commands: unknown }>
   components: unknown
 }
 
@@ -73,7 +78,7 @@ export type FormatDefinition = {
 
 const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
 
-// To make another format editable, add `editing` to its entry. CSV, plain text and JSON are editable for now.
+// To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now.
 const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'csv',
@@ -105,7 +110,16 @@ const formatDefinitions: FormatDefinition[] = [
       loadEditingModule: () => Promise.resolve(jsonEditingModule),
     },
   },
-  { viewerId: 'excel', ViewerComponent: comingSoonViewer },
+  {
+    viewerId: 'excel',
+    ViewerComponent: lazy(() => import('./excel/ExcelViewer')),
+    editing: {
+      createEmptyEdits: createEmptyExcelEdits,
+      countChanges: (edits) => countExcelEdits(edits as ExcelEdits),
+      describeChanges: (edits) => describeExcelChanges(edits as ExcelEdits),
+      loadEditingModule: () => import('./excel/excelEditing').then((editingFile) => editingFile.excelEditingModule),
+    },
+  },
   { viewerId: 'word', ViewerComponent: comingSoonViewer },
   { viewerId: 'pdf', ViewerComponent: comingSoonViewer },
   { viewerId: 'powerpoint', ViewerComponent: comingSoonViewer },
@@ -135,8 +149,8 @@ export function buildDownloadName(fileName: string, hasEdits: boolean, newExtens
   return `${baseName}${hasEdits ? '-edited' : ''}${extension}`
 }
 
-// Saves text as a file by clicking a temporary link to it.
-export function downloadTextFile(fileName: string, fileText: string, mimeType: string) {
+// Saves text (or bytes) as a file by clicking a temporary link to it.
+export function downloadTextFile(fileName: string, fileText: BlobPart, mimeType: string) {
   const downloadUrl = URL.createObjectURL(new Blob([fileText], { type: mimeType }))
   const downloadLink = document.createElement('a')
   downloadLink.href = downloadUrl

@@ -2,7 +2,7 @@
 /* oxlint-disable react/only-export-components */
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import type { KeyboardEvent, ReactNode, RefObject } from 'react'
+import type { CSSProperties, KeyboardEvent, MouseEvent, ReactNode, RefObject } from 'react'
 
 // The table shared by every format that shows rows and columns (CSV, JSON arrays of objects, later Excel). It draws the grid,
 // keeps only the rows on screen in the page, and sorts and searches lists of row ids. It owns no data and no editing state:
@@ -179,17 +179,22 @@ type CellInputProps = {
   onDraftChange: (newDraft: string) => void
   onFinish: (shouldCommit: boolean, moveAfter?: 'down' | 'right') => void
   onBlur: () => void
+  // Select the whole text when the box opens (the default). A box opened by typing a character leaves it off, so the next
+  // character is added to the first one instead of replacing it.
+  selectOnFocus?: boolean
 }
 
 // The text box that appears inside a cell (or a column header) while it is being edited.
-export function CellInput({ ariaLabel, draft, onDraftChange, onFinish, onBlur }: CellInputProps) {
+export function CellInput({ ariaLabel, draft, onDraftChange, onFinish, onBlur, selectOnFocus = true }: CellInputProps) {
   return (
     <input
       autoFocus
       dir="auto"
       aria-label={ariaLabel}
       value={draft}
-      onFocus={(event) => event.currentTarget.select()}
+      onFocus={(event) => {
+        if (selectOnFocus) event.currentTarget.select()
+      }}
       onChange={(event) => onDraftChange(event.target.value)}
       onKeyDown={(event) => {
         if (event.key === 'Enter') {
@@ -250,6 +255,19 @@ type DataTableProps = {
   // Rows added by the visitor show "new" instead of a row number.
   isInsertedRow?: (rowId: number) => boolean
   isFindMatch?: (cellText: string) => boolean
+  // Spreadsheet formats: the other cells of a selected range are tinted, a press on a cell starts (or with Shift extends) a
+  // range, dragging over cells extends it, and a click on a row number selects the row. Formats without ranges leave these out.
+  isCellInSelection?: (rowId: number, columnId: number) => boolean
+  onCellMouseDown?: (position: CellPosition, event: MouseEvent<HTMLDivElement>) => void
+  onCellDragOver?: (position: CellPosition) => void
+  onRowHeaderClick?: (rowId: number, event: MouseEvent<HTMLDivElement>) => void
+  // Colours, font and alignment for a cell (spreadsheets). The fill is not drawn on selected cells, which show the selection tint.
+  getCellStyle?: (rowId: number, columnId: number) => CSSProperties | undefined
+  // A merged cell: asked for every cell, answers how many columns and rows the cell stretches over when it is the top-left cell of
+  // a merge (the cells it covers are drawn underneath it). Rows are counted in the order shown.
+  getCellSpan?: (rowId: number, columnId: number) => { rowSpan: number; columnSpan: number } | null
+  // The text of a row's number cell; by default the row id plus one (or "new" for an inserted row).
+  getRowLabel?: (rowId: number) => string
   selectedCell: CellPosition | null
   sort: SortState
   onCycleSort: (columnId: number) => void
@@ -282,6 +300,13 @@ export default function DataTable({
   isCellEdited,
   isInsertedRow,
   isFindMatch,
+  isCellInSelection,
+  getCellSpan,
+  getCellStyle,
+  onCellMouseDown,
+  onCellDragOver,
+  onRowHeaderClick,
+  getRowLabel,
   selectedCell,
   sort,
   onCycleSort,
@@ -471,19 +496,30 @@ export default function DataTable({
               >
                 <div
                   role="rowheader"
+                  onClick={onRowHeaderClick ? (event) => onRowHeaderClick(rowId, event) : undefined}
                   className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
                     isSelectedRow ? `${selectedCellTint} font-semibold text-(--file-color)` : 'bg-paper text-ink-soft'
-                  } ${isNewRow ? 'italic' : ''}`}
+                  } ${isNewRow ? 'italic' : ''} ${onRowHeaderClick ? 'cursor-pointer' : ''}`}
                   style={{ width: rowNumberWidthPx }}
                 >
-                  {isNewRow ? 'new' : (rowId + 1).toLocaleString()}
+                  {getRowLabel ? getRowLabel(rowId) : isNewRow ? 'new' : (rowId + 1).toLocaleString()}
                 </div>
                 {columnIds.map((columnId, columnPosition) => {
                   const isEdited = isCellEdited(rowId, columnId)
                   const isSelected = isSelectedRow && selectedCell?.columnId === columnId
+                  const isInRange = !isSelected && (isCellInSelection?.(rowId, columnId) ?? false)
                   const cellText = getCellText(rowId, columnId)
                   const cellEditor = renderCellEditor?.(rowId, columnId, columnNames[columnPosition]) ?? null
                   const isMatch = isFindMatch?.(cellText) ?? false
+                  const span = getCellSpan?.(rowId, columnId) ?? null
+                  const cellStyle = getCellStyle?.(rowId, columnId)
+                  const shownCellStyle = isSelected || isInRange ? { ...cellStyle, backgroundColor: undefined } : cellStyle
+                  let spanWidthPx = 0
+                  let spanHeightPx = 0
+                  if (span) {
+                    for (let offset = 0; offset < span.columnSpan; offset++) spanWidthPx += shownColumnWidthsPx[columnPosition + offset] ?? 0
+                    for (let offset = 0; offset < span.rowSpan; offset++) spanHeightPx += rowVirtualizer.options.estimateSize(virtualRow.index + offset)
+                  }
                   const isExpandedHere = expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId
                   return (
                     <div
@@ -491,7 +527,11 @@ export default function DataTable({
                       role="gridcell"
                       aria-selected={isSelected}
                       dir="auto"
-                      onMouseEnter={(event) => anchorCellExpansion(event.currentTarget, { rowId, columnId })}
+                      onMouseEnter={(event) => {
+                        anchorCellExpansion(event.currentTarget, { rowId, columnId })
+                        if (event.buttons === 1) onCellDragOver?.({ rowId, columnId })
+                      }}
+                      onMouseDown={onCellMouseDown ? (event) => onCellMouseDown({ rowId, columnId }, event) : undefined}
                       onClick={(event) => {
                         anchorCellExpansion(event.currentTarget, { rowId, columnId })
                         onCellClick({ rowId, columnId })
@@ -500,29 +540,42 @@ export default function DataTable({
                       onDoubleClick={() => {
                         if (isEditable) onCellDoubleClick({ rowId, columnId })
                       }}
-                      className={`group relative min-w-0 ${isEditable ? 'cursor-cell' : 'cursor-default'} border-r border-rule/60 tabular-nums ${
+                      className={`group relative min-w-0 ${span ? 'z-[3]' : ''} ${isEditable ? 'cursor-cell' : 'cursor-default'} border-r border-rule/60 tabular-nums ${
                         isSelected
                           ? `z-[1] ${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)`
-                          : isMatch
+                          : isInRange
+                            ? selectedCellTint
+                            : isMatch
                             ? 'bg-accent/15'
                             : isEdited
                               ? 'bg-edit-mark/10'
                               : ''
                       }`}
-                      style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${CELL_LINE_HEIGHT_PX}px` }}
+                      style={{ ...shownCellStyle, flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${CELL_LINE_HEIGHT_PX}px` }}
                     >
                       {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
-                      {cellEditor ?? (
+                      {!cellEditor && span && (
                         <span
                           dir="auto"
-                          style={{ paddingBlock: CELL_VERTICAL_PADDING_PX }}
+                          style={{ backgroundColor: shownCellStyle?.backgroundColor, textDecoration: cellStyle?.textDecoration, width: spanWidthPx, height: spanHeightPx, paddingBlock: CELL_VERTICAL_PADDING_PX }}
+                          className={`absolute left-0 top-0 overflow-hidden whitespace-pre-wrap break-words border-b border-r border-rule/60 px-3 ${
+                            isSelected ? `${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)` : isInRange ? selectedCellTint : 'bg-paper-raised'
+                          }`}
+                        >
+                          {cellText}
+                        </span>
+                      )}
+                      {cellEditor ?? (span ? null : (
+                        <span
+                          dir="auto"
+                          style={{ paddingBlock: CELL_VERTICAL_PADDING_PX, textDecoration: cellStyle?.textDecoration }}
                           className={`absolute px-3 ${isExpandedHere && expandAnchor.fromRight ? 'right-0' : 'left-0'} ${
                             isExpandedHere && expandAnchor.fromBottom ? 'bottom-0' : 'top-0'
                           } ${isSelected ? `${expandedCellTextClassName} ${selectedCellTint}` : `${restingCellTextClassName} ${hoverExpandedCellTextClassName}`}`}
                         >
                           {cellText}
                         </span>
-                      )}
+                      ))}
                       {isEdited && <span className="sr-only">(edited)</span>}
                     </div>
                   )

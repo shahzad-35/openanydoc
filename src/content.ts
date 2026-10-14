@@ -18,6 +18,7 @@ export const features = [
   'Download what you see (the edits, the current sort and only the rows your search shows) as CSV or JSON, or copy it for Excel or Google Sheets.',
   'UTF-8 (with or without a BOM), UTF-16 and Arabic text are read correctly, and Arabic cells display right-to-left.',
   'Open JSON files as a collapsible tree, a table (for a list of objects) or formatted code, with search, error messages that give the line and column, and editing. Large files are read in the background so the page stays responsive.',
+  'Open Excel workbooks (.xlsx, .xls, .xlsm, .ods) with sheet tabs, formatted dates, percentages and currency, merged cells, and bold and coloured cells. Edit cells, formulas (results update as you edit), rows, columns, sheets links, text clean-up, number and date formats and, in .xlsx files, fonts, borders, bold, colours, alignment and indent, with find and replace, undo and redo, then save the workbook in its own format.',
   'Files over 50 MB show a warning, and OpenAnyDoc still tries to open them.',
   'Light and dark themes, with keyboard-friendly controls.',
 ]
@@ -30,7 +31,7 @@ export const faqItems = [
   },
   {
     question: 'Which files can I open?',
-    answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json), Excel (.xlsx, .xls), Word (.docx), PDF (.pdf) and PowerPoint (.pptx).',
+    answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json), Excel (.xlsx, .xls, .xlsm, .ods), Word (.docx), PDF (.pdf) and PowerPoint (.pptx).',
   },
   {
     question: 'How big can a file be?',
@@ -40,7 +41,7 @@ export const faqItems = [
   {
     question: 'Can I edit my file or save changes?',
     answer:
-      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Plain text and JSON files can be edited too (JSON as a tree, a table, or code that is checked as you type). Other formats cannot be edited yet.',
+      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Plain text and JSON files can be edited too (JSON as a tree, a table, or code that is checked as you type). Excel workbooks can be edited and saved in their own format: formulas recalculate as you edit, and .xlsx files keep their bold, colours and merged cells. Charts, images and macros are not kept, and styles are not kept in .xls, .ods and .xlsm files or in very large workbooks. Word, PDF and PowerPoint cannot be edited yet.',
   },
   {
     question: 'Which CSV delimiters are supported?',

@@ -13,7 +13,7 @@ export const viewers: Viewer[] = [
   { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], description: 'Open comma- and tab-separated files as a clean, searchable table.', toolPath: '/csv-viewer' },
   { id: 'text', label: 'TXT', extensions: ['.txt'], description: 'Read plain text files as they were written.', toolPath: '/txt-viewer' },
   { id: 'json', label: 'JSON', extensions: ['.json'], description: 'Explore JSON as a tree or as formatted code, and fix mistakes.', toolPath: '/json-viewer' },
-  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls'], description: 'Browse sheets and cells from .xlsx and .xls workbooks.' },
+  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], description: 'Browse sheets, edit cells and formulas, and save the workbook.', toolPath: '/excel-viewer' },
   { id: 'word', label: 'Word', extensions: ['.docx'], description: 'Read .docx documents with their original formatting.' },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'], description: 'Read .pdf documents page by page in your browser.' },
   { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], description: 'Flip through .pptx slides right in your browser.' },

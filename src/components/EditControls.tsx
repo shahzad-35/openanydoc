@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { buildDownloadName, downloadTextFile } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import type { EditSession } from '../formats/useEditSession'
@@ -5,6 +6,17 @@ import type { OpenedFile } from '../useFileIntake'
 
 const toolbarButtonClassName =
   'control-shape solid-box min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-[13px] transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50'
+
+const historyButtonClassName =
+  'control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-40'
+
+function HistoryIcon({ children }: { children: ReactNode }) {
+  return (
+    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 pointer-coarse:size-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      {children}
+    </svg>
+  )
+}
 
 function ModeIcon({ mode }: { mode: ViewMode }) {
   return (
@@ -96,11 +108,11 @@ function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEd
   const { downloadOption } = editingModule
   const downloadLabel = exportSource === null ? 'Download' : `${downloadOption.getLabel(exportSource)}: ${editingModule.describeDownload(exportSource)}`
 
-  function downloadWhatYouSee() {
+  async function downloadWhatYouSee() {
     const includeByteOrderMark = editingModule.getDefaultByteOrderMark(exportSource)
     downloadTextFile(
       buildDownloadName(openedFile.file.name, hasEdits, downloadOption.extension),
-      downloadOption.createFile(edits, exportSource, { includeByteOrderMark }),
+      await downloadOption.createFile(edits, exportSource, { includeByteOrderMark }),
       downloadOption.getMimeType(exportSource),
     )
   }
@@ -109,7 +121,7 @@ function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEd
     <button
       type="button"
       disabled={exportSource === null}
-      onClick={downloadWhatYouSee}
+      onClick={() => void downloadWhatYouSee()}
       aria-label={downloadLabel}
       title={downloadLabel}
       className="control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center bg-accent text-on-accent transition duration-200 hover:bg-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
@@ -136,16 +148,27 @@ type EditToolbarProps = {
 export function EditToolbar({ openedFile, session, editingModule, selection, viewerCommands, exportSource }: EditToolbarProps) {
   return (
     <div role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
-      <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto md:flex-wrap md:overflow-visible">
-      <button type="button" disabled={!session.canUndo} onClick={session.undo} title="Undo (Ctrl+Z)" className={toolbarButtonClassName}>
-        Undo
+      <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
+      <button type="button" disabled={!session.canUndo} onClick={session.undo} aria-label="Undo" title="Undo (Ctrl+Z)" className={historyButtonClassName}>
+        <HistoryIcon>
+          <path d="M9 14 4 9l5-5" />
+          <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+        </HistoryIcon>
       </button>
-      <button type="button" disabled={!session.canRedo} onClick={session.redo} title="Redo (Ctrl+Shift+Z)" className={toolbarButtonClassName}>
-        Redo
+      <button type="button" disabled={!session.canRedo} onClick={session.redo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)" className={historyButtonClassName}>
+        <HistoryIcon>
+          <path d="m15 14 5-5-5-5" />
+          <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
+        </HistoryIcon>
       </button>
-      <button type="button" disabled={session.changeCount === 0} onClick={session.revertAll} className={toolbarButtonClassName}>
-        Revert all
+      <button type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label="Revert all changes" title="Revert all changes" className={historyButtonClassName}>
+        <HistoryIcon>
+          <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+          <path d="M3 3v5h5" />
+          <path d="M12 8v4l3 2" />
+        </HistoryIcon>
       </button>
+      {editingModule?.ToolbarContent && <editingModule.ToolbarContent selection={selection} commands={viewerCommands} />}
       {editingModule?.tools.map((tool) => (
         <button
           key={tool.id}

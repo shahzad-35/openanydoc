@@ -11,11 +11,14 @@
   },
   "dependencies": {
     "@tanstack/react-virtual": "^3.14.13",
+    "exceljs": "^4.4.0",
+    "fast-formula-parser": "^1.0.19",
     "papaparse": "^5.7.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "roughjs": "^4.6.6",
-    "three": "^0.186.1"
+    "three": "^0.186.1",
+    "xlsx": "https://cdn.sheetjs.com/xlsx-0.20.3/xlsx-0.20.3.tgz"
   },
   "devDependencies": {
     "@tailwindcss/vite": "^4.3.3",
