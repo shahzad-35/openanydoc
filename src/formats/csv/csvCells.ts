@@ -5,6 +5,8 @@
 // position in the file as its id (0, 1, 2 ...); a row or column added by the visitor gets a negative id (-2, -3 ...). The id
 // -1 is only ever used as an anchor meaning "before the first one". Edits are sparse, so a 100k-row file is never copied.
 
+import type { TableFormat } from '../../viewers'
+
 export type CellPosition = { rowId: number; columnId: number }
 
 // A row or column added by the visitor, shown right after the line with id `afterId` (-1 = before the first one).
@@ -41,6 +43,8 @@ export type CsvExportSource = {
   hasHeaderRow: boolean
   detectedDelimiter: string
   hadByteOrderMark: boolean
+  // The download's name and type: CSV, TSV or Text.
+  tableFormat: TableFormat
   displayColumnIds: number[]
   // Rows matching the current search, in the current sort order.
   visibleRowIds: number[]

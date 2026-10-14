@@ -65,9 +65,9 @@ const tools: EditorTool[] = [
 // order, with the edits applied and the deleted and added columns taken into account.
 const downloadOption: ExportOption = {
   id: 'csv',
-  label: 'Download CSV',
+  getLabel: (exportSource) => `Download ${(exportSource as CsvExportSource).tableFormat.label}`,
   extension: null,
-  mimeType: 'text/csv;charset=utf-8',
+  getMimeType: (exportSource) => `${(exportSource as CsvExportSource).tableFormat.mimeType};charset=utf-8`,
   createFile(edits, exportSource, settings) {
     const source = exportSource as CsvExportSource
     const dataRows = source.visibleRowIds.map((rowId) =>

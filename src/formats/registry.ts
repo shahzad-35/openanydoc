@@ -5,6 +5,7 @@ import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
+import { countTextChanges, createEmptyTextEdits, describeTextChanges, textEditingModule } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
 export type ViewMode = 'view' | 'edit'
@@ -37,10 +38,10 @@ export type ExportSettings = { includeByteOrderMark: boolean }
 // The file the Download icon saves.
 export type ExportOption = {
   id: string
-  label: string
+  getLabel(exportSource: unknown): string
   // null keeps the original file's extension.
   extension: string | null
-  mimeType: string
+  getMimeType(exportSource: unknown): string
   createFile(edits: unknown, exportSource: unknown, settings: ExportSettings): string
 }
 
@@ -71,7 +72,7 @@ export type FormatDefinition = {
 
 const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
 
-// To make another format editable, add `editing` to its entry. Only CSV is editable for now.
+// To make another format editable, add `editing` to its entry. Only CSV and plain text are editable for now.
 const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'csv',
@@ -81,6 +82,16 @@ const formatDefinitions: FormatDefinition[] = [
       countChanges: (edits) => countCsvEdits(edits as CsvEdits),
       describeChanges: (edits) => describeCsvChanges(edits as CsvEdits),
       loadEditingModule: () => import('./csv/csvEditing').then((editingFile) => editingFile.csvEditingModule),
+    },
+  },
+  {
+    viewerId: 'text',
+    ViewerComponent: lazy(() => import('./text/TextViewer')),
+    editing: {
+      createEmptyEdits: createEmptyTextEdits,
+      countChanges: countTextChanges,
+      describeChanges: describeTextChanges,
+      loadEditingModule: () => Promise.resolve(textEditingModule),
     },
   },
   { viewerId: 'excel', ViewerComponent: comingSoonViewer },
@@ -103,4 +114,22 @@ export function findFormatForFileName(fileName: string) {
     if (lowerCaseFileName.endsWith(extension)) return definition
   }
   return undefined
+}
+
+// "sales.csv" -> "sales-edited.csv" (or "sales-edited.json" when converting); an untouched copy keeps its name.
+export function buildDownloadName(fileName: string, hasEdits: boolean, newExtension: string | null) {
+  const dotIndex = fileName.lastIndexOf('.')
+  const baseName = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName
+  const extension = newExtension ?? (dotIndex > 0 ? fileName.slice(dotIndex) : '')
+  return `${baseName}${hasEdits ? '-edited' : ''}${extension}`
+}
+
+// Saves text as a file by clicking a temporary link to it.
+export function downloadTextFile(fileName: string, fileText: string, mimeType: string) {
+  const downloadUrl = URL.createObjectURL(new Blob([fileText], { type: mimeType }))
+  const downloadLink = document.createElement('a')
+  downloadLink.href = downloadUrl
+  downloadLink.download = fileName
+  downloadLink.click()
+  setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
 }

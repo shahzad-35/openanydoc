@@ -2,9 +2,10 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { textControlClassName } from '../../buttonStyles'
-import { DELIMITER_OPTIONS, parseCsv } from '../../parseCsv'
+import { DELIMITER_OPTIONS, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
 import type { DelimiterChoice, ParsedCsv } from '../../parseCsv'
 import { getLargeFileWarning } from '../../useFileIntake'
+import { findTableFormat } from '../../viewers'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import {
@@ -27,15 +28,21 @@ import {
 import type { CellPosition, CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
 import type { ChangeRow, CsvEditingComponents } from './csvEditing'
 
-// Rows are 28px for a mouse so more data fits on screen, and 36px on touch screens where cells are tapped.
+const CELL_LINE_HEIGHT_PX = 20
+// Rows are at least 28px for a mouse so more data fits on screen, and 36px on touch screens where cells are tapped.
 const ROW_HEIGHT_PX = window.matchMedia('(pointer: coarse)').matches ? 36 : 28
+const CELL_VERTICAL_PADDING_PX = (ROW_HEIGHT_PX - CELL_LINE_HEIGHT_PX) / 2
 const COLUMN_MIN_WIDTH_PX = 80
 const COLUMN_MAX_WIDTH_PX = 384
-// Room around a cell's text (padding) and around a header's name (padding, sort arrow, menu button).
-const CELL_PADDING_PX = 20
+// Room around a cell's text (padding and the column border) and around a header's name (padding, sort arrow, menu button).
+const CELL_PADDING_PX = 26
 const HEADER_EXTRA_PX = 56
 // Only the first rows are measured, so a 120,000-row file opens as fast as a small one.
 const ROWS_MEASURED_FOR_WIDTH = 500
+// A cell whose text is wider than its column wraps onto more lines, and its row grows to fit, up to this many lines.
+const MAX_CELL_LINES = 6
+const CELL_FONT = '14px system-ui, sans-serif'
+const measuringContext = document.createElement('canvas').getContext('2d')
 const ROW_NUMBER_MIN_WIDTH_PX = 56
 const MAX_LISTED_CHANGES = 200
 
@@ -58,6 +65,21 @@ function compareCells(firstCell: string, secondCell: string) {
 // A row or column added here is shown until it is deleted; an original one until it is hidden by a delete.
 function isLineShown(id: number, deletedIds: ReadonlySet<number>, insertedLines: CsvEdits['insertedRows']) {
   return isInsertedLine(id) ? insertedLines.some((line) => line.id === id) : !deletedIds.has(id)
+}
+
+// How many lines a cell's text takes in a column of this width (a close estimate of the browser's wrapping).
+function countCellLines(cellText: string, columnWidthPx: number) {
+  const textWidthPx = columnWidthPx - CELL_PADDING_PX
+  // Most cells are short: nine pixels per character is wider than almost any character at this size.
+  if (cellText.length * 9 <= textWidthPx && !cellText.includes('\n')) return 1
+  if (!measuringContext) return 1
+  measuringContext.font = CELL_FONT
+  let lineCount = 0
+  for (const paragraph of cellText.split(/\r\n|\n|\r/)) {
+    lineCount += Math.max(1, Math.ceil((measuringContext.measureText(paragraph).width * 1.05) / textWidthPx))
+    if (lineCount >= MAX_CELL_LINES) return MAX_CELL_LINES
+  }
+  return lineCount
 }
 
 function SortChevron({ direction }: { direction: 'asc' | 'desc' | null }) {
@@ -106,11 +128,11 @@ function SearchIcon() {
 // a very long value stops growing (EXPANDED_MAX_*) and scrolls inside the cell. Nothing around it moves.
 const EXPANDED_MAX_WIDTH_PX = 448 // = max-w-md
 const EXPANDED_MAX_HEIGHT_PX = 192 // = max-h-48
-const restingCellTextClassName = 'block h-full w-full truncate'
+const restingCellTextClassName = 'line-clamp-6 h-full w-full whitespace-pre-wrap break-words'
 const expandedCellTextClassName =
-  'z-[5] block h-auto max-h-48 min-h-full w-max min-w-full max-w-md overflow-auto whitespace-pre-wrap break-words py-[3px] leading-5'
+  'z-[5] block h-auto max-h-48 min-h-full w-max min-w-full max-w-md overflow-auto whitespace-pre-wrap break-words leading-5'
 const hoverExpandedCellTextClassName =
-  'group-hover:z-[5] group-hover:h-auto group-hover:max-h-48 group-hover:min-h-full group-hover:w-max group-hover:min-w-full group-hover:max-w-md group-hover:overflow-auto group-hover:whitespace-pre-wrap group-hover:break-words group-hover:bg-paper-raised group-hover:py-[3px] group-hover:leading-5 group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule'
+  'group-hover:z-[5] group-hover:h-auto group-hover:max-h-48 group-hover:min-h-full group-hover:w-max group-hover:min-w-full group-hover:max-w-md group-hover:overflow-auto group-hover:whitespace-pre-wrap group-hover:break-words group-hover:[-webkit-line-clamp:unset] group-hover:bg-paper-raised group-hover:leading-5 group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule'
 
 const selectedCellTint = 'bg-[color-mix(in_srgb,var(--file-color)_14%,var(--paper-raised))]'
 
@@ -129,14 +151,16 @@ export default function CsvViewer({
   const session = untypedSession as EditSession<CsvEdits>
   const editing = editingComponents as CsvEditingComponents | null
   const isEditable = mode === 'edit' && editing !== null
-  const [delimiterChoice, setDelimiterChoice] = useState<DelimiterChoice>('auto')
-  const [hasHeaderRow, setHasHeaderRow] = useState(true)
+  const tableFormat = findTableFormat(openedFile.file.name)
+  const [delimiterChoice, setDelimiterChoice] = useState<DelimiterChoice>(tableFormat.defaultDelimiter)
+  const [hasHeaderRow, setHasHeaderRow] = useState(tableFormat.headerRow === 'always')
   const [searchText, setSearchText] = useState('')
   const [sortState, setSortState] = useState<SortState>(null)
   const [parsedCsv, setParsedCsv] = useState<ParsedCsv | null>(null)
   const [pickedCell, setPickedCell] = useState<CellPosition | null>(null)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [renamingColumn, setRenamingColumn] = useState<{ columnId: number; draft: string } | null>(null)
+  const [gridWidthPx, setGridWidthPx] = useState(0)
   const [expandAnchor, setExpandAnchor] = useState<ExpandAnchor | null>(null)
   const [columnMenu, setColumnMenu] = useState<{ columnId: number; left: number; top: number } | null>(null)
   const [isFindOpen, setIsFindOpen] = useState(false)
@@ -167,9 +191,15 @@ export default function CsvViewer({
     setPickedCell(null)
     setEditingCell(null)
     setRenamingColumn(null)
-    const parseTimerId = setTimeout(() => setParsedCsv(parseCsv(openedFile.contents, delimiterChoice)), 0)
+    const parseTimerId = setTimeout(() => {
+      const newParsedCsv = parseCsv(openedFile.contents, delimiterChoice)
+      if (newParsedCsv.status === 'ok' && tableFormat.headerRow !== 'always') {
+        setHasHeaderRow(firstRowLooksLikeHeader(newParsedCsv.rows))
+      }
+      setParsedCsv(newParsedCsv)
+    }, 0)
     return () => clearTimeout(parseTimerId)
-  }, [openedFile, delimiterChoice, resetEditSession])
+  }, [openedFile, delimiterChoice, tableFormat.headerRow, resetEditSession])
 
   // "/" jumps to the search box, like in many web apps.
   useEffect(() => {
@@ -212,19 +242,26 @@ export default function CsvViewer({
   // Each column is as wide as its longest text among the first rows (and its header name), within a minimum and maximum.
   // Original text only, so a column does not change width while it is being edited.
   const columnWidthsPx = useMemo(() => {
-    const measuringContext = document.createElement('canvas').getContext('2d')
     if (!measuringContext) return displayColumnIds.map(() => COLUMN_MIN_WIDTH_PX)
     const lastMeasuredRowId = Math.min(originalRowCount, firstDataRowId + ROWS_MEASURED_FOR_WIDTH)
     return displayColumnIds.map((columnId, columnPosition) => {
       measuringContext.font = '600 12px system-ui, sans-serif'
       let widestTextPx = measuringContext.measureText(columnNames[columnPosition]).width + HEADER_EXTRA_PX - CELL_PADDING_PX
-      measuringContext.font = '14px system-ui, sans-serif'
+      measuringContext.font = CELL_FONT
       for (let rowId = firstDataRowId; rowId < lastMeasuredRowId; rowId++) {
         widestTextPx = Math.max(widestTextPx, measuringContext.measureText(getOriginalCellText(rows, rowId, columnId)).width)
       }
       return Math.min(COLUMN_MAX_WIDTH_PX, Math.max(COLUMN_MIN_WIDTH_PX, Math.ceil(widestTextPx + CELL_PADDING_PX)))
     })
   }, [displayColumnIds, columnNames, rows, originalRowCount, firstDataRowId])
+
+  // Columns share any spare room equally (they grow to fill the window), so their real width can exceed the measured one.
+  const rowNumberColumnWidthPx = Math.max(ROW_NUMBER_MIN_WIDTH_PX, originalRowCount.toLocaleString().length * 10 + 36)
+  const shownColumnWidthsPx = useMemo(() => {
+    const spareWidthPx = gridWidthPx - rowNumberColumnWidthPx - columnWidthsPx.reduce((totalWidthPx, columnWidthPx) => totalWidthPx + columnWidthPx, 0)
+    const extraWidthPerColumnPx = columnWidthsPx.length > 0 ? Math.max(0, spareWidthPx) / columnWidthsPx.length : 0
+    return columnWidthsPx.map((columnWidthPx) => columnWidthPx + extraWidthPerColumnPx)
+  }, [columnWidthsPx, gridWidthPx, rowNumberColumnWidthPx])
 
   // A cell stays selected only while its row and column are still shown (deleting them clears the selection).
   const selectedCell =
@@ -272,9 +309,31 @@ export default function CsvViewer({
   const rowVirtualizer = useVirtualizer({
     count: visibleRowIds.length,
     getScrollElement: () => scrollContainerRef.current,
-    estimateSize: () => ROW_HEIGHT_PX,
+    estimateSize: (rowPosition) => {
+      let tallestCellLineCount = 1
+      displayColumnIds.forEach((columnId, columnPosition) => {
+        const cellLineCount = countCellLines(getOriginalCellText(rows, visibleRowIds[rowPosition], columnId), shownColumnWidthsPx[columnPosition])
+        tallestCellLineCount = Math.max(tallestCellLineCount, cellLineCount)
+      })
+      return Math.max(ROW_HEIGHT_PX, tallestCellLineCount * CELL_LINE_HEIGHT_PX + 2 * CELL_VERTICAL_PADDING_PX)
+    },
     overscan: 12,
   })
+
+  // The window's width decides how much spare room the columns share.
+  const hasTable = readableCsv !== null
+  useEffect(() => {
+    const scrollContainer = scrollContainerRef.current
+    if (!scrollContainer) return
+    const resizeObserver = new ResizeObserver(() => setGridWidthPx(scrollContainer.clientWidth))
+    resizeObserver.observe(scrollContainer)
+    return () => resizeObserver.disconnect()
+  }, [hasTable])
+
+  // The row heights depend on the column widths, which can change when columns are added, deleted or renamed.
+  useEffect(() => {
+    rowVirtualizer.measure()
+  }, [rowVirtualizer, shownColumnWidthsPx])
 
   function getText(rowId: number, columnId: number) {
     return getCellText(rows, edits, rowId, columnId)
@@ -459,7 +518,7 @@ export default function CsvViewer({
 
   const totalRowCount = displayRowIds.length
   const isSearching = deferredSearchText.trim() !== ''
-  const rowNumberWidthPx = Math.max(ROW_NUMBER_MIN_WIDTH_PX, originalRowCount.toLocaleString().length * 10 + 36)
+  const rowNumberWidthPx = rowNumberColumnWidthPx
   const tableMinWidthPx = rowNumberWidthPx + columnWidthsPx.reduce((totalWidthPx, columnWidthPx) => totalWidthPx + columnWidthPx, 0)
   const detectedDelimiterLabel =
     DELIMITER_OPTIONS.find((option) => option.value === readableCsv?.detectedDelimiter)?.label ?? 'Custom'
@@ -498,11 +557,12 @@ export default function CsvViewer({
       hasHeaderRow,
       detectedDelimiter: readableCsv.detectedDelimiter,
       hadByteOrderMark: readableCsv.encodingLabel.startsWith('UTF-8 with BOM'),
+      tableFormat,
       displayColumnIds,
       visibleRowIds,
     }
     onExportSourceChange(exportSource)
-  }, [readableCsv, rows, hasHeaderRow, displayColumnIds, visibleRowIds, onExportSourceChange])
+  }, [readableCsv, rows, hasHeaderRow, tableFormat, displayColumnIds, visibleRowIds, onExportSourceChange])
 
   // What the Changes list shows: the first edited cells with their old and new text, and how many there are in all.
   const visibleRowIdSet = useMemo(() => (isSearching ? new Set(visibleRowIds) : null), [isSearching, visibleRowIds])
@@ -649,13 +709,13 @@ export default function CsvViewer({
             ref={scrollContainerRef}
             tabIndex={0}
             onKeyDown={handleGridKeyDown}
-            aria-label="CSV data, scrollable"
+            aria-label={`${tableFormat.label} data, scrollable`}
             className="min-h-0 flex-1 overflow-auto outline-none"
             style={{ scrollPaddingTop: ROW_HEIGHT_PX, scrollPaddingLeft: rowNumberWidthPx }}
           >
             <div
               role="grid"
-              aria-label="CSV data"
+              aria-label={`${tableFormat.label} data`}
               aria-rowcount={visibleRowIds.length + 1}
               aria-colcount={displayColumnIds.length + 1}
               style={{ minWidth: tableMinWidthPx }}
@@ -760,7 +820,7 @@ export default function CsvViewer({
                       role="row"
                       aria-rowindex={virtualRow.index + 2}
                       className="absolute inset-x-0 flex border-b border-rule/70 bg-paper-raised"
-                      style={{ top: virtualRow.start, height: ROW_HEIGHT_PX }}
+                      style={{ top: virtualRow.start, height: virtualRow.size }}
                     >
                       <div
                         role="rowheader"
@@ -804,7 +864,7 @@ export default function CsvViewer({
                                     ? 'bg-edit-mark/10'
                                     : ''
                             }`}
-                            style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${ROW_HEIGHT_PX}px` }}
+                            style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${CELL_LINE_HEIGHT_PX}px` }}
                           >
                             {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
                             {isEditable && isEditingHere && editingCell?.source === 'cell' ? (
@@ -824,6 +884,7 @@ export default function CsvViewer({
                             ) : (
                               <span
                                 dir="auto"
+                                style={{ paddingBlock: CELL_VERTICAL_PADDING_PX }}
                                 className={`absolute px-3 ${
                                   expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId && expandAnchor.fromRight ? 'right-0' : 'left-0'
                                 } ${

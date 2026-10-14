@@ -1,17 +1,10 @@
+import { buildDownloadName, downloadTextFile } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import type { EditSession } from '../formats/useEditSession'
 import type { OpenedFile } from '../useFileIntake'
 
 const toolbarButtonClassName =
   'control-shape solid-box min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-[13px] transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50'
-
-// "sales.csv" -> "sales-edited.csv" (or "sales-edited.json" when converting); an untouched copy keeps its name.
-function buildDownloadName(fileName: string, hasEdits: boolean, newExtension: string | null) {
-  const dotIndex = fileName.lastIndexOf('.')
-  const baseName = dotIndex > 0 ? fileName.slice(0, dotIndex) : fileName
-  const extension = newExtension ?? (dotIndex > 0 ? fileName.slice(dotIndex) : '')
-  return `${baseName}${hasEdits ? '-edited' : ''}${extension}`
-}
 
 function ModeIcon({ mode }: { mode: ViewMode }) {
   return (
@@ -101,17 +94,15 @@ type DownloadControlProps = {
 // leaves, named like sales-edited.csv. The tooltip says which rows.
 function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEdits }: DownloadControlProps) {
   const { downloadOption } = editingModule
-  const downloadLabel = exportSource === null ? 'Download' : `${downloadOption.label}: ${editingModule.describeDownload(exportSource)}`
+  const downloadLabel = exportSource === null ? 'Download' : `${downloadOption.getLabel(exportSource)}: ${editingModule.describeDownload(exportSource)}`
 
   function downloadWhatYouSee() {
     const includeByteOrderMark = editingModule.getDefaultByteOrderMark(exportSource)
-    const fileText = downloadOption.createFile(edits, exportSource, { includeByteOrderMark })
-    const downloadUrl = URL.createObjectURL(new Blob([fileText], { type: downloadOption.mimeType }))
-    const downloadLink = document.createElement('a')
-    downloadLink.href = downloadUrl
-    downloadLink.download = buildDownloadName(openedFile.file.name, hasEdits, downloadOption.extension)
-    downloadLink.click()
-    setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
+    downloadTextFile(
+      buildDownloadName(openedFile.file.name, hasEdits, downloadOption.extension),
+      downloadOption.createFile(edits, exportSource, { includeByteOrderMark }),
+      downloadOption.getMimeType(exportSource),
+    )
   }
 
   return (

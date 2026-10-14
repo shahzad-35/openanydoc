@@ -12,7 +12,7 @@ export const features = [
   'One drop zone for every supported format.',
   'Drag and drop, click to browse, or paste CSV text.',
   'Files are read in your browser and never uploaded.',
-  'CSV files: automatic delimiter detection (comma, semicolon, tab, pipe) with a manual override, a first-row-is-header toggle, column sorting and search.',
+  'Table files: .csv files get automatic delimiter detection (comma, semicolon, tab, pipe), .tsv and .tab files open tab-separated with the header row detected, you can choose another delimiter yourself, and there is a first-row-is-header toggle, column sorting and search.',
   'Large CSV files stay smooth because only the visible rows are drawn, including while you edit.',
   'Edit CSV files in your browser: change cells, add or delete rows and columns, rename headers, find and replace, with undo and redo.',
   'Download what you see (the edits, the current sort and only the rows your search shows) as CSV or JSON, or copy it for Excel or Google Sheets.',
@@ -29,7 +29,7 @@ export const faqItems = [
   },
   {
     question: 'Which files can I open?',
-    answer: 'CSV and text tables (.csv, .tsv, .tab, .txt), Excel (.xlsx, .xls), Word (.docx), PDF (.pdf) and PowerPoint (.pptx).',
+    answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), Excel (.xlsx, .xls), Word (.docx), PDF (.pdf) and PowerPoint (.pptx).',
   },
   {
     question: 'How big can a file be?',
@@ -43,7 +43,7 @@ export const faqItems = [
   },
   {
     question: 'Which CSV delimiters are supported?',
-    answer: 'Comma, semicolon, tab and pipe. OpenAnyDoc detects the delimiter automatically, and you can choose one yourself.',
+    answer: 'Comma, semicolon, tab and pipe. .csv files are detected automatically, .tsv and .tab files open tab-separated, and you can choose a delimiter yourself.',
   },
   {
     question: 'Does it handle Arabic text?',

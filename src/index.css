@@ -18,6 +18,7 @@
   --icon-roughness: 0;
 
   --type-csv: #6a46b0;
+  --type-text: #4a5a73;
   --type-excel: #1b7a43;
   --type-word: #2459b5;
   --type-pdf: #b0214f;
@@ -48,6 +49,7 @@
   --edit-mark: #fbbf24;
 
   --type-csv: #b79bff;
+  --type-text: #a9b9d4;
   --type-excel: #5fd08b;
   --type-word: #7fb0ff;
   --type-pdf: #ff7a9f;
@@ -68,6 +70,10 @@
 /* An element with data-file-type gets --file-color for itself and everything inside it. */
 [data-file-type="csv"] {
   --file-color: var(--type-csv);
+}
+
+[data-file-type="text"] {
+  --file-color: var(--type-text);
 }
 
 [data-file-type="excel"] {

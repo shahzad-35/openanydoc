@@ -46,7 +46,7 @@ export function decodeCsvBytes(fileContents: ArrayBuffer) {
   }
 }
 
-function looksLikeBinary(fileContents: ArrayBuffer) {
+export function looksLikeBinary(fileContents: ArrayBuffer) {
   const bytes = new Uint8Array(fileContents, 0, Math.min(fileContents.byteLength, BINARY_CHECK_BYTE_COUNT))
   const isUtf16 = (bytes[0] === 0xff && bytes[1] === 0xfe) || (bytes[0] === 0xfe && bytes[1] === 0xff)
   return !isUtf16 && bytes.includes(0)
@@ -87,7 +87,7 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
     return {
       status: 'error',
       message:
-        "This doesn't look like a text CSV file. It contains binary data, so it may be corrupted or a different file type.",
+        "This doesn't look like a text table. It contains binary data, so it may be corrupted or a different file type.",
     }
   }
 
@@ -125,6 +125,21 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
     encodingLabel,
     notices,
   }
+}
+
+const NUMBER_PATTERN = /^[-+]?[\d.,]+%?$/
+
+// Like Python's csv.Sniffer: the first row is a header when it is all text, has no empty cell, and the rows below hold numbers
+// in a column where the first row has text. A table that is all text gives no such evidence, so it counts as having no header.
+export function firstRowLooksLikeHeader(rows: string[][]) {
+  const [firstRow, ...dataRows] = rows
+  if (!firstRow || dataRows.length === 0) return false
+  if (firstRow.some((cellText) => cellText.trim() === '' || NUMBER_PATTERN.test(cellText.trim()))) return false
+
+  return firstRow.some((_, columnPosition) => {
+    const sampledCells = dataRows.slice(0, 100).map((row) => (row[columnPosition] ?? '').trim()).filter((cellText) => cellText !== '')
+    return sampledCells.length > 0 && sampledCells.filter((cellText) => NUMBER_PATTERN.test(cellText)).length / sampledCells.length >= 0.8
+  })
 }
 
 // Excel needs a byte order mark to read Arabic and other non-ASCII text correctly, so add one when the source had it or the text needs it.

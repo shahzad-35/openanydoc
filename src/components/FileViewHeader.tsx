@@ -3,7 +3,7 @@ import type { ReactNode } from 'react'
 import { compactSecondaryButtonClassName } from '../buttonStyles'
 import { formatFileSize } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
-import { findViewerForFileName } from '../viewers'
+import { findTableFormat, findViewerForFileName } from '../viewers'
 import FileTypeChip from './FileTypeChip'
 import ThemeToggle from './ThemeToggle'
 
@@ -50,7 +50,7 @@ export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onO
           OpenAnyDoc
         </button>
         <div className="order-3 flex min-w-0 basis-full items-center gap-3 sm:order-none sm:flex-1 sm:basis-24">
-          {viewer && <FileTypeChip viewer={viewer} />}
+          {viewer && <FileTypeChip viewer={viewer} label={viewer.id === 'csv' ? findTableFormat(openedFile.file.name).label : viewer.label} />}
           <h1 ref={fileNameRef} tabIndex={-1} className="truncate font-medium outline-none">
             {openedFile.file.name}
           </h1>
