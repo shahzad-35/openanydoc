@@ -1,15 +1,18 @@
 import type { DelimiterChoice } from './parseCsv'
 
 export type Viewer = {
-  id: 'csv' | 'text' | 'excel' | 'word' | 'pdf' | 'powerpoint'
+  id: 'csv' | 'text' | 'json' | 'excel' | 'word' | 'pdf' | 'powerpoint'
   label: string
   extensions: string[]
   description: string
+  // The address of this format's own page (a drop zone for just this format), for formats that work. The open file keeps it.
+  toolPath?: string
 }
 
 export const viewers: Viewer[] = [
-  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], description: 'Open comma- and tab-separated files as a clean, searchable table.' },
-  { id: 'text', label: 'TXT', extensions: ['.txt'], description: 'Read plain text files as they were written.' },
+  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], description: 'Open comma- and tab-separated files as a clean, searchable table.', toolPath: '/csv-viewer' },
+  { id: 'text', label: 'TXT', extensions: ['.txt'], description: 'Read plain text files as they were written.', toolPath: '/txt-viewer' },
+  { id: 'json', label: 'JSON', extensions: ['.json'], description: 'Explore JSON as a tree or as formatted code, and fix mistakes.', toolPath: '/json-viewer' },
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls'], description: 'Browse sheets and cells from .xlsx and .xls workbooks.' },
   { id: 'word', label: 'Word', extensions: ['.docx'], description: 'Read .docx documents with their original formatting.' },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'], description: 'Read .pdf documents page by page in your browser.' },
@@ -34,13 +37,20 @@ export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions
 
 const LEGACY_FILE_VIEW_PATH = '/view'
 
-// Each kind of file has its own address while it is open: /view-csv, /view-text, /view-excel, /view-word, /view-pdf, /view-powerpoint.
+// A file keeps the address of its format's own page (/csv-viewer, /txt-viewer, /json-viewer), so the address and a reload
+// both make sense. Formats without a page of their own use /view-excel, /view-word, /view-pdf, /view-powerpoint while open.
 export function getFileViewPath(fileName: string) {
-  return `/view-${findViewerForFileName(fileName)?.id ?? 'file'}`
+  const viewer = findViewerForFileName(fileName)
+  return viewer?.toolPath ?? `/view-${viewer?.id ?? 'file'}`
 }
 
+// Addresses that only exist while a file is open; a reload or Forward sends them home because the file lives in memory.
 export function isFileViewPath(pathname: string) {
   return pathname === LEGACY_FILE_VIEW_PATH || viewers.some((viewer) => pathname === `/view-${viewer.id}`)
+}
+
+export function findViewerByToolPath(pathname: string) {
+  return viewers.find((viewer) => viewer.toolPath === pathname)
 }
 
 export function findViewerForFileName(fileName: string) {

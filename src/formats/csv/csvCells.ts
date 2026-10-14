@@ -7,7 +7,8 @@
 
 import type { TableFormat } from '../../viewers'
 
-export type CellPosition = { rowId: number; columnId: number }
+import type { CellPosition } from '../DataTable'
+export type { CellPosition }
 
 // A row or column added by the visitor, shown right after the line with id `afterId` (-1 = before the first one).
 export type InsertedLine = { id: number; afterId: number }
@@ -64,15 +65,6 @@ export function cellKey(rowId: number, columnId: number) {
 export function parseCellKey(key: string): CellPosition {
   const separatorIndex = key.indexOf(':')
   return { rowId: Number(key.slice(0, separatorIndex)), columnId: Number(key.slice(separatorIndex + 1)) }
-}
-
-// 0 -> A, 25 -> Z, 26 -> AA, like the columns of a spreadsheet.
-export function columnLabel(columnPosition: number) {
-  let label = ''
-  for (let remaining = columnPosition + 1; remaining > 0; remaining = Math.floor((remaining - 1) / 26)) {
-    label = String.fromCharCode(65 + ((remaining - 1) % 26)) + label
-  }
-  return label
 }
 
 export function isInsertedLine(id: number) {

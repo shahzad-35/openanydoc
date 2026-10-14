@@ -5,6 +5,7 @@ import type { FocusEventHandler, KeyboardEventHandler } from 'react'
 import Papa from 'papaparse'
 import { compactSecondaryButtonClassName, textControlClassName } from '../../buttonStyles'
 import ModalDialog from '../../components/ModalDialog'
+import { CellInput } from '../DataTable'
 import type { EditingModule, EditorTool, ExportOption } from '../registry'
 import type { EditSession } from '../useEditSession'
 import { getCellText, withCellText, withDeletedLine, withInsertedLine } from './csvCells'
@@ -120,42 +121,6 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
         className={`${textControlClassName} min-w-48 flex-1 disabled:cursor-not-allowed disabled:text-ink-soft`}
       />
     </>
-  )
-}
-
-type CellInputProps = {
-  ariaLabel: string
-  draft: string
-  onDraftChange: (newDraft: string) => void
-  onFinish: (shouldCommit: boolean, moveAfter?: 'down' | 'right') => void
-  onBlur: () => void
-}
-
-// The text box that appears inside a cell (or a column header) while it is being edited.
-function CellInput({ ariaLabel, draft, onDraftChange, onFinish, onBlur }: CellInputProps) {
-  return (
-    <input
-      autoFocus
-      dir="auto"
-      aria-label={ariaLabel}
-      value={draft}
-      onFocus={(event) => event.currentTarget.select()}
-      onChange={(event) => onDraftChange(event.target.value)}
-      onKeyDown={(event) => {
-        if (event.key === 'Enter') {
-          event.preventDefault()
-          onFinish(true, 'down')
-        } else if (event.key === 'Tab') {
-          event.preventDefault()
-          onFinish(true, 'right')
-        } else if (event.key === 'Escape') {
-          event.preventDefault()
-          onFinish(false)
-        }
-      }}
-      onBlur={onBlur}
-      className="absolute inset-0 w-full bg-paper-raised px-3 outline-none"
-    />
   )
 }
 

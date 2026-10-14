@@ -1,17 +1,17 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
-import { useVirtualizer } from '@tanstack/react-virtual'
 import { textControlClassName } from '../../buttonStyles'
 import { DELIMITER_OPTIONS, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
 import type { DelimiterChoice, ParsedCsv } from '../../parseCsv'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
 import type { FormatViewerProps } from '../registry'
+import DataTable, { SearchIcon, columnLabel, getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
+import type { CellPosition, DataTableHandle, SortState } from '../DataTable'
 import type { EditSession } from '../useEditSession'
 import {
   buildDisplayIds,
   cellKey,
-  columnLabel,
   countShownEditedCells,
   describeCsvChanges,
   getCellText,
@@ -25,116 +25,18 @@ import {
   withInsertedLine,
   withReplacedText,
 } from './csvCells'
-import type { CellPosition, CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
+import type { CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
 import type { ChangeRow, CsvEditingComponents } from './csvEditing'
 
-const CELL_LINE_HEIGHT_PX = 20
-// Rows are at least 28px for a mouse so more data fits on screen, and 36px on touch screens where cells are tapped.
-const ROW_HEIGHT_PX = window.matchMedia('(pointer: coarse)').matches ? 36 : 28
-const CELL_VERTICAL_PADDING_PX = (ROW_HEIGHT_PX - CELL_LINE_HEIGHT_PX) / 2
-const COLUMN_MIN_WIDTH_PX = 80
-const COLUMN_MAX_WIDTH_PX = 384
-// Room around a cell's text (padding and the column border) and around a header's name (padding, sort arrow, menu button).
-const CELL_PADDING_PX = 26
-const HEADER_EXTRA_PX = 56
-// Only the first rows are measured, so a 120,000-row file opens as fast as a small one.
-const ROWS_MEASURED_FOR_WIDTH = 500
-// A cell whose text is wider than its column wraps onto more lines, and its row grows to fit, up to this many lines.
-const MAX_CELL_LINES = 6
-const CELL_FONT = '14px system-ui, sans-serif'
-const measuringContext = document.createElement('canvas').getContext('2d')
-const ROW_NUMBER_MIN_WIDTH_PX = 56
 const MAX_LISTED_CHANGES = 200
 
 type EditingCell = CellPosition & { draft: string; source: 'cell' | 'bar' }
-type SortState = { columnId: number; direction: 'asc' | 'desc' } | null
-// Which way an expanded cell grows: away from the table's right and bottom edges, so it never adds scroll width or height.
-type ExpandAnchor = CellPosition & { fromRight: boolean; fromBottom: boolean }
-
-const cellCollator = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' })
 const noRows: string[][] = []
-
-function compareCells(firstCell: string, secondCell: string) {
-  const firstNumber = Number(firstCell)
-  const secondNumber = Number(secondCell)
-  const bothAreNumbers =
-    firstCell.trim() !== '' && secondCell.trim() !== '' && !Number.isNaN(firstNumber) && !Number.isNaN(secondNumber)
-  return bothAreNumbers ? firstNumber - secondNumber : cellCollator.compare(firstCell, secondCell)
-}
 
 // A row or column added here is shown until it is deleted; an original one until it is hidden by a delete.
 function isLineShown(id: number, deletedIds: ReadonlySet<number>, insertedLines: CsvEdits['insertedRows']) {
   return isInsertedLine(id) ? insertedLines.some((line) => line.id === id) : !deletedIds.has(id)
 }
-
-// How many lines a cell's text takes in a column of this width (a close estimate of the browser's wrapping).
-function countCellLines(cellText: string, columnWidthPx: number) {
-  const textWidthPx = columnWidthPx - CELL_PADDING_PX
-  // Most cells are short: nine pixels per character is wider than almost any character at this size.
-  if (cellText.length * 9 <= textWidthPx && !cellText.includes('\n')) return 1
-  if (!measuringContext) return 1
-  measuringContext.font = CELL_FONT
-  let lineCount = 0
-  for (const paragraph of cellText.split(/\r\n|\n|\r/)) {
-    lineCount += Math.max(1, Math.ceil((measuringContext.measureText(paragraph).width * 1.05) / textWidthPx))
-    if (lineCount >= MAX_CELL_LINES) return MAX_CELL_LINES
-  }
-  return lineCount
-}
-
-function SortChevron({ direction }: { direction: 'asc' | 'desc' | null }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 12 12"
-      className={`size-3 shrink-0 ${direction ? 'text-(--file-color)' : 'text-ink-soft opacity-50'}`}
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {direction === 'asc' && <path d="M3 7.5 6 4.5l3 3" />}
-      {direction === 'desc' && <path d="M3 4.5 6 7.5l3-3" />}
-      {direction === null && (
-        <>
-          <path d="M3 5 6 2.5 9 5" />
-          <path d="M3 7 6 9.5 9 7" />
-        </>
-      )}
-    </svg>
-  )
-}
-
-function SearchIcon() {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 16 16"
-      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-    >
-      <circle cx="7" cy="7" r="4.5" />
-      <path d="m10.5 10.5 3 3" />
-    </svg>
-  )
-}
-
-// A value that does not fit is cut off with an ellipsis. While the pointer is over the cell (or the cell is selected, which is
-// how a tap works on a touch screen) the text grows over the neighbouring cells to show everything, wrapping onto more lines;
-// a very long value stops growing (EXPANDED_MAX_*) and scrolls inside the cell. Nothing around it moves.
-const EXPANDED_MAX_WIDTH_PX = 448 // = max-w-md
-const EXPANDED_MAX_HEIGHT_PX = 192 // = max-h-48
-const restingCellTextClassName = 'line-clamp-6 h-full w-full whitespace-pre-wrap break-words'
-const expandedCellTextClassName =
-  'z-[5] block h-auto max-h-48 min-h-full w-max min-w-full max-w-md overflow-auto whitespace-pre-wrap break-words leading-5'
-const hoverExpandedCellTextClassName =
-  'group-hover:z-[5] group-hover:h-auto group-hover:max-h-48 group-hover:min-h-full group-hover:w-max group-hover:min-w-full group-hover:max-w-md group-hover:overflow-auto group-hover:whitespace-pre-wrap group-hover:break-words group-hover:[-webkit-line-clamp:unset] group-hover:bg-paper-raised group-hover:leading-5 group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule'
-
-const selectedCellTint = 'bg-[color-mix(in_srgb,var(--file-color)_14%,var(--paper-raised))]'
 
 // The CSV table. In view mode it only reads; in edit mode the editing components (loaded on first Edit) add the value bar,
 // the in-cell text box, find and replace and the changes list, and every change goes through the shared edit session.
@@ -160,8 +62,6 @@ export default function CsvViewer({
   const [pickedCell, setPickedCell] = useState<CellPosition | null>(null)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [renamingColumn, setRenamingColumn] = useState<{ columnId: number; draft: string } | null>(null)
-  const [gridWidthPx, setGridWidthPx] = useState(0)
-  const [expandAnchor, setExpandAnchor] = useState<ExpandAnchor | null>(null)
   const [columnMenu, setColumnMenu] = useState<{ columnId: number; left: number; top: number } | null>(null)
   const [isFindOpen, setIsFindOpen] = useState(false)
   const [findText, setFindText] = useState('')
@@ -170,7 +70,7 @@ export default function CsvViewer({
   const [replaceResultMessage, setReplaceResultMessage] = useState('')
   const deferredSearchText = useDeferredValue(searchText)
   const deferredFindText = useDeferredValue(findText)
-  const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const tableRef = useRef<DataTableHandle>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const { reset: resetEditSession } = session
   const edits = session.edits
@@ -185,6 +85,8 @@ export default function CsvViewer({
 
   // Parse after the "Reading file" state has painted, so the page never looks frozen.
   useEffect(() => {
+    // A new file or delimiter starts from a clean state; this is the reset, not a value derived from other state.
+    // oxlint-disable-next-line react/set-state-in-effect
     setParsedCsv(null)
     setSortState(null)
     resetEditSession()
@@ -239,29 +141,11 @@ export default function CsvViewer({
     [displayColumnIds, hasHeaderRow, rows, edits],
   )
 
-  // Each column is as wide as its longest text among the first rows (and its header name), within a minimum and maximum.
-  // Original text only, so a column does not change width while it is being edited.
-  const columnWidthsPx = useMemo(() => {
-    if (!measuringContext) return displayColumnIds.map(() => COLUMN_MIN_WIDTH_PX)
-    const lastMeasuredRowId = Math.min(originalRowCount, firstDataRowId + ROWS_MEASURED_FOR_WIDTH)
-    return displayColumnIds.map((columnId, columnPosition) => {
-      measuringContext.font = '600 12px system-ui, sans-serif'
-      let widestTextPx = measuringContext.measureText(columnNames[columnPosition]).width + HEADER_EXTRA_PX - CELL_PADDING_PX
-      measuringContext.font = CELL_FONT
-      for (let rowId = firstDataRowId; rowId < lastMeasuredRowId; rowId++) {
-        widestTextPx = Math.max(widestTextPx, measuringContext.measureText(getOriginalCellText(rows, rowId, columnId)).width)
-      }
-      return Math.min(COLUMN_MAX_WIDTH_PX, Math.max(COLUMN_MIN_WIDTH_PX, Math.ceil(widestTextPx + CELL_PADDING_PX)))
-    })
-  }, [displayColumnIds, columnNames, rows, originalRowCount, firstDataRowId])
-
-  // Columns share any spare room equally (they grow to fill the window), so their real width can exceed the measured one.
-  const rowNumberColumnWidthPx = Math.max(ROW_NUMBER_MIN_WIDTH_PX, originalRowCount.toLocaleString().length * 10 + 36)
-  const shownColumnWidthsPx = useMemo(() => {
-    const spareWidthPx = gridWidthPx - rowNumberColumnWidthPx - columnWidthsPx.reduce((totalWidthPx, columnWidthPx) => totalWidthPx + columnWidthPx, 0)
-    const extraWidthPerColumnPx = columnWidthsPx.length > 0 ? Math.max(0, spareWidthPx) / columnWidthsPx.length : 0
-    return columnWidthsPx.map((columnWidthPx) => columnWidthPx + extraWidthPerColumnPx)
-  }, [columnWidthsPx, gridWidthPx, rowNumberColumnWidthPx])
+  const columnWidthsPx = useMemo(
+    () => measureColumnWidthsPx(displayColumnIds, columnNames, firstDataRowId, originalRowCount, (rowId, columnId) => getOriginalCellText(rows, rowId, columnId)),
+    [displayColumnIds, columnNames, rows, originalRowCount, firstDataRowId],
+  )
+  const rowNumberColumnWidthPx = getRowNumberColumnWidthPx(originalRowCount)
 
   // A cell stays selected only while its row and column are still shown (deleting them clears the selection).
   const selectedCell =
@@ -273,67 +157,17 @@ export default function CsvViewer({
 
   const activeSort = sortState && displayColumnIds.includes(sortState.columnId) ? sortState : null
 
-  // Rows are never copied: search and sort work on lists of row ids. They read the edits as they were when the search or
-  // sort last changed, so a row does not jump away from under the cursor while it is being edited.
-  const sortRowIds = useMemo(() => {
-    if (!activeSort) return (rowIds: number[]) => rowIds
-    const directionFactor = activeSort.direction === 'asc' ? 1 : -1
-    return (rowIds: number[]) => {
-      const currentEdits = editsRef.current
-      return rowIds.sort(
-        (firstRowId, secondRowId) =>
-          directionFactor *
-          compareCells(
-            getCellText(rows, currentEdits, firstRowId, activeSort.columnId),
-            getCellText(rows, currentEdits, secondRowId, activeSort.columnId),
-          ),
-      )
-    }
-  }, [activeSort, rows])
-
-  const visibleRowIds = useMemo(() => {
-    const lowerCaseSearch = deferredSearchText.trim().toLowerCase()
-    if (lowerCaseSearch === '') return sortRowIds(displayRowIds.slice())
-    const currentEdits = editsRef.current
-    const matchingRowIds = displayRowIds.filter(
-      // Rows added here stay in view while searching, so a new row never disappears as it is created.
-      (rowId) =>
-        isInsertedLine(rowId) ||
-        displayColumnIds.some((columnId) => getCellText(rows, currentEdits, rowId, columnId).toLowerCase().includes(lowerCaseSearch)),
-    )
-    return sortRowIds(matchingRowIds)
-  }, [deferredSearchText, displayRowIds, displayColumnIds, rows, sortRowIds])
-
-  // TanStack Virtual returns functions the React Compiler cannot memoize; this project does not use the compiler.
-  // oxlint-disable-next-line react/incompatible-library
-  const rowVirtualizer = useVirtualizer({
-    count: visibleRowIds.length,
-    getScrollElement: () => scrollContainerRef.current,
-    estimateSize: (rowPosition) => {
-      let tallestCellLineCount = 1
-      displayColumnIds.forEach((columnId, columnPosition) => {
-        const cellLineCount = countCellLines(getOriginalCellText(rows, visibleRowIds[rowPosition], columnId), shownColumnWidthsPx[columnPosition])
-        tallestCellLineCount = Math.max(tallestCellLineCount, cellLineCount)
-      })
-      return Math.max(ROW_HEIGHT_PX, tallestCellLineCount * CELL_LINE_HEIGHT_PX + 2 * CELL_VERTICAL_PADDING_PX)
-    },
-    overscan: 12,
+  // The table reads the edits as they were when the search or sort last changed (see useVisibleRowIds), through this ref.
+  const visibleRowIds = useVisibleRowIds({
+    rowIds: displayRowIds,
+    columnIds: displayColumnIds,
+    searchText: deferredSearchText,
+    sort: activeSort,
+    readText: (rowId, columnId) => getCellText(rows, editsRef.current, rowId, columnId),
+    // Rows added here stay in view while searching, so a new row never disappears as it is created.
+    isAlwaysShown: isInsertedLine,
+    dataKey: rows,
   })
-
-  // The window's width decides how much spare room the columns share.
-  const hasTable = readableCsv !== null
-  useEffect(() => {
-    const scrollContainer = scrollContainerRef.current
-    if (!scrollContainer) return
-    const resizeObserver = new ResizeObserver(() => setGridWidthPx(scrollContainer.clientWidth))
-    resizeObserver.observe(scrollContainer)
-    return () => resizeObserver.disconnect()
-  }, [hasTable])
-
-  // The row heights depend on the column widths, which can change when columns are added, deleted or renamed.
-  useEffect(() => {
-    rowVirtualizer.measure()
-  }, [rowVirtualizer, shownColumnWidthsPx])
 
   function getText(rowId: number, columnId: number) {
     return getCellText(rows, edits, rowId, columnId)
@@ -354,7 +188,7 @@ export default function CsvViewer({
     const clampedRowPosition = Math.max(0, Math.min(rowPosition, visibleRowIds.length - 1))
     const clampedColumnPosition = Math.max(0, Math.min(columnPosition, displayColumnIds.length - 1))
     setPickedCell({ rowId: visibleRowIds[clampedRowPosition], columnId: displayColumnIds[clampedColumnPosition] })
-    rowVirtualizer.scrollToIndex(clampedRowPosition)
+    tableRef.current?.scrollToRow(clampedRowPosition)
   }
 
   function beginEditing(position: CellPosition, source: 'cell' | 'bar', draft?: string) {
@@ -369,7 +203,7 @@ export default function CsvViewer({
     const rowPosition = visibleRowIds.indexOf(editingCell.rowId)
     const columnPosition = displayColumnIds.indexOf(editingCell.columnId)
     setEditingCell(null)
-    scrollContainerRef.current?.focus()
+    tableRef.current?.focus()
     if (moveAfter === 'down') selectCellAtPosition(rowPosition + 1, columnPosition)
     if (moveAfter === 'right') selectCellAtPosition(rowPosition, columnPosition + 1)
   }
@@ -385,23 +219,10 @@ export default function CsvViewer({
     if (shouldCommit) commitCellEdit({ rowId: 0, columnId: renamingColumn.columnId }, renamingColumn.draft)
     else editWasCancelledRef.current = true
     setRenamingColumn(null)
-    scrollContainerRef.current?.focus()
+    tableRef.current?.focus()
   }
 
   // The menu opens right under the header, lined up with the name.
-  function anchorCellExpansion(cellElement: HTMLElement, position: CellPosition) {
-    const containerBox = scrollContainerRef.current?.getBoundingClientRect()
-    if (!containerBox) return
-    const cellBox = cellElement.getBoundingClientRect()
-    const fromRight = cellBox.left + EXPANDED_MAX_WIDTH_PX > containerBox.right
-    const fromBottom = cellBox.top + EXPANDED_MAX_HEIGHT_PX > containerBox.bottom
-    setExpandAnchor((current) =>
-      current?.rowId === position.rowId && current.columnId === position.columnId && current.fromRight === fromRight && current.fromBottom === fromBottom
-        ? current
-        : { ...position, fromRight, fromBottom },
-    )
-  }
-
   function openColumnMenu(columnId: number, nameButton: HTMLElement) {
     const headerBottom = nameButton.closest('[role="columnheader"]')?.getBoundingClientRect().bottom ?? nameButton.getBoundingClientRect().bottom
     setColumnMenu({ columnId, left: nameButton.getBoundingClientRect().left, top: headerBottom + 2 })
@@ -451,7 +272,7 @@ export default function CsvViewer({
     const rowPosition = visibleRowIds.indexOf(position.rowId)
     if (rowPosition === -1) return
     selectCellAtPosition(rowPosition, displayColumnIds.indexOf(position.columnId))
-    scrollContainerRef.current?.focus({ preventScroll: true })
+    tableRef.current?.focus({ preventScroll: true })
   }
 
   function replaceAllMatches() {
@@ -513,13 +334,11 @@ export default function CsvViewer({
     if (rowPosition === -1 || !displayColumnIds.includes(columnId)) return
     pendingRevealRef.current = null
     setPickedCell({ rowId, columnId })
-    rowVirtualizer.scrollToIndex(rowPosition)
-  }, [visibleRowIds, displayColumnIds, selectedCell, rowVirtualizer])
+    tableRef.current?.scrollToRow(rowPosition)
+  }, [visibleRowIds, displayColumnIds, selectedCell])
 
   const totalRowCount = displayRowIds.length
   const isSearching = deferredSearchText.trim() !== ''
-  const rowNumberWidthPx = rowNumberColumnWidthPx
-  const tableMinWidthPx = rowNumberWidthPx + columnWidthsPx.reduce((totalWidthPx, columnWidthPx) => totalWidthPx + columnWidthPx, 0)
   const detectedDelimiterLabel =
     DELIMITER_OPTIONS.find((option) => option.value === readableCsv?.detectedDelimiter)?.label ?? 'Custom'
   const largeFileWarning = getLargeFileWarning(openedFile.file)
@@ -613,7 +432,7 @@ export default function CsvViewer({
                 } else if (event.key === 'Escape') {
                   event.preventDefault()
                   if (editingCell) finishEditing(false)
-                  else scrollContainerRef.current?.focus()
+                  else tableRef.current?.focus()
                 }
               }}
               onBlur={() => {
@@ -705,79 +524,33 @@ export default function CsvViewer({
         )}
 
         {readableCsv && (
-          <div
-            ref={scrollContainerRef}
-            tabIndex={0}
-            onKeyDown={handleGridKeyDown}
-            aria-label={`${tableFormat.label} data, scrollable`}
-            className="min-h-0 flex-1 overflow-auto outline-none"
-            style={{ scrollPaddingTop: ROW_HEIGHT_PX, scrollPaddingLeft: rowNumberWidthPx }}
-          >
-            <div
-              role="grid"
-              aria-label={`${tableFormat.label} data`}
-              aria-rowcount={visibleRowIds.length + 1}
-              aria-colcount={displayColumnIds.length + 1}
-              style={{ minWidth: tableMinWidthPx }}
-            >
-              <div role="row" aria-rowindex={1} className="sticky top-0 z-20 flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
-                <div
-                  role="columnheader"
-                  className="sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule bg-paper px-3 text-xs text-ink-soft"
-                  style={{ width: rowNumberWidthPx, height: ROW_HEIGHT_PX }}
-                >
-                  <span aria-hidden="true">#</span>
-                  <span className="sr-only">Row number</span>
-                </div>
-                {displayColumnIds.map((columnId, columnPosition) => {
-                  const columnName = columnNames[columnPosition]
-                  const columnDirection = activeSort?.columnId === columnId ? activeSort.direction : null
-                  const isSelectedColumn = selectedCell?.columnId === columnId
-                  const isRenamingHere = isEditable && renamingColumn?.columnId === columnId
-                  return (
-                    <div
-                      key={columnId}
-                      role="columnheader"
-                      aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
-                      className={`group relative min-w-0 border-r border-rule/60 ${isSelectedColumn ? selectedCellTint : ''}`}
-                      style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, height: ROW_HEIGHT_PX }}
-                    >
-                      {/* The name is cut off to fit the column. While the pointer is over the header (or it has focus) this strip grows to
-                          show the whole name, over the neighbouring headers, and shrinks back when the pointer leaves. */}
-                      <div
-                        className={`absolute inset-y-0 ${columnPosition === displayColumnIds.length - 1 ? 'right-0' : 'left-0'} flex w-full items-center gap-1.5 px-2 group-focus-within:z-10 group-focus-within:w-max group-focus-within:max-w-96 group-focus-within:min-w-full group-focus-within:bg-paper-raised group-hover:z-10 group-hover:w-max group-hover:max-w-96 group-hover:min-w-full group-hover:bg-paper-raised group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule`}
-                      >
-                        <span aria-hidden="true" className="font-mono text-[10px] font-normal text-ink-soft">
-                          {columnLabel(columnPosition)}
-                        </span>
-                        {isEditable ? (
-                          <button
-                            type="button"
-                            dir="auto"
-                            aria-haspopup="menu"
-                            aria-expanded={columnMenu?.columnId === columnId}
-                            title={`Column actions for ${columnName}`}
-                            onClick={(event) => openColumnMenu(columnId, event.currentTarget)}
-                            className="min-w-0 flex-1 cursor-pointer truncate text-start text-xs font-semibold hover:underline"
-                          >
-                            {columnName}
-                          </button>
-                        ) : (
-                          <span dir="auto" className="min-w-0 flex-1 truncate text-xs font-semibold">
-                            {columnName}
-                          </span>
-                        )}
-                        <button
-                          type="button"
-                          onClick={() => cycleSort(columnId)}
-                          aria-label={`Sort by ${columnName}`}
-                          title={`Sort by ${columnName}`}
-                          className="grid size-5 pointer-coarse:size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 hover:bg-paper-raised"
-                        >
-                          <SortChevron direction={columnDirection} />
-                        </button>
-                      </div>
-                      {isEditable && columnMenu?.columnId === columnId && (
+          <DataTable
+            tableRef={tableRef}
+            label={tableFormat.label}
+            columnIds={displayColumnIds}
+            columnNames={columnNames}
+            columnWidthsPx={columnWidthsPx}
+            rowNumberWidthPx={rowNumberColumnWidthPx}
+            rowIds={visibleRowIds}
+            getCellText={(rowId, columnId) =>
+              editingCell?.source === 'bar' && editingCell.rowId === rowId && editingCell.columnId === columnId ? editingCell.draft : getText(rowId, columnId)
+            }
+            getOriginalText={(rowId, columnId) => getOriginalCellText(rows, rowId, columnId)}
+            dataKey={rows}
+            isCellEdited={(rowId, columnId) => edits.cells.has(cellKey(rowId, columnId)) || isInsertedLine(rowId) || isInsertedLine(columnId)}
+            isInsertedRow={isInsertedLine}
+            isFindMatch={isEditable && isFindOpen && deferredFindText !== '' ? (cellText) => textMatches(cellText, deferredFindText, matchCase) : undefined}
+            selectedCell={selectedCell}
+            sort={activeSort}
+            onCycleSort={cycleSort}
+            isEditable={isEditable}
+            onColumnNameClick={isEditable ? openColumnMenu : undefined}
+            openMenuColumnId={columnMenu?.columnId ?? null}
+            renderHeaderExtras={
+              isEditable
+                ? (columnId, columnName) => (
+                    <>
+                      {columnMenu?.columnId === columnId && (
                         <editing.ColumnMenu
                           left={columnMenu.left}
                           top={columnMenu.top}
@@ -789,7 +562,7 @@ export default function CsvViewer({
                           onClose={() => setColumnMenu(null)}
                         />
                       )}
-                      {isRenamingHere && (
+                      {renamingColumn?.columnId === columnId && (
                         <editing.CellInput
                           ariaLabel={`Rename column ${columnName}`}
                           draft={renamingColumn.draft}
@@ -804,107 +577,38 @@ export default function CsvViewer({
                           }}
                         />
                       )}
-                    </div>
+                    </>
                   )
-                })}
-              </div>
-
-              <div role="rowgroup" className="relative" style={{ height: rowVirtualizer.getTotalSize() }}>
-                {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                  const rowId = visibleRowIds[virtualRow.index]
-                  const isSelectedRow = selectedCell?.rowId === rowId
-                  const isNewRow = isInsertedLine(rowId)
-                  return (
-                    <div
-                      key={virtualRow.key}
-                      role="row"
-                      aria-rowindex={virtualRow.index + 2}
-                      className="absolute inset-x-0 flex border-b border-rule/70 bg-paper-raised"
-                      style={{ top: virtualRow.start, height: virtualRow.size }}
-                    >
-                      <div
-                        role="rowheader"
-                        className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
-                          isSelectedRow ? `${selectedCellTint} font-semibold text-(--file-color)` : 'bg-paper text-ink-soft'
-                        } ${isNewRow ? 'italic' : ''}`}
-                        style={{ width: rowNumberWidthPx }}
-                      >
-                        {isNewRow ? 'new' : (rowId + 1).toLocaleString()}
-                      </div>
-                      {displayColumnIds.map((columnId, columnPosition) => {
-                        const key = cellKey(rowId, columnId)
-                        const isEdited = edits.cells.has(key) || isNewRow || isInsertedLine(columnId)
-                        const isSelected = isSelectedRow && selectedCell?.columnId === columnId
-                        const isEditingHere = editingCell?.rowId === rowId && editingCell.columnId === columnId
-                        const cellText = isEditingHere && editingCell?.source === 'bar' ? editingCell.draft : getText(rowId, columnId)
-                        const isFindMatch = isEditable && isFindOpen && deferredFindText !== '' && textMatches(cellText, deferredFindText, matchCase)
-                        return (
-                          <div
-                            key={columnId}
-                            role="gridcell"
-                            aria-selected={isSelected}
-                            dir="auto"
-                            onMouseEnter={(event) => anchorCellExpansion(event.currentTarget, { rowId, columnId })}
-                            onClick={(event) => {
-                              anchorCellExpansion(event.currentTarget, { rowId, columnId })
-                              setPickedCell({ rowId, columnId })
-                              scrollContainerRef.current?.focus({ preventScroll: true })
-                            }}
-                            onDoubleClick={() => {
-                              if (!isEditable) return
-                              setPickedCell({ rowId, columnId })
-                              beginEditing({ rowId, columnId }, 'cell')
-                            }}
-                            className={`group relative min-w-0 ${isEditable ? 'cursor-cell' : 'cursor-default'} border-r border-rule/60 tabular-nums ${
-                              isSelected
-                                ? `z-[1] ${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)`
-                                : isFindMatch
-                                  ? 'bg-accent/15'
-                                  : isEdited
-                                    ? 'bg-edit-mark/10'
-                                    : ''
-                            }`}
-                            style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${CELL_LINE_HEIGHT_PX}px` }}
-                          >
-                            {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
-                            {isEditable && isEditingHere && editingCell?.source === 'cell' ? (
-                              <editing.CellInput
-                                ariaLabel={`Edit ${columnNames[columnPosition]}, row ${rowLabel(rowId)}`}
-                                draft={editingCell.draft}
-                                onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
-                                onFinish={finishEditing}
-                                onBlur={() => {
-                                  if (editWasCancelledRef.current) {
-                                    editWasCancelledRef.current = false
-                                    return
-                                  }
-                                  finishEditing(true)
-                                }}
-                              />
-                            ) : (
-                              <span
-                                dir="auto"
-                                style={{ paddingBlock: CELL_VERTICAL_PADDING_PX }}
-                                className={`absolute px-3 ${
-                                  expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId && expandAnchor.fromRight ? 'right-0' : 'left-0'
-                                } ${
-                                  expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId && expandAnchor.fromBottom ? 'bottom-0' : 'top-0'
-                                } ${isSelected ? `${expandedCellTextClassName} ${selectedCellTint}` : `${restingCellTextClassName} ${hoverExpandedCellTextClassName}`}`}
-                              >
-                                {cellText}
-                              </span>
-                            )}
-                            {isEdited && <span className="sr-only">(edited)</span>}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-            {visibleRowIds.length === 0 && <p className="p-6 text-ink-soft">{isSearching ? 'No rows match your search.' : 'This file has no data rows.'}</p>}
-          </div>
+                : undefined
+            }
+            renderCellEditor={
+              isEditable
+                ? (rowId, columnId, columnName) =>
+                    editingCell?.source === 'cell' && editingCell.rowId === rowId && editingCell.columnId === columnId ? (
+                      <editing.CellInput
+                        ariaLabel={`Edit ${columnName}, row ${rowLabel(rowId)}`}
+                        draft={editingCell.draft}
+                        onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
+                        onFinish={finishEditing}
+                        onBlur={() => {
+                          if (editWasCancelledRef.current) {
+                            editWasCancelledRef.current = false
+                            return
+                          }
+                          finishEditing(true)
+                        }}
+                      />
+                    ) : null
+                : undefined
+            }
+            onCellClick={setPickedCell}
+            onCellDoubleClick={(position) => {
+              setPickedCell(position)
+              beginEditing(position, 'cell')
+            }}
+            onKeyDown={handleGridKeyDown}
+            emptyMessage={isSearching ? 'No rows match your search.' : 'This file has no data rows.'}
+          />
         )}
       </main>
 

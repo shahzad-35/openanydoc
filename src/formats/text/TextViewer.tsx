@@ -1,7 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Fragment, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { textControlClassName } from '../../buttonStyles'
+import { textControlClassName, viewerBarButtonClassName as barButtonClassName, viewerSegmentButtonClassName as segmentButtonClassName } from '../../buttonStyles'
 import { decodeCsvBytes, looksLikeBinary } from '../../parseCsv'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
@@ -21,11 +21,6 @@ const LARGE_EDIT_CHARACTER_COUNT = 2_000_000
 const COMMIT_DELAY_MS = 600
 const searchShortcutLabel = /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘K' : 'Ctrl K'
 const noLines: string[] = []
-
-const barButtonClassName =
-  'control-shape solid-box inline-flex min-h-8 pointer-coarse:min-h-11 min-w-8 shrink-0 cursor-pointer items-center justify-center gap-1.5 border-rule px-2.5 text-[13px] font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50 aria-pressed:border-(--file-color) aria-pressed:bg-(--file-color) aria-pressed:text-on-accent'
-const segmentButtonClassName =
-  'control-shape inline-flex min-h-7 pointer-coarse:min-h-10 min-w-8 cursor-pointer items-center justify-center px-2.5 text-[13px] font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-40 aria-pressed:bg-(--file-color) aria-pressed:text-on-accent'
 
 function readPlainText(fileContents: ArrayBuffer): ReadableText {
   if (fileContents.byteLength === 0) return { status: 'error', message: 'This file is empty.' }
@@ -344,8 +339,8 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
         <p className="border-b border-rule bg-paper px-4 py-2">This file is large, so typing may feel slow and line numbers are hidden while editing. View mode stays fast.</p>
       )}
 
-      <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper p-2 sm:p-4">
-        <div className="box-shape solid-box mx-auto flex min-h-0 w-full max-w-5xl flex-1 flex-col overflow-hidden border-rule border-t-2 border-t-(--file-color) bg-paper-raised">
+      <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
+        <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden border-t-2 border-t-(--file-color)">
           {isEditing ? (
             <div className="flex min-h-0 flex-1">
               {showLineNumbers && (

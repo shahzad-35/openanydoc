@@ -3,12 +3,13 @@ import DiscardEditsDialog from './components/DiscardEditsDialog'
 import FileViewPage from './pages/FileViewPage'
 import HomePage from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
-import { getFileViewPath, isFileViewPath } from './viewers'
+import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
 
 export default function App() {
   const [openedFile, setOpenedFile] = useState<OpenedFile | null>(null)
   const [discardRequest, setDiscardRequest] = useState<{ answer: (shouldDiscard: boolean) => void } | null>(null)
   const [fileKey, setFileKey] = useState(0)
+  const [pathname, setPathname] = useState(window.location.pathname)
   const hasUnsavedEditsRef = useRef(false)
   const openedFilePathRef = useRef('/')
 
@@ -27,10 +28,12 @@ export default function App() {
     hasUnsavedEditsRef.current = hasUnsavedEdits
   }, [])
 
-  // The file only lives in memory, so a file address (/view-csv, /view-pdf ...) never shows without one: a reload or Forward lands on home instead.
+  // The file only lives in memory, so an address that exists only for an open file (/view-pdf ...) never shows without one: a
+  // reload or Forward lands on home instead. A format's own address (/json-viewer ...) shows its page with the drop zone.
   useEffect(() => {
     function sendHomeIfOnFileViewPath() {
       if (isFileViewPath(window.location.pathname)) window.history.replaceState(null, '', '/')
+      setPathname(window.location.pathname)
     }
 
     function handleBrowserNavigation() {
@@ -58,6 +61,7 @@ export default function App() {
     setFileKey((currentKey) => currentKey + 1)
     openedFilePathRef.current = getFileViewPath(file.name)
     window.history.pushState({ fromHomePage: true }, '', openedFilePathRef.current)
+    setPathname(openedFilePathRef.current)
   }
 
   // Another file on the same file page: no new history entry, but the address follows the new file's type. The new key gives
@@ -67,6 +71,13 @@ export default function App() {
     setFileKey((currentKey) => currentKey + 1)
     openedFilePathRef.current = getFileViewPath(file.name)
     window.history.replaceState(window.history.state, '', openedFilePathRef.current)
+    setPathname(openedFilePathRef.current)
+  }
+
+  function navigateTo(path: string) {
+    window.history.pushState(null, '', path)
+    setPathname(path)
+    window.scrollTo(0, 0)
   }
 
   function closeFile() {
@@ -75,6 +86,7 @@ export default function App() {
       window.history.back()
     } else {
       window.history.replaceState(null, '', '/')
+      setPathname('/')
       setOpenedFile(null)
     }
   }
@@ -91,7 +103,7 @@ export default function App() {
           onUnsavedEditsChange={reportUnsavedEdits}
         />
       ) : (
-        <HomePage onFileLoaded={openFile} />
+        <HomePage onFileLoaded={openFile} onNavigate={navigateTo} toolViewer={findViewerByToolPath(pathname)} />
       )}
       {discardRequest && (
         <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />

@@ -19,6 +19,7 @@
 
   --type-csv: #6a46b0;
   --type-text: #4a5a73;
+  --type-json: #8a6700;
   --type-excel: #1b7a43;
   --type-word: #2459b5;
   --type-pdf: #b0214f;
@@ -50,6 +51,7 @@
 
   --type-csv: #b79bff;
   --type-text: #a9b9d4;
+  --type-json: #e8c547;
   --type-excel: #5fd08b;
   --type-word: #7fb0ff;
   --type-pdf: #ff7a9f;
@@ -74,6 +76,10 @@
 
 [data-file-type="text"] {
   --file-color: var(--type-text);
+}
+
+[data-file-type="json"] {
+  --file-color: var(--type-json);
 }
 
 [data-file-type="excel"] {

@@ -5,6 +5,7 @@ import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
+import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, jsonEditingModule } from './json/jsonModel'
 import { countTextChanges, createEmptyTextEdits, describeTextChanges, textEditingModule } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
@@ -72,7 +73,7 @@ export type FormatDefinition = {
 
 const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
 
-// To make another format editable, add `editing` to its entry. Only CSV and plain text are editable for now.
+// To make another format editable, add `editing` to its entry. CSV, plain text and JSON are editable for now.
 const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'csv',
@@ -92,6 +93,16 @@ const formatDefinitions: FormatDefinition[] = [
       countChanges: countTextChanges,
       describeChanges: describeTextChanges,
       loadEditingModule: () => Promise.resolve(textEditingModule),
+    },
+  },
+  {
+    viewerId: 'json',
+    ViewerComponent: lazy(() => import('./json/JsonViewer')),
+    editing: {
+      createEmptyEdits: createEmptyJsonEdits,
+      countChanges: countJsonChanges,
+      describeChanges: describeJsonChanges,
+      loadEditingModule: () => Promise.resolve(jsonEditingModule),
     },
   },
   { viewerId: 'excel', ViewerComponent: comingSoonViewer },

@@ -17,6 +17,7 @@ export const features = [
   'Edit CSV files in your browser: change cells, add or delete rows and columns, rename headers, find and replace, with undo and redo.',
   'Download what you see (the edits, the current sort and only the rows your search shows) as CSV or JSON, or copy it for Excel or Google Sheets.',
   'UTF-8 (with or without a BOM), UTF-16 and Arabic text are read correctly, and Arabic cells display right-to-left.',
+  'Open JSON files as a collapsible tree, a table (for a list of objects) or formatted code, with search, error messages that give the line and column, and editing. Large files are read in the background so the page stays responsive.',
   'Files over 50 MB show a warning, and OpenAnyDoc still tries to open them.',
   'Light and dark themes, with keyboard-friendly controls.',
 ]
@@ -29,7 +30,7 @@ export const faqItems = [
   },
   {
     question: 'Which files can I open?',
-    answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), Excel (.xlsx, .xls), Word (.docx), PDF (.pdf) and PowerPoint (.pptx).',
+    answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json), Excel (.xlsx, .xls), Word (.docx), PDF (.pdf) and PowerPoint (.pptx).',
   },
   {
     question: 'How big can a file be?',
@@ -39,7 +40,7 @@ export const faqItems = [
   {
     question: 'Can I edit my file or save changes?',
     answer:
-      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Other formats cannot be edited yet.',
+      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Plain text and JSON files can be edited too (JSON as a tree, a table, or code that is checked as you type). Other formats cannot be edited yet.',
   },
   {
     question: 'Which CSV delimiters are supported?',
