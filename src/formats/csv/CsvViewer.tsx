@@ -29,7 +29,13 @@ import type { ChangeRow, CsvEditingComponents } from './csvEditing'
 
 // Rows are 28px for a mouse so more data fits on screen, and 36px on touch screens where cells are tapped.
 const ROW_HEIGHT_PX = window.matchMedia('(pointer: coarse)').matches ? 36 : 28
-const COLUMN_MIN_WIDTH_PX = 140
+const COLUMN_MIN_WIDTH_PX = 80
+const COLUMN_MAX_WIDTH_PX = 384
+// Room around a cell's text (padding) and around a header's name (padding, sort arrow, menu button).
+const CELL_PADDING_PX = 20
+const HEADER_EXTRA_PX = 56
+// Only the first rows are measured, so a 120,000-row file opens as fast as a small one.
+const ROWS_MEASURED_FOR_WIDTH = 500
 const ROW_NUMBER_MIN_WIDTH_PX = 56
 const MAX_LISTED_CHANGES = 200
 
@@ -202,6 +208,23 @@ export default function CsvViewer({
       ),
     [displayColumnIds, hasHeaderRow, rows, edits],
   )
+
+  // Each column is as wide as its longest text among the first rows (and its header name), within a minimum and maximum.
+  // Original text only, so a column does not change width while it is being edited.
+  const columnWidthsPx = useMemo(() => {
+    const measuringContext = document.createElement('canvas').getContext('2d')
+    if (!measuringContext) return displayColumnIds.map(() => COLUMN_MIN_WIDTH_PX)
+    const lastMeasuredRowId = Math.min(originalRowCount, firstDataRowId + ROWS_MEASURED_FOR_WIDTH)
+    return displayColumnIds.map((columnId, columnPosition) => {
+      measuringContext.font = '600 12px system-ui, sans-serif'
+      let widestTextPx = measuringContext.measureText(columnNames[columnPosition]).width + HEADER_EXTRA_PX - CELL_PADDING_PX
+      measuringContext.font = '14px system-ui, sans-serif'
+      for (let rowId = firstDataRowId; rowId < lastMeasuredRowId; rowId++) {
+        widestTextPx = Math.max(widestTextPx, measuringContext.measureText(getOriginalCellText(rows, rowId, columnId)).width)
+      }
+      return Math.min(COLUMN_MAX_WIDTH_PX, Math.max(COLUMN_MIN_WIDTH_PX, Math.ceil(widestTextPx + CELL_PADDING_PX)))
+    })
+  }, [displayColumnIds, columnNames, rows, originalRowCount, firstDataRowId])
 
   // A cell stays selected only while its row and column are still shown (deleting them clears the selection).
   const selectedCell =
@@ -437,7 +460,7 @@ export default function CsvViewer({
   const totalRowCount = displayRowIds.length
   const isSearching = deferredSearchText.trim() !== ''
   const rowNumberWidthPx = Math.max(ROW_NUMBER_MIN_WIDTH_PX, originalRowCount.toLocaleString().length * 10 + 36)
-  const tableMinWidthPx = rowNumberWidthPx + displayColumnIds.length * COLUMN_MIN_WIDTH_PX
+  const tableMinWidthPx = rowNumberWidthPx + columnWidthsPx.reduce((totalWidthPx, columnWidthPx) => totalWidthPx + columnWidthPx, 0)
   const detectedDelimiterLabel =
     DELIMITER_OPTIONS.find((option) => option.value === readableCsv?.detectedDelimiter)?.label ?? 'Custom'
   const largeFileWarning = getLargeFileWarning(openedFile.file)
@@ -657,7 +680,7 @@ export default function CsvViewer({
                       role="columnheader"
                       aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
                       className={`group relative min-w-0 border-r border-rule/60 ${isSelectedColumn ? selectedCellTint : ''}`}
-                      style={{ flex: `1 0 ${COLUMN_MIN_WIDTH_PX}px`, height: ROW_HEIGHT_PX }}
+                      style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, height: ROW_HEIGHT_PX }}
                     >
                       {/* The name is cut off to fit the column. While the pointer is over the header (or it has focus) this strip grows to
                           show the whole name, over the neighbouring headers, and shrinks back when the pointer leaves. */}
@@ -781,7 +804,7 @@ export default function CsvViewer({
                                     ? 'bg-edit-mark/10'
                                     : ''
                             }`}
-                            style={{ flex: `1 0 ${COLUMN_MIN_WIDTH_PX}px`, lineHeight: `${ROW_HEIGHT_PX}px` }}
+                            style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${ROW_HEIGHT_PX}px` }}
                           >
                             {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
                             {isEditable && isEditingHere && editingCell?.source === 'cell' ? (

@@ -9,15 +9,7 @@
       content="OpenAnyDoc is a free file viewer and editor for CSV, Excel, Word, PDF and PowerPoint files. Instant and private: your files never leave your device."
     />
     <title>OpenAnyDoc – Free, private file viewer and editor</title>
-    <script>
-      try {
-        const savedTheme = localStorage.getItem('theme')
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
-        if (savedTheme === 'dark' || (savedTheme !== 'light' && prefersDark)) {
-          document.documentElement.classList.add('dark')
-        }
-      } catch {}
-    </script>
+    <script src="/theme-init.js"></script>
   </head>
   <body>
     <div id="root"></div>

@@ -26,4 +26,6 @@ dist-ssr
 /test-files
 /.claude
 CLAUDE.md
+DECISIONS.md
+DESIGN.md
 LOG.md
