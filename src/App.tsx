@@ -2,6 +2,7 @@ import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import DiscardEditsDialog from './components/DiscardEditsDialog'
 import { LocaleContext, SwitchLanguageContext, getBrowserLocale, localizePath, splitLocalePath } from './i18n'
 import type { Locale } from './i18n'
+import { ToastProvider } from './components/Messages'
 import FileViewPage from './pages/FileViewPage'
 import HomePage from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
@@ -148,34 +149,36 @@ export default function App() {
   return (
     <LocaleContext.Provider value={locale}>
       <SwitchLanguageContext.Provider value={switchLanguage}>
-        {openedFile ? (
-          <FileViewPage
-            key={fileKey}
-            openedFile={openedFile}
-            onClose={closeFile}
-            onReplaceFile={replaceFile}
-            confirmDiscardEdits={confirmDiscardEdits}
-            onUnsavedEditsChange={reportUnsavedEdits}
-          />
-        ) : path === '/changelog' ? (
-          <Suspense fallback={null}>
-            <ChangelogPage onNavigate={navigateTo} />
-          </Suspense>
-        ) : (
-          <HomePage
-            onFileLoaded={openFile}
-            onNavigate={navigateTo}
-            toolViewer={findViewerByToolPath(path)}
-            isBannerDismissed={isBannerDismissed}
-            onDismissBanner={() => setIsBannerDismissed(true)}
-            handoffFile={handoffFile}
-            onHandoffConsumed={() => setHandoffFile(null)}
-            onOpenInViewer={openInViewer}
-          />
-        )}
-        {discardRequest && (
-          <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
-        )}
+        <ToastProvider>
+          {openedFile ? (
+            <FileViewPage
+              key={fileKey}
+              openedFile={openedFile}
+              onClose={closeFile}
+              onReplaceFile={replaceFile}
+              confirmDiscardEdits={confirmDiscardEdits}
+              onUnsavedEditsChange={reportUnsavedEdits}
+            />
+          ) : path === '/changelog' ? (
+            <Suspense fallback={null}>
+              <ChangelogPage onNavigate={navigateTo} />
+            </Suspense>
+          ) : (
+            <HomePage
+              onFileLoaded={openFile}
+              onNavigate={navigateTo}
+              toolViewer={findViewerByToolPath(path)}
+              isBannerDismissed={isBannerDismissed}
+              onDismissBanner={() => setIsBannerDismissed(true)}
+              handoffFile={handoffFile}
+              onHandoffConsumed={() => setHandoffFile(null)}
+              onOpenInViewer={openInViewer}
+            />
+          )}
+          {discardRequest && (
+            <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
+          )}
+      </ToastProvider>
       </SwitchLanguageContext.Provider>
     </LocaleContext.Provider>
   )

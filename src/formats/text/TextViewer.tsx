@@ -7,6 +7,7 @@ import { Icon, IconButton } from '../../components/ToolbarControls'
 import { useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { decodeCsvBytes, looksLikeBinary } from '../../parseCsv'
+import { FatalFileError, Notice } from '../../components/Messages'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
@@ -73,7 +74,7 @@ function HighlightedLine({ lineText, searchText }: { lineText: string; searchTex
 // A plain text file as a document. In View mode: a sheet with a line-number gutter, search, and reading controls, every line
 // aligned to its own language direction, drawn only where visible so a very long file stays smooth. In Edit mode the same
 // sheet holds one text box; the edits join the page's undo, redo and Download.
-export default function TextViewer({ openedFile, mode, session: untypedSession, onExportSourceChange, onSelectionChange, onCommandsChange }: FormatViewerProps) {
+export default function TextViewer({ openedFile, mode, session: untypedSession, onOpenAnotherFile, onExportSourceChange, onSelectionChange, onCommandsChange }: FormatViewerProps) {
   const { locale, t, tp, idFor } = useT()
   const session = untypedSession as EditSession<TextEdits>
   const readableText = useMemo(() => readPlainText(openedFile.contents), [openedFile])
@@ -305,11 +306,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   if (readableText.status === 'error') {
     return (
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
-        <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
-          <h2 className="type-h3">{t('text.error.title')}</h2>
-          <p className="mt-2">{t(readableText.messageKey)}</p>
-          <p className="mt-2 text-ink-soft">{t('text.error.hint')}</p>
-        </div>
+        <FatalFileError title={t('text.error.title')} reason={t(readableText.messageKey)} hint={t('text.error.hint')} onOpenAnotherFile={onOpenAnotherFile} />
       </main>
     )
   }
@@ -416,7 +413,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
         />
       )}
 
-      {largeFileWarning && <p id="large-file-warning" className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
+      <Notice id="large-file-warning" kind="warning" className="border-b border-rule bg-paper px-4 py-2" message={largeFileWarning ?? ''} />
       {isEditing && isLargeForEditing && (
         <p id="large-edit-warning" className="border-b border-rule bg-paper px-4 py-2">{t('text.largeEditWarning')}</p>
       )}
@@ -486,11 +483,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
         <p id="character-count" className="text-ink-soft">{tp('text.status.characters', (isEditing ? draftText : currentText).length)}</p>
         {isEditing && <p id="word-count" className="text-ink-soft">{tp('text.status.words', wordCount)}</p>}
         <p id="encoding-label" className="text-ink-soft">{t('text.status.encoding', { encoding: readableText.encodingLabel })}</p>
-        {copyMessage && (
-          <p id="copy-message" role="status" className="font-medium">
-            {copyMessage}
-          </p>
-        )}
+        <Notice id="copy-message" kind="success" role="status" className="font-medium" message={copyMessage} />
         <p className="ms-auto text-ink-soft">{isEditing ? t('text.status.editingHint') : t('text.status.searchHint', { shortcut: searchShortcutLabel })}</p>
       </footer>
     </div>

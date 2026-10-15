@@ -84,7 +84,7 @@
   "drop.step1": "Choose a file",
   "drop.step2": "Read in your browser",
   "drop.step3": "View it",
-  "intake.cannotOpen": "{name} can't be opened here. OpenAnyDoc opens {extensions} files.",
+  "intake.cannotOpen": "This file type isn't supported.",
   "intake.readFailed": "Couldn't read this file. It may be too large for your browser's memory.",
   "intake.oneFile": "Open one file at a time.",
   "intake.largeFile": "This file is {size}. Large files can be slow or run out of memory, but we'll still try to open it.",
@@ -588,5 +588,10 @@
   "formats.viewAndEdit": "View and edit",
   "formats.viewOnly": "View",
   "formats.comingSoon": "Coming soon",
-  "intake.comingSoon": "{format} files can't be opened yet; support is coming soon."
+  "intake.comingSoon": "{format} support is coming soon.",
+  "toast.dismiss": "Dismiss message",
+  "toast.region": "Messages",
+  "json.error.details": "Details",
+  "banner.title": "New file types are here",
+  "intake.tryThese": "You can open CSV, Excel, JSON and TXT files."
 }

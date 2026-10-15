@@ -125,7 +125,7 @@ export default function HomePage({
         </header>
 
         {/* What's new is announced on the home page only, not on a format's own page. */}
-        {!toolViewer && !isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} isContained />}
+        {!toolViewer && !isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} />}
 
         <main id="main" className="mx-auto max-w-5xl px-4 pb-20">
           <section id="hero" className="flex min-h-[calc(100dvh-6rem)] flex-col justify-center py-8 text-center">

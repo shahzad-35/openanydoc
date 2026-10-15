@@ -224,7 +224,7 @@ await test('a JSON file dropped on the CSV page is offered the JSON viewer, with
   await openPage('/en/csv-viewer')
   await chooseFile(sampleJson)
   await waitFor(`document.body.innerText.includes('This looks like a JSON file.')`, 'the redirect offer')
-  expect(await evaluate(`document.body.innerText.includes("can't be opened here")`) === false, 'the plain rejection was shown too')
+  expect(await evaluate(`document.body.innerText.includes("This file type isn't supported.")`) === false, 'the plain rejection was shown too')
   await evaluate(`[...document.querySelectorAll('button')].find((button) => button.innerText === 'Open it in the JSON viewer').click()`)
   await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open in the JSON viewer')
   expect(!(await evaluate('location.href')).includes('sample'), 'the file name reached the URL')
@@ -234,7 +234,7 @@ await test('a JSON file dropped on the CSV page is offered the JSON viewer, with
 await test('a file nobody opens keeps the friendly rejection', async () => {
   await openPage('/en/csv-viewer')
   await chooseFile(unknownFile)
-  await waitFor(`document.body.innerText.replace(/[\u2066-\u2069]/g, '').includes("notes.doc can't be opened here")`, 'the rejection message')
+  await waitFor(`document.body.innerText.includes("This file type isn't supported.")`, 'the rejection message')
   expect(!(await evaluate(`document.body.innerText.includes('This looks like')`)), 'a redirect was offered for an unregistered type')
 })
 
@@ -400,9 +400,9 @@ await test('one drop zone opens every live format with its View / Edit toggle an
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
     await chooseFile(comingSoonFile)
-    await waitFor(`document.querySelector('#coming-soon-message')`, 'the Coming soon message')
+    await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the Coming soon toast')
     expect((await evaluate('location.pathname')) === `/${locale}`, `${locale}: left the home page`)
-    expect(await evaluate(`document.querySelector('#drop-error') === null && document.querySelector('#file-page') === null`), `${locale}: an error or a file page showed for a Coming soon format`)
+    expect(await evaluate(`document.querySelector('#file-page') === null && document.querySelector('#coming-soon-message') === null`), `${locale}: a file page or an inline line showed for a Coming soon format`)
   }
   expect(await evaluate(`document.querySelector('#privacy-note').innerText.length > 40`), 'the privacy note is missing')
 })
@@ -473,6 +473,136 @@ await test('an Arabic CSV without a UTF-8 BOM offers the Excel copy, in both lan
     await waitFor(`document.querySelector('#data-table')`, 'the ASCII CSV to show')
     expect(await evaluate(`document.querySelector('#download-excel-copy-button') === null`), `${locale}: the button shows for an ASCII file`)
   }
+})
+
+
+// ---------------------------------------------------------------- messages on a phone: toasts and modals
+
+const emptyCsv = path.join(scratchFolder, 'empty.csv')
+fs.writeFileSync(emptyCsv, '')
+const brokenJson = path.join(scratchFolder, 'broken.json')
+fs.writeFileSync(brokenJson, '{"a": 1,}')
+const arabicCsvForPhone = path.join(scratchFolder, 'arabic-phone.csv')
+fs.writeFileSync(arabicCsvForPhone, 'name,city\nأحمد,الرياض\n')
+
+async function onPhone(run) {
+  await send('Emulation.setDeviceMetricsOverride', { width: 390, height: 800, deviceScaleFactor: 2, mobile: true })
+  await send('Emulation.setTouchEmulationEnabled', { enabled: true })
+  try {
+    await run()
+  } finally {
+    await send('Emulation.setTouchEmulationEnabled', { enabled: false })
+    await send('Emulation.clearDeviceMetricsOverride')
+  }
+}
+const toastRegionText = () => evaluate(`document.querySelector('#toast-region:popover-open')?.innerText ?? ''`)
+
+await test('on a phone an unsupported file shows a toast, not a banner; it can be dismissed', async () => {
+  await onPhone(async () => {
+    for (const locale of ['en', 'ar']) {
+      await openPage(`/${locale}`)
+      await chooseFile(unknownFile)
+      await waitFor(`document.querySelector('#toast-region:popover-open [role=status]')`, `${locale}: the error toast`)
+      expect(await evaluate(`document.querySelector('#drop-error') === null`), `${locale}: the inline error showed on a phone`)
+      expect((await toastRegionText()).length > 0 && (await toastRegionText()).length < 120, `${locale}: the toast is empty or long`)
+      expect(await evaluate(`document.querySelector('#toast-region').getBoundingClientRect().bottom > innerHeight - 40`), `${locale}: the toast is not at the bottom`)
+      expect(await evaluate(`document.querySelectorAll('#toast-region button').length === 1`), `${locale}: the toast must have one button, to dismiss it`)
+      await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
+      await waitFor(`!document.querySelector('#toast-region:popover-open')`, `${locale}: the toast to close`)
+    }
+    await openPage('/en')
+    await chooseFile(comingSoonFile)
+    await waitFor(`document.querySelector('#toast-region:popover-open [role=status]')`, 'the Coming soon toast')
+    expect(await evaluate(`document.querySelector('#coming-soon-message') === null`), 'the inline Coming soon line showed on a phone')
+  })
+})
+
+await test('on a phone a toast goes away by itself', async () => {
+  await onPhone(async () => {
+    await openPage('/en')
+    await chooseFile(unknownFile)
+    await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the toast')
+    const shownAt = Date.now()
+    await waitFor(`!document.querySelector('#toast-region:popover-open')`, 'the toast to go away by itself', 6000)
+    expect(Date.now() - shownAt < 5200, `the toast stayed ${Date.now() - shownAt} ms; it should go after about 3 seconds`)
+  })
+})
+
+await test('on a phone a file for another viewer is offered in a dialog, and an unreadable file in a dialog with a way out', async () => {
+  await onPhone(async () => {
+    await openPage('/en/csv-viewer')
+    await chooseFile(sampleJson)
+    await waitFor(`document.querySelector('#dialog-wrong-file[open] #open-in-viewer-button')`, 'the wrong-file dialog')
+    expect(await evaluate(`document.querySelector('#wrong-file-redirect') === null`), 'the inline offer showed on a phone')
+    await evaluate(`document.querySelector('#open-in-viewer-button').click()`)
+    await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the JSON file to open')
+    await openPage('/en/csv-viewer')
+    await chooseFile(emptyCsv)
+    await waitFor(`document.querySelector('#dialog-file-error[open]')`, 'the file error dialog')
+    expect(await evaluate(`document.querySelector('#file-error') === null`), 'the inline error box showed behind the dialog')
+    await evaluate(`window.__pickerClicks = 0; const click = HTMLInputElement.prototype.click; HTMLInputElement.prototype.click = function () { if (this.type === 'file') window.__pickerClicks++; else click.call(this) }`)
+    await evaluate(`document.querySelector('#file-error-open-another-button').click()`)
+    expect((await evaluate('window.__pickerClicks')) === 1, '"Open another file" did not open the chooser')
+    await openPage('/en/csv-viewer')
+    await chooseFile(emptyCsv)
+    await waitFor(`document.querySelector('#dialog-file-error[open]')`, 'the file error dialog again')
+    await evaluate(`document.querySelector('#file-error-close-button').click()`)
+    await waitFor(`document.querySelector('#file-error') && !document.querySelector('#dialog-file-error')`, 'the box to stay after closing the dialog')
+  })
+})
+
+await test('on a phone a JSON syntax error is a slim bar that opens a dialog; the Arabic Excel copy is a toast with a button', async () => {
+  await onPhone(async () => {
+    await openPage('/en/json-viewer')
+    await chooseFile(brokenJson)
+    await waitFor(`document.querySelector('#json-error-bar')`, 'the slim error bar')
+    expect(await evaluate(`document.querySelector('#json-error') === null`), 'the full banner showed on a phone')
+    expect(await evaluate(`document.querySelector('#json-error-bar').getBoundingClientRect().height < 60`), 'the bar is not slim')
+    await evaluate(`document.querySelector('#json-error-bar').click()`)
+    await waitFor(`document.querySelector('#dialog-json-error[open] #json-error-message')`, 'the error dialog')
+    await evaluate(`document.querySelector('#json-error-close-button').click()`)
+    for (const locale of ['en', 'ar']) {
+      await openPage(`/${locale}/csv-viewer`)
+      await chooseFile(arabicCsvForPhone)
+      await waitFor(`document.querySelector('#toast-region:popover-open [id^=toast-action-button]')`, `${locale}: the Excel copy toast`)
+      expect(await evaluate(`document.querySelector('#excel-copy-notice') === null`), `${locale}: the inline Excel strip showed on a phone`)
+    }
+  })
+})
+
+
+// ---------------------------------------------------------------- the What's new card
+
+await test("the What's new card floats at the bottom end and moves nothing", async () => {
+  for (const locale of ['en', 'ar']) {
+    await openPage(`/${locale}`)
+    const card = await evaluate(`(() => { const box = document.querySelector('#whats-new-banner').getBoundingClientRect(); return { position: getComputedStyle(document.querySelector('#whats-new-banner')).position, left: box.left, right: box.right, bottom: box.bottom, width: innerWidth, height: innerHeight, heroTop: document.querySelector('#hero').getBoundingClientRect().top } })()`)
+    expect(card.position === 'fixed' && card.bottom <= card.height && card.bottom > card.height - 40, `${locale}: the card is not fixed at the bottom`)
+    if (locale === 'en') expect(card.right > card.width - 40 && card.left > card.width / 2, 'the card is not at the bottom right')
+    else expect(card.left < 40 && card.right < card.width / 2, 'the card is not at the bottom left in Arabic')
+    await evaluate(`document.querySelector('#banner-close-button').click()`)
+    const heroTopAfter = await evaluate(`document.querySelector('#hero').getBoundingClientRect().top`)
+    expect(heroTopAfter === card.heroTop, `${locale}: the page moved when the card closed (${card.heroTop} to ${heroTopAfter})`)
+  }
+  await onPhone(async () => {
+    await openPage('/en')
+    const fits = await evaluate(`(() => { const box = document.querySelector('#whats-new-banner').getBoundingClientRect(); return box.left >= 8 && box.right <= innerWidth - 8 && box.height < 190 })()`)
+    expect(fits, 'the card does not fit a phone, or it is too tall')
+  })
+})
+
+
+await test("the What's new card closes itself after about 3 seconds, waits while the pointer is over it, and returns after a reload", async () => {
+  await openPage('/en')
+  expect((await bannerText()) !== null, 'the card was not there at first')
+  await waitFor(`!document.querySelector('#whats-new-banner')`, 'the card to close by itself', 6000)
+  await openPage('/en')
+  const box = await evaluate(`(() => { const b = document.querySelector('#whats-new-banner').getBoundingClientRect(); return { x: b.x + b.width / 2, y: b.y + b.height / 2 } })()`)
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: box.x, y: box.y })
+  await sleep(4500)
+  expect((await bannerText()) !== null, 'the card closed while the pointer was over it')
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 5 })
+  await waitFor(`!document.querySelector('#whats-new-banner')`, 'the card to close after the pointer left', 6000)
 })
 
 // ---------------------------------------------------------------- report

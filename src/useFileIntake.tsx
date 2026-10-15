@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
-import { isolateLeftToRight, isolateText, translate, useT } from './i18n'
+import { isolateLeftToRight, translate, useT } from './i18n'
 import type { Locale } from './i18n'
 import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
@@ -42,6 +42,8 @@ export function getLargeFileWarning(file: File, locale: Locale) {
 export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed }: FileIntakeOptions) {
   const { locale, t } = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  // The grey line under an error toast, for the rejection that can say what to do instead.
+  const [errorDetail, setErrorDetail] = useState<string | null>(null)
   const [redirectSuggestion, setRedirectSuggestion] = useState<RedirectSuggestion | null>(null)
   const [comingSoonViewer, setComingSoonViewer] = useState<Viewer | null>(null)
   const [largeFileWarning, setLargeFileWarning] = useState<string | null>(null)
@@ -57,6 +59,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   async function loadFile(file: File) {
     setErrorMessage(null)
+    setErrorDetail(null)
     setRedirectSuggestion(null)
     setComingSoonViewer(null)
     setLargeFileWarning(null)
@@ -76,7 +79,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
         setRedirectSuggestion({ viewer: releasedFormat.viewer, file })
         return
       }
-      setErrorMessage(t('intake.cannotOpen', { name: isolateText(file.name), extensions: isolateLeftToRight(acceptedExtensions.join(', ')) }))
+      setErrorMessage(t('intake.cannotOpen'))
+      setErrorDetail(t('intake.tryThese'))
       return
     }
 
@@ -165,8 +169,10 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   return {
     acceptsPastedText,
+    clearRedirectSuggestion: () => setRedirectSuggestion(null),
     comingSoonViewer,
     dropTargetProps,
+    errorDetail,
     errorMessage,
     fileInput,
     isDraggingOver,

@@ -4,6 +4,7 @@ import { compactSecondaryButtonClassName, textControlClassName } from '../../but
 import { isolateLeftToRight, isolateText, useT } from '../../i18n'
 import { DELIMITER_OPTIONS, describeParseNotice, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
 import type { DelimiterChoice, ParsedCsv } from '../../parseCsv'
+import { FatalFileError, Notice, useIsPhone, useToast } from '../../components/Messages'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
 import { buildDownloadName, downloadTextFile } from '../registry'
@@ -53,6 +54,7 @@ export default function CsvViewer({
   session: untypedSession,
   editingComponents,
   confirmDiscardEdits,
+  onOpenAnotherFile,
   onSelectionChange,
   onCommandsChange,
   onExportSourceChange,
@@ -441,6 +443,26 @@ export default function CsvViewer({
     downloadTextFile(downloadName, `\uFEFF${buildCsvText(edits, exportSource)}`, `${tableFormat.mimeType};charset=utf-8`)
   }
 
+  // On a phone the notices and the Excel-copy offer are toasts (the button acts on what is current, so it goes through a ref).
+  const isPhone = useIsPhone()
+  const { showToast, dismissToast } = useToast()
+  const downloadExcelCopyRef = useRef(downloadExcelCopy)
+  useEffect(() => {
+    downloadExcelCopyRef.current = downloadExcelCopy
+  })
+  const noticeText = noticeLines.join('\n')
+  useEffect(() => {
+    if (!isPhone || noticeText === '') return
+    for (const noticeLine of noticeText.split('\n')) showToast({ message: noticeLine, kind: 'warning' })
+  }, [isPhone, noticeText, showToast])
+  const excelCopyReason = t('csv.excelCopy.reason')
+  const excelCopyButtonLabel = t('csv.excelCopy.button')
+  useEffect(() => {
+    if (!isPhone || !offersExcelCopy) return
+    const toastId = showToast({ message: excelCopyReason, kind: 'info', action: { label: excelCopyButtonLabel, onClick: () => downloadExcelCopyRef.current() } })
+    return () => dismissToast(toastId)
+  }, [isPhone, offersExcelCopy, excelCopyReason, excelCopyButtonLabel, showToast, dismissToast])
+
   // What the Changes list shows: the first edited cells with their old and new text, and how many there are in all.
   const visibleRowIdSet = useMemo(() => (isSearching ? new Set(visibleRowIds) : null), [isSearching, visibleRowIds])
   const changedCellCount = useMemo(() => countShownEditedCells(edits), [edits])
@@ -563,7 +585,7 @@ export default function CsvViewer({
         />
       )}
 
-      {noticeLines.length > 0 && (
+      {!isPhone && noticeLines.length > 0 && (
         <ul id="file-notices" role="status" className="space-y-1 border-b border-rule bg-paper-raised px-4 py-2 text-sm">
           {noticeLines.map((noticeLine) => (
             <li key={noticeLine}>{noticeLine}</li>
@@ -571,7 +593,7 @@ export default function CsvViewer({
         </ul>
       )}
 
-      {offersExcelCopy && (
+      {!isPhone && offersExcelCopy && (
         <div id="excel-copy-notice" className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-rule bg-paper-raised px-4 py-2 text-sm">
           <p>{t('csv.excelCopy.reason')}</p>
           <button id="download-excel-copy-button" type="button" onClick={downloadExcelCopy} className={compactSecondaryButtonClassName}>
@@ -584,11 +606,7 @@ export default function CsvViewer({
         {parsedCsv === null && <p className="p-6 text-ink-soft">{t('csv.reading')}</p>}
 
         {parsedCsv?.status === 'error' && (
-          <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
-            <h2 className="type-h3">{t('csv.error.title')}</h2>
-            <p className="mt-2">{t(`csv.error.${parsedCsv.reason}`)}</p>
-            <p className="mt-2 text-ink-soft">{t('csv.error.hint')}</p>
-          </div>
+          <FatalFileError title={t('csv.error.title')} reason={t(`csv.error.${parsedCsv.reason}`)} hint={t('csv.error.hint')} onOpenAnotherFile={onOpenAnotherFile} />
         )}
 
         {readableCsv && (
@@ -715,11 +733,7 @@ export default function CsvViewer({
             />
             {t('csv.headerRow')}
           </label>
-          {cleanUpMessage?.forEdits === edits && (
-            <span id="clean-up-message" role="status" className="font-medium">
-              {cleanUpMessage.text}
-            </span>
-          )}
+          <Notice id="clean-up-message" kind="success" role="status" className="font-medium" message={cleanUpMessage?.forEdits === edits ? cleanUpMessage.text : ''} />
           <span className="hidden text-ink-soft sm:inline">{readableCsv.encodingLabel.startsWith('Windows-1256') ? t('csv.encoding.windows1256') : readableCsv.encodingLabel}</span>
           <span className="ms-auto hidden text-ink-soft md:inline">{isEditable ? t('csv.hint.edit') : t('csv.hint.view')}</span>
         </footer>

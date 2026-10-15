@@ -5,6 +5,9 @@ import { textControlClassName } from '../../buttonStyles'
 import { Icon, IconButton } from '../../components/ToolbarControls'
 import { isolateLeftToRight, translatePlural, useT } from '../../i18n'
 import type { Locale } from '../../i18n'
+import { Notice, useIsPhone } from '../../components/Messages'
+import ModalDialog from '../../components/ModalDialog'
+import { primaryButtonClassName, secondaryButtonClassName } from '../../buttonStyles'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
@@ -71,6 +74,8 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
   const [searchText, setSearchText] = useState('')
   const [currentMatchPosition, setCurrentMatchPosition] = useState(0)
   const [copyMessage, setCopyMessage] = useState('')
+  const isPhone = useIsPhone()
+  const [isErrorDialogOpen, setIsErrorDialogOpen] = useState(false)
   const [selectedPath, setSelectedPath] = useState<JsonPath | null>(null)
   const [pathCopyMessage, setPathCopyMessage] = useState('')
   const [isFindOpen, setIsFindOpen] = useState(false)
@@ -548,9 +553,50 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
           onClose={() => setIsFindOpen(false)}
         />
       )}
-      {largeFileWarning && <p id="large-file-warning" className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
-      {expandNotice && <p id="expand-notice" className="border-b border-rule bg-paper px-4 py-2">{expandNotice}</p>}
-      {validationError ? (
+      <Notice id="large-file-warning" kind="warning" className="border-b border-rule bg-paper px-4 py-2" message={largeFileWarning ?? ''} />
+      <Notice id="expand-notice" kind="info" className="border-b border-rule bg-paper px-4 py-2" message={expandNotice} />
+      {validationError && isPhone ? (
+        <>
+          <button
+            id="json-error-bar"
+            type="button"
+            onClick={() => setIsErrorDialogOpen(true)}
+            className="flex min-h-11 w-full cursor-pointer items-center gap-2 border-b border-danger bg-paper px-4 text-start text-sm text-danger"
+          >
+            <span className="min-w-0 flex-1 truncate">
+              <strong>{t('json.viewer.notValid')} </strong>
+              {validationError.line !== null && t('json.viewer.errorPosition', { line: validationError.line, column: validationError.column ?? 1 })}
+            </span>
+            <span className="shrink-0 font-medium underline">{t('json.error.details')}</span>
+          </button>
+          {isErrorDialogOpen && (
+            <ModalDialog id="dialog-json-error" title={t('json.viewer.notValid')} onClose={() => setIsErrorDialogOpen(false)}>
+              <p id="json-error-message" role="alert" className="mt-3">
+                {validationError.line !== null && `${t('json.viewer.errorPosition', { line: validationError.line, column: validationError.column ?? 1 })} `}
+                <bdi dir="ltr">{validationError.message}</bdi>
+              </p>
+              <div className="mt-6 flex flex-wrap justify-end gap-3">
+                {isEditing && validationError.line !== null && showCode && (
+                  <button
+                    id="json-error-go-to-button"
+                    type="button"
+                    onClick={() => {
+                      setIsErrorDialogOpen(false)
+                      selectErrorInTextBox()
+                    }}
+                    className={primaryButtonClassName}
+                  >
+                    {t('json.viewer.goToError')}
+                  </button>
+                )}
+                <button id="json-error-close-button" type="button" autoFocus onClick={() => setIsErrorDialogOpen(false)} className={isEditing && showCode ? secondaryButtonClassName : primaryButtonClassName}>
+                  {t('find.close')}
+                </button>
+              </div>
+            </ModalDialog>
+          )}
+        </>
+      ) : validationError ? (
         <div id="json-error" role="alert" className="flex flex-wrap items-center gap-3 border-b border-danger bg-paper px-4 py-2 text-danger">
           <p className="min-w-0 flex-1">
             <strong>{t('json.viewer.notValid')} </strong>
@@ -654,18 +700,10 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
                 <path d="M8 7.5c5 0 3 9 8 9" />
               </Icon>
             </IconButton>
-            {pathCopyMessage && (
-              <span id="path-copy-message" role="status" className="font-medium">
-                {pathCopyMessage}
-              </span>
-            )}
+            <Notice id="path-copy-message" kind="success" role="status" className="font-medium" message={pathCopyMessage} />
           </p>
         )}
-        {copyMessage && (
-          <p id="copy-message" role="status" className="font-medium">
-            {copyMessage}
-          </p>
-        )}
+        <Notice id="copy-message" kind="success" role="status" className="font-medium" message={copyMessage} />
         {(showCode || edits.root === null) && <p className="text-ink-soft">{tp('json.viewer.characters', (showCode ? codeText : originalText).length)}</p>}
         <p className="ms-auto text-ink-soft">{isEditing ? t('json.viewer.editingNote') : t('json.viewer.searchHint', { shortcut: isolateLeftToRight(searchShortcutLabel) })}</p>
       </footer>

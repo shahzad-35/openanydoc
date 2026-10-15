@@ -1,6 +1,7 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChangeCounter, EditToolbar, ViewEditToggle } from '../components/EditControls'
 import FileViewHeader from '../components/FileViewHeader'
+import { Notice, REJECTED_FILE_TOAST_SECONDS } from '../components/Messages'
 import { FILE_SAVED_EVENT, findFormatForFileName } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import { useEditSession } from '../formats/useEditSession'
@@ -162,25 +163,36 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
       )}
       {anotherFileIntake.fileInput}
       <div id="file-messages" aria-live="polite">
-        {anotherFileIntake.errorMessage && (
-          <p id="another-file-error" role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 font-medium text-danger">
-            {anotherFileIntake.errorMessage}
-          </p>
-        )}
-        {anotherFileIntake.comingSoonViewer && (
-          <p id="another-file-coming-soon" className="border-b border-rule bg-paper-raised px-4 py-2 font-medium">
-            {t('intake.comingSoon', { format: anotherFileIntake.comingSoonViewer.label })}
-          </p>
-        )}
-        {anotherFileIntake.largeFileWarning && (
-          <p id="another-file-warning" className="border-b border-rule bg-paper-raised px-4 py-2">{anotherFileIntake.largeFileWarning}</p>
-        )}
+        <Notice
+          id="another-file-error"
+          kind={anotherFileIntake.errorDetail ? 'info' : 'error'}
+          alwaysToast
+          seconds={REJECTED_FILE_TOAST_SECONDS}
+          message={anotherFileIntake.errorMessage ?? ''}
+          detail={anotherFileIntake.errorDetail ?? undefined}
+        />
+        <Notice
+          id="another-file-coming-soon"
+          kind="info"
+          alwaysToast
+          seconds={REJECTED_FILE_TOAST_SECONDS}
+          message={anotherFileIntake.comingSoonViewer ? t('intake.comingSoon', { format: anotherFileIntake.comingSoonViewer.label }) : ''}
+          detail={t('intake.tryThese')}
+        />
+        <Notice
+          id="another-file-warning"
+          kind="warning"
+          className="border-b border-rule bg-paper-raised px-4 py-2"
+          message={anotherFileIntake.largeFileWarning ?? ''}
+        />
       </div>
-      {editingLoadFailed && (
-        <p id="editing-load-error" role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 text-danger">
-          {t('file.editingLoadFailed')}
-        </p>
-      )}
+      <Notice
+        id="editing-load-error"
+        kind="error"
+        role="alert"
+        className="border-b border-rule bg-paper-raised px-4 py-2 text-danger"
+        message={editingLoadFailed ? t('file.editingLoadFailed') : ''}
+      />
       <Suspense fallback={<p id="file-loading" className="p-6 text-ink-soft">{t('file.reading')}</p>}>
         <Viewer
           openedFile={openedFile}
@@ -188,6 +200,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
           session={session}
           editingComponents={editingModule?.components ?? null}
           confirmDiscardEdits={confirmDiscardEdits}
+          onOpenAnotherFile={anotherFileIntake.openFilePicker}
           onSelectionChange={setSelection}
           onCommandsChange={setViewerCommands}
           onExportSourceChange={setExportSource}

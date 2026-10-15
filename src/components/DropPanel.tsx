@@ -2,6 +2,8 @@ import { primaryButtonClassName, secondaryButtonClassName } from '../buttonStyle
 import { joinNodesAsList, localizePath, translate, translateWithNodes, useT } from '../i18n'
 import type { MessageKey } from '../i18n'
 import { getFormatCapabilities, getOtherReleasedFormats } from '../whatsNew'
+import { Notice, REJECTED_FILE_TOAST_SECONDS, useIsPhone } from './Messages'
+import ModalDialog from './ModalDialog'
 import NewBadge from './NewBadge'
 import type { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
@@ -118,6 +120,9 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
   const { locale, t } = useT()
   const otherFormats = currentViewerId ? getOtherReleasedFormats(currentViewerId) : []
   const suggestion = intake.redirectSuggestion
+  const isPhone = useIsPhone()
+  const wrongFileMessage = suggestion ? translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey) : ''
+  const openSuggestedViewer = () => suggestion && onOpenInViewer?.(suggestion.file, localizePath(locale, suggestion.viewer.toolPath as string))
   return (
     <>
       <div
@@ -141,21 +146,35 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
         <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
-          {intake.largeFileWarning && <p id="large-file-warning">{intake.largeFileWarning}</p>}
-          {intake.comingSoonViewer && <p id="coming-soon-message" className="font-medium">{t('intake.comingSoon', { format: intake.comingSoonViewer.label })}</p>}
-          {intake.errorMessage && <p id="drop-error" className="font-medium text-danger">{intake.errorMessage}</p>}
-          {suggestion && (
+          <Notice id="large-file-warning" kind="warning" message={intake.largeFileWarning ?? ''} />
+          <Notice
+            id="coming-soon-message"
+            kind="info"
+            alwaysToast
+            seconds={REJECTED_FILE_TOAST_SECONDS}
+            message={intake.comingSoonViewer ? t('intake.comingSoon', { format: intake.comingSoonViewer.label }) : ''}
+            detail={t('intake.tryThese')}
+          />
+          <Notice id="drop-error" kind={intake.errorDetail ? 'info' : 'error'} alwaysToast seconds={REJECTED_FILE_TOAST_SECONDS} message={intake.errorMessage ?? ''} detail={intake.errorDetail ?? undefined} />
+          {suggestion && !isPhone && (
             <div id="wrong-file-redirect" className="flex flex-col items-center gap-3">
-              <p id="wrong-file-message" className="font-medium">{translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey)}</p>
-              <button
-                id="open-in-viewer-button"
-                type="button"
-                onClick={() => onOpenInViewer?.(suggestion.file, localizePath(locale, suggestion.viewer.toolPath as string))}
-                className={secondaryButtonClassName}
-              >
+              <p id="wrong-file-message" className="font-medium">{wrongFileMessage}</p>
+              <button id="open-in-viewer-button" type="button" onClick={openSuggestedViewer} className={secondaryButtonClassName}>
                 {t('redirect.open', { format: suggestion.viewer.label })}
               </button>
             </div>
+          )}
+          {suggestion && isPhone && (
+            <ModalDialog id="dialog-wrong-file" title={wrongFileMessage} onClose={intake.clearRedirectSuggestion}>
+              <div className="mt-6 flex flex-wrap justify-end gap-3">
+                <button id="open-in-viewer-button" type="button" autoFocus onClick={openSuggestedViewer} className={primaryButtonClassName}>
+                  {t('redirect.open', { format: suggestion.viewer.label })}
+                </button>
+                <button id="wrong-file-close-button" type="button" onClick={intake.clearRedirectSuggestion} className={secondaryButtonClassName}>
+                  {t('find.close')}
+                </button>
+              </div>
+            </ModalDialog>
           )}
         </div>
       </div>

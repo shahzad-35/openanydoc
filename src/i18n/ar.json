@@ -88,7 +88,7 @@
   "drop.step1": "اختر ملفًا",
   "drop.step2": "يُقرأ في متصفحك",
   "drop.step3": "اعرضه",
-  "intake.cannotOpen": "تعذّر فتح {name} هنا. يفتح OpenAnyDoc ملفات {extensions}.",
+  "intake.cannotOpen": "نوع هذا الملف غير مدعوم.",
   "intake.readFailed": "تعذّرت قراءة هذا الملف. قد يكون كبيرًا على ذاكرة المتصفح.",
   "intake.oneFile": "افتح ملفًا واحدًا في كل مرة.",
   "intake.largeFile": "حجم هذا الملف {size}. قد تكون الملفات الكبيرة بطيئة أو تستهلك الذاكرة بالكامل، لكننا سنحاول فتحه.",
@@ -788,5 +788,10 @@
   "formats.viewAndEdit": "عرض وتحرير",
   "formats.viewOnly": "عرض",
   "formats.comingSoon": "قريبًا",
-  "intake.comingSoon": "لا يمكن فتح ملفات {format} بعد؛ الدعم قادم قريبًا."
+  "intake.comingSoon": "دعم {format} قادم قريبًا.",
+  "toast.dismiss": "إغلاق الرسالة",
+  "toast.region": "الرسائل",
+  "json.error.details": "التفاصيل",
+  "banner.title": "أنواع ملفات جديدة",
+  "intake.tryThese": "يمكنك فتح ملفات CSV وExcel وJSON وTXT."
 }

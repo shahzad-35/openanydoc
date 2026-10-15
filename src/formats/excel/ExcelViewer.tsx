@@ -1,6 +1,7 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
 import { textControlClassName } from '../../buttonStyles'
+import { FatalFileError, Notice } from '../../components/Messages'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { isolateText, useT } from '../../i18n'
 import type { FormatViewerProps } from '../registry'
@@ -72,6 +73,7 @@ export default function ExcelViewer({
   mode,
   session: untypedSession,
   editingComponents,
+  onOpenAnotherFile,
   onSelectionChange,
   onCommandsChange,
   onExportSourceChange,
@@ -899,27 +901,27 @@ export default function ExcelViewer({
         />
       )}
 
-      {isEditable && inputMessage !== '' && (
-        <p role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 text-sm text-danger">
-          {inputMessage}
-        </p>
-      )}
+      <Notice
+        id="input-message"
+        kind="error"
+        role="alert"
+        className="border-b border-rule bg-paper-raised px-4 py-2 text-sm text-danger"
+        message={isEditable ? inputMessage : ''}
+      />
 
-      {parsed && largeFileWarning && (
-        <p role="status" className="border-b border-rule bg-paper-raised px-4 py-1 text-sm">
-          {largeFileWarning}
-        </p>
-      )}
+      <Notice
+        id="large-file-warning"
+        kind="warning"
+        role="status"
+        className="border-b border-rule bg-paper-raised px-4 py-1 text-sm"
+        message={parsed && largeFileWarning ? largeFileWarning : ''}
+      />
 
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
         {parseResult === null && <p className="p-6 text-ink-soft">{t('excel.view.reading')}</p>}
 
         {parseResult?.status === 'error' && (
-          <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
-            <h2 className="type-h3">{t('excel.view.errorTitle')}</h2>
-            <p className="mt-2">{parseResult.message}</p>
-            <p className="mt-2 text-ink-soft">{t('excel.view.errorHint')}</p>
-          </div>
+          <FatalFileError title={t('excel.view.errorTitle')} reason={parseResult.message} hint={t('excel.view.errorHint')} onOpenAnotherFile={onOpenAnotherFile} />
         )}
 
         {parsed && sheet && isSheetEmpty && (

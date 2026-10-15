@@ -23,6 +23,8 @@ export type FormatViewerProps = {
   // Set once the format's editing module has loaded after Edit was first used; null while viewing.
   editingComponents: unknown
   confirmDiscardEdits: () => Promise<boolean>
+  // Opens the system file chooser (the "Open another file" button's action), for the way out of a fatal error.
+  onOpenAnotherFile: () => void
   onSelectionChange: (selection: unknown) => void
   // Things the toolbar can ask the viewer to do (rename a column, open find and replace, scroll to a cell).
   onCommandsChange: (commands: unknown) => void
