@@ -849,6 +849,7 @@ export default function ExcelViewer({
             <span className="sr-only">Search rows</span>
             <SearchIcon />
             <input
+              id="search-input"
               ref={searchInputRef}
               type="search"
               dir="auto"
@@ -913,7 +914,7 @@ export default function ExcelViewer({
         {parseResult === null && <p className="p-6 text-ink-soft">Reading file</p>}
 
         {parseResult?.status === 'error' && (
-          <div role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
+          <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
             <h2 className="type-h3">This file can't be shown</h2>
             <p className="mt-2">{parseResult.message}</p>
             <p className="mt-2 text-ink-soft">Use "Open another file" above to try a different file.</p>
@@ -1057,17 +1058,18 @@ export default function ExcelViewer({
       )}
 
       {parsed && (
-        <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
-          <p aria-live="polite" className="whitespace-nowrap font-semibold">
+        <footer id="excel-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
+          <p id="sheet-size" aria-live="polite" className="whitespace-nowrap font-semibold">
             {isSearching
               ? `${visibleRowIds.length.toLocaleString()} of ${displayRowIds.length.toLocaleString()} rows`
               : `${displayRowIds.length.toLocaleString()} rows × ${columnIds.length.toLocaleString()} columns`}
           </p>
-          <span className="text-ink-soft">
+          <span id="sheet-count" className="text-ink-soft">
             {sheetRecords.length} {sheetRecords.length === 1 ? 'sheet' : 'sheets'}
           </span>
           <label className="flex min-h-6 pointer-coarse:min-h-11 items-center gap-2 text-xs">
             <input
+              id="header-row-checkbox"
               type="checkbox"
               checked={hasHeaderRow}
               disabled={allRowIds.length < 2}

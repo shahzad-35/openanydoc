@@ -136,6 +136,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   const fileInput = (
     <input
+      id="file-input"
       ref={fileInputRef}
       type="file"
       accept={acceptedExtensions.join(',')}

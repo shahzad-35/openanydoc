@@ -12,6 +12,7 @@ import http from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import * as XLSX from 'xlsx'
 
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
@@ -203,16 +204,17 @@ await test('the banner closes with the keyboard and stays closed while navigatin
   await waitFor(`!document.querySelector('[role=region]')`, 'the banner to close')
   await evaluate(`document.querySelector('footer nav a[href="/json-viewer"]').click()`)
   await waitFor(`location.pathname === '/json-viewer'`, 'navigation to the JSON page')
-  expect((await bannerText()) === null, 'the banner came back after navigating')
+  expect((await bannerText()) === null, 'a banner showed on the JSON page')
   const crossLinks = await evaluate(`[...document.querySelectorAll('p')].find((p) => p.innerText.startsWith('Also works with'))?.innerText ?? null`)
   expect(crossLinks && crossLinks.includes('CSV') && crossLinks.includes('Excel') && !crossLinks.includes('JSON'), `cross-format line was: ${crossLinks}`)
 })
 
 await test('a reload brings the banner back, so nothing was remembered', async () => {
   await openPage('/json-viewer')
-  const jsonPageBanner = await bannerText()
-  expect(jsonPageBanner && !jsonPageBanner.includes('JSON') && jsonPageBanner.includes('Excel'), `the JSON page banner was: ${jsonPageBanner}`)
+  expect((await bannerText()) === null, 'the announcement banner showed on a format page: it belongs on the home page only')
+  expect(await evaluate(`document.querySelector('#footer-link-changelog') === null`), 'the changelog link showed on a format page')
   await openPage('/')
+  expect(await evaluate(`document.querySelector('#footer-link-changelog') !== null`), 'the changelog link is missing on the home page')
   expect((await bannerText()) !== null, 'the banner did not come back after the reload')
 })
 
@@ -224,8 +226,7 @@ await test('a JSON file dropped on the CSV page is offered the JSON viewer, with
   await evaluate(`[...document.querySelectorAll('button')].find((button) => button.innerText === 'Open it in the JSON viewer').click()`)
   await waitFor(`location.pathname === '/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open in the JSON viewer')
   expect(!(await evaluate('location.href')).includes('sample'), 'the file name reached the URL')
-  const banner = await bannerText()
-  expect(banner && !banner.includes('JSON') && banner.includes('Excel'), `viewer page banner was: ${banner}`)
+  expect((await bannerText()) === null, 'the banner showed on a file page')
 })
 
 await test('a file nobody opens keeps the friendly rejection', async () => {
@@ -239,7 +240,7 @@ await test('saving a file shows one dismissible tip', async () => {
   await openPage('/json-viewer')
   await chooseFile(sampleJson)
   await waitFor(`document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open')
-  const downloadButton = `[...document.querySelectorAll('button')].find((button) => button.innerText.trim() === 'Download')`
+  const downloadButton = `document.querySelector('button[aria-label="Download"]')`
   await waitFor(`${downloadButton} && !${downloadButton}.disabled`, 'the Download button')
   await evaluate(`${downloadButton}.click()`)
   await waitFor(`[...document.querySelectorAll('[role=status]')].some((status) => status.innerText.includes('also opens and edits'))`, 'the tip')
@@ -303,6 +304,61 @@ await test('home and format pages carry their own title, description, canonical 
   }
   expect(new Set(questionLists.values()).size === questionLists.size, 'two pages share the same questions: each page needs its own')
 })
+
+// Every input, select, textarea and button has an id, and no id is used twice on the same page.
+const idProblems = () =>
+  evaluate(`(() => {
+    const seen = new Map()
+    for (const element of document.querySelectorAll('[id]')) seen.set(element.id, (seen.get(element.id) ?? 0) + 1)
+    const duplicates = [...seen].filter(([, count]) => count > 1).map(([id, count]) => id + ' x' + count)
+    const missing = [...document.querySelectorAll('input, select, textarea, button, main, header, footer, nav, aside, dialog')]
+      .filter((element) => !element.id)
+      .map((element) => element.tagName.toLowerCase() + (element.getAttribute('aria-label') ? '[' + element.getAttribute('aria-label') + ']' : '') + ':' + (element.textContent ?? '').trim().slice(0, 24))
+    return { duplicates, missing }
+  })()`)
+
+async function expectCleanIds(where) {
+  const { duplicates, missing } = await idProblems()
+  expect(duplicates.length === 0, `${where}: duplicate ids: ${duplicates.slice(0, 6).join(', ')}`)
+  expect(missing.length === 0, `${where}: elements without an id: ${missing.slice(0, 6).join(' | ')}`)
+}
+
+const sampleCsv = path.join(scratchFolder, 'sample.csv')
+fs.writeFileSync(sampleCsv, 'id,name\n1,Alpha\n2,Beta\n')
+const sampleText = path.join(scratchFolder, 'sample.txt')
+fs.writeFileSync(sampleText, 'one\ntwo\nthree\n')
+const sampleWorkbook = path.join(scratchFolder, 'sample.xlsx')
+const workbook = XLSX.utils.book_new()
+XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['Name', 'Qty'], ['A', 1], ['B', 2]]), 'Data')
+fs.writeFileSync(sampleWorkbook, XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }))
+
+for (const [name, address, file, readyElement] of [
+  ['CSV', '/csv-viewer', sampleCsv, '#data-table'],
+  ['TXT', '/txt-viewer', sampleText, '#text-view'],
+  ['JSON', '/json-viewer', sampleJson, '#json-tree'],
+  ['Excel', '/excel-viewer', sampleWorkbook, '#data-table'],
+]) {
+  await test(`${name}: every field has an id and no id repeats (page, view mode, edit mode, an open menu)`, async () => {
+    await openPage(address)
+    await expectCleanIds(`${name} drop page`)
+    await chooseFile(file)
+    await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
+    await expectCleanIds(`${name} view mode`)
+    await evaluate(`document.querySelector('#mode-edit-button').click()`)
+    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled)')`, 'the edit toolbar')
+    await expectCleanIds(`${name} edit mode`)
+    await evaluate(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled)').click()`)
+    await waitFor(`document.querySelector('[role=menu]')`, 'a menu to open')
+    await expectCleanIds(`${name} with a menu open`)
+  })
+}
+
+for (const address of ['/', '/en/changelog', '/ar/changelog']) {
+  await test(`${address}: every field has an id and no id repeats`, async () => {
+    await openPage(address)
+    await expectCleanIds(address)
+  })
+}
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()

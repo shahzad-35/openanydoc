@@ -1,8 +1,11 @@
 import { useEffect, useId, useRef } from 'react'
 import type { ReactNode } from 'react'
+import { toElementId } from '../elementId'
 
 type ModalDialogProps = {
   title: string
+  // The dialog's id; by default it is made from the title ("Add sheet" becomes dialog-add-sheet).
+  id?: string
   // The id of the element inside `children` that describes the dialog, for screen readers.
   describedById?: string
   // Esc, a click on the backdrop and the dialog's own Close buttons all end up here.
@@ -15,7 +18,7 @@ const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), selec
 
 // A native modal <dialog>. It is drawn in the browser's top layer, so nothing on the page can cover it or clip it, and the
 // page behind is inert. Tab stays inside, Esc and a click on the backdrop close it, and focus goes back to what opened it.
-export default function ModalDialog({ title, describedById, onClose, widthClassName = 'w-[min(32rem,calc(100vw-2rem))]', children }: ModalDialogProps) {
+export default function ModalDialog({ title, id, describedById, onClose, widthClassName = 'w-[min(32rem,calc(100vw-2rem))]', children }: ModalDialogProps) {
   const dialogRef = useRef<HTMLDialogElement>(null)
   const titleId = useId()
 
@@ -33,6 +36,7 @@ export default function ModalDialog({ title, describedById, onClose, widthClassN
 
   return (
     <dialog
+      id={id ?? `dialog-${toElementId(title)}`}
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={describedById}

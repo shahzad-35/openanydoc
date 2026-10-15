@@ -54,7 +54,7 @@ const modeOptions = [
 // icon (an eye to look, a pencil to edit) with no visible text; the names are in the tooltip and for screen readers.
 export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (newMode: ViewMode) => void }) {
   return (
-    <div role="group" aria-label="Mode" className="control-shape solid-box relative grid shrink-0 grid-cols-2 border-ink bg-paper p-0.5">
+    <div id="mode-toggle" role="group" aria-label="Mode" className="control-shape solid-box relative grid shrink-0 grid-cols-2 border-ink bg-paper p-0.5">
       <span
         aria-hidden="true"
         className={`control-shape absolute inset-y-0.5 left-0.5 w-[calc(50%-0.125rem)] bg-accent transition-transform duration-300 ease-out ${
@@ -64,6 +64,7 @@ export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (
       {modeOptions.map(({ mode: optionMode, label }) => (
         <button
           key={optionMode}
+          id={`mode-${optionMode}-button`}
           type="button"
           aria-pressed={mode === optionMode}
           data-tip={label}
@@ -83,7 +84,7 @@ export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (
 // A live region: screen readers hear "3 edited cells, 1 row deleted" whenever it changes.
 export function ChangeCounter({ description }: { description: string }) {
   return (
-    <p role="status" aria-live="polite" className="shrink-0 text-sm font-medium">
+    <p id="change-counter" role="status" aria-live="polite" className="shrink-0 text-sm font-medium">
       {description !== '' && (
         <span className="flex items-center gap-2">
           <span aria-hidden="true" className="size-2 rounded-full bg-edit-mark" />
@@ -119,6 +120,7 @@ function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEd
 
   return (
     <button
+      id="download-button"
       type="button"
       disabled={exportSource === null}
       onClick={() => void downloadWhatYouSee()}
@@ -148,21 +150,21 @@ type EditToolbarProps = {
 // Shown in Edit mode: undo, redo and revert all for every format, then this format's own tools and the Download icon.
 export function EditToolbar({ openedFile, session, editingModule, selection, viewerCommands, exportSource }: EditToolbarProps) {
   return (
-    <div role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
-      <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
-      <button type="button" disabled={!session.canUndo} onClick={session.undo} aria-label="Undo" data-tip="Undo (Ctrl+Z)" className={historyButtonClassName}>
+    <div id="edit-toolbar" role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
+      <div id="edit-toolbar-tools" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
+      <button id="undo-button" type="button" disabled={!session.canUndo} onClick={session.undo} aria-label="Undo" data-tip="Undo (Ctrl+Z)" className={historyButtonClassName}>
         <HistoryIcon>
           <path d="M9 14 4 9l5-5" />
           <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
         </HistoryIcon>
       </button>
-      <button type="button" disabled={!session.canRedo} onClick={session.redo} aria-label="Redo" data-tip="Redo (Ctrl+Shift+Z)" className={historyButtonClassName}>
+      <button id="redo-button" type="button" disabled={!session.canRedo} onClick={session.redo} aria-label="Redo" data-tip="Redo (Ctrl+Shift+Z)" className={historyButtonClassName}>
         <HistoryIcon>
           <path d="m15 14 5-5-5-5" />
           <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
         </HistoryIcon>
       </button>
-      <button type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label="Revert all changes" data-tip="Revert all changes" className={historyButtonClassName}>
+      <button id="revert-all-button" type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label="Revert all changes" data-tip="Revert all changes" className={historyButtonClassName}>
         <HistoryIcon>
           <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
           <path d="M3 3v5h5" />
@@ -173,6 +175,7 @@ export function EditToolbar({ openedFile, session, editingModule, selection, vie
       {editingModule?.tools.map((tool) => (
         <button
           key={tool.id}
+          id={`tool-${tool.id}-button`}
           type="button"
           disabled={!tool.isEnabled(selection)}
           onClick={() => tool.run(session, selection, viewerCommands)}

@@ -4,18 +4,17 @@ import { getNewFormats } from '../whatsNew'
 import type { Viewer } from '../viewers'
 
 type WhatsNewBannerProps = {
-  // The page the visitor is on: a format's own page does not announce that format.
-  currentViewerId?: Viewer['id']
-  // Changes the page without a reload. Without it (on a file page, where leaving could lose edits) links open in a new tab.
+  // Changes the page without a reload. Without it, links open in a new tab.
   onNavigate?: (path: string) => void
   onDismiss: () => void
-  // Lines the row up with the home page's content column; on a file page it runs the full width like the other strips.
+  // Lines the row up with the home page's content column.
   isContained?: boolean
 }
 
-function BannerLink({ path, onNavigate, className, children, fileType }: { path: string; onNavigate?: (path: string) => void; className: string; children: ReactNode; fileType?: Viewer['id'] }) {
+function BannerLink({ id, path, onNavigate, className, children, fileType }: { id?: string; path: string; onNavigate?: (path: string) => void; className: string; children: ReactNode; fileType?: Viewer['id'] }) {
   return (
     <a
+      id={id}
       href={path}
       data-file-type={fileType}
       {...(onNavigate ? {} : { target: '_blank', rel: 'noopener noreferrer' })}
@@ -33,24 +32,25 @@ function BannerLink({ path, onNavigate, className, children, fileType }: { path:
 
 // A slim announcement under the header, built from the registry: it names only the formats that are new right now. Closing it
 // is remembered by the page's React state for this tab only (see App.tsx); nothing is stored, and nothing takes focus or moves.
-export default function WhatsNewBanner({ currentViewerId, onNavigate, onDismiss, isContained = false }: WhatsNewBannerProps) {
+export default function WhatsNewBanner({ onNavigate, onDismiss, isContained = false }: WhatsNewBannerProps) {
   const { locale, t } = useT()
-  const announcedFormats = getNewFormats().filter(({ viewer }) => viewer.id !== currentViewerId)
+  const announcedFormats = getNewFormats()
   if (announcedFormats.length === 0) return null
 
   const canEditAll = announcedFormats.every(({ definition }) => definition.editing)
   const formatLinks = announcedFormats.map(({ viewer }) => (
-    <BannerLink key={viewer.id} path={viewer.toolPath as string} onNavigate={onNavigate} fileType={viewer.id} className="font-semibold text-(--file-color) underline-offset-2 hover:underline">
+    <BannerLink key={viewer.id} id={`banner-link-${viewer.id}`} path={viewer.toolPath as string} onNavigate={onNavigate} fileType={viewer.id} className="font-semibold text-(--file-color) underline-offset-2 hover:underline">
       {viewer.label}
     </BannerLink>
   ))
 
   return (
-    <div role="region" aria-label={t('banner.label')} className="relative z-10 border-b border-accent/25 bg-accent/10 backdrop-blur-sm">
+    <div id="whats-new-banner" role="region" aria-label={t('banner.label')} className="relative z-10 border-b border-accent/25 bg-accent/10 backdrop-blur-sm">
       <div className={`flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-2 text-sm ${isContained ? 'mx-auto max-w-5xl' : ''}`}>
-        <span className="control-shape shrink-0 bg-accent px-2.5 py-0.5 text-xs font-semibold text-on-accent">{t('badge.new')}</span>
-        <p className="min-w-0 flex-1">{translateWithNodes(locale, canEditAll ? 'banner.openAndEdit' : 'banner.open', { formats: joinNodesAsList(locale, formatLinks) })}</p>
+        <span id="banner-new-badge" className="control-shape shrink-0 bg-accent px-2.5 py-0.5 text-xs font-semibold text-on-accent">{t('badge.new')}</span>
+        <p id="banner-message" className="min-w-0 flex-1">{translateWithNodes(locale, canEditAll ? 'banner.openAndEdit' : 'banner.open', { formats: joinNodesAsList(locale, formatLinks) })}</p>
         <BannerLink
+          id="banner-changelog-link"
           path={`/${locale}/changelog`}
           onNavigate={onNavigate}
           className="control-shape shrink-0 border border-accent px-3 py-0.5 font-medium text-accent transition-colors duration-200 hover:bg-accent hover:text-on-accent"
@@ -58,6 +58,7 @@ export default function WhatsNewBanner({ currentViewerId, onNavigate, onDismiss,
           {t('banner.changelog')}
         </BannerLink>
         <button
+          id="banner-close-button"
           type="button"
           aria-label={t('banner.close')}
           onClick={onDismiss}

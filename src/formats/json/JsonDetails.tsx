@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Icon, IconButton } from '../../components/ToolbarControls'
 import { HighlightedCodeLine } from './JsonTree'
 import { formatPathText, getChildEntries, isContainer } from './jsonModel'
 import type { JsonPath, JsonValue } from './jsonModel'
@@ -6,8 +7,6 @@ import type { JsonPath, JsonValue } from './jsonModel'
 const PREVIEW_MAX_CHILDREN = 50
 const PREVIEW_MAX_DEPTH = 6
 const PREVIEW_MAX_LINES = 300
-const actionButtonClassName =
-  'control-shape inline-flex min-h-7 pointer-coarse:min-h-10 cursor-pointer items-center justify-center border border-rule bg-paper-raised px-3 text-[13px] font-medium transition-colors duration-200 hover:bg-paper'
 
 function describeNode(node: JsonValue) {
   if (node === null) return 'null'
@@ -51,7 +50,7 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
 
   if (path === null || node === undefined) {
     return (
-      <aside aria-label="Details" className="hidden w-80 shrink-0 border-l border-rule bg-paper p-5 text-ink-soft lg:block xl:w-96">
+      <aside id="json-details" aria-label="Details" className="hidden w-80 shrink-0 border-l border-rule bg-paper p-5 text-ink-soft lg:block xl:w-96">
         <h2 className="font-semibold text-ink">Details</h2>
         <p className="mt-2">Select a row to see its path, type and value. Arrow keys move between rows.</p>
       </aside>
@@ -63,7 +62,7 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
   const hiddenLineCount = Math.max(0, previewLines.length - PREVIEW_MAX_LINES)
 
   return (
-    <aside aria-label="Details" className="hidden w-80 shrink-0 flex-col border-l border-rule bg-paper lg:flex xl:w-96">
+    <aside id="json-details" aria-label="Details" className="hidden w-80 shrink-0 flex-col border-l border-rule bg-paper lg:flex xl:w-96">
       <div className="border-b border-rule p-4">
         <h2 className="font-semibold">Details</h2>
         <p className="mt-2 text-ink-soft">Path</p>
@@ -73,13 +72,20 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
         <p className="mt-3 text-ink-soft">Type</p>
         <p className="mt-0.5">{describeNode(node)}</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <button type="button" onClick={() => copyText(pathText, 'Path copied')} className={actionButtonClassName}>
-            Copy path
-          </button>
-          <button type="button" onClick={() => copyText(typeof node === 'string' ? node : JSON.stringify(node, null, 2), 'Value copied')} className={actionButtonClassName}>
-            Copy value
-          </button>
-          <span aria-live="polite" className="text-ink-soft">
+          <IconButton label="Copy path" onClick={() => copyText(pathText, 'Path copied')}>
+            <Icon>
+              <circle cx="6" cy="6" r="2.5" />
+              <circle cx="18" cy="18" r="2.5" />
+              <path d="M8 7.5c5 0 3 9 8 9" />
+            </Icon>
+          </IconButton>
+          <IconButton label="Copy value" onClick={() => copyText(typeof node === 'string' ? node : JSON.stringify(node, null, 2), 'Value copied')}>
+            <Icon>
+              <rect x="8" y="8" width="12" height="12" rx="2" />
+              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+            </Icon>
+          </IconButton>
+          <span id="details-copy-message" aria-live="polite" className="text-ink-soft">
             {copyMessage}
           </span>
         </div>
@@ -93,7 +99,7 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
                 <HighlightedCodeLine lineText={lineText} searchText="" />
               </div>
             ))}
-            {hiddenLineCount > 0 && <div className="mt-1 text-ink-soft">… {hiddenLineCount.toLocaleString()} more lines. Use Copy value for everything.</div>}
+            {hiddenLineCount > 0 && <div className="mt-1 text-ink-soft">… {hiddenLineCount.toLocaleString()} more lines. Use the Copy value icon for everything.</div>}
           </pre>
         ) : (
           <p dir="auto" className="mt-1 whitespace-pre-wrap break-words font-mono text-[13px]">

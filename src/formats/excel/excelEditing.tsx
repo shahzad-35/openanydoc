@@ -3,6 +3,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { FocusEventHandler, KeyboardEventHandler, ReactNode } from 'react'
 import { compactSecondaryButtonClassName, primaryButtonClassName, textControlClassName } from '../../buttonStyles'
+import { toElementId } from '../../elementId'
+import FindReplaceBar from '../../components/FindReplaceBar'
 import ModalDialog from '../../components/ModalDialog'
 import { ActionMenu, Icon, IconButton, IconMenuButton, iconButtonClassName } from '../../components/ToolbarControls'
 import { CellInput } from '../DataTable'
@@ -120,6 +122,7 @@ const COLOR_CHOICES = ['000000', '595959', 'A6A6A6', 'FFFFFF', 'FF0000', 'FF9900
 
 // A button that opens a small grid of colours (and "None"), for text and fill colour.
 function ColorMenuButton({ label, isDisabled, currentColor, onPick, children }: { label: string; isDisabled: boolean; currentColor: string; onPick: (hexColor: string | null) => void; children: ReactNode }) {
+  const buttonId = `toolbar-${toElementId(label)}`
   const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -138,10 +141,12 @@ function ColorMenuButton({ label, isDisabled, currentColor, onPick, children }: 
   return (
     <>
       <button
+        id={buttonId}
         type="button"
         aria-label={label}
         data-tip={label}
         aria-haspopup="menu"
+        aria-controls={menuPosition ? `${buttonId}-menu` : undefined}
         aria-expanded={menuPosition !== null}
         disabled={isDisabled}
         onClick={(event) => {
@@ -157,6 +162,7 @@ function ColorMenuButton({ label, isDisabled, currentColor, onPick, children }: 
       </button>
       {menuPosition && (
         <div
+          id={`${buttonId}-menu`}
           ref={menuRef}
           popover="auto"
           role="menu"
@@ -171,6 +177,7 @@ function ColorMenuButton({ label, isDisabled, currentColor, onPick, children }: 
             {COLOR_CHOICES.map((hexColor) => (
               <button
                 key={hexColor}
+                id={`${buttonId}-menu-${hexColor}`}
                 type="button"
                 role="menuitem"
                 aria-label={`#${hexColor}`}
@@ -185,6 +192,7 @@ function ColorMenuButton({ label, isDisabled, currentColor, onPick, children }: 
             ))}
           </div>
           <button
+            id={`${buttonId}-menu-none`}
             type="button"
             role="menuitem"
             onClick={() => {
@@ -338,7 +346,7 @@ function ToolbarMenus({ selection, commands }: { selection: unknown; commands: u
           <path d="m5 9 3 3-3 3" />
         </Icon>
       </IconButton>
-      <IconButton label={isMerged ? 'Unmerge cells' : 'Merge cells'} isPressed={isMerged} isDisabled={!hasSelection} onClick={() => getActions().toggleMerge()}>
+      <IconButton id="toolbar-merge-cells" label={isMerged ? 'Unmerge cells' : 'Merge cells'} isPressed={isMerged} isDisabled={!hasSelection} onClick={() => getActions().toggleMerge()}>
         <Icon>
           <rect x="3" y="5" width="18" height="14" rx="1" />
           <path d="M8 12h8" />
@@ -455,6 +463,7 @@ type ColumnMenuProps = {
 function ColumnMenu({ left, top, canRename, canDelete, onRename, onSelect, onInsertLeft, onInsertRight, onDelete, onClear, onWidth, onClose }: ColumnMenuProps) {
   return (
     <ActionMenu
+      id="column-actions-menu"
       ariaLabel="Column actions"
       left={left}
       top={top}
@@ -488,12 +497,14 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
   return (
     <>
       <p
+        id="selected-cell-label"
         aria-label="Selected cell"
         className="control-shape solid-box flex min-h-8 pointer-coarse:min-h-11 min-w-16 shrink-0 items-center justify-center border-rule bg-paper-raised px-3 font-mono text-sm"
       >
         {selectedCellLabel}
       </p>
       <input
+        id="cell-value-input"
         dir="auto"
         aria-label="Value or formula of the selected cell"
         placeholder="Select a cell, then type a value or a formula starting with ="
@@ -505,101 +516,6 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
         className={`${textControlClassName} min-w-48 flex-1 disabled:cursor-not-allowed disabled:text-ink-soft`}
       />
     </>
-  )
-}
-
-type FindReplaceBarProps = {
-  findText: string
-  replaceText: string
-  matchCase: boolean
-  matchCount: number
-  matchPosition: number
-  resultMessage: string
-  onFindChange: (newText: string) => void
-  onReplaceChange: (newText: string) => void
-  onMatchCaseChange: (newValue: boolean) => void
-  onPrevious: () => void
-  onNext: () => void
-  onReplace: () => void
-  onReplaceAll: () => void
-  onClose: () => void
-}
-
-function FindReplaceBar({
-  findText,
-  replaceText,
-  matchCase,
-  matchCount,
-  matchPosition,
-  resultMessage,
-  onFindChange,
-  onReplaceChange,
-  onMatchCaseChange,
-  onPrevious,
-  onNext,
-  onReplace,
-  onReplaceAll,
-  onClose,
-}: FindReplaceBarProps) {
-  const matchMessage = matchCount === 0 ? 'No matches' : `${Math.min(matchPosition, matchCount - 1) + 1} of ${matchCount.toLocaleString()} ${matchCount === 1 ? 'cell' : 'cells'}`
-  const countMessage = resultMessage || (findText === '' ? '' : matchMessage)
-  const barButtonClassName =
-    'control-shape solid-box min-h-8 pointer-coarse:min-h-11 cursor-pointer border-ink px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50'
-  return (
-    <div
-      role="search"
-      aria-label="Find and replace"
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          event.preventDefault()
-          onClose()
-        }
-      }}
-      className="flex flex-wrap items-center gap-2 border-b border-rule bg-paper px-4 py-2"
-    >
-      <label className="flex items-center gap-2">
-        <span className="text-sm text-ink-soft">Find</span>
-        <input
-          autoFocus
-          dir="auto"
-          value={findText}
-          onChange={(event) => onFindChange(event.target.value)}
-          onKeyDown={(event) => {
-            if (event.key !== 'Enter') return
-            event.preventDefault()
-            if (event.shiftKey) onPrevious()
-            else onNext()
-          }}
-          className={`${textControlClassName} w-44`}
-        />
-      </label>
-      <label className="flex items-center gap-2">
-        <span className="text-sm text-ink-soft">Replace with</span>
-        <input dir="auto" value={replaceText} onChange={(event) => onReplaceChange(event.target.value)} className={`${textControlClassName} w-44`} />
-      </label>
-      <label className="flex min-h-8 pointer-coarse:min-h-11 items-center gap-2 text-sm">
-        <input type="checkbox" checked={matchCase} onChange={(event) => onMatchCaseChange(event.target.checked)} className="size-4 pointer-coarse:size-5" />
-        Match case
-      </label>
-      <p role="status" aria-live="polite" className="min-w-28 text-sm font-medium">
-        {countMessage}
-      </p>
-      <button type="button" disabled={matchCount === 0} onClick={onPrevious} className={barButtonClassName}>
-        Previous
-      </button>
-      <button type="button" disabled={matchCount === 0} onClick={onNext} className={barButtonClassName}>
-        Next
-      </button>
-      <button type="button" disabled={matchCount === 0} onClick={onReplace} className={barButtonClassName}>
-        Replace
-      </button>
-      <button type="button" disabled={matchCount === 0} onClick={onReplaceAll} className={barButtonClassName}>
-        Replace all
-      </button>
-      <button type="button" onClick={onClose} className="control-shape min-h-8 pointer-coarse:min-h-11 cursor-pointer px-3 text-sm transition-colors duration-200 hover:bg-paper-raised">
-        Close
-      </button>
-    </div>
   )
 }
 
@@ -668,6 +584,7 @@ function SheetDialogs({
   return (
     <ModalDialog title={titles[dialog.kind]} onClose={onClose} widthClassName="w-[min(26rem,calc(100vw-2rem))]">
       <form
+        id="sheet-dialog-form"
         onSubmit={(event) => {
           event.preventDefault()
           submit()
@@ -679,9 +596,10 @@ function SheetDialogs({
             Delete the sheet "{activeSheetName}" and everything in it? You can undo this until you leave the page.
           </p>
         ) : (
-          <label className="block">
+          <label htmlFor="dialog-input" className="block">
             <span className="text-sm text-ink-soft">{dialog.kind === 'column-width' ? 'Width in pixels' : dialog.kind === 'link' ? 'Web address (leave empty to remove the link)' : 'Sheet name'}</span>
             <input
+              id="dialog-input"
               autoFocus
               dir="auto"
               inputMode={dialog.kind === 'column-width' ? 'numeric' : dialog.kind === 'link' ? 'url' : undefined}
@@ -693,15 +611,15 @@ function SheetDialogs({
           </label>
         )}
         {problem && draft !== '' && (
-          <p role="alert" className="text-sm text-danger">
+          <p id="dialog-error" role="alert" className="text-sm text-danger">
             {problem}
           </p>
         )}
         <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className={compactSecondaryButtonClassName}>
+          <button id="dialog-cancel-button" type="button" onClick={onClose} className={compactSecondaryButtonClassName}>
             Cancel
           </button>
-          <button type="submit" disabled={problem !== null} className={`${primaryButtonClassName} disabled:cursor-not-allowed disabled:opacity-50`}>
+          <button id="dialog-submit-button" type="submit" disabled={problem !== null} className={`${primaryButtonClassName} disabled:cursor-not-allowed disabled:opacity-50`}>
             {dialog.kind === 'delete-sheet' ? 'Delete' : dialog.kind === 'add-sheet' ? 'Add' : 'Save'}
           </button>
         </div>

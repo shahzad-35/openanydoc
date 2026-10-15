@@ -1,14 +1,16 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
-import type { ReactNode } from 'react'
 import FindReplaceBar from '../../components/FindReplaceBar'
-import { textControlClassName, viewerBarButtonClassName as barButtonClassName, viewerSegmentButtonClassName as segmentButtonClassName } from '../../buttonStyles'
+import { textControlClassName } from '../../buttonStyles'
+import { Icon, IconButton } from '../../components/ToolbarControls'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import JsonTable from './JsonTable'
 import JsonDetails from './JsonDetails'
+import { JsonViewTools } from './jsonViewTools'
+import type { JsonViewActions, JsonViewSettings } from './jsonViewTools'
 import JsonTree, { HighlightedCodeLine } from './JsonTree'
 import type { JsonTreeActions } from './JsonTree'
 import {
@@ -44,14 +46,6 @@ const searchShortcutLabel = /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘K'
 const noLines: string[] = []
 
 type JsonParseError = Extract<JsonParseResult, { status: 'error' }>
-
-function BarIcon({ children }: { children: ReactNode }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {children}
-    </svg>
-  )
-}
 
 function describeRoot(root: JsonValue) {
   if (!isContainer(root)) return 'A single value'
@@ -326,10 +320,14 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
     }
   }, [showTree, selectedPath, root])
 
+  const viewSettings: JsonViewSettings = { viewKind: activeView, canShowTable, hasDocument: root !== null }
+  const viewActions: JsonViewActions = { setViewKind, expandAll, collapseAll, copyAll: () => void copyAllText() }
+
   // The toolbar reaches the viewer through this stable commands object, which calls the latest functions.
   const latestActionsRef = useRef<JsonActions | null>(null)
   useEffect(() => {
     latestActionsRef.current = {
+      ...viewActions,
       setIndent: async (indent: JsonIndent) => {
         if (isEditing && showCode) await commitDraft(latestDraftRef.current)
         if (originalRoot !== null) session.update((currentEdits) => withIndent(currentEdits, originalText, originalRoot, indent))
@@ -375,8 +373,14 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
 
   const isDocumentValid = root !== null && draftError === null
   useEffect(() => {
-    onSelectionChange({ view: activeView, isValid: isDocumentValid, hasDocument: root !== null, selectedNode: selectedNodeInfo, indent: edits.indent } satisfies NonNullable<JsonSelection>)
-  }, [activeView, isDocumentValid, root, selectedNodeInfo, edits.indent, onSelectionChange])
+    onSelectionChange({
+      isValid: isDocumentValid,
+      hasDocument: root !== null,
+      selectedNode: selectedNodeInfo,
+      indent: edits.indent,
+      view: { viewKind: activeView, canShowTable, hasDocument: root !== null },
+    } satisfies NonNullable<JsonSelection>)
+  }, [activeView, canShowTable, isDocumentValid, root, selectedNodeInfo, edits.indent, onSelectionChange])
 
   // Find and replace works on the text inside string values, in every view; keys and structure are never touched.
   const deferredRoot = useDeferredValue(root)
@@ -453,27 +457,14 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
   const gutterWidthPx = codeLines.length.toLocaleString().length * 9 + 30
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col text-[13px]">
-      <div role="toolbar" aria-label="JSON tools" className="flex items-center gap-2 overflow-x-auto border-b border-rule bg-paper px-4 py-1.5 md:flex-wrap md:overflow-visible">
-        <div role="group" aria-label="View" className="control-shape solid-box flex shrink-0 gap-0.5 border-rule p-0.5">
-          <button type="button" aria-pressed={showTree} disabled={root === null} onClick={() => setViewKind('tree')} className={segmentButtonClassName}>
-            Tree
-          </button>
-          <button
-            type="button"
-            aria-pressed={showTable}
-            disabled={!canShowTable}
-            title={canShowTable ? undefined : 'The table view needs a list of objects'}
-            onClick={() => setViewKind('table')}
-            className={segmentButtonClassName}
-          >
-            Table
-          </button>
-          <button type="button" aria-pressed={showCode} onClick={() => setViewKind('code')} className={segmentButtonClassName}>
-            Code
-          </button>
-        </div>
-
+    <div id="json-viewer" className="flex min-h-0 flex-1 flex-col text-[13px]">
+      <div id="json-view-toolbar" role="toolbar" aria-label={isEditing ? 'Search' : 'JSON tools'} className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
+        {!isEditing && (
+          <>
+            <JsonViewTools settings={viewSettings} actions={viewActions} />
+            <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-rule" />
+          </>
+        )}
         <div className="relative shrink-0">
           <label>
             <span className="sr-only">Search keys and values</span>
@@ -482,6 +473,7 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
               <path d="m10.5 10.5 3 3" />
             </svg>
             <input
+              id="search-input"
               ref={searchInputRef}
               type="search"
               dir="auto"
@@ -509,49 +501,30 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
         </div>
         {hasSearch && !showTable && (
           <>
-            <p aria-live="polite" className="shrink-0 whitespace-nowrap text-ink-soft">
+            <p id="search-match-status" aria-live="polite" className="shrink-0 whitespace-nowrap px-1 text-ink-soft">
               {matchStatus}
             </p>
-            <button type="button" aria-label="Previous match" disabled={matchCount === 0} onClick={() => goToMatch(currentMatchPosition - 1)} className={barButtonClassName}>
-              <BarIcon>
+            <IconButton label="Previous match" isDisabled={matchCount === 0} onClick={() => goToMatch(currentMatchPosition - 1)}>
+              <Icon>
                 <path d="m6 15 6-6 6 6" />
-              </BarIcon>
-            </button>
-            <button type="button" aria-label="Next match" disabled={matchCount === 0} onClick={() => goToMatch(currentMatchPosition + 1)} className={barButtonClassName}>
-              <BarIcon>
+              </Icon>
+            </IconButton>
+            <IconButton label="Next match" isDisabled={matchCount === 0} onClick={() => goToMatch(currentMatchPosition + 1)}>
+              <Icon>
                 <path d="m6 9 6 6 6-6" />
-              </BarIcon>
-            </button>
+              </Icon>
+            </IconButton>
           </>
         )}
-
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          {showTree && (
-            <>
-              <button type="button" onClick={expandAll} className={barButtonClassName}>
-                Expand all
-              </button>
-              <button type="button" onClick={collapseAll} className={barButtonClassName}>
-                Collapse all
-              </button>
-            </>
-          )}
-          <button type="button" disabled={root === null} onClick={copyAllText} className={barButtonClassName}>
-            <BarIcon>
-              <rect x="8" y="8" width="12" height="12" rx="2" />
-              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
-            </BarIcon>
-            <span aria-live="polite">{copyMessage || 'Copy'}</span>
-          </button>
-          {!isEditing && (
-            <button type="button" disabled={root === null} onClick={downloadCurrentJson} className={barButtonClassName}>
-              <BarIcon>
+        {!isEditing && (
+          <div className="ml-auto shrink-0" data-tip-align="end">
+            <IconButton label="Download" isDisabled={root === null} onClick={downloadCurrentJson}>
+              <Icon>
                 <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
-              </BarIcon>
-              Download
-            </button>
-          )}
-        </div>
+              </Icon>
+            </IconButton>
+          </div>
+        )}
       </div>
 
       {isEditing && isFindOpen && (
@@ -577,24 +550,27 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
           onClose={() => setIsFindOpen(false)}
         />
       )}
-      {largeFileWarning && <p className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
-      {expandNotice && <p className="border-b border-rule bg-paper px-4 py-2">{expandNotice}</p>}
+      {largeFileWarning && <p id="large-file-warning" className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
+      {expandNotice && <p id="expand-notice" className="border-b border-rule bg-paper px-4 py-2">{expandNotice}</p>}
       {validationError ? (
-        <div role="alert" className="flex flex-wrap items-center gap-3 border-b border-danger bg-paper px-4 py-2 text-danger">
+        <div id="json-error" role="alert" className="flex flex-wrap items-center gap-3 border-b border-danger bg-paper px-4 py-2 text-danger">
           <p className="min-w-0 flex-1">
             <strong>Not valid JSON. </strong>
             {describeErrorPosition(validationError)}
             {validationError.message}
           </p>
           {isEditing && validationError.line !== null && showCode && (
-            <button type="button" onClick={selectErrorInTextBox} className={barButtonClassName}>
-              Go to error
-            </button>
+            <IconButton label="Go to the error" onClick={selectErrorInTextBox}>
+              <Icon>
+                <circle cx="12" cy="12" r="7" />
+                <path d="M12 3v3M12 18v3M3 12h3M18 12h3" />
+              </Icon>
+            </IconButton>
           )}
         </div>
       ) : (
         isEditing && showCode && (
-          <p role="status" className="border-b border-rule bg-paper px-4 py-2 text-ink-soft">
+          <p id="json-valid-status" role="status" className="border-b border-rule bg-paper px-4 py-2 text-ink-soft">
             Valid JSON
           </p>
         )
@@ -603,11 +579,11 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
         <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden border-t-2 border-t-(--file-color)">
           {parseResult === null ? (
-            <p role="status" className="p-6 text-ink-soft">
+            <p id="json-loading" role="status" className="p-6 text-ink-soft">
               Reading file…
             </p>
           ) : showTree ? (
-            <div className="flex min-h-0 flex-1">
+            <div id="json-tree-view" className="flex min-h-0 flex-1">
               <JsonTree
                 root={root}
                 isEditable={isEditing}
@@ -625,6 +601,7 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
             <JsonTable rows={root as JsonValue[]} originalRows={originalRoot} isEditable={isEditing} searchText={deferredSearchText} onSetCell={setTableCell} />
           ) : isEditing ? (
             <textarea
+              id="json-code-editor"
               ref={textareaRef}
               autoFocus
               dir="ltr"
@@ -638,7 +615,7 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
               className="min-h-0 w-full flex-1 resize-none bg-transparent px-4 py-3 font-mono text-[13px] leading-[22px] outline-none"
             />
           ) : (
-            <div ref={codeScrollRef} tabIndex={0} aria-label="JSON code, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
+            <div id="json-code-view" ref={codeScrollRef} tabIndex={0} aria-label="JSON code, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
               <div role="document" dir="ltr" className="relative w-max min-w-full font-mono text-[13px]" style={{ height: lineVirtualizer.getTotalSize() }}>
                 {lineVirtualizer.getVirtualItems().map((virtualLine) => {
                   const isErrorLine = validationError?.line === virtualLine.index + 1
@@ -664,17 +641,31 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
         </div>
       </main>
 
-      <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
-        <p className="whitespace-nowrap font-semibold">{root === null ? 'JSON' : describeRoot(root)}</p>
+      <footer id="json-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
+        <p id="json-summary" className="whitespace-nowrap font-semibold">{root === null ? 'JSON' : describeRoot(root)}</p>
         {showTree && selectedPath !== null && (
-          <p className="flex min-w-0 items-center gap-2 lg:hidden">
+          <p id="selected-path-bar" className="flex min-w-0 items-center gap-2 lg:hidden">
             <span className="sr-only">Selected path</span>
-            <code dir="ltr" className="min-w-0 truncate font-mono text-(--file-color)">
+            <code id="selected-path" dir="ltr" className="min-w-0 truncate font-mono text-(--file-color)">
               {formatPathText(selectedPath)}
             </code>
-            <button type="button" onClick={copySelectedPath} className="shrink-0 cursor-pointer rounded px-1.5 text-ink-soft underline underline-offset-2 hover:text-ink">
-              <span aria-live="polite">{pathCopyMessage || 'Copy path'}</span>
-            </button>
+            <IconButton id="footer-copy-path-button" label="Copy path" onClick={copySelectedPath}>
+              <Icon>
+                <circle cx="6" cy="6" r="2.5" />
+                <circle cx="18" cy="18" r="2.5" />
+                <path d="M8 7.5c5 0 3 9 8 9" />
+              </Icon>
+            </IconButton>
+            {pathCopyMessage && (
+              <span id="path-copy-message" role="status" className="font-medium">
+                {pathCopyMessage}
+              </span>
+            )}
+          </p>
+        )}
+        {copyMessage && (
+          <p id="copy-message" role="status" className="font-medium">
+            {copyMessage}
           </p>
         )}
         {(showCode || edits.root === null) && <p className="text-ink-soft">{(showCode ? codeText : originalText).length.toLocaleString()} characters</p>}

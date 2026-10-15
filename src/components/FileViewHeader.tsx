@@ -38,26 +38,27 @@ export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onO
   }
 
   return (
-    <header className="border-b border-rule bg-paper-raised">
+    <header id="file-header" className="border-b border-rule bg-paper-raised">
       <a
+        id="skip-to-content-link"
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
       >
         Skip to content
       </a>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-1">
-        <button type="button" onClick={clearIfAllowed} className="type-h3 cursor-pointer text-base!">
+        <button id="brand-home-button" type="button" onClick={clearIfAllowed} className="type-h3 cursor-pointer text-base!">
           OpenAnyDoc
         </button>
-        <div className="order-3 flex min-w-0 basis-full items-center gap-3 sm:order-none sm:flex-1 sm:basis-24">
+        <div id="file-summary" className="order-3 flex min-w-0 basis-full items-center gap-3 sm:order-none sm:flex-1 sm:basis-24">
           {viewer && <FileTypeChip viewer={viewer} label={viewer.id === 'csv' ? findTableFormat(openedFile.file.name).label : viewer.label} />}
-          <h1 ref={fileNameRef} tabIndex={-1} className="truncate font-medium outline-none">
+          <h1 id="file-name" ref={fileNameRef} tabIndex={-1} className="truncate font-medium outline-none">
             {openedFile.file.name}
           </h1>
-          <span className="shrink-0 text-ink-soft">{formatFileSize(openedFile.file.size)}</span>
+          <span id="file-size" className="shrink-0 text-ink-soft">{formatFileSize(openedFile.file.size)}</span>
         </div>
-        {controls && <div className="order-3 flex basis-full items-center gap-3 sm:order-none sm:basis-auto">{controls}</div>}
-        <button type="button" onClick={onOpenAnotherFile} className={`${compactSecondaryButtonClassName} order-4 sm:order-none`}>
+        {controls && <div id="file-mode-controls" className="order-3 flex basis-full items-center gap-3 sm:order-none sm:basis-auto">{controls}</div>}
+        <button id="open-another-file-button" type="button" onClick={onOpenAnotherFile} className={`${compactSecondaryButtonClassName} order-4 sm:order-none`}>
           Open another file
         </button>
         <div className="order-2 ml-auto sm:order-none sm:ml-0">

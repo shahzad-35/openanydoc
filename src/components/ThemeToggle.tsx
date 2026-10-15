@@ -45,6 +45,7 @@ export default function ThemeToggle({ compact = false }: { compact?: boolean }) 
   // The icon shows the mode a click switches to: a sun while dark, a moon while light.
   return (
     <button
+      id="theme-toggle"
       type="button"
       onClick={toggleTheme}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}

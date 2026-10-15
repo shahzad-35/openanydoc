@@ -48,6 +48,7 @@ export default function FindReplaceBar({
   const countMessage = resultMessage || (findText === '' ? '' : matchMessage)
   return (
     <div
+      id="find-replace-bar"
       role="search"
       aria-label="Find and replace"
       onKeyDown={(event) => {
@@ -61,6 +62,7 @@ export default function FindReplaceBar({
       <label className="flex items-center gap-2">
         <span className="text-sm text-ink-soft">Find</span>
         <input
+          id="find-input"
           autoFocus
           dir="auto"
           value={findText}
@@ -76,34 +78,34 @@ export default function FindReplaceBar({
       </label>
       <label className="flex items-center gap-2">
         <span className="text-sm text-ink-soft">Replace with</span>
-        <input dir="auto" value={replaceText} onChange={(event) => onReplaceChange(event.target.value)} className={`${textControlClassName} w-44`} />
+        <input id="replace-input" dir="auto" value={replaceText} onChange={(event) => onReplaceChange(event.target.value)} className={`${textControlClassName} w-44`} />
       </label>
       <label className="flex min-h-8 pointer-coarse:min-h-11 items-center gap-2 text-sm">
-        <input type="checkbox" checked={matchCase} onChange={(event) => onMatchCaseChange(event.target.checked)} className="size-4 pointer-coarse:size-5" />
+        <input id="match-case-checkbox" type="checkbox" checked={matchCase} onChange={(event) => onMatchCaseChange(event.target.checked)} className="size-4 pointer-coarse:size-5" />
         Match case
       </label>
-      <p role="status" aria-live="polite" className="min-w-28 text-sm font-medium">
+      <p id="find-result" role="status" aria-live="polite" className="min-w-28 text-sm font-medium">
         {countMessage}
       </p>
       {onPrevious && (
-        <button type="button" disabled={matchCount === 0} onClick={onPrevious} className={barButtonClassName}>
+        <button id="find-previous-button" type="button" disabled={matchCount === 0} onClick={onPrevious} className={barButtonClassName}>
           Previous
         </button>
       )}
       {onNext && (
-        <button type="button" disabled={matchCount === 0} onClick={onNext} className={barButtonClassName}>
+        <button id="find-next-button" type="button" disabled={matchCount === 0} onClick={onNext} className={barButtonClassName}>
           Next
         </button>
       )}
       {onReplace && (
-        <button type="button" disabled={matchCount === 0} onClick={onReplace} className={barButtonClassName}>
+        <button id="replace-button" type="button" disabled={matchCount === 0} onClick={onReplace} className={barButtonClassName}>
           Replace
         </button>
       )}
-      <button type="button" disabled={findText === '' || matchCount === 0} onClick={onReplaceAll} className={barButtonClassName}>
+      <button id="replace-all-button" type="button" disabled={findText === '' || matchCount === 0} onClick={onReplaceAll} className={barButtonClassName}>
         Replace all
       </button>
-      <button type="button" onClick={onClose} className="control-shape min-h-8 pointer-coarse:min-h-11 cursor-pointer px-3 text-sm transition-colors duration-200 hover:bg-paper-raised">
+      <button id="find-close-button" type="button" onClick={onClose} className="control-shape min-h-8 pointer-coarse:min-h-11 cursor-pointer px-3 text-sm transition-colors duration-200 hover:bg-paper-raised">
         Close
       </button>
     </div>

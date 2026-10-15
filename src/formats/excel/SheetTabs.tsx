@@ -24,13 +24,14 @@ export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect,
   }
 
   return (
-    <div className="flex items-center gap-1 overflow-x-auto border-t border-rule bg-paper px-2 pt-1">
-      <div role="tablist" aria-label="Sheets" onKeyDown={moveBetweenTabs} className="flex items-end gap-1">
+    <div id="sheet-tabs" className="flex items-center gap-1 overflow-x-auto border-t border-rule bg-paper px-2 pt-1">
+      <div id="sheet-tablist" role="tablist" aria-label="Sheets" onKeyDown={moveBetweenTabs} className="flex items-end gap-1">
         {sheets.map((sheet) => {
           const isActive = sheet.id === activeSheetId
           return (
             <button
               key={sheet.id}
+              id={`sheet-tab-${sheet.id}`}
               type="button"
               role="tab"
               aria-selected={isActive}
@@ -52,6 +53,7 @@ export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect,
       </div>
       {isEditable && (
         <button
+          id="add-sheet-button"
           type="button"
           onClick={onAdd}
           aria-label="Add sheet"

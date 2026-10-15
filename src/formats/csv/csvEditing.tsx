@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import type { FocusEventHandler, KeyboardEventHandler } from 'react'
 import Papa from 'papaparse'
 import { compactSecondaryButtonClassName, textControlClassName } from '../../buttonStyles'
+import FindReplaceBar from '../../components/FindReplaceBar'
 import ModalDialog from '../../components/ModalDialog'
 import { Icon, IconButton, IconMenuButton } from '../../components/ToolbarControls'
 import { CellInput } from '../DataTable'
@@ -139,12 +140,14 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
   return (
     <>
       <p
+        id="selected-cell-label"
         aria-label="Selected cell"
         className="control-shape solid-box flex min-h-8 pointer-coarse:min-h-11 min-w-16 shrink-0 items-center justify-center border-rule bg-paper-raised px-3 font-mono text-sm"
       >
         {selectedCellLabel}
       </p>
       <input
+        id="cell-value-input"
         dir="auto"
         aria-label="Value of the selected cell"
         placeholder="Select a cell to see or edit its value"
@@ -156,76 +159,6 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
         className={`${textControlClassName} min-w-48 flex-1 disabled:cursor-not-allowed disabled:text-ink-soft`}
       />
     </>
-  )
-}
-
-type FindReplaceBarProps = {
-  findText: string
-  replaceText: string
-  matchCase: boolean
-  matchCount: number
-  resultMessage: string
-  onFindChange: (newText: string) => void
-  onReplaceChange: (newText: string) => void
-  onMatchCaseChange: (newValue: boolean) => void
-  onReplaceAll: () => void
-  onClose: () => void
-}
-
-// Find and replace over every shown cell: a live count of matching cells and "Replace all" as one undoable change.
-function FindReplaceBar({
-  findText,
-  replaceText,
-  matchCase,
-  matchCount,
-  resultMessage,
-  onFindChange,
-  onReplaceChange,
-  onMatchCaseChange,
-  onReplaceAll,
-  onClose,
-}: FindReplaceBarProps) {
-  const matchMessage = matchCount === 0 ? 'No matches' : `${matchCount.toLocaleString()} ${matchCount === 1 ? 'cell matches' : 'cells match'}`
-  const countMessage = resultMessage || (findText === '' ? '' : matchMessage)
-  return (
-    <div
-      role="search"
-      aria-label="Find and replace"
-      onKeyDown={(event) => {
-        if (event.key === 'Escape') {
-          event.preventDefault()
-          onClose()
-        }
-      }}
-      className="flex flex-wrap items-center gap-2 border-b border-rule bg-paper px-4 py-2"
-    >
-      <label className="flex items-center gap-2">
-        <span className="text-sm text-ink-soft">Find</span>
-        <input autoFocus dir="auto" value={findText} onChange={(event) => onFindChange(event.target.value)} className={`${textControlClassName} w-44`} />
-      </label>
-      <label className="flex items-center gap-2">
-        <span className="text-sm text-ink-soft">Replace with</span>
-        <input dir="auto" value={replaceText} onChange={(event) => onReplaceChange(event.target.value)} className={`${textControlClassName} w-44`} />
-      </label>
-      <label className="flex min-h-8 pointer-coarse:min-h-11 items-center gap-2 text-sm">
-        <input type="checkbox" checked={matchCase} onChange={(event) => onMatchCaseChange(event.target.checked)} className="size-4 pointer-coarse:size-5" />
-        Match case
-      </label>
-      <p role="status" aria-live="polite" className="min-w-28 text-sm font-medium">
-        {countMessage}
-      </p>
-      <button
-        type="button"
-        disabled={findText === '' || matchCount === 0}
-        onClick={onReplaceAll}
-        className="control-shape solid-box min-h-8 pointer-coarse:min-h-11 cursor-pointer border-ink px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Replace all
-      </button>
-      <button type="button" onClick={onClose} className="control-shape min-h-8 pointer-coarse:min-h-11 cursor-pointer px-3 text-sm transition-colors duration-200 hover:bg-paper-raised">
-        Close
-      </button>
-    </div>
   )
 }
 
@@ -259,6 +192,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
   return (
     <>
       <button
+        id="review-changes-button"
         type="button"
         aria-haspopup="dialog"
         aria-expanded={isOpen && hasChanges}
@@ -274,6 +208,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
           <div className="mt-3 flex items-center justify-between gap-3">
             {structureSummary ? <p className="text-ink-soft">{structureSummary}</p> : <span />}
             <button
+              id="changes-revert-all-button"
               type="button"
               onClick={() => {
                 onRevertAll()
@@ -286,8 +221,9 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
           </div>
           <ul className="mt-3 divide-y divide-rule">
             {changeRows.map((change) => (
-              <li key={change.key} className="flex items-center gap-2 py-2">
+              <li key={change.key} id={`change-${change.address}`} className="flex items-center gap-2 py-2">
                 <button
+                  id={`change-go-to-${change.address}`}
                   type="button"
                   disabled={!change.isVisible}
                   title={change.isVisible ? 'Go to this cell' : 'Hidden by the current search'}
@@ -309,6 +245,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
                   </span>
                 </button>
                 <button
+                  id={`change-revert-${change.address}`}
                   type="button"
                   aria-label={`Revert ${change.address}`}
                   onClick={() => onRevertCell(change.key)}
@@ -325,7 +262,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
             </p>
           )}
           <div className="mt-4 flex justify-end">
-            <button type="button" onClick={() => setIsOpen(false)} className={compactSecondaryButtonClassName}>
+            <button id="changes-close-button" type="button" onClick={() => setIsOpen(false)} className={compactSecondaryButtonClassName}>
               Close
             </button>
           </div>
@@ -375,6 +312,7 @@ function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfte
 
   return (
     <div
+      id="column-actions-menu"
       ref={menuRef}
       popover="auto"
       role="menu"
@@ -394,6 +332,7 @@ function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfte
       className="box-shape solid-box fixed m-0 w-52 border-rule bg-paper-raised p-1 text-ink"
     >
       <button
+        id="column-rename-item"
         type="button"
         role="menuitem"
         disabled={!canRename}
@@ -403,10 +342,10 @@ function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfte
       >
         Rename column
       </button>
-      <button type="button" role="menuitem" onClick={() => runAndClose(onAddColumnAfter)} className={itemClassName}>
+      <button id="column-add-after-item" type="button" role="menuitem" onClick={() => runAndClose(onAddColumnAfter)} className={itemClassName}>
         Add column after
       </button>
-      <button type="button" role="menuitem" disabled={!canDelete} onClick={() => runAndClose(onDelete)} className={itemClassName}>
+      <button id="column-delete-item" type="button" role="menuitem" disabled={!canDelete} onClick={() => runAndClose(onDelete)} className={itemClassName}>
         Delete column
       </button>
     </div>

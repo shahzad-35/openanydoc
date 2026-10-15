@@ -125,8 +125,6 @@ export default function App() {
           onReplaceFile={replaceFile}
           confirmDiscardEdits={confirmDiscardEdits}
           onUnsavedEditsChange={reportUnsavedEdits}
-          isBannerDismissed={isBannerDismissed}
-          onDismissBanner={() => setIsBannerDismissed(true)}
         />
       ) : isChangelogPath(pathname) ? (
         <Suspense fallback={null}>

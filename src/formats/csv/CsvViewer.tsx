@@ -494,6 +494,7 @@ export default function CsvViewer({
             <span className="sr-only">Search rows</span>
             <SearchIcon />
             <input
+              id="search-input"
               ref={searchInputRef}
               type="search"
               dir="auto"
@@ -550,7 +551,7 @@ export default function CsvViewer({
       )}
 
       {noticeLines.length > 0 && (
-        <ul role="status" className="space-y-1 border-b border-rule bg-paper-raised px-4 py-2 text-sm">
+        <ul id="file-notices" role="status" className="space-y-1 border-b border-rule bg-paper-raised px-4 py-2 text-sm">
           {noticeLines.map((noticeLine) => (
             <li key={noticeLine}>{noticeLine}</li>
           ))}
@@ -561,7 +562,7 @@ export default function CsvViewer({
         {parsedCsv === null && <p className="p-6 text-ink-soft">Reading file</p>}
 
         {parsedCsv?.status === 'error' && (
-          <div role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
+          <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
             <h2 className="type-h3">This file can't be shown</h2>
             <p className="mt-2">{parsedCsv.message}</p>
             <p className="mt-2 text-ink-soft">Use "Open another file" above to try a different file.</p>
@@ -658,7 +659,7 @@ export default function CsvViewer({
       </main>
 
       {readableCsv && (
-        <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
+        <footer id="csv-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
           <p aria-live="polite" className="whitespace-nowrap font-semibold">
             {isSearching
               ? `${visibleRowIds.length.toLocaleString()} of ${totalRowCount.toLocaleString()} rows`
@@ -667,6 +668,7 @@ export default function CsvViewer({
           <label className="flex items-center gap-2 text-ink-soft">
             Delimiter
             <select
+              id="delimiter-select"
               value={delimiterChoice}
               onChange={(event) => void changeDelimiter(event.target.value as DelimiterChoice)}
               className={textControlClassName}
@@ -680,6 +682,7 @@ export default function CsvViewer({
           </label>
           <label className="flex min-h-8 pointer-coarse:min-h-11 items-center gap-2">
             <input
+              id="header-row-checkbox"
               type="checkbox"
               checked={hasHeaderRow}
               onChange={(event) => {
@@ -691,7 +694,7 @@ export default function CsvViewer({
             First row is header
           </label>
           {cleanUpMessage?.forEdits === edits && (
-            <span role="status" className="font-medium">
+            <span id="clean-up-message" role="status" className="font-medium">
               {cleanUpMessage.text}
             </span>
           )}

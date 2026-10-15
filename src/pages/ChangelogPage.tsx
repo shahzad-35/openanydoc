@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import NewBadge from '../components/NewBadge'
 import changelog from '../data/changelog.json'
 import { useT } from '../i18n'
-import { CHECK_ICON_PATH, changelogClasses } from './changelogMarkup'
+import { CHECK_ICON_PATH, changelogClasses, changelogIds } from './changelogMarkup'
 import type { Locale, MessageKey } from '../i18n'
 import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
@@ -53,9 +53,10 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
   const { locale, t } = useT()
   useChangelogHead(locale, t('changelog.title'), t('changelog.description'))
 
-  function pageLink(path: string, className: string, children: React.ReactNode, hreflang?: Locale) {
+  function pageLink(id: string, path: string, className: string, children: React.ReactNode, hreflang?: Locale) {
     return (
       <a
+        id={id}
         href={path}
         {...(hreflang ? { hrefLang: hreflang, lang: hreflang } : {})}
         onClick={(event) => {
@@ -73,26 +74,26 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
   const viewerById = new Map<string, Viewer>(viewers.map((viewer) => [viewer.id, viewer]))
 
   return (
-    <div className={changelogClasses.page}>
-      <header className={changelogClasses.header}>
-        <p>{pageLink('/', changelogClasses.brandLink, 'OpenAnyDoc')}</p>
-        <p>{pageLink(`/${otherLocale(locale)}/changelog`, changelogClasses.languageLink, t('changelog.otherLanguage'), otherLocale(locale))}</p>
+    <div id={changelogIds.page} className={changelogClasses.page}>
+      <header id={changelogIds.header} className={changelogClasses.header}>
+        <p>{pageLink(changelogIds.brandLink, '/', changelogClasses.brandLink, 'OpenAnyDoc')}</p>
+        <p>{pageLink(changelogIds.languageLink, `/${otherLocale(locale)}/changelog`, changelogClasses.languageLink, t('changelog.otherLanguage'), otherLocale(locale))}</p>
       </header>
-      <main id="main" className={changelogClasses.main}>
+      <main id={changelogIds.main} className={changelogClasses.main}>
         <div className={changelogClasses.intro}>
-          <h1 className={changelogClasses.heading}>{t('changelog.heading')}</h1>
-          <p className={changelogClasses.introText}>{t('changelog.intro')}</p>
+          <h1 id={changelogIds.heading} className={changelogClasses.heading}>{t('changelog.heading')}</h1>
+          <p id={changelogIds.intro} className={changelogClasses.introText}>{t('changelog.intro')}</p>
         </div>
-        <ol className={changelogClasses.timeline}>
+        <ol id={changelogIds.timeline} className={changelogClasses.timeline}>
           {changelog.map((entry) => (
-            <li key={entry.version} data-file-type={entry.formats[0]} className={changelogClasses.entry}>
+            <li key={entry.version} id={changelogIds.release(entry.version)} data-file-type={entry.formats[0]} className={changelogClasses.entry}>
               <span aria-hidden="true" className={changelogClasses.dot} />
               <article className={changelogClasses.card}>
                 <p className={changelogClasses.meta}>
                   <span className={changelogClasses.versionPill}>{t('changelog.version', { version: entry.version })}</span>
                   <time dateTime={entry.date}>{formatDate(entry.date, locale)}</time>
                 </p>
-                <h2 className={changelogClasses.entryTitle}>{t(entry.title as MessageKey)}</h2>
+                <h2 id={changelogIds.releaseTitle(entry.version)} className={changelogClasses.entryTitle}>{t(entry.title as MessageKey)}</h2>
                 <ul className={changelogClasses.items}>
                   {entry.items.map((itemKey) => (
                     <li key={itemKey} className={changelogClasses.item}>
@@ -109,7 +110,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
                     const viewer = viewerById.get(viewerId) as Viewer
                     return (
                       <span key={viewerId} className="inline-flex items-center">
-                        {pageLink(viewer.toolPath as string, changelogClasses.formatLink, t('viewer.name', { format: viewer.label }))}
+                        {pageLink(changelogIds.tryFormat(entry.version, viewerId), viewer.toolPath as string, changelogClasses.formatLink, t('viewer.name', { format: viewer.label }))}
                         <NewBadge viewerId={viewer.id} />
                       </span>
                     )
@@ -119,7 +120,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
             </li>
           ))}
         </ol>
-        {pageLink('/', changelogClasses.backLink, t('changelog.home'))}
+        {pageLink(changelogIds.backLink, '/', changelogClasses.backLink, t('changelog.home'))}
       </main>
     </div>
   )

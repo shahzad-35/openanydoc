@@ -3,6 +3,7 @@
 import { Icon, IconButton, IconMenuButton } from '../../components/ToolbarControls'
 import type { EditingModule } from '../registry'
 import { jsonEditingModule } from './jsonModel'
+import { JsonViewTools } from './jsonViewTools'
 import type { JsonIndent, JsonSelection, JsonViewerCommands } from './jsonModel'
 
 const INDENT_CHOICES: { label: string; indent: JsonIndent }[] = [
@@ -28,6 +29,8 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
   return (
     <>
       {divider}
+      <JsonViewTools settings={jsonSelection.view} actions={getActions()} />
+      {divider}
       <IconMenuButton
         label="Format the saved JSON"
         isDisabled={!canEditDocument}
@@ -38,6 +41,7 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
         </Icon>
       </IconMenuButton>
       <IconMenuButton
+        id="toolbar-sort-keys"
         label={`Sort keys${node?.kind === 'object' ? ' of the selected object' : ' of the whole document'}`}
         isDisabled={!canEditDocument}
         items={[
@@ -53,6 +57,7 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
         </Icon>
       </IconMenuButton>
       <IconMenuButton
+        id="toolbar-sort-list"
         label={`Sort the selected list${node?.kind === 'array' ? '' : ' (select a list in the tree)'}`}
         isDisabled={!canEditDocument || node?.kind !== 'array'}
         items={[
@@ -66,7 +71,7 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
         </Icon>
       </IconMenuButton>
       {divider}
-      <IconButton label={`Add a child to the selected ${node?.kind === 'array' ? 'list' : 'object'}${isContainerSelected ? '' : ' (select an object or list)'}`} isDisabled={!canEditDocument || !isContainerSelected} onClick={() => getActions().addChild()}>
+      <IconButton id="toolbar-add-child" label={`Add a child to the selected ${node?.kind === 'array' ? 'list' : 'object'}${isContainerSelected ? '' : ' (select an object or list)'}`} isDisabled={!canEditDocument || !isContainerSelected} onClick={() => getActions().addChild()}>
         <Icon>
           <path d="M12 5v14M5 12h14" />
         </Icon>

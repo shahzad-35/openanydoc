@@ -302,7 +302,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   if (readableText.status === 'error') {
     return (
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
-        <div role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
+        <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
           <h2 className="type-h3">This file can't be shown</h2>
           <p className="mt-2">{readableText.message}</p>
           <p className="mt-2 text-ink-soft">Use "Open another file" above to try a different file.</p>
@@ -320,7 +320,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   return (
     <div className="flex min-h-0 flex-1 flex-col text-[13px]">
       {!isEditing && (
-        <div role="toolbar" aria-label="Text tools" className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
+        <div id="text-view-toolbar" role="toolbar" aria-label="Text tools" className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
           <TextViewTools settings={viewSettings} actions={viewActions} />
           <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-rule" />
           <div className="relative shrink-0">
@@ -331,6 +331,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
                 <path d="m10.5 10.5 3 3" />
               </svg>
               <input
+                id="search-input"
                 ref={searchInputRef}
                 type="search"
                 dir="auto"
@@ -357,7 +358,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
           </div>
           {hasSearch && (
             <>
-              <p aria-live="polite" className="shrink-0 whitespace-nowrap px-1 text-ink-soft">
+              <p id="search-match-status" aria-live="polite" className="shrink-0 whitespace-nowrap px-1 text-ink-soft">
                 {matchStatus}
               </p>
               <IconButton label="Previous match" isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition - 1)}>
@@ -412,9 +413,9 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
         />
       )}
 
-      {largeFileWarning && <p className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
+      {largeFileWarning && <p id="large-file-warning" className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
       {isEditing && isLargeForEditing && (
-        <p className="border-b border-rule bg-paper px-4 py-2">This file is large, so typing may feel slow and line numbers are hidden while editing. View mode stays fast.</p>
+        <p id="large-edit-warning" className="border-b border-rule bg-paper px-4 py-2">This file is large, so typing may feel slow and line numbers are hidden while editing. View mode stays fast.</p>
       )}
 
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
@@ -422,13 +423,14 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
           {isEditing ? (
             <div className="flex min-h-0 flex-1">
               {showLineNumbers && (
-                <div ref={gutterRef} aria-hidden="true" className="shrink-0 select-none overflow-hidden border-r border-rule bg-paper text-right text-ink-soft tabular-nums" style={{ width: gutterWidthPx }}>
+                <div id="line-number-gutter" ref={gutterRef} aria-hidden="true" className="shrink-0 select-none overflow-hidden border-r border-rule bg-paper text-right text-ink-soft tabular-nums" style={{ width: gutterWidthPx }}>
                   <pre className="pr-3" style={{ ...textStyle, paddingBlock: SHEET_VERTICAL_PADDING_PX }}>
                     {editGutterNumbers}
                   </pre>
                 </div>
               )}
               <textarea
+                id="text-editor"
                 ref={textareaRef}
                 autoFocus
                 dir="auto"
@@ -447,7 +449,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
               />
             </div>
           ) : (
-            <div ref={scrollContainerRef} tabIndex={0} aria-label="Text content, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
+            <div id="text-view" ref={scrollContainerRef} tabIndex={0} aria-label="Text content, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
               <div role="document" className={`relative ${wrapLines ? '' : 'w-max min-w-full'}`} style={{ ...textStyle, height: lineVirtualizer.getTotalSize() }}>
                 {lineVirtualizer.getVirtualItems().map((virtualLine) => {
                   const isCurrentMatch = hasSearch && virtualLine.index === currentMatchLineNumber
@@ -476,13 +478,13 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
         </div>
       </main>
 
-      <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
-        <p className="whitespace-nowrap font-semibold">{(isEditing ? splitIntoLines(draftText).length : lines.length).toLocaleString()} lines</p>
-        <p className="text-ink-soft">{(isEditing ? draftText : currentText).length.toLocaleString()} characters</p>
-        {isEditing && <p className="text-ink-soft">{wordCount.toLocaleString()} words</p>}
-        <p className="text-ink-soft">Encoding: {readableText.encodingLabel}</p>
+      <footer id="text-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
+        <p id="line-count" className="whitespace-nowrap font-semibold">{(isEditing ? splitIntoLines(draftText).length : lines.length).toLocaleString()} lines</p>
+        <p id="character-count" className="text-ink-soft">{(isEditing ? draftText : currentText).length.toLocaleString()} characters</p>
+        {isEditing && <p id="word-count" className="text-ink-soft">{wordCount.toLocaleString()} words</p>}
+        <p id="encoding-label" className="text-ink-soft">Encoding: {readableText.encodingLabel}</p>
         {copyMessage && (
-          <p role="status" className="font-medium">
+          <p id="copy-message" role="status" className="font-medium">
             {copyMessage}
           </p>
         )}

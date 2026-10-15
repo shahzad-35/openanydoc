@@ -38,8 +38,6 @@ type JsonTreeProps = {
 
 type EditingBox = { pathKey: string; kind: 'value' | 'key'; draft: string; errorMessage: string }
 
-const actionButtonClassName =
-  'control-shape inline-flex min-h-6 pointer-coarse:min-h-9 cursor-pointer items-center justify-center border border-rule bg-paper px-2 text-xs font-medium transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-40'
 
 export function HighlightedText({ text, searchText }: { text: string; searchText: string }) {
   if (searchText === '') return <>{text}</>
@@ -98,6 +96,24 @@ function getValueClassName(value: JsonValue) {
 
 // The document as a collapsible tree. Only the rows on screen are drawn. In Edit mode each row has buttons to change its
 // value, rename its key, move it, add to it and delete it; changes are made by the viewer, through the shared edit session.
+// A small icon button on a tree row (shown on hover, or always on touch screens). `children` are the icon's paths.
+function RowActionButton({ id, label, isDanger = false, onClick, children }: { id: string; label: string; isDanger?: boolean; onClick: () => void; children: ReactNode }) {
+  return (
+    <button
+      id={id}
+      type="button"
+      aria-label={label}
+      data-tip={label}
+      onClick={onClick}
+      className={`grid size-6 pointer-coarse:size-9 cursor-pointer place-items-center rounded hover:bg-paper-raised ${isDanger ? 'text-danger' : 'text-ink-soft hover:text-ink'}`}
+    >
+      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-3.5 pointer-coarse:size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        {children}
+      </svg>
+    </button>
+  )
+}
+
 export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpanded, searchText, currentMatchPathKey, selectedPathKey, onSelectPath, actions }: JsonTreeProps) {
   const [editingBox, setEditingBox] = useState<EditingBox | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -160,8 +176,8 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
   }
 
   return (
-    <div ref={scrollContainerRef} tabIndex={0} onKeyDown={handleTreeKeyDown} aria-label="JSON tree, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
-      <div role="tree" className="relative w-full font-mono text-[13px]" style={{ height: rowVirtualizer.getTotalSize() }}>
+    <div id="json-tree" ref={scrollContainerRef} tabIndex={0} onKeyDown={handleTreeKeyDown} aria-label="JSON tree, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
+      <div id="json-tree-rows" role="tree" className="relative w-full font-mono text-[13px]" style={{ height: rowVirtualizer.getTotalSize() }}>
         {rowVirtualizer.getVirtualItems().map((virtualRow) => {
           const row = rows[virtualRow.index]
           const isExpanded = expandedKeys.has(row.pathKey)
@@ -173,6 +189,7 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
           return (
             <div
               key={row.pathKey}
+              id={`tree-row-${virtualRow.index}`}
               role="treeitem"
               aria-level={row.depth + 1}
               aria-expanded={isContainer(row.value) ? isExpanded : undefined}
@@ -197,6 +214,7 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
               ))}
               {isContainer(row.value) ? (
                 <button
+                  id={`tree-toggle-${virtualRow.index}`}
                   type="button"
                   aria-label={`${isExpanded ? 'Collapse' : 'Expand'} ${row.label ?? 'root'}`}
                   onClick={() => onToggleExpanded(row.pathKey)}
@@ -215,6 +233,7 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
                 <span className="shrink-0 text-accent">
                   {isEditingThisRow && editingBox.kind === 'key' ? (
                     <input
+                      id="tree-key-input"
                       autoFocus
                       aria-label="Key name"
                       aria-invalid={editingBox.errorMessage !== ''}
@@ -239,6 +258,7 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
               <span className={`min-w-0 truncate ${getValueClassName(row.value)}`}>
                 {isEditingThisRow && editingBox.kind === 'value' ? (
                   <input
+                    id="tree-value-input"
                     autoFocus
                     aria-label="Value, written as JSON"
                     aria-invalid={editingBox.errorMessage !== ''}
@@ -258,7 +278,7 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
                 )}
               </span>
               {isEditingThisRow && editingBox.errorMessage !== '' && (
-                <span role="alert" className="shrink-0 font-sans text-xs text-danger">
+                <span id="tree-edit-error" role="alert" className="shrink-0 font-sans text-xs text-danger">
                   {editingBox.errorMessage}
                 </span>
               )}
@@ -266,31 +286,32 @@ export default function JsonTree({ root, isEditable, expandedKeys, onToggleExpan
               {isEditable && !isEditingThisRow && (
                 <span className="ms-auto flex shrink-0 gap-1 font-sans opacity-0 transition-opacity duration-150 group-focus-within:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100">
                   {canEditValue && (
-                    <button type="button" onClick={() => startEditing(row, 'value')} className={actionButtonClassName}>
-                      Edit value
-                    </button>
+                    <RowActionButton id={`tree-edit-value-${virtualRow.index}`} label={`Edit the value of ${row.label}`} onClick={() => startEditing(row, 'value')}>
+                      <path d="m4 20 1-4L16 5a2.1 2.1 0 0 1 3 3L8 19l-4 1Z" />
+                    </RowActionButton>
                   )}
                   {isObjectMember && (
-                    <button type="button" onClick={() => startEditing(row, 'key')} className={actionButtonClassName}>
-                      Rename
-                    </button>
+                    <RowActionButton id={`tree-rename-${virtualRow.index}`} label={`Rename the key ${row.label}`} onClick={() => startEditing(row, 'key')}>
+                      <path d="M4 7h16M4 12h10M4 17h16" />
+                      <path d="m17 12 3 3-3 3" />
+                    </RowActionButton>
                   )}
                   {isContainer(row.value) && (
-                    <button type="button" onClick={() => actions.addChild(row.path)} className={actionButtonClassName}>
-                      Add
-                    </button>
+                    <RowActionButton id={`tree-add-${virtualRow.index}`} label={`Add a child to ${row.label ?? 'root'}`} onClick={() => actions.addChild(row.path)}>
+                      <path d="M12 5v14M5 12h14" />
+                    </RowActionButton>
                   )}
                   {row.path.length > 0 && (
                     <>
-                      <button type="button" aria-label={`Move ${row.label} up`} onClick={() => actions.moveNode(row.path, -1)} className={actionButtonClassName}>
-                        Up
-                      </button>
-                      <button type="button" aria-label={`Move ${row.label} down`} onClick={() => actions.moveNode(row.path, 1)} className={actionButtonClassName}>
-                        Down
-                      </button>
-                      <button type="button" aria-label={`Delete ${row.label}`} onClick={() => actions.deleteNode(row.path)} className={`${actionButtonClassName} text-danger`}>
-                        Delete
-                      </button>
+                      <RowActionButton id={`tree-move-up-${virtualRow.index}`} label={`Move ${row.label} up`} onClick={() => actions.moveNode(row.path, -1)}>
+                        <path d="m6 15 6-6 6 6" />
+                      </RowActionButton>
+                      <RowActionButton id={`tree-move-down-${virtualRow.index}`} label={`Move ${row.label} down`} onClick={() => actions.moveNode(row.path, 1)}>
+                        <path d="m6 9 6 6 6-6" />
+                      </RowActionButton>
+                      <RowActionButton id={`tree-delete-${virtualRow.index}`} label={`Delete ${row.label}`} isDanger onClick={() => actions.deleteNode(row.path)}>
+                        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                      </RowActionButton>
                     </>
                   )}
                 </span>

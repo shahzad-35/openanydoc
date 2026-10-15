@@ -10,7 +10,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { faqItems, features } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
-import { CHECK_ICON_PATH, changelogClasses } from '../src/pages/changelogMarkup.ts'
+import { CHECK_ICON_PATH, changelogClasses, changelogIds } from '../src/pages/changelogMarkup.ts'
 import { SITE_NAME, SITE_ORIGIN, pageSeo } from '../src/seo.ts'
 import { viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -41,24 +41,24 @@ function renderChangelogBody(locale) {
       const links = entry.formats
         .map((viewerId) => {
           const viewer = viewerById.get(viewerId)
-          return `<span class="inline-flex items-center"><a href="${viewer.toolPath}" class="${c.formatLink}">${t('viewer.name', { format: viewer.label })}</a></span>`
+          return `<span class="inline-flex items-center"><a id="${changelogIds.tryFormat(entry.version, viewerId)}" href="${viewer.toolPath}" class="${c.formatLink}">${t('viewer.name', { format: viewer.label })}</a></span>`
         })
         .join('')
       return (
-        `<li data-file-type="${entry.formats[0]}" class="${c.entry}"><span aria-hidden="true" class="${c.dot}"></span><article class="${c.card}">` +
+        `<li id="${changelogIds.release(entry.version)}" data-file-type="${entry.formats[0]}" class="${c.entry}"><span aria-hidden="true" class="${c.dot}"></span><article class="${c.card}">` +
         `<p class="${c.meta}"><span class="${c.versionPill}">${t('changelog.version', { version: entry.version })}</span><time datetime="${entry.date}">${escapeHtml(formatDate(entry.date, locale))}</time></p>` +
-        `<h2 class="${c.entryTitle}">${t(entry.title)}</h2><ul class="${c.items}">${items}</ul>` +
+        `<h2 id="${changelogIds.releaseTitle(entry.version)}" class="${c.entryTitle}">${t(entry.title)}</h2><ul class="${c.items}">${items}</ul>` +
         `<p class="${c.tryIt}"><span class="${c.tryItLabel}">${t('changelog.tryIt')}</span>${links}</p></article></li>`
       )
     })
     .join('')
   const other = otherLocale(locale)
   return (
-    `<div class="${c.page}">` +
-    `<header class="${c.header}"><p><a href="/" class="${c.brandLink}">OpenAnyDoc</a></p>` +
-    `<p><a href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
-    `<main id="main" class="${c.main}"><div class="${c.intro}"><h1 class="${c.heading}">${t('changelog.heading')}</h1><p class="${c.introText}">${t('changelog.intro')}</p></div>` +
-    `<ol class="${c.timeline}">${entries}</ol><a href="/" class="${c.backLink}">${t('changelog.home')}</a></main></div>`
+    `<div id="${changelogIds.page}" class="${c.page}">` +
+    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/" class="${c.brandLink}">OpenAnyDoc</a></p>` +
+    `<p><a id="${changelogIds.languageLink}" href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
+    `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}"><h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
+    `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/" class="${c.backLink}">${t('changelog.home')}</a></main></div>`
   )
 }
 

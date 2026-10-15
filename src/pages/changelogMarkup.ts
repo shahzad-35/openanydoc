@@ -1,6 +1,22 @@
 // The look of the changelog page, shared by the React page (ChangelogPage.tsx) and the build script that writes the same page as
 // plain HTML (scripts/build-static-pages.mjs). Tailwind only generates the classes it finds in src/, so they live here.
 
+// Stable ids for the page's parts; a release is "release-1-3-0".
+export const changelogIds = {
+  page: 'changelog-page',
+  header: 'changelog-header',
+  brandLink: 'changelog-brand-link',
+  languageLink: 'language-switch-link',
+  main: 'main',
+  heading: 'changelog-heading',
+  intro: 'changelog-intro',
+  timeline: 'changelog-timeline',
+  backLink: 'changelog-home-link',
+  release: (version: string) => `release-${version.replaceAll('.', '-')}`,
+  releaseTitle: (version: string) => `release-${version.replaceAll('.', '-')}-title`,
+  tryFormat: (version: string, viewerId: string) => `release-${version.replaceAll('.', '-')}-try-${viewerId}`,
+} as const
+
 export const changelogClasses = {
   page: 'min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink',
   header: 'mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-5',

@@ -188,6 +188,7 @@ type CellInputProps = {
 export function CellInput({ ariaLabel, draft, onDraftChange, onFinish, onBlur, selectOnFocus = true }: CellInputProps) {
   return (
     <input
+      id="cell-editor-input"
       autoFocus
       dir="auto"
       aria-label={ariaLabel}
@@ -403,6 +404,7 @@ export default function DataTable({
 
   return (
     <div
+      id="data-table"
       ref={scrollContainerRef}
       tabIndex={0}
       onKeyDown={onKeyDown}
@@ -411,13 +413,14 @@ export default function DataTable({
       style={{ scrollPaddingTop: ROW_HEIGHT_PX, scrollPaddingLeft: rowNumberWidthPx }}
     >
       <div
+        id="data-grid"
         role="grid"
         aria-label={`${label} data`}
         aria-rowcount={rowIds.length + 1}
         aria-colcount={columnIds.length + 1}
         style={{ minWidth: tableMinWidthPx }}
       >
-        <div role="row" aria-rowindex={1} className="sticky top-0 z-20 flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
+        <div id="data-grid-header" role="row" aria-rowindex={1} className="sticky top-0 z-20 flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
           <div
             role="columnheader"
             className="sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule bg-paper px-3 text-xs text-ink-soft"
@@ -433,6 +436,7 @@ export default function DataTable({
             return (
               <div
                 key={columnId}
+                id={`column-header-${columnId}`}
                 role="columnheader"
                 aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
                 className={`group relative min-w-0 border-r border-rule/60 ${isSelectedColumn ? selectedCellTint : ''}`}
@@ -450,6 +454,7 @@ export default function DataTable({
                   )}
                   {onColumnNameClick ? (
                     <button
+                      id={`column-menu-button-${columnId}`}
                       type="button"
                       dir="auto"
                       aria-haspopup="menu"
@@ -466,6 +471,7 @@ export default function DataTable({
                     </span>
                   )}
                   <button
+                    id={`sort-column-${columnId}`}
                     type="button"
                     onClick={() => onCycleSort(columnId)}
                     aria-label={`Sort by ${columnName}`}
@@ -481,7 +487,7 @@ export default function DataTable({
           })}
         </div>
 
-        <div role="rowgroup" className="relative" style={{ height: rowVirtualizer.getTotalSize() }}>
+        <div id="data-grid-body" role="rowgroup" className="relative" style={{ height: rowVirtualizer.getTotalSize() }}>
           {rowVirtualizer.getVirtualItems().map((virtualRow) => {
             const rowId = rowIds[virtualRow.index]
             const isSelectedRow = selectedCell?.rowId === rowId
@@ -489,12 +495,14 @@ export default function DataTable({
             return (
               <div
                 key={virtualRow.key}
+                id={`row-${rowId}`}
                 role="row"
                 aria-rowindex={virtualRow.index + 2}
                 className="absolute inset-x-0 flex border-b border-rule/70 bg-paper-raised"
                 style={{ top: virtualRow.start, height: virtualRow.size }}
               >
                 <div
+                  id={`row-header-${rowId}`}
                   role="rowheader"
                   onClick={onRowHeaderClick ? (event) => onRowHeaderClick(rowId, event) : undefined}
                   className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
@@ -524,6 +532,7 @@ export default function DataTable({
                   return (
                     <div
                       key={columnId}
+                      id={`cell-${rowId}-${columnId}`}
                       role="gridcell"
                       aria-selected={isSelected}
                       dir="auto"

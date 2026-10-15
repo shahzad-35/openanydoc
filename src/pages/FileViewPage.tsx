@@ -1,7 +1,6 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChangeCounter, EditToolbar, ViewEditToggle } from '../components/EditControls'
 import FileViewHeader from '../components/FileViewHeader'
-import WhatsNewBanner from '../components/WhatsNewBanner'
 import { FILE_SAVED_EVENT, findFormatForFileName } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import { useEditSession } from '../formats/useEditSession'
@@ -20,8 +19,6 @@ type FileViewPageProps = {
   confirmDiscardEdits: () => Promise<boolean>
   // Tells App whether there are unsaved edits, so the browser's Back button can ask first.
   onUnsavedEditsChange: (hasUnsavedEdits: boolean) => void
-  isBannerDismissed: boolean
-  onDismissBanner: () => void
 }
 
 const noEdits = () => null
@@ -29,7 +26,7 @@ const countNoEdits = () => 0
 
 // The page a file opens on: the header, the View / Edit toggle, the edit toolbar and the format's viewer. It owns the edit
 // session, so edits survive switching between View and Edit.
-export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange, isBannerDismissed, onDismissBanner }: FileViewPageProps) {
+export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange }: FileViewPageProps) {
   const { locale, t } = useT()
   const viewer = findViewerForFileName(openedFile.file.name)
   const format = findFormatForFileName(openedFile.file.name)
@@ -114,7 +111,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const tipFormat = viewer ? pickRelatedFormat(viewer.id) : undefined
 
   return (
-    <div data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[14px] leading-normal text-ink">
+    <div id="file-page" data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[14px] leading-normal text-ink">
       <FileViewHeader
         openedFile={openedFile}
         onClose={onClose}
@@ -129,10 +126,9 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
           )
         }
       />
-      {!isBannerDismissed && <WhatsNewBanner currentViewerId={viewer?.id} onDismiss={onDismissBanner} />}
       {isSaveTipShown && tipFormat && (
-        <div role="status" className="flex items-center gap-3 border-b border-rule bg-paper-raised px-4 py-1.5 text-sm">
-          <p className="min-w-0 flex-1">
+        <div id="save-tip" role="status" className="flex items-center gap-3 border-b border-rule bg-paper-raised px-4 py-1.5 text-sm">
+          <p id="save-tip-message" className="min-w-0 flex-1">
             {translateWithNodes(locale, 'tip.alsoOpens', {
               format: (
                 <a href={tipFormat.viewer.toolPath} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2 hover:text-accent">
@@ -142,6 +138,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
             })}
           </p>
           <button
+            id="save-tip-close-button"
             type="button"
             aria-label={t('tip.close')}
             onClick={() => setIsSaveTipShown(false)}
@@ -164,22 +161,22 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         />
       )}
       {anotherFileIntake.fileInput}
-      <div aria-live="polite">
+      <div id="file-messages" aria-live="polite">
         {anotherFileIntake.errorMessage && (
-          <p role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 font-medium text-danger">
+          <p id="another-file-error" role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 font-medium text-danger">
             {anotherFileIntake.errorMessage}
           </p>
         )}
         {anotherFileIntake.largeFileWarning && (
-          <p className="border-b border-rule bg-paper-raised px-4 py-2">{anotherFileIntake.largeFileWarning}</p>
+          <p id="another-file-warning" className="border-b border-rule bg-paper-raised px-4 py-2">{anotherFileIntake.largeFileWarning}</p>
         )}
       </div>
       {editingLoadFailed && (
-        <p role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 text-danger">
+        <p id="editing-load-error" role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 text-danger">
           The editing tools could not be loaded. Check your connection and reload the page; the file is still open for viewing.
         </p>
       )}
-      <Suspense fallback={<p className="p-6 text-ink-soft">Reading file</p>}>
+      <Suspense fallback={<p id="file-loading" className="p-6 text-ink-soft">Reading file</p>}>
         <Viewer
           openedFile={openedFile}
           mode={mode}

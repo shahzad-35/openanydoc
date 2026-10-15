@@ -22,6 +22,7 @@ function TextToolbar({ selection, commands }: { selection: unknown; commands: un
       <TextViewTools settings={textSelection.view} actions={getActions()} />
       {divider}
       <IconMenuButton
+        id="toolbar-change-case"
         label={`Change case of ${scope}`}
         items={[
           { label: 'UPPERCASE', onSelect: () => getActions().transform('upper') },
@@ -33,6 +34,7 @@ function TextToolbar({ selection, commands }: { selection: unknown; commands: un
         <span className="text-[11px] font-semibold">Aa</span>
       </IconMenuButton>
       <IconMenuButton
+        id="toolbar-clean-up-whitespace"
         label={`Clean up whitespace in ${scope}`}
         items={[
           { label: 'Trim trailing spaces', onSelect: () => getActions().transform('trimTrailingSpaces') },
@@ -47,6 +49,7 @@ function TextToolbar({ selection, commands }: { selection: unknown; commands: un
         </Icon>
       </IconMenuButton>
       <IconMenuButton
+        id="toolbar-arrange-lines"
         label={`Arrange the lines of ${scope}`}
         items={[
           { label: 'Sort A to Z', onSelect: () => getActions().transform('sortAscending') },

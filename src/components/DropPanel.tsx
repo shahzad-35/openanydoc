@@ -65,11 +65,11 @@ export function ExtensionPill({ extension }: { extension: string }) {
   )
 }
 
-function ExtensionList({ className, shownViewers }: { className: string; shownViewers: Viewer[] }) {
+function ExtensionList({ id, className, shownViewers }: { id: string; className: string; shownViewers: Viewer[] }) {
   return (
-    <ul className={className}>
+    <ul id={id} className={className}>
       {shownViewers.map((viewer) => (
-        <li key={viewer.id} className="grid grid-cols-[6rem_1fr] items-start gap-x-3">
+        <li key={viewer.id} id={`extension-row-${viewer.id}`} className="grid grid-cols-[6rem_1fr] items-start gap-x-3">
           <span className="py-0.5 text-sm text-ink-soft">
             {viewer.label}
             <NewBadge viewerId={viewer.id} />
@@ -107,31 +107,33 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
   return (
     <>
       <div
+        id="drop-panel"
         className={`box-shape solid-box mx-auto w-full max-w-3xl bg-paper-raised/80 p-6 text-center backdrop-blur-md transition-colors duration-200 md:p-8 ${
           intake.isDraggingOver ? 'border-accent' : 'border-rule'
         }`}
       >
-        <p className="type-h3 text-3xl md:text-4xl">{intake.promptText}</p>
-        <p className="mt-2 text-ink-soft">or pick one from your device.</p>
+        <p id="drop-prompt" className="type-h3 text-3xl md:text-4xl">{intake.promptText}</p>
+        <p id="drop-subprompt" className="mt-2 text-ink-soft">or pick one from your device.</p>
 
-        <ExtensionList shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-left md:grid-cols-2" />
+        <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-left md:grid-cols-2" />
 
         {intake.fileInput}
         <div className="mt-6">
-          <button type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className={primaryButtonClassName}>
+          <button id="choose-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className={primaryButtonClassName}>
             Choose a file
           </button>
         </div>
-        {intake.acceptsPastedText && <p className="mt-4 text-sm text-ink-soft">{pasteHint}</p>}
-        <p className="mt-1 text-sm text-ink-soft">Opened in your browser — the file is never uploaded.</p>
+        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{pasteHint}</p>}
+        <p id="privacy-note" className="mt-1 text-sm text-ink-soft">Opened in your browser — the file is never uploaded.</p>
 
-        <div aria-live="polite" className="mt-4 space-y-2">
-          {intake.largeFileWarning && <p>{intake.largeFileWarning}</p>}
-          {intake.errorMessage && <p className="font-medium text-danger">{intake.errorMessage}</p>}
+        <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
+          {intake.largeFileWarning && <p id="large-file-warning">{intake.largeFileWarning}</p>}
+          {intake.errorMessage && <p id="drop-error" className="font-medium text-danger">{intake.errorMessage}</p>}
           {suggestion && (
-            <div className="flex flex-col items-center gap-3">
-              <p className="font-medium">{translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey)}</p>
+            <div id="wrong-file-redirect" className="flex flex-col items-center gap-3">
+              <p id="wrong-file-message" className="font-medium">{translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey)}</p>
               <button
+                id="open-in-viewer-button"
                 type="button"
                 onClick={() => onOpenInViewer?.(suggestion.file, suggestion.viewer.toolPath as string)}
                 className={secondaryButtonClassName}
@@ -144,13 +146,14 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
       </div>
 
       {otherFormats.length > 0 && (
-        <p className="mt-6 text-center text-ink-soft">
+        <p id="also-works-with" className="mt-6 text-center text-ink-soft">
           {translateWithNodes(locale, 'crossLinks.alsoWorks', {
             formats: joinNodesAsList(
               locale,
               otherFormats.map(({ viewer }) => (
                 <a
                   key={viewer.id}
+                  id={`also-works-link-${viewer.id}`}
                   href={viewer.toolPath}
                   onClick={(event) => {
                     if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
@@ -167,7 +170,7 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
         </p>
       )}
 
-      <ol className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-ink-soft">
+      <ol id="drop-steps" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-ink-soft">
         {steps.map((step, index) => (
           <li key={step} className="flex items-center gap-2">
             <span className="control-shape type-h3 grid size-8 place-items-center bg-paper-raised/80 text-sm text-ink">

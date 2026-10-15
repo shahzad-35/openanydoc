@@ -14,10 +14,10 @@ export default function DiscardEditsDialog({ onKeepEditing, onDiscard }: Discard
         The file on your device is untouched. The changes you made here are not saved anywhere, so they will be lost.
       </p>
       <div className="mt-6 flex flex-wrap justify-end gap-3">
-        <button type="button" autoFocus onClick={onKeepEditing} className={primaryButtonClassName}>
+        <button id="keep-editing-button" type="button" autoFocus onClick={onKeepEditing} className={primaryButtonClassName}>
           Keep editing
         </button>
-        <button type="button" onClick={onDiscard} className={secondaryButtonClassName}>
+        <button id="discard-edits-button" type="button" onClick={onDiscard} className={secondaryButtonClassName}>
           Discard and start over
         </button>
       </div>

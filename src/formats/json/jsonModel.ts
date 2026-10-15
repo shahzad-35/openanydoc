@@ -1,4 +1,5 @@
 import type { EditingModule, ExportOption } from '../registry'
+import type { JsonViewActions, JsonViewSettings } from './jsonViewTools'
 
 export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue }
 export type JsonContainer = JsonValue[] | { [key: string]: JsonValue }
@@ -16,12 +17,12 @@ export type JsonExportSource = { originalText: string }
 
 // What the toolbar needs to know about the open document and the selected node.
 export type JsonSelection = {
-  view: 'tree' | 'table' | 'code'
   isValid: boolean
   hasDocument: boolean
   // The selected node in the tree: its kind, whether it is the root, and where it stands among its siblings.
   selectedNode: { kind: 'object' | 'array' | 'value'; isRoot: boolean; isFirst: boolean; isLast: boolean } | null
   indent: JsonIndent
+  view: JsonViewSettings
 } | null
 
 // Things the toolbar can ask the viewer to do.
@@ -31,7 +32,7 @@ export type JsonViewerCommands = {
   getActions: () => JsonActions
 }
 
-export type JsonActions = {
+export type JsonActions = JsonViewActions & {
   setIndent: (indent: JsonIndent) => void
   // Sorts the keys of the selected object, or of the whole document when no object is selected.
   sortKeys: (direction: 'asc' | 'desc', includeNested: boolean) => void

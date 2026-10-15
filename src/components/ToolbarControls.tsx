@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import { toElementId } from '../elementId'
 
 // The icon controls every format's editing toolbar is built from (see "Editing toolbar standard" in DESIGN.md): a plain icon
 // button, an icon button that opens a menu of actions, and the popover menu itself.
@@ -7,6 +8,8 @@ import type { ReactNode } from 'react'
 export type MenuItem = { label: string; onSelect: () => void; isDisabled?: boolean }
 
 type ActionMenuProps = {
+  // The id of the menu; the button that opens it points at it with aria-controls, and each item gets "<id>-<item>".
+  id?: string
   ariaLabel: string
   // Where the menu opens: right under what opened it.
   left: number
@@ -17,7 +20,7 @@ type ActionMenuProps = {
 
 // A menu in the browser's top layer (a popover), so the table can never cover it. Esc and a click outside close it, the arrow
 // keys move between items, and focus returns to what opened it.
-export function ActionMenu({ ariaLabel, left, top, items, onClose }: ActionMenuProps) {
+export function ActionMenu({ id, ariaLabel, left, top, items, onClose }: ActionMenuProps) {
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -36,6 +39,7 @@ export function ActionMenu({ ariaLabel, left, top, items, onClose }: ActionMenuP
   return (
     <div
       ref={menuRef}
+      id={id}
       popover="auto"
       role="menu"
       aria-label={ariaLabel}
@@ -56,6 +60,7 @@ export function ActionMenu({ ariaLabel, left, top, items, onClose }: ActionMenuP
       {items.map((item) => (
         <button
           key={item.label}
+          id={id ? `${id}-${toElementId(item.label, true)}` : undefined}
           type="button"
           role="menuitem"
           disabled={item.isDisabled}
@@ -76,15 +81,18 @@ export const iconButtonClassName =
   'control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center text-[14px] transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:text-ink/40 aria-pressed:bg-paper-raised aria-pressed:text-(--file-color)'
 
 // An icon button with a small arrow that opens a menu of actions.
-export function IconMenuButton({ label, items, isDisabled, children }: { label: string; items: MenuItem[]; isDisabled?: boolean; children: ReactNode }) {
+export function IconMenuButton({ id, label, items, isDisabled, children }: { id?: string; label: string; items: MenuItem[]; isDisabled?: boolean; children: ReactNode }) {
   const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null)
+  const buttonId = id ?? `toolbar-${toElementId(label)}`
   return (
     <>
       <button
+        id={buttonId}
         type="button"
         aria-label={label}
         data-tip={label}
         aria-haspopup="menu"
+        aria-controls={menuPosition ? `${buttonId}-menu` : undefined}
         aria-expanded={menuPosition !== null}
         disabled={isDisabled}
         onClick={(event) => {
@@ -98,7 +106,7 @@ export function IconMenuButton({ label, items, isDisabled, children }: { label: 
           <path d="m3 4.5 3 3 3-3" />
         </svg>
       </button>
-      {menuPosition && <ActionMenu ariaLabel={label} {...menuPosition} items={items} onClose={() => setMenuPosition(null)} />}
+      {menuPosition && <ActionMenu id={`${buttonId}-menu`} ariaLabel={label} {...menuPosition} items={items} onClose={() => setMenuPosition(null)} />}
     </>
   )
 }
@@ -112,11 +120,11 @@ export function Icon({ children }: { children: ReactNode }) {
 }
 
 
-export type IconButtonProps = { label: string; isPressed?: boolean; isDisabled?: boolean; onClick: () => void; children: ReactNode }
+export type IconButtonProps = { id?: string; label: string; isPressed?: boolean; isDisabled?: boolean; onClick: () => void; children: ReactNode }
 
-export function IconButton({ label, isPressed, isDisabled, onClick, children }: IconButtonProps) {
+export function IconButton({ id, label, isPressed, isDisabled, onClick, children }: IconButtonProps) {
   return (
-    <button type="button" aria-label={label} data-tip={label} aria-pressed={isPressed} disabled={isDisabled} onClick={onClick} className={iconButtonClassName}>
+    <button id={id ?? `toolbar-${toElementId(label)}`} type="button" aria-label={label} data-tip={label} aria-pressed={isPressed} disabled={isDisabled} onClick={onClick} className={iconButtonClassName}>
       {children}
     </button>
   )
