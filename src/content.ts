@@ -14,7 +14,8 @@ export const features = [
   'Files are read in your browser and never uploaded.',
   'Table files: .csv files get automatic delimiter detection (comma, semicolon, tab, pipe), .tsv and .tab files open tab-separated with the header row detected, you can choose another delimiter yourself, and there is a first-row-is-header toggle, column sorting and search.',
   'Large CSV files stay smooth because only the visible rows are drawn, including while you edit.',
-  'Edit CSV files in your browser: change cells, add or delete rows and columns, rename headers, find and replace, with undo and redo.',
+  'Edit CSV files in your browser: change cells, add or delete rows and columns, rename headers, find and replace, clean up a column or the table (case, spaces, empty and duplicate rows), with undo and redo.',
+  'Edit text and JSON with icon toolbars: change case, tidy spaces, sort and reverse lines, choose line endings, format or minify JSON, sort keys and lists, and duplicate, move or delete JSON nodes.',
   'Download what you see (the edits, the current sort and only the rows your search shows) as CSV or JSON, or copy it for Excel or Google Sheets.',
   'UTF-8 (with or without a BOM), UTF-16 and Arabic text are read correctly, and Arabic cells display right-to-left.',
   'Open JSON files as a collapsible tree, a table (for a list of objects) or formatted code, with search, error messages that give the line and column, and editing. Large files are read in the background so the page stays responsive.',
@@ -41,7 +42,7 @@ export const faqItems = [
   {
     question: 'Can I edit my file or save changes?',
     answer:
-      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Plain text and JSON files can be edited too (JSON as a tree, a table, or code that is checked as you type). Excel workbooks can be edited and saved in their own format: formulas recalculate as you edit, and .xlsx files keep their bold, colours and merged cells. Charts, images and macros are not kept, and styles are not kept in .xls, .ods and .xlsm files or in very large workbooks. Word, PDF and PowerPoint cannot be edited yet.',
+      'CSV files, yes: switch to Edit to change cells, add or delete rows and columns, rename headers, and find and replace. You can then download a copy (CSV or JSON) or copy the rows for Excel or Google Sheets. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Plain text and JSON files can be edited too (JSON as a tree, a table, or code that is checked as you type), with tools such as change case, sort lines, line endings, format and sort keys. Excel workbooks can be edited and saved in their own format: formulas recalculate as you edit, and .xlsx files keep their bold, colours and merged cells. Charts, images and macros are not kept, and styles are not kept in .xls, .ods and .xlsm files or in very large workbooks. Word, PDF and PowerPoint cannot be edited yet.',
   },
   {
     question: 'Which CSV delimiters are supported?',

@@ -54,8 +54,23 @@ export type CsvExportSource = {
 // Things the toolbar can ask the viewer to do.
 export type CsvViewerCommands = {
   toggleFindReplace: () => void
-  // Selects a cell and scrolls it into view; a missing id means "the selected one" or the first.
-  revealCell: (position: Partial<CellPosition>) => void
+  // The viewer's actions as they are now, read when a toolbar item is chosen.
+  getActions: () => CsvActions
+}
+
+// What the toolbar's icons do. "Column" actions work on the column of the selected cell.
+export type CsvActions = {
+  insertRow: (side: 'above' | 'below') => void
+  deleteRow: () => void
+  insertColumn: (side: 'left' | 'right') => void
+  deleteColumn: () => void
+  clearCell: () => void
+  revertCell: () => void
+  transformColumn: (transform: CellTextTransform) => void
+  fillColumnDown: () => void
+  trimAllCells: () => void
+  removeEmptyRows: () => void
+  removeDuplicateRows: () => void
 }
 
 export function cellKey(rowId: number, columnId: number) {
@@ -242,4 +257,84 @@ export function withReplacedText(
     }
   }
   return { edits: replacedCellCount === 0 ? edits : { ...edits, cells: nextCells }, replacedCellCount }
+}
+
+// ---------------------------------------------------------------- column and table clean-up
+// Each function returns one edits object, so one toolbar action is one undo step.
+
+export type CellTextTransform = 'trim' | 'upper' | 'lower' | 'capitalize'
+
+const cellTextTransforms: Record<CellTextTransform, (text: string) => string> = {
+  trim: (text) => text.trim().replace(/\s+/g, ' '),
+  upper: (text) => text.toLocaleUpperCase(),
+  lower: (text) => text.toLocaleLowerCase(),
+  capitalize: (text) => text.toLocaleLowerCase().replace(/(^|[\s\-(])(\p{L})/gu, (_match, before: string, letter: string) => before + letter.toLocaleUpperCase()),
+}
+
+// Applies a text change to every shown cell of the given columns.
+export function withTransformedText(
+  edits: CsvEdits,
+  rows: string[][],
+  rowIds: readonly number[],
+  columnIds: readonly number[],
+  transform: CellTextTransform,
+): CsvEdits {
+  const nextCells = new Map(edits.cells)
+  for (const rowId of rowIds) {
+    for (const columnId of columnIds) {
+      const currentText = getCellText(rows, edits, rowId, columnId)
+      const newText = cellTextTransforms[transform](currentText)
+      if (newText === currentText) continue
+      const key = cellKey(rowId, columnId)
+      if (newText === getOriginalCellText(rows, rowId, columnId)) nextCells.delete(key)
+      else nextCells.set(key, newText)
+    }
+  }
+  return nextCells.size === edits.cells.size && [...nextCells].every(([key, text]) => edits.cells.get(key) === text) ? edits : { ...edits, cells: nextCells }
+}
+
+// Fills every empty cell of a column with the closest filled cell above it.
+export function withFilledDown(edits: CsvEdits, rows: string[][], rowIds: readonly number[], columnId: number): CsvEdits {
+  const nextCells = new Map(edits.cells)
+  let lastFilledText = ''
+  for (const rowId of rowIds) {
+    const currentText = getCellText(rows, edits, rowId, columnId)
+    if (currentText.trim() !== '') {
+      lastFilledText = currentText
+      continue
+    }
+    if (lastFilledText === '' || currentText === lastFilledText) continue
+    const key = cellKey(rowId, columnId)
+    if (lastFilledText === getOriginalCellText(rows, rowId, columnId)) nextCells.delete(key)
+    else nextCells.set(key, lastFilledText)
+  }
+  return nextCells.size === edits.cells.size && [...nextCells].every(([key, text]) => edits.cells.get(key) === text) ? edits : { ...edits, cells: nextCells }
+}
+
+// Deletes many rows at once (a loop of withDeletedLine would copy the set for every row).
+function withDeletedRows(edits: CsvEdits, deletedRowIds: readonly number[]): CsvEdits {
+  if (deletedRowIds.length === 0) return edits
+  const originalIds = deletedRowIds.filter((rowId) => !isInsertedLine(rowId))
+  let nextEdits: CsvEdits = { ...edits, deletedRowIds: new Set([...edits.deletedRowIds, ...originalIds]) }
+  for (const rowId of deletedRowIds) {
+    if (isInsertedLine(rowId)) nextEdits = withDeletedLine(nextEdits, 'row', rowId)
+  }
+  return nextEdits
+}
+
+export function withoutEmptyRows(edits: CsvEdits, rows: string[][], rowIds: readonly number[], columnIds: readonly number[]) {
+  const emptyRowIds = rowIds.filter((rowId) => columnIds.every((columnId) => getCellText(rows, edits, rowId, columnId).trim() === ''))
+  return { edits: withDeletedRows(edits, emptyRowIds), removedCount: emptyRowIds.length }
+}
+
+// Keeps the first of every group of identical rows.
+export function withoutDuplicateRows(edits: CsvEdits, rows: string[][], rowIds: readonly number[], columnIds: readonly number[]) {
+  const seenRowTexts = new Set<string>()
+  const duplicateRowIds: number[] = []
+  for (const rowId of rowIds) {
+    const rowText = columnIds.map((columnId) => getCellText(rows, edits, rowId, columnId)).join('\u0000')
+    if (seenRowTexts.has(rowText)) duplicateRowIds.push(rowId)
+    else seenRowTexts.add(rowText)
+  }
+  return { edits: withDeletedRows(edits, duplicateRowIds), removedCount: duplicateRowIds.length }
 }

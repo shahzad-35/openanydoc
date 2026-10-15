@@ -5,62 +5,97 @@ import type { FocusEventHandler, KeyboardEventHandler } from 'react'
 import Papa from 'papaparse'
 import { compactSecondaryButtonClassName, textControlClassName } from '../../buttonStyles'
 import ModalDialog from '../../components/ModalDialog'
+import { Icon, IconButton, IconMenuButton } from '../../components/ToolbarControls'
 import { CellInput } from '../DataTable'
-import type { EditingModule, EditorTool, ExportOption } from '../registry'
-import type { EditSession } from '../useEditSession'
-import { getCellText, withCellText, withDeletedLine, withInsertedLine } from './csvCells'
+import type { EditingModule, ExportOption } from '../registry'
+import { getCellText } from './csvCells'
 import type { CellPosition, CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
 
 // Everything in this file is loaded only when Edit is first used.
 
-function setSelectedCellText(session: EditSession<unknown>, selection: unknown, newText: string) {
-  const { cell, originalText } = selection as NonNullable<CsvSelection>
-  if (!cell) return
-  session.update((edits) => withCellText(edits as CsvEdits, cell, originalText, newText))
-}
-
-function addRowBelowSelection(session: EditSession<unknown>, selection: unknown, commands: unknown) {
-  const { cell, lastRowId } = selection as NonNullable<CsvSelection>
-  const newRowId = (session.edits as CsvEdits).nextRowId
-  session.update((currentEdits) => withInsertedLine(currentEdits as CsvEdits, 'row', cell?.rowId ?? lastRowId))
-  ;(commands as CsvViewerCommands).revealCell({ rowId: newRowId, columnId: cell?.columnId })
-}
-
-function deleteSelectedRow(session: EditSession<unknown>, selection: unknown) {
-  const { cell } = selection as NonNullable<CsvSelection>
-  if (!cell) return
-  session.update((edits) => withDeletedLine(edits as CsvEdits, 'row', cell.rowId))
-}
-
 const hasSelectedCell = (selection: unknown) => (selection as CsvSelection)?.cell != null
 
-const tools: EditorTool[] = [
-  {
-    id: 'find-replace',
-    label: 'Find and replace',
-    isEnabled: (selection) => selection !== null,
-    run: (_session, _selection, commands) => (commands as CsvViewerCommands).toggleFindReplace(),
-  },
-  {
-    id: 'add-row',
-    label: 'Add row',
-    isEnabled: (selection) => selection !== null,
-    run: addRowBelowSelection,
-  },
-  { id: 'delete-row', label: 'Delete row', isEnabled: hasSelectedCell, run: deleteSelectedRow },
-  {
-    id: 'clear-cell',
-    label: 'Clear cell',
-    isEnabled: hasSelectedCell,
-    run: (session, selection) => setSelectedCellText(session, selection, ''),
-  },
-  {
-    id: 'revert-cell',
-    label: 'Revert cell',
-    isEnabled: (selection) => (selection as CsvSelection)?.isEdited === true,
-    run: (session, selection) => setSelectedCellText(session, selection, (selection as NonNullable<CsvSelection>).originalText),
-  },
-]
+// The icons in the page's edit toolbar, after Undo, Redo and Revert all: rows, columns, the selected cell, find and clean-up.
+// Every action changes cell text or structure, so each one is saved in the downloaded file.
+function CsvToolbar({ selection, commands }: { selection: unknown; commands: unknown }) {
+  const getActions = (commands as CsvViewerCommands | null)?.getActions
+  if (!getActions) return null
+  const csvSelection = selection as CsvSelection
+  const hasCell = hasSelectedCell(selection)
+  const divider = <span aria-hidden="true" className="h-5 w-px shrink-0 bg-rule" />
+  return (
+    <>
+      {divider}
+      <IconMenuButton
+        label="Rows"
+        isDisabled={!hasCell}
+        items={[
+          { label: 'Insert row above', onSelect: () => getActions().insertRow('above') },
+          { label: 'Insert row below', onSelect: () => getActions().insertRow('below') },
+          { label: 'Delete row', onSelect: () => getActions().deleteRow() },
+        ]}
+      >
+        <Icon>
+          <rect x="3" y="4" width="18" height="16" rx="1" />
+          <path d="M3 10h18" />
+          <path d="M3 15h18" />
+        </Icon>
+      </IconMenuButton>
+      <IconMenuButton
+        label="Columns"
+        isDisabled={!hasCell}
+        items={[
+          { label: 'Insert column left', onSelect: () => getActions().insertColumn('left') },
+          { label: 'Insert column right', onSelect: () => getActions().insertColumn('right') },
+          { label: 'Delete column', onSelect: () => getActions().deleteColumn(), isDisabled: (csvSelection?.columnCount ?? 0) < 2 },
+        ]}
+      >
+        <Icon>
+          <rect x="3" y="4" width="18" height="16" rx="1" />
+          <path d="M9 4v16" />
+          <path d="M15 4v16" />
+        </Icon>
+      </IconMenuButton>
+      {divider}
+      <IconButton label="Clear cell" isDisabled={!hasCell} onClick={() => getActions().clearCell()}>
+        <Icon>
+          <path d="m7 21-4-4 11-11 7 7-6 6H7Z" />
+          <path d="M9 11l6 6" />
+        </Icon>
+      </IconButton>
+      <IconButton label="Revert cell to the original" isDisabled={csvSelection?.isEdited !== true} onClick={() => getActions().revertCell()}>
+        <Icon>
+          <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+          <path d="M3 3v5h5" />
+        </Icon>
+      </IconButton>
+      {divider}
+      <IconMenuButton
+        label="Clean up the column or the table"
+        isDisabled={csvSelection === null}
+        items={[
+          { label: 'Column: UPPERCASE', onSelect: () => getActions().transformColumn('upper'), isDisabled: !hasCell },
+          { label: 'Column: lowercase', onSelect: () => getActions().transformColumn('lower'), isDisabled: !hasCell },
+          { label: 'Column: Capitalize Each Word', onSelect: () => getActions().transformColumn('capitalize'), isDisabled: !hasCell },
+          { label: 'Column: trim extra spaces', onSelect: () => getActions().transformColumn('trim'), isDisabled: !hasCell },
+          { label: 'Column: fill empty cells down', onSelect: () => getActions().fillColumnDown(), isDisabled: !hasCell },
+          { label: 'Table: trim extra spaces', onSelect: () => getActions().trimAllCells() },
+          { label: 'Table: remove empty rows', onSelect: () => getActions().removeEmptyRows() },
+          { label: 'Table: remove duplicate rows', onSelect: () => getActions().removeDuplicateRows() },
+        ]}
+      >
+        <span className="text-[11px] font-semibold">Aa</span>
+      </IconMenuButton>
+      <IconButton label="Find and replace" isDisabled={csvSelection === null} onClick={() => (commands as CsvViewerCommands).toggleFindReplace()}>
+        <Icon>
+          <circle cx="11" cy="11" r="6" />
+          <path d="m20 20-4.5-4.5" />
+        </Icon>
+      </IconButton>
+      {divider}
+    </>
+  )
+}
 
 // The file the Download icon saves: the header (when the file has one) and the rows the search leaves, in the current sort
 // order, with the edits applied and the deleted and added columns taken into account.
@@ -387,7 +422,8 @@ export type CsvEditingComponents = {
 }
 
 export const csvEditingModule: EditingModule = {
-  tools,
+  tools: [],
+  ToolbarContent: CsvToolbar,
   downloadOption,
   describeDownload,
   getDefaultByteOrderMark,

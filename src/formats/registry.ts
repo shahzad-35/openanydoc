@@ -7,8 +7,8 @@ import { countExcelEdits, createEmptyExcelEdits, describeExcelChanges } from './
 import type { ExcelEdits } from './excel/excelEdits'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
-import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, jsonEditingModule } from './json/jsonModel'
-import { countTextChanges, createEmptyTextEdits, describeTextChanges, textEditingModule } from './text/textEditing'
+import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges } from './json/jsonModel'
+import { countTextChanges, createEmptyTextEdits, describeTextChanges } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
 export type ViewMode = 'view' | 'edit'
@@ -97,7 +97,7 @@ const formatDefinitions: FormatDefinition[] = [
       createEmptyEdits: createEmptyTextEdits,
       countChanges: countTextChanges,
       describeChanges: describeTextChanges,
-      loadEditingModule: () => Promise.resolve(textEditingModule),
+      loadEditingModule: () => import('./text/textToolbar').then((toolbarFile) => toolbarFile.textEditingModuleWithToolbar),
     },
   },
   {
@@ -107,7 +107,7 @@ const formatDefinitions: FormatDefinition[] = [
       createEmptyEdits: createEmptyJsonEdits,
       countChanges: countJsonChanges,
       describeChanges: describeJsonChanges,
-      loadEditingModule: () => Promise.resolve(jsonEditingModule),
+      loadEditingModule: () => import('./json/jsonToolbar').then((toolbarFile) => toolbarFile.jsonEditingModuleWithToolbar),
     },
   },
   {

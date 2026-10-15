@@ -1,19 +1,21 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { Fragment, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { textControlClassName, viewerBarButtonClassName as barButtonClassName, viewerSegmentButtonClassName as segmentButtonClassName } from '../../buttonStyles'
+import FindReplaceBar from '../../components/FindReplaceBar'
+import { textControlClassName } from '../../buttonStyles'
+import { Icon, IconButton } from '../../components/ToolbarControls'
 import { decodeCsvBytes, looksLikeBinary } from '../../parseCsv'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
-import { buildTextDownload, withEditedText } from './textEditing'
-import type { TextEdits, TextExportSource } from './textEditing'
+import { applyTextTransform, buildTextDownload, findTextMatches, replaceAllTextMatches, withEditedText, withLineEnding } from './textEditing'
+import { DEFAULT_TEXT_FONT_KEY, DEFAULT_TEXT_SIZE_PX, TEXT_FONT_CHOICES, TextViewTools } from './textViewTools'
+import type { TextViewActions, TextViewSettings } from './textViewTools'
+import type { TextActions, TextEdits, TextExportSource, TextSelection, TextViewerCommands } from './textEditing'
 
 type ReadableText = ({ status: 'ok'; encodingLabel: string } & TextExportSource) | { status: 'error'; message: string }
 
-const TEXT_SIZES_PX = [12, 13, 15, 17, 20]
-const DEFAULT_TEXT_SIZE_POSITION = 2
 const LINE_HEIGHT_RATIO = 1.7
 const SHEET_VERTICAL_PADDING_PX = 12
 // While editing, the text is one text box; beyond this size typing may feel slow, and the line numbers are left out.
@@ -47,14 +49,6 @@ function splitIntoLines(text: string) {
   return lines
 }
 
-function BarIcon({ children }: { children: ReactNode }) {
-  return (
-    <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 shrink-0" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-      {children}
-    </svg>
-  )
-}
-
 // A line with every match of the search text highlighted.
 function HighlightedLine({ lineText, searchText }: { lineText: string; searchText: string }) {
   if (searchText === '') return <>{lineText === '' ? '​' : lineText}</>
@@ -77,7 +71,7 @@ function HighlightedLine({ lineText, searchText }: { lineText: string; searchTex
 // A plain text file as a document. In View mode: a sheet with a line-number gutter, search, and reading controls, every line
 // aligned to its own language direction, drawn only where visible so a very long file stays smooth. In Edit mode the same
 // sheet holds one text box; the edits join the page's undo, redo and Download.
-export default function TextViewer({ openedFile, mode, session: untypedSession, onExportSourceChange }: FormatViewerProps) {
+export default function TextViewer({ openedFile, mode, session: untypedSession, onExportSourceChange, onSelectionChange, onCommandsChange }: FormatViewerProps) {
   const session = untypedSession as EditSession<TextEdits>
   const readableText = useMemo(() => readPlainText(openedFile.contents), [openedFile])
   const largeFileWarning = getLargeFileWarning(openedFile.file)
@@ -89,11 +83,21 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   const [currentMatchPosition, setCurrentMatchPosition] = useState(0)
   const [wantsLineNumbers, setWantsLineNumbers] = useState(true)
   const [wrapLines, setWrapLines] = useState(true)
-  const [useMonospaceFont, setUseMonospaceFont] = useState(true)
-  const [textSizePosition, setTextSizePosition] = useState(DEFAULT_TEXT_SIZE_POSITION)
+  const [fontKey, setFontKey] = useState(DEFAULT_TEXT_FONT_KEY)
+  const [textSizePx, setTextSizePx] = useState(DEFAULT_TEXT_SIZE_PX)
   const [copyMessage, setCopyMessage] = useState('')
   const [draftText, setDraftText] = useState(currentText)
   const [syncedText, setSyncedText] = useState(currentText)
+  const [hasSelection, setHasSelection] = useState(false)
+  const [isFindOpen, setIsFindOpen] = useState(false)
+  const [findText, setFindText] = useState('')
+  const [replaceText, setReplaceText] = useState('')
+  const [matchCase, setMatchCase] = useState(false)
+  const [matchPosition, setMatchPosition] = useState(0)
+  const [replaceResultMessage, setReplaceResultMessage] = useState('')
+  const deferredDraftText = useDeferredValue(draftText)
+  const deferredFindText = useDeferredValue(findText)
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
   const deferredSearchText = useDeferredValue(searchText.toLowerCase())
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -102,7 +106,6 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   const lastCommittedTextRef = useRef(currentText)
 
   const lines = useMemo(() => (readableText.status === 'ok' ? splitIntoLines(currentText) : noLines), [readableText.status, currentText])
-  const textSizePx = TEXT_SIZES_PX[textSizePosition]
   const lineHeightPx = Math.round(textSizePx * LINE_HEIGHT_RATIO)
   const isLargeForEditing = draftText.length > LARGE_EDIT_CHARACTER_COUNT
   // While editing, line numbers need every line to be one row, so they are available only without wrapping.
@@ -181,6 +184,95 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
     commitTimerRef.current = window.setTimeout(() => commitDraft(newText), COMMIT_DELAY_MS)
   }
 
+  // Replaces the whole text in one step (one undo step) and puts the selection where the change says.
+  function replaceDraftText(newText: string, selectionStart: number, selectionEnd: number) {
+    setDraftText(newText)
+    commitDraft(newText)
+    requestAnimationFrame(() => {
+      textareaRef.current?.focus()
+      textareaRef.current?.setSelectionRange(selectionStart, selectionEnd)
+    })
+  }
+
+  function transformText(kind: Parameters<typeof applyTextTransform>[3]) {
+    const textarea = textareaRef.current
+    const liveText = textarea?.value ?? draftText
+    const result = applyTextTransform(liveText, textarea?.selectionStart ?? 0, textarea?.selectionEnd ?? 0, kind)
+    if (result.text !== liveText) replaceDraftText(result.text, result.selectionStart, result.selectionEnd)
+  }
+
+  // Find and replace works on the text in the box: Next and Previous select the match in the box.
+  const matchStarts = useMemo(
+    () => (isFindOpen ? findTextMatches(deferredDraftText, deferredFindText, matchCase) : []),
+    [isFindOpen, deferredDraftText, deferredFindText, matchCase],
+  )
+
+  function goToTextMatch(newPosition: number) {
+    if (matchStarts.length === 0) return
+    const wrappedPosition = (newPosition + matchStarts.length) % matchStarts.length
+    setMatchPosition(wrappedPosition)
+    const textarea = textareaRef.current
+    if (!textarea) return
+    textarea.focus()
+    textarea.setSelectionRange(matchStarts[wrappedPosition], matchStarts[wrappedPosition] + findText.length)
+  }
+
+  function replaceCurrentMatch() {
+    const textarea = textareaRef.current
+    if (!textarea || matchStarts.length === 0) return
+    const matchStart = matchStarts[Math.min(matchPosition, matchStarts.length - 1)]
+    const newText = textarea.value.slice(0, matchStart) + replaceText + textarea.value.slice(matchStart + findText.length)
+    replaceDraftText(newText, matchStart, matchStart + replaceText.length)
+    setReplaceResultMessage('Replaced 1 match')
+  }
+
+  function replaceAllMatches() {
+    const textarea = textareaRef.current
+    if (!textarea) return
+    const newText = replaceAllTextMatches(textarea.value, findText, replaceText, matchCase)
+    replaceDraftText(newText, 0, 0)
+    setReplaceResultMessage(`Replaced ${matchStarts.length.toLocaleString()} ${matchStarts.length === 1 ? 'match' : 'matches'}`)
+  }
+
+  const lineNumbersAvailable = !isEditing || (!wrapLines && !isLargeForEditing)
+  const viewSettings: TextViewSettings = { fontKey, textSizePx, wrapLines, showLineNumbers, lineNumbersAvailable }
+  const viewActions: TextViewActions = {
+    setFontKey,
+    setTextSize: setTextSizePx,
+    toggleWrapLines: () => setWrapLines((wasWrapped) => !wasWrapped),
+    toggleLineNumbers: () => setWantsLineNumbers((wanted) => !wanted),
+    copyAllText: () => void copyAllText(),
+  }
+
+  // The toolbar reaches the viewer through this stable commands object, which calls the latest functions.
+  const latestActionsRef = useRef<TextActions | null>(null)
+  useEffect(() => {
+    latestActionsRef.current = {
+      ...viewActions,
+      transform: transformText,
+      setLineEnding: (lineEnding) => {
+        if (exportSource) session.update((currentEdits) => withLineEnding(currentEdits, exportSource.lineEnding, lineEnding))
+      },
+    }
+  })
+  const viewerCommands = useMemo<TextViewerCommands>(
+    () => ({
+      toggleFindReplace: () => setIsFindOpen((wasOpen) => !wasOpen),
+      getActions: () => latestActionsRef.current as TextActions,
+    }),
+    [],
+  )
+  useEffect(() => {
+    onCommandsChange(viewerCommands)
+  }, [onCommandsChange, viewerCommands])
+
+  const effectiveLineEnding = session.edits.lineEnding ?? exportSource?.lineEnding ?? '\n'
+  useEffect(() => {
+    onSelectionChange(exportSource ? ({ hasSelection, lineEnding: effectiveLineEnding, view: { fontKey, textSizePx, wrapLines, showLineNumbers, lineNumbersAvailable } } satisfies TextSelection) : null)
+  }, [exportSource, hasSelection, effectiveLineEnding, fontKey, textSizePx, wrapLines, showLineNumbers, lineNumbersAvailable, onSelectionChange])
+
+  const wordCount = useMemo(() => (isEditing ? (deferredDraftText.match(/\S+/g)?.length ?? 0) : 0), [isEditing, deferredDraftText])
+
   function goToMatch(newMatchPosition: number) {
     if (matchingLineNumbers.length === 0) return
     const wrappedPosition = (newMatchPosition + matchingLineNumbers.length) % matchingLineNumbers.length
@@ -222,117 +314,103 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   const hasSearch = deferredSearchText !== '' && !isEditing
   const matchStatus = !hasSearch ? '' : matchingLineNumbers.length === 0 ? 'No matches' : `${currentMatchPosition + 1} of ${matchingLineNumbers.length.toLocaleString()}`
   const currentMatchLineNumber = matchingLineNumbers[currentMatchPosition]
-  const textStyle = { fontSize: textSizePx, lineHeight: `${lineHeightPx}px`, tabSize: 4 }
-  const fontClassName = useMonospaceFont ? 'font-mono' : 'font-sans'
+  const fontFamily = (TEXT_FONT_CHOICES.find((font) => font.key === fontKey) ?? TEXT_FONT_CHOICES[0]).css
+  const textStyle = { fontSize: textSizePx, lineHeight: `${lineHeightPx}px`, tabSize: 4, fontFamily }
 
   return (
     <div className="flex min-h-0 flex-1 flex-col text-[13px]">
-      <div role="toolbar" aria-label="Text tools" className="flex items-center gap-2 overflow-x-auto border-b border-rule bg-paper px-4 py-1.5 md:flex-wrap md:overflow-visible">
-        <div className="relative shrink-0">
-          <label>
-            <span className="sr-only">Search text</span>
-            <svg aria-hidden="true" viewBox="0 0 16 16" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
-              <circle cx="7" cy="7" r="4.5" />
-              <path d="m10.5 10.5 3 3" />
-            </svg>
-            <input
-              ref={searchInputRef}
-              type="search"
-              dir="auto"
-              disabled={isEditing}
-              placeholder={isEditing ? 'Search is in View mode' : 'Search text'}
-              value={searchText}
-              onChange={(event) => {
-                setSearchText(event.target.value)
-                setCurrentMatchPosition(0)
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter') {
-                  event.preventDefault()
-                  goToMatch(currentMatchPosition + (event.shiftKey ? -1 : 1))
-                }
-              }}
-              className={`${textControlClassName} w-64 pl-9 ${searchText === '' ? 'pr-16' : 'pr-3'} disabled:cursor-not-allowed disabled:opacity-60`}
-            />
-          </label>
-          {searchText === '' && !isEditing && (
-            <kbd aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">
-              {searchShortcutLabel}
-            </kbd>
+      {!isEditing && (
+        <div role="toolbar" aria-label="Text tools" className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
+          <TextViewTools settings={viewSettings} actions={viewActions} />
+          <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-rule" />
+          <div className="relative shrink-0">
+            <label>
+              <span className="sr-only">Search text</span>
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+                <circle cx="7" cy="7" r="4.5" />
+                <path d="m10.5 10.5 3 3" />
+              </svg>
+              <input
+                ref={searchInputRef}
+                type="search"
+                dir="auto"
+                placeholder="Search text"
+                value={searchText}
+                onChange={(event) => {
+                  setSearchText(event.target.value)
+                  setCurrentMatchPosition(0)
+                }}
+                onKeyDown={(event) => {
+                  if (event.key === 'Enter') {
+                    event.preventDefault()
+                    goToMatch(currentMatchPosition + (event.shiftKey ? -1 : 1))
+                  }
+                }}
+                className={`${textControlClassName} w-56 pl-9 ${searchText === '' ? 'pr-16' : 'pr-3'}`}
+              />
+            </label>
+            {searchText === '' && (
+              <kbd aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">
+                {searchShortcutLabel}
+              </kbd>
+            )}
+          </div>
+          {hasSearch && (
+            <>
+              <p aria-live="polite" className="shrink-0 whitespace-nowrap px-1 text-ink-soft">
+                {matchStatus}
+              </p>
+              <IconButton label="Previous match" isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition - 1)}>
+                <Icon>
+                  <path d="m6 15 6-6 6 6" />
+                </Icon>
+              </IconButton>
+              <IconButton label="Next match" isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition + 1)}>
+                <Icon>
+                  <path d="m6 9 6 6 6-6" />
+                </Icon>
+              </IconButton>
+            </>
           )}
-        </div>
-        {hasSearch && (
-          <>
-            <p aria-live="polite" className="shrink-0 whitespace-nowrap text-ink-soft">
-              {matchStatus}
-            </p>
-            <button type="button" aria-label="Previous match" disabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition - 1)} className={barButtonClassName}>
-              <BarIcon>
-                <path d="m6 15 6-6 6 6" />
-              </BarIcon>
-            </button>
-            <button type="button" aria-label="Next match" disabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition + 1)} className={barButtonClassName}>
-              <BarIcon>
-                <path d="m6 9 6 6 6-6" />
-              </BarIcon>
-            </button>
-          </>
-        )}
-
-        <div className="ml-auto flex shrink-0 items-center gap-2">
-          <div role="group" aria-label="Font" className="control-shape solid-box flex shrink-0 gap-0.5 border-rule p-0.5">
-            <button type="button" aria-pressed={useMonospaceFont} onClick={() => setUseMonospaceFont(true)} className={`${segmentButtonClassName} font-mono`}>
-              Mono
-            </button>
-            <button type="button" aria-pressed={!useMonospaceFont} onClick={() => setUseMonospaceFont(false)} className={segmentButtonClassName}>
-              Sans
-            </button>
-          </div>
-          <div role="group" aria-label="Text size" className="control-shape solid-box flex shrink-0 gap-0.5 border-rule p-0.5">
-            <button type="button" aria-label="Smaller text" disabled={textSizePosition === 0} onClick={() => setTextSizePosition(textSizePosition - 1)} className={segmentButtonClassName}>
-              <span className="text-xs">A</span>
-            </button>
-            <button type="button" aria-label="Larger text" disabled={textSizePosition === TEXT_SIZES_PX.length - 1} onClick={() => setTextSizePosition(textSizePosition + 1)} className={segmentButtonClassName}>
-              <span className="text-base">A</span>
-            </button>
-          </div>
-          <button
-            type="button"
-            aria-pressed={showLineNumbers}
-            aria-label="Line numbers"
-            title={isEditing && wrapLines ? 'Turn off Wrap lines to see line numbers while editing' : 'Line numbers'}
-            disabled={isEditing && (wrapLines || isLargeForEditing)}
-            onClick={() => setWantsLineNumbers(!wantsLineNumbers)}
-            className={barButtonClassName}
-          >
-            <BarIcon>
-              <path d="M10 6h10M10 12h10M10 18h10" />
-              <path d="M4 5.5 5.5 4.5V9M4 19h3M4.2 14.2c.4-.7 2.6-.9 2.6.6 0 1-1.4 1.4-2.6 2.2" />
-            </BarIcon>
-          </button>
-          <button type="button" aria-pressed={wrapLines} aria-label="Wrap lines" title="Wrap lines" onClick={() => setWrapLines(!wrapLines)} className={barButtonClassName}>
-            <BarIcon>
-              <path d="M4 6h16M4 12h12a3 3 0 0 1 0 6h-4" />
-              <path d="m14 15-2 3 2 3M4 18h4" />
-            </BarIcon>
-          </button>
-          <button type="button" onClick={copyAllText} className={barButtonClassName}>
-            <BarIcon>
-              <rect x="8" y="8" width="12" height="12" rx="2" />
-              <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
-            </BarIcon>
-            <span aria-live="polite">{copyMessage || 'Copy'}</span>
-          </button>
-          {!isEditing && (
-            <button type="button" onClick={downloadCurrentText} className={barButtonClassName}>
-              <BarIcon>
+          <div className="ml-auto shrink-0" data-tip-align="end">
+            <IconButton label="Download" onClick={downloadCurrentText}>
+              <Icon>
                 <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
-              </BarIcon>
-              Download
-            </button>
-          )}
+              </Icon>
+            </IconButton>
+          </div>
         </div>
-      </div>
+      )}
+
+      {isEditing && isFindOpen && (
+        <FindReplaceBar
+          findText={findText}
+          replaceText={replaceText}
+          matchCase={matchCase}
+          matchCount={matchStarts.length}
+          matchPosition={matchPosition}
+          resultMessage={replaceResultMessage}
+          onFindChange={(newText) => {
+            setFindText(newText)
+            setMatchPosition(0)
+            setReplaceResultMessage('')
+          }}
+          onReplaceChange={(newText) => {
+            setReplaceText(newText)
+            setReplaceResultMessage('')
+          }}
+          onMatchCaseChange={(newValue) => {
+            setMatchCase(newValue)
+            setMatchPosition(0)
+            setReplaceResultMessage('')
+          }}
+          onPrevious={() => goToTextMatch(matchPosition - 1)}
+          onNext={() => goToTextMatch(matchPosition + 1)}
+          onReplace={replaceCurrentMatch}
+          onReplaceAll={replaceAllMatches}
+          onClose={() => setIsFindOpen(false)}
+        />
+      )}
 
       {largeFileWarning && <p className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
       {isEditing && isLargeForEditing && (
@@ -345,12 +423,13 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
             <div className="flex min-h-0 flex-1">
               {showLineNumbers && (
                 <div ref={gutterRef} aria-hidden="true" className="shrink-0 select-none overflow-hidden border-r border-rule bg-paper text-right text-ink-soft tabular-nums" style={{ width: gutterWidthPx }}>
-                  <pre className={`pr-3 ${fontClassName}`} style={{ ...textStyle, paddingBlock: SHEET_VERTICAL_PADDING_PX }}>
+                  <pre className="pr-3" style={{ ...textStyle, paddingBlock: SHEET_VERTICAL_PADDING_PX }}>
                     {editGutterNumbers}
                   </pre>
                 </div>
               )}
               <textarea
+                ref={textareaRef}
                 autoFocus
                 dir="auto"
                 spellCheck={false}
@@ -359,16 +438,17 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
                 value={draftText}
                 onChange={(event) => changeDraft(event.target.value)}
                 onBlur={(event) => commitDraft(event.currentTarget.value)}
+                onSelect={(event) => setHasSelection(event.currentTarget.selectionEnd > event.currentTarget.selectionStart)}
                 onScroll={(event) => {
                   if (gutterRef.current) gutterRef.current.scrollTop = event.currentTarget.scrollTop
                 }}
-                className={`min-w-0 flex-1 resize-none bg-transparent px-4 outline-none ${fontClassName}`}
+                className="min-w-0 flex-1 resize-none bg-transparent px-4 outline-none"
                 style={{ ...textStyle, paddingBlock: SHEET_VERTICAL_PADDING_PX }}
               />
             </div>
           ) : (
             <div ref={scrollContainerRef} tabIndex={0} aria-label="Text content, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
-              <div role="document" className={`relative ${fontClassName} ${wrapLines ? '' : 'w-max min-w-full'}`} style={{ ...textStyle, height: lineVirtualizer.getTotalSize() }}>
+              <div role="document" className={`relative ${wrapLines ? '' : 'w-max min-w-full'}`} style={{ ...textStyle, height: lineVirtualizer.getTotalSize() }}>
                 {lineVirtualizer.getVirtualItems().map((virtualLine) => {
                   const isCurrentMatch = hasSearch && virtualLine.index === currentMatchLineNumber
                   return (
@@ -399,7 +479,13 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
       <footer className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
         <p className="whitespace-nowrap font-semibold">{(isEditing ? splitIntoLines(draftText).length : lines.length).toLocaleString()} lines</p>
         <p className="text-ink-soft">{(isEditing ? draftText : currentText).length.toLocaleString()} characters</p>
+        {isEditing && <p className="text-ink-soft">{wordCount.toLocaleString()} words</p>}
         <p className="text-ink-soft">Encoding: {readableText.encodingLabel}</p>
+        {copyMessage && (
+          <p role="status" className="font-medium">
+            {copyMessage}
+          </p>
+        )}
         <p className="ml-auto text-ink-soft">{isEditing ? 'Changes are kept in your browser until you download' : `Press ${searchShortcutLabel} or / to search`}</p>
       </footer>
     </div>

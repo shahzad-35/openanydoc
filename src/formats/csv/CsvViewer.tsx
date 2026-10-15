@@ -24,8 +24,12 @@ import {
   withDeletedLine,
   withInsertedLine,
   withReplacedText,
+  withTransformedText,
+  withFilledDown,
+  withoutEmptyRows,
+  withoutDuplicateRows,
 } from './csvCells'
-import type { CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
+import type { CsvActions, CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
 import type { ChangeRow, CsvEditingComponents } from './csvEditing'
 
 const MAX_LISTED_CHANGES = 200
@@ -68,6 +72,8 @@ export default function CsvViewer({
   const [replaceText, setReplaceText] = useState('')
   const [matchCase, setMatchCase] = useState(false)
   const [replaceResultMessage, setReplaceResultMessage] = useState('')
+  // What a clean-up action did, shown in the status line until the next change.
+  const [cleanUpMessage, setCleanUpMessage] = useState<{ text: string; forEdits: CsvEdits } | null>(null)
   const deferredSearchText = useDeferredValue(searchText)
   const deferredFindText = useDeferredValue(findText)
   const tableRef = useRef<DataTableHandle>(null)
@@ -304,19 +310,58 @@ export default function CsvViewer({
   }, [isFindOpen, deferredFindText, matchCase, displayRowIds, displayColumnIds, rows, deferredEdits])
 
   // The toolbar's tools reach the viewer through these commands. The object never changes; it calls the latest functions.
-  const latestActionsRef = useRef({ toggleFindReplace: () => {}, revealCell: (_position: Partial<CellPosition>) => {} })
+  const latestActionsRef = useRef<CsvActions | null>(null)
   useEffect(() => {
     latestActionsRef.current = {
-      toggleFindReplace: () => setIsFindOpen((wasOpen) => !wasOpen),
-      revealCell: (position) => {
-        pendingRevealRef.current = position
+      insertRow: (side) => {
+        if (!selectedCell) return
+        const rowPosition = displayRowIds.indexOf(selectedCell.rowId)
+        const afterId = side === 'below' ? selectedCell.rowId : (displayRowIds[rowPosition - 1] ?? -1)
+        pendingRevealRef.current = { rowId: edits.nextRowId, columnId: selectedCell.columnId }
+        session.update((currentEdits) => withInsertedLine(currentEdits, 'row', afterId))
+      },
+      deleteRow: () => {
+        if (selectedCell) session.update((currentEdits) => withDeletedLine(currentEdits, 'row', selectedCell.rowId))
+      },
+      insertColumn: (side) => {
+        if (!selectedCell) return
+        const columnPosition = displayColumnIds.indexOf(selectedCell.columnId)
+        const afterId = side === 'right' ? selectedCell.columnId : (displayColumnIds[columnPosition - 1] ?? -1)
+        pendingRevealRef.current = { columnId: edits.nextColumnId }
+        session.update((currentEdits) => withInsertedLine(currentEdits, 'column', afterId))
+      },
+      deleteColumn: () => {
+        if (selectedCell && displayColumnIds.length > 1) deleteColumn(selectedCell.columnId)
+      },
+      clearCell: () => {
+        if (selectedCell) commitCellEdit(selectedCell, '')
+      },
+      revertCell: () => {
+        if (selectedCell) revertCell(cellKey(selectedCell.rowId, selectedCell.columnId))
+      },
+      transformColumn: (transform) => {
+        if (selectedCell) session.update((currentEdits) => withTransformedText(currentEdits, rows, displayRowIds, [selectedCell.columnId], transform))
+      },
+      fillColumnDown: () => {
+        if (selectedCell) session.update((currentEdits) => withFilledDown(currentEdits, rows, displayRowIds, selectedCell.columnId))
+      },
+      trimAllCells: () => session.update((currentEdits) => withTransformedText(currentEdits, rows, displayRowIds, displayColumnIds, 'trim')),
+      removeEmptyRows: () => {
+        const { edits: cleanedEdits, removedCount } = withoutEmptyRows(edits, rows, displayRowIds, displayColumnIds)
+        session.update(() => cleanedEdits)
+        setCleanUpMessage({ text: `Removed ${removedCount.toLocaleString()} empty ${removedCount === 1 ? 'row' : 'rows'}`, forEdits: cleanedEdits })
+      },
+      removeDuplicateRows: () => {
+        const { edits: cleanedEdits, removedCount } = withoutDuplicateRows(edits, rows, displayRowIds, displayColumnIds)
+        session.update(() => cleanedEdits)
+        setCleanUpMessage({ text: `Removed ${removedCount.toLocaleString()} duplicate ${removedCount === 1 ? 'row' : 'rows'}`, forEdits: cleanedEdits })
       },
     }
   })
   const viewerCommands = useMemo<CsvViewerCommands>(
     () => ({
-      toggleFindReplace: () => latestActionsRef.current.toggleFindReplace(),
-      revealCell: (position) => latestActionsRef.current.revealCell(position),
+      toggleFindReplace: () => setIsFindOpen((wasOpen) => !wasOpen),
+      getActions: () => latestActionsRef.current as CsvActions,
     }),
     [],
   )
@@ -645,6 +690,11 @@ export default function CsvViewer({
             />
             First row is header
           </label>
+          {cleanUpMessage?.forEdits === edits && (
+            <span role="status" className="font-medium">
+              {cleanUpMessage.text}
+            </span>
+          )}
           <span className="hidden text-ink-soft sm:inline">{readableCsv.encodingLabel}</span>
           <span className="ml-auto hidden text-ink-soft md:inline">
             {isEditable ? 'Double-click or press Enter to edit · ' : ''}Press / to search

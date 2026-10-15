@@ -8,7 +8,7 @@ const toolbarButtonClassName =
   'control-shape solid-box min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-[13px] transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50'
 
 const historyButtonClassName =
-  'control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-40'
+  'control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:text-ink/40'
 
 function HistoryIcon({ children }: { children: ReactNode }) {
   return (
@@ -66,7 +66,7 @@ export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (
           key={optionMode}
           type="button"
           aria-pressed={mode === optionMode}
-          title={label}
+          data-tip={label}
           onClick={() => onChange(optionMode)}
           className={`control-shape relative grid min-h-7 min-w-10 pointer-coarse:min-h-10 pointer-coarse:min-w-14 cursor-pointer place-items-center transition-colors duration-300 ${
             mode === optionMode ? 'text-on-accent' : 'text-ink hover:text-accent'
@@ -123,8 +123,9 @@ function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEd
       disabled={exportSource === null}
       onClick={() => void downloadWhatYouSee()}
       aria-label={downloadLabel}
-      title={downloadLabel}
-      className="control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center bg-accent text-on-accent transition duration-200 hover:bg-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-50"
+      data-tip={downloadLabel}
+      data-tip-align="end"
+      className="control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center bg-accent text-on-accent transition duration-200 hover:bg-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-rule disabled:text-ink-soft"
     >
       <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 pointer-coarse:size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
         <path d="M12 4v11" />
@@ -149,19 +150,19 @@ export function EditToolbar({ openedFile, session, editingModule, selection, vie
   return (
     <div role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
       <div className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
-      <button type="button" disabled={!session.canUndo} onClick={session.undo} aria-label="Undo" title="Undo (Ctrl+Z)" className={historyButtonClassName}>
+      <button type="button" disabled={!session.canUndo} onClick={session.undo} aria-label="Undo" data-tip="Undo (Ctrl+Z)" className={historyButtonClassName}>
         <HistoryIcon>
           <path d="M9 14 4 9l5-5" />
           <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
         </HistoryIcon>
       </button>
-      <button type="button" disabled={!session.canRedo} onClick={session.redo} aria-label="Redo" title="Redo (Ctrl+Shift+Z)" className={historyButtonClassName}>
+      <button type="button" disabled={!session.canRedo} onClick={session.redo} aria-label="Redo" data-tip="Redo (Ctrl+Shift+Z)" className={historyButtonClassName}>
         <HistoryIcon>
           <path d="m15 14 5-5-5-5" />
           <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
         </HistoryIcon>
       </button>
-      <button type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label="Revert all changes" title="Revert all changes" className={historyButtonClassName}>
+      <button type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label="Revert all changes" data-tip="Revert all changes" className={historyButtonClassName}>
         <HistoryIcon>
           <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
           <path d="M3 3v5h5" />

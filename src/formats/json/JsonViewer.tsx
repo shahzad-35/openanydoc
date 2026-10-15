@@ -1,6 +1,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
+import FindReplaceBar from '../../components/FindReplaceBar'
 import { textControlClassName, viewerBarButtonClassName as barButtonClassName, viewerSegmentButtonClassName as segmentButtonClassName } from '../../buttonStyles'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
@@ -12,6 +13,7 @@ import JsonTree, { HighlightedCodeLine } from './JsonTree'
 import type { JsonTreeActions } from './JsonTree'
 import {
   buildJsonDownload,
+  countMatchingValues,
   expandNodesUpToLimit,
   formatPathText,
   findMatchingPaths,
@@ -21,14 +23,19 @@ import {
   isArrayOfObjects,
   isContainer,
   parseJsonText,
+  sortKeys,
   withAddedChild,
+  withDuplicatedNode,
+  withIndent,
   withMovedNode,
   withNewRoot,
   withoutNodeAt,
   withRenamedKey,
+  withReplacedValues,
+  withSortedArray,
   withValueAt,
 } from './jsonModel'
-import type { JsonEdits, JsonExportSource, JsonParseResult, JsonPath, JsonValue } from './jsonModel'
+import type { JsonActions, JsonEdits, JsonExportSource, JsonIndent, JsonParseResult, JsonPath, JsonSelection, JsonValue, JsonViewerCommands } from './jsonModel'
 
 const COMMIT_DELAY_MS = 600
 const CODE_LINE_HEIGHT_PX = 22
@@ -59,7 +66,7 @@ function describeErrorPosition(error: JsonParseError) {
 
 // A JSON file as a tree or as formatted code. The file is parsed in a Web Worker; edits are kept as the parsed document
 // (changing a node copies only the path to it), so the undo history stays small even for a 50 MB file.
-export default function JsonViewer({ openedFile, mode, session: untypedSession, onExportSourceChange }: FormatViewerProps) {
+export default function JsonViewer({ openedFile, mode, session: untypedSession, onExportSourceChange, onSelectionChange, onCommandsChange }: FormatViewerProps) {
   const session = untypedSession as EditSession<JsonEdits>
   const edits = session.edits
   const isEditing = mode === 'edit'
@@ -75,6 +82,12 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
   const [copyMessage, setCopyMessage] = useState('')
   const [selectedPath, setSelectedPath] = useState<JsonPath | null>(null)
   const [pathCopyMessage, setPathCopyMessage] = useState('')
+  const [isFindOpen, setIsFindOpen] = useState(false)
+  const [findText, setFindText] = useState('')
+  const [replaceText, setReplaceText] = useState('')
+  const [matchCase, setMatchCase] = useState(false)
+  const [replaceResultMessage, setReplaceResultMessage] = useState('')
+  const deferredFindText = useDeferredValue(findText)
   const deferredSearchText = useDeferredValue(searchText.toLowerCase())
   const searchInputRef = useRef<HTMLInputElement>(null)
   const codeScrollRef = useRef<HTMLDivElement>(null)
@@ -107,6 +120,7 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
   const lastCommittedTextRef = useRef(codeText)
   const latestDraftRef = useRef(codeText)
   const commitTimerRef = useRef<number | undefined>(undefined)
+  const inFlightCommitRef = useRef<{ text: string; promise: Promise<void> } | null>(null)
 
   // The text changed from outside the text box (undo, redo, revert all, a tree edit, the file finished loading): show it.
   // Our own commits are skipped, so the formatting being typed is never replaced under the cursor.
@@ -207,7 +221,17 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
     if (!treeMatches) lineVirtualizer.scrollToIndex(matchingLineNumbers[wrappedPosition], { align: 'center' })
   }
 
-  async function commitDraft(text: string) {
+  // The same text is read once even when the box losing focus and a toolbar action both ask for it, so it is one undo step.
+  function commitDraft(text: string) {
+    if (inFlightCommitRef.current?.text === text) return inFlightCommitRef.current.promise
+    const promise = commitDraftNow(text).finally(() => {
+      if (inFlightCommitRef.current?.promise === promise) inFlightCommitRef.current = null
+    })
+    inFlightCommitRef.current = { text, promise }
+    return promise
+  }
+
+  async function commitDraftNow(text: string) {
     window.clearTimeout(commitTimerRef.current)
     if (text === lastCommittedTextRef.current) {
       setDraftError(null)
@@ -240,16 +264,17 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
     textBox.setSelectionRange(errorOffset, errorOffset + 1)
   }
 
-  function changeIndent(indent: 0 | 2) {
-    if (root === null) return
-    session.update((currentEdits) => withNewRoot(currentEdits, originalRoot, currentEdits.root ?? root, indent))
-  }
-
   function changeDocument(change: (currentRoot: JsonValue) => JsonValue) {
     session.update((currentEdits) => {
       const currentRoot = currentEdits.root ?? originalRoot
       return currentRoot === null ? currentEdits : withNewRoot(currentEdits, originalRoot, change(currentRoot))
     })
+  }
+
+  // A toolbar change to the document first reads what was typed in the code box, so it never races the box's own commit.
+  async function changeDocumentAfterTyping(change: (currentRoot: JsonValue) => JsonValue) {
+    if (isEditing && showCode) await commitDraft(latestDraftRef.current)
+    changeDocument(change)
   }
 
   const treeActions: JsonTreeActions = {
@@ -285,6 +310,84 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
       changeDocument((currentRoot) => withAddedChild(currentRoot, containerPath))
       setExpandedKeys((currentKeys) => new Set(currentKeys).add(getPathKey(containerPath)))
     },
+  }
+
+  const selectedNodeInfo = useMemo<NonNullable<JsonSelection>['selectedNode']>(() => {
+    if (!showTree || selectedPath === null || root === null) return null
+    const node = getNodeAt(root, selectedPath)
+    const isRoot = selectedPath.length === 0
+    const siblings = isRoot ? [] : getChildEntries(getNodeAt(root, selectedPath.slice(0, -1)) as never)
+    const position = siblings.findIndex(([label]) => label === selectedPath[selectedPath.length - 1])
+    return {
+      kind: !isContainer(node) ? 'value' : Array.isArray(node) ? 'array' : 'object',
+      isRoot,
+      isFirst: isRoot || position === 0,
+      isLast: isRoot || position === siblings.length - 1,
+    }
+  }, [showTree, selectedPath, root])
+
+  // The toolbar reaches the viewer through this stable commands object, which calls the latest functions.
+  const latestActionsRef = useRef<JsonActions | null>(null)
+  useEffect(() => {
+    latestActionsRef.current = {
+      setIndent: async (indent: JsonIndent) => {
+        if (isEditing && showCode) await commitDraft(latestDraftRef.current)
+        if (originalRoot !== null) session.update((currentEdits) => withIndent(currentEdits, originalText, originalRoot, indent))
+      },
+      sortKeys: (direction, includeNested) => {
+        const targetPath = selectedNodeInfo?.kind === 'object' && selectedPath !== null ? selectedPath : []
+        void changeDocumentAfterTyping((currentRoot) => {
+          const target = getNodeAt(currentRoot, targetPath)
+          const sorted = sortKeys(target, direction, includeNested)
+          return sorted === target ? currentRoot : withValueAt(currentRoot, targetPath, sorted)
+        })
+      },
+      sortSelectedArray: (direction) => {
+        if (selectedPath !== null) void changeDocumentAfterTyping((currentRoot) => withSortedArray(currentRoot, selectedPath, direction))
+      },
+      addChild: () => {
+        if (selectedPath !== null) treeActions.addChild(selectedPath)
+      },
+      duplicateNode: () => {
+        if (selectedPath === null || selectedPath.length === 0) return
+        changeDocument((currentRoot) => withDuplicatedNode(currentRoot, selectedPath))
+        const step = selectedPath[selectedPath.length - 1]
+        if (typeof step === 'number') setSelectedPath([...selectedPath.slice(0, -1), step + 1])
+      },
+      moveNode: (direction) => {
+        if (selectedPath !== null && selectedPath.length > 0) treeActions.moveNode(selectedPath, direction)
+      },
+      deleteNode: () => {
+        if (selectedPath !== null && selectedPath.length > 0) treeActions.deleteNode(selectedPath)
+      },
+    }
+  })
+  const viewerCommands = useMemo<JsonViewerCommands>(
+    () => ({
+      toggleFindReplace: () => setIsFindOpen((wasOpen) => !wasOpen),
+      getActions: () => latestActionsRef.current as JsonActions,
+    }),
+    [],
+  )
+  useEffect(() => {
+    onCommandsChange(viewerCommands)
+  }, [onCommandsChange, viewerCommands])
+
+  const isDocumentValid = root !== null && draftError === null
+  useEffect(() => {
+    onSelectionChange({ view: activeView, isValid: isDocumentValid, hasDocument: root !== null, selectedNode: selectedNodeInfo, indent: edits.indent } satisfies NonNullable<JsonSelection>)
+  }, [activeView, isDocumentValid, root, selectedNodeInfo, edits.indent, onSelectionChange])
+
+  // Find and replace works on the text inside string values, in every view; keys and structure are never touched.
+  const deferredRoot = useDeferredValue(root)
+  const valueMatchCount = useMemo(
+    () => (isFindOpen && deferredRoot !== null ? countMatchingValues(deferredRoot, deferredFindText, matchCase) : 0),
+    [isFindOpen, deferredRoot, deferredFindText, matchCase],
+  )
+
+  function replaceAllValues() {
+    void changeDocumentAfterTyping((currentRoot) => withReplacedValues(currentRoot, findText, replaceText, matchCase))
+    setReplaceResultMessage(`Replaced in ${valueMatchCount.toLocaleString()} ${valueMatchCount === 1 ? 'value' : 'values'}`)
   }
 
   function toggleExpanded(pathKey: string) {
@@ -433,16 +536,6 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
               </button>
             </>
           )}
-          {isEditing && (
-            <>
-              <button type="button" disabled={root === null || draftError !== null} onClick={() => changeIndent(2)} className={barButtonClassName}>
-                Format
-              </button>
-              <button type="button" disabled={root === null || draftError !== null} onClick={() => changeIndent(0)} className={barButtonClassName}>
-                Minify
-              </button>
-            </>
-          )}
           <button type="button" disabled={root === null} onClick={copyAllText} className={barButtonClassName}>
             <BarIcon>
               <rect x="8" y="8" width="12" height="12" rx="2" />
@@ -461,6 +554,29 @@ export default function JsonViewer({ openedFile, mode, session: untypedSession, 
         </div>
       </div>
 
+      {isEditing && isFindOpen && (
+        <FindReplaceBar
+          findText={findText}
+          replaceText={replaceText}
+          matchCase={matchCase}
+          matchCount={valueMatchCount}
+          resultMessage={replaceResultMessage}
+          onFindChange={(newText) => {
+            setFindText(newText)
+            setReplaceResultMessage('')
+          }}
+          onReplaceChange={(newText) => {
+            setReplaceText(newText)
+            setReplaceResultMessage('')
+          }}
+          onMatchCaseChange={(newValue) => {
+            setMatchCase(newValue)
+            setReplaceResultMessage('')
+          }}
+          onReplaceAll={replaceAllValues}
+          onClose={() => setIsFindOpen(false)}
+        />
+      )}
       {largeFileWarning && <p className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
       {expandNotice && <p className="border-b border-rule bg-paper px-4 py-2">{expandNotice}</p>}
       {validationError ? (

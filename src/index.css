@@ -175,6 +175,47 @@ html {
   outline-offset: 2px;
 }
 
+/* A tooltip that appears after a short delay (the browser's own title tooltip waits about a second). Used by the toolbar icons:
+   put the words in data-tip (and keep aria-label). It hides while the button's menu is open. data-tip-align="end" keeps the
+   tooltip inside the window for buttons at the right edge. */
+[data-tip] {
+  position: relative;
+}
+
+[data-tip]::after {
+  content: attr(data-tip);
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  z-index: 60;
+  width: max-content;
+  max-width: 18rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.35;
+  text-align: start;
+  white-space: normal;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 80ms ease-out 600ms;
+}
+
+[data-tip-align="end"] [data-tip]::after,
+[data-tip][data-tip-align="end"]::after {
+  left: auto;
+  right: 0;
+}
+
+[data-tip]:not([aria-expanded="true"]):hover::after,
+[data-tip]:not([aria-expanded="true"]):focus-visible::after {
+  opacity: 1;
+}
+
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
