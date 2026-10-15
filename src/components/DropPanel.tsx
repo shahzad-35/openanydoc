@@ -1,4 +1,8 @@
-import { primaryButtonClassName } from '../buttonStyles'
+import { primaryButtonClassName, secondaryButtonClassName } from '../buttonStyles'
+import { joinNodesAsList, translate, translateWithNodes, useT } from '../i18n'
+import type { MessageKey } from '../i18n'
+import { getOtherReleasedFormats } from '../whatsNew'
+import NewBadge from './NewBadge'
 import { pasteHint } from '../content'
 import type { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
@@ -66,7 +70,10 @@ function ExtensionList({ className, shownViewers }: { className: string; shownVi
     <ul className={className}>
       {shownViewers.map((viewer) => (
         <li key={viewer.id} className="grid grid-cols-[6rem_1fr] items-start gap-x-3">
-          <span className="py-0.5 text-sm text-ink-soft">{viewer.label}</span>
+          <span className="py-0.5 text-sm text-ink-soft">
+            {viewer.label}
+            <NewBadge viewerId={viewer.id} />
+          </span>
           <span className="flex flex-wrap gap-1.5">
             {viewer.extensions.map((extension) => (
               <ExtensionPill key={extension} extension={extension} />
@@ -83,7 +90,20 @@ const steps = ['Choose a file', 'Read in your browser', 'View it']
 // The big centered drop panel plus the slim three-step strip. The whole home screen is the drop target (see HomePage);
 // this panel is where the prompt, the accepted types and the Choose a file button live.
 // `shownViewers` are the formats listed: all of them on the home page, one on a format's own page.
-export default function DropPanel({ intake, shownViewers = viewers }: { intake: ReturnType<typeof useFileIntake>; shownViewers?: Viewer[] }) {
+type DropPanelProps = {
+  intake: ReturnType<typeof useFileIntake>
+  shownViewers?: Viewer[]
+  // Set on a format's own page: that format is left out of the "Also works with" line.
+  currentViewerId?: Viewer['id']
+  onNavigate?: (path: string) => void
+  // The "Open it in the ... viewer" button: gives the same File to that viewer's page.
+  onOpenInViewer?: (file: File, toolPath: string) => void
+}
+
+export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer }: DropPanelProps) {
+  const { locale, t } = useT()
+  const otherFormats = currentViewerId ? getOtherReleasedFormats(currentViewerId) : []
+  const suggestion = intake.redirectSuggestion
   return (
     <>
       <div
@@ -108,8 +128,44 @@ export default function DropPanel({ intake, shownViewers = viewers }: { intake: 
         <div aria-live="polite" className="mt-4 space-y-2">
           {intake.largeFileWarning && <p>{intake.largeFileWarning}</p>}
           {intake.errorMessage && <p className="font-medium text-danger">{intake.errorMessage}</p>}
+          {suggestion && (
+            <div className="flex flex-col items-center gap-3">
+              <p className="font-medium">{translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey)}</p>
+              <button
+                type="button"
+                onClick={() => onOpenInViewer?.(suggestion.file, suggestion.viewer.toolPath as string)}
+                className={secondaryButtonClassName}
+              >
+                {t('redirect.open', { format: suggestion.viewer.label })}
+              </button>
+            </div>
+          )}
         </div>
       </div>
+
+      {otherFormats.length > 0 && (
+        <p className="mt-6 text-center text-ink-soft">
+          {translateWithNodes(locale, 'crossLinks.alsoWorks', {
+            formats: joinNodesAsList(
+              locale,
+              otherFormats.map(({ viewer }) => (
+                <a
+                  key={viewer.id}
+                  href={viewer.toolPath}
+                  onClick={(event) => {
+                    if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+                    event.preventDefault()
+                    onNavigate(viewer.toolPath as string)
+                  }}
+                  className="underline underline-offset-2 hover:text-ink"
+                >
+                  {viewer.label}
+                </a>
+              )),
+            ),
+          })}
+        </p>
+      )}
 
       <ol className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-ink-soft">
         {steps.map((step, index) => (

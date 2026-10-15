@@ -1,5 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
+import { findViewerForFileName } from './viewers'
+import type { Viewer } from './viewers'
+import { findReleasedFormat } from './whatsNew'
 
 const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
 
@@ -13,7 +16,14 @@ type FileIntakeOptions = {
   onFileLoaded: (file: File, fileContents: ArrayBuffer) => void
   // Pasting CSV text opens it as a file. Off where pasting must stay a normal paste, e.g. on the file page.
   allowPaste?: boolean
+  // A file another page handed over (the "Open it in the ... viewer" button): it is opened once, through the same checks as a
+  // dropped file, and `onHandoffConsumed` then tells the owner to forget it. It is kept in React state only.
+  handoffFile?: File | null
+  onHandoffConsumed?: () => void
 }
+
+// A file whose type another viewer opens: shown as an offer to open it there instead of as an error.
+export type RedirectSuggestion = { viewer: Viewer; file: File }
 
 export function formatFileSize(byteCount: number) {
   if (byteCount < 1024) return `${byteCount} B`
@@ -27,8 +37,9 @@ export function getLargeFileWarning(file: File) {
 }
 
 // Everything a drop zone needs, with no markup of its own, so each layout can build its own UI.
-export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true }: FileIntakeOptions) {
+export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed }: FileIntakeOptions) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [redirectSuggestion, setRedirectSuggestion] = useState<RedirectSuggestion | null>(null)
   const [largeFileWarning, setLargeFileWarning] = useState<string | null>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [isReading, setIsReading] = useState(false)
@@ -42,9 +53,17 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   async function loadFile(file: File) {
     setErrorMessage(null)
+    setRedirectSuggestion(null)
     setLargeFileWarning(null)
 
     if (!hasAcceptedExtension(file.name)) {
+      // The file is not read here: another viewer may open it, and the button hands the same File over.
+      const otherViewer = findViewerForFileName(file.name)
+      const releasedFormat = otherViewer && findReleasedFormat(otherViewer.id)
+      if (releasedFormat) {
+        setRedirectSuggestion({ viewer: releasedFormat.viewer, file })
+        return
+      }
       setErrorMessage(`${file.name} can't be opened here. OpenAnyDoc opens ${acceptedExtensions.join(', ')} files.`)
       return
     }
@@ -70,6 +89,17 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     }
     loadFile(files[0])
   }
+
+  // Opens the file another page handed over, once (a second run of this effect in development would open it twice).
+  const handledHandoffRef = useRef<File | null>(null)
+  useEffect(() => {
+    if (!handoffFile || handledHandoffRef.current === handoffFile) return
+    handledHandoffRef.current = handoffFile
+    onHandoffConsumed?.()
+    void loadFile(handoffFile)
+    // loadFile and onHandoffConsumed are new functions on every render; the file itself is what starts this.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [handoffFile])
 
   // Re-subscribes on every render so the handler always sees the current props.
   useEffect(() => {
@@ -130,5 +160,6 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     largeFileWarning,
     openFilePicker: () => fileInputRef.current?.click(),
     promptText,
+    redirectSuggestion,
   }
 }

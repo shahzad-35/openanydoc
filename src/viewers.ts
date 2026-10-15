@@ -10,10 +10,10 @@ export type Viewer = {
 }
 
 export const viewers: Viewer[] = [
-  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], description: 'Open comma- and tab-separated files as a clean, searchable table.', toolPath: '/csv-viewer' },
-  { id: 'text', label: 'TXT', extensions: ['.txt'], description: 'Read plain text files as they were written.', toolPath: '/txt-viewer' },
-  { id: 'json', label: 'JSON', extensions: ['.json'], description: 'Explore JSON as a tree or as formatted code, and fix mistakes.', toolPath: '/json-viewer' },
-  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], description: 'Browse sheets, edit cells and formulas, and save the workbook.', toolPath: '/excel-viewer' },
+  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], description: 'View and edit CSV, TSV and tab files as a searchable table with automatic delimiter detection.', toolPath: '/csv-viewer' },
+  { id: 'text', label: 'TXT', extensions: ['.txt'], description: 'View and edit plain text files with search, line numbers and handy tools for lines and whitespace.', toolPath: '/txt-viewer' },
+  { id: 'json', label: 'JSON', extensions: ['.json'], description: 'View, format and edit JSON as a tree, a table or code, with error messages and sorting.', toolPath: '/json-viewer' },
+  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], description: 'View and edit Excel XLSX, XLS, XLSM and ODS files: sheets, formulas, formats and styles.', toolPath: '/excel-viewer' },
   { id: 'word', label: 'Word', extensions: ['.docx'], description: 'Read .docx documents with their original formatting.' },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'], description: 'Read .pdf documents page by page in your browser.' },
   { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], description: 'Flip through .pptx slides right in your browser.' },

@@ -1,19 +1,27 @@
-import { useEffect } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import AboutContent from '../components/AboutContent'
+import FormatGuide from '../components/FormatGuide'
 import DropPanel from '../components/DropPanel'
+import NewBadge from '../components/NewBadge'
+import WhatsNewBanner from '../components/WhatsNewBanner'
+import { useT } from '../i18n'
+import { pageSeo } from '../seo'
 import ThemeToggle from '../components/ThemeToggle'
-import ThreeCanvas from '../backdrop/ThreeCanvas'
-import { createAuroraDust } from '../backdrop/AuroraDust'
-import { footerText, heroSubtitle, heroTitle } from '../content'
+import { footerText } from '../content'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 
+const AuroraBackdrop = lazy(() => import('../backdrop/AuroraBackdrop'))
+
+// Footer links read quietly until hovered.
+const footerLinkClassName = 'text-ink-soft underline-offset-2 hover:text-ink hover:underline'
+
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
 
 // A link that changes the page without reloading (the app has no router package); modified clicks open a new tab as usual.
-function PageLink({ path, onNavigate, children }: { path: string; onNavigate: (path: string) => void; children: ReactNode }) {
+function PageLink({ path, onNavigate, children, className = 'underline underline-offset-2 hover:text-ink' }: { path: string; onNavigate: (path: string) => void; children: ReactNode; className?: string }) {
   return (
     <a
       href={path}
@@ -22,7 +30,7 @@ function PageLink({ path, onNavigate, children }: { path: string; onNavigate: (p
         event.preventDefault()
         onNavigate(path)
       }}
-      className="underline underline-offset-2 hover:text-ink"
+      className={className}
     >
       {children}
     </a>
@@ -35,12 +43,38 @@ export default function HomePage({
   onFileLoaded,
   onNavigate,
   toolViewer,
+  isBannerDismissed,
+  onDismissBanner,
+  handoffFile,
+  onHandoffConsumed,
+  onOpenInViewer,
 }: {
   onFileLoaded: (file: File, fileContents: ArrayBuffer) => void
   onNavigate: (path: string) => void
   toolViewer?: Viewer
+  isBannerDismissed: boolean
+  onDismissBanner: () => void
+  handoffFile: File | null
+  onHandoffConsumed: () => void
+  onOpenInViewer: (file: File, toolPath: string) => void
 }) {
-  const intake = useFileIntake({ acceptedExtensions: toolViewer?.extensions ?? supportedExtensions, onFileLoaded })
+  const { t } = useT()
+  // The animated backdrop is decoration: it is fetched only after the page has appeared and the browser is idle, and not at all
+  // when the visitor asked their browser to save data.
+  const [isBackdropWanted, setIsBackdropWanted] = useState(false)
+  useEffect(() => {
+    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
+    if (saveData) return
+    const wantBackdrop = () => setIsBackdropWanted(true)
+    if ('requestIdleCallback' in window) {
+      const idleId = window.requestIdleCallback(wantBackdrop, { timeout: 2000 })
+      return () => window.cancelIdleCallback(idleId)
+    }
+    const timerId = setTimeout(wantBackdrop, 500)
+    return () => clearTimeout(timerId)
+  }, [])
+
+  const intake = useFileIntake({ acceptedExtensions: toolViewer?.extensions ?? supportedExtensions, onFileLoaded, handoffFile, onHandoffConsumed })
 
   // Each format's page gets its own title and description for search results and browser tabs.
   useEffect(() => {
@@ -48,8 +82,9 @@ export default function HomePage({
     const previousTitle = document.title
     const descriptionTag = document.querySelector('meta[name="description"]')
     const previousDescription = descriptionTag?.getAttribute('content') ?? ''
-    document.title = `${toolViewer.label} viewer and editor online – OpenAnyDoc`
-    descriptionTag?.setAttribute('content', `Open, view and edit ${toolViewer.label} files in your browser. Free and private: your file is never uploaded.`)
+    const seo = pageSeo[toolViewer.toolPath as string]
+    document.title = seo.title
+    descriptionTag?.setAttribute('content', seo.description)
     return () => {
       document.title = previousTitle
       descriptionTag?.setAttribute('content', previousDescription)
@@ -59,7 +94,11 @@ export default function HomePage({
   return (
     <div {...intake.dropTargetProps} className="relative min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink">
       <div aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
-        <ThreeCanvas createScene={createAuroraDust} className="h-full w-full" />
+        {isBackdropWanted && (
+          <Suspense fallback={null}>
+            <AuroraBackdrop />
+          </Suspense>
+        )}
       </div>
       {intake.isDraggingOver && (
         <div aria-hidden="true" className="pointer-events-none fixed inset-3 z-20 box-shape border-2 border-dashed border-accent" />
@@ -78,34 +117,63 @@ export default function HomePage({
           <ThemeToggle />
         </header>
 
+        {!isBannerDismissed && <WhatsNewBanner currentViewerId={toolViewer?.id} onNavigate={onNavigate} onDismiss={onDismissBanner} isContained />}
+
         <main id="main" className="mx-auto max-w-5xl px-4 pb-20">
           <section className="flex min-h-[calc(100dvh-6rem)] flex-col justify-center py-8 text-center">
-            <h1 className="type-h1 mx-auto max-w-3xl text-balance">{toolViewer ? `${toolViewer.label} viewer and editor` : heroTitle}</h1>
-            <p className="mb-8 mt-3 text-ink-soft">{toolViewer ? `${toolViewer.description} ${heroSubtitle}` : heroSubtitle}</p>
-            <DropPanel intake={intake} shownViewers={toolViewer ? [toolViewer] : viewers} />
+            <h1 className="type-h1 mx-auto max-w-3xl text-balance">{toolViewer ? pageSeo[toolViewer.toolPath as string].heading : pageSeo['/'].heading}</h1>
+            <p className="mb-8 mt-3 text-ink-soft">{toolViewer ? pageSeo[toolViewer.toolPath as string].intro : pageSeo['/'].intro}</p>
+            <DropPanel
+              intake={intake}
+              shownViewers={toolViewer ? [toolViewer] : viewers}
+              currentViewerId={toolViewer?.id}
+              onNavigate={onNavigate}
+              onOpenInViewer={onOpenInViewer}
+            />
           </section>
 
           <div className="box-shape mt-12 bg-paper-raised/90 p-6 backdrop-blur-md md:p-10">
-            <AboutContent />
+            {toolViewer ? <FormatGuide address={toolViewer.toolPath as string} viewerId={toolViewer.id} /> : <AboutContent />}
           </div>
         </main>
 
-        <footer className="border-t border-rule">
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-6 text-sm text-ink-soft">
-            <p>{footerText}</p>
-            <nav aria-label="File viewers" className="flex flex-wrap gap-x-4 gap-y-1">
-              {toolViewer && (
-                <PageLink path="/" onNavigate={onNavigate}>
-                  All file types
-                </PageLink>
-              )}
-              {pagesWithOwnAddress
-                .filter((viewer) => viewer !== toolViewer)
-                .map((viewer) => (
-                  <PageLink key={viewer.id} path={viewer.toolPath as string} onNavigate={onNavigate}>
-                    {viewer.label} viewer
+        <footer className="border-t border-rule bg-paper-raised/80 backdrop-blur-md">
+          <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 text-sm md:grid-cols-[2fr_1fr_1fr]">
+            <div>
+              <p className="type-h3">OpenAnyDoc</p>
+              <p className="mt-2 max-w-xs text-ink-soft">{footerText}</p>
+            </div>
+            <nav aria-label={t('footer.viewers')}>
+              <h2 className="font-semibold">{t('footer.viewers')}</h2>
+              <ul className="mt-3 space-y-2">
+                {pagesWithOwnAddress
+                  .filter((viewer) => viewer !== toolViewer)
+                  .map((viewer) => (
+                    <li key={viewer.id} className="flex items-center">
+                      <PageLink path={viewer.toolPath as string} onNavigate={onNavigate} className={footerLinkClassName}>
+                        {viewer.label} viewer
+                      </PageLink>
+                      <NewBadge viewerId={viewer.id} />
+                    </li>
+                  ))}
+              </ul>
+            </nav>
+            <nav aria-label={t('footer.more')}>
+              <h2 className="font-semibold">{t('footer.more')}</h2>
+              <ul className="mt-3 space-y-2">
+                {toolViewer && (
+                  <li>
+                    <PageLink path="/" onNavigate={onNavigate} className={footerLinkClassName}>
+                      {t('footer.allTypes')}
+                    </PageLink>
+                  </li>
+                )}
+                <li>
+                  <PageLink path="/en/changelog" onNavigate={onNavigate} className={footerLinkClassName}>
+                    {t('footer.whatsNew')}
                   </PageLink>
-                ))}
+                </li>
+              </ul>
             </nav>
           </div>
         </footer>

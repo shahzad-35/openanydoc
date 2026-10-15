@@ -38,6 +38,11 @@
   --ext-10: #b0214f;
 }
 
+/* The display font has no Arabic letters, so Arabic pages use a system Arabic-capable stack for headings. */
+html[lang="ar"] {
+  --font-display: system-ui, "Segoe UI", Tahoma, "Geeza Pro", "Noto Sans Arabic", sans-serif;
+}
+
 .dark {
   --paper: #0a1128;
   --paper-raised: #121c3a;

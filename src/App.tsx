@@ -1,15 +1,26 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import DiscardEditsDialog from './components/DiscardEditsDialog'
+import { LocaleContext, getLocaleFromPath } from './i18n'
 import FileViewPage from './pages/FileViewPage'
 import HomePage from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
+
+const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
+
+const isChangelogPath = (pathname: string) => /^\/(en|ar)\/changelog\/?$/.test(pathname)
 
 export default function App() {
   const [openedFile, setOpenedFile] = useState<OpenedFile | null>(null)
   const [discardRequest, setDiscardRequest] = useState<{ answer: (shouldDiscard: boolean) => void } | null>(null)
   const [fileKey, setFileKey] = useState(0)
   const [pathname, setPathname] = useState(window.location.pathname)
+  // The "what's new" banner is closed in React state only, so it comes back when the tab is reloaded. Do not persist this
+  // (no cookies, localStorage, sessionStorage or IndexedDB) and do not send it anywhere: DECISIONS.md, "What's new".
+  const [isBannerDismissed, setIsBannerDismissed] = useState(false)
+  // A file another page asked to open here (the wrong-file redirect); React state only, never in the URL.
+  const [handoffFile, setHandoffFile] = useState<File | null>(null)
+  const locale = getLocaleFromPath(pathname)
   const hasUnsavedEditsRef = useRef(false)
   const openedFilePathRef = useRef('/')
 
@@ -80,6 +91,19 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
+  // The page language follows the address (/ar/changelog is right-to-left Arabic).
+  useEffect(() => {
+    document.documentElement.lang = locale
+    document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
+  }, [locale])
+
+  // Hands a file to another format's page. Leaving a page with unsaved edits asks first, as everywhere else.
+  async function openInViewer(file: File, toolPath: string) {
+    if (hasUnsavedEditsRef.current && !(await confirmDiscardEdits())) return
+    navigateTo(toolPath)
+    setHandoffFile(file)
+  }
+
   function closeFile() {
     hasUnsavedEditsRef.current = false
     if (window.history.state?.fromHomePage) {
@@ -92,7 +116,7 @@ export default function App() {
   }
 
   return (
-    <>
+    <LocaleContext.Provider value={locale}>
       {openedFile ? (
         <FileViewPage
           key={fileKey}
@@ -101,13 +125,28 @@ export default function App() {
           onReplaceFile={replaceFile}
           confirmDiscardEdits={confirmDiscardEdits}
           onUnsavedEditsChange={reportUnsavedEdits}
+          isBannerDismissed={isBannerDismissed}
+          onDismissBanner={() => setIsBannerDismissed(true)}
         />
+      ) : isChangelogPath(pathname) ? (
+        <Suspense fallback={null}>
+          <ChangelogPage onNavigate={navigateTo} />
+        </Suspense>
       ) : (
-        <HomePage onFileLoaded={openFile} onNavigate={navigateTo} toolViewer={findViewerByToolPath(pathname)} />
+        <HomePage
+          onFileLoaded={openFile}
+          onNavigate={navigateTo}
+          toolViewer={findViewerByToolPath(pathname)}
+          isBannerDismissed={isBannerDismissed}
+          onDismissBanner={() => setIsBannerDismissed(true)}
+          handoffFile={handoffFile}
+          onHandoffConsumed={() => setHandoffFile(null)}
+          onOpenInViewer={openInViewer}
+        />
       )}
       {discardRequest && (
         <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
       )}
-    </>
+    </LocaleContext.Provider>
   )
 }

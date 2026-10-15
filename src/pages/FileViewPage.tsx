@@ -1,12 +1,15 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChangeCounter, EditToolbar, ViewEditToggle } from '../components/EditControls'
 import FileViewHeader from '../components/FileViewHeader'
-import { findFormatForFileName } from '../formats/registry'
+import WhatsNewBanner from '../components/WhatsNewBanner'
+import { FILE_SAVED_EVENT, findFormatForFileName } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import { useEditSession } from '../formats/useEditSession'
+import { translateWithNodes, useT } from '../i18n'
 import { useFileIntake } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findViewerForFileName, supportedExtensions } from '../viewers'
+import { pickRelatedFormat } from '../whatsNew'
 
 type FileViewPageProps = {
   openedFile: OpenedFile
@@ -17,6 +20,8 @@ type FileViewPageProps = {
   confirmDiscardEdits: () => Promise<boolean>
   // Tells App whether there are unsaved edits, so the browser's Back button can ask first.
   onUnsavedEditsChange: (hasUnsavedEdits: boolean) => void
+  isBannerDismissed: boolean
+  onDismissBanner: () => void
 }
 
 const noEdits = () => null
@@ -24,7 +29,8 @@ const countNoEdits = () => 0
 
 // The page a file opens on: the header, the View / Edit toggle, the edit toolbar and the format's viewer. It owns the edit
 // session, so edits survive switching between View and Edit.
-export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange }: FileViewPageProps) {
+export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange, isBannerDismissed, onDismissBanner }: FileViewPageProps) {
+  const { locale, t } = useT()
   const viewer = findViewerForFileName(openedFile.file.name)
   const format = findFormatForFileName(openedFile.file.name)
   const editing = format?.editing
@@ -35,6 +41,8 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const [selection, setSelection] = useState<unknown>(null)
   const [viewerCommands, setViewerCommands] = useState<unknown>(null)
   const [exportSource, setExportSource] = useState<unknown>(null)
+  // One tip after a save, closed in React state only (nothing is stored); the page's key resets it for the next file.
+  const [isSaveTipShown, setIsSaveTipShown] = useState(false)
   const { undo, redo } = session
   const hasUnsavedEdits = session.changeCount > 0
   const changeDescription = useMemo(() => editing?.describeChanges(session.edits) ?? '', [editing, session.edits])
@@ -51,6 +59,14 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
     onUnsavedEditsChange(hasUnsavedEdits)
     return () => onUnsavedEditsChange(false)
   }, [hasUnsavedEdits, onUnsavedEditsChange])
+
+  useEffect(() => {
+    function showTipAfterSave() {
+      setIsSaveTipShown(true)
+    }
+    window.addEventListener(FILE_SAVED_EVENT, showTipAfterSave)
+    return () => window.removeEventListener(FILE_SAVED_EVENT, showTipAfterSave)
+  }, [])
 
   // Closing or reloading the tab with unsaved edits makes the browser ask first.
   useEffect(() => {
@@ -95,6 +111,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
 
   if (!format) return null
   const Viewer = format.ViewerComponent
+  const tipFormat = viewer ? pickRelatedFormat(viewer.id) : undefined
 
   return (
     <div data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[14px] leading-normal text-ink">
@@ -112,6 +129,30 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
           )
         }
       />
+      {!isBannerDismissed && <WhatsNewBanner currentViewerId={viewer?.id} onDismiss={onDismissBanner} />}
+      {isSaveTipShown && tipFormat && (
+        <div role="status" className="flex items-center gap-3 border-b border-rule bg-paper-raised px-4 py-1.5 text-sm">
+          <p className="min-w-0 flex-1">
+            {translateWithNodes(locale, 'tip.alsoOpens', {
+              format: (
+                <a href={tipFormat.viewer.toolPath} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2 hover:text-accent">
+                  {tipFormat.viewer.label}
+                </a>
+              ),
+            })}
+          </p>
+          <button
+            type="button"
+            aria-label={t('tip.close')}
+            onClick={() => setIsSaveTipShown(false)}
+            className="control-shape grid size-8 shrink-0 cursor-pointer place-items-center transition-colors duration-200 hover:bg-paper"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <path d="m6 6 12 12M18 6 6 18" />
+            </svg>
+          </button>
+        </div>
+      )}
       {mode === 'edit' && (
         <EditToolbar
           openedFile={openedFile}

@@ -1,0 +1,47 @@
+[
+  {
+    "date": "2026-10-15",
+    "version": "1.3.0",
+    "formats": [
+      "excel"
+    ],
+    "items": [
+      "highlights.excel.open",
+      "highlights.excel.edit",
+      "highlights.excel.format",
+      "changelog.toolbars",
+      "changelog.whatsNew"
+    ],
+    "title": "changelog.v1_3.title"
+  },
+  {
+    "date": "2026-10-14",
+    "version": "1.2.0",
+    "formats": [
+      "json",
+      "text"
+    ],
+    "items": [
+      "highlights.json.views",
+      "highlights.json.edit",
+      "highlights.json.errors",
+      "highlights.text.view",
+      "highlights.text.edit",
+      "highlights.text.endings"
+    ],
+    "title": "changelog.v1_2.title"
+  },
+  {
+    "date": "2026-10-05",
+    "version": "1.0.0",
+    "formats": [
+      "csv"
+    ],
+    "items": [
+      "highlights.csv.open",
+      "highlights.csv.edit",
+      "highlights.csv.large"
+    ],
+    "title": "changelog.v1_0.title"
+  }
+]

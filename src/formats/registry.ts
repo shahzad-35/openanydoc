@@ -71,6 +71,12 @@ export type FormatEditing = {
 
 export type FormatDefinition = {
   viewerId: Viewer['id']
+  // The day the format went live (YYYY-MM-DD). A format without it is not released yet: it is never announced, linked or suggested.
+  addedOn?: string
+  // Two or three short feature keys (translated in src/i18n/en.json and ar.json), used in the changelog.
+  highlights?: string[]
+  // Formats worth suggesting to someone who just saved a file of this format.
+  related?: Viewer['id'][]
   ViewerComponent: LazyExoticComponent<ComponentType<FormatViewerProps>>
   // Absent while a format cannot be edited yet; the View / Edit toggle is then not shown.
   editing?: FormatEditing
@@ -79,9 +85,12 @@ export type FormatDefinition = {
 const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
 
 // To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now.
-const formatDefinitions: FormatDefinition[] = [
+export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'csv',
+    addedOn: '2026-10-05',
+    highlights: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'],
+    related: ['excel', 'json'],
     ViewerComponent: lazy(() => import('./csv/CsvViewer')),
     editing: {
       createEmptyEdits: createEmptyCsvEdits,
@@ -92,6 +101,9 @@ const formatDefinitions: FormatDefinition[] = [
   },
   {
     viewerId: 'text',
+    addedOn: '2026-10-14',
+    highlights: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'],
+    related: ['csv', 'json'],
     ViewerComponent: lazy(() => import('./text/TextViewer')),
     editing: {
       createEmptyEdits: createEmptyTextEdits,
@@ -102,6 +114,9 @@ const formatDefinitions: FormatDefinition[] = [
   },
   {
     viewerId: 'json',
+    addedOn: '2026-10-14',
+    highlights: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'],
+    related: ['csv', 'excel'],
     ViewerComponent: lazy(() => import('./json/JsonViewer')),
     editing: {
       createEmptyEdits: createEmptyJsonEdits,
@@ -112,6 +127,9 @@ const formatDefinitions: FormatDefinition[] = [
   },
   {
     viewerId: 'excel',
+    addedOn: '2026-10-15',
+    highlights: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'],
+    related: ['csv', 'json'],
     ViewerComponent: lazy(() => import('./excel/ExcelViewer')),
     editing: {
       createEmptyEdits: createEmptyExcelEdits,
@@ -149,6 +167,9 @@ export function buildDownloadName(fileName: string, hasEdits: boolean, newExtens
   return `${baseName}${hasEdits ? '-edited' : ''}${extension}`
 }
 
+// Sent on the window after a file is saved, so the page can offer a tip. It carries nothing: no file name, no content.
+export const FILE_SAVED_EVENT = 'openanydoc:saved'
+
 // Saves text (or bytes) as a file by clicking a temporary link to it.
 export function downloadTextFile(fileName: string, fileText: BlobPart, mimeType: string) {
   const downloadUrl = URL.createObjectURL(new Blob([fileText], { type: mimeType }))
@@ -156,5 +177,6 @@ export function downloadTextFile(fileName: string, fileText: BlobPart, mimeType:
   downloadLink.href = downloadUrl
   downloadLink.download = fileName
   downloadLink.click()
+  window.dispatchEvent(new Event(FILE_SAVED_EVENT))
   setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
 }
