@@ -4,7 +4,7 @@ import FileViewHeader from '../components/FileViewHeader'
 import { FILE_SAVED_EVENT, findFormatForFileName } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import { useEditSession } from '../formats/useEditSession'
-import { translateWithNodes, useT } from '../i18n'
+import { localizePath, translateWithNodes, useT } from '../i18n'
 import { useFileIntake } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findViewerForFileName, supportedExtensions } from '../viewers'
@@ -42,7 +42,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const [isSaveTipShown, setIsSaveTipShown] = useState(false)
   const { undo, redo } = session
   const hasUnsavedEdits = session.changeCount > 0
-  const changeDescription = useMemo(() => editing?.describeChanges(session.edits) ?? '', [editing, session.edits])
+  const changeDescription = useMemo(() => editing?.describeChanges(session.edits, locale) ?? '', [editing, session.edits, locale])
 
   // The editing code is fetched the first time Edit is chosen, never while only viewing.
   function chooseMode(newMode: ViewMode) {
@@ -131,7 +131,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
           <p id="save-tip-message" className="min-w-0 flex-1">
             {translateWithNodes(locale, 'tip.alsoOpens', {
               format: (
-                <a href={tipFormat.viewer.toolPath} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2 hover:text-accent">
+                <a href={localizePath(locale, tipFormat.viewer.toolPath as string)} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2 hover:text-accent">
                   {tipFormat.viewer.label}
                 </a>
               ),
@@ -173,10 +173,10 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
       </div>
       {editingLoadFailed && (
         <p id="editing-load-error" role="alert" className="border-b border-rule bg-paper-raised px-4 py-2 text-danger">
-          The editing tools could not be loaded. Check your connection and reload the page; the file is still open for viewing.
+          {t('file.editingLoadFailed')}
         </p>
       )}
-      <Suspense fallback={<p id="file-loading" className="p-6 text-ink-soft">Reading file</p>}>
+      <Suspense fallback={<p id="file-loading" className="p-6 text-ink-soft">{t('file.reading')}</p>}>
         <Viewer
           openedFile={openedFile}
           mode={mode}

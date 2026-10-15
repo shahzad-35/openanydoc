@@ -1,10 +1,12 @@
 import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { compactSecondaryButtonClassName } from '../buttonStyles'
+import { useT } from '../i18n'
 import { formatFileSize } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findTableFormat, findViewerForFileName } from '../viewers'
 import FileTypeChip from './FileTypeChip'
+import LanguageSwitcher from './LanguageSwitcher'
 import ThemeToggle from './ThemeToggle'
 
 type FileViewHeaderProps = {
@@ -20,16 +22,19 @@ type FileViewHeaderProps = {
 
 // The app bar at the top of every file page: brand, file type, name and size, and the way back home.
 export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onOpenAnotherFile, controls }: FileViewHeaderProps) {
+  const { t } = useT()
   const viewer = findViewerForFileName(openedFile.file.name)
   const fileNameRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
     const previousTitle = document.title
-    document.title = `${openedFile.file.name} – OpenAnyDoc`
+    document.title = t('file.title', { name: openedFile.file.name })
     fileNameRef.current?.focus()
     return () => {
       document.title = previousTitle
     }
+    // t changes with the language: the title follows it without moving focus again
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [openedFile])
 
   async function clearIfAllowed() {
@@ -42,9 +47,9 @@ export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onO
       <a
         id="skip-to-content-link"
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
       >
-        Skip to content
+        {t('skip.toContent')}
       </a>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 px-4 py-1">
         <button id="brand-home-button" type="button" onClick={clearIfAllowed} className="type-h3 cursor-pointer text-base!">
@@ -55,13 +60,14 @@ export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onO
           <h1 id="file-name" ref={fileNameRef} tabIndex={-1} className="truncate font-medium outline-none">
             {openedFile.file.name}
           </h1>
-          <span id="file-size" className="shrink-0 text-ink-soft">{formatFileSize(openedFile.file.size)}</span>
+          <span id="file-size" dir="ltr" className="shrink-0 text-ink-soft">{formatFileSize(openedFile.file.size)}</span>
         </div>
         {controls && <div id="file-mode-controls" className="order-3 flex basis-full items-center gap-3 sm:order-none sm:basis-auto">{controls}</div>}
         <button id="open-another-file-button" type="button" onClick={onOpenAnotherFile} className={`${compactSecondaryButtonClassName} order-4 sm:order-none`}>
-          Open another file
+          {t('file.openAnother')}
         </button>
-        <div className="order-2 ml-auto sm:order-none sm:ml-0">
+        <div className="order-2 ms-auto flex items-center gap-2 sm:order-none sm:ms-0">
+          <LanguageSwitcher compact />
           <ThemeToggle compact />
         </div>
       </div>

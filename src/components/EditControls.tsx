@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import { useT } from '../i18n'
 import { buildDownloadName, downloadTextFile } from '../formats/registry'
 import type { EditingModule, ViewMode } from '../formats/registry'
 import type { EditSession } from '../formats/useEditSession'
@@ -45,36 +46,34 @@ function ModeIcon({ mode }: { mode: ViewMode }) {
   )
 }
 
-const modeOptions = [
-  { mode: 'view', label: 'View' },
-  { mode: 'edit', label: 'Edit' },
-] as const
+const modeOptions = ['view', 'edit'] as const
 
 // A sliding switch in the spirit of the light/dark toggle: the accent thumb glides to the chosen side. Each side is an
 // icon (an eye to look, a pencil to edit) with no visible text; the names are in the tooltip and for screen readers.
 export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (newMode: ViewMode) => void }) {
+  const { t } = useT()
   return (
-    <div id="mode-toggle" role="group" aria-label="Mode" className="control-shape solid-box relative grid shrink-0 grid-cols-2 border-ink bg-paper p-0.5">
+    <div id="mode-toggle" role="group" aria-label={t('mode.label')} className="control-shape solid-box relative grid shrink-0 grid-cols-2 border-ink bg-paper p-0.5">
       <span
         aria-hidden="true"
-        className={`control-shape absolute inset-y-0.5 left-0.5 w-[calc(50%-0.125rem)] bg-accent transition-transform duration-300 ease-out ${
-          mode === 'edit' ? 'translate-x-full' : ''
+        className={`control-shape absolute inset-y-0.5 start-0.5 w-[calc(50%-0.125rem)] bg-accent transition-transform duration-300 ease-out ${
+          mode === 'edit' ? 'translate-x-full rtl:-translate-x-full' : ''
         }`}
       />
-      {modeOptions.map(({ mode: optionMode, label }) => (
+      {modeOptions.map((optionMode) => (
         <button
           key={optionMode}
           id={`mode-${optionMode}-button`}
           type="button"
           aria-pressed={mode === optionMode}
-          data-tip={label}
+          data-tip={t(optionMode === 'view' ? 'mode.view' : 'mode.edit')}
           onClick={() => onChange(optionMode)}
           className={`control-shape relative grid min-h-7 min-w-10 pointer-coarse:min-h-10 pointer-coarse:min-w-14 cursor-pointer place-items-center transition-colors duration-300 ${
             mode === optionMode ? 'text-on-accent' : 'text-ink hover:text-accent'
           }`}
         >
           <ModeIcon mode={optionMode} />
-          <span className="sr-only">{label}</span>
+          <span className="sr-only">{t(optionMode === 'view' ? 'mode.view' : 'mode.edit')}</span>
         </button>
       ))}
     </div>
@@ -106,8 +105,9 @@ type DownloadControlProps = {
 // An icon only, and one click saves what you see: CSV with the edits, the current sort order and only the rows the search
 // leaves, named like sales-edited.csv. The tooltip says which rows.
 function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEdits }: DownloadControlProps) {
+  const { locale, t } = useT()
   const { downloadOption } = editingModule
-  const downloadLabel = exportSource === null ? 'Download' : `${downloadOption.getLabel(exportSource)}: ${editingModule.describeDownload(exportSource)}`
+  const downloadLabel = exportSource === null ? t('toolbar.download') : `${downloadOption.getLabel(exportSource, locale)}: ${editingModule.describeDownload(exportSource, locale)}`
 
   async function downloadWhatYouSee() {
     const includeByteOrderMark = editingModule.getDefaultByteOrderMark(exportSource)
@@ -149,22 +149,23 @@ type EditToolbarProps = {
 
 // Shown in Edit mode: undo, redo and revert all for every format, then this format's own tools and the Download icon.
 export function EditToolbar({ openedFile, session, editingModule, selection, viewerCommands, exportSource }: EditToolbarProps) {
+  const { t } = useT()
   return (
-    <div id="edit-toolbar" role="toolbar" aria-label="Editing tools" className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
+    <div id="edit-toolbar" role="toolbar" aria-label={t('toolbar.label')} className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
       <div id="edit-toolbar-tools" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
-      <button id="undo-button" type="button" disabled={!session.canUndo} onClick={session.undo} aria-label="Undo" data-tip="Undo (Ctrl+Z)" className={historyButtonClassName}>
+      <button id="undo-button" type="button" disabled={!session.canUndo} onClick={session.undo} aria-label={t('toolbar.undo')} data-tip={t('toolbar.undoTip')} className={historyButtonClassName}>
         <HistoryIcon>
           <path d="M9 14 4 9l5-5" />
           <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
         </HistoryIcon>
       </button>
-      <button id="redo-button" type="button" disabled={!session.canRedo} onClick={session.redo} aria-label="Redo" data-tip="Redo (Ctrl+Shift+Z)" className={historyButtonClassName}>
+      <button id="redo-button" type="button" disabled={!session.canRedo} onClick={session.redo} aria-label={t('toolbar.redo')} data-tip={t('toolbar.redoTip')} className={historyButtonClassName}>
         <HistoryIcon>
           <path d="m15 14 5-5-5-5" />
           <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
         </HistoryIcon>
       </button>
-      <button id="revert-all-button" type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label="Revert all changes" data-tip="Revert all changes" className={historyButtonClassName}>
+      <button id="revert-all-button" type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label={t('toolbar.revertAll')} data-tip={t('toolbar.revertAll')} className={historyButtonClassName}>
         <HistoryIcon>
           <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
           <path d="M3 3v5h5" />
@@ -195,7 +196,7 @@ export function EditToolbar({ openedFile, session, editingModule, selection, vie
             hasEdits={session.changeCount > 0}
           />
         ) : (
-          <p className="text-sm text-ink-soft">Loading editing tools</p>
+          <p className="text-sm text-ink-soft">{t('toolbar.loading')}</p>
         )}
       </div>
     </div>

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { Icon, IconButton } from '../../components/ToolbarControls'
+import { translate, translatePlural, useT } from '../../i18n'
+import type { Locale } from '../../i18n'
 import { HighlightedCodeLine } from './JsonTree'
 import { formatPathText, getChildEntries, isContainer } from './jsonModel'
 import type { JsonPath, JsonValue } from './jsonModel'
@@ -8,34 +10,35 @@ const PREVIEW_MAX_CHILDREN = 50
 const PREVIEW_MAX_DEPTH = 6
 const PREVIEW_MAX_LINES = 300
 
-function describeNode(node: JsonValue) {
+function describeNode(node: JsonValue, locale: Locale) {
   if (node === null) return 'null'
-  if (typeof node === 'string') return `string, ${node.length.toLocaleString()} ${node.length === 1 ? 'character' : 'characters'}`
-  if (!isContainer(node)) return typeof node
+  if (typeof node === 'string') return translatePlural(locale, 'json.type.string', node.length)
+  if (typeof node === 'boolean') return translate(locale, 'json.type.boolean')
+  if (typeof node === 'number') return translate(locale, 'json.type.number')
   const count = getChildEntries(node).length
-  if (Array.isArray(node)) return `list, ${count.toLocaleString()} ${count === 1 ? 'item' : 'items'}`
-  return `object, ${count.toLocaleString()} ${count === 1 ? 'key' : 'keys'}`
+  return translatePlural(locale, Array.isArray(node) ? 'json.type.list' : 'json.type.object', count)
 }
 
 // A copy of the value that is short enough to show: long lists and objects keep their first items, deep parts are folded.
-function shortenForPreview(value: JsonValue, depth: number): JsonValue {
+function shortenForPreview(value: JsonValue, depth: number, locale: Locale): JsonValue {
   if (!isContainer(value)) return value
   const entries = getChildEntries(value)
-  if (depth >= PREVIEW_MAX_DEPTH) return entries.length === 0 ? value : Array.isArray(value) ? `[… ${entries.length.toLocaleString()} items]` : `{… ${entries.length.toLocaleString()} keys}`
+  if (depth >= PREVIEW_MAX_DEPTH) return entries.length === 0 ? value : translatePlural(locale, Array.isArray(value) ? 'json.preview.foldedArray' : 'json.preview.foldedObject', entries.length)
   const shown = entries.slice(0, PREVIEW_MAX_CHILDREN)
   const hiddenCount = entries.length - shown.length
   if (Array.isArray(value)) {
-    const items = shown.map(([, child]) => shortenForPreview(child, depth + 1))
-    return hiddenCount > 0 ? [...items, `… ${hiddenCount.toLocaleString()} more`] : items
+    const items = shown.map(([, child]) => shortenForPreview(child, depth + 1, locale))
+    return hiddenCount > 0 ? [...items, translate(locale, 'json.preview.more', { count: hiddenCount })] : items
   }
-  const members = Object.fromEntries(shown.map(([key, child]) => [key, shortenForPreview(child, depth + 1)]))
-  return hiddenCount > 0 ? { ...members, '…': `${hiddenCount.toLocaleString()} more keys` } : members
+  const members = Object.fromEntries(shown.map(([key, child]) => [key, shortenForPreview(child, depth + 1, locale)]))
+  return hiddenCount > 0 ? { ...members, '…': translate(locale, 'json.preview.more', { count: hiddenCount }) } : members
 }
 
 type JsonDetailsProps = { node: JsonValue | undefined; path: JsonPath | null }
 
 // The side panel next to the tree on wide screens: what the selected row is, where it is, and its value.
 export default function JsonDetails({ node, path }: JsonDetailsProps) {
+  const { locale, t, idFor } = useT()
   const [copyMessage, setCopyMessage] = useState('')
 
   async function copyText(text: string, message: string) {
@@ -43,43 +46,43 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
       await navigator.clipboard.writeText(text)
       setCopyMessage(message)
     } catch {
-      setCopyMessage('Copy not allowed')
+      setCopyMessage(t('json.status.copyNotAllowed'))
     }
     window.setTimeout(() => setCopyMessage(''), 2000)
   }
 
   if (path === null || node === undefined) {
     return (
-      <aside id="json-details" aria-label="Details" className="hidden w-80 shrink-0 border-l border-rule bg-paper p-5 text-ink-soft lg:block xl:w-96">
-        <h2 className="font-semibold text-ink">Details</h2>
-        <p className="mt-2">Select a row to see its path, type and value. Arrow keys move between rows.</p>
+      <aside id="json-details" aria-label={t('json.details.title')} className="hidden w-80 shrink-0 border-s border-rule bg-paper p-5 text-ink-soft lg:block xl:w-96">
+        <h2 className="font-semibold text-ink">{t('json.details.title')}</h2>
+        <p className="mt-2">{t('json.details.empty')}</p>
       </aside>
     )
   }
 
   const pathText = formatPathText(path)
-  const previewLines = isContainer(node) ? JSON.stringify(shortenForPreview(node, 0), null, 2).split('\n') : []
+  const previewLines = isContainer(node) ? JSON.stringify(shortenForPreview(node, 0, locale), null, 2).split('\n') : []
   const hiddenLineCount = Math.max(0, previewLines.length - PREVIEW_MAX_LINES)
 
   return (
-    <aside id="json-details" aria-label="Details" className="hidden w-80 shrink-0 flex-col border-l border-rule bg-paper lg:flex xl:w-96">
+    <aside id="json-details" aria-label={t('json.details.title')} className="hidden w-80 shrink-0 flex-col border-s border-rule bg-paper lg:flex xl:w-96">
       <div className="border-b border-rule p-4">
-        <h2 className="font-semibold">Details</h2>
-        <p className="mt-2 text-ink-soft">Path</p>
+        <h2 className="font-semibold">{t('json.details.title')}</h2>
+        <p className="mt-2 text-ink-soft">{t('json.details.path')}</p>
         <code dir="ltr" className="mt-0.5 block break-all font-mono text-(--file-color)">
           {pathText}
         </code>
-        <p className="mt-3 text-ink-soft">Type</p>
-        <p className="mt-0.5">{describeNode(node)}</p>
+        <p className="mt-3 text-ink-soft">{t('json.details.type')}</p>
+        <p className="mt-0.5">{describeNode(node, locale)}</p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
-          <IconButton label="Copy path" onClick={() => copyText(pathText, 'Path copied')}>
+          <IconButton id={`toolbar-${idFor('json.details.copyPath')}`} label={t('json.details.copyPath')} onClick={() => copyText(pathText, t('json.details.pathCopied'))}>
             <Icon>
               <circle cx="6" cy="6" r="2.5" />
               <circle cx="18" cy="18" r="2.5" />
               <path d="M8 7.5c5 0 3 9 8 9" />
             </Icon>
           </IconButton>
-          <IconButton label="Copy value" onClick={() => copyText(typeof node === 'string' ? node : JSON.stringify(node, null, 2), 'Value copied')}>
+          <IconButton id={`toolbar-${idFor('json.details.copyValue')}`} label={t('json.details.copyValue')} onClick={() => copyText(typeof node === 'string' ? node : JSON.stringify(node, null, 2), t('json.details.valueCopied'))}>
             <Icon>
               <rect x="8" y="8" width="12" height="12" rx="2" />
               <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
@@ -91,7 +94,7 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
         </div>
       </div>
       <div className="min-h-0 flex-1 overflow-auto p-4">
-        <p className="text-ink-soft">{isContainer(node) ? 'Preview' : 'Value'}</p>
+        <p className="text-ink-soft">{isContainer(node) ? t('json.details.preview') : t('json.details.value')}</p>
         {isContainer(node) ? (
           <pre dir="ltr" className="mt-1 font-mono text-[13px] leading-5">
             {previewLines.slice(0, PREVIEW_MAX_LINES).map((lineText, lineNumber) => (
@@ -99,7 +102,7 @@ export default function JsonDetails({ node, path }: JsonDetailsProps) {
                 <HighlightedCodeLine lineText={lineText} searchText="" />
               </div>
             ))}
-            {hiddenLineCount > 0 && <div className="mt-1 text-ink-soft">… {hiddenLineCount.toLocaleString()} more lines. Use the Copy value icon for everything.</div>}
+            {hiddenLineCount > 0 && <div dir="auto" className="mt-1 text-ink-soft">{t('json.preview.moreLines', { count: hiddenLineCount })}</div>}
           </pre>
         ) : (
           <p dir="auto" className="mt-1 whitespace-pre-wrap break-words font-mono text-[13px]">

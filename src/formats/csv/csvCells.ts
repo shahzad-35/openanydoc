@@ -5,6 +5,9 @@
 // position in the file as its id (0, 1, 2 ...); a row or column added by the visitor gets a negative id (-2, -3 ...). The id
 // -1 is only ever used as an anchor meaning "before the first one". Edits are sparse, so a 100k-row file is never copied.
 
+import Papa from 'papaparse'
+import { translate, translatePlural } from '../../i18n'
+import type { Locale } from '../../i18n'
 import type { TableFormat } from '../../viewers'
 
 import type { CellPosition } from '../DataTable'
@@ -86,7 +89,7 @@ export function isInsertedLine(id: number) {
   return id <= -2
 }
 
-// The row number from the file; rows added here have none.
+// The row number from the file; rows added here have none. Used in cell addresses and ids, so "new" is the same in every language.
 export function rowLabel(rowId: number) {
   return isInsertedLine(rowId) ? 'new' : String(rowId + 1)
 }
@@ -203,22 +206,28 @@ export function countShownEditedCells(edits: CsvEdits) {
   return count
 }
 
-function pluralize(count: number, singular: string, plural: string) {
-  return `${count.toLocaleString()} ${count === 1 ? singular : plural}`
-}
-
 // "3 edited cells, 1 row deleted": what the header counter says. Cells in deleted rows or columns are not counted.
-export function describeCsvChanges(edits: CsvEdits) {
+export function describeCsvChanges(edits: CsvEdits, locale: Locale) {
   const editedCellCount = countShownEditedCells(edits)
   return [
-    editedCellCount > 0 && pluralize(editedCellCount, 'edited cell', 'edited cells'),
-    edits.insertedRows.length > 0 && pluralize(edits.insertedRows.length, 'row added', 'rows added'),
-    edits.deletedRowIds.size > 0 && pluralize(edits.deletedRowIds.size, 'row deleted', 'rows deleted'),
-    edits.insertedColumns.length > 0 && pluralize(edits.insertedColumns.length, 'column added', 'columns added'),
-    edits.deletedColumnIds.size > 0 && pluralize(edits.deletedColumnIds.size, 'column deleted', 'columns deleted'),
+    editedCellCount > 0 && translatePlural(locale, 'csv.summary.editedCells', editedCellCount),
+    edits.insertedRows.length > 0 && translatePlural(locale, 'csv.summary.rowsAdded', edits.insertedRows.length),
+    edits.deletedRowIds.size > 0 && translatePlural(locale, 'csv.summary.rowsDeleted', edits.deletedRowIds.size),
+    edits.insertedColumns.length > 0 && translatePlural(locale, 'csv.summary.columnsAdded', edits.insertedColumns.length),
+    edits.deletedColumnIds.size > 0 && translatePlural(locale, 'csv.summary.columnsDeleted', edits.deletedColumnIds.size),
   ]
     .filter(Boolean)
-    .join(', ')
+    .join(translate(locale, 'csv.summary.separator'))
+}
+
+// The CSV text the Download icon saves: the header (when the file has one) and the rows the search leaves, in the current
+// sort order, with the edits applied and the deleted and added columns taken into account. No byte order mark.
+export function buildCsvText(edits: CsvEdits, source: CsvExportSource) {
+  const dataRows = source.visibleRowIds.map((rowId) =>
+    source.displayColumnIds.map((columnId) => getCellText(source.rows, edits, rowId, columnId)),
+  )
+  const headerRows = source.hasHeaderRow ? [source.displayColumnIds.map((columnId) => getCellText(source.rows, edits, 0, columnId))] : []
+  return Papa.unparse([...headerRows, ...dataRows], { delimiter: source.detectedDelimiter })
 }
 
 export function textMatches(text: string, findText: string, matchCase: boolean) {

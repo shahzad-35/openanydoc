@@ -4,6 +4,8 @@ import type { ReactNode } from 'react'
 import FindReplaceBar from '../../components/FindReplaceBar'
 import { textControlClassName } from '../../buttonStyles'
 import { Icon, IconButton } from '../../components/ToolbarControls'
+import { useT } from '../../i18n'
+import type { MessageKey } from '../../i18n'
 import { decodeCsvBytes, looksLikeBinary } from '../../parseCsv'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
@@ -14,7 +16,7 @@ import { DEFAULT_TEXT_FONT_KEY, DEFAULT_TEXT_SIZE_PX, TEXT_FONT_CHOICES, TextVie
 import type { TextViewActions, TextViewSettings } from './textViewTools'
 import type { TextActions, TextEdits, TextExportSource, TextSelection, TextViewerCommands } from './textEditing'
 
-type ReadableText = ({ status: 'ok'; encodingLabel: string } & TextExportSource) | { status: 'error'; message: string }
+type ReadableText = ({ status: 'ok'; encodingLabel: string } & TextExportSource) | { status: 'error'; messageKey: MessageKey }
 
 const LINE_HEIGHT_RATIO = 1.7
 const SHEET_VERTICAL_PADDING_PX = 12
@@ -25,13 +27,13 @@ const searchShortcutLabel = /Mac|iPhone|iPad/.test(navigator.userAgent) ? '⌘K'
 const noLines: string[] = []
 
 function readPlainText(fileContents: ArrayBuffer): ReadableText {
-  if (fileContents.byteLength === 0) return { status: 'error', message: 'This file is empty.' }
+  if (fileContents.byteLength === 0) return { status: 'error', messageKey: 'text.error.empty' }
   if (looksLikeBinary(fileContents)) {
-    return { status: 'error', message: "This doesn't look like a text file. It contains binary data, so it may be corrupted or a different file type." }
+    return { status: 'error', messageKey: 'text.error.binary' }
   }
 
   const { text, encodingLabel } = decodeCsvBytes(fileContents)
-  if (text.trim() === '') return { status: 'error', message: 'This file is empty.' }
+  if (text.trim() === '') return { status: 'error', messageKey: 'text.error.empty' }
 
   return {
     status: 'ok',
@@ -72,9 +74,10 @@ function HighlightedLine({ lineText, searchText }: { lineText: string; searchTex
 // aligned to its own language direction, drawn only where visible so a very long file stays smooth. In Edit mode the same
 // sheet holds one text box; the edits join the page's undo, redo and Download.
 export default function TextViewer({ openedFile, mode, session: untypedSession, onExportSourceChange, onSelectionChange, onCommandsChange }: FormatViewerProps) {
+  const { locale, t, tp, idFor } = useT()
   const session = untypedSession as EditSession<TextEdits>
   const readableText = useMemo(() => readPlainText(openedFile.contents), [openedFile])
-  const largeFileWarning = getLargeFileWarning(openedFile.file)
+  const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
   const originalText = readableText.status === 'ok' ? readableText.originalText : ''
   const currentText = session.edits.text ?? originalText
   const isEditing = mode === 'edit'
@@ -112,7 +115,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   const showLineNumbers = wantsLineNumbers && (!isEditing || (!wrapLines && !isLargeForEditing))
   const editedLineCount = useMemo(() => (isEditing && showLineNumbers ? (draftText.match(/\n/g)?.length ?? 0) + 1 : 0), [isEditing, showLineNumbers, draftText])
   const gutterLineCount = isEditing ? editedLineCount : lines.length
-  const gutterWidthPx = showLineNumbers ? gutterLineCount.toLocaleString().length * 9 + 30 : 0
+  const gutterWidthPx = showLineNumbers ? gutterLineCount.toLocaleString('en').length * 9 + 30 : 0
   const editGutterNumbers = useMemo(() => Array.from({ length: editedLineCount }, (_, lineNumber) => lineNumber + 1).join('\n'), [editedLineCount])
 
   // The text changed from outside the text box (undo, redo, revert all): show it. Our own commits are skipped.
@@ -223,7 +226,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
     const matchStart = matchStarts[Math.min(matchPosition, matchStarts.length - 1)]
     const newText = textarea.value.slice(0, matchStart) + replaceText + textarea.value.slice(matchStart + findText.length)
     replaceDraftText(newText, matchStart, matchStart + replaceText.length)
-    setReplaceResultMessage('Replaced 1 match')
+    setReplaceResultMessage(tp('text.replaced', 1))
   }
 
   function replaceAllMatches() {
@@ -231,7 +234,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
     if (!textarea) return
     const newText = replaceAllTextMatches(textarea.value, findText, replaceText, matchCase)
     replaceDraftText(newText, 0, 0)
-    setReplaceResultMessage(`Replaced ${matchStarts.length.toLocaleString()} ${matchStarts.length === 1 ? 'match' : 'matches'}`)
+    setReplaceResultMessage(tp('text.replaced', matchStarts.length))
   }
 
   const lineNumbersAvailable = !isEditing || (!wrapLines && !isLargeForEditing)
@@ -283,9 +286,9 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   async function copyAllText() {
     try {
       await navigator.clipboard.writeText(currentText)
-      setCopyMessage('Copied')
+      setCopyMessage(t('text.status.copied'))
     } catch {
-      setCopyMessage('Copy not allowed')
+      setCopyMessage(t('text.status.copyNotAllowed'))
     }
     window.setTimeout(() => setCopyMessage(''), 2000)
   }
@@ -303,16 +306,16 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
     return (
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
         <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
-          <h2 className="type-h3">This file can't be shown</h2>
-          <p className="mt-2">{readableText.message}</p>
-          <p className="mt-2 text-ink-soft">Use "Open another file" above to try a different file.</p>
+          <h2 className="type-h3">{t('text.error.title')}</h2>
+          <p className="mt-2">{t(readableText.messageKey)}</p>
+          <p className="mt-2 text-ink-soft">{t('text.error.hint')}</p>
         </div>
       </main>
     )
   }
 
   const hasSearch = deferredSearchText !== '' && !isEditing
-  const matchStatus = !hasSearch ? '' : matchingLineNumbers.length === 0 ? 'No matches' : `${currentMatchPosition + 1} of ${matchingLineNumbers.length.toLocaleString()}`
+  const matchStatus = !hasSearch ? '' : matchingLineNumbers.length === 0 ? t('find.noMatches') : t('find.matchPosition', { position: currentMatchPosition + 1, total: matchingLineNumbers.length })
   const currentMatchLineNumber = matchingLineNumbers[currentMatchPosition]
   const fontFamily = (TEXT_FONT_CHOICES.find((font) => font.key === fontKey) ?? TEXT_FONT_CHOICES[0]).css
   const textStyle = { fontSize: textSizePx, lineHeight: `${lineHeightPx}px`, tabSize: 4, fontFamily }
@@ -320,13 +323,13 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
   return (
     <div className="flex min-h-0 flex-1 flex-col text-[13px]">
       {!isEditing && (
-        <div id="text-view-toolbar" role="toolbar" aria-label="Text tools" className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
+        <div id="text-view-toolbar" role="toolbar" aria-label={t('text.viewToolbar.label')} className="flex items-center gap-1 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
           <TextViewTools settings={viewSettings} actions={viewActions} />
           <span aria-hidden="true" className="mx-1 h-5 w-px shrink-0 bg-rule" />
           <div className="relative shrink-0">
             <label>
-              <span className="sr-only">Search text</span>
-              <svg aria-hidden="true" viewBox="0 0 16 16" className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+              <span className="sr-only">{t('text.search.label')}</span>
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
                 <circle cx="7" cy="7" r="4.5" />
                 <path d="m10.5 10.5 3 3" />
               </svg>
@@ -335,7 +338,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
                 ref={searchInputRef}
                 type="search"
                 dir="auto"
-                placeholder="Search text"
+                placeholder={t('text.search.label')}
                 value={searchText}
                 onChange={(event) => {
                   setSearchText(event.target.value)
@@ -347,11 +350,11 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
                     goToMatch(currentMatchPosition + (event.shiftKey ? -1 : 1))
                   }
                 }}
-                className={`${textControlClassName} w-56 pl-9 ${searchText === '' ? 'pr-16' : 'pr-3'}`}
+                className={`${textControlClassName} w-56 ps-9 ${searchText === '' ? 'pe-16' : 'pe-3'}`}
               />
             </label>
             {searchText === '' && (
-              <kbd aria-hidden="true" className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">
+              <kbd aria-hidden="true" className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 rounded-md border border-rule bg-paper px-1.5 py-0.5 font-sans text-[11px] text-ink-soft">
                 {searchShortcutLabel}
               </kbd>
             )}
@@ -361,20 +364,20 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
               <p id="search-match-status" aria-live="polite" className="shrink-0 whitespace-nowrap px-1 text-ink-soft">
                 {matchStatus}
               </p>
-              <IconButton label="Previous match" isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition - 1)}>
+              <IconButton id={`toolbar-${idFor('text.search.previous')}`} label={t('text.search.previous')} isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition - 1)}>
                 <Icon>
                   <path d="m6 15 6-6 6 6" />
                 </Icon>
               </IconButton>
-              <IconButton label="Next match" isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition + 1)}>
+              <IconButton id={`toolbar-${idFor('text.search.next')}`} label={t('text.search.next')} isDisabled={matchingLineNumbers.length === 0} onClick={() => goToMatch(currentMatchPosition + 1)}>
                 <Icon>
                   <path d="m6 9 6 6 6-6" />
                 </Icon>
               </IconButton>
             </>
           )}
-          <div className="ml-auto shrink-0" data-tip-align="end">
-            <IconButton label="Download" onClick={downloadCurrentText}>
+          <div className="ms-auto shrink-0" data-tip-align="end">
+            <IconButton id={`toolbar-${idFor('toolbar.download')}`} label={t('toolbar.download')} onClick={downloadCurrentText}>
               <Icon>
                 <path d="M12 4v11M7 11l5 5 5-5M5 20h14" />
               </Icon>
@@ -415,13 +418,13 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
 
       {largeFileWarning && <p id="large-file-warning" className="border-b border-rule bg-paper px-4 py-2">{largeFileWarning}</p>}
       {isEditing && isLargeForEditing && (
-        <p id="large-edit-warning" className="border-b border-rule bg-paper px-4 py-2">This file is large, so typing may feel slow and line numbers are hidden while editing. View mode stays fast.</p>
+        <p id="large-edit-warning" className="border-b border-rule bg-paper px-4 py-2">{t('text.largeEditWarning')}</p>
       )}
 
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
         <div className="flex min-h-0 w-full flex-1 flex-col overflow-hidden border-t-2 border-t-(--file-color)">
           {isEditing ? (
-            <div className="flex min-h-0 flex-1">
+            <div dir="ltr" className="flex min-h-0 flex-1">
               {showLineNumbers && (
                 <div id="line-number-gutter" ref={gutterRef} aria-hidden="true" className="shrink-0 select-none overflow-hidden border-r border-rule bg-paper text-right text-ink-soft tabular-nums" style={{ width: gutterWidthPx }}>
                   <pre className="pr-3" style={{ ...textStyle, paddingBlock: SHEET_VERTICAL_PADDING_PX }}>
@@ -436,7 +439,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
                 dir="auto"
                 spellCheck={false}
                 wrap={wrapLines ? 'soft' : 'off'}
-                aria-label="Edit text"
+                aria-label={t('text.editLabel')}
                 value={draftText}
                 onChange={(event) => changeDraft(event.target.value)}
                 onBlur={(event) => commitDraft(event.currentTarget.value)}
@@ -449,7 +452,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
               />
             </div>
           ) : (
-            <div id="text-view" ref={scrollContainerRef} tabIndex={0} aria-label="Text content, scrollable" className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
+            <div id="text-view" ref={scrollContainerRef} dir="ltr" tabIndex={0} aria-label={t('text.contentLabel')} className="min-h-0 flex-1 overflow-auto outline-none focus-visible:-outline-offset-2 focus-visible:outline-2 focus-visible:outline-(--file-color)">
               <div role="document" className={`relative ${wrapLines ? '' : 'w-max min-w-full'}`} style={{ ...textStyle, height: lineVirtualizer.getTotalSize() }}>
                 {lineVirtualizer.getVirtualItems().map((virtualLine) => {
                   const isCurrentMatch = hasSearch && virtualLine.index === currentMatchLineNumber
@@ -463,7 +466,7 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
                     >
                       {showLineNumbers && (
                         <span aria-hidden="true" className="sticky left-0 z-10 shrink-0 select-none border-r border-rule bg-paper pr-3 text-right text-ink-soft tabular-nums transition-colors duration-150 group-hover:text-ink" style={{ width: gutterWidthPx }}>
-                          {(virtualLine.index + 1).toLocaleString()}
+                          {(virtualLine.index + 1).toLocaleString('en')}
                         </span>
                       )}
                       <span dir="auto" className={`min-w-0 flex-1 px-4 text-start ${wrapLines ? 'whitespace-pre-wrap break-words' : 'whitespace-pre'}`}>
@@ -479,16 +482,16 @@ export default function TextViewer({ openedFile, mode, session: untypedSession, 
       </main>
 
       <footer id="text-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
-        <p id="line-count" className="whitespace-nowrap font-semibold">{(isEditing ? splitIntoLines(draftText).length : lines.length).toLocaleString()} lines</p>
-        <p id="character-count" className="text-ink-soft">{(isEditing ? draftText : currentText).length.toLocaleString()} characters</p>
-        {isEditing && <p id="word-count" className="text-ink-soft">{wordCount.toLocaleString()} words</p>}
-        <p id="encoding-label" className="text-ink-soft">Encoding: {readableText.encodingLabel}</p>
+        <p id="line-count" className="whitespace-nowrap font-semibold">{tp('text.status.lines', isEditing ? splitIntoLines(draftText).length : lines.length)}</p>
+        <p id="character-count" className="text-ink-soft">{tp('text.status.characters', (isEditing ? draftText : currentText).length)}</p>
+        {isEditing && <p id="word-count" className="text-ink-soft">{tp('text.status.words', wordCount)}</p>}
+        <p id="encoding-label" className="text-ink-soft">{t('text.status.encoding', { encoding: readableText.encodingLabel })}</p>
         {copyMessage && (
           <p id="copy-message" role="status" className="font-medium">
             {copyMessage}
           </p>
         )}
-        <p className="ml-auto text-ink-soft">{isEditing ? 'Changes are kept in your browser until you download' : `Press ${searchShortcutLabel} or / to search`}</p>
+        <p className="ms-auto text-ink-soft">{isEditing ? t('text.status.editingHint') : t('text.status.searchHint', { shortcut: searchShortcutLabel })}</p>
       </footer>
     </div>
   )

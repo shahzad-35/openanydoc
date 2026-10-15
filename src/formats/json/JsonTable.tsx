@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import DataTable, { CellInput, getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
 import type { CellPosition, DataTableHandle, SortState } from '../DataTable'
+import { isolateText, useT } from '../../i18n'
 import { isPlainObject } from './jsonModel'
 import type { JsonValue } from './jsonModel'
 
@@ -57,6 +58,7 @@ function collectColumnNames(rows: JsonValue[]) {
 // A JSON array of objects as a table: a row per item, a column per key. Cells can be edited in Edit mode; every change goes
 // to the viewer, which applies it to the document through the shared edit session.
 export default function JsonTable({ rows, originalRows, isEditable, searchText, onSetCell }: JsonTableProps) {
+  const { t, tp } = useT()
   const [sort, setSort] = useState<SortState>(null)
   const [pickedCell, setPickedCell] = useState<CellPosition | null>(null)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
@@ -189,7 +191,7 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
             ? (rowId, columnId, columnName) =>
                 editingCell?.rowId === rowId && editingCell.columnId === columnId ? (
                   <CellInput
-                    ariaLabel={`Edit ${columnName}, row ${rowId + 1}`}
+                    ariaLabel={t('json.table.editCell', { column: isolateText(columnName), row: rowId + 1 })}
                     draft={editingCell.draft}
                     onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
                     onFinish={finishEditing}
@@ -210,14 +212,14 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
           beginEditing(position)
         }}
         onKeyDown={handleGridKeyDown}
-        emptyMessage={isSearching ? 'No rows match your search.' : 'This array has no items.'}
+        emptyMessage={isSearching ? t('json.table.noRowsMatch') : t('json.table.emptyArray')}
       />
       <p aria-live="polite" className="flex flex-wrap gap-x-6 border-t border-rule bg-paper px-4 py-1 text-xs">
         <span className="font-semibold">
-          {isSearching ? `${visibleRowIds.length.toLocaleString()} of ${rows.length.toLocaleString()} rows` : `${rows.length.toLocaleString()} rows × ${columnNames.length.toLocaleString()} columns`}
+          {isSearching ? tp('json.table.rowsFound', rows.length, { shown: visibleRowIds.length }) : `${tp('json.table.rowCount', rows.length)} × ${tp('json.table.columnCount', columnNames.length)}`}
         </span>
-        {hasHiddenColumns && <span className="text-ink-soft">Showing the first {MAX_COLUMNS} columns; the tree and code views show everything.</span>}
-        {isEditable && <span className="text-ink-soft">Double-click or press Enter to edit. Text stays text; in other cells, numbers, true, false and null are read as JSON.</span>}
+        {hasHiddenColumns && <span className="text-ink-soft">{t('json.table.firstColumns', { count: MAX_COLUMNS })}</span>}
+        {isEditable && <span className="text-ink-soft">{t('json.table.editHint')}</span>}
       </p>
     </>
   )

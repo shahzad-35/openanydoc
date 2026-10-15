@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+/* Arabic letters only (the Latin text of an Arabic page uses the system fonts below). Bundled from our own domain: the browser
+   downloads a file only when a page shows Arabic text. */
+@import "@fontsource/ibm-plex-sans-arabic/arabic-400.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
+@import "@fontsource/ibm-plex-sans-arabic/arabic-700.css";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Neutral base: color on this page comes from the file types below. */
@@ -38,9 +44,17 @@
   --ext-10: #b0214f;
 }
 
-/* The display font has no Arabic letters, so Arabic pages use a system Arabic-capable stack for headings. */
+/* Arabic pages: IBM Plex Sans Arabic first, then the system Arabic-capable fonts. The Latin letters inside Arabic text fall
+   through to the system stacks. */
+html[lang="ar"] .type-h1,
+html[lang="ar"] .type-h3 {
+  letter-spacing: 0; /* tight tracking breaks the joins between Arabic letters */
+}
+
 html[lang="ar"] {
-  --font-display: system-ui, "Segoe UI", Tahoma, "Geeza Pro", "Noto Sans Arabic", sans-serif;
+  --font-display: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, "Geeza Pro", "Noto Sans Arabic", sans-serif;
+  --font-sans: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, "Geeza Pro", "Noto Sans Arabic", sans-serif;
+  --font-rounded: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, "Geeza Pro", "Noto Sans Arabic", sans-serif;
 }
 
 .dark {
@@ -191,7 +205,7 @@ html {
   content: attr(data-tip);
   position: absolute;
   top: calc(100% + 6px);
-  left: 0;
+  inset-inline-start: 0;
   z-index: 60;
   width: max-content;
   max-width: 18rem;
@@ -211,8 +225,8 @@ html {
 
 [data-tip-align="end"] [data-tip]::after,
 [data-tip][data-tip-align="end"]::after {
-  left: auto;
-  right: 0;
+  inset-inline-start: auto;
+  inset-inline-end: 0;
 }
 
 [data-tip]:not([aria-expanded="true"]):hover::after,

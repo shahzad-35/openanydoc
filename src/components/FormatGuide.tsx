@@ -1,3 +1,4 @@
+import { useT } from '../i18n'
 import { formatGuides } from '../pageContent'
 import type { Viewer } from '../viewers'
 import { PrivacySection } from './AboutSections'
@@ -5,7 +6,8 @@ import { PrivacySection } from './AboutSections'
 // The text that fills a format's own page under the drop zone: numbered steps, then that file type's questions and answers, then
 // the privacy note. Read from src/pageContent.ts, which the build also uses for the page's static HTML and FAQ data.
 export default function FormatGuide({ address, viewerId }: { address: string; viewerId: Viewer['id'] }) {
-  const guide = formatGuides[address]
+  const { locale } = useT()
+  const guide = formatGuides[locale][address]
   if (!guide) return null
   return (
     <div id="format-guide" data-file-type={viewerId} className="mx-auto max-w-3xl space-y-12">

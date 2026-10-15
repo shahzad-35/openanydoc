@@ -1,3 +1,5 @@
+import { translate, translatePlural } from '../../i18n'
+import type { Locale } from '../../i18n'
 import type { EditingModule, ExportOption } from '../registry'
 import type { TextViewActions, TextViewSettings } from './textViewTools'
 
@@ -29,11 +31,11 @@ export const createEmptyTextEdits = (): TextEdits => ({ text: null, changedLineC
 
 export const countTextChanges = (edits: unknown) => (edits as TextEdits).changedLineCount + ((edits as TextEdits).lineEnding ? 1 : 0)
 
-export function describeTextChanges(edits: unknown) {
+export function describeTextChanges(edits: unknown, locale: Locale) {
   const { changedLineCount, lineEnding } = edits as TextEdits
-  const changedLines = changedLineCount > 0 ? `${changedLineCount.toLocaleString()} changed ${changedLineCount === 1 ? 'line' : 'lines'}` : ''
-  const changedLineEnding = lineEnding ? `line endings ${lineEnding === '\r\n' ? 'CRLF' : 'LF'}` : ''
-  return [changedLines, changedLineEnding].filter(Boolean).join(', ')
+  const changedLines = changedLineCount > 0 ? translatePlural(locale, 'text.changes.lines', changedLineCount) : ''
+  const changedLineEnding = lineEnding ? translate(locale, 'text.changes.lineEnding', { type: lineEnding === '\r\n' ? 'CRLF' : 'LF' }) : ''
+  return [changedLines, changedLineEnding].filter(Boolean).join(locale === 'ar' ? '، ' : ', ')
 }
 
 // Lines that differ at the same position, plus the lines added or removed at the end.
@@ -69,7 +71,7 @@ export function buildTextDownload(edits: TextEdits, source: TextExportSource, in
 
 const downloadOption: ExportOption = {
   id: 'txt',
-  getLabel: () => 'Download TXT',
+  getLabel: (_exportSource, locale) => translate(locale, 'text.downloadLabel'),
   extension: null,
   getMimeType: () => 'text/plain;charset=utf-8',
   createFile: (edits, exportSource, settings) => buildTextDownload(edits as TextEdits, exportSource as TextExportSource, settings.includeByteOrderMark),
@@ -78,7 +80,7 @@ const downloadOption: ExportOption = {
 export const textEditingModule: EditingModule = {
   tools: [],
   downloadOption,
-  describeDownload: (exportSource) => `${(exportSource as TextExportSource).originalText.length.toLocaleString()} characters`,
+  describeDownload: (exportSource, locale) => translatePlural(locale, 'text.status.characters', (exportSource as TextExportSource).originalText.length),
   getDefaultByteOrderMark: (exportSource) => (exportSource as TextExportSource).hadByteOrderMark,
   components: null,
 }

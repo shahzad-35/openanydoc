@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import NewBadge from '../components/NewBadge'
 import changelog from '../data/changelog.json'
-import { useT } from '../i18n'
+import { localizePath, useT } from '../i18n'
 import { CHECK_ICON_PATH, changelogClasses, changelogIds } from './changelogMarkup'
 import type { Locale, MessageKey } from '../i18n'
 import { viewers } from '../viewers'
@@ -76,7 +76,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
   return (
     <div id={changelogIds.page} className={changelogClasses.page}>
       <header id={changelogIds.header} className={changelogClasses.header}>
-        <p>{pageLink(changelogIds.brandLink, '/', changelogClasses.brandLink, 'OpenAnyDoc')}</p>
+        <p>{pageLink(changelogIds.brandLink, localizePath(locale, '/'), changelogClasses.brandLink, 'OpenAnyDoc')}</p>
         <p>{pageLink(changelogIds.languageLink, `/${otherLocale(locale)}/changelog`, changelogClasses.languageLink, t('changelog.otherLanguage'), otherLocale(locale))}</p>
       </header>
       <main id={changelogIds.main} className={changelogClasses.main}>
@@ -110,7 +110,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
                     const viewer = viewerById.get(viewerId) as Viewer
                     return (
                       <span key={viewerId} className="inline-flex items-center">
-                        {pageLink(changelogIds.tryFormat(entry.version, viewerId), viewer.toolPath as string, changelogClasses.formatLink, t('viewer.name', { format: viewer.label }))}
+                        {pageLink(changelogIds.tryFormat(entry.version, viewerId), localizePath(locale, viewer.toolPath as string), changelogClasses.formatLink, t('viewer.name', { format: viewer.label }))}
                         <NewBadge viewerId={viewer.id} />
                       </span>
                     )
@@ -120,7 +120,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
             </li>
           ))}
         </ol>
-        {pageLink(changelogIds.backLink, '/', changelogClasses.backLink, t('changelog.home'))}
+        {pageLink(changelogIds.backLink, localizePath(locale, '/'), changelogClasses.backLink, t('changelog.home'))}
       </main>
     </div>
   )

@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import type { ComponentType, LazyExoticComponent } from 'react'
+import type { Locale } from '../i18n'
 import type { OpenedFile } from '../useFileIntake'
 import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
@@ -41,7 +42,7 @@ export type ExportSettings = { includeByteOrderMark: boolean }
 // The file the Download icon saves.
 export type ExportOption = {
   id: string
-  getLabel(exportSource: unknown): string
+  getLabel(exportSource: unknown, locale: Locale): string
   // null keeps the original file's extension.
   extension: string | null
   getMimeType(exportSource: unknown): string
@@ -54,7 +55,7 @@ export type EditingModule = {
   tools: EditorTool[]
   downloadOption: ExportOption
   // What the Download icon will save, for its tooltip, e.g. "visible rows (2)".
-  describeDownload(exportSource: unknown): string
+  describeDownload(exportSource: unknown, locale: Locale): string
   getDefaultByteOrderMark(exportSource: unknown): boolean
   // Extra toolbar content for this format (menus), drawn in the edit toolbar's single row after Undo and Redo.
   ToolbarContent?: ComponentType<{ selection: unknown; commands: unknown }>
@@ -65,7 +66,7 @@ export type FormatEditing = {
   createEmptyEdits: () => unknown
   countChanges: (edits: unknown) => number
   // "3 edited cells, 1 row deleted"; empty when nothing changed.
-  describeChanges: (edits: unknown) => string
+  describeChanges: (edits: unknown, locale: Locale) => string
   loadEditingModule: () => Promise<EditingModule>
 }
 
@@ -95,7 +96,7 @@ export const formatDefinitions: FormatDefinition[] = [
     editing: {
       createEmptyEdits: createEmptyCsvEdits,
       countChanges: (edits) => countCsvEdits(edits as CsvEdits),
-      describeChanges: (edits) => describeCsvChanges(edits as CsvEdits),
+      describeChanges: (edits, locale) => describeCsvChanges(edits as CsvEdits, locale),
       loadEditingModule: () => import('./csv/csvEditing').then((editingFile) => editingFile.csvEditingModule),
     },
   },
@@ -134,7 +135,7 @@ export const formatDefinitions: FormatDefinition[] = [
     editing: {
       createEmptyEdits: createEmptyExcelEdits,
       countChanges: (edits) => countExcelEdits(edits as ExcelEdits),
-      describeChanges: (edits) => describeExcelChanges(edits as ExcelEdits),
+      describeChanges: (edits, locale) => describeExcelChanges(edits as ExcelEdits, locale),
       loadEditingModule: () => import('./excel/excelEditing').then((editingFile) => editingFile.excelEditingModule),
     },
   },

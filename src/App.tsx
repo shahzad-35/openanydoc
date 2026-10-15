@@ -1,6 +1,7 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import DiscardEditsDialog from './components/DiscardEditsDialog'
-import { LocaleContext, getLocaleFromPath } from './i18n'
+import { LocaleContext, SwitchLanguageContext, getBrowserLocale, localizePath, splitLocalePath } from './i18n'
+import type { Locale } from './i18n'
 import FileViewPage from './pages/FileViewPage'
 import HomePage from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
@@ -8,21 +9,37 @@ import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 
-const isChangelogPath = (pathname: string) => /^\/(en|ar)\/changelog\/?$/.test(pathname)
+// What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
+// language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still
+// work. Addresses that only exist for an open file (/en/view-pdf ...) go home, because the file lives in memory.
+function resolveAddress(pathname: string) {
+  const { locale, path } = splitLocalePath(pathname)
+  if (isFileViewPath(path)) return localizePath(locale ?? getBrowserLocale(), '/')
+  if (locale) return pathname
+  return localizePath(path === '/' ? getBrowserLocale() : 'en', path)
+}
+
+// Shows the resolved address in the browser's address bar (replacing the entry, so Back never lands on the old address).
+function showResolvedAddress() {
+  const address = resolveAddress(window.location.pathname)
+  if (address !== window.location.pathname) window.history.replaceState(window.history.state, '', address + window.location.search + window.location.hash)
+  return address
+}
 
 export default function App() {
   const [openedFile, setOpenedFile] = useState<OpenedFile | null>(null)
   const [discardRequest, setDiscardRequest] = useState<{ answer: (shouldDiscard: boolean) => void } | null>(null)
   const [fileKey, setFileKey] = useState(0)
-  const [pathname, setPathname] = useState(window.location.pathname)
+  const [pathname, setPathname] = useState(showResolvedAddress)
   // The "what's new" banner is closed in React state only, so it comes back when the tab is reloaded. Do not persist this
   // (no cookies, localStorage, sessionStorage or IndexedDB) and do not send it anywhere: DECISIONS.md, "What's new".
   const [isBannerDismissed, setIsBannerDismissed] = useState(false)
   // A file another page asked to open here (the wrong-file redirect); React state only, never in the URL.
   const [handoffFile, setHandoffFile] = useState<File | null>(null)
-  const locale = getLocaleFromPath(pathname)
+  const { locale: addressLocale, path } = splitLocalePath(pathname)
+  const locale: Locale = addressLocale ?? 'en'
   const hasUnsavedEditsRef = useRef(false)
-  const openedFilePathRef = useRef('/')
+  const openedFilePathRef = useRef('/en')
 
   // Shows the "Discard your edits?" dialog and resolves with the visitor's choice.
   const confirmDiscardEdits = useCallback(
@@ -39,12 +56,11 @@ export default function App() {
     hasUnsavedEditsRef.current = hasUnsavedEdits
   }, [])
 
-  // The file only lives in memory, so an address that exists only for an open file (/view-pdf ...) never shows without one: a
-  // reload or Forward lands on home instead. A format's own address (/json-viewer ...) shows its page with the drop zone.
+  // The file only lives in memory, so an address that exists only for an open file (/en/view-pdf ...) never shows without one: a
+  // reload or Forward lands on home instead. A format's own address (/en/json-viewer ...) shows its page with the drop zone.
   useEffect(() => {
     function sendHomeIfOnFileViewPath() {
-      if (isFileViewPath(window.location.pathname)) window.history.replaceState(null, '', '/')
-      setPathname(window.location.pathname)
+      setPathname(showResolvedAddress())
     }
 
     function handleBrowserNavigation() {
@@ -70,7 +86,7 @@ export default function App() {
   function openFile(file: File, fileContents: ArrayBuffer) {
     setOpenedFile({ file, contents: fileContents })
     setFileKey((currentKey) => currentKey + 1)
-    openedFilePathRef.current = getFileViewPath(file.name)
+    openedFilePathRef.current = localizePath(locale, getFileViewPath(file.name))
     window.history.pushState({ fromHomePage: true }, '', openedFilePathRef.current)
     setPathname(openedFilePathRef.current)
   }
@@ -80,7 +96,7 @@ export default function App() {
   function replaceFile(file: File, fileContents: ArrayBuffer) {
     setOpenedFile({ file, contents: fileContents })
     setFileKey((currentKey) => currentKey + 1)
-    openedFilePathRef.current = getFileViewPath(file.name)
+    openedFilePathRef.current = localizePath(locale, getFileViewPath(file.name))
     window.history.replaceState(window.history.state, '', openedFilePathRef.current)
     setPathname(openedFilePathRef.current)
   }
@@ -91,7 +107,20 @@ export default function App() {
     window.scrollTo(0, 0)
   }
 
-  // The page language follows the address (/ar/changelog is right-to-left Arabic).
+  // The same page in the other language. With a file open the entry is replaced (not added) so Back still closes the file and
+  // the edits stay where they are; otherwise it is a normal visit.
+  function switchLanguage(newLocale: Locale) {
+    const newAddress = localizePath(newLocale, path)
+    if (openedFile) {
+      window.history.replaceState(window.history.state, '', newAddress)
+      openedFilePathRef.current = newAddress
+      setPathname(newAddress)
+    } else {
+      navigateTo(newAddress)
+    }
+  }
+
+  // The page language follows the address (/ar/... is right-to-left Arabic).
   useEffect(() => {
     document.documentElement.lang = locale
     document.documentElement.dir = locale === 'ar' ? 'rtl' : 'ltr'
@@ -109,42 +138,45 @@ export default function App() {
     if (window.history.state?.fromHomePage) {
       window.history.back()
     } else {
-      window.history.replaceState(null, '', '/')
-      setPathname('/')
+      const homeAddress = localizePath(locale, '/')
+      window.history.replaceState(null, '', homeAddress)
+      setPathname(homeAddress)
       setOpenedFile(null)
     }
   }
 
   return (
     <LocaleContext.Provider value={locale}>
-      {openedFile ? (
-        <FileViewPage
-          key={fileKey}
-          openedFile={openedFile}
-          onClose={closeFile}
-          onReplaceFile={replaceFile}
-          confirmDiscardEdits={confirmDiscardEdits}
-          onUnsavedEditsChange={reportUnsavedEdits}
-        />
-      ) : isChangelogPath(pathname) ? (
-        <Suspense fallback={null}>
-          <ChangelogPage onNavigate={navigateTo} />
-        </Suspense>
-      ) : (
-        <HomePage
-          onFileLoaded={openFile}
-          onNavigate={navigateTo}
-          toolViewer={findViewerByToolPath(pathname)}
-          isBannerDismissed={isBannerDismissed}
-          onDismissBanner={() => setIsBannerDismissed(true)}
-          handoffFile={handoffFile}
-          onHandoffConsumed={() => setHandoffFile(null)}
-          onOpenInViewer={openInViewer}
-        />
-      )}
-      {discardRequest && (
-        <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
-      )}
+      <SwitchLanguageContext.Provider value={switchLanguage}>
+        {openedFile ? (
+          <FileViewPage
+            key={fileKey}
+            openedFile={openedFile}
+            onClose={closeFile}
+            onReplaceFile={replaceFile}
+            confirmDiscardEdits={confirmDiscardEdits}
+            onUnsavedEditsChange={reportUnsavedEdits}
+          />
+        ) : path === '/changelog' ? (
+          <Suspense fallback={null}>
+            <ChangelogPage onNavigate={navigateTo} />
+          </Suspense>
+        ) : (
+          <HomePage
+            onFileLoaded={openFile}
+            onNavigate={navigateTo}
+            toolViewer={findViewerByToolPath(path)}
+            isBannerDismissed={isBannerDismissed}
+            onDismissBanner={() => setIsBannerDismissed(true)}
+            handoffFile={handoffFile}
+            onHandoffConsumed={() => setHandoffFile(null)}
+            onOpenInViewer={openInViewer}
+          />
+        )}
+        {discardRequest && (
+          <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
+        )}
+      </SwitchLanguageContext.Provider>
     </LocaleContext.Provider>
   )
 }

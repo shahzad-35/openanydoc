@@ -1,6 +1,7 @@
 // The helpers and hooks live beside the component because every format that uses the table needs them together.
 /* oxlint-disable react/only-export-components */
 import { useVirtualizer } from '@tanstack/react-virtual'
+import { isolateText, useT } from '../i18n'
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent, MouseEvent, ReactNode, RefObject } from 'react'
 
@@ -73,7 +74,7 @@ function countCellLines(cellText: string, columnWidthPx: number) {
   return lineCount
 }
 
-export const getRowNumberColumnWidthPx = (rowCount: number) => Math.max(ROW_NUMBER_MIN_WIDTH_PX, rowCount.toLocaleString().length * 10 + 36)
+export const getRowNumberColumnWidthPx = (rowCount: number) => Math.max(ROW_NUMBER_MIN_WIDTH_PX, rowCount.toLocaleString('en').length * 10 + 36)
 
 // Each column is as wide as its longest text among the first rows (and its header name), within a minimum and maximum.
 // Original text only, so a column does not change width while it is being edited. Rows run from `firstRowId` up to (not
@@ -161,7 +162,7 @@ export function SearchIcon() {
     <svg
       aria-hidden="true"
       viewBox="0 0 16 16"
-      className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft"
+      className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-ink-soft"
       fill="none"
       stroke="currentColor"
       strokeWidth="1.5"
@@ -323,6 +324,7 @@ export default function DataTable({
   emptyMessage,
   tableRef,
 }: DataTableProps) {
+  const { locale, t } = useT()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   // A row's height depends only on its original text and the column widths, so it is worked out once per row (measuring text is
   // slow) and kept while searching, sorting and editing change which rows are shown.
@@ -405,17 +407,18 @@ export default function DataTable({
   return (
     <div
       id="data-table"
+      dir="ltr"
       ref={scrollContainerRef}
       tabIndex={0}
       onKeyDown={onKeyDown}
-      aria-label={`${label} data, scrollable`}
+      aria-label={t('table.labelScrollable', { label })}
       className="min-h-0 flex-1 overflow-auto outline-none"
       style={{ scrollPaddingTop: ROW_HEIGHT_PX, scrollPaddingLeft: rowNumberWidthPx }}
     >
       <div
         id="data-grid"
         role="grid"
-        aria-label={`${label} data`}
+        aria-label={t('table.label', { label })}
         aria-rowcount={rowIds.length + 1}
         aria-colcount={columnIds.length + 1}
         style={{ minWidth: tableMinWidthPx }}
@@ -427,7 +430,7 @@ export default function DataTable({
             style={{ width: rowNumberWidthPx, height: ROW_HEIGHT_PX }}
           >
             <span aria-hidden="true">#</span>
-            <span className="sr-only">Row number</span>
+            <span className="sr-only">{t('table.rowNumber')}</span>
           </div>
           {columnIds.map((columnId, columnPosition) => {
             const columnName = columnNames[columnPosition]
@@ -459,7 +462,7 @@ export default function DataTable({
                       dir="auto"
                       aria-haspopup="menu"
                       aria-expanded={openMenuColumnId === columnId}
-                      title={`Column actions for ${columnName}`}
+                      title={t('table.columnActions', { name: isolateText(columnName) })}
                       onClick={(event) => onColumnNameClick(columnId, event.currentTarget)}
                       className="min-w-0 flex-1 cursor-pointer truncate text-start text-xs font-semibold hover:underline"
                     >
@@ -474,8 +477,8 @@ export default function DataTable({
                     id={`sort-column-${columnId}`}
                     type="button"
                     onClick={() => onCycleSort(columnId)}
-                    aria-label={`Sort by ${columnName}`}
-                    title={`Sort by ${columnName}`}
+                    aria-label={t('table.sortBy', { name: isolateText(columnName) })}
+                    title={t('table.sortBy', { name: isolateText(columnName) })}
                     className="grid size-5 pointer-coarse:size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 hover:bg-paper-raised"
                   >
                     <SortChevron direction={columnDirection} />
@@ -510,7 +513,7 @@ export default function DataTable({
                   } ${isNewRow ? 'italic' : ''} ${onRowHeaderClick ? 'cursor-pointer' : ''}`}
                   style={{ width: rowNumberWidthPx }}
                 >
-                  {getRowLabel ? getRowLabel(rowId) : isNewRow ? 'new' : (rowId + 1).toLocaleString()}
+                  {getRowLabel ? getRowLabel(rowId) : isNewRow ? t('table.newRow') : (rowId + 1).toLocaleString('en')}
                 </div>
                 {columnIds.map((columnId, columnPosition) => {
                   const isEdited = isCellEdited(rowId, columnId)
@@ -585,7 +588,7 @@ export default function DataTable({
                           {cellText}
                         </span>
                       ))}
-                      {isEdited && <span className="sr-only">(edited)</span>}
+                      {isEdited && <span className="sr-only">{t('table.edited')}</span>}
                     </div>
                   )
                 })}
@@ -594,7 +597,7 @@ export default function DataTable({
           })}
         </div>
       </div>
-      {rowIds.length === 0 && emptyMessage && <p className="p-6 text-ink-soft">{emptyMessage}</p>}
+      {rowIds.length === 0 && emptyMessage && <p dir={locale === 'ar' ? 'rtl' : 'ltr'} className="p-6 text-start text-ink-soft">{emptyMessage}</p>}
     </div>
   )
 }

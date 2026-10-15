@@ -5,10 +5,10 @@ import FormatGuide from '../components/FormatGuide'
 import DropPanel from '../components/DropPanel'
 import NewBadge from '../components/NewBadge'
 import WhatsNewBanner from '../components/WhatsNewBanner'
-import { useT } from '../i18n'
+import LanguageSwitcher from '../components/LanguageSwitcher'
+import { localizePath, useT } from '../i18n'
 import { pageSeo } from '../seo'
 import ThemeToggle from '../components/ThemeToggle'
-import { footerText } from '../content'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
@@ -21,15 +21,18 @@ const footerLinkClassName = 'text-ink-soft underline-offset-2 hover:text-ink hov
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
 
 // A link that changes the page without reloading (the app has no router package); modified clicks open a new tab as usual.
+// `path` is the address without its language ('/csv-viewer'); the link goes to the page in the current language.
 function PageLink({ id, path, onNavigate, children, className = 'underline underline-offset-2 hover:text-ink' }: { id?: string; path: string; onNavigate: (path: string) => void; children: ReactNode; className?: string }) {
+  const { locale } = useT()
+  const localizedPath = localizePath(locale, path)
   return (
     <a
       id={id}
-      href={path}
+      href={localizedPath}
       onClick={(event) => {
         if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
         event.preventDefault()
-        onNavigate(path)
+        onNavigate(localizedPath)
       }}
       className={className}
     >
@@ -59,7 +62,7 @@ export default function HomePage({
   onHandoffConsumed: () => void
   onOpenInViewer: (file: File, toolPath: string) => void
 }) {
-  const { t } = useT()
+  const { locale, t } = useT()
   // The animated backdrop is decoration: it is fetched only after the page has appeared and the browser is idle, and not at all
   // when the visitor asked their browser to save data.
   const [isBackdropWanted, setIsBackdropWanted] = useState(false)
@@ -77,20 +80,19 @@ export default function HomePage({
 
   const intake = useFileIntake({ acceptedExtensions: toolViewer?.extensions ?? supportedExtensions, onFileLoaded, handoffFile, onHandoffConsumed })
 
-  // Each format's page gets its own title and description for search results and browser tabs.
+  // Each page gets its own title and description, in the page's language, for search results and browser tabs.
+  const seo = pageSeo[locale][toolViewer?.toolPath ?? '/']
   useEffect(() => {
-    if (!toolViewer) return
     const previousTitle = document.title
     const descriptionTag = document.querySelector('meta[name="description"]')
     const previousDescription = descriptionTag?.getAttribute('content') ?? ''
-    const seo = pageSeo[toolViewer.toolPath as string]
     document.title = seo.title
     descriptionTag?.setAttribute('content', seo.description)
     return () => {
       document.title = previousTitle
       descriptionTag?.setAttribute('content', previousDescription)
     }
-  }, [toolViewer])
+  }, [seo])
 
   return (
     <div id="home-page" {...intake.dropTargetProps} className="relative min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink">
@@ -108,15 +110,18 @@ export default function HomePage({
       <a
         id="skip-to-content-link"
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
       >
-        Skip to content
+        {t('skip.toContent')}
       </a>
 
       <div className="relative z-10">
         <header id="site-header" className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5">
           <p id="site-brand" className="type-h3">{toolViewer ? <PageLink id="brand-home-link" path="/" onNavigate={onNavigate}>OpenAnyDoc</PageLink> : 'OpenAnyDoc'}</p>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher />
+            <ThemeToggle />
+          </div>
         </header>
 
         {/* What's new is announced on the home page only, not on a format's own page. */}
@@ -124,8 +129,8 @@ export default function HomePage({
 
         <main id="main" className="mx-auto max-w-5xl px-4 pb-20">
           <section id="hero" className="flex min-h-[calc(100dvh-6rem)] flex-col justify-center py-8 text-center">
-            <h1 id="page-heading" className="type-h1 mx-auto max-w-3xl text-balance">{toolViewer ? pageSeo[toolViewer.toolPath as string].heading : pageSeo['/'].heading}</h1>
-            <p id="page-intro" className="mb-8 mt-3 text-ink-soft">{toolViewer ? pageSeo[toolViewer.toolPath as string].intro : pageSeo['/'].intro}</p>
+            <h1 id="page-heading" className="type-h1 mx-auto max-w-3xl text-balance">{seo.heading}</h1>
+            <p id="page-intro" className="mb-8 mt-3 text-ink-soft">{seo.intro}</p>
             <DropPanel
               intake={intake}
               shownViewers={toolViewer ? [toolViewer] : viewers}
@@ -144,7 +149,7 @@ export default function HomePage({
           <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 text-sm md:grid-cols-[2fr_1fr_1fr]">
             <div>
               <p className="type-h3">OpenAnyDoc</p>
-              <p className="mt-2 max-w-xs text-ink-soft">{footerText}</p>
+              <p className="mt-2 max-w-xs text-ink-soft">{t('footer.text')}</p>
             </div>
             <nav id="footer-viewers" aria-label={t('footer.viewers')}>
               <h2 className="font-semibold">{t('footer.viewers')}</h2>
@@ -154,7 +159,7 @@ export default function HomePage({
                   .map((viewer) => (
                     <li key={viewer.id} className="flex items-center">
                       <PageLink id={`footer-link-${viewer.id}`} path={viewer.toolPath as string} onNavigate={onNavigate} className={footerLinkClassName}>
-                        {viewer.label} viewer
+                        {t('viewer.name', { format: viewer.label })}
                       </PageLink>
                       <NewBadge viewerId={viewer.id} />
                     </li>
@@ -173,7 +178,7 @@ export default function HomePage({
                 )}
                 {!toolViewer && (
                   <li>
-                    <PageLink id="footer-link-changelog" path="/en/changelog" onNavigate={onNavigate} className={footerLinkClassName}>
+                    <PageLink id="footer-link-changelog" path="/changelog" onNavigate={onNavigate} className={footerLinkClassName}>
                       {t('footer.whatsNew')}
                     </PageLink>
                   </li>

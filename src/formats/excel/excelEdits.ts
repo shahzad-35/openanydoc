@@ -2,6 +2,8 @@
 // these for the change counter, and the registry must not pull SheetJS into the pages that never open a workbook.
 
 import type { Style } from 'exceljs'
+import { translate, translatePlural } from '../../i18n'
+import type { Locale } from '../../i18n'
 import type { CellObject } from 'xlsx'
 
 // What the toolbar can change about a cell, and what is read from and saved to .xlsx files. Colours are always { argb }.
@@ -65,11 +67,7 @@ export function countExcelEdits(edits: ExcelEdits) {
   return count
 }
 
-function pluralize(count: number, singular: string, plural: string) {
-  return `${count.toLocaleString()} ${count === 1 ? singular : plural}`
-}
-
-export function describeExcelChanges(edits: ExcelEdits) {
+export function describeExcelChanges(edits: ExcelEdits, locale: Locale = 'en') {
   let cells = 0
   let rowsAdded = 0
   let rowsDeleted = 0
@@ -85,15 +83,14 @@ export function describeExcelChanges(edits: ExcelEdits) {
     mergeChanges += sheetEdits.mergeChanges
   }
   return [
-    cells > 0 && pluralize(cells, 'edited cell', 'edited cells'),
-    rowsAdded > 0 && pluralize(rowsAdded, 'row added', 'rows added'),
-    rowsDeleted > 0 && pluralize(rowsDeleted, 'row deleted', 'rows deleted'),
-    columnsAdded > 0 && pluralize(columnsAdded, 'column added', 'columns added'),
-    columnsDeleted > 0 && pluralize(columnsDeleted, 'column deleted', 'columns deleted'),
-    mergeChanges > 0 && pluralize(mergeChanges, 'merge change', 'merge changes'),
-    edits.sheetChangeCount > 0 && pluralize(edits.sheetChangeCount, 'sheet change', 'sheet changes'),
+    cells > 0 && translatePlural(locale, 'excel.status.changeCells', cells),
+    rowsAdded > 0 && translatePlural(locale, 'excel.status.changeRowsAdded', rowsAdded),
+    rowsDeleted > 0 && translatePlural(locale, 'excel.status.changeRowsDeleted', rowsDeleted),
+    columnsAdded > 0 && translatePlural(locale, 'excel.status.changeColumnsAdded', columnsAdded),
+    columnsDeleted > 0 && translatePlural(locale, 'excel.status.changeColumnsDeleted', columnsDeleted),
+    mergeChanges > 0 && translatePlural(locale, 'excel.status.changeMerges', mergeChanges),
+    edits.sheetChangeCount > 0 && translatePlural(locale, 'excel.status.changeSheets', edits.sheetChangeCount),
   ]
     .filter(Boolean)
-    .join(', ')
+    .join(translate(locale, 'excel.status.changeSeparator'))
 }
-

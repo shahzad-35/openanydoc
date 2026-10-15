@@ -185,7 +185,7 @@ function expect(condition, message) {
 const bannerText = () => evaluate(`document.querySelector('[role=region]')?.innerText ?? null`)
 
 await test('home page shows the banner, the badges and takes no focus', async () => {
-  await openPage('/')
+  await openPage('/en')
   const text = await bannerText()
   expect(text?.includes('New') && text.includes('You can now open and edit CSV, TXT, JSON, and Excel files'), `banner text was: ${text}`)
   expect(await evaluate(`document.activeElement === document.body`), 'the banner took focus')
@@ -194,7 +194,7 @@ await test('home page shows the banner, the badges and takes no focus', async ()
 })
 
 await test('the banner closes with the keyboard and stays closed while navigating in the tab', async () => {
-  await openPage('/')
+  await openPage('/en')
   for (let attempt = 0; attempt < 40; attempt++) {
     if (await evaluate(`document.activeElement?.getAttribute('aria-label') === 'Close announcement'`)) break
     await pressKey('Tab', 'Tab', 9)
@@ -202,42 +202,42 @@ await test('the banner closes with the keyboard and stays closed while navigatin
   expect(await evaluate(`document.activeElement?.getAttribute('aria-label') === 'Close announcement'`), 'could not reach the close button with Tab')
   await pressKey('Enter', 'Enter', 13, '\r')
   await waitFor(`!document.querySelector('[role=region]')`, 'the banner to close')
-  await evaluate(`document.querySelector('footer nav a[href="/json-viewer"]').click()`)
-  await waitFor(`location.pathname === '/json-viewer'`, 'navigation to the JSON page')
+  await evaluate(`document.querySelector('footer nav a[href="/en/json-viewer"]').click()`)
+  await waitFor(`location.pathname === '/en/json-viewer'`, 'navigation to the JSON page')
   expect((await bannerText()) === null, 'a banner showed on the JSON page')
   const crossLinks = await evaluate(`[...document.querySelectorAll('p')].find((p) => p.innerText.startsWith('Also works with'))?.innerText ?? null`)
   expect(crossLinks && crossLinks.includes('CSV') && crossLinks.includes('Excel') && !crossLinks.includes('JSON'), `cross-format line was: ${crossLinks}`)
 })
 
 await test('a reload brings the banner back, so nothing was remembered', async () => {
-  await openPage('/json-viewer')
+  await openPage('/en/json-viewer')
   expect((await bannerText()) === null, 'the announcement banner showed on a format page: it belongs on the home page only')
   expect(await evaluate(`document.querySelector('#footer-link-changelog') === null`), 'the changelog link showed on a format page')
-  await openPage('/')
+  await openPage('/en')
   expect(await evaluate(`document.querySelector('#footer-link-changelog') !== null`), 'the changelog link is missing on the home page')
   expect((await bannerText()) !== null, 'the banner did not come back after the reload')
 })
 
 await test('a JSON file dropped on the CSV page is offered the JSON viewer, with the same File', async () => {
-  await openPage('/csv-viewer')
+  await openPage('/en/csv-viewer')
   await chooseFile(sampleJson)
   await waitFor(`document.body.innerText.includes('This looks like a JSON file.')`, 'the redirect offer')
   expect(await evaluate(`document.body.innerText.includes("can't be opened here")`) === false, 'the plain rejection was shown too')
   await evaluate(`[...document.querySelectorAll('button')].find((button) => button.innerText === 'Open it in the JSON viewer').click()`)
-  await waitFor(`location.pathname === '/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open in the JSON viewer')
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open in the JSON viewer')
   expect(!(await evaluate('location.href')).includes('sample'), 'the file name reached the URL')
   expect((await bannerText()) === null, 'the banner showed on a file page')
 })
 
 await test('a file nobody opens keeps the friendly rejection', async () => {
-  await openPage('/csv-viewer')
+  await openPage('/en/csv-viewer')
   await chooseFile(unknownFile)
-  await waitFor(`document.body.innerText.includes("notes.docx can't be opened here")`, 'the rejection message')
+  await waitFor(`document.body.innerText.replace(/[\u2066-\u2069]/g, '').includes("notes.docx can't be opened here")`, 'the rejection message')
   expect(!(await evaluate(`document.body.innerText.includes('This looks like')`)), 'a redirect was offered for an unregistered type')
 })
 
 await test('saving a file shows one dismissible tip', async () => {
-  await openPage('/json-viewer')
+  await openPage('/en/json-viewer')
   await chooseFile(sampleJson)
   await waitFor(`document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open')
   const downloadButton = `document.querySelector('button[aria-label="Download"]')`
@@ -253,7 +253,7 @@ await test('after the window ends there are no badges and no banner', async () =
     source: `(() => { const RealDate = Date; class FakeDate extends RealDate { constructor(...args) { if (args.length) super(...args); else super(${SAVED_TEST_YEAR_START}) } static now() { return ${SAVED_TEST_YEAR_START} } }; window.Date = FakeDate })()`,
   })
   try {
-    await openPage('/')
+    await openPage('/en')
     expect((await bannerText()) === null, 'the banner showed after the window ended')
     expect(await evaluate(`document.querySelectorAll('footer nav [data-file-type]').length === 0`), 'badges showed after the window ended')
   } finally {
@@ -278,7 +278,7 @@ for (const locale of ['en', 'ar']) {
 await test('home and format pages carry their own title, description, canonical and structured data', async () => {
   const titles = new Set()
   const questionLists = new Map()
-  for (const address of ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer']) {
+  for (const address of ['en', 'ar'].flatMap((locale) => ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer'].map((page) => `/${locale}${page}`))) {
     const html = await (await fetch(`${siteOrigin}${address}`)).text()
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
@@ -290,6 +290,8 @@ await test('home and format pages carry their own title, description, canonical 
     const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
     expect(structuredData.some((item) => item['@type'] === 'WebApplication'), `${address}: WebApplication data is missing`)
     expect(!titles.has(title), `${address}: the title is used on another page`)
+    expect(html.includes(`<html lang="${address.slice(1, 3)}" dir="${address.startsWith('/ar') ? 'rtl' : 'ltr'}">`), `${address}: lang and dir are missing from the static HTML`)
+    expect(html.includes('hreflang="ar"') && html.includes('hreflang="en"') && html.includes('hreflang="x-default"'), `${address}: hreflang alternates are missing`)
     titles.add(title)
     const faq = structuredData.find((item) => item['@type'] === 'FAQPage')
     expect(faq, `${address}: there is no FAQPage data`)
@@ -333,13 +335,13 @@ XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['Name', 'Qty'],
 fs.writeFileSync(sampleWorkbook, XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }))
 
 for (const [name, address, file, readyElement] of [
-  ['CSV', '/csv-viewer', sampleCsv, '#data-table'],
-  ['TXT', '/txt-viewer', sampleText, '#text-view'],
-  ['JSON', '/json-viewer', sampleJson, '#json-tree'],
-  ['Excel', '/excel-viewer', sampleWorkbook, '#data-table'],
+  ['CSV', '/en/csv-viewer', sampleCsv, '#data-table'],
+  ['TXT', '/en/txt-viewer', sampleText, '#text-view'],
+  ['JSON', '/en/json-viewer', sampleJson, '#json-tree'],
+  ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table'],
 ]) {
-  await test(`${name}: every field has an id and no id repeats (page, view mode, edit mode, an open menu)`, async () => {
-    await openPage(address)
+  for (const locale of ['en', 'ar']) await test(`${name} (${locale}): every field has an id and no id repeats (page, view mode, edit mode, an open menu)`, async () => {
+    await openPage(address.replace('/en/', `/${locale}/`))
     await expectCleanIds(`${name} drop page`)
     await chooseFile(file)
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
@@ -353,7 +355,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/', '/en/changelog', '/ar/changelog']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -362,9 +364,78 @@ for (const address of ['/', '/en/changelog', '/ar/changelog']) {
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en/changelog', '/ar/changelog', '/json-viewer', '/excel-viewer']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
+})
+
+
+// ---------------------------------------------------------------- languages
+
+async function setBrowserLanguage(acceptLanguage) {
+  await send('Emulation.setUserAgentOverride', { userAgent: await evaluate('navigator.userAgent'), acceptLanguage })
+}
+
+await test('/ goes to /ar for an Arabic browser and to /en otherwise; old addresses go to /en', async () => {
+  await setBrowserLanguage('ar-SA,ar;q=0.9,en;q=0.5')
+  try {
+    await openPage('/')
+    expect((await evaluate('location.pathname')) === '/ar', `an Arabic browser landed on ${await evaluate('location.pathname')}`)
+    expect(await evaluate(`document.documentElement.lang === 'ar' && document.documentElement.dir === 'rtl'`), 'lang and dir are not ar and rtl')
+  } finally {
+    await setBrowserLanguage('en-US,en;q=0.9')
+  }
+  await openPage('/')
+  expect((await evaluate('location.pathname')) === '/en', `an English browser landed on ${await evaluate('location.pathname')}`)
+  expect(await evaluate(`document.documentElement.lang === 'en' && document.documentElement.dir === 'ltr'`), 'lang and dir are not en and ltr')
+  for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer']) {
+    await openPage(`/${page}`)
+    expect((await evaluate('location.pathname')) === `/en/${page}`, `/${page} landed on ${await evaluate('location.pathname')}`)
+  }
+})
+
+await test('the language switch keeps the page and an open file with its edits', async () => {
+  await openPage('/en/csv-viewer')
+  await chooseFile(sampleCsv)
+  await waitFor(`document.querySelector('#data-table')`, 'the CSV to show')
+  await evaluate(`document.querySelector('#mode-edit-button').click()`)
+  await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled)')`, 'the edit toolbar')
+  expect((await evaluate('location.pathname')) === '/en/csv-viewer', 'the open file is not at /en/csv-viewer')
+  await evaluate(`document.querySelector('#language-switch-link').click()`)
+  await waitFor(`document.documentElement.dir === 'rtl'`, 'the page to turn right-to-left')
+  expect((await evaluate('location.pathname')) === '/ar/csv-viewer', `the address is ${await evaluate('location.pathname')}`)
+  expect(await evaluate(`document.querySelector('#data-table')?.getAttribute('dir') === 'ltr'`), 'the table is not left-to-right')
+  expect(await evaluate(`document.querySelector('#undo-button')?.getAttribute('aria-label') === 'تراجع'`), 'the toolbar is not in Arabic')
+  expect(await evaluate(`getComputedStyle(document.body).fontFamily.includes('IBM Plex Sans Arabic')`), 'the Arabic font is not in use')
+  await evaluate(`document.querySelector('#language-switch-link').click()`)
+  await waitFor(`document.documentElement.dir === 'ltr'`, 'the page to turn back')
+  expect(await evaluate(`document.querySelector('#data-table') !== null`), 'the open file was lost by switching language')
+})
+
+await test('an Arabic CSV without a UTF-8 BOM offers the Excel copy, in both languages', async () => {
+  const arabicCsv = path.join(scratchFolder, 'arabic.csv')
+  fs.writeFileSync(arabicCsv, 'name,city\nأحمد,الرياض\n')
+  const arabicCsvWithBom = path.join(scratchFolder, 'arabic-bom.csv')
+  fs.writeFileSync(arabicCsvWithBom, Buffer.concat([Buffer.from([0xef, 0xbb, 0xbf]), Buffer.from('name,city\nأحمد,الرياض\n')]))
+  for (const locale of ['en', 'ar']) {
+    await openPage(`/${locale}/csv-viewer`)
+    await chooseFile(arabicCsv)
+    await waitFor(`document.querySelector('#data-table')`, 'the Arabic CSV to show')
+    expect(await evaluate(`document.querySelector('#download-excel-copy-button') !== null`), `${locale}: the Excel copy button is missing`)
+    await evaluate(`window.__blobs = []; const make = URL.createObjectURL; URL.createObjectURL = (blob) => { window.__blobs.push(blob); return make(blob) }`)
+    await evaluate(`document.querySelector('#download-excel-copy-button').click()`)
+    await waitFor(`window.__blobs.length === 1`, 'the copy to be made')
+    const firstBytes = await evaluate(`window.__blobs[0].arrayBuffer().then((buffer) => [...new Uint8Array(buffer).slice(0, 3)].join(','))`)
+    expect(firstBytes === '239,187,191', `${locale}: the copy starts with ${firstBytes}, not a UTF-8 BOM`)
+    await openPage(`/${locale}/csv-viewer`)
+    await chooseFile(arabicCsvWithBom)
+    await waitFor(`document.querySelector('#data-table')`, 'the BOM CSV to show')
+    expect(await evaluate(`document.querySelector('#download-excel-copy-button') === null`), `${locale}: the button shows for a file that already has a BOM`)
+    await openPage(`/${locale}/csv-viewer`)
+    await chooseFile(sampleCsv)
+    await waitFor(`document.querySelector('#data-table')`, 'the ASCII CSV to show')
+    expect(await evaluate(`document.querySelector('#download-excel-copy-button') === null`), `${locale}: the button shows for an ASCII file`)
+  }
 })
 
 // ---------------------------------------------------------------- report

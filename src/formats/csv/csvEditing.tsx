@@ -2,14 +2,15 @@
 /* oxlint-disable react/only-export-components */
 import { useEffect, useRef, useState } from 'react'
 import type { FocusEventHandler, KeyboardEventHandler } from 'react'
-import Papa from 'papaparse'
 import { compactSecondaryButtonClassName, textControlClassName } from '../../buttonStyles'
 import FindReplaceBar from '../../components/FindReplaceBar'
 import ModalDialog from '../../components/ModalDialog'
+import { isolateLeftToRight, translate, translatePlural, useT } from '../../i18n'
+import type { Locale } from '../../i18n'
 import { Icon, IconButton, IconMenuButton } from '../../components/ToolbarControls'
 import { CellInput } from '../DataTable'
 import type { EditingModule, ExportOption } from '../registry'
-import { getCellText } from './csvCells'
+import { buildCsvText } from './csvCells'
 import type { CellPosition, CsvEdits, CsvExportSource, CsvSelection, CsvViewerCommands } from './csvCells'
 
 // Everything in this file is loaded only when Edit is first used.
@@ -19,6 +20,7 @@ const hasSelectedCell = (selection: unknown) => (selection as CsvSelection)?.cel
 // The icons in the page's edit toolbar, after Undo, Redo and Revert all: rows, columns, the selected cell, find and clean-up.
 // Every action changes cell text or structure, so each one is saved in the downloaded file.
 function CsvToolbar({ selection, commands }: { selection: unknown; commands: unknown }) {
+  const { t, idFor } = useT()
   const getActions = (commands as CsvViewerCommands | null)?.getActions
   if (!getActions) return null
   const csvSelection = selection as CsvSelection
@@ -28,12 +30,13 @@ function CsvToolbar({ selection, commands }: { selection: unknown; commands: unk
     <>
       {divider}
       <IconMenuButton
-        label="Rows"
+        id={`toolbar-${idFor('csv.toolbar.rows')}`}
+        label={t('csv.toolbar.rows')}
         isDisabled={!hasCell}
         items={[
-          { label: 'Insert row above', onSelect: () => getActions().insertRow('above') },
-          { label: 'Insert row below', onSelect: () => getActions().insertRow('below') },
-          { label: 'Delete row', onSelect: () => getActions().deleteRow() },
+          { id: idFor('csv.toolbar.insertRowAbove', true), label: t('csv.toolbar.insertRowAbove'), onSelect: () => getActions().insertRow('above') },
+          { id: idFor('csv.toolbar.insertRowBelow', true), label: t('csv.toolbar.insertRowBelow'), onSelect: () => getActions().insertRow('below') },
+          { id: idFor('csv.toolbar.deleteRow', true), label: t('csv.toolbar.deleteRow'), onSelect: () => getActions().deleteRow() },
         ]}
       >
         <Icon>
@@ -43,12 +46,13 @@ function CsvToolbar({ selection, commands }: { selection: unknown; commands: unk
         </Icon>
       </IconMenuButton>
       <IconMenuButton
-        label="Columns"
+        id={`toolbar-${idFor('csv.toolbar.columns')}`}
+        label={t('csv.toolbar.columns')}
         isDisabled={!hasCell}
         items={[
-          { label: 'Insert column left', onSelect: () => getActions().insertColumn('left') },
-          { label: 'Insert column right', onSelect: () => getActions().insertColumn('right') },
-          { label: 'Delete column', onSelect: () => getActions().deleteColumn(), isDisabled: (csvSelection?.columnCount ?? 0) < 2 },
+          { id: idFor('csv.toolbar.insertColumnLeft', true), label: t('csv.toolbar.insertColumnLeft'), onSelect: () => getActions().insertColumn('left') },
+          { id: idFor('csv.toolbar.insertColumnRight', true), label: t('csv.toolbar.insertColumnRight'), onSelect: () => getActions().insertColumn('right') },
+          { id: idFor('csv.toolbar.deleteColumn', true), label: t('csv.toolbar.deleteColumn'), onSelect: () => getActions().deleteColumn(), isDisabled: (csvSelection?.columnCount ?? 0) < 2 },
         ]}
       >
         <Icon>
@@ -58,13 +62,13 @@ function CsvToolbar({ selection, commands }: { selection: unknown; commands: unk
         </Icon>
       </IconMenuButton>
       {divider}
-      <IconButton label="Clear cell" isDisabled={!hasCell} onClick={() => getActions().clearCell()}>
+      <IconButton id={`toolbar-${idFor('csv.toolbar.clearCell')}`} label={t('csv.toolbar.clearCell')} isDisabled={!hasCell} onClick={() => getActions().clearCell()}>
         <Icon>
           <path d="m7 21-4-4 11-11 7 7-6 6H7Z" />
           <path d="M9 11l6 6" />
         </Icon>
       </IconButton>
-      <IconButton label="Revert cell to the original" isDisabled={csvSelection?.isEdited !== true} onClick={() => getActions().revertCell()}>
+      <IconButton id={`toolbar-${idFor('csv.toolbar.revertCell')}`} label={t('csv.toolbar.revertCell')} isDisabled={csvSelection?.isEdited !== true} onClick={() => getActions().revertCell()}>
         <Icon>
           <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
           <path d="M3 3v5h5" />
@@ -72,22 +76,23 @@ function CsvToolbar({ selection, commands }: { selection: unknown; commands: unk
       </IconButton>
       {divider}
       <IconMenuButton
-        label="Clean up the column or the table"
+        id={`toolbar-${idFor('csv.toolbar.cleanUp')}`}
+        label={t('csv.toolbar.cleanUp')}
         isDisabled={csvSelection === null}
         items={[
-          { label: 'Column: UPPERCASE', onSelect: () => getActions().transformColumn('upper'), isDisabled: !hasCell },
-          { label: 'Column: lowercase', onSelect: () => getActions().transformColumn('lower'), isDisabled: !hasCell },
-          { label: 'Column: Capitalize Each Word', onSelect: () => getActions().transformColumn('capitalize'), isDisabled: !hasCell },
-          { label: 'Column: trim extra spaces', onSelect: () => getActions().transformColumn('trim'), isDisabled: !hasCell },
-          { label: 'Column: fill empty cells down', onSelect: () => getActions().fillColumnDown(), isDisabled: !hasCell },
-          { label: 'Table: trim extra spaces', onSelect: () => getActions().trimAllCells() },
-          { label: 'Table: remove empty rows', onSelect: () => getActions().removeEmptyRows() },
-          { label: 'Table: remove duplicate rows', onSelect: () => getActions().removeDuplicateRows() },
+          { id: idFor('csv.toolbar.columnUpper', true), label: t('csv.toolbar.columnUpper'), onSelect: () => getActions().transformColumn('upper'), isDisabled: !hasCell },
+          { id: idFor('csv.toolbar.columnLower', true), label: t('csv.toolbar.columnLower'), onSelect: () => getActions().transformColumn('lower'), isDisabled: !hasCell },
+          { id: idFor('csv.toolbar.columnCapitalize', true), label: t('csv.toolbar.columnCapitalize'), onSelect: () => getActions().transformColumn('capitalize'), isDisabled: !hasCell },
+          { id: idFor('csv.toolbar.columnTrim', true), label: t('csv.toolbar.columnTrim'), onSelect: () => getActions().transformColumn('trim'), isDisabled: !hasCell },
+          { id: idFor('csv.toolbar.columnFillDown', true), label: t('csv.toolbar.columnFillDown'), onSelect: () => getActions().fillColumnDown(), isDisabled: !hasCell },
+          { id: idFor('csv.toolbar.tableTrim', true), label: t('csv.toolbar.tableTrim'), onSelect: () => getActions().trimAllCells() },
+          { id: idFor('csv.toolbar.tableRemoveEmpty', true), label: t('csv.toolbar.tableRemoveEmpty'), onSelect: () => getActions().removeEmptyRows() },
+          { id: idFor('csv.toolbar.tableRemoveDuplicates', true), label: t('csv.toolbar.tableRemoveDuplicates'), onSelect: () => getActions().removeDuplicateRows() },
         ]}
       >
         <span className="text-[11px] font-semibold">Aa</span>
       </IconMenuButton>
-      <IconButton label="Find and replace" isDisabled={csvSelection === null} onClick={() => (commands as CsvViewerCommands).toggleFindReplace()}>
+      <IconButton id={`toolbar-${idFor('find.label')}`} label={t('find.label')} isDisabled={csvSelection === null} onClick={() => (commands as CsvViewerCommands).toggleFindReplace()}>
         <Icon>
           <circle cx="11" cy="11" r="6" />
           <path d="m20 20-4.5-4.5" />
@@ -98,26 +103,20 @@ function CsvToolbar({ selection, commands }: { selection: unknown; commands: unk
   )
 }
 
-// The file the Download icon saves: the header (when the file has one) and the rows the search leaves, in the current sort
-// order, with the edits applied and the deleted and added columns taken into account.
+// The file the Download icon saves: see buildCsvText for what it holds.
 const downloadOption: ExportOption = {
   id: 'csv',
-  getLabel: (exportSource) => `Download ${(exportSource as CsvExportSource).tableFormat.label}`,
+  getLabel: (exportSource, locale) => translate(locale, 'csv.download.label', { format: isolateLeftToRight((exportSource as CsvExportSource).tableFormat.label) }),
   extension: null,
   getMimeType: (exportSource) => `${(exportSource as CsvExportSource).tableFormat.mimeType};charset=utf-8`,
   createFile(edits, exportSource, settings) {
-    const source = exportSource as CsvExportSource
-    const dataRows = source.visibleRowIds.map((rowId) =>
-      source.displayColumnIds.map((columnId) => getCellText(source.rows, edits as CsvEdits, rowId, columnId)),
-    )
-    const headerRows = source.hasHeaderRow ? [source.displayColumnIds.map((columnId) => getCellText(source.rows, edits as CsvEdits, 0, columnId))] : []
-    const csvText = Papa.unparse([...headerRows, ...dataRows], { delimiter: source.detectedDelimiter })
+    const csvText = buildCsvText(edits as CsvEdits, exportSource as CsvExportSource)
     return settings.includeByteOrderMark ? `\uFEFF${csvText}` : csvText
   },
 }
 
-function describeDownload(exportSource: unknown) {
-  return `visible rows (${(exportSource as CsvExportSource).visibleRowIds.length.toLocaleString()})`
+function describeDownload(exportSource: unknown, locale: Locale) {
+  return translatePlural(locale, 'csv.download.rows', (exportSource as CsvExportSource).visibleRowIds.length)
 }
 
 // Excel needs a byte order mark to show Arabic and other non-ASCII text correctly in a CSV.
@@ -137,11 +136,13 @@ type EditBarProps = {
 
 // The cell address and the value field that edits the selected cell.
 function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, onBlur }: EditBarProps) {
+  const { t } = useT()
   return (
     <>
       <p
         id="selected-cell-label"
-        aria-label="Selected cell"
+        dir="ltr"
+        aria-label={t('csv.selectedCell')}
         className="control-shape solid-box flex min-h-8 pointer-coarse:min-h-11 min-w-16 shrink-0 items-center justify-center border-rule bg-paper-raised px-3 font-mono text-sm"
       >
         {selectedCellLabel}
@@ -149,8 +150,8 @@ function EditBar({ selectedCellLabel, isDisabled, value, onChange, onKeyDown, on
       <input
         id="cell-value-input"
         dir="auto"
-        aria-label="Value of the selected cell"
-        placeholder="Select a cell to see or edit its value"
+        aria-label={t('csv.valueOfCell')}
+        placeholder={t('csv.valuePlaceholder')}
         disabled={isDisabled}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -186,6 +187,7 @@ type ChangesControlProps = {
 // A button that opens the list of every edited cell with the old and new value, a Revert and a Go to for each. The list is a
 // modal dialog, so it always sits above the table.
 function ChangesControl({ changeRows, changedCellCount, structureSummary, onRevertCell, onRevertAll, onGoToCell }: ChangesControlProps) {
+  const { t, tp, idFor } = useT()
   const [isOpen, setIsOpen] = useState(false)
   const hasChanges = changedCellCount > 0 || structureSummary !== ''
 
@@ -200,11 +202,11 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
         onClick={() => setIsOpen(true)}
         className="control-shape solid-box min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer border-rule px-3 text-sm transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:opacity-50"
       >
-        Review changes
+        {t('csv.changes.review')}
       </button>
 
       {isOpen && hasChanges && (
-        <ModalDialog title="Changes" onClose={() => setIsOpen(false)} widthClassName="w-[min(30rem,calc(100vw-2rem))]">
+        <ModalDialog title={t('csv.changes.title')} id={`dialog-${idFor('csv.changes.title')}`} onClose={() => setIsOpen(false)} widthClassName="w-[min(30rem,calc(100vw-2rem))]">
           <div className="mt-3 flex items-center justify-between gap-3">
             {structureSummary ? <p className="text-ink-soft">{structureSummary}</p> : <span />}
             <button
@@ -216,7 +218,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
               }}
               className={compactSecondaryButtonClassName}
             >
-              Revert all
+              {t('csv.changes.revertAll')}
             </button>
           </div>
           <ul className="mt-3 divide-y divide-rule">
@@ -226,7 +228,7 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
                   id={`change-go-to-${change.address}`}
                   type="button"
                   disabled={!change.isVisible}
-                  title={change.isVisible ? 'Go to this cell' : 'Hidden by the current search'}
+                  title={change.isVisible ? t('csv.changes.goTo') : t('csv.changes.hidden')}
                   onClick={() => {
                     setIsOpen(false)
                     // The page behind a modal dialog cannot take focus, so go to the cell once the dialog is gone.
@@ -235,35 +237,35 @@ function ChangesControl({ changeRows, changedCellCount, structureSummary, onReve
                   className="min-w-0 flex-1 cursor-pointer text-start disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <span className="font-mono text-sm text-ink-soft">
-                    {change.address} · {change.columnName}
+                    <bdi dir="ltr">{change.address}</bdi> · <bdi>{change.columnName}</bdi>
                   </span>
-                  <span dir="auto" className="block truncate text-left text-ink-soft line-through">
-                    {change.originalText === '' ? '(empty)' : change.originalText}
+                  <span dir="auto" className="block truncate text-start text-ink-soft line-through">
+                    {change.originalText === '' ? t('csv.changes.empty') : change.originalText}
                   </span>
-                  <span dir="auto" className="block truncate text-left font-medium">
-                    {change.newText === '' ? '(empty)' : change.newText}
+                  <span dir="auto" className="block truncate text-start font-medium">
+                    {change.newText === '' ? t('csv.changes.empty') : change.newText}
                   </span>
                 </button>
                 <button
                   id={`change-revert-${change.address}`}
                   type="button"
-                  aria-label={`Revert ${change.address}`}
+                  aria-label={t('csv.changes.revertCell', { address: isolateLeftToRight(change.address) })}
                   onClick={() => onRevertCell(change.key)}
                   className="control-shape min-h-8 pointer-coarse:min-h-11 shrink-0 cursor-pointer px-3 text-sm font-medium transition-colors duration-200 hover:bg-paper"
                 >
-                  Revert
+                  {t('csv.changes.revert')}
                 </button>
               </li>
             ))}
           </ul>
           {changedCellCount > changeRows.length && (
             <p className="mt-3 text-sm text-ink-soft">
-              And {(changedCellCount - changeRows.length).toLocaleString()} more edited cells. "Revert all" undoes every one of them.
+              {tp('csv.changes.more', changedCellCount - changeRows.length)}
             </p>
           )}
           <div className="mt-4 flex justify-end">
             <button id="changes-close-button" type="button" onClick={() => setIsOpen(false)} className={compactSecondaryButtonClassName}>
-              Close
+              {t('csv.changes.close')}
             </button>
           </div>
         </ModalDialog>
@@ -287,6 +289,7 @@ type ColumnMenuProps = {
 // The menu under a column header in Edit mode. It is a popover, drawn in the top layer so the table can never cover it;
 // Esc and a click outside close it, the arrow keys move between items.
 function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfter, onDelete, onClose }: ColumnMenuProps) {
+  const { t } = useT()
   const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -316,7 +319,7 @@ function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfte
       ref={menuRef}
       popover="auto"
       role="menu"
-      aria-label="Column actions"
+      aria-label={t('csv.columnMenu.label')}
       onToggle={(event) => {
         if (event.newState === 'closed') onClose()
       }}
@@ -336,17 +339,17 @@ function ColumnMenu({ left, top, canRename, canDelete, onRename, onAddColumnAfte
         type="button"
         role="menuitem"
         disabled={!canRename}
-        title={canRename ? undefined : 'Turn on "First row is header" to rename columns'}
+        title={canRename ? undefined : t('csv.columnMenu.renameDisabled')}
         onClick={() => runAndClose(onRename)}
         className={itemClassName}
       >
-        Rename column
+        {t('csv.columnMenu.rename')}
       </button>
       <button id="column-add-after-item" type="button" role="menuitem" onClick={() => runAndClose(onAddColumnAfter)} className={itemClassName}>
-        Add column after
+        {t('csv.columnMenu.addAfter')}
       </button>
       <button id="column-delete-item" type="button" role="menuitem" disabled={!canDelete} onClick={() => runAndClose(onDelete)} className={itemClassName}>
-        Delete column
+        {t('csv.columnMenu.delete')}
       </button>
     </div>
   )

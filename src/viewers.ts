@@ -4,19 +4,19 @@ export type Viewer = {
   id: 'csv' | 'text' | 'json' | 'excel' | 'word' | 'pdf' | 'powerpoint'
   label: string
   extensions: string[]
-  description: string
-  // The address of this format's own page (a drop zone for just this format), for formats that work. The open file keeps it.
+  // The address of this format's own page (a drop zone for just this format), without the language: /csv-viewer is served at
+  // /en/csv-viewer and /ar/csv-viewer. Only for formats that work. The open file keeps it.
   toolPath?: string
 }
 
 export const viewers: Viewer[] = [
-  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], description: 'View and edit CSV, TSV and tab files as a searchable table with automatic delimiter detection.', toolPath: '/csv-viewer' },
-  { id: 'text', label: 'TXT', extensions: ['.txt'], description: 'View and edit plain text files with search, line numbers and handy tools for lines and whitespace.', toolPath: '/txt-viewer' },
-  { id: 'json', label: 'JSON', extensions: ['.json'], description: 'View, format and edit JSON as a tree, a table or code, with error messages and sorting.', toolPath: '/json-viewer' },
-  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], description: 'View and edit Excel XLSX, XLS, XLSM and ODS files: sheets, formulas, formats and styles.', toolPath: '/excel-viewer' },
-  { id: 'word', label: 'Word', extensions: ['.docx'], description: 'Read .docx documents with their original formatting.' },
-  { id: 'pdf', label: 'PDF', extensions: ['.pdf'], description: 'Read .pdf documents page by page in your browser.' },
-  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], description: 'Flip through .pptx slides right in your browser.' },
+  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], toolPath: '/csv-viewer' },
+  { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer' },
+  { id: 'json', label: 'JSON', extensions: ['.json'], toolPath: '/json-viewer' },
+  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer' },
+  { id: 'word', label: 'Word', extensions: ['.docx'] },
+  { id: 'pdf', label: 'PDF', extensions: ['.pdf'] },
+  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'] },
 ]
 
 // How the table viewer treats each kind of table file: .csv starts on auto-detect (real CSVs are often semicolon separated),

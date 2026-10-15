@@ -1,3 +1,5 @@
+import { translate, translatePlural } from '../../i18n'
+import type { Locale } from '../../i18n'
 import type { EditingModule, ExportOption } from '../registry'
 import type { JsonViewActions, JsonViewSettings } from './jsonViewTools'
 
@@ -46,10 +48,10 @@ export type JsonActions = JsonViewActions & {
 export const createEmptyJsonEdits = (): JsonEdits => ({ root: null, indent: 2, changeCount: 0 })
 export const countJsonChanges = (edits: unknown) => (edits as JsonEdits).changeCount
 
-export function describeJsonChanges(edits: unknown) {
+export function describeJsonChanges(edits: unknown, locale: Locale) {
   const { changeCount } = edits as JsonEdits
   if (changeCount === 0) return ''
-  return `${changeCount.toLocaleString()} ${changeCount === 1 ? 'edit' : 'edits'}`
+  return translatePlural(locale, 'json.changes.edits', changeCount)
 }
 
 export function isContainer(value: JsonValue): value is JsonContainer {
@@ -76,7 +78,7 @@ function getChild(container: JsonContainer, step: string | number): JsonValue {
 }
 
 // Parsing runs in a Web Worker so a 50 MB file never freezes the page.
-export function parseJsonText(text: string): Promise<JsonParseResult> {
+export function parseJsonText(text: string, locale: Locale): Promise<JsonParseResult> {
   return new Promise((resolve) => {
     const worker = new Worker(new URL('./jsonParse.worker.ts', import.meta.url), { type: 'module' })
     worker.onmessage = (event: MessageEvent<JsonParseResult>) => {
@@ -85,7 +87,7 @@ export function parseJsonText(text: string): Promise<JsonParseResult> {
     }
     worker.onerror = () => {
       worker.terminate()
-      resolve({ status: 'error', message: 'The JSON reader could not start in this browser.', line: null, column: null })
+      resolve({ status: 'error', message: translate(locale, 'json.parse.readerFailed'), line: null, column: null })
     }
     worker.postMessage(text)
   })
@@ -340,7 +342,7 @@ export function buildJsonDownload(edits: JsonEdits, source: JsonExportSource) {
 
 const downloadOption: ExportOption = {
   id: 'json',
-  getLabel: () => 'Download JSON',
+  getLabel: (_exportSource, locale) => translate(locale, 'json.download.label'),
   extension: null,
   getMimeType: () => 'application/json;charset=utf-8',
   createFile: (edits, exportSource) => buildJsonDownload(edits as JsonEdits, exportSource as JsonExportSource),
@@ -349,7 +351,7 @@ const downloadOption: ExportOption = {
 export const jsonEditingModule: EditingModule = {
   tools: [],
   downloadOption,
-  describeDownload: (exportSource) => `${(exportSource as JsonExportSource).originalText.length.toLocaleString()} characters`,
+  describeDownload: (exportSource, locale) => translatePlural(locale, 'json.viewer.characters', (exportSource as JsonExportSource).originalText.length),
   getDefaultByteOrderMark: () => false,
   components: null,
 }

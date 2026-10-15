@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
+import { isolateLeftToRight, isolateText, translate, useT } from './i18n'
+import type { Locale } from './i18n'
 import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
 import { findReleasedFormat } from './whatsNew'
@@ -31,13 +33,14 @@ export function formatFileSize(byteCount: number) {
   return `${(byteCount / (1024 * 1024)).toFixed(1)} MB`
 }
 
-export function getLargeFileWarning(file: File) {
+export function getLargeFileWarning(file: File, locale: Locale) {
   if (file.size <= LARGE_FILE_WARNING_BYTES) return null
-  return `This file is ${formatFileSize(file.size)}. Large files can be slow or run out of memory, but we'll still try to open it.`
+  return translate(locale, 'intake.largeFile', { size: isolateLeftToRight(formatFileSize(file.size)) })
 }
 
 // Everything a drop zone needs, with no markup of its own, so each layout can build its own UI.
 export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed }: FileIntakeOptions) {
+  const { locale, t } = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [redirectSuggestion, setRedirectSuggestion] = useState<RedirectSuggestion | null>(null)
   const [largeFileWarning, setLargeFileWarning] = useState<string | null>(null)
@@ -64,18 +67,18 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
         setRedirectSuggestion({ viewer: releasedFormat.viewer, file })
         return
       }
-      setErrorMessage(`${file.name} can't be opened here. OpenAnyDoc opens ${acceptedExtensions.join(', ')} files.`)
+      setErrorMessage(t('intake.cannotOpen', { name: isolateText(file.name), extensions: isolateLeftToRight(acceptedExtensions.join(', ')) }))
       return
     }
 
-    setLargeFileWarning(getLargeFileWarning(file))
+    setLargeFileWarning(getLargeFileWarning(file, locale))
     setIsReading(true)
     try {
       const fileContents = await file.arrayBuffer()
       setLargeFileWarning(null)
       onFileLoaded(file, fileContents)
     } catch {
-      setErrorMessage("Couldn't read this file. It may be too large for your browser's memory.")
+      setErrorMessage(t('intake.readFailed'))
     } finally {
       setIsReading(false)
     }
@@ -84,7 +87,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   function openChosenFiles(files: File[]) {
     if (files.length === 0) return
     if (files.length > 1) {
-      setErrorMessage('Open one file at a time.')
+      setErrorMessage(t('intake.oneFile'))
       return
     }
     loadFile(files[0])
@@ -140,7 +143,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       ref={fileInputRef}
       type="file"
       accept={acceptedExtensions.join(',')}
-      aria-label={`Choose a file: ${acceptedExtensions.join(', ')}`}
+      aria-label={t('intake.fileInputLabel', { extensions: isolateLeftToRight(acceptedExtensions.join(', ')) })}
       className="hidden"
       onChange={(event) => {
         openChosenFiles(Array.from(event.target.files ?? []))
@@ -149,7 +152,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     />
   )
 
-  const promptText = isReading ? 'Reading file' : isDraggingOver ? 'Release to open' : 'Drop a file here'
+  const promptText = isReading ? t('drop.reading') : isDraggingOver ? t('drop.release') : t('drop.prompt')
 
   return {
     acceptsPastedText,

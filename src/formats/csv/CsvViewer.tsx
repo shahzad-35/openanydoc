@@ -1,15 +1,18 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { KeyboardEvent } from 'react'
-import { textControlClassName } from '../../buttonStyles'
-import { DELIMITER_OPTIONS, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
+import { compactSecondaryButtonClassName, textControlClassName } from '../../buttonStyles'
+import { isolateLeftToRight, isolateText, useT } from '../../i18n'
+import { DELIMITER_OPTIONS, describeParseNotice, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
 import type { DelimiterChoice, ParsedCsv } from '../../parseCsv'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
+import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import DataTable, { SearchIcon, columnLabel, getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
 import type { CellPosition, DataTableHandle, SortState } from '../DataTable'
 import type { EditSession } from '../useEditSession'
 import {
+  buildCsvText,
   buildDisplayIds,
   cellKey,
   countShownEditedCells,
@@ -54,6 +57,7 @@ export default function CsvViewer({
   onCommandsChange,
   onExportSourceChange,
 }: FormatViewerProps) {
+  const { locale, t, tp } = useT()
   const session = untypedSession as EditSession<CsvEdits>
   const editing = editingComponents as CsvEditingComponents | null
   const isEditable = mode === 'edit' && editing !== null
@@ -142,9 +146,9 @@ export default function CsvViewer({
   const columnNames = useMemo(
     () =>
       displayColumnIds.map(
-        (columnId, columnPosition) => (hasHeaderRow ? getCellText(rows, edits, 0, columnId).trim() : '') || `Column ${columnPosition + 1}`,
+        (columnId, columnPosition) => (hasHeaderRow ? getCellText(rows, edits, 0, columnId).trim() : '') || t('csv.columnName', { number: columnPosition + 1 }),
       ),
-    [displayColumnIds, hasHeaderRow, rows, edits],
+    [displayColumnIds, hasHeaderRow, rows, edits, t],
   )
 
   const columnWidthsPx = useMemo(
@@ -292,7 +296,7 @@ export default function CsvViewer({
       matchCase,
     )
     session.update(() => replacedEdits)
-    setReplaceResultMessage(`Replaced in ${replacedCellCount.toLocaleString()} ${replacedCellCount === 1 ? 'cell' : 'cells'}`)
+    setReplaceResultMessage(tp('csv.replaced', replacedCellCount))
   }
 
   // Find and replace counts the cells that match on every shown cell, not only the rows the search leaves visible. It reads
@@ -349,12 +353,12 @@ export default function CsvViewer({
       removeEmptyRows: () => {
         const { edits: cleanedEdits, removedCount } = withoutEmptyRows(edits, rows, displayRowIds, displayColumnIds)
         session.update(() => cleanedEdits)
-        setCleanUpMessage({ text: `Removed ${removedCount.toLocaleString()} empty ${removedCount === 1 ? 'row' : 'rows'}`, forEdits: cleanedEdits })
+        setCleanUpMessage({ text: tp('csv.cleanUp.removedEmptyRows', removedCount), forEdits: cleanedEdits })
       },
       removeDuplicateRows: () => {
         const { edits: cleanedEdits, removedCount } = withoutDuplicateRows(edits, rows, displayRowIds, displayColumnIds)
         session.update(() => cleanedEdits)
-        setCleanUpMessage({ text: `Removed ${removedCount.toLocaleString()} duplicate ${removedCount === 1 ? 'row' : 'rows'}`, forEdits: cleanedEdits })
+        setCleanUpMessage({ text: tp('csv.cleanUp.removedDuplicateRows', removedCount), forEdits: cleanedEdits })
       },
     }
   })
@@ -384,10 +388,12 @@ export default function CsvViewer({
 
   const totalRowCount = displayRowIds.length
   const isSearching = deferredSearchText.trim() !== ''
-  const detectedDelimiterLabel =
-    DELIMITER_OPTIONS.find((option) => option.value === readableCsv?.detectedDelimiter)?.label ?? 'Custom'
-  const largeFileWarning = getLargeFileWarning(openedFile.file)
-  const noticeLines = [...(largeFileWarning ? [largeFileWarning] : []), ...(readableCsv?.notices ?? [])]
+  const detectedDelimiterOption = DELIMITER_OPTIONS.find((option) => option.value === readableCsv?.detectedDelimiter)
+  const detectedDelimiterLabel = detectedDelimiterOption ? t(detectedDelimiterOption.labelKey) : t('csv.delimiter.custom')
+  const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
+  const noticeLines = [...(largeFileWarning ? [largeFileWarning] : []), ...(readableCsv?.notices ?? []).map((notice) => describeParseNotice(notice, locale))]
+  // Excel shows Arabic letters as garbled text unless the file starts with the UTF-8 marker, so offer a copy that has it.
+  const offersExcelCopy = readableCsv !== null && !readableCsv.hasUtf8Bom && rows.some((row) => row.some((cellText) => /[؀-ۿ]/.test(cellText)))
 
   const selectedColumnPosition = selectedCell ? displayColumnIds.indexOf(selectedCell.columnId) : -1
   const selectedCellLabel = selectedCell ? `${columnLabel(selectedColumnPosition)}${rowLabel(selectedCell.rowId)}` : '–'
@@ -411,22 +417,29 @@ export default function CsvViewer({
     onSelectionChange(selection)
   }, [selectedCell, readableCsv, rows, edits, displayRowIds, displayColumnIds, hasHeaderRow, onSelectionChange])
 
+  const exportSource = useMemo<CsvExportSource | null>(
+    () =>
+      readableCsv && {
+        rows,
+        hasHeaderRow,
+        detectedDelimiter: readableCsv.detectedDelimiter,
+        hadByteOrderMark: readableCsv.hasUtf8Bom,
+        tableFormat,
+        displayColumnIds,
+        visibleRowIds,
+      },
+    [readableCsv, rows, hasHeaderRow, tableFormat, displayColumnIds, visibleRowIds],
+  )
   useEffect(() => {
-    if (!readableCsv) {
-      onExportSourceChange(null)
-      return
-    }
-    const exportSource: CsvExportSource = {
-      rows,
-      hasHeaderRow,
-      detectedDelimiter: readableCsv.detectedDelimiter,
-      hadByteOrderMark: readableCsv.encodingLabel.startsWith('UTF-8 with BOM'),
-      tableFormat,
-      displayColumnIds,
-      visibleRowIds,
-    }
     onExportSourceChange(exportSource)
-  }, [readableCsv, rows, hasHeaderRow, tableFormat, displayColumnIds, visibleRowIds, onExportSourceChange])
+  }, [exportSource, onExportSourceChange])
+
+  // The same table the Download icon saves, as UTF-8 with a byte order mark, named like sales-excel.csv.
+  function downloadExcelCopy() {
+    if (!exportSource) return
+    const downloadName = buildDownloadName(openedFile.file.name, editedCount > 0, null).replace(/(\.[^.]*)?$/, '-excel$1')
+    downloadTextFile(downloadName, `\uFEFF${buildCsvText(edits, exportSource)}`, `${tableFormat.mimeType};charset=utf-8`)
+  }
 
   // What the Changes list shows: the first edited cells with their old and new text, and how many there are in all.
   const visibleRowIdSet = useMemo(() => (isSearching ? new Set(visibleRowIds) : null), [isSearching, visibleRowIds])
@@ -452,8 +465,8 @@ export default function CsvViewer({
     return listedRows
   }, [edits, columnPositionById, columnNames, rows, visibleRowIdSet])
   const structureSummary = useMemo(
-    () => describeCsvChanges({ ...edits, cells: new Map() }),
-    [edits],
+    () => describeCsvChanges({ ...edits, cells: new Map() }, locale),
+    [edits, locale],
   )
 
   return (
@@ -491,22 +504,22 @@ export default function CsvViewer({
           )}
 
           <label className="relative shrink-0">
-            <span className="sr-only">Search rows</span>
+            <span className="sr-only">{t('csv.search.label')}</span>
             <SearchIcon />
             <input
               id="search-input"
               ref={searchInputRef}
               type="search"
               dir="auto"
-              placeholder="Search rows"
+              placeholder={t('csv.search.label')}
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              className={`${textControlClassName} w-48 pl-9 pr-10`}
+              className={`${textControlClassName} w-48 ps-9 pe-10`}
             />
             {searchText === '' && (
               <kbd
                 aria-hidden="true"
-                className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-rule px-1.5 text-xs text-ink-soft"
+                className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 rounded border border-rule px-1.5 text-xs text-ink-soft"
               >
                 /
               </kbd>
@@ -558,14 +571,23 @@ export default function CsvViewer({
         </ul>
       )}
 
+      {offersExcelCopy && (
+        <div id="excel-copy-notice" className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b border-rule bg-paper-raised px-4 py-2 text-sm">
+          <p>{t('csv.excelCopy.reason')}</p>
+          <button id="download-excel-copy-button" type="button" onClick={downloadExcelCopy} className={compactSecondaryButtonClassName}>
+            {t('csv.excelCopy.button')}
+          </button>
+        </div>
+      )}
+
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
-        {parsedCsv === null && <p className="p-6 text-ink-soft">Reading file</p>}
+        {parsedCsv === null && <p className="p-6 text-ink-soft">{t('csv.reading')}</p>}
 
         {parsedCsv?.status === 'error' && (
           <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
-            <h2 className="type-h3">This file can't be shown</h2>
-            <p className="mt-2">{parsedCsv.message}</p>
-            <p className="mt-2 text-ink-soft">Use "Open another file" above to try a different file.</p>
+            <h2 className="type-h3">{t('csv.error.title')}</h2>
+            <p className="mt-2">{t(`csv.error.${parsedCsv.reason}`)}</p>
+            <p className="mt-2 text-ink-soft">{t('csv.error.hint')}</p>
           </div>
         )}
 
@@ -610,7 +632,7 @@ export default function CsvViewer({
                       )}
                       {renamingColumn?.columnId === columnId && (
                         <editing.CellInput
-                          ariaLabel={`Rename column ${columnName}`}
+                          ariaLabel={t('csv.renameColumn', { name: isolateText(columnName) })}
                           draft={renamingColumn.draft}
                           onDraftChange={(newDraft) => setRenamingColumn({ columnId, draft: newDraft })}
                           onFinish={finishRenamingColumn}
@@ -632,7 +654,7 @@ export default function CsvViewer({
                 ? (rowId, columnId, columnName) =>
                     editingCell?.source === 'cell' && editingCell.rowId === rowId && editingCell.columnId === columnId ? (
                       <editing.CellInput
-                        ariaLabel={`Edit ${columnName}, row ${rowLabel(rowId)}`}
+                        ariaLabel={t('csv.editCell', { column: isolateText(columnName), row: isolateLeftToRight(isInsertedLine(rowId) ? t('table.newRow') : rowLabel(rowId)) })}
                         draft={editingCell.draft}
                         onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
                         onFinish={finishEditing}
@@ -653,7 +675,7 @@ export default function CsvViewer({
               beginEditing(position, 'cell')
             }}
             onKeyDown={handleGridKeyDown}
-            emptyMessage={isSearching ? 'No rows match your search.' : 'This file has no data rows.'}
+            emptyMessage={isSearching ? t('csv.empty.noMatch') : t('csv.empty.noRows')}
           />
         )}
       </main>
@@ -662,11 +684,11 @@ export default function CsvViewer({
         <footer id="csv-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
           <p aria-live="polite" className="whitespace-nowrap font-semibold">
             {isSearching
-              ? `${visibleRowIds.length.toLocaleString()} of ${totalRowCount.toLocaleString()} rows`
-              : `${totalRowCount.toLocaleString()} rows × ${displayColumnIds.length.toLocaleString()} columns`}
+              ? t('csv.status.shownOfTotal', { shown: visibleRowIds.length, total: totalRowCount })
+              : t('csv.status.size', { rows: tp('csv.rowCount', totalRowCount), columns: tp('csv.columnCount', displayColumnIds.length) })}
           </p>
           <label className="flex items-center gap-2 text-ink-soft">
-            Delimiter
+            {t('csv.delimiter.label')}
             <select
               id="delimiter-select"
               value={delimiterChoice}
@@ -675,7 +697,7 @@ export default function CsvViewer({
             >
               {DELIMITER_OPTIONS.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.value === 'auto' ? `Auto-detect (${detectedDelimiterLabel})` : option.label}
+                  {option.value === 'auto' ? t('csv.delimiter.autoDetected', { detected: detectedDelimiterLabel }) : t(option.labelKey)}
                 </option>
               ))}
             </select>
@@ -691,17 +713,15 @@ export default function CsvViewer({
               }}
               className="size-4 pointer-coarse:size-5"
             />
-            First row is header
+            {t('csv.headerRow')}
           </label>
           {cleanUpMessage?.forEdits === edits && (
             <span id="clean-up-message" role="status" className="font-medium">
               {cleanUpMessage.text}
             </span>
           )}
-          <span className="hidden text-ink-soft sm:inline">{readableCsv.encodingLabel}</span>
-          <span className="ml-auto hidden text-ink-soft md:inline">
-            {isEditable ? 'Double-click or press Enter to edit · ' : ''}Press / to search
-          </span>
+          <span className="hidden text-ink-soft sm:inline">{readableCsv.encodingLabel.startsWith('Windows-1256') ? t('csv.encoding.windows1256') : readableCsv.encodingLabel}</span>
+          <span className="ms-auto hidden text-ink-soft md:inline">{isEditable ? t('csv.hint.edit') : t('csv.hint.view')}</span>
         </footer>
       )}
     </div>

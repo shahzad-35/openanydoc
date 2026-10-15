@@ -1,21 +1,24 @@
 // This module is fetched on demand (the first time Edit is used), not hot-reloaded as a component file.
 /* oxlint-disable react/only-export-components */
 import { Icon, IconButton, IconMenuButton } from '../../components/ToolbarControls'
+import { useT } from '../../i18n'
+import type { MessageKey } from '../../i18n'
 import type { EditingModule } from '../registry'
 import { jsonEditingModule } from './jsonModel'
 import { JsonViewTools } from './jsonViewTools'
 import type { JsonIndent, JsonSelection, JsonViewerCommands } from './jsonModel'
 
-const INDENT_CHOICES: { label: string; indent: JsonIndent }[] = [
-  { label: '2 spaces', indent: 2 },
-  { label: '4 spaces', indent: 4 },
-  { label: 'Tab', indent: '\t' },
-  { label: 'Minified (one line)', indent: 0 },
+const INDENT_CHOICES: { labelKey: MessageKey; indent: JsonIndent }[] = [
+  { labelKey: 'json.toolbar.indent2', indent: 2 },
+  { labelKey: 'json.toolbar.indent4', indent: 4 },
+  { labelKey: 'json.toolbar.indentTab', indent: '\t' },
+  { labelKey: 'json.toolbar.indentMinified', indent: 0 },
 ]
 
 // The icons in the page's edit toolbar, after Undo, Redo and Revert all. Each one changes the document (or how it is written),
 // so each one is saved in the downloaded file. Node actions work on the node selected in the tree.
 function JsonToolbar({ selection, commands }: { selection: unknown; commands: unknown }) {
+  const { t, idFor } = useT()
   const getActions = (commands as JsonViewerCommands | null)?.getActions
   const jsonSelection = selection as JsonSelection
   if (!getActions || jsonSelection === null) return null
@@ -24,7 +27,8 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
   const node = selectedNode
   const isContainerSelected = node?.kind === 'object' || node?.kind === 'array'
   const canChangeNode = canEditDocument && node !== null && !node.isRoot
-  const nodeHint = node === null ? ' (select a node in the tree)' : ''
+  const nodeHint = node === null ? ` ${t('json.toolbar.nodeHint')}` : ''
+  const toolbarId = (key: MessageKey) => `toolbar-${idFor(key)}`
   const divider = <span aria-hidden="true" className="h-5 w-px shrink-0 bg-rule" />
   return (
     <>
@@ -32,9 +36,14 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
       <JsonViewTools settings={jsonSelection.view} actions={getActions()} />
       {divider}
       <IconMenuButton
-        label="Format the saved JSON"
+        id={toolbarId('json.toolbar.formatSaved')}
+        label={t('json.toolbar.formatSaved')}
         isDisabled={!canEditDocument}
-        items={INDENT_CHOICES.map(({ label, indent: choice }) => ({ label: choice === indent ? `${label} (current)` : label, onSelect: () => void getActions().setIndent(choice) }))}
+        items={INDENT_CHOICES.map(({ labelKey, indent: choice }) => ({
+          id: idFor(labelKey, true),
+          label: choice === indent ? t('json.toolbar.current', { label: t(labelKey) }) : t(labelKey),
+          onSelect: () => void getActions().setIndent(choice),
+        }))}
       >
         <Icon>
           <path d="M4 6h16M8 12h12M12 18h8" />
@@ -42,13 +51,13 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
       </IconMenuButton>
       <IconMenuButton
         id="toolbar-sort-keys"
-        label={`Sort keys${node?.kind === 'object' ? ' of the selected object' : ' of the whole document'}`}
+        label={t(node?.kind === 'object' ? 'json.toolbar.sortKeysOfObject' : 'json.toolbar.sortKeysOfDocument')}
         isDisabled={!canEditDocument}
         items={[
-          { label: 'A to Z', onSelect: () => getActions().sortKeys('asc', false) },
-          { label: 'Z to A', onSelect: () => getActions().sortKeys('desc', false) },
-          { label: 'A to Z, including nested objects', onSelect: () => getActions().sortKeys('asc', true) },
-          { label: 'Z to A, including nested objects', onSelect: () => getActions().sortKeys('desc', true) },
+          { id: idFor('json.toolbar.sortAsc', true), label: t('json.toolbar.sortAsc'), onSelect: () => getActions().sortKeys('asc', false) },
+          { id: idFor('json.toolbar.sortDesc', true), label: t('json.toolbar.sortDesc'), onSelect: () => getActions().sortKeys('desc', false) },
+          { id: idFor('json.toolbar.sortAscNested', true), label: t('json.toolbar.sortAscNested'), onSelect: () => getActions().sortKeys('asc', true) },
+          { id: idFor('json.toolbar.sortDescNested', true), label: t('json.toolbar.sortDescNested'), onSelect: () => getActions().sortKeys('desc', true) },
         ]}
       >
         <Icon>
@@ -58,11 +67,11 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
       </IconMenuButton>
       <IconMenuButton
         id="toolbar-sort-list"
-        label={`Sort the selected list${node?.kind === 'array' ? '' : ' (select a list in the tree)'}`}
+        label={node?.kind === 'array' ? t('json.toolbar.sortList') : `${t('json.toolbar.sortList')} ${t('json.toolbar.sortListHint')}`}
         isDisabled={!canEditDocument || node?.kind !== 'array'}
         items={[
-          { label: 'Ascending (numbers by size, text A to Z)', onSelect: () => getActions().sortSelectedArray('asc') },
-          { label: 'Descending', onSelect: () => getActions().sortSelectedArray('desc') },
+          { id: idFor('json.toolbar.listAsc', true), label: t('json.toolbar.listAsc'), onSelect: () => getActions().sortSelectedArray('asc') },
+          { id: idFor('json.toolbar.listDesc', true), label: t('json.toolbar.listDesc'), onSelect: () => getActions().sortSelectedArray('desc') },
         ]}
       >
         <Icon>
@@ -71,34 +80,34 @@ function JsonToolbar({ selection, commands }: { selection: unknown; commands: un
         </Icon>
       </IconMenuButton>
       {divider}
-      <IconButton id="toolbar-add-child" label={`Add a child to the selected ${node?.kind === 'array' ? 'list' : 'object'}${isContainerSelected ? '' : ' (select an object or list)'}`} isDisabled={!canEditDocument || !isContainerSelected} onClick={() => getActions().addChild()}>
+      <IconButton id="toolbar-add-child" label={`${t(node?.kind === 'array' ? 'json.toolbar.addChildToList' : 'json.toolbar.addChildToObject')}${isContainerSelected ? '' : ` ${t('json.toolbar.addChildHint')}`}`} isDisabled={!canEditDocument || !isContainerSelected} onClick={() => getActions().addChild()}>
         <Icon>
           <path d="M12 5v14M5 12h14" />
         </Icon>
       </IconButton>
-      <IconButton label={`Duplicate the selected node${nodeHint}`} isDisabled={!canChangeNode} onClick={() => getActions().duplicateNode()}>
+      <IconButton id={toolbarId('json.toolbar.duplicateNode')} label={`${t('json.toolbar.duplicateNode')}${nodeHint}`} isDisabled={!canChangeNode} onClick={() => getActions().duplicateNode()}>
         <Icon>
           <rect x="8" y="8" width="12" height="12" rx="2" />
           <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
         </Icon>
       </IconButton>
-      <IconButton label={`Move the selected node up${nodeHint}`} isDisabled={!canChangeNode || node?.isFirst === true} onClick={() => getActions().moveNode(-1)}>
+      <IconButton id={toolbarId('json.toolbar.moveNodeUp')} label={`${t('json.toolbar.moveNodeUp')}${nodeHint}`} isDisabled={!canChangeNode || node?.isFirst === true} onClick={() => getActions().moveNode(-1)}>
         <Icon>
           <path d="m6 15 6-6 6 6" />
         </Icon>
       </IconButton>
-      <IconButton label={`Move the selected node down${nodeHint}`} isDisabled={!canChangeNode || node?.isLast === true} onClick={() => getActions().moveNode(1)}>
+      <IconButton id={toolbarId('json.toolbar.moveNodeDown')} label={`${t('json.toolbar.moveNodeDown')}${nodeHint}`} isDisabled={!canChangeNode || node?.isLast === true} onClick={() => getActions().moveNode(1)}>
         <Icon>
           <path d="m6 9 6 6 6-6" />
         </Icon>
       </IconButton>
-      <IconButton label={`Delete the selected node${nodeHint}`} isDisabled={!canChangeNode} onClick={() => getActions().deleteNode()}>
+      <IconButton id={toolbarId('json.toolbar.deleteNode')} label={`${t('json.toolbar.deleteNode')}${nodeHint}`} isDisabled={!canChangeNode} onClick={() => getActions().deleteNode()}>
         <Icon>
           <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
         </Icon>
       </IconButton>
       {divider}
-      <IconButton label="Find and replace text in values" isDisabled={!canEditDocument} onClick={() => (commands as JsonViewerCommands).toggleFindReplace()}>
+      <IconButton id={toolbarId('json.toolbar.findReplace')} label={t('json.toolbar.findReplace')} isDisabled={!canEditDocument} onClick={() => (commands as JsonViewerCommands).toggleFindReplace()}>
         <Icon>
           <circle cx="11" cy="11" r="6" />
           <path d="m20 20-4.5-4.5" />

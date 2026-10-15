@@ -1,11 +1,10 @@
 import { useEffect, useId, useRef } from 'react'
 import type { ReactNode } from 'react'
-import { toElementId } from '../elementId'
 
 type ModalDialogProps = {
   title: string
-  // The dialog's id; by default it is made from the title ("Add sheet" becomes dialog-add-sheet).
-  id?: string
+  // The dialog's id, the same in every language: "dialog-add-sheet" (use `dialog-${idFor('some.key')}` from useT).
+  id: string
   // The id of the element inside `children` that describes the dialog, for screen readers.
   describedById?: string
   // Esc, a click on the backdrop and the dialog's own Close buttons all end up here.
@@ -36,7 +35,7 @@ export default function ModalDialog({ title, id, describedById, onClose, widthCl
 
   return (
     <dialog
-      id={id ?? `dialog-${toElementId(title)}`}
+      id={id}
       ref={dialogRef}
       aria-labelledby={titleId}
       aria-describedby={describedById}

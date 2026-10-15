@@ -1,15 +1,17 @@
 import { useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
-import { toElementId } from '../elementId'
 
 // The icon controls every format's editing toolbar is built from (see "Editing toolbar standard" in DESIGN.md): a plain icon
 // button, an icon button that opens a menu of actions, and the popover menu itself.
 
-export type MenuItem = { label: string; onSelect: () => void; isDisabled?: boolean }
+// `id` is the item's part of its element id and must not depend on the language: use `idFor('some.key', true)` from useT.
+const MENU_WIDTH_PX = 224 // the menu's w-56
+
+export type MenuItem = { id: string; label: string; onSelect: () => void; isDisabled?: boolean }
 
 type ActionMenuProps = {
   // The id of the menu; the button that opens it points at it with aria-controls, and each item gets "<id>-<item>".
-  id?: string
+  id: string
   ariaLabel: string
   // Where the menu opens: right under what opened it.
   left: number
@@ -54,13 +56,13 @@ export function ActionMenu({ id, ariaLabel, left, top, items, onClose }: ActionM
         const step = event.key === 'ArrowDown' ? 1 : -1
         buttons[(position + step + buttons.length) % buttons.length]?.focus()
       }}
-      style={{ left, top }}
+      style={{ left: Math.min(left, window.innerWidth - MENU_WIDTH_PX - 8), top }}
       className="box-shape solid-box fixed m-0 max-h-[70vh] w-56 overflow-y-auto border-rule bg-paper-raised p-1 text-ink"
     >
       {items.map((item) => (
         <button
-          key={item.label}
-          id={id ? `${id}-${toElementId(item.label, true)}` : undefined}
+          key={item.id}
+          id={`${id}-${item.id}`}
           type="button"
           role="menuitem"
           disabled={item.isDisabled}
@@ -81,9 +83,9 @@ export const iconButtonClassName =
   'control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center text-[14px] transition-colors duration-200 hover:bg-paper-raised disabled:cursor-not-allowed disabled:text-ink/40 aria-pressed:bg-paper-raised aria-pressed:text-(--file-color)'
 
 // An icon button with a small arrow that opens a menu of actions.
-export function IconMenuButton({ id, label, items, isDisabled, children }: { id?: string; label: string; items: MenuItem[]; isDisabled?: boolean; children: ReactNode }) {
+export function IconMenuButton({ id, label, items, isDisabled, children }: { id: string; label: string; items: MenuItem[]; isDisabled?: boolean; children: ReactNode }) {
   const [menuPosition, setMenuPosition] = useState<{ left: number; top: number } | null>(null)
-  const buttonId = id ?? `toolbar-${toElementId(label)}`
+  const buttonId = id
   return (
     <>
       <button
@@ -120,11 +122,11 @@ export function Icon({ children }: { children: ReactNode }) {
 }
 
 
-export type IconButtonProps = { id?: string; label: string; isPressed?: boolean; isDisabled?: boolean; onClick: () => void; children: ReactNode }
+export type IconButtonProps = { id: string; label: string; isPressed?: boolean; isDisabled?: boolean; onClick: () => void; children: ReactNode }
 
 export function IconButton({ id, label, isPressed, isDisabled, onClick, children }: IconButtonProps) {
   return (
-    <button id={id ?? `toolbar-${toElementId(label)}`} type="button" aria-label={label} data-tip={label} aria-pressed={isPressed} disabled={isDisabled} onClick={onClick} className={iconButtonClassName}>
+    <button id={id} type="button" aria-label={label} data-tip={label} aria-pressed={isPressed} disabled={isDisabled} onClick={onClick} className={iconButtonClassName}>
       {children}
     </button>
   )

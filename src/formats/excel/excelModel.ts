@@ -12,6 +12,8 @@ import * as XLSX from 'xlsx'
 import type { CSSProperties } from 'react'
 import type { CellPosition } from '../DataTable'
 import type { ExcelActions } from './excelEditing'
+import { isolateText, translate } from '../../i18n'
+import type { Locale } from '../../i18n'
 import { emptySheetEdits } from './excelEdits'
 import type { CellStyle, ExcelEdits, Merge, SheetEdits, SheetRecord } from './excelEdits'
 export type { CellPosition, CellStyle, ExcelEdits, Merge, SheetEdits, SheetRecord }
@@ -163,7 +165,7 @@ function readWithoutConsoleNoise(contents: ArrayBuffer) {
   }
 }
 
-export function parseWorkbook(contents: ArrayBuffer, fileName: string): ParseResult {
+export function parseWorkbook(contents: ArrayBuffer, fileName: string, locale: Locale = 'en'): ParseResult {
   try {
     const workbook = readWithoutConsoleNoise(contents)
     const sheets = workbook.SheetNames.map((name): OriginalSheet => {
@@ -174,8 +176,8 @@ export function parseWorkbook(contents: ArrayBuffer, fileName: string): ParseRes
     const extension = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase()
     return { status: 'ok', parsed: { workbook, sheets, bookType: BOOK_TYPE_BY_EXTENSION[extension] ?? 'xlsx', styles: null } }
   } catch (error) {
-    const reason = error instanceof Error ? error.message : 'Unknown error'
-    return { status: 'error', message: `This workbook could not be read (${reason}). It may be damaged or password protected.` }
+    const reason = error instanceof Error ? error.message : translate(locale, 'excel.msg.unknownError')
+    return { status: 'error', message: translate(locale, 'excel.msg.cannotReadWorkbook', { reason: isolateText(reason) }) }
   }
 }
 
@@ -346,7 +348,7 @@ export type CellInputResult = { cell: XLSX.CellObject | null } | { error: string
 
 // Turns what was typed into a cell of the right type, keeping the number format the cell already had. A cell formatted as a
 // number or a date refuses text, with a message that says what to type instead.
-export function parseCellInput(text: string, currentCell: XLSX.CellObject | undefined): CellInputResult {
+export function parseCellInput(text: string, currentCell: XLSX.CellObject | undefined, locale: Locale = 'en'): CellInputResult {
   if (text.trim() === '') return { cell: null }
   const currentFormat = typeof currentCell?.z === 'string' ? currentCell.z : undefined
   const withFormat = (cell: XLSX.CellObject, format: string | undefined): XLSX.CellObject => (format && format !== 'General' ? { ...cell, z: format } : cell)
@@ -366,10 +368,10 @@ export function parseCellInput(text: string, currentCell: XLSX.CellObject | unde
   if (isDateFormat) {
     if (date) return { cell: { t: 'n', v: date.serial, z: date.hasTime && !currentFormat.includes('h') ? 'yyyy-mm-dd hh:mm:ss' : currentFormat } }
     if (number && !number.isPercent) return { cell: { t: 'n', v: number.value, z: currentFormat } }
-    return { error: 'This cell is formatted as a date. Type a date such as 2026-03-15, or a number.' }
+    return { error: translate(locale, 'excel.msg.dateCellRefusesText') }
   }
   if (isNumberFormat) {
-    if (!number) return { error: 'This cell is formatted as a number. Type a number such as 1250.50, or clear its format first.' }
+    if (!number) return { error: translate(locale, 'excel.msg.numberCellRefusesText') }
     const isPercentFormat = currentFormat.includes('%')
     const value = number.isPercent || isPercentFormat ? number.value / 100 : number.value
     return { cell: { t: 'n', v: value, z: currentFormat } }
@@ -536,13 +538,13 @@ export function withColumnWidth(edits: ExcelEdits, sheetId: number, columnId: nu
 const FORBIDDEN_SHEET_NAME_CHARACTERS = /[\\/?*[\]:]/
 
 // Excel's rules for a sheet name; returns the problem, or null when the name is fine.
-export function validateSheetName(name: string, otherNames: readonly string[]) {
-  if (name.trim() === '') return 'Type a name for the sheet.'
-  if (name.length > 31) return 'A sheet name can have at most 31 characters.'
-  if (FORBIDDEN_SHEET_NAME_CHARACTERS.test(name)) return 'A sheet name cannot contain any of these characters: \\ / ? * [ ] :'
-  if (name.startsWith("'") || name.endsWith("'")) return "A sheet name cannot start or end with an apostrophe (')."
-  if (name.toLowerCase() === 'history') return '"History" is reserved by Excel. Choose another name.'
-  if (otherNames.some((otherName) => otherName.toLowerCase() === name.toLowerCase())) return 'Another sheet already has this name (sheet names are not case sensitive).'
+export function validateSheetName(name: string, otherNames: readonly string[], locale: Locale = 'en') {
+  if (name.trim() === '') return translate(locale, 'excel.msg.sheetNameEmpty')
+  if (name.length > 31) return translate(locale, 'excel.msg.sheetNameTooLong')
+  if (FORBIDDEN_SHEET_NAME_CHARACTERS.test(name)) return translate(locale, 'excel.msg.sheetNameForbiddenCharacters')
+  if (name.startsWith("'") || name.endsWith("'")) return translate(locale, 'excel.msg.sheetNameApostrophe')
+  if (name.toLowerCase() === 'history') return translate(locale, 'excel.msg.sheetNameReserved')
+  if (otherNames.some((otherName) => otherName.toLowerCase() === name.toLowerCase())) return translate(locale, 'excel.msg.sheetNameTaken')
   return null
 }
 

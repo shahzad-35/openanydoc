@@ -1,9 +1,8 @@
 import { primaryButtonClassName, secondaryButtonClassName } from '../buttonStyles'
-import { joinNodesAsList, translate, translateWithNodes, useT } from '../i18n'
+import { joinNodesAsList, localizePath, translate, translateWithNodes, useT } from '../i18n'
 import type { MessageKey } from '../i18n'
 import { getOtherReleasedFormats } from '../whatsNew'
 import NewBadge from './NewBadge'
-import { pasteHint } from '../content'
 import type { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
@@ -57,6 +56,7 @@ const colorNumberByExtension = new Map(
 export function ExtensionPill({ extension }: { extension: string }) {
   return (
     <span
+      dir="ltr"
       style={{ backgroundColor: `var(--ext-${colorNumberByExtension.get(extension)})` }}
       className="control-shape px-2.5 py-0.5 font-mono text-sm font-medium text-on-accent"
     >
@@ -85,7 +85,7 @@ function ExtensionList({ id, className, shownViewers }: { id: string; className:
   )
 }
 
-const steps = ['Choose a file', 'Read in your browser', 'View it']
+const stepKeys = ['drop.step1', 'drop.step2', 'drop.step3'] as const
 
 // The big centered drop panel plus the slim three-step strip. The whole home screen is the drop target (see HomePage);
 // this panel is where the prompt, the accepted types and the Choose a file button live.
@@ -113,18 +113,18 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
         }`}
       >
         <p id="drop-prompt" className="type-h3 text-3xl md:text-4xl">{intake.promptText}</p>
-        <p id="drop-subprompt" className="mt-2 text-ink-soft">or pick one from your device.</p>
+        <p id="drop-subprompt" className="mt-2 text-ink-soft">{t('drop.subprompt')}</p>
 
-        <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-left md:grid-cols-2" />
+        <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />
 
         {intake.fileInput}
         <div className="mt-6">
           <button id="choose-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className={primaryButtonClassName}>
-            Choose a file
+            {t('drop.chooseFile')}
           </button>
         </div>
-        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{pasteHint}</p>}
-        <p id="privacy-note" className="mt-1 text-sm text-ink-soft">Opened in your browser — the file is never uploaded.</p>
+        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{t('drop.pasteHint')}</p>}
+        <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
           {intake.largeFileWarning && <p id="large-file-warning">{intake.largeFileWarning}</p>}
@@ -135,7 +135,7 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
               <button
                 id="open-in-viewer-button"
                 type="button"
-                onClick={() => onOpenInViewer?.(suggestion.file, suggestion.viewer.toolPath as string)}
+                onClick={() => onOpenInViewer?.(suggestion.file, localizePath(locale, suggestion.viewer.toolPath as string))}
                 className={secondaryButtonClassName}
               >
                 {t('redirect.open', { format: suggestion.viewer.label })}
@@ -154,11 +154,11 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
                 <a
                   key={viewer.id}
                   id={`also-works-link-${viewer.id}`}
-                  href={viewer.toolPath}
+                  href={localizePath(locale, viewer.toolPath as string)}
                   onClick={(event) => {
                     if (!onNavigate || event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
                     event.preventDefault()
-                    onNavigate(viewer.toolPath as string)
+                    onNavigate(localizePath(locale, viewer.toolPath as string))
                   }}
                   className="underline underline-offset-2 hover:text-ink"
                 >
@@ -171,12 +171,12 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
       )}
 
       <ol id="drop-steps" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-ink-soft">
-        {steps.map((step, index) => (
-          <li key={step} className="flex items-center gap-2">
+        {stepKeys.map((stepKey, index) => (
+          <li key={stepKey} className="flex items-center gap-2">
             <span className="control-shape type-h3 grid size-8 place-items-center bg-paper-raised/80 text-sm text-ink">
               {index + 1}
             </span>
-            {step}
+            {t(stepKey)}
           </li>
         ))}
       </ol>

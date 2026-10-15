@@ -2,6 +2,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { ClipboardEvent, KeyboardEvent } from 'react'
 import { textControlClassName } from '../../buttonStyles'
 import { getLargeFileWarning } from '../../useFileIntake'
+import { isolateText, useT } from '../../i18n'
 import type { FormatViewerProps } from '../registry'
 import DataTable, { SearchIcon, columnLabel, getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
 import type { DataTableHandle, SortState } from '../DataTable'
@@ -75,6 +76,7 @@ export default function ExcelViewer({
   onCommandsChange,
   onExportSourceChange,
 }: FormatViewerProps) {
+  const { locale, t, tp } = useT()
   const session = untypedSession as EditSession<ExcelEdits>
   const editing = editingComponents as ExcelEditingComponents | null
   const isEditable = mode === 'edit' && editing !== null
@@ -115,9 +117,10 @@ export default function ExcelViewer({
     setRange(null)
     setEditingCell(null)
     resetEditSession()
-    const parseTimerId = setTimeout(() => setParseResult(parseWorkbook(openedFile.contents, openedFile.file.name)), 0)
+    const parseTimerId = setTimeout(() => setParseResult(parseWorkbook(openedFile.contents, openedFile.file.name, locale)), 0)
     return () => clearTimeout(parseTimerId)
-  }, [openedFile, resetEditSession])
+    // A language change must not re-read the file and drop the visitor's edits.
+  }, [openedFile, resetEditSession]) // oxlint-disable-line react-hooks/exhaustive-deps
 
   // "/" jumps to the search box. It is registered only while this viewer is on screen.
   useEffect(() => {
@@ -294,7 +297,7 @@ export default function ExcelViewer({
   // added here, which have no original number.
   function parseTypedCell(text: string, position: CellPosition) {
     if (!sheet) return { cell: null }
-    if (!text.startsWith('=') || text.length < 2) return parseCellInput(text, readCell(sheet, position.rowId, position.columnId))
+    if (!text.startsWith('=') || text.length < 2) return parseCellInput(text, readCell(sheet, position.rowId, position.columnId), locale)
     const { text: storedFormula, hasMissingReference } = translateFormulaRefs(
       text.slice(1),
       (rowNumber) => {
@@ -306,8 +309,8 @@ export default function ExcelViewer({
         return columnId === undefined || columnId < 0 ? null : columnId + 1
       },
     )
-    if (hasMissingReference) return { error: 'This formula uses a cell that is outside the sheet or in a row or column added here, which formulas cannot use yet.' }
-    return parseCellInput(`=${storedFormula}`, readCell(sheet, position.rowId, position.columnId))
+    if (hasMissingReference) return { error: t('excel.msg.formulaOutsideSheet') }
+    return parseCellInput(`=${storedFormula}`, readCell(sheet, position.rowId, position.columnId), locale)
   }
 
   function getText(rowId: number, columnId: number) {
@@ -410,7 +413,7 @@ export default function ExcelViewer({
       else filledCells.push([position, sourceCell ?? null])
     }
     changeCells(filledCells)
-    setInputMessage(skippedFormulaCount > 0 ? 'Formulas were not filled, because their cell references would not move with them.' : '')
+    setInputMessage(skippedFormulaCount > 0 ? t('excel.msg.fillSkippedFormulas') : '')
   }
 
   // Styles are changed on every selected cell. Toggles follow the first selected cell: if it is bold, all become not bold.
@@ -438,8 +441,8 @@ export default function ExcelViewer({
     }
     const firstRowPosition = allRowPositionById.get(selectedRowIds[0]) as number
     const rowsAreTogether = selectedRowIds.every((rowId, offset) => allRowPositionById.get(rowId) === firstRowPosition + offset)
-    if (selectedRowIds.length * selectedColumnIds.length < 2) setInputMessage('Select two or more cells to merge.')
-    else if (!rowsAreTogether) setInputMessage('Clear the search or sort to merge these rows.')
+    if (selectedRowIds.length * selectedColumnIds.length < 2) setInputMessage(t('excel.msg.mergeSelectTwo'))
+    else if (!rowsAreTogether) setInputMessage(t('excel.msg.mergeClearSearchOrSort'))
     else {
       setInputMessage('')
       session.update((currentEdits) => withMergedCells(currentEdits, sheet, selectedRowIds, selectedColumnIds))
@@ -547,11 +550,11 @@ export default function ExcelViewer({
         pastedRow.forEach((text, columnOffset) => addPastedCell(rangeBounds.firstRow + rowOffset, rangeBounds.firstColumn + columnOffset, text)),
       )
     } else {
-      setInputMessage('That is too much to paste at once.')
+      setInputMessage(t('excel.msg.pasteTooMuch'))
       return
     }
     changeCells(pastedCells)
-    setInputMessage(skippedCount > 0 ? `${skippedCount.toLocaleString()} pasted ${skippedCount === 1 ? 'value was' : 'values were'} skipped: outside the sheet, or not valid for the cell's format.` : '')
+    setInputMessage(skippedCount > 0 ? tp('excel.msg.pasteSkipped', skippedCount) : '')
   }
 
   // ------------------------------------------------------------ keyboard
@@ -640,15 +643,15 @@ export default function ExcelViewer({
     const match = matchingCells[Math.min(matchPosition, matchingCells.length - 1)]
     const { edits: replacedEdits, replacedCount } = withReplacedText(edits, parsed, sheet, [match], findText, replaceText, matchCase)
     session.update(() => replacedEdits)
-    setReplaceResultMessage(replacedCount === 0 ? 'This cell could not be replaced' : 'Replaced 1 cell')
+    setReplaceResultMessage(replacedCount === 0 ? t('excel.msg.replaceFailed') : t('excel.msg.replacedOne'))
   }
 
   function replaceAllMatches() {
     if (!parsed || !sheet) return
     const { edits: replacedEdits, replacedCount, skippedCount } = withReplacedText(edits, parsed, sheet, matchingCells, findText, replaceText, matchCase)
     session.update(() => replacedEdits)
-    const skippedNote = skippedCount > 0 ? `, ${skippedCount.toLocaleString()} skipped (formulas or cells whose format refuses the text)` : ''
-    setReplaceResultMessage(`Replaced in ${replacedCount.toLocaleString()} ${replacedCount === 1 ? 'cell' : 'cells'}${skippedNote}`)
+    const skippedNote = skippedCount > 0 ? t('excel.msg.replacedSkipped', { count: skippedCount }) : ''
+    setReplaceResultMessage(`${tp('excel.msg.replacedCells', replacedCount)}${skippedNote}`)
   }
 
   // ------------------------------------------------------------ what the page's toolbar can ask of this viewer
@@ -711,11 +714,9 @@ export default function ExcelViewer({
 
   const isSearching = deferredSearchText.trim() !== ''
   const isSheetEmpty = allRowIds.length === 0 || columnIds.length === 0
-  const largeFileWarning = getLargeFileWarning(openedFile.file)
+  const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
   const isMacroFile = openedFile.file.name.toLowerCase().endsWith('.xlsm')
-  const saveNote = `Formulas are recalculated when you edit and saved together with their results. ${
-    canStyle ? 'Cell styles, merges, number formats, column widths and sheet names are kept; charts, images and pivot tables are not.' : 'Merges, number formats, column widths and sheet names are kept; fonts, colours and borders are not (styles can be saved in .xlsx files).'
-  }${isMacroFile ? ' Macros are not kept.' : ''}`
+  const saveNote = [t('excel.view.saveNoteBase'), canStyle ? t('excel.view.saveNoteStyles') : t('excel.view.saveNoteNoStyles'), isMacroFile && t('excel.view.saveNoteMacros')].filter(Boolean).join(' ')
   const selectedCellLabel = selectedCell
     ? `${columnLabel(columnPositionById.get(selectedCell.columnId) as number)}${(allRowPositionById.get(selectedCell.rowId) ?? 0) + 1}`
     : '–'
@@ -846,20 +847,20 @@ export default function ExcelViewer({
           )}
 
           <label className="relative shrink-0">
-            <span className="sr-only">Search rows</span>
+            <span className="sr-only">{t('excel.view.searchRows')}</span>
             <SearchIcon />
             <input
               id="search-input"
               ref={searchInputRef}
               type="search"
               dir="auto"
-              placeholder="Search rows"
+              placeholder={t('excel.view.searchRows')}
               value={searchText}
               onChange={(event) => setSearchText(event.target.value)}
-              className={`${textControlClassName} w-48 pl-9 pr-10`}
+              className={`${textControlClassName} w-48 ps-9 pe-10`}
             />
             {searchText === '' && (
-              <kbd aria-hidden="true" className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rounded border border-rule px-1.5 text-xs text-ink-soft">
+              <kbd aria-hidden="true" className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 rounded border border-rule px-1.5 text-xs text-ink-soft">
                 /
               </kbd>
             )}
@@ -911,22 +912,22 @@ export default function ExcelViewer({
       )}
 
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
-        {parseResult === null && <p className="p-6 text-ink-soft">Reading file</p>}
+        {parseResult === null && <p className="p-6 text-ink-soft">{t('excel.view.reading')}</p>}
 
         {parseResult?.status === 'error' && (
           <div id="file-error" role="alert" className="box-shape solid-box m-6 max-w-2xl border-danger p-6">
-            <h2 className="type-h3">This file can't be shown</h2>
+            <h2 className="type-h3">{t('excel.view.errorTitle')}</h2>
             <p className="mt-2">{parseResult.message}</p>
-            <p className="mt-2 text-ink-soft">Use "Open another file" above to try a different file.</p>
+            <p className="mt-2 text-ink-soft">{t('excel.view.errorHint')}</p>
           </div>
         )}
 
         {parsed && sheet && isSheetEmpty && (
-          <p className="p-6 text-ink-soft">{isEditable ? 'This sheet is empty. Use the Rows and Columns menus to add some.' : 'This sheet is empty.'}</p>
+          <p className="p-6 text-ink-soft">{isEditable ? t('excel.view.sheetEmptyEditable') : t('excel.view.sheetEmpty')}</p>
         )}
 
         {parsed && sheet && !isSheetEmpty && (
-          <div className="flex min-h-0 flex-1 flex-col" onCopy={copySelection} onCut={cutSelection} onPaste={pasteIntoSelection}>
+          <div dir="ltr" className="flex min-h-0 flex-1 flex-col" onCopy={copySelection} onCut={cutSelection} onPaste={pasteIntoSelection}>
             <DataTable
               tableRef={tableRef}
               label={activeSheetName}
@@ -996,7 +997,7 @@ export default function ExcelViewer({
                         )}
                         {editingCell?.source === 'header' && editingCell.columnId === columnId && (
                           <editing.CellInput
-                            ariaLabel={`Rename column ${columnName}`}
+                            ariaLabel={t('excel.view.renameColumn', { name: isolateText(columnName) })}
                             draft={editingCell.draft}
                             onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
                             onFinish={finishEditing}
@@ -1018,7 +1019,7 @@ export default function ExcelViewer({
                   ? (rowId, columnId, columnName) =>
                       editingCell?.source === 'cell' && editingCell.rowId === rowId && editingCell.columnId === columnId ? (
                         <editing.CellInput
-                          ariaLabel={`Edit ${columnName}, row ${(allRowPositionById.get(rowId) ?? 0) + 1}`}
+                          ariaLabel={t('excel.view.editCell', { column: isolateText(columnName), row: (allRowPositionById.get(rowId) ?? 0) + 1 })}
                           draft={editingCell.draft}
                           selectOnFocus={!editingCell.startedByTyping}
                           onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
@@ -1040,7 +1041,7 @@ export default function ExcelViewer({
                 beginEditing(position, 'cell')
               }}
               onKeyDown={handleGridKeyDown}
-              emptyMessage={isSearching ? 'No rows match your search.' : 'This sheet has no data rows.'}
+              emptyMessage={isSearching ? t('excel.view.noRowsMatch') : t('excel.view.noDataRows')}
             />
           </div>
         )}
@@ -1061,11 +1062,11 @@ export default function ExcelViewer({
         <footer id="excel-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
           <p id="sheet-size" aria-live="polite" className="whitespace-nowrap font-semibold">
             {isSearching
-              ? `${visibleRowIds.length.toLocaleString()} of ${displayRowIds.length.toLocaleString()} rows`
-              : `${displayRowIds.length.toLocaleString()} rows × ${columnIds.length.toLocaleString()} columns`}
+              ? t('excel.status.rowsFound', { shown: visibleRowIds.length, total: displayRowIds.length })
+              : `${tp('excel.status.rows', displayRowIds.length)} × ${tp('excel.status.columns', columnIds.length)}`}
           </p>
           <span id="sheet-count" className="text-ink-soft">
-            {sheetRecords.length} {sheetRecords.length === 1 ? 'sheet' : 'sheets'}
+            {tp('excel.status.sheets', sheetRecords.length)}
           </span>
           <label className="flex min-h-6 pointer-coarse:min-h-11 items-center gap-2 text-xs">
             <input
@@ -1081,16 +1082,14 @@ export default function ExcelViewer({
               }}
               className="size-3.5 pointer-coarse:size-5"
             />
-            First row is header
+            {t('excel.status.headerRow')}
           </label>
           {isEditable && (
             <span title={saveNote} className="hidden cursor-help text-ink-soft lg:inline">
-              {canStyle ? 'Formulas recalculate · charts and images are not kept' : 'Formulas recalculate · fonts and colours are not kept'}
+              {canStyle ? t('excel.status.recalcStyles') : t('excel.status.recalcNoStyles')}
             </span>
           )}
-          <span className="ml-auto hidden text-ink-soft md:inline">
-            {isEditable ? 'Double-click or Enter to edit · Shift+arrows select a range · ' : ''}Press / to search
-          </span>
+          <span className="ms-auto hidden text-ink-soft md:inline">{isEditable ? t('excel.status.editHint') : t('excel.status.searchHint')}</span>
         </footer>
       )}
 
@@ -1100,7 +1099,7 @@ export default function ExcelViewer({
           sheetNames={sheetRecords.map((sheetRecord) => sheetRecord.name)}
           activeSheetName={activeSheetName}
           suggestedSheetName={suggestNewSheetName(sheetRecords)}
-          validateSheetName={validateSheetName}
+          validateSheetName={(name, otherNames) => validateSheetName(name, otherNames, locale)}
           currentLink={sheet && selectedCell ? (readCell(sheet, selectedCell.rowId, selectedCell.columnId)?.l?.Target ?? '') : ''}
           onSetLink={setSelectedCellLink}
           currentColumnWidthPx={dialog.kind === 'column-width' ? (columnWidthsPx[columnPositionById.get(dialog.columnId) ?? 0] ?? 0) : 0}

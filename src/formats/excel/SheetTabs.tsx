@@ -1,4 +1,5 @@
 import type { KeyboardEvent } from 'react'
+import { useT } from '../../i18n'
 import type { SheetRecord } from './excelModel'
 
 type SheetTabsProps = {
@@ -13,10 +14,15 @@ type SheetTabsProps = {
 
 // The sheet names at the bottom of the workbook, like Excel's. The arrow keys move between tabs.
 export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect, onAdd, onRename }: SheetTabsProps) {
+  const { t } = useT()
+
   function moveBetweenTabs(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
     const activePosition = sheets.findIndex((sheet) => sheet.id === activeSheetId)
-    const step = event.key === 'ArrowRight' ? 1 : -1
+    // The tab strip follows the page direction (it reads right to left in Arabic), so the arrow that points forward changes with it.
+    const isRightToLeft = getComputedStyle(event.currentTarget).direction === 'rtl'
+    const forwardKey = isRightToLeft ? 'ArrowLeft' : 'ArrowRight'
+    const step = event.key === forwardKey ? 1 : -1
     const nextSheet = sheets[(activePosition + step + sheets.length) % sheets.length]
     event.preventDefault()
     onSelect(nextSheet.id)
@@ -25,7 +31,7 @@ export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect,
 
   return (
     <div id="sheet-tabs" className="flex items-center gap-1 overflow-x-auto border-t border-rule bg-paper px-2 pt-1">
-      <div id="sheet-tablist" role="tablist" aria-label="Sheets" onKeyDown={moveBetweenTabs} className="flex items-end gap-1">
+      <div id="sheet-tablist" role="tablist" aria-label={t('excel.tabs.label')} onKeyDown={moveBetweenTabs} className="flex items-end gap-1">
         {sheets.map((sheet) => {
           const isActive = sheet.id === activeSheetId
           return (
@@ -36,7 +42,7 @@ export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect,
               role="tab"
               aria-selected={isActive}
               tabIndex={isActive ? 0 : -1}
-              title={isEditable && isActive ? 'Double-click to rename' : sheet.name}
+              title={isEditable && isActive ? t('excel.tabs.renameTip') : sheet.name}
               onClick={() => onSelect(sheet.id)}
               onDoubleClick={isEditable && isActive ? onRename : undefined}
               dir="auto"
@@ -56,8 +62,8 @@ export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect,
           id="add-sheet-button"
           type="button"
           onClick={onAdd}
-          aria-label="Add sheet"
-          title="Add sheet"
+          aria-label={t('excel.tabs.add')}
+          title={t('excel.tabs.add')}
           className="control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center text-lg leading-none transition-colors duration-200 hover:bg-paper-raised"
         >
           +

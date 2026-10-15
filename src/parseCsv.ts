@@ -1,25 +1,49 @@
 import Papa from 'papaparse'
+import { translate, translatePlural } from './i18n'
+import type { Locale, MessageKey } from './i18n'
 
 export type DelimiterChoice = 'auto' | ',' | ';' | '\t' | '|'
 
-export const DELIMITER_OPTIONS: { value: DelimiterChoice; label: string }[] = [
-  { value: 'auto', label: 'Auto-detect' },
-  { value: ',', label: 'Comma' },
-  { value: ';', label: 'Semicolon' },
-  { value: '\t', label: 'Tab' },
-  { value: '|', label: 'Pipe' },
+export const DELIMITER_OPTIONS: { value: DelimiterChoice; labelKey: MessageKey }[] = [
+  { value: 'auto', labelKey: 'csv.delimiter.auto' },
+  { value: ',', labelKey: 'csv.delimiter.comma' },
+  { value: ';', labelKey: 'csv.delimiter.semicolon' },
+  { value: '\t', labelKey: 'csv.delimiter.tab' },
+  { value: '|', labelKey: 'csv.delimiter.pipe' },
 ]
 
+// What went wrong or looks odd, kept as data so the page can show it in whichever language is active.
+export type ParseNotice =
+  | { kind: 'mismatchedRows'; rowCount: number }
+  | { kind: 'unclosedQuote'; rowNumber: number }
+  | { kind: 'noDelimiter' }
+  | { kind: 'oneColumn' }
+
 export type ParsedCsv =
-  | { status: 'error'; message: string }
+  | { status: 'error'; reason: 'empty' | 'binary' | 'noRows' }
   | {
       status: 'ok'
       rows: string[][]
       columnCount: number
       detectedDelimiter: string
       encodingLabel: string
-      notices: string[]
+      // The file's own first bytes are the UTF-8 marker (EF BB BF) that makes Excel read Arabic correctly.
+      hasUtf8Bom: boolean
+      notices: ParseNotice[]
     }
+
+export function describeParseNotice(notice: ParseNotice, locale: Locale) {
+  switch (notice.kind) {
+    case 'mismatchedRows':
+      return translatePlural(locale, 'csv.notice.mismatchedRows', notice.rowCount)
+    case 'unclosedQuote':
+      return translate(locale, 'csv.notice.unclosedQuote', { row: notice.rowNumber })
+    case 'noDelimiter':
+      return translate(locale, 'csv.notice.noDelimiter')
+    case 'oneColumn':
+      return translate(locale, 'csv.notice.oneColumn')
+  }
+}
 
 const BINARY_CHECK_BYTE_COUNT = 64 * 1024
 
@@ -52,48 +76,30 @@ export function looksLikeBinary(fileContents: ArrayBuffer) {
   return !isUtf16 && bytes.includes(0)
 }
 
-function describeParseProblems(errors: Papa.ParseError[], columnCount: number, mismatchedRowCount: number) {
-  const notices: string[] = []
+function findParseProblems(errors: Papa.ParseError[], columnCount: number, mismatchedRowCount: number) {
+  const notices: ParseNotice[] = []
 
-  if (mismatchedRowCount > 0) {
-    notices.push(
-      `${mismatchedRowCount.toLocaleString()} rows have a different number of columns than the first row. Missing cells are shown empty.`,
-    )
-  }
+  if (mismatchedRowCount > 0) notices.push({ kind: 'mismatchedRows', rowCount: mismatchedRowCount })
 
   const unclosedQuote = errors.find((error) => error.code === 'MissingQuotes')
-  if (unclosedQuote) {
-    notices.push(
-      `A quoted value that starts on row ${((unclosedQuote.row ?? 0) + 1).toLocaleString()} never closes. Rows after it may be merged into one cell.`,
-    )
-  }
+  if (unclosedQuote) notices.push({ kind: 'unclosedQuote', rowNumber: (unclosedQuote.row ?? 0) + 1 })
 
-  if (errors.some((error) => error.code === 'UndetectableDelimiter')) {
-    notices.push('The delimiter could not be detected, so a comma was assumed. You can choose another one above.')
-  }
+  if (errors.some((error) => error.code === 'UndetectableDelimiter')) notices.push({ kind: 'noDelimiter' })
 
-  if (columnCount === 1) {
-    notices.push('Only one column was found. If the file uses a different delimiter, choose one above.')
-  }
+  if (columnCount === 1) notices.push({ kind: 'oneColumn' })
 
   return notices
 }
 
 export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterChoice): ParsedCsv {
   if (fileContents.byteLength === 0) {
-    return { status: 'error', message: 'This file is empty.' }
+    return { status: 'error', reason: 'empty' }
   }
-  if (looksLikeBinary(fileContents)) {
-    return {
-      status: 'error',
-      message:
-        "This doesn't look like a text table. It contains binary data, so it may be corrupted or a different file type.",
-    }
-  }
+  if (looksLikeBinary(fileContents)) return { status: 'error', reason: 'binary' }
 
   const { text, encodingLabel } = decodeCsvBytes(fileContents)
   if (text.trim() === '') {
-    return { status: 'error', message: 'This file is empty.' }
+    return { status: 'error', reason: 'empty' }
   }
 
   const parseResult = Papa.parse<string[]>(text, {
@@ -104,7 +110,7 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
 
   const rows = parseResult.data
   if (rows.length === 0) {
-    return { status: 'error', message: 'No rows could be read from this file.' }
+    return { status: 'error', reason: 'noRows' }
   }
 
   // PapaParse only reports column-count mismatches when it uses a header row, so count them here.
@@ -115,7 +121,7 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
     if (row.length !== rows[0].length) mismatchedRowCount++
   }
 
-  const notices = describeParseProblems(parseResult.errors, rows.length > 1 ? columnCount : 0, mismatchedRowCount)
+  const notices = findParseProblems(parseResult.errors, rows.length > 1 ? columnCount : 0, mismatchedRowCount)
 
   return {
     status: 'ok',
@@ -123,6 +129,7 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
     columnCount,
     detectedDelimiter: parseResult.meta.delimiter,
     encodingLabel,
+    hasUtf8Bom: encodingLabel.startsWith('UTF-8 with BOM'),
     notices,
   }
 }

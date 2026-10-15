@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { joinNodesAsList, translateWithNodes, useT } from '../i18n'
+import { joinNodesAsList, localizePath, translateWithNodes, useT } from '../i18n'
 import { getNewFormats } from '../whatsNew'
 import type { Viewer } from '../viewers'
 
@@ -39,7 +39,7 @@ export default function WhatsNewBanner({ onNavigate, onDismiss, isContained = fa
 
   const canEditAll = announcedFormats.every(({ definition }) => definition.editing)
   const formatLinks = announcedFormats.map(({ viewer }) => (
-    <BannerLink key={viewer.id} id={`banner-link-${viewer.id}`} path={viewer.toolPath as string} onNavigate={onNavigate} fileType={viewer.id} className="font-semibold text-(--file-color) underline-offset-2 hover:underline">
+    <BannerLink key={viewer.id} id={`banner-link-${viewer.id}`} path={localizePath(locale, viewer.toolPath as string)} onNavigate={onNavigate} fileType={viewer.id} className="font-semibold text-(--file-color) underline-offset-2 hover:underline">
       {viewer.label}
     </BannerLink>
   ))
@@ -51,7 +51,7 @@ export default function WhatsNewBanner({ onNavigate, onDismiss, isContained = fa
         <p id="banner-message" className="min-w-0 flex-1">{translateWithNodes(locale, canEditAll ? 'banner.openAndEdit' : 'banner.open', { formats: joinNodesAsList(locale, formatLinks) })}</p>
         <BannerLink
           id="banner-changelog-link"
-          path={`/${locale}/changelog`}
+          path={localizePath(locale, '/changelog')}
           onNavigate={onNavigate}
           className="control-shape shrink-0 border border-accent px-3 py-0.5 font-medium text-accent transition-colors duration-200 hover:bg-accent hover:text-on-accent"
         >
