@@ -33,6 +33,14 @@ export function getReleasedFormats(): ReleasedFormat[] {
   })
 }
 
+// What a registered format can do today: it is "coming soon" until the registry gives it a release date (`addedOn`), and it can
+// be edited when it has an `editing` entry. Undefined for a format that is not in the registry.
+export function getFormatCapabilities(viewerId: Viewer['id']) {
+  const definition = formatDefinitions.find((candidate) => candidate.viewerId === viewerId)
+  if (!definition) return undefined
+  return { canEdit: Boolean(definition.editing), isComingSoon: !definition.addedOn }
+}
+
 export function getNewFormats(today = new Date()) {
   return getReleasedFormats().filter(({ definition }) => isNewFormat(definition, today))
 }

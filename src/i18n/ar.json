@@ -83,7 +83,7 @@
   "drop.reading": "جارٍ قراءة الملف",
   "drop.subprompt": "أو اختر ملفًا من جهازك.",
   "drop.chooseFile": "اختر ملفًا",
-  "drop.privacyNote": "يُفتح الملف في متصفحك ولا يُرفع أبدًا.",
+  "drop.privacyNote": "يُفتح ملفك في علامة تبويب المتصفح هذه فقط: لا يُرفع ولا يُخزَّن في أي مكان، ويختفي عند إغلاق التبويب.",
   "drop.pasteHint": "يمكنك أيضًا لصق نص CSV باستخدام Ctrl+V (⌘+V على جهاز ماك).",
   "drop.step1": "اختر ملفًا",
   "drop.step2": "يُقرأ في متصفحك",
@@ -784,5 +784,9 @@
   "csv.download.rows.many": "الصفوف المعروضة ({count})",
   "csv.download.rows.other": "الصفوف المعروضة ({count})",
   "csv.excelCopy.reason": "قد يعرض Excel الحروف العربية رموزًا مشوّهة ما لم يبدأ الملف بعلامة UTF-8.",
-  "csv.excelCopy.button": "تنزيل نسخة تُفتح بشكل صحيح في Excel"
+  "csv.excelCopy.button": "تنزيل نسخة تُفتح بشكل صحيح في Excel",
+  "formats.viewAndEdit": "عرض وتحرير",
+  "formats.viewOnly": "عرض",
+  "formats.comingSoon": "قريبًا",
+  "intake.comingSoon": "لا يمكن فتح ملفات {format} بعد؛ الدعم قادم قريبًا."
 }

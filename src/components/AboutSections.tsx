@@ -1,6 +1,7 @@
 import { faqItems, features } from '../content'
 import { useT } from '../i18n'
 import { viewers } from '../viewers'
+import { FormatCapabilities } from './DropPanel'
 import FileTypeChip from './FileTypeChip'
 import NewBadge from './NewBadge'
 
@@ -28,6 +29,9 @@ export function SupportedFilesSection() {
             <NewBadge viewerId={viewer.id} />{' '}
             <span dir="ltr" className="inline-block font-mono text-sm text-ink-soft">{viewer.extensions.join('  ')}</span>
             <span className="block text-ink-soft">{t(`viewer.description.${viewer.id}`)}</span>
+            <span className="block text-sm text-ink-soft">
+              <FormatCapabilities idPrefix="supported-capabilities" viewerId={viewer.id} />
+            </span>
           </li>
         ))}
       </ul>

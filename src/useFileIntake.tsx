@@ -4,7 +4,7 @@ import { isolateLeftToRight, isolateText, translate, useT } from './i18n'
 import type { Locale } from './i18n'
 import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
-import { findReleasedFormat } from './whatsNew'
+import { findReleasedFormat, getFormatCapabilities } from './whatsNew'
 
 const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
 
@@ -43,6 +43,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   const { locale, t } = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [redirectSuggestion, setRedirectSuggestion] = useState<RedirectSuggestion | null>(null)
+  const [comingSoonViewer, setComingSoonViewer] = useState<Viewer | null>(null)
   const [largeFileWarning, setLargeFileWarning] = useState<string | null>(null)
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [isReading, setIsReading] = useState(false)
@@ -57,7 +58,15 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   async function loadFile(file: File) {
     setErrorMessage(null)
     setRedirectSuggestion(null)
+    setComingSoonViewer(null)
     setLargeFileWarning(null)
+
+    // A registered format whose viewer is not built yet (Word, PDF, PowerPoint): say so instead of opening a page or an error.
+    const droppedViewer = findViewerForFileName(file.name)
+    if (droppedViewer && getFormatCapabilities(droppedViewer.id)?.isComingSoon) {
+      setComingSoonViewer(droppedViewer)
+      return
+    }
 
     if (!hasAcceptedExtension(file.name)) {
       // The file is not read here: another viewer may open it, and the button hands the same File over.
@@ -156,6 +165,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   return {
     acceptsPastedText,
+    comingSoonViewer,
     dropTargetProps,
     errorMessage,
     fileInput,

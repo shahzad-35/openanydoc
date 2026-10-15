@@ -167,6 +167,11 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
             {anotherFileIntake.errorMessage}
           </p>
         )}
+        {anotherFileIntake.comingSoonViewer && (
+          <p id="another-file-coming-soon" className="border-b border-rule bg-paper-raised px-4 py-2 font-medium">
+            {t('intake.comingSoon', { format: anotherFileIntake.comingSoonViewer.label })}
+          </p>
+        )}
         {anotherFileIntake.largeFileWarning && (
           <p id="another-file-warning" className="border-b border-rule bg-paper-raised px-4 py-2">{anotherFileIntake.largeFileWarning}</p>
         )}

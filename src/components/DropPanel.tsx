@@ -1,7 +1,7 @@
 import { primaryButtonClassName, secondaryButtonClassName } from '../buttonStyles'
 import { joinNodesAsList, localizePath, translate, translateWithNodes, useT } from '../i18n'
 import type { MessageKey } from '../i18n'
-import { getOtherReleasedFormats } from '../whatsNew'
+import { getFormatCapabilities, getOtherReleasedFormats } from '../whatsNew'
 import NewBadge from './NewBadge'
 import type { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
@@ -65,14 +65,28 @@ export function ExtensionPill({ extension }: { extension: string }) {
   )
 }
 
+// What a format can do, read from the registry: "View and edit", "View", or a "Coming soon" tag.
+export function FormatCapabilities({ idPrefix, viewerId }: { idPrefix: string; viewerId: Viewer['id'] }) {
+  const { t } = useT()
+  const capabilities = getFormatCapabilities(viewerId)
+  if (!capabilities) return null
+  if (capabilities.isComingSoon) {
+    return <span id={`${idPrefix}-${viewerId}`} className="control-shape inline-block border border-rule px-2 text-xs">{t('formats.comingSoon')}</span>
+  }
+  return <span id={`${idPrefix}-${viewerId}`}>{t(capabilities.canEdit ? 'formats.viewAndEdit' : 'formats.viewOnly')}</span>
+}
+
 function ExtensionList({ id, className, shownViewers }: { id: string; className: string; shownViewers: Viewer[] }) {
   return (
     <ul id={id} className={className}>
-      {shownViewers.map((viewer) => (
+      {shownViewers.filter((viewer) => getFormatCapabilities(viewer.id)).map((viewer) => (
         <li key={viewer.id} id={`extension-row-${viewer.id}`} className="grid grid-cols-[6rem_1fr] items-start gap-x-3">
           <span className="py-0.5 text-sm text-ink-soft">
             {viewer.label}
             <NewBadge viewerId={viewer.id} />
+            <span className="mt-0.5 block text-xs">
+              <FormatCapabilities idPrefix="extension-capabilities" viewerId={viewer.id} />
+            </span>
           </span>
           <span className="flex flex-wrap gap-1.5">
             {viewer.extensions.map((extension) => (
@@ -128,6 +142,7 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
           {intake.largeFileWarning && <p id="large-file-warning">{intake.largeFileWarning}</p>}
+          {intake.comingSoonViewer && <p id="coming-soon-message" className="font-medium">{t('intake.comingSoon', { format: intake.comingSoonViewer.label })}</p>}
           {intake.errorMessage && <p id="drop-error" className="font-medium text-danger">{intake.errorMessage}</p>}
           {suggestion && (
             <div id="wrong-file-redirect" className="flex flex-col items-center gap-3">

@@ -79,7 +79,7 @@
   "drop.reading": "Reading file",
   "drop.subprompt": "or pick one from your device.",
   "drop.chooseFile": "Choose a file",
-  "drop.privacyNote": "Opened in your browser — the file is never uploaded.",
+  "drop.privacyNote": "Your file is opened in this browser tab only: it is never uploaded or stored anywhere, and it is gone when you close the tab.",
   "drop.pasteHint": "You can also paste CSV text with Ctrl+V (⌘+V on a Mac).",
   "drop.step1": "Choose a file",
   "drop.step2": "Read in your browser",
@@ -584,5 +584,9 @@
   "csv.download.rows.one": "visible rows ({count})",
   "csv.download.rows.other": "visible rows ({count})",
   "csv.excelCopy.reason": "Excel may show Arabic letters as garbled text unless the file starts with a UTF-8 marker.",
-  "csv.excelCopy.button": "Download a copy that opens correctly in Excel"
+  "csv.excelCopy.button": "Download a copy that opens correctly in Excel",
+  "formats.viewAndEdit": "View and edit",
+  "formats.viewOnly": "View",
+  "formats.comingSoon": "Coming soon",
+  "intake.comingSoon": "{format} files can't be opened yet; support is coming soon."
 }

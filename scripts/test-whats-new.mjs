@@ -163,7 +163,9 @@ async function openPage(pathname) {
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
-const unknownFile = path.join(scratchFolder, 'notes.docx')
+const comingSoonFile = path.join(scratchFolder, 'letter.docx')
+fs.writeFileSync(comingSoonFile, 'not a real document')
+const unknownFile = path.join(scratchFolder, 'notes.doc')
 fs.writeFileSync(unknownFile, 'not a real document')
 
 const results = []
@@ -232,7 +234,7 @@ await test('a JSON file dropped on the CSV page is offered the JSON viewer, with
 await test('a file nobody opens keeps the friendly rejection', async () => {
   await openPage('/en/csv-viewer')
   await chooseFile(unknownFile)
-  await waitFor(`document.body.innerText.replace(/[\u2066-\u2069]/g, '').includes("notes.docx can't be opened here")`, 'the rejection message')
+  await waitFor(`document.body.innerText.replace(/[\u2066-\u2069]/g, '').includes("notes.doc can't be opened here")`, 'the rejection message')
   expect(!(await evaluate(`document.body.innerText.includes('This looks like')`)), 'a redirect was offered for an unregistered type')
 })
 
@@ -369,6 +371,41 @@ await test('sitemap.xml and robots.txt list the pages', async () => {
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
 
+
+
+// ---------------------------------------------------------------- one drop zone for every format
+
+await test('the format list is read from the registry: View and edit, or Coming soon', async () => {
+  for (const [locale, words] of [['en', { edit: 'View and edit', soon: 'Coming soon' }], ['ar', { edit: 'عرض وتحرير', soon: 'قريبًا' }]]) {
+    await openPage(`/${locale}`)
+    for (const id of ['csv', 'text', 'json', 'excel']) {
+      expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.edit, `${locale}: ${id} does not say "${words.edit}"`)
+    }
+    for (const id of ['word', 'pdf', 'powerpoint']) {
+      expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.soon, `${locale}: ${id} does not say "${words.soon}"`)
+    }
+  }
+})
+
+await test('one drop zone opens every live format with its View / Edit toggle and tools; Coming soon stays on the page', async () => {
+  const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook]]
+  for (const [name, file] of sampleFiles) {
+    await openPage('/en')
+    await chooseFile(file)
+    await waitFor(`document.querySelector('#mode-toggle')`, `the ${name} file page with its toggle`)
+    expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
+    await evaluate(`document.querySelector('#mode-edit-button').click()`)
+    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace')`, `the ${name} tools`)
+  }
+  for (const locale of ['en', 'ar']) {
+    await openPage(`/${locale}`)
+    await chooseFile(comingSoonFile)
+    await waitFor(`document.querySelector('#coming-soon-message')`, 'the Coming soon message')
+    expect((await evaluate('location.pathname')) === `/${locale}`, `${locale}: left the home page`)
+    expect(await evaluate(`document.querySelector('#drop-error') === null && document.querySelector('#file-page') === null`), `${locale}: an error or a file page showed for a Coming soon format`)
+  }
+  expect(await evaluate(`document.querySelector('#privacy-note').innerText.length > 40`), 'the privacy note is missing')
+})
 
 // ---------------------------------------------------------------- languages
 
