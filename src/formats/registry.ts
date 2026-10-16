@@ -8,7 +8,7 @@ import { countExcelEdits, createEmptyExcelEdits, describeExcelChanges } from './
 import type { ExcelEdits } from './excel/excelEdits'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
-import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, jsonEditingModule } from './json/jsonModel'
+import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges } from './json/jsonModel'
 import { countTextChanges, createEmptyTextEdits, describeTextChanges } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
@@ -27,6 +27,8 @@ export type FormatViewerProps = {
   onOpenAnotherFile: () => void
   // Goes back to the home page, asking first when there are unsaved edits (for a format that draws its own header).
   onClose: () => void
+  // Opens a file made on the page (pasted text, a sample) through the same checks as a chosen one.
+  onOpenFile: (file: File) => void
   onSelectionChange: (selection: unknown) => void
   // Things the toolbar can ask the viewer to do (rename a column, open find and replace, scroll to a cell).
   onCommandsChange: (commands: unknown) => void
@@ -71,7 +73,8 @@ export type FormatEditing = {
   countChanges: (edits: unknown) => number
   // "3 edited cells, 1 row deleted"; empty when nothing changed.
   describeChanges: (edits: unknown, locale: Locale) => string
-  loadEditingModule: () => Promise<EditingModule>
+  // Absent for a format that draws its own page with its own tools (CSV, JSON).
+  loadEditingModule?: () => Promise<EditingModule>
   // A workbench that is always editable (JSON): it opens in Edit mode with its tools loaded, and has no View / Edit switch.
   alwaysEditable?: boolean
 }
@@ -103,11 +106,12 @@ export const formatDefinitions: FormatDefinition[] = [
     highlights: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'],
     related: ['excel', 'json'],
     ViewerComponent: lazy(() => import('./csv/CsvViewer')),
+    ownsWholePage: true,
     editing: {
       createEmptyEdits: createEmptyCsvEdits,
       countChanges: (edits) => countCsvEdits(edits as CsvEdits),
       describeChanges: (edits, locale) => describeCsvChanges(edits as CsvEdits, locale),
-      loadEditingModule: () => import('./csv/csvEditing').then((editingFile) => editingFile.csvEditingModule),
+      alwaysEditable: true,
     },
   },
   {
@@ -137,7 +141,6 @@ export const formatDefinitions: FormatDefinition[] = [
       createEmptyEdits: createEmptyJsonEdits,
       countChanges: countJsonChanges,
       describeChanges: describeJsonChanges,
-      loadEditingModule: () => Promise.resolve(jsonEditingModule),
       alwaysEditable: true,
     },
   },

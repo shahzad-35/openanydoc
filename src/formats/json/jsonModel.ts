@@ -1,6 +1,5 @@
 import { translate, translatePlural } from '../../i18n'
 import type { Locale } from '../../i18n'
-import type { EditingModule, ExportOption } from '../registry'
 import { isBigNumber, restoreBigNumbers } from './jsonTools'
 import type { BigNumber } from './jsonTools'
 
@@ -281,20 +280,4 @@ export function findMatchingPaths(root: JsonValue, lowerCaseSearch: string, limi
 // The text that is saved: the original text while nothing is edited, so key order and number spelling survive untouched.
 export function buildJsonDownload(edits: JsonEdits, source: JsonExportSource) {
   return edits.root === null ? source.originalText : JSON.stringify(edits.root, null, edits.indent)
-}
-
-const downloadOption: ExportOption = {
-  id: 'json',
-  getLabel: (_exportSource, locale) => translate(locale, 'json.download.label'),
-  extension: null,
-  getMimeType: () => 'application/json;charset=utf-8',
-  createFile: (edits, exportSource) => buildJsonDownload(edits as JsonEdits, exportSource as JsonExportSource),
-}
-
-export const jsonEditingModule: EditingModule = {
-  tools: [],
-  downloadOption,
-  describeDownload: (exportSource, locale) => translatePlural(locale, 'json.viewer.characters', (exportSource as JsonExportSource).originalText.length),
-  getDefaultByteOrderMark: () => false,
-  components: null,
 }

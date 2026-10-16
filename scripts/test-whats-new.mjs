@@ -239,11 +239,11 @@ await test('a file nobody opens keeps the friendly rejection', async () => {
 })
 
 await test('saving a file shows one dismissible tip', async () => {
-  const tipCsv = path.join(scratchFolder, 'tip.csv')
-  fs.writeFileSync(tipCsv, 'id,name\n1,Alpha\n')
-  await openPage('/en/csv-viewer')
-  await chooseFile(tipCsv)
-  await waitFor(`document.querySelector('h1')?.innerText === 'tip.csv'`, 'the file to open')
+  const tipText = path.join(scratchFolder, 'tip.txt')
+  fs.writeFileSync(tipText, 'one\ntwo\n')
+  await openPage('/en/txt-viewer')
+  await chooseFile(tipText)
+  await waitFor(`document.querySelector('h1')?.innerText === 'tip.txt'`, 'the file to open')
   await evaluate(`document.querySelector('#mode-edit-button').click()`)
   const downloadButton = `document.querySelector('#download-button')`
   await waitFor(`${downloadButton} && !${downloadButton}.disabled`, 'the Download button')
@@ -351,8 +351,8 @@ for (const [name, address, file, readyElement] of [
     await chooseFile(file)
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
     await expectCleanIds(`${name} view mode`)
-    // JSON draws its own page, always editable, with its own menus; the other formats switch to Edit.
-    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
+    // JSON and CSV draw their own page, always editable, with their own menus; the other formats switch to Edit.
+    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
     await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
     await waitFor(`document.querySelector('${menuButton}')`, 'the editing tools')
     await expectCleanIds(`${name} edit mode`)
@@ -397,10 +397,10 @@ await test('one drop zone opens every live format with its View / Edit toggle an
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
     await chooseFile(file)
-    await waitFor(`document.querySelector('#mode-toggle') || (${name === 'JSON'} && document.querySelector('#json-workbench'))`, `the ${name} file page with its toggle`)
+    await waitFor(`document.querySelector('#mode-toggle') || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench'))`, `the ${name} file page with its toggle`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
     await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
-    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button')`, `the ${name} tools`)
+    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled)')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
@@ -439,9 +439,7 @@ await test('/ goes to /ar for an Arabic browser and to /en otherwise; old addres
 await test('the language switch keeps the page and an open file with its edits', async () => {
   await openPage('/en/csv-viewer')
   await chooseFile(sampleCsv)
-  await waitFor(`document.querySelector('#data-table')`, 'the CSV to show')
-  await evaluate(`document.querySelector('#mode-edit-button').click()`)
-  await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled)')`, 'the edit toolbar')
+  await waitFor(`document.querySelector('#csv-workbench #data-table tbody td')`, 'the CSV to show')
   expect((await evaluate('location.pathname')) === '/en/csv-viewer', 'the open file is not at /en/csv-viewer')
   await evaluate(`document.querySelector('#language-switch-link').click()`)
   await waitFor(`document.documentElement.dir === 'rtl'`, 'the page to turn right-to-left')
@@ -688,6 +686,85 @@ await test('JSON: pasting JSON on the JSON page opens it; Format offers 1, 2, 3,
   await waitFor(`document.querySelector('#json-text-input').value.includes('\\n    "pasted"')`, 'the text with 4 spaces')
   await evaluate(`document.querySelector('#minify-button').click()`)
   await waitFor(`document.querySelector('#json-text-input').value === '{"pasted":[1,2]}' && document.querySelector('#indent-status').innerText === 'Minified'`, 'the minified text')
+})
+
+await test('CSV: filters, multi-column sort, profile, selection stats, editing, transpose with undo, and download options', async () => {
+  const ordersCsv = path.join(scratchFolder, 'orders.csv')
+  fs.writeFileSync(ordersCsv, 'order_id,city,total,paid\n1001,Karachi,192.00,true\n1002,Riyadh,28.00,false\n1003,Karachi,2.40,true\n1004,Lahore,49.95,true\n1005,Riyadh,14.00,true\n')
+  await openPage('/en/csv-viewer')
+  await chooseFile(ordersCsv)
+  await waitFor(`document.querySelector('#csv-workbench #data-table tbody td')`, 'the grid')
+  expect(await evaluate(`document.querySelector('#file-page header') === document.querySelector('#top-bar') && document.querySelector('#edit-toolbar') === null && document.querySelector('#mode-toggle') === null`), 'the shared header, toolbar or View / Edit switch is still on the CSV page')
+  const types = await evaluate(`[...document.querySelectorAll('#data-table .hd-type')].map((label) => label.textContent).join(',')`)
+  expect(types === 'Number,Text,Number,Yes/No', `the column types are ${types}`)
+  const header = (name) => `[...document.querySelectorAll('#data-table .hd')].find((th) => th.querySelector('.hd-name').textContent === '${name}')`
+  await evaluate(`${header('total')}.querySelector('.hd-inner').click()`)
+  await waitFor(`document.querySelector('#dock-title')?.textContent === 'total' && document.querySelector('#profile-scroll .stats')?.textContent.includes('192.00')`, 'the profile of total')
+  // A filter from the column menu: city is not Riyadh.
+  await evaluate(`${header('city')}.querySelector('.hd-btn').click()`)
+  await waitFor(`document.querySelector('#popover #filter-checklist')`, 'the city filter')
+  await evaluate(`[...document.querySelectorAll('#filter-checklist label')].find((label) => label.textContent.startsWith('Riyadh')).querySelector('input').click()`)
+  await waitFor(`document.querySelector('#filter-preview')?.textContent === '3 of 5 rows'`, 'the filter preview')
+  await evaluate(`document.querySelector('#filter-apply-button').click()`)
+  await waitFor(`document.querySelectorAll('#data-table tbody tr:not(.grid-spacer)').length === 3 && document.querySelector('#chips-bar .chip')`, 'three rows and a filter chip')
+  await evaluate(`document.querySelector('#remove-filter-0').click()`)
+  // Two sort levels with Shift+click: city, then total (clicked twice: high to low).
+  for (const [name, clicks] of [['city', 1], ['total', 2]]) {
+    for (let click = 0; click < clicks; click++) await evaluate(`${header(name)}.querySelector('.hd-inner').dispatchEvent(new MouseEvent('click', { bubbles: true, shiftKey: true }))`)
+  }
+  await waitFor(`document.querySelectorAll('#chips-bar .chip.sort').length === 2`, 'two sort chips')
+  const sortedIds = await evaluate(`[...document.querySelectorAll('#data-table tbody tr:not(.grid-spacer)')].map((row) => row.children[1].textContent).join(',')`)
+  expect(sortedIds === '1001,1003,1004,1002,1005', `sorted by city then total high to low gave ${sortedIds}`)
+  await evaluate(`document.querySelector('#clear-all-filters-button').click()`)
+  // A range in total: Count, Sum and Average in the status bar.
+  const cellCenter = (id) => evaluate(`(() => { const box = document.querySelector('#${id}').getBoundingClientRect(); return { x: box.x + box.width / 2, y: box.y + box.height / 2 } })()`)
+  const first = await cellCenter('cell-0-2')
+  await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: first.x, y: first.y, button: 'left', clickCount: 1 })
+  // The value bar appears with the first selected cell and moves the grid down, so find the end cell after the press.
+  const last = await cellCenter('cell-2-2')
+  await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: last.x, y: last.y, button: 'left' })
+  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: last.x, y: last.y, button: 'left', clickCount: 1 })
+  await waitFor(`document.querySelector('#status-bar').textContent.includes('Sum 222.40')`, 'the selection sum (192.00 + 28.00 + 2.40)')
+  // Edit a cell by typing into it.
+  const cityCell = await cellCenter('cell-1-1')
+  await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: cityCell.x, y: cityCell.y, button: 'left', clickCount: 1 })
+  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: cityCell.x, y: cityCell.y, button: 'left', clickCount: 1 })
+  await pressKey('J', 'KeyJ', 74, 'J')
+  await waitFor(`document.querySelector('#cell-value-inline-input')`, 'the cell editor')
+  await send('Input.insertText', { text: 'eddah' })
+  await pressKey('Enter', 'Enter', 13)
+  await waitFor(`document.querySelector('#cell-1-1')?.textContent === 'Jeddah' && document.querySelector('#status-changes-button')`, 'the edited cell')
+  // Transpose, then undo.
+  await evaluate(`document.querySelector('#clean-menu-button').click()`)
+  await waitFor(`document.querySelector('#clean-menu-transpose')`, 'the Clean up menu')
+  await evaluate(`document.querySelector('#clean-menu-transpose').click()`)
+  await waitFor(`document.querySelector('#dialog-clean-tool[open] #clean-tool-apply-button')`, 'the transpose dialog')
+  await evaluate(`document.querySelector('#clean-tool-apply-button').click()`)
+  await waitFor(`document.querySelectorAll('#data-table thead .hd').length === 6`, 'the transposed table (5 rows become 6 columns with the header)')
+  await evaluate(`document.querySelector('#undo-button').click()`)
+  await waitFor(`document.querySelectorAll('#data-table thead .hd').length === 4 && document.querySelector('#cell-1-1')?.textContent === 'Jeddah'`, 'the table back after undo, with the edit')
+  // Download with options: semicolons, every field quoted.
+  await evaluate(`window.__blobs = []; const make = URL.createObjectURL; URL.createObjectURL = (blob) => { window.__blobs.push(blob); return make(blob) }`)
+  await evaluate(`document.querySelector('#more-menu-button').click()`)
+  await waitFor(`document.querySelector('#more-menu-download')`, 'the More menu')
+  await evaluate(`document.querySelector('#more-menu-download').click()`)
+  await waitFor(`document.querySelector('#dialog-download[open] #download-delimiter-select')`, 'the download dialog')
+  await evaluate(`(() => { const select = document.querySelector('#download-delimiter-select'); const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set; setter.call(select, ';'); select.dispatchEvent(new Event('change', { bubbles: true })) })()`)
+  await evaluate(`document.querySelector('#download-quote-checkbox').click()`)
+  await evaluate(`document.querySelector('#download-confirm-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the download')
+  const savedText = await evaluate(`window.__blobs[0].text()`)
+  expect(savedText.startsWith('"order_id";"city";"total";"paid"') && savedText.includes('"1002";"Jeddah";"28.00";"false"'), `the download was: ${savedText.slice(0, 120)}`)
+})
+
+await test('CSV in Arabic: the bars mirror, the table stays left to right', async () => {
+  await openPage('/ar/csv-viewer')
+  await chooseFile(sampleCsv)
+  await waitFor(`document.querySelector('#csv-workbench #data-table tbody td')`, 'the grid')
+  const layout = await evaluate(`({ home: document.querySelector('#home-button').getBoundingClientRect().right, download: document.querySelector('#download-button').getBoundingClientRect().left, width: innerWidth, grid: getComputedStyle(document.querySelector('#grid-scroll')).direction })`)
+  expect(layout.home > layout.width - 80 && layout.download < 200, 'the top bar is not mirrored')
+  expect(layout.grid === 'ltr', 'the table scrolls right to left')
+  expect(!(await evaluate(`document.body.innerText.includes('{')`)), 'a text still has an unfilled {placeholder}')
 })
 
 await test('JSON over 10 MB is refused with a toast before it is read; 10 MB exactly opens', async () => {

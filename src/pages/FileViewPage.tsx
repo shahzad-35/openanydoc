@@ -49,13 +49,13 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   function chooseMode(newMode: ViewMode) {
     setMode(newMode)
     if (newMode === 'edit' && editing && !editingModule) {
-      editing.loadEditingModule().then(setEditingModule, () => setEditingLoadFailed(true))
+      editing.loadEditingModule?.().then(setEditingModule, () => setEditingLoadFailed(true))
     }
   }
 
   // An always-editable format (JSON) loads its tools straight away.
   useEffect(() => {
-    if (editing?.alwaysEditable) editing.loadEditingModule().then(setEditingModule, () => setEditingLoadFailed(true))
+    if (editing?.alwaysEditable) editing.loadEditingModule?.().then(setEditingModule, () => setEditingLoadFailed(true))
   }, [editing])
 
   useEffect(() => {
@@ -157,6 +157,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         editingComponents={editingModule?.components ?? null}
         confirmDiscardEdits={confirmDiscardEdits}
         onOpenAnotherFile={anotherFileIntake.openFilePicker}
+        onOpenFile={(file) => anotherFileIntake.openFiles([file])}
         onClose={() => void closeAfterConfirm()}
         onSelectionChange={setSelection}
         onCommandsChange={setViewerCommands}

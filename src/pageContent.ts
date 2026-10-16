@@ -16,16 +16,16 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       stepsTitle: 'How to open a CSV file online',
       steps: [
         { title: 'Drop your file on the page', text: 'Drop a .csv, .tsv or .tab file on the page, or choose it from your device. It is read in your browser and never uploaded.' },
-        { title: 'Check the columns', text: 'The delimiter (comma, semicolon, tab or pipe) is detected for you. If the columns look wrong, pick another delimiter from the list at the bottom, and turn "First row is header" on or off.' },
-        { title: 'Search and sort', text: 'Type in the search box (press / to jump to it) to show only the rows that match, and click the arrows in a column header to sort that column.' },
-        { title: 'Switch to Edit to make changes', text: 'Click a cell to edit it, add or delete rows and columns, use find and replace, or clean up a column or the whole table: change case, trim spaces, remove empty or duplicate rows. Undo and redo are always there.' },
-        { title: 'Download your CSV', text: 'Use the download icon to save the edited file. The original file on your device is never changed.' },
+        { title: 'Check the columns', text: 'The delimiter (comma, semicolon, tab or pipe) and the encoding are detected for you. If the columns look wrong, click the delimiter in the status bar at the bottom to pick another one, or turn "First row is header" on or off.' },
+        { title: 'Search, filter and sort', text: 'Type in the search box (press / to jump to it) to find rows in every column. Use Filter, or the menu in a column header, to keep only the rows you need, and Shift+click column headers to sort by one or more columns. Click a header to see that column\'s profile: blanks, distinct values, numbers and a chart.' },
+        { title: 'Edit and clean up', text: 'Every cell can be edited: click it and type, or paste cells copied from a spreadsheet. Add or delete rows and columns, use Find & replace, or open Clean up to change case, trim spaces, fill down blanks, split or merge columns, remove duplicate rows or transpose the table. Undo and redo are always there.' },
+        { title: 'Download your CSV', text: 'Click Download to save every row with the file\'s own delimiter, or choose "Download options" in the More menu to change the delimiter, quotes or line endings, or to keep only the filtered rows. The original file on your device is never changed.' },
       ],
       faqTitle: 'CSV viewer and editor: common questions',
       faq: [
         {
           question: 'Why does my CSV file open in a single column?',
-          answer: 'The file probably uses a different separator from the comma, such as a semicolon, which is common in files saved by Excel in many countries. OpenAnyDoc detects comma, semicolon, tab and pipe automatically, and you can choose the delimiter yourself from the list at the bottom of the table.',
+          answer: 'The file probably uses a different separator from the comma, such as a semicolon, which is common in files saved by Excel in many countries. OpenAnyDoc detects comma, semicolon, tab and pipe automatically, and you can choose the delimiter yourself by clicking it in the status bar at the bottom of the page.',
         },
         {
           question: 'How do I open a CSV file with Arabic or other non-English text?',
@@ -37,7 +37,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'How do I remove duplicate rows from a CSV file?',
-          answer: 'Switch to Edit, open the Clean up menu (the Aa icon) and choose "Table: remove duplicate rows". The first copy of each row is kept. The same menu can remove empty rows, trim spaces, change the case of a column and fill empty cells down.',
+          answer: 'Open Clean up and choose "Remove duplicate rows", then pick the columns that must match for two rows to count as duplicates. The first copy of each row is kept. The same menu can remove empty rows, trim spaces, change the case of a column and fill empty cells down.',
         },
         {
           question: 'Does the CSV editor keep leading zeros and long numbers?',
@@ -166,16 +166,16 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       stepsTitle: 'كيف تفتح ملف CSV أونلاين',
       steps: [
         { title: 'أفلت ملفك على الصفحة', text: 'أفلت ملف .csv أو .tsv أو .tab على الصفحة، أو اخترْه من جهازك. يُقرأ الملف داخل متصفحك ولا يُرفع أبدًا.' },
-        { title: 'تحقق من الأعمدة', text: 'يُكتشف الفاصل (فاصلة، فاصلة منقوطة، علامة جدولة أو شرطة عمودية) تلقائيًا. إذا بدت الأعمدة غير صحيحة، اختر فاصلًا آخر من القائمة في الأسفل، وفعّل «الصف الأول عناوين» أو أوقفه.' },
-        { title: 'ابحث وافرز', text: 'اكتب في مربع البحث (اضغط / للانتقال إليه) لإظهار الصفوف المطابقة فقط، وانقر على الأسهم في عنوان العمود لفرز ذلك العمود.' },
-        { title: 'انتقل إلى التحرير لإجراء التغييرات', text: 'انقر على خلية لتعديلها، وأضف الصفوف والأعمدة أو احذفها، واستخدم البحث والاستبدال، أو نظّف عمودًا أو الجدول كله: غيّر حالة الأحرف، واحذف المسافات الزائدة، واحذف الصفوف الفارغة أو المكررة. التراجع والإعادة متاحان دائمًا.' },
-        { title: 'نزّل ملف CSV', text: 'استخدم أيقونة التنزيل لحفظ الملف المعدَّل. الملف الأصلي على جهازك لا يتغير أبدًا.' },
+        { title: 'تحقق من الأعمدة', text: 'يُكتشف الفاصل (فاصلة، فاصلة منقوطة، علامة جدولة أو شرطة عمودية) والترميز تلقائيًا. إذا بدت الأعمدة غير صحيحة، انقر على الفاصل في شريط الحالة في الأسفل لاختيار فاصل آخر، وفعّل «الصف الأول عناوين» أو أوقفه.' },
+        { title: 'ابحث وصفِّ ورتّب', text: 'اكتب في مربع البحث (اضغط / للانتقال إليه) للعثور على الصفوف في كل الأعمدة. استخدم «تصفية» أو قائمة عنوان العمود لإبقاء الصفوف التي تحتاجها فقط، وانقر مع Shift على عناوين الأعمدة للترتيب حسب عمود واحد أو أكثر. انقر على عنوان عمود لترى ملخصه: الخلايا الفارغة والقيم المختلفة والأرقام ومخططًا.' },
+        { title: 'حرّر ونظّف', text: 'كل خلية قابلة للتحرير: انقر عليها واكتب، أو الصق خلايا منسوخة من جدول بيانات. أضف الصفوف والأعمدة أو احذفها، واستخدم «بحث واستبدال»، أو افتح «تنظيف» لتغيير حالة الأحرف وحذف المسافات الزائدة وتعبئة الفراغات للأسفل وتقسيم الأعمدة أو دمجها وحذف الصفوف المكررة أو تبديل الصفوف والأعمدة. التراجع والإعادة متاحان دائمًا.' },
+        { title: 'نزّل ملف CSV', text: 'انقر على «تنزيل» لحفظ كل الصفوف بفاصل الملف نفسه، أو اختر «خيارات التنزيل» من قائمة «المزيد» لتغيير الفاصل أو علامات الاقتباس أو نهايات الأسطر، أو لإبقاء الصفوف المصفّاة فقط. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
       faqTitle: 'عارض ومحرر CSV: أسئلة شائعة',
       faq: [
         {
           question: 'لماذا يُفتح ملف CSV في عمود واحد؟',
-          answer: 'غالبًا يستخدم الملف فاصلًا غير الفاصلة، مثل الفاصلة المنقوطة، وهذا شائع في الملفات التي يحفظها Excel في كثير من البلدان. يكتشف OpenAnyDoc الفاصلة والفاصلة المنقوطة وعلامة الجدولة والشرطة العمودية تلقائيًا، ويمكنك اختيار الفاصل بنفسك من القائمة في أسفل الجدول.',
+          answer: 'غالبًا يستخدم الملف فاصلًا غير الفاصلة، مثل الفاصلة المنقوطة، وهذا شائع في الملفات التي يحفظها Excel في كثير من البلدان. يكتشف OpenAnyDoc الفاصلة والفاصلة المنقوطة وعلامة الجدولة والشرطة العمودية تلقائيًا، ويمكنك اختيار الفاصل بنفسك بالنقر عليه في شريط الحالة أسفل الصفحة.',
         },
         {
           question: 'كيف أفتح ملف CSV فيه نص عربي أو بلغة غير الإنجليزية؟',
@@ -187,7 +187,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'كيف أحذف الصفوف المكررة من ملف CSV؟',
-          answer: 'انتقل إلى التحرير، وافتح قائمة التنظيف (أيقونة Aa) واختر «الجدول: حذف الصفوف المكررة». تبقى أول نسخة من كل صف. ومن القائمة نفسها يمكنك حذف الصفوف الفارغة، وإزالة المسافات الزائدة، وتغيير حالة أحرف عمود، وتعبئة الخلايا الفارغة للأسفل.',
+          answer: 'افتح «تنظيف» واختر «إزالة الصفوف المكررة»، ثم اختر الأعمدة التي يجب أن تتطابق ليُعدّ الصفّان مكررين. تبقى أول نسخة من كل صف. ومن القائمة نفسها يمكنك حذف الصفوف الفارغة، وإزالة المسافات الزائدة، وتغيير حالة أحرف عمود، وتعبئة الخلايا الفارغة للأسفل.',
         },
         {
           question: 'هل يحافظ محرر CSV على الأصفار البادئة والأرقام الطويلة؟',

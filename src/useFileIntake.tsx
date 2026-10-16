@@ -195,6 +195,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     isReading,
     largeFileWarning,
     openFilePicker: () => fileInputRef.current?.click(),
+    openFiles: openChosenFiles,
     openSampleJson: () => loadFile(new File([SAMPLE_JSON_TEXT], 'sample.json', { type: 'application/json' })),
     promptText,
     redirectSuggestion,

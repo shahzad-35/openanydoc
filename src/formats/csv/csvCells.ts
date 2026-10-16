@@ -1,17 +1,16 @@
-// The CSV edit model and cell helpers, shared by the CSV viewer (loaded for viewing) and the CSV editing module (loaded on
-// first Edit).
+// The CSV edit model and cell helpers.
 //
 // Rows and columns have stable ids so that adding and deleting never shifts the edits: an original row or column keeps its
 // position in the file as its id (0, 1, 2 ...); a row or column added by the visitor gets a negative id (-2, -3 ...). The id
 // -1 is only ever used as an anchor meaning "before the first one". Edits are sparse, so a 100k-row file is never copied.
+// Changes that rebuild the whole table (transpose, split or merge a column, apply the sort to the file) store the new table as
+// `table`; the ids then count from that table, and the earlier sparse edits are folded into it.
 
 import Papa from 'papaparse'
 import { translate, translatePlural } from '../../i18n'
 import type { Locale } from '../../i18n'
-import type { TableFormat } from '../../viewers'
 
-import type { CellPosition } from '../DataTable'
-export type { CellPosition }
+export type CellPosition = { rowId: number; columnId: number }
 
 // A row or column added by the visitor, shown right after the line with id `afterId` (-1 = before the first one).
 export type InsertedLine = { id: number; afterId: number }
@@ -25,56 +24,13 @@ export type CsvEdits = {
   insertedColumns: readonly InsertedLine[]
   nextRowId: number
   nextColumnId: number
+  // The order of the columns after they were moved; null keeps the file's order.
+  columnOrder: readonly number[] | null
+  // The whole table after a change that rebuilt it (header row included when there is one); null uses the file as read.
+  table: string[][] | null
 }
 
 type LineKind = 'row' | 'column'
-
-// What the toolbar tools need to know about the table and the selected cell.
-export type CsvSelection = {
-  cell: CellPosition | null
-  originalText: string
-  isEdited: boolean
-  // The last row and column shown, where "Add row" and "Add column" go when no cell is selected (-1 when there are none).
-  lastRowId: number
-  lastColumnId: number
-  columnCount: number
-  hasHeaderRow: boolean
-} | null
-
-// Everything the export functions need besides the edits.
-export type CsvExportSource = {
-  rows: string[][]
-  hasHeaderRow: boolean
-  detectedDelimiter: string
-  hadByteOrderMark: boolean
-  // The download's name and type: CSV, TSV or Text.
-  tableFormat: TableFormat
-  displayColumnIds: number[]
-  // Rows matching the current search, in the current sort order.
-  visibleRowIds: number[]
-}
-
-// Things the toolbar can ask the viewer to do.
-export type CsvViewerCommands = {
-  toggleFindReplace: () => void
-  // The viewer's actions as they are now, read when a toolbar item is chosen.
-  getActions: () => CsvActions
-}
-
-// What the toolbar's icons do. "Column" actions work on the column of the selected cell.
-export type CsvActions = {
-  insertRow: (side: 'above' | 'below') => void
-  deleteRow: () => void
-  insertColumn: (side: 'left' | 'right') => void
-  deleteColumn: () => void
-  clearCell: () => void
-  revertCell: () => void
-  transformColumn: (transform: CellTextTransform) => void
-  fillColumnDown: () => void
-  trimAllCells: () => void
-  removeEmptyRows: () => void
-  removeDuplicateRows: () => void
-}
 
 export function cellKey(rowId: number, columnId: number) {
   return `${rowId}:${columnId}`
@@ -89,11 +45,6 @@ export function isInsertedLine(id: number) {
   return id <= -2
 }
 
-// The row number from the file; rows added here have none. Used in cell addresses and ids, so "new" is the same in every language.
-export function rowLabel(rowId: number) {
-  return isInsertedLine(rowId) ? 'new' : String(rowId + 1)
-}
-
 export function createEmptyCsvEdits(): CsvEdits {
   return {
     cells: new Map(),
@@ -103,6 +54,8 @@ export function createEmptyCsvEdits(): CsvEdits {
     insertedColumns: [],
     nextRowId: -2,
     nextColumnId: -2,
+    columnOrder: null,
+    table: null,
   }
 }
 
@@ -157,15 +110,40 @@ export function withCellText(edits: CsvEdits, position: CellPosition, originalTe
   return { ...edits, cells: nextCells }
 }
 
+// The columns on display, in order: the file's order (or the moved order), minus the deleted ones, plus the added ones.
+export function getDisplayColumnIds(edits: CsvEdits, columnCount: number) {
+  const columnIds = buildDisplayIds(0, columnCount, edits.deletedColumnIds, edits.insertedColumns)
+  if (edits.columnOrder === null) return columnIds
+  const shownIds = new Set(columnIds)
+  return edits.columnOrder.filter((columnId) => shownIds.has(columnId))
+}
+
 export function withInsertedLine(edits: CsvEdits, kind: LineKind, afterId: number): CsvEdits {
   if (kind === 'row') {
     return { ...edits, insertedRows: [...edits.insertedRows, { id: edits.nextRowId, afterId }], nextRowId: edits.nextRowId - 1 }
+  }
+  let columnOrder = edits.columnOrder
+  if (columnOrder !== null) {
+    const nextOrder = [...columnOrder]
+    nextOrder.splice(nextOrder.indexOf(afterId) + 1, 0, edits.nextColumnId)
+    columnOrder = nextOrder
   }
   return {
     ...edits,
     insertedColumns: [...edits.insertedColumns, { id: edits.nextColumnId, afterId }],
     nextColumnId: edits.nextColumnId - 1,
+    columnOrder,
   }
+}
+
+// Moves a column to another place among the shown columns (`toPosition` counts from 0 in the shown order).
+export function withMovedColumn(edits: CsvEdits, displayColumnIds: readonly number[], columnId: number, toPosition: number): CsvEdits {
+  const fromPosition = displayColumnIds.indexOf(columnId)
+  if (fromPosition === -1 || fromPosition === toPosition || toPosition < 0 || toPosition >= displayColumnIds.length) return edits
+  const columnOrder = [...displayColumnIds]
+  columnOrder.splice(fromPosition, 1)
+  columnOrder.splice(toPosition, 0, columnId)
+  return { ...edits, columnOrder }
 }
 
 // Deleting an original line hides it; deleting one added here removes it for good, with its typed cells, and whatever was
@@ -191,7 +169,13 @@ export function withDeletedLine(edits: CsvEdits, kind: LineKind, id: number): Cs
 
 export function countCsvEdits(edits: CsvEdits) {
   return (
-    edits.cells.size + edits.deletedRowIds.size + edits.deletedColumnIds.size + edits.insertedRows.length + edits.insertedColumns.length
+    edits.cells.size +
+    edits.deletedRowIds.size +
+    edits.deletedColumnIds.size +
+    edits.insertedRows.length +
+    edits.insertedColumns.length +
+    (edits.columnOrder === null ? 0 : 1) +
+    (edits.table === null ? 0 : 1)
   )
 }
 
@@ -215,57 +199,68 @@ export function describeCsvChanges(edits: CsvEdits, locale: Locale) {
     edits.deletedRowIds.size > 0 && translatePlural(locale, 'csv.summary.rowsDeleted', edits.deletedRowIds.size),
     edits.insertedColumns.length > 0 && translatePlural(locale, 'csv.summary.columnsAdded', edits.insertedColumns.length),
     edits.deletedColumnIds.size > 0 && translatePlural(locale, 'csv.summary.columnsDeleted', edits.deletedColumnIds.size),
+    edits.columnOrder !== null && translate(locale, 'csv.summary.columnsMoved'),
+    edits.table !== null && translate(locale, 'csv.summary.tableRebuilt'),
   ]
     .filter(Boolean)
     .join(translate(locale, 'csv.summary.separator'))
 }
 
-// The CSV text the Download icon saves: the header (when the file has one) and the rows the search leaves, in the current
-// sort order, with the edits applied and the deleted and added columns taken into account. No byte order mark.
-export function buildCsvText(edits: CsvEdits, source: CsvExportSource) {
-  const dataRows = source.visibleRowIds.map((rowId) =>
-    source.displayColumnIds.map((columnId) => getCellText(source.rows, edits, rowId, columnId)),
-  )
-  const headerRows = source.hasHeaderRow ? [source.displayColumnIds.map((columnId) => getCellText(source.rows, edits, 0, columnId))] : []
-  return Papa.unparse([...headerRows, ...dataRows], { delimiter: source.detectedDelimiter })
+export type CsvFileOptions = {
+  rowIds: readonly number[]
+  columnIds: readonly number[]
+  // The header row (row 0) goes first; only when the table has one.
+  includeHeaderRow: boolean
+  delimiter: string
+  lineEnding: '\n' | '\r\n'
+  quoteAllFields: boolean
+  byteOrderMark: boolean
 }
 
-export function textMatches(text: string, findText: string, matchCase: boolean) {
-  return matchCase ? text.includes(findText) : text.toLowerCase().includes(findText.toLowerCase())
+// The CSV text a download saves, with the edits applied.
+export function buildCsvFileText(rows: string[][], edits: CsvEdits, options: CsvFileOptions) {
+  const readRow = (rowId: number) => options.columnIds.map((columnId) => getCellText(rows, edits, rowId, columnId))
+  const tableRows = [...(options.includeHeaderRow ? [readRow(0)] : []), ...options.rowIds.map(readRow)]
+  const csvText = Papa.unparse(tableRows, { delimiter: options.delimiter, newline: options.lineEnding, quotes: options.quoteAllFields })
+  return `${options.byteOrderMark ? '﻿' : ''}${csvText}${options.lineEnding}`
 }
 
-function replaceInText(text: string, findText: string, replacement: string, matchCase: boolean) {
-  if (matchCase) return text.split(findText).join(replacement)
-  const escapedFindText = findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-  return text.replace(new RegExp(escapedFindText, 'gi'), () => replacement)
+// The table as it is now (edits applied), for a change that rebuilds it.
+export function readTable(rows: string[][], edits: CsvEdits, rowIds: readonly number[], columnIds: readonly number[]) {
+  return rowIds.map((rowId) => columnIds.map((columnId) => getCellText(rows, edits, rowId, columnId)))
 }
 
-// Replaces the text in every shown cell that contains it, as one change (one undo step). Rows and columns are the ones on
-// display: deleted ones are skipped.
-export function withReplacedText(
-  edits: CsvEdits,
-  rows: string[][],
-  rowIds: readonly number[],
-  columnIds: readonly number[],
-  findText: string,
-  replacement: string,
-  matchCase: boolean,
-) {
-  const nextCells = new Map(edits.cells)
-  let replacedCellCount = 0
-  for (const rowId of rowIds) {
-    for (const columnId of columnIds) {
-      const currentText = getCellText(rows, edits, rowId, columnId)
-      if (!textMatches(currentText, findText, matchCase)) continue
-      const newText = replaceInText(currentText, findText, replacement, matchCase)
-      if (newText === currentText) continue
-      replacedCellCount++
-      const key = cellKey(rowId, columnId)
-      if (newText === getOriginalCellText(rows, rowId, columnId)) nextCells.delete(key)
-      else nextCells.set(key, newText)
-    }
-  }
-  return { edits: replacedCellCount === 0 ? edits : { ...edits, cells: nextCells }, replacedCellCount }
+// The edits after a change that rebuilt the whole table: only the new table is kept, so this is one undo step.
+export function withRebuiltTable(table: string[][]): CsvEdits {
+  return { ...createEmptyCsvEdits(), table }
+}
+
+// The table turned on its side: columns become rows, so the old first column becomes the new first row.
+export function transposeTable(table: string[][]) {
+  const columnCount = Math.max(0, ...table.map((row) => row.length))
+  return Array.from({ length: columnCount }, (_, columnPosition) => table.map((row) => row[columnPosition] ?? ''))
+}
+
+// A column split at every separator into new columns placed after it, named "name_1", "name_2"...; the original can stay.
+export function splitColumnInTable(table: string[][], columnPosition: number, separator: string, keepOriginal: boolean, hasHeaderRow: boolean, maxParts: number) {
+  if (separator === '') return table
+  const dataStart = hasHeaderRow ? 1 : 0
+  const partsByRow = table.map((row, rowPosition) => (rowPosition < dataStart ? [] : (row[columnPosition] ?? '').split(separator).slice(0, maxParts)))
+  const partCount = Math.max(1, ...partsByRow.map((parts) => parts.length))
+  const baseName = hasHeaderRow ? table[0][columnPosition] || `column${columnPosition + 1}` : ''
+  return table.map((row, rowPosition) => {
+    const newCells = Array.from({ length: partCount }, (_, partPosition) => (rowPosition < dataStart ? `${baseName}_${partPosition + 1}` : (partsByRow[rowPosition][partPosition] ?? '')))
+    return [...row.slice(0, keepOriginal ? columnPosition + 1 : columnPosition), ...newCells, ...row.slice(columnPosition + 1)]
+  })
+}
+
+// Two columns joined into a new column placed after the later one (empty parts are left out).
+export function mergeColumnsInTable(table: string[][], firstPosition: number, secondPosition: number, separator: string, newName: string, hasHeaderRow: boolean) {
+  const insertAt = Math.max(firstPosition, secondPosition) + 1
+  return table.map((row, rowPosition) => {
+    const mergedText = hasHeaderRow && rowPosition === 0 ? newName : [row[firstPosition] ?? '', row[secondPosition] ?? ''].filter((text) => text !== '').join(separator)
+    return [...row.slice(0, insertAt), mergedText, ...row.slice(insertAt)]
+  })
 }
 
 // ---------------------------------------------------------------- column and table clean-up
@@ -273,33 +268,39 @@ export function withReplacedText(
 
 export type CellTextTransform = 'trim' | 'upper' | 'lower' | 'capitalize'
 
-const cellTextTransforms: Record<CellTextTransform, (text: string) => string> = {
+export const cellTextTransforms: Record<CellTextTransform, (text: string) => string> = {
   trim: (text) => text.trim().replace(/\s+/g, ' '),
   upper: (text) => text.toLocaleUpperCase(),
   lower: (text) => text.toLocaleLowerCase(),
   capitalize: (text) => text.toLocaleLowerCase().replace(/(^|[\s\-(])(\p{L})/gu, (_match, before: string, letter: string) => before + letter.toLocaleUpperCase()),
 }
 
-// Applies a text change to every shown cell of the given columns.
-export function withTransformedText(
-  edits: CsvEdits,
-  rows: string[][],
-  rowIds: readonly number[],
-  columnIds: readonly number[],
-  transform: CellTextTransform,
-): CsvEdits {
+// Sets many cells at once (paste, clear, replace): one edits object, so one undo step. Unchanged text adds nothing.
+export function withCellTexts(edits: CsvEdits, rows: string[][], changes: readonly (CellPosition & { text: string })[]) {
   const nextCells = new Map(edits.cells)
+  let changedCount = 0
+  for (const { rowId, columnId, text } of changes) {
+    const key = cellKey(rowId, columnId)
+    const originalText = getOriginalCellText(rows, rowId, columnId)
+    if (text === (nextCells.get(key) ?? originalText)) continue
+    changedCount++
+    if (text === originalText) nextCells.delete(key)
+    else nextCells.set(key, text)
+  }
+  return { edits: changedCount === 0 ? edits : { ...edits, cells: nextCells }, changedCount }
+}
+
+// Applies a text change to every given cell (change case, trim, replace).
+export function withMappedCells(edits: CsvEdits, rows: string[][], rowIds: readonly number[], columnIds: readonly number[], mapText: (text: string) => string) {
+  const changes: (CellPosition & { text: string })[] = []
   for (const rowId of rowIds) {
     for (const columnId of columnIds) {
       const currentText = getCellText(rows, edits, rowId, columnId)
-      const newText = cellTextTransforms[transform](currentText)
-      if (newText === currentText) continue
-      const key = cellKey(rowId, columnId)
-      if (newText === getOriginalCellText(rows, rowId, columnId)) nextCells.delete(key)
-      else nextCells.set(key, newText)
+      const newText = mapText(currentText)
+      if (newText !== currentText) changes.push({ rowId, columnId, text: newText })
     }
   }
-  return nextCells.size === edits.cells.size && [...nextCells].every(([key, text]) => edits.cells.get(key) === text) ? edits : { ...edits, cells: nextCells }
+  return withCellTexts(edits, rows, changes)
 }
 
 // Fills every empty cell of a column with the closest filled cell above it.
@@ -321,7 +322,7 @@ export function withFilledDown(edits: CsvEdits, rows: string[][], rowIds: readon
 }
 
 // Deletes many rows at once (a loop of withDeletedLine would copy the set for every row).
-function withDeletedRows(edits: CsvEdits, deletedRowIds: readonly number[]): CsvEdits {
+export function withDeletedRows(edits: CsvEdits, deletedRowIds: readonly number[]): CsvEdits {
   if (deletedRowIds.length === 0) return edits
   const originalIds = deletedRowIds.filter((rowId) => !isInsertedLine(rowId))
   let nextEdits: CsvEdits = { ...edits, deletedRowIds: new Set([...edits.deletedRowIds, ...originalIds]) }
@@ -336,7 +337,14 @@ export function withoutEmptyRows(edits: CsvEdits, rows: string[][], rowIds: read
   return { edits: withDeletedRows(edits, emptyRowIds), removedCount: emptyRowIds.length }
 }
 
-// Keeps the first of every group of identical rows.
+export function withRestoredRow(edits: CsvEdits, rowId: number): CsvEdits {
+  if (!edits.deletedRowIds.has(rowId)) return edits
+  const deletedRowIds = new Set(edits.deletedRowIds)
+  deletedRowIds.delete(rowId)
+  return { ...edits, deletedRowIds }
+}
+
+// Keeps the first of every group of rows that are the same in the given columns.
 export function withoutDuplicateRows(edits: CsvEdits, rows: string[][], rowIds: readonly number[], columnIds: readonly number[]) {
   const seenRowTexts = new Set<string>()
   const duplicateRowIds: number[] = []
