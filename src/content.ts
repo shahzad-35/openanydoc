@@ -14,12 +14,12 @@ export const features: Record<Locale, string[]> = {
     'Handles large CSV files smoothly, because only the visible rows are drawn, even while you edit.',
     'Excel viewer and editor: open XLSX, XLS, XLSM and ODS workbooks with sheet tabs, formatted dates, percentages and currencies, merged cells and cell styles.',
     'Edit Excel cells and formulas that recalculate as you type, insert or delete rows, columns and sheets, add links, change number and date formats and, in XLSX files, fonts, borders, colours and alignment, then save the workbook in its own format.',
-    'JSON viewer, formatter and editor: explore JSON as a collapsible tree, a table (for a list of objects) or formatted code, with search and error messages that give the line and column.',
-    'Edit JSON: change, add, duplicate, move or delete nodes, sort keys and lists, choose the indentation or minify, and find and replace text in values. Large JSON files are read in the background so the page stays responsive.',
+    'JSON viewer, validator and editor: paste, type or open JSON and see the text next to a collapsible tree (or a table for a list of objects) with an inspector, search, a path query, size and depth stats, and errors with the line and column.',
+    'Edit JSON: repair hand-written mistakes (comments, trailing commas, single quotes, unquoted keys), change, add, duplicate, move or delete nodes, sort keys, choose 1 to 8 spaces, a tab or minified, and find and replace in the text. Long numbers are kept exactly, and large files are read in the background.',
     'Text file (TXT) viewer and editor: line numbers, search, font and size choices, change case, tidy spaces, sort, reverse and de-duplicate lines, choose LF or CRLF line endings and find and replace.',
-    'Download what you see (your edits, the current sort and only the rows your search shows) as CSV or JSON, or copy it into Excel or Google Sheets.',
+    'Download what you see (your edits, the current sort and only the rows your search shows) in the file\'s own format.',
     'Reads UTF-8 (with or without a BOM), UTF-16 and Arabic text correctly, and shows Arabic cells right-to-left.',
-    'Files over 50 MB show a warning, and OpenAnyDoc still tries to open them.',
+    'Files over 50 MB show a warning, and OpenAnyDoc still tries to open them. JSON files open up to 10 MB.',
     'Light and dark themes and keyboard-friendly controls.',
   ],
   ar: [
@@ -31,12 +31,12 @@ export const features: Record<Locale, string[]> = {
       'يتعامل بسلاسة مع ملفات CSV الكبيرة، لأن الصفوف الظاهرة فقط هي التي تُرسم، حتى أثناء التحرير.',
       'عارض ومحرر Excel: افتح مصنفات XLSX وXLS وXLSM وODS مع تبويبات الأوراق، والتواريخ والنسب المئوية والعملات بتنسيقها، والخلايا المدمجة وأنماط الخلايا.',
       'عدّل خلايا Excel والصيغ التي تُعاد حسابها أثناء الكتابة، وأدرج الصفوف والأعمدة والأوراق أو احذفها، وأضف الروابط، وغيّر تنسيقات الأرقام والتواريخ، وفي ملفات XLSX غيّر الخطوط والحدود والألوان والمحاذاة، ثم احفظ المصنف بصيغته الأصلية.',
-      'عارض JSON ومنسّقه ومحرره: استعرض JSON كشجرة قابلة للطي أو كجدول (لقائمة من الكائنات) أو كشيفرة منسقة، مع البحث ورسائل خطأ تذكر السطر والعمود.',
-      'تحرير JSON: غيّر العقد وأضفها وكرّرها وانقلها واحذفها، ورتّب المفاتيح والقوائم، واختر المسافة البادئة أو اضغط الملف، وابحث عن النص في القيم واستبدله. تُقرأ ملفات JSON الكبيرة في الخلفية لتبقى الصفحة سريعة الاستجابة.',
+      'عارض JSON ومدقّقه ومحرره: الصق JSON أو اكتبه أو افتحه، وشاهد النص بجانب شجرة قابلة للطي (أو جدول لقائمة من الكائنات) مع لوحة تفاصيل وبحث واستعلام مسار وإحصاءات الحجم والعمق، ورسائل خطأ تذكر السطر والعمود.',
+      'تحرير JSON: أصلح أخطاء الكتابة اليدوية (التعليقات والفواصل الزائدة وعلامات الاقتباس المفردة والمفاتيح غير المقتبسة)، وغيّر العقد وأضفها وكرّرها وانقلها واحذفها، ورتّب المفاتيح، واختر من مسافة إلى 8 مسافات أو علامة جدولة أو التصغير، وابحث في النص واستبدل. تُحفظ الأرقام الطويلة كما هي، وتُقرأ الملفات الكبيرة في الخلفية.',
       'عارض ومحرر الملفات النصية (TXT): أرقام الأسطر، والبحث، واختيار الخط وحجمه، وتغيير حالة الأحرف، وترتيب المسافات، وفرز الأسطر وعكسها وحذف المكرر منها، واختيار نهايات الأسطر LF أو CRLF، والبحث والاستبدال.',
-      'نزّل ما تراه (تعديلاتك، والفرز الحالي، والصفوف التي يعرضها البحث فقط) بصيغة CSV أو JSON، أو انسخه إلى Excel أو Google Sheets.',
+      'نزّل ما تراه (تعديلاتك، والفرز الحالي، والصفوف التي يعرضها البحث فقط) بصيغة الملف نفسها.',
       'يقرأ ترميز UTF-8 (مع BOM أو بدونه) وUTF-16 والنصوص العربية قراءة صحيحة، ويعرض الخلايا العربية من اليمين إلى اليسار.',
-      'تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك.',
+      'تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك. وتُفتح ملفات JSON حتى 10 ميغابايت.',
       'مظهر فاتح ومظهر داكن، وعناصر تحكم تعمل بلوحة المفاتيح.',
   ],
 }
@@ -61,7 +61,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     },
     {
       question: 'How do I view and format a JSON file online?',
-      answer: 'Open your .json file on the JSON viewer. Explore it as a tree, a table or formatted code, see the line and column of any error, then format it with 2 spaces, 4 spaces or a tab, minify it, sort the keys and download it.',
+      answer: 'Open or paste your JSON on the JSON viewer. See the text next to a tree (or a table), validate it and see the line and column of any error, repair common mistakes, then format it with 1 to 8 spaces or a tab, minify it, sort the keys and download it.',
     },
     {
       question: 'Which file types can I open?',
@@ -70,7 +70,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     {
       question: 'Can I edit my file and save the changes?',
       answer:
-        'Yes, for CSV, TXT, JSON and Excel files: switch to Edit, make your changes, with undo and redo, and download a copy. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Excel files keep their formulas, number formats and merged cells, and .xlsx files keep their bold, colours and borders; charts, images and macros are not kept, and styles are not kept in .xls, .ods and .xlsm files or in very large workbooks. Word, PDF and PowerPoint cannot be edited yet.',
+        'Yes, for CSV, TXT, JSON and Excel files: switch to Edit (JSON opens ready to edit), make your changes, with undo and redo, and download a copy. The file on your device is never changed, and your edits are not saved anywhere else, so download a copy before you leave. Excel files keep their formulas, number formats and merged cells, and .xlsx files keep their bold, colours and borders; charts, images and macros are not kept, and styles are not kept in .xls, .ods and .xlsm files or in very large workbooks. Word, PDF and PowerPoint cannot be edited yet.',
     },
     {
       question: 'Which CSV delimiters are supported?',
@@ -84,7 +84,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     {
       question: 'How big can a file be?',
       answer:
-        "There is no fixed limit; it depends on your browser's memory. Files over 50 MB show a warning, and OpenAnyDoc still tries to open them. A CSV file with 100,000 rows opens in under a second.",
+        "There is no fixed limit for CSV, TXT and Excel; it depends on your browser's memory. Files over 50 MB show a warning, and OpenAnyDoc still tries to open them. JSON files are the exception: they open up to 10 MB. A CSV file with 100,000 rows opens in under a second.",
     },
     { question: 'Do I need to install anything or create an account?', answer: 'No. OpenAnyDoc runs in your browser, with no install and no account.' },
     {
@@ -111,7 +111,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     },
     {
       question: 'كيف أعرض ملف JSON وأنسّقه أونلاين؟',
-      answer: 'افتح ملف .json على عارض JSON. استعرضه كشجرة أو جدول أو شيفرة منسقة، وانظر سطر أي خطأ وعموده، ثم نسّقه بمسافتين أو 4 مسافات أو علامة جدولة، أو اضغطه، أو رتّب المفاتيح، ثم نزّله.',
+      answer: 'افتح JSON أو الصقه على عارض JSON. شاهد النص بجانب شجرة (أو جدول)، وتحقّق منه وانظر سطر أي خطأ وعموده، وأصلح الأخطاء الشائعة، ثم نسّقه بمسافة إلى 8 مسافات أو علامة جدولة، أو صغّره، أو رتّب المفاتيح، ثم نزّله.',
     },
     {
       question: 'ما أنواع الملفات التي يمكنني فتحها؟',
@@ -120,7 +120,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     {
       question: 'هل يمكنني تحرير ملفي وحفظ التغييرات؟',
       answer:
-        'نعم، لملفات CSV وTXT وJSON وExcel: انتقل إلى التحرير، وأجرِ تغييراتك مع التراجع والإعادة، ثم نزّل نسخة. الملف الموجود على جهازك لا يتغير أبدًا، وتعديلاتك لا تُحفظ في أي مكان آخر، لذا نزّل نسخة قبل أن تغادر. تحتفظ ملفات Excel بصيغها وتنسيقات الأرقام والخلايا المدمجة، وتحتفظ ملفات .xlsx بالخط الغامق والألوان والحدود؛ أما المخططات والصور وحزم الماكرو فلا تُحفظ، ولا تُحفظ الأنماط في ملفات .xls و.ods و.xlsm ولا في المصنفات الكبيرة جدًا. لا يمكن تحرير Word وPDF وPowerPoint بعد.',
+        'نعم، لملفات CSV وTXT وJSON وExcel: انتقل إلى التحرير (يُفتح JSON جاهزًا للتحرير)، وأجرِ تغييراتك مع التراجع والإعادة، ثم نزّل نسخة. الملف الموجود على جهازك لا يتغير أبدًا، وتعديلاتك لا تُحفظ في أي مكان آخر، لذا نزّل نسخة قبل أن تغادر. تحتفظ ملفات Excel بصيغها وتنسيقات الأرقام والخلايا المدمجة، وتحتفظ ملفات .xlsx بالخط الغامق والألوان والحدود؛ أما المخططات والصور وحزم الماكرو فلا تُحفظ، ولا تُحفظ الأنماط في ملفات .xls و.ods و.xlsm ولا في المصنفات الكبيرة جدًا. لا يمكن تحرير Word وPDF وPowerPoint بعد.',
     },
     {
       question: 'ما الفواصل المدعومة في ملفات CSV؟',
@@ -134,7 +134,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     {
       question: 'ما أكبر حجم يمكن فتحه؟',
       answer:
-        'لا يوجد حد ثابت؛ فالأمر يعتمد على ذاكرة متصفحك. تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك. يُفتح ملف CSV بـ 100,000 صف في أقل من ثانية.',
+        'لا يوجد حد ثابت لملفات CSV وTXT وExcel؛ فالأمر يعتمد على ذاكرة متصفحك. تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك. والاستثناء ملفات JSON: تُفتح حتى 10 ميغابايت. يُفتح ملف CSV بـ 100,000 صف في أقل من ثانية.',
     },
     { question: 'هل أحتاج إلى تثبيت شيء أو إنشاء حساب؟', answer: 'لا. يعمل OpenAnyDoc في متصفحك، بدون تثبيت وبدون حساب.' },
     {

@@ -226,7 +226,7 @@ await test('a JSON file dropped on the CSV page is offered the JSON viewer, with
   await waitFor(`document.body.innerText.includes('This looks like a JSON file.')`, 'the redirect offer')
   expect(await evaluate(`document.body.innerText.includes("This file type isn't supported.")`) === false, 'the plain rejection was shown too')
   await evaluate(`[...document.querySelectorAll('button')].find((button) => button.innerText === 'Open it in the JSON viewer').click()`)
-  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open in the JSON viewer')
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json'`, 'the file to open in the JSON viewer')
   expect(!(await evaluate('location.href')).includes('sample'), 'the file name reached the URL')
   expect((await bannerText()) === null, 'the banner showed on a file page')
 })
@@ -239,10 +239,13 @@ await test('a file nobody opens keeps the friendly rejection', async () => {
 })
 
 await test('saving a file shows one dismissible tip', async () => {
-  await openPage('/en/json-viewer')
-  await chooseFile(sampleJson)
-  await waitFor(`document.querySelector('h1')?.innerText === 'sample.json'`, 'the file to open')
-  const downloadButton = `document.querySelector('button[aria-label="Download"]')`
+  const tipCsv = path.join(scratchFolder, 'tip.csv')
+  fs.writeFileSync(tipCsv, 'id,name\n1,Alpha\n')
+  await openPage('/en/csv-viewer')
+  await chooseFile(tipCsv)
+  await waitFor(`document.querySelector('h1')?.innerText === 'tip.csv'`, 'the file to open')
+  await evaluate(`document.querySelector('#mode-edit-button').click()`)
+  const downloadButton = `document.querySelector('#download-button')`
   await waitFor(`${downloadButton} && !${downloadButton}.disabled`, 'the Download button')
   await evaluate(`${downloadButton}.click()`)
   await waitFor(`[...document.querySelectorAll('[role=status]')].some((status) => status.innerText.includes('also opens and edits'))`, 'the tip')
@@ -339,7 +342,7 @@ fs.writeFileSync(sampleWorkbook, XLSX.write(workbook, { type: 'buffer', bookType
 for (const [name, address, file, readyElement] of [
   ['CSV', '/en/csv-viewer', sampleCsv, '#data-table'],
   ['TXT', '/en/txt-viewer', sampleText, '#text-view'],
-  ['JSON', '/en/json-viewer', sampleJson, '#json-tree'],
+  ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row'],
   ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table'],
 ]) {
   for (const locale of ['en', 'ar']) await test(`${name} (${locale}): every field has an id and no id repeats (page, view mode, edit mode, an open menu)`, async () => {
@@ -348,10 +351,12 @@ for (const [name, address, file, readyElement] of [
     await chooseFile(file)
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
     await expectCleanIds(`${name} view mode`)
-    await evaluate(`document.querySelector('#mode-edit-button').click()`)
-    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled)')`, 'the edit toolbar')
+    // JSON draws its own page, always editable, with its own menus; the other formats switch to Edit.
+    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
+    await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
+    await waitFor(`document.querySelector('${menuButton}')`, 'the editing tools')
     await expectCleanIds(`${name} edit mode`)
-    await evaluate(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled)').click()`)
+    await evaluate(`document.querySelector('${menuButton}').click()`)
     await waitFor(`document.querySelector('[role=menu]')`, 'a menu to open')
     await expectCleanIds(`${name} with a menu open`)
   })
@@ -392,10 +397,10 @@ await test('one drop zone opens every live format with its View / Edit toggle an
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
     await chooseFile(file)
-    await waitFor(`document.querySelector('#mode-toggle')`, `the ${name} file page with its toggle`)
+    await waitFor(`document.querySelector('#mode-toggle') || (${name === 'JSON'} && document.querySelector('#json-workbench'))`, `the ${name} file page with its toggle`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
-    await evaluate(`document.querySelector('#mode-edit-button').click()`)
-    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace')`, `the ${name} tools`)
+    await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
+    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
@@ -535,7 +540,7 @@ await test('on a phone a file for another viewer is offered in a dialog, and an 
     await waitFor(`document.querySelector('#dialog-wrong-file[open] #open-in-viewer-button')`, 'the wrong-file dialog')
     expect(await evaluate(`document.querySelector('#wrong-file-redirect') === null`), 'the inline offer showed on a phone')
     await evaluate(`document.querySelector('#open-in-viewer-button').click()`)
-    await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('h1')?.innerText === 'sample.json'`, 'the JSON file to open')
+    await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json'`, 'the JSON file to open')
     await openPage('/en/csv-viewer')
     await chooseFile(emptyCsv)
     await waitFor(`document.querySelector('#dialog-file-error[open]')`, 'the file error dialog')
@@ -551,16 +556,13 @@ await test('on a phone a file for another viewer is offered in a dialog, and an 
   })
 })
 
-await test('on a phone a JSON syntax error is a slim bar that opens a dialog; the Arabic Excel copy is a toast with a button', async () => {
+await test('on a phone a JSON syntax error opens the Text tab with the error and Repair; the Arabic Excel copy is a toast with a button', async () => {
   await onPhone(async () => {
     await openPage('/en/json-viewer')
     await chooseFile(brokenJson)
-    await waitFor(`document.querySelector('#json-error-bar')`, 'the slim error bar')
-    expect(await evaluate(`document.querySelector('#json-error') === null`), 'the full banner showed on a phone')
-    expect(await evaluate(`document.querySelector('#json-error-bar').getBoundingClientRect().height < 60`), 'the bar is not slim')
-    await evaluate(`document.querySelector('#json-error-bar').click()`)
-    await waitFor(`document.querySelector('#dialog-json-error[open] #json-error-message')`, 'the error dialog')
-    await evaluate(`document.querySelector('#json-error-close-button').click()`)
+    await waitFor(`document.querySelector('#json-workbench[data-mtab=text] #editor-notice.error #notice-repair-button')`, 'the error in the Text tab')
+    expect(await evaluate(`getComputedStyle(document.querySelector('#text-pane')).display === 'flex' && getComputedStyle(document.querySelector('#tree-pane')).display === 'none'`), 'the Text tab is not the one shown')
+    expect(await evaluate(`document.querySelector('#mobile-validity-dot').classList.contains('err')`), 'the Text tab has no red dot')
     for (const locale of ['en', 'ar']) {
       await openPage(`/${locale}/csv-viewer`)
       await chooseFile(arabicCsvForPhone)
@@ -603,6 +605,134 @@ await test("the What's new card closes itself after about 3 seconds, waits while
   expect((await bannerText()) !== null, 'the card closed while the pointer was over it')
   await send('Input.dispatchMouseEvent', { type: 'mouseMoved', x: 5, y: 5 })
   await waitFor(`!document.querySelector('#whats-new-banner')`, 'the card to close after the pointer left', 6000)
+})
+
+
+await test('the same unsupported file twice shows the toast both times', async () => {
+  await openPage('/en')
+  await chooseFile(unknownFile)
+  await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the first toast')
+  await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
+  await waitFor(`!document.querySelector('#toast-region:popover-open')`, 'the first toast to close')
+  await chooseFile(unknownFile)
+  await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the toast for the second try')
+  await chooseFile(unknownFile)
+  await waitFor(`document.querySelectorAll('#toast-region [id^=toast-title]').length === 1`, 'one toast, not two, while the first one is still showing')
+  await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
+  await chooseFile(comingSoonFile)
+  await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the Coming soon toast')
+  await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
+  await chooseFile(comingSoonFile)
+  await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the Coming soon toast for the second try')
+})
+
+
+// ---------------------------------------------------------------- JSON workbench (text and tree side by side)
+
+await test('JSON: sample, split panes, validate, path query, big numbers kept exactly, and the logo goes home', async () => {
+  await openPage('/en/json-viewer')
+  await evaluate(`document.querySelector('#open-sample-json-button').click()`)
+  await waitFor(`document.querySelector('#text-pane #json-text-input') && document.querySelector('#tree-pane #tree-view .row')`, 'the text and the tree side by side')
+  expect(await evaluate(`document.querySelector('#tree-view').innerText.includes('9007199254740993') && document.querySelector('#tree-view .badge.big') !== null`), 'the big number was rounded or not marked in the tree')
+  expect(await evaluate(`document.querySelector('#file-page header') === document.querySelector('#command-bar') && document.querySelector('#edit-toolbar') === null`), 'the shared header or edit toolbar is still on the JSON page')
+  await evaluate(`document.querySelector('#validate-button').click()`)
+  await waitFor(`document.querySelector('#editor-notice.ok')?.innerText.includes('Valid JSON.')`, 'the valid message')
+  const validText = await evaluate(`document.querySelector('#editor-notice').innerText`)
+  expect(validText.includes('33 keys') && validText.includes('depth 5'), `the valid message was: ${validText}`)
+  const statusKeys = await evaluate(`document.querySelector('#stat-keys').textContent`)
+  expect(statusKeys === '33 keys', `the status bar says "${statusKeys}"`)
+  await evaluate(`document.querySelector('#path-query-input').focus()`)
+  await send('Input.insertText', { text: '$.orders[*].total' })
+  await waitFor(`document.querySelector('#query-results-button')?.innerText === '3' && document.querySelector('#query-result-1')`, 'three query results')
+  await evaluate(`document.querySelector('#query-result-1').click()`)
+  await waitFor(`document.querySelector('#inspector-path')?.innerText === '$.orders[1].total'`, 'the inspector to show the chosen result')
+  await evaluate(`window.__blobs = []; const make = URL.createObjectURL; URL.createObjectURL = (blob) => { window.__blobs.push(blob); return make(blob) }`)
+  await evaluate(`document.querySelector('#download-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the download')
+  expect(await evaluate(`window.__blobs[0].text().then((text) => text.includes('9007199254740993'))`), 'the download lost the big number')
+  await evaluate(`document.querySelector('#home-button').click()`)
+  await waitFor(`document.querySelector('#json-workbench') === null`, 'the logo to leave the file page')
+})
+
+await test('JSON: Repair fixes a broken file, and the cursor in the text selects the node in the tree', async () => {
+  const brokenText = path.join(scratchFolder, 'hand-written.json')
+  fs.writeFileSync(brokenText, "{\n  // a comment\n  name: 'Demo',\n  \"list\": [1, 2,],\n  \"ok\": True,\n}\n")
+  await openPage('/en/json-viewer')
+  await chooseFile(brokenText)
+  await waitFor(`document.querySelector('#editor-notice.error #notice-repair-button')`, 'the error message with Repair')
+  expect(await evaluate(`document.querySelector('#mode-edit-button') === null && document.querySelector('.hl-line.err-line') !== null`), 'a View / Edit switch shows, or the error line is not marked')
+  await evaluate(`document.querySelector('#repair-button').click()`)
+  await waitFor(`document.querySelector('#editor-notice.info')?.innerText.includes('Repaired:')`, 'the repair message')
+  const note = await evaluate(`document.querySelector('#editor-notice').innerText`)
+  expect(note.includes('removed 1 comment') && note.includes('quoted 1 key') && note.includes('trailing comma'), `the repair message was: ${note}`)
+  await waitFor(`document.querySelector('#tree-view').innerText.includes('name')`, 'the tree after repair')
+  const textBox = `document.querySelector('#json-text-input')`
+  await waitFor(`${textBox}.value.includes('"list"')`, 'the repaired text')
+  await evaluate(`(() => { const box = ${textBox}; const at = box.value.indexOf('"list"') + 1; box.focus(); box.setSelectionRange(at, at) })()`)
+  await pressKey('ArrowRight', 'ArrowRight', 39)
+  await sleep(300)
+  await waitFor(`document.querySelector('#inspector-path')?.innerText === '$.list'`, 'the node under the cursor to be selected')
+  expect(await evaluate(`document.querySelector('#cursor-position') !== null`), 'the cursor position is not shown')
+})
+
+await test('JSON: pasting JSON on the JSON page opens it; Format offers 1, 2, 3, 4, 8 spaces and tab; Minify writes one line', async () => {
+  await openPage('/en/json-viewer')
+  await evaluate(`(() => { const data = new DataTransfer(); data.setData('text/plain', '{"pasted": [1, 2]}'); window.dispatchEvent(new ClipboardEvent('paste', { clipboardData: data })) })()`)
+  await waitFor(`document.querySelector('#json-workbench .file-tab')?.innerText === 'pasted.json'`, 'the pasted JSON to open')
+  await waitFor(`document.querySelector('#indent-button:not(:disabled)')`, 'the indentation menu')
+  await evaluate(`document.querySelector('#indent-button').click()`)
+  await waitFor(`document.querySelector('#indent-button-menu')`, 'the indentation menu to open')
+  const itemCount = await evaluate(`document.querySelectorAll('#indent-button-menu [role=menuitemradio]').length`)
+  expect(itemCount === 6, `the indentation menu has ${itemCount} choices`)
+  await evaluate(`document.querySelector('#indent-button-menu-4-spaces').click()`)
+  await waitFor(`document.querySelector('#json-text-input').value.includes('\\n    "pasted"')`, 'the text with 4 spaces')
+  await evaluate(`document.querySelector('#minify-button').click()`)
+  await waitFor(`document.querySelector('#json-text-input').value === '{"pasted":[1,2]}' && document.querySelector('#indent-status').innerText === 'Minified'`, 'the minified text')
+})
+
+await test('JSON over 10 MB is refused with a toast before it is read; 10 MB exactly opens', async () => {
+  const limitBytes = 10 * 1024 * 1024
+  const tooLargeJson = path.join(scratchFolder, 'too-large.json')
+  const limitJson = path.join(scratchFolder, 'at-limit.json')
+  fs.writeFileSync(tooLargeJson, `[${' '.repeat(limitBytes + limitBytes / 20)}]`)
+  fs.writeFileSync(limitJson, `[${' '.repeat(limitBytes - 2)}]`)
+  for (const address of ['/en', '/en/json-viewer', '/ar/json-viewer']) {
+    await openPage(address)
+    await chooseFile(tooLargeJson)
+    await waitFor(`document.querySelector('#toast-region:popover-open')?.innerText.includes('10 MB')`, `${address}: the too-large toast with the limit`)
+    const toastText = await evaluate(`document.querySelector('#toast-region').outerHTML.replace(/<[^>]+>/g, ' ')`)
+    expect(address.startsWith('/ar') ? toastText.includes('10 MB') : toastText.includes('too large') && toastText.includes('JSON files up to'), `${address}: the toast said: ${toastText}`)
+    expect(await evaluate(`document.querySelector('#json-workbench') === null`), `${address}: the too-large file opened`)
+  }
+  await openPage('/en/json-viewer')
+  await chooseFile(limitJson)
+  await waitFor(`document.querySelector('#json-workbench #tree-view')`, 'the 10 MB file to open')
+})
+
+await test('JSON in Arabic: the bars mirror, the code and tree stay left to right', async () => {
+  await openPage('/ar/json-viewer')
+  await evaluate(`document.querySelector('#open-sample-json-button').click()`)
+  await waitFor(`document.querySelector('#tree-view .row')`, 'the tree')
+  const layout = await evaluate(`({ home: document.querySelector('#home-button').getBoundingClientRect().right, download: document.querySelector('#download-button').getBoundingClientRect().left, width: innerWidth, tree: getComputedStyle(document.querySelector('#tree-view')).direction, code: getComputedStyle(document.querySelector('#json-text-input')).direction })`)
+  expect(layout.home > layout.width - 60 && layout.download < 60, 'the command bar is not mirrored')
+  expect(layout.tree === 'ltr' && layout.code === 'ltr', 'the tree or the code is right to left')
+  await expectCleanIds('JSON (ar) workbench')
+})
+
+await test('JSON on a phone: Text, Tree and Inspector tabs instead of side by side', async () => {
+  await onPhone(async () => {
+    await openPage('/en/json-viewer')
+    await evaluate(`document.querySelector('#open-sample-json-button').click()`)
+    await waitFor(`document.querySelector('#tree-view .row')`, 'the tree')
+    const shown = (id) => `getComputedStyle(document.querySelector('${id}')).display !== 'none'`
+    expect(await evaluate(`${shown('#mobile-pane-tabs')} && ${shown('#tree-pane')} && !(${shown('#text-pane')})`), 'both panes show on a phone')
+    await evaluate(`document.querySelector('#mobile-tab-text').click()`)
+    await waitFor(`${shown('#text-pane')} && !(${shown('#tree-pane')})`, 'the text tab')
+    await evaluate(`document.querySelector('#mobile-tab-inspector').click()`)
+    await waitFor(`${shown('#inspector-drawer')} && !(${shown('#tree-view')})`, 'the inspector tab')
+    expect(await evaluate(`${shown('#mobile-action-bar')}`), 'the action bar is missing on a phone')
+    expect(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), 'the page scrolls sideways on a phone')
+  })
 })
 
 // ---------------------------------------------------------------- report

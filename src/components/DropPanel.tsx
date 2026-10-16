@@ -137,12 +137,17 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
         <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />
 
         {intake.fileInput}
-        <div className="mt-6">
+        <div className="mt-6 flex flex-wrap justify-center gap-3">
           <button id="choose-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className={primaryButtonClassName}>
             {t('drop.chooseFile')}
           </button>
+          {currentViewerId === 'json' && (
+            <button id="open-sample-json-button" type="button" disabled={intake.isReading} onClick={intake.openSampleJson} className={secondaryButtonClassName}>
+              {t('drop.trySampleJson')}
+            </button>
+          )}
         </div>
-        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{t('drop.pasteHint')}</p>}
+        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{t(currentViewerId === 'json' ? 'drop.pasteHintJson' : 'drop.pasteHint')}</p>}
         <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
@@ -152,10 +157,11 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
             kind="info"
             alwaysToast
             seconds={REJECTED_FILE_TOAST_SECONDS}
+            attempt={intake.attemptCount}
             message={intake.comingSoonViewer ? t('intake.comingSoon', { format: intake.comingSoonViewer.label }) : ''}
             detail={t('intake.tryThese')}
           />
-          <Notice id="drop-error" kind={intake.errorDetail ? 'info' : 'error'} alwaysToast seconds={REJECTED_FILE_TOAST_SECONDS} message={intake.errorMessage ?? ''} detail={intake.errorDetail ?? undefined} />
+          <Notice id="drop-error" kind={intake.errorDetail ? 'info' : 'error'} alwaysToast seconds={REJECTED_FILE_TOAST_SECONDS} attempt={intake.attemptCount} message={intake.errorMessage ?? ''} detail={intake.errorDetail ?? undefined} />
           {suggestion && !isPhone && (
             <div id="wrong-file-redirect" className="flex flex-col items-center gap-3">
               <p id="wrong-file-message" className="font-medium">{wrongFileMessage}</p>

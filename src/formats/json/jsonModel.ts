@@ -1,49 +1,23 @@
 import { translate, translatePlural } from '../../i18n'
 import type { Locale } from '../../i18n'
 import type { EditingModule, ExportOption } from '../registry'
-import type { JsonViewActions, JsonViewSettings } from './jsonViewTools'
+import { isBigNumber, restoreBigNumbers } from './jsonTools'
+import type { BigNumber } from './jsonTools'
 
-export type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue }
+// A BigNumber is a number too long to keep in a JavaScript number, held as its exact text (see jsonTools.ts).
+export type JsonValue = null | boolean | number | BigNumber | string | JsonValue[] | { [key: string]: JsonValue }
 export type JsonContainer = JsonValue[] | { [key: string]: JsonValue }
 // The steps from the document root to a node: object keys and array positions.
 export type JsonPath = (string | number)[]
 
-export type JsonParseResult = { status: 'ok'; value: JsonValue } | { status: 'error'; message: string; line: number | null; column: number | null }
+export type JsonParseResult = { status: 'ok'; value: JsonValue; bigNumberCount: number } | { status: 'error'; message: string; line: number | null; column: number | null }
 
 // The edit model: the parsed document, changed by copying only the path to the changed node, so the undo history shares
 // everything else and stays small even for a 50 MB file. `root` is null until the first edit (the original text is then used).
 // `indent` is what JSON.stringify gets as its spacing: 0 is minified, a number is that many spaces, '\t' is a tab.
-export type JsonIndent = 0 | 2 | 4 | '\t'
+export type JsonIndent = 0 | 1 | 2 | 3 | 4 | 8 | '\t'
 export type JsonEdits = { root: JsonValue | null; indent: JsonIndent; changeCount: number }
 export type JsonExportSource = { originalText: string }
-
-// What the toolbar needs to know about the open document and the selected node.
-export type JsonSelection = {
-  isValid: boolean
-  hasDocument: boolean
-  // The selected node in the tree: its kind, whether it is the root, and where it stands among its siblings.
-  selectedNode: { kind: 'object' | 'array' | 'value'; isRoot: boolean; isFirst: boolean; isLast: boolean } | null
-  indent: JsonIndent
-  view: JsonViewSettings
-} | null
-
-// Things the toolbar can ask the viewer to do.
-export type JsonViewerCommands = {
-  toggleFindReplace: () => void
-  // The viewer's actions as they are now, read when a toolbar item is chosen.
-  getActions: () => JsonActions
-}
-
-export type JsonActions = JsonViewActions & {
-  setIndent: (indent: JsonIndent) => void
-  // Sorts the keys of the selected object, or of the whole document when no object is selected.
-  sortKeys: (direction: 'asc' | 'desc', includeNested: boolean) => void
-  sortSelectedArray: (direction: 'asc' | 'desc') => void
-  addChild: () => void
-  duplicateNode: () => void
-  moveNode: (direction: -1 | 1) => void
-  deleteNode: () => void
-}
 
 export const createEmptyJsonEdits = (): JsonEdits => ({ root: null, indent: 2, changeCount: 0 })
 export const countJsonChanges = (edits: unknown) => (edits as JsonEdits).changeCount
@@ -55,11 +29,11 @@ export function describeJsonChanges(edits: unknown, locale: Locale) {
 }
 
 export function isContainer(value: JsonValue): value is JsonContainer {
-  return typeof value === 'object' && value !== null
+  return typeof value === 'object' && value !== null && !isBigNumber(value)
 }
 
 export function isPlainObject(value: JsonValue | undefined): value is { [key: string]: JsonValue } {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
+  return typeof value === 'object' && value !== null && !Array.isArray(value) && !isBigNumber(value)
 }
 
 const TABLE_CHECK_ROW_COUNT = 1000
@@ -83,7 +57,8 @@ export function parseJsonText(text: string, locale: Locale): Promise<JsonParseRe
     const worker = new Worker(new URL('./jsonParse.worker.ts', import.meta.url), { type: 'module' })
     worker.onmessage = (event: MessageEvent<JsonParseResult>) => {
       worker.terminate()
-      resolve(event.data)
+      const result = event.data
+      resolve(result.status === 'ok' && result.bigNumberCount > 0 ? { ...result, value: restoreBigNumbers(result.value) } : result)
     }
     worker.onerror = () => {
       worker.terminate()
@@ -156,13 +131,20 @@ export function withMovedNode(root: JsonValue, path: JsonPath, direction: -1 | 1
   })
 }
 
-// Adds a null at the end of an array, or a key named "newKey" (then "newKey2"...) to an object.
-export function withAddedChild(root: JsonValue, containerPath: JsonPath): JsonValue {
+// Adds a null to an array, or a key named "newKey" (then "newKey2"...) to an object: right after the child `afterStep`, or at the
+// end when it is not given.
+export function withAddedChild(root: JsonValue, containerPath: JsonPath, afterStep?: string | number): JsonValue {
   return withChangedContainer(root, containerPath, (container) => {
-    if (Array.isArray(container)) return [...container, null]
+    if (Array.isArray(container)) {
+      const copy = container.slice()
+      copy.splice(afterStep === undefined ? copy.length : (afterStep as number) + 1, 0, null)
+      return copy
+    }
     let newKey = 'newKey'
     for (let suffix = 2; newKey in container; suffix++) newKey = `newKey${suffix}`
-    return { ...container, [newKey]: null }
+    const entries = Object.entries(container)
+    entries.splice(afterStep === undefined ? entries.length : entries.findIndex(([key]) => key === afterStep) + 1, 0, [newKey, null])
+    return Object.fromEntries(entries)
   })
 }
 
@@ -206,21 +188,6 @@ export function sortKeys(value: JsonValue, direction: 'asc' | 'desc', includeNes
   return isUnchanged ? value : Object.fromEntries(sortedEntries)
 }
 
-function compareArrayItems(firstItem: JsonValue, secondItem: JsonValue) {
-  if (typeof firstItem === 'number' && typeof secondItem === 'number') return firstItem - secondItem
-  const asText = (item: JsonValue) => (typeof item === 'string' ? item : JSON.stringify(item))
-  return keyCollator.compare(asText(firstItem), asText(secondItem))
-}
-
-// Puts the items of the array at `path` in order: numbers by size, text and other items by their text.
-export function withSortedArray(root: JsonValue, path: JsonPath, direction: 'asc' | 'desc'): JsonValue {
-  const array = getNodeAt(root, path)
-  if (!Array.isArray(array)) return root
-  const directionFactor = direction === 'asc' ? 1 : -1
-  const sortedItems = array.slice().sort((firstItem, secondItem) => directionFactor * compareArrayItems(firstItem, secondItem))
-  return sortedItems.every((item, position) => item === array[position]) ? root : withValueAt(root, path, sortedItems)
-}
-
 // A copy of the node right after it: an item in a list, or a key named "name copy" (then "name copy 2") in an object.
 export function withDuplicatedNode(root: JsonValue, path: JsonPath): JsonValue {
   const step = path[path.length - 1]
@@ -238,33 +205,6 @@ export function withDuplicatedNode(root: JsonValue, path: JsonPath): JsonValue {
   })
 }
 
-function textMatches(text: string, findText: string, matchCase: boolean) {
-  return matchCase ? text.includes(findText) : text.toLowerCase().includes(findText.toLowerCase())
-}
-
-export function countMatchingValues(value: JsonValue, findText: string, matchCase: boolean): number {
-  if (findText === '') return 0
-  if (typeof value === 'string') return textMatches(value, findText, matchCase) ? 1 : 0
-  if (!isContainer(value)) return 0
-  return getChildEntries(value).reduce((total, [, child]) => total + countMatchingValues(child, findText, matchCase), 0)
-}
-
-// Replaces the text inside the string values (keys and the document's structure are never touched).
-export function withReplacedValues(value: JsonValue, findText: string, replacement: string, matchCase: boolean): JsonValue {
-  if (typeof value === 'string') {
-    if (!textMatches(value, findText, matchCase)) return value
-    if (matchCase) return value.split(findText).join(replacement)
-    return value.replace(new RegExp(findText.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'gi'), () => replacement)
-  }
-  if (!isContainer(value)) return value
-  if (Array.isArray(value)) {
-    const replacedItems = value.map((item) => withReplacedValues(item, findText, replacement, matchCase))
-    return replacedItems.every((item, position) => item === value[position]) ? value : replacedItems
-  }
-  const replacedEntries = Object.entries(value).map(([key, child]): [string, JsonValue] => [key, withReplacedValues(child, findText, replacement, matchCase)])
-  return replacedEntries.every(([key, child]) => child === value[key]) ? value : Object.fromEntries(replacedEntries)
-}
-
 export const getPathKey = (path: JsonPath) => JSON.stringify(path)
 
 // A path in the usual dotted form: $.users[0].address["zip code"]
@@ -275,19 +215,21 @@ export function formatPathText(path: JsonPath) {
   )
 }
 
-export type TreeRow = { path: JsonPath; pathKey: string; label: string | number | null; value: JsonValue; depth: number }
+// `position` and `siblingCount` place the row among its parent's children (the root is 0 of 1).
+export type TreeRow = { path: JsonPath; pathKey: string; label: string | number | null; value: JsonValue; depth: number; position: number; siblingCount: number }
 
 // The rows on screen: the root, and the children of every expanded container, in order.
 export function flattenVisibleNodes(root: JsonValue, expandedKeys: ReadonlySet<string>): TreeRow[] {
   const rows: TreeRow[] = []
-  const pending: TreeRow[] = [{ path: [], pathKey: getPathKey([]), label: null, value: root, depth: 0 }]
+  const pending: TreeRow[] = [{ path: [], pathKey: getPathKey([]), label: null, value: root, depth: 0, position: 0, siblingCount: 1 }]
   while (pending.length > 0) {
     const row = pending.pop() as TreeRow
     rows.push(row)
     if (isContainer(row.value) && expandedKeys.has(row.pathKey)) {
-      const childRows = getChildEntries(row.value).map(([label, value]) => {
+      const entries = getChildEntries(row.value)
+      const childRows = entries.map(([label, value], position) => {
         const path = [...row.path, label]
-        return { path, pathKey: getPathKey(path), label, value, depth: row.depth + 1 }
+        return { path, pathKey: getPathKey(path), label, value, depth: row.depth + 1, position, siblingCount: entries.length }
       })
       for (let position = childRows.length - 1; position >= 0; position--) pending.push(childRows[position])
     }
@@ -298,13 +240,14 @@ export function flattenVisibleNodes(root: JsonValue, expandedKeys: ReadonlySet<s
 // Expand all stops once this many rows would be on screen, so a huge file does not freeze the page.
 export const EXPAND_ALL_ROW_LIMIT = 20_000
 
-export function expandNodesUpToLimit(root: JsonValue): { expandedKeys: Set<string>; isLimited: boolean } {
+// Opens every container (or those above `maxLevel`: 1 opens the root only, 2 also its children ...) until the row limit.
+export function expandNodesUpToLimit(root: JsonValue, maxLevel = Infinity): { expandedKeys: Set<string>; isLimited: boolean } {
   const expandedKeys = new Set<string>()
   let rowCount = 1
   const queue: { path: JsonPath; value: JsonValue }[] = [{ path: [], value: root }]
   for (let position = 0; position < queue.length; position++) {
     const { path, value } = queue[position]
-    if (!isContainer(value)) continue
+    if (!isContainer(value) || path.length >= maxLevel) continue
     const children = getChildEntries(value)
     if (rowCount + children.length > EXPAND_ALL_ROW_LIMIT) return { expandedKeys, isLimited: true }
     rowCount += children.length

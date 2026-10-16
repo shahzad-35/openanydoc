@@ -177,16 +177,17 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   )
 }
 
-type NoticeProps = { id: string; kind: ToastKind; role?: 'alert' | 'status'; className?: string; message: string; detail?: string; alwaysToast?: boolean; seconds?: number }
+type NoticeProps = { id: string; kind: ToastKind; role?: 'alert' | 'status'; className?: string; message: string; detail?: string; alwaysToast?: boolean; seconds?: number; attempt?: number }
 
 // A message that is an inline line on a wide screen (exactly the paragraph it replaces: same id, role and classes) and a toast on a
 // phone, shown once each time the text changes.
-export function Notice({ id, kind, role, className, message, detail, alwaysToast = false, seconds }: NoticeProps) {
+export function Notice({ id, kind, role, className, message, detail, alwaysToast = false, seconds, attempt }: NoticeProps) {
   const isPhone = useIsPhone()
   const { showToast } = useToast()
   useEffect(() => {
     if ((isPhone || alwaysToast) && message !== '') showToast({ message, description: detail, kind, seconds })
-  }, [isPhone, alwaysToast, message, detail, kind, seconds, showToast])
+    // `attempt` changes when the same message happens again, so it shows again.
+  }, [isPhone, alwaysToast, message, detail, kind, seconds, attempt, showToast])
   if (isPhone || alwaysToast || message === '') return null
   return (
     <p id={id} role={role} className={className}>

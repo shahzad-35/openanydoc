@@ -1,0 +1,358 @@
+/* The JSON file page: design option 1, "Studio split" (.claude/design-options/json-viewer/option-1-studio-split.html), ported as
+   it is. Everything is scoped to #json-workbench, so no other page gets these rules. Light and dark follow the site's .dark class.
+   Physical sides (left, right) became logical ones (start, end) so the page mirrors in Arabic; the code and the tree stay
+   left-to-right. The site's own tokens are pointed at the studio's colours, so shared parts (the table) match. */
+
+#json-workbench {
+  --ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Inter, Roboto, "Helvetica Neue", sans-serif;
+  --mono: "JetBrains Mono", "SF Mono", ui-monospace, Menlo, Consolas, "Liberation Mono", monospace;
+  --bg: #eef0f4; --panel: #ffffff; --panel-2: #f8f9fb; --raised: #ffffff; --hover: rgba(20, 28, 45, .06);
+  --line: #e2e5eb; --line-strong: #d0d5de; --guide: #e6e9ef;
+  --text: #1b1f27; --muted: #535b6a; --faint: #69717f;
+  --accent: #4353e0; --accent-text: #3343c9; --accent-soft: rgba(67, 83, 224, .10); --accent-line: rgba(67, 83, 224, .45); --on-accent: #ffffff;
+  --ok: #13804a; --ok-soft: rgba(19, 128, 74, .10); --err: #c42b37; --err-soft: rgba(196, 43, 55, .08); --warn: #8f5200; --warn-soft: rgba(176, 104, 0, .12);
+  --cur-line: rgba(67, 83, 224, .06); --sel-text: rgba(67, 83, 224, .22);
+  --sx-key: #1c5cb4; --sx-str: #17734a; --sx-num: #a94f06; --sx-bool: #7234d6; --sx-null: #b5265d; --sx-punct: #5f6776;
+  --shadow: 0 12px 32px -8px rgba(16, 24, 40, .22), 0 2px 6px rgba(16, 24, 40, .08);
+  --show-sun: none; --show-moon: block;
+  color-scheme: light;
+
+  --paper: var(--panel-2); --paper-raised: var(--panel); --ink: var(--text); --ink-soft: var(--muted); --rule: var(--line);
+  --danger: var(--err); --edit-mark: var(--warn); --file-color: var(--accent); --font-mono: var(--mono); --font-sans: var(--ui);
+}
+.dark #json-workbench {
+  --bg: #090b10; --panel: #0f1218; --panel-2: #0c0f14; --raised: #161a23; --hover: rgba(255, 255, 255, .06);
+  --line: #1e232e; --line-strong: #2b3242; --guide: #1d222c;
+  --text: #e4e7ee; --muted: #a0a8b9; --faint: #7f889b;
+  --accent: #8b9cff; --accent-text: #a9b5ff; --accent-soft: rgba(139, 156, 255, .14); --accent-line: rgba(139, 156, 255, .5); --on-accent: #0a0c12;
+  --ok: #4fdc9b; --ok-soft: rgba(79, 220, 155, .12); --err: #ff7b86; --err-soft: rgba(255, 123, 134, .11); --warn: #f3bb69; --warn-soft: rgba(243, 187, 105, .13);
+  --cur-line: rgba(139, 156, 255, .07); --sel-text: rgba(139, 156, 255, .28);
+  --sx-key: #8ec6ff; --sx-str: #9fe0a9; --sx-num: #f6b77b; --sx-bool: #cba5ff; --sx-null: #ff9fc2; --sx-punct: #8b93a6;
+  --shadow: 0 16px 40px -10px rgba(0, 0, 0, .7), 0 2px 8px rgba(0, 0, 0, .4);
+  --show-sun: block; --show-moon: none;
+  color-scheme: dark;
+}
+html[lang="ar"] #json-workbench {
+  --ui: "IBM Plex Sans Arabic", system-ui, "Segoe UI", Tahoma, "Geeza Pro", "Noto Sans Arabic", sans-serif;
+}
+
+#json-workbench * { box-sizing: border-box }
+#json-workbench { background: var(--bg); color: var(--text); font: 13px/1.4 var(--ui); height: 100dvh; display: grid; grid-template-rows: auto 1fr auto; grid-template-columns: minmax(0, 1fr); overflow: hidden; -webkit-font-smoothing: antialiased }
+#json-workbench :is(button, input, select, textarea) { font: inherit; color: inherit }
+#json-workbench button { cursor: pointer }
+#json-workbench svg { flex: none; display: inline-block }
+#json-workbench :focus-visible { outline: 2px solid var(--accent); outline-offset: 1px }
+#json-workbench .mono { font-family: var(--mono) }
+#json-workbench .spacer { flex: 1 }
+#json-workbench .ico { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round }
+#json-workbench .ico.sm { width: 14px; height: 14px }
+#json-workbench .vsep { width: 1px; height: 18px; background: var(--line); flex: none }
+#json-workbench .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap }
+
+/* Buttons */
+#json-workbench .btn { height: 30px; padding: 0 10px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid transparent; border-radius: 7px; background: transparent; white-space: nowrap; font-weight: 500; font-size: 12.5px; text-decoration: none }
+#json-workbench .btn:hover { background: var(--hover) }
+#json-workbench .btn:disabled { opacity: .45; cursor: not-allowed }
+#json-workbench .btn.icon { width: 30px; padding: 0; justify-content: center }
+#json-workbench .btn.sm { height: 26px; padding: 0 8px; font-size: 12px }
+#json-workbench .btn.sm.icon { width: 26px; padding: 0 }
+#json-workbench .btn.primary { background: var(--accent); color: var(--on-accent); font-weight: 600 }
+#json-workbench .btn.primary:hover { filter: brightness(1.08); background: var(--accent) }
+#json-workbench .btn.outline { border-color: var(--line-strong); background: var(--panel) }
+#json-workbench .btn.danger { color: var(--err) }
+
+/* Command bar */
+#json-workbench #command-bar { display: flex; align-items: center; gap: 10px; height: 50px; padding: 0 12px; background: var(--panel); border-bottom: 1px solid var(--line); position: relative; z-index: 5 }
+#json-workbench .brand { display: flex; align-items: center; gap: 9px; min-width: 0; padding: 0; border: 0; background: transparent; text-align: start }
+#json-workbench .logo { width: 26px; height: 26px; border-radius: 7px; background: linear-gradient(135deg, #6f7dff, #3fb8c9); display: grid; place-items: center; flex: none }
+#json-workbench .logo svg { width: 16px; height: 16px; stroke: #fff; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round }
+#json-workbench .brand-name { font-weight: 650; letter-spacing: -.01em }
+#json-workbench .slash { color: var(--line-strong); font-size: 18px; font-weight: 300 }
+#json-workbench .page-title { margin: 0; font-size: 13px; font-weight: 500; color: var(--muted); white-space: nowrap }
+#json-workbench .file-chip { display: inline-flex; align-items: center; gap: 7px; height: 28px; padding-block: 0; padding-inline: 8px 10px; border: 1px solid var(--line); border-radius: 999px; background: var(--panel-2); font-size: 12px; min-width: 0; max-width: 260px }
+#json-workbench .file-chip .fname { overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench .file-chip:hover { border-color: var(--line-strong) }
+#json-workbench .file-chip .fsize { color: var(--muted); font-family: var(--mono); font-size: 11px; white-space: nowrap }
+#json-workbench .file-chip .mod { width: 6px; height: 6px; border-radius: 50%; background: var(--accent); flex: none }
+#json-workbench .cmds { display: flex; align-items: center; gap: 2px; padding: 2px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel-2) }
+#json-workbench .cmds .btn { height: 28px }
+#json-workbench .split-btn { position: relative; display: inline-flex; align-items: center }
+#json-workbench .split-btn .caret { padding-block: 0; padding-inline: 7px 8px; border-inline-start: 1px solid var(--line); border-radius: 0; border-start-end-radius: 7px; border-end-end-radius: 7px; gap: 4px; font-family: var(--mono); font-size: 11.5px; color: var(--muted) }
+#json-workbench .split-btn .main { border-radius: 0; border-start-start-radius: 7px; border-end-start-radius: 7px }
+#json-workbench .search { display: flex; align-items: center; gap: 7px; height: 30px; width: 232px; padding-block: 0; padding-inline: 9px 6px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel-2); color: var(--muted) }
+#json-workbench .search:focus-within { border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-soft) }
+#json-workbench .search input { flex: 1; min-width: 0; border: 0; background: transparent; outline: none; font-size: 12.5px; color: var(--text) }
+#json-workbench .search input::placeholder { color: var(--faint) }
+#json-workbench kbd { font: 500 10.5px var(--mono); padding: 1px 5px; border: 1px solid var(--line-strong); border-bottom-width: 2px; border-radius: 4px; color: var(--muted) }
+#json-workbench #search-count { font: 11px var(--mono); color: var(--accent-text); white-space: nowrap }
+#json-workbench .i-sun { display: var(--show-sun) }
+#json-workbench .i-moon { display: var(--show-moon) }
+#json-workbench #mobile-search-button { display: none }
+#json-workbench #language-switch-link { font-size: 12.5px }
+
+/* Menus */
+#json-workbench .menu { position: absolute; top: calc(100% + 6px); inset-inline-start: 0; min-width: 170px; padding: 4px; background: var(--raised); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow); z-index: 30 }
+#json-workbench .menu.right { inset-inline-start: auto; inset-inline-end: 0 }
+#json-workbench .menu-label { padding: 6px 9px 4px; font-size: 11px; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase }
+#json-workbench .menu button { display: flex; align-items: center; gap: 8px; width: 100%; height: 30px; padding: 0 9px; border: 0; border-radius: 6px; background: transparent; font-size: 12.5px; text-align: start; white-space: nowrap }
+#json-workbench .menu button:hover, #json-workbench .menu button:focus-visible { background: var(--accent-soft); outline: none }
+#json-workbench .menu .check { width: 14px; visibility: hidden; color: var(--accent-text) }
+#json-workbench .menu [aria-checked="true"] .check { visibility: visible }
+#json-workbench .menu .hint { margin-inline-start: auto; padding-inline-start: 12px; color: var(--faint); font: 11px var(--mono) }
+
+/* Workbench */
+#json-workbench #workbench { display: grid; grid-template-columns: minmax(300px, var(--left, 46%)) 5px minmax(380px, 1fr); min-height: 0; min-width: 0 }
+#json-workbench .pane { display: flex; flex-direction: column; min-width: 0; min-height: 0; background: var(--panel); position: relative }
+#json-workbench .pane-head { display: flex; align-items: center; gap: 4px; height: 40px; padding-block: 0; padding-inline: 12px 8px; border-bottom: 1px solid var(--line); flex: none }
+#json-workbench .pane-title { font-size: 11px; font-weight: 650; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); margin-inline-end: 6px }
+#json-workbench .pane-sub { font-size: 11.5px; color: var(--faint); white-space: nowrap; display: inline-flex; align-items: center; gap: 6px }
+#json-workbench .file-tab { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 9px; border-radius: 6px; background: var(--panel-2); border: 1px solid var(--line); font: 12px var(--mono); margin-inline-end: 6px; min-width: 0; max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench .file-tab .ico { color: var(--accent-text) }
+#json-workbench #split-handle { background: var(--line); cursor: col-resize; position: relative; touch-action: none }
+#json-workbench #split-handle::after { content: ""; position: absolute; inset: 0 -3px }
+#json-workbench #split-handle:hover, #json-workbench #split-handle.dragging, #json-workbench #split-handle:focus-visible { background: var(--accent); outline: none }
+#json-workbench #split-handle .grip { position: absolute; top: 50%; left: 50%; width: 3px; height: 28px; margin: -14px 0 0 -1.5px; border-radius: 2px; background: var(--line-strong) }
+
+/* Editor */
+#json-workbench #editor-notice { margin: 10px 12px 0; flex: none }
+#json-workbench .notice { display: flex; align-items: center; gap: 10px; padding-block: 7px; padding-inline: 11px 8px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; background: var(--panel-2) }
+#json-workbench .notice .ico { color: var(--accent-text) }
+#json-workbench .notice.info { border-color: var(--accent-line); background: var(--accent-soft) }
+#json-workbench .notice.ok { border-color: color-mix(in srgb, var(--ok) 40%, transparent); background: var(--ok-soft) }
+#json-workbench .notice.ok .ico { color: var(--ok) }
+#json-workbench .notice.error { border-color: color-mix(in srgb, var(--err) 45%, transparent); background: var(--err-soft) }
+#json-workbench .notice.error .ico { color: var(--err) }
+#json-workbench .notice .msg { flex: 1; min-width: 0 }
+#json-workbench .notice strong { font-weight: 650 }
+#json-workbench .notice code { font-family: var(--mono); font-size: 11.5px }
+#json-workbench #find-replace-bar { display: flex; gap: 6px; align-items: center; padding: 8px 12px; border-bottom: 1px solid var(--line); background: var(--panel-2); flex-wrap: wrap }
+#json-workbench .field { display: flex; align-items: center; gap: 6px; height: 28px; padding: 0 8px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--panel); min-width: 0; flex: 1 }
+#json-workbench .field input { border: 0; outline: none; background: transparent; min-width: 0; flex: 1; font: 12px var(--mono) }
+#json-workbench .field:focus-within { border-color: var(--accent-line) }
+#json-workbench .editor { flex: 1; display: grid; grid-template-columns: auto 1fr; min-height: 0; background: var(--panel-2); margin-top: 10px; border-top: 1px solid var(--line) }
+#json-workbench #editor-gutter { width: 50px; overflow: hidden; font: 12.5px/20px var(--mono); color: var(--faint); text-align: right; user-select: none; border-right: 1px solid var(--line); background: var(--panel-2) }
+#json-workbench #editor-gutter .inner { padding: 10px 10px 40px 0 }
+#json-workbench #editor-gutter .g { height: 20px; position: relative }
+#json-workbench #editor-gutter .g.cur { color: var(--text) }
+#json-workbench #editor-gutter .g.err { color: var(--err); font-weight: 700 }
+#json-workbench #editor-gutter .g.err::before { content: ""; position: absolute; left: 8px; top: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--err) }
+#json-workbench .code-area { position: relative; overflow: hidden; min-width: 0 }
+#json-workbench #editor-highlight { position: absolute; top: 0; left: 0; margin: 0; min-width: 100%; padding: 10px 0 40px; font: 12.5px/20px var(--mono); white-space: pre; pointer-events: none; color: var(--sx-punct); tab-size: 4 }
+#json-workbench .hl-line { height: 20px; padding: 0 24px 0 12px }
+#json-workbench .hl-line.cur { background: var(--cur-line) }
+#json-workbench .hl-line.err-line { background: var(--err-soft); box-shadow: inset 2px 0 var(--err) }
+#json-workbench #json-text-input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 10px 24px 40px 12px; border: 0; outline: none; resize: none; background: transparent; color: transparent; caret-color: var(--text); font: 12.5px/20px var(--mono); white-space: pre; overflow: auto; tab-size: 4 }
+#json-workbench #json-text-input.plain { color: var(--text) }
+#json-workbench #json-text-input::placeholder { color: var(--faint) }
+#json-workbench #json-text-input::selection { background: var(--sel-text); color: transparent }
+#json-workbench #json-text-input.plain::selection { color: var(--text) }
+#json-workbench .t-k { color: var(--sx-key) }
+#json-workbench .t-s { color: var(--sx-str) }
+#json-workbench .t-n { color: var(--sx-num) }
+#json-workbench .t-b { color: var(--sx-bool) }
+#json-workbench .t-z { color: var(--sx-null); font-style: italic }
+#json-workbench .t-big { text-decoration: underline dotted var(--warn); text-underline-offset: 4px }
+#json-workbench .t-sel { background: var(--accent-soft); border-radius: 3px; box-shadow: 0 0 0 1px var(--accent-line) }
+#json-workbench .t-err { text-decoration: wavy underline var(--err); text-decoration-thickness: 1.5px; text-underline-offset: 4px; background: var(--err-soft); border-radius: 2px }
+#json-workbench .drop-hint { display: flex; align-items: center; gap: 8px; height: 32px; padding: 0 12px; border-top: 1px dashed var(--line-strong); color: var(--muted); font-size: 12px; background: var(--panel-2); flex: none }
+#json-workbench .drop-hint .ico { color: var(--faint) }
+#json-workbench .drop-hint .privacy-mobile { display: none }
+#json-workbench #drop-overlay { position: fixed; inset: 12px; border: 2px dashed var(--accent); border-radius: 16px; background: color-mix(in srgb, var(--panel) 85%, transparent); display: none; place-items: center; font-size: 15px; font-weight: 600; z-index: 50; color: var(--accent-text); pointer-events: none }
+#file-page[data-dragging="true"] #json-workbench #drop-overlay { display: grid }
+
+/* Tree pane */
+#json-workbench .tabs { display: flex; gap: 2px; padding: 2px; border-radius: 8px; background: var(--panel-2); border: 1px solid var(--line); margin-inline-end: 8px }
+#json-workbench .tabs [role=tab] { height: 26px; padding: 0 11px; border: 0; border-radius: 6px; background: transparent; font-size: 12.5px; font-weight: 500; color: var(--muted); display: inline-flex; align-items: center; gap: 6px }
+#json-workbench .tabs [role=tab]:disabled { opacity: .45; cursor: not-allowed }
+#json-workbench .tabs [role=tab][aria-selected="true"] { background: var(--panel); color: var(--text); box-shadow: 0 0 0 1px var(--line-strong), 0 1px 2px rgba(0, 0, 0, .08) }
+#json-workbench .live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft) }
+#json-workbench .live-dot.paused { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-soft) }
+#json-workbench #tree-options { display: flex; align-items: center; gap: 6px; height: 38px; padding-block: 0; padding-inline: 12px 10px; border-bottom: 1px solid var(--line); flex: none; overflow-x: auto; scrollbar-width: none }
+#json-workbench .chip { height: 24px; padding-block: 0; padding-inline: 7px 9px; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--line-strong); border-radius: 999px; background: transparent; font-size: 12px; color: var(--muted); white-space: nowrap }
+#json-workbench .chip .box { width: 12px; height: 12px; border-radius: 4px; border: 1.5px solid var(--faint); display: grid; place-items: center }
+#json-workbench .chip[aria-pressed="true"] { color: var(--text); border-color: var(--accent-line); background: var(--accent-soft) }
+#json-workbench .chip[aria-pressed="true"] .box { background: var(--accent); border-color: var(--accent) }
+#json-workbench .chip[aria-pressed="true"] .box::after { content: ""; width: 5px; height: 3px; border: solid var(--on-accent); border-width: 0 0 1.5px 1.5px; transform: rotate(-45deg) translate(0.5px, -0.5px) }
+#json-workbench .seg { display: inline-flex; align-items: center; gap: 0; border: 1px solid var(--line-strong); border-radius: 7px; overflow: hidden; height: 24px; margin-inline-start: 4px; flex: none }
+#json-workbench .seg .lbl { padding: 0 8px; font-size: 11.5px; color: var(--muted); border-inline-end: 1px solid var(--line-strong); height: 100%; display: flex; align-items: center; white-space: nowrap }
+#json-workbench .seg button { height: 100%; min-width: 26px; padding: 0 7px; border: 0; background: transparent; font: 11.5px var(--mono); color: var(--muted) }
+#json-workbench .seg button + button { border-inline-start: 1px solid var(--line) }
+#json-workbench .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-text); font-weight: 700 }
+#json-workbench #stale-banner { display: flex; align-items: center; gap: 8px; padding: 7px 12px; font-size: 12px; color: var(--warn); background: var(--warn-soft); border-bottom: 1px solid var(--line); flex: none }
+#json-workbench .view { flex: 1; overflow: auto; min-height: 0 }
+#json-workbench #tree-view { padding: 6px 0 14px; font: 12.5px/1 var(--mono); outline: none }
+#json-workbench #tree-view:focus-visible { box-shadow: inset 0 0 0 2px var(--accent) }
+#json-workbench #tree-view.dim { opacity: .55 }
+#json-workbench .tree-rows { position: relative; width: 100% }
+#json-workbench .row { --d: 0; display: flex; align-items: center; gap: 6px; position: absolute; left: 0; right: 0; height: 26px; padding: 0 8px 0 calc(var(--d) * 18px + 8px); white-space: nowrap; cursor: default;
+  background-image: repeating-linear-gradient(to right, var(--guide) 0 1px, transparent 1px 18px); background-size: calc(var(--d) * 18px) 100%; background-position: 16px 0; background-repeat: no-repeat }
+#json-workbench .row:hover { background-color: var(--hover) }
+#json-workbench .row.sel { background-color: var(--accent-soft); box-shadow: inset 2px 0 var(--accent) }
+#json-workbench .row.match:not(.sel) { background-color: color-mix(in srgb, var(--warn) 10%, transparent) }
+#json-workbench .tw { width: 18px; height: 18px; margin-left: -4px; display: grid; place-items: center; border: 0; background: transparent; border-radius: 4px; color: var(--faint); padding: 0; flex: none }
+#json-workbench .tw:hover { background: var(--hover); color: var(--text) }
+#json-workbench .tw svg { transition: transform .12s }
+#json-workbench .tw[aria-expanded="true"] svg { transform: rotate(90deg) }
+#json-workbench .tw-gap { width: 18px; margin-left: -4px; flex: none }
+#json-workbench .tk { color: var(--sx-key) }
+#json-workbench .tk.root { color: var(--muted); font-family: var(--ui); font-weight: 600; font-size: 12px }
+#json-workbench .ti { color: var(--faint); min-width: 12px }
+#json-workbench .colon { color: var(--sx-punct) }
+#json-workbench .tv { overflow: hidden; text-overflow: ellipsis }
+#json-workbench .tv.s { color: var(--sx-str) }
+#json-workbench .tv.n { color: var(--sx-num) }
+#json-workbench .tv.b { color: var(--sx-bool) }
+#json-workbench .tv.z { color: var(--sx-null); font-style: italic }
+#json-workbench .sum { color: var(--faint); overflow: hidden; text-overflow: ellipsis }
+#json-workbench .sum b { font-weight: 400; color: var(--muted) }
+#json-workbench .badge { font: 600 10px var(--ui); letter-spacing: .02em; padding: 2px 6px; border-radius: 999px; white-space: nowrap }
+#json-workbench .badge.big { color: var(--warn); background: var(--warn-soft); border: 1px solid color-mix(in srgb, var(--warn) 35%, transparent) }
+#json-workbench .ty { margin-left: auto; padding-left: 10px; color: var(--faint); font: 11px var(--ui) }
+#json-workbench #tree-view.no-types .acts { margin-left: auto }
+#json-workbench .ln-ref { font: 10.5px var(--mono); color: var(--accent-text); display: none }
+#json-workbench .row.sel .ln-ref { display: inline }
+#json-workbench .acts { display: none; gap: 1px; margin-left: 6px }
+#json-workbench .row.sel .acts, #json-workbench .row:hover .acts { display: inline-flex }
+#json-workbench .acts button { width: 22px; height: 22px; display: grid; place-items: center; border: 0; border-radius: 5px; background: transparent; color: var(--muted); padding: 0 }
+#json-workbench .acts button:hover { background: var(--panel); color: var(--text); box-shadow: 0 0 0 1px var(--line-strong) }
+#json-workbench .acts button.del:hover { color: var(--err) }
+#json-workbench .acts button:disabled { opacity: .35; pointer-events: none }
+#json-workbench mark { background: color-mix(in srgb, var(--warn) 30%, transparent); color: inherit; border-radius: 2px }
+#json-workbench .empty { padding: 40px 24px; color: var(--muted); text-align: center; font-family: var(--ui); font-size: 13px; line-height: 1.6 }
+
+/* Table */
+#json-workbench #table-view { display: flex; flex-direction: column; overflow: hidden }
+#json-workbench .table-meta { display: flex; align-items: center; gap: 8px; padding: 10px 12px; font-size: 12px; color: var(--muted); flex: none; flex-wrap: wrap }
+#json-workbench .table-meta .mono { color: var(--text) }
+
+/* Inspector drawer */
+#json-workbench #inspector-drawer { flex: none; border-top: 1px solid var(--line); background: var(--panel-2) }
+#json-workbench #inspector-toggle { display: flex; align-items: center; gap: 8px; width: 100%; height: 36px; padding: 0 12px; border: 0; background: transparent; text-align: start }
+#json-workbench #inspector-toggle .pane-title { margin: 0 }
+#json-workbench #inspector-toggle .chev { transition: transform .15s; color: var(--muted) }
+#json-workbench #inspector-toggle[aria-expanded="false"] .chev { transform: rotate(-90deg) }
+#json-workbench:dir(rtl) #inspector-toggle[aria-expanded="false"] .chev { transform: rotate(90deg) }
+#json-workbench #inspector-mini { font: 11.5px var(--mono); color: var(--accent-text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench #inspector-body { padding: 0 12px 12px }
+#json-workbench .insp-grid { display: grid; grid-template-columns: 62px 1fr; gap: 7px 12px; align-items: center; margin: 0 }
+#json-workbench .insp-grid dt { font-size: 11.5px; color: var(--muted) }
+#json-workbench .insp-grid dd { margin: 0; min-width: 0; display: flex; align-items: center; gap: 8px }
+#json-workbench .insp-path { font: 12.5px var(--mono); color: var(--text); padding: 4px 8px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; min-width: 0 }
+#json-workbench .insp-value { font: 12.5px var(--mono); padding: 4px 8px; border-radius: 6px; background: var(--panel); border: 1px solid var(--line); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench .insp-value input { width: 100%; border: 0; outline: none; background: transparent; font: inherit; padding: 0 }
+#json-workbench .insp-value input.t-z { font-style: italic }
+#json-workbench .insp-value:focus-within { border-color: var(--accent-line) }
+#json-workbench .type-pill { font: 600 11px var(--mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-text); white-space: nowrap }
+#json-workbench .insp-note { font-size: 11.5px; color: var(--warn); line-height: 1.45; grid-column: 2 }
+#json-workbench .insp-note.error { color: var(--err) }
+#json-workbench .insp-actions { display: flex; gap: 6px; margin-top: 11px; flex-wrap: wrap }
+#json-workbench .insp-where { font: 11.5px var(--mono); color: var(--muted); white-space: nowrap }
+
+/* Status bar */
+#json-workbench #status-bar { display: flex; align-items: center; gap: 2px; height: 30px; padding: 0 6px; border-top: 1px solid var(--line); background: var(--panel); font-size: 11.5px; color: var(--muted); position: relative; z-index: 6 }
+#json-workbench .sb { display: inline-flex; align-items: center; gap: 6px; height: 22px; padding: 0 8px; border-radius: 5px; white-space: nowrap }
+#json-workbench button.sb { border: 0; background: transparent; color: inherit; font-size: 11.5px }
+#json-workbench button.sb:hover { background: var(--hover); color: var(--text) }
+#json-workbench .sb-sep { width: 1px; height: 14px; background: var(--line); margin: 0 3px }
+#json-workbench .vdot { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); box-shadow: 0 0 0 3px var(--ok-soft) }
+#json-workbench .vdot.err { background: var(--err); box-shadow: 0 0 0 3px var(--err-soft) }
+#json-workbench #validity-status.invalid .vdot { background: var(--err); box-shadow: 0 0 0 3px var(--err-soft) }
+#json-workbench #validity-status.invalid #validity-text { color: var(--err) }
+#json-workbench #validity-status.empty .vdot { background: var(--line-strong); box-shadow: none }
+#json-workbench #validity-status.empty #validity-text { color: var(--muted) }
+#json-workbench #validity-text { color: var(--ok); font-weight: 600 }
+#json-workbench .pulse .vdot { animation: json-workbench-pulse .6s ease 2 }
+@keyframes json-workbench-pulse { 50% { transform: scale(1.6) } }
+#json-workbench .stat b { font-weight: 600; color: var(--text); font-family: var(--mono); font-size: 11px }
+#json-workbench #path-query { position: relative; display: flex; align-items: center; gap: 6px; height: 22px; margin: 0 4px; padding-block: 0; padding-inline: 8px 3px; border: 1px solid var(--line-strong); border-radius: 6px; background: var(--panel-2) }
+#json-workbench #path-query:focus-within { border-color: var(--accent-line); box-shadow: 0 0 0 3px var(--accent-soft) }
+#json-workbench #path-query label { font-size: 11px; color: var(--muted); font-weight: 600 }
+#json-workbench #path-query-input { width: 150px; border: 0; outline: none; background: transparent; font: 11.5px var(--mono); color: var(--text) }
+#json-workbench #path-query-input::placeholder { color: var(--faint) }
+#json-workbench #query-results-button { height: 16px; padding: 0 6px; border: 0; border-radius: 4px; background: var(--accent); color: var(--on-accent); font: 700 10.5px var(--mono) }
+#json-workbench #query-results-button.none { background: var(--line-strong); color: var(--muted) }
+#json-workbench #query-results-popover { position: absolute; bottom: calc(100% + 8px); inset-inline-start: -8px; width: 290px; max-height: 320px; overflow: auto; padding: 6px; background: var(--raised); border: 1px solid var(--line-strong); border-radius: 10px; box-shadow: var(--shadow) }
+#json-workbench .qp-head { display: flex; align-items: center; gap: 8px; padding: 4px 6px 8px; font-size: 11.5px; color: var(--muted); border-bottom: 1px solid var(--line); margin-bottom: 4px }
+#json-workbench .qp-head code { font: 11.5px var(--mono); color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench .qp-row { display: flex; align-items: center; gap: 10px; width: 100%; height: 28px; padding: 0 8px; border: 0; border-radius: 6px; background: transparent; font: 12px var(--mono); text-align: start }
+#json-workbench .qp-row:hover, #json-workbench .qp-row:focus-visible { background: var(--accent-soft); outline: none }
+#json-workbench .qp-row .p { color: var(--muted); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench .qp-row .v { color: var(--sx-num); font-weight: 600; max-width: 110px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+#json-workbench .qp-empty { padding: 10px 8px; color: var(--muted); font-size: 12px }
+#json-workbench .privacy { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); padding: 0 8px; white-space: nowrap }
+#json-workbench .privacy .ico { color: var(--ok) }
+
+#json-workbench #toast { position: fixed; left: 50%; bottom: 44px; transform: translateX(-50%) translateY(8px); padding: 7px 12px; border-radius: 8px; background: var(--text); color: var(--panel); font-size: 12px; font-weight: 500; opacity: 0; pointer-events: none; transition: .18s; z-index: 60 }
+#json-workbench #toast.show { opacity: 1; transform: translateX(-50%) }
+#json-workbench #mobile-pane-tabs, #json-workbench #mobile-action-bar { display: none }
+
+@media (max-width: 1280px) {
+  #json-workbench .privacy-desktop { display: none }
+  #json-workbench .cmds .btn .lbl-opt { display: none }
+  #json-workbench .search { width: 190px }
+}
+@media (max-width: 1080px) {
+  #json-workbench .page-title, #json-workbench .slash { display: none }
+  #json-workbench #stat-values, #json-workbench #indent-status, #json-workbench #encoding-status { display: none }
+}
+
+/* Phone */
+@media (max-width: 760px) {
+  #json-workbench { grid-template-rows: auto auto 1fr auto auto }
+  #json-workbench #command-bar { height: 54px; padding-block: 0; padding-inline: 12px 10px; gap: 8px }
+  #json-workbench .brand { flex-direction: row; gap: 9px }
+  #json-workbench .brand-text { display: flex; flex-direction: column; line-height: 1.15 }
+  #json-workbench .brand-name { font-size: 11px; color: var(--muted); font-weight: 600; order: 2 }
+  #json-workbench .page-title { display: block; font-size: 14px; font-weight: 650; color: var(--text); order: 1 }
+  #json-workbench :is(.slash, .cmds, #file-chip-button, #fullscreen-button, .download-label) { display: none }
+  #json-workbench .search { display: none; position: absolute; top: 58px; left: 12px; right: 12px; width: auto; height: 38px; background: var(--raised); box-shadow: var(--shadow); z-index: 40 }
+  #json-workbench #command-bar.search-open .search { display: flex }
+  #json-workbench #mobile-search-button { display: inline-flex }
+  #json-workbench #download-button { width: 34px; padding: 0; justify-content: center }
+  #json-workbench #command-bar .btn.icon { width: 34px; height: 34px }
+  #json-workbench #language-switch-link { height: 34px; padding: 0 8px }
+  #json-workbench #mobile-pane-tabs { display: flex; gap: 2px; margin: 8px 12px; padding: 3px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line) }
+  #json-workbench #mobile-pane-tabs button { flex: 1; height: 32px; border: 0; border-radius: 7px; background: transparent; font-weight: 600; font-size: 13px; color: var(--muted); display: inline-flex; align-items: center; justify-content: center; gap: 6px }
+  #json-workbench #mobile-pane-tabs button[aria-selected="true"] { background: var(--accent-soft); color: var(--accent-text); box-shadow: inset 0 0 0 1px var(--accent-line) }
+  #json-workbench #mobile-pane-tabs .vdot { width: 6px; height: 6px; box-shadow: none }
+  #json-workbench #workbench { grid-template-columns: minmax(0, 1fr); margin: 0 12px; border: 1px solid var(--line); border-radius: 12px; overflow: hidden }
+  #json-workbench #split-handle { display: none }
+  #json-workbench .pane { display: none }
+  #json-workbench[data-mtab="text"] #text-pane { display: flex }
+  #json-workbench[data-mtab="tree"] #tree-pane, #json-workbench[data-mtab="inspector"] #tree-pane { display: flex }
+  #json-workbench[data-mtab="tree"] #inspector-drawer { display: none }
+  #json-workbench[data-mtab="inspector"] #tree-pane > :not(#inspector-drawer) { display: none }
+  #json-workbench[data-mtab="inspector"] #inspector-drawer { flex: 1; border-top: 0; background: var(--panel); overflow: auto }
+  #json-workbench[data-mtab="inspector"] #inspector-toggle { pointer-events: none; height: 44px }
+  #json-workbench[data-mtab="inspector"] #inspector-toggle .chev { display: none }
+  #json-workbench[data-mtab="inspector"] #inspector-body { display: block !important }
+  #json-workbench .insp-grid { grid-template-columns: 58px 1fr }
+  #json-workbench :is(.text-extra, #tree-sync-label .lbl, .pane-sub.lines) { display: none }
+  #json-workbench .pane-head { padding-block: 0; padding-inline: 10px 6px }
+  #json-workbench .file-tab { font-size: 11.5px }
+  #json-workbench #editor-gutter { width: 40px }
+  #json-workbench #editor-gutter .g.err::before { left: 3px }
+  #json-workbench .drop-hint .privacy-mobile { display: inline }
+  #json-workbench .drop-hint .drop-text { display: none }
+  #json-workbench #status-bar { height: auto; flex-wrap: wrap; padding: 6px 10px; gap: 2px 0; border-top: 0; background: transparent }
+  #json-workbench :is(#cursor-position, #indent-status, #encoding-status, #stat-values, .privacy-desktop, .sb-sep) { display: none }
+  #json-workbench .sb { padding: 0 6px }
+  #json-workbench #status-bar .spacer { display: none }
+  #json-workbench .badge .long { display: none }
+  #json-workbench .insp-actions .spacer { display: none }
+  #json-workbench #path-query { order: 10; flex: 1 0 100%; margin: 4px 0 0; height: 32px }
+  #json-workbench #path-query-input { flex: 1; width: auto; font-size: 13px }
+  #json-workbench #query-results-popover { left: 0; right: 0; width: auto }
+  #json-workbench #mobile-action-bar { display: grid; grid-template-columns: repeat(5, 1fr); gap: 4px; padding: 6px 8px calc(6px + env(safe-area-inset-bottom)); background: var(--panel); border-top: 1px solid var(--line) }
+  #json-workbench #mobile-action-bar button { height: 48px; border: 0; border-radius: 9px; background: transparent; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 500; color: var(--muted) }
+  #json-workbench #mobile-action-bar button:disabled { opacity: .45 }
+  #json-workbench #mobile-action-bar button .ico { width: 19px; height: 19px; color: var(--text) }
+  #json-workbench #mobile-action-bar button:active { background: var(--hover) }
+  #json-workbench #mobile-action-bar .accent .ico { color: var(--accent-text) }
+  #json-workbench #toast { bottom: 150px }
+  #json-workbench .row { height: 32px }
+  #json-workbench #tree-view { font-size: 13px }
+}
+@media (prefers-reduced-motion: reduce) {
+  #json-workbench * { transition: none !important; animation: none !important }
+}

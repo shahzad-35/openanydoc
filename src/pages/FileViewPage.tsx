@@ -33,7 +33,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const format = findFormatForFileName(openedFile.file.name)
   const editing = format?.editing
   const session = useEditSession<unknown>(editing?.createEmptyEdits ?? noEdits, editing?.countChanges ?? countNoEdits)
-  const [mode, setMode] = useState<ViewMode>('view')
+  const [mode, setMode] = useState<ViewMode>(editing?.alwaysEditable ? 'edit' : 'view')
   const [editingModule, setEditingModule] = useState<EditingModule | null>(null)
   const [editingLoadFailed, setEditingLoadFailed] = useState(false)
   const [selection, setSelection] = useState<unknown>(null)
@@ -52,6 +52,11 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
       editing.loadEditingModule().then(setEditingModule, () => setEditingLoadFailed(true))
     }
   }
+
+  // An always-editable format (JSON) loads its tools straight away.
+  useEffect(() => {
+    if (editing?.alwaysEditable) editing.loadEditingModule().then(setEditingModule, () => setEditingLoadFailed(true))
+  }, [editing])
 
   useEffect(() => {
     onUnsavedEditsChange(hasUnsavedEdits)
@@ -106,10 +111,70 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   })
 
   const confirmBeforeClear = useCallback(async () => !hasUnsavedEdits || (await confirmDiscardEdits()), [hasUnsavedEdits, confirmDiscardEdits])
+  const closeAfterConfirm = useCallback(async () => {
+    if (await confirmBeforeClear()) onClose()
+  }, [confirmBeforeClear, onClose])
 
   if (!format) return null
   const Viewer = format.ViewerComponent
   const tipFormat = viewer ? pickRelatedFormat(viewer.id) : undefined
+
+  const fileMessages = (
+    <div id="file-messages" aria-live="polite">
+      <Notice
+        id="another-file-error"
+        kind={anotherFileIntake.errorDetail ? 'info' : 'error'}
+        alwaysToast
+        seconds={REJECTED_FILE_TOAST_SECONDS}
+        attempt={anotherFileIntake.attemptCount}
+        message={anotherFileIntake.errorMessage ?? ''}
+        detail={anotherFileIntake.errorDetail ?? undefined}
+      />
+      <Notice
+        id="another-file-coming-soon"
+        kind="info"
+        alwaysToast
+        seconds={REJECTED_FILE_TOAST_SECONDS}
+        attempt={anotherFileIntake.attemptCount}
+        message={anotherFileIntake.comingSoonViewer ? t('intake.comingSoon', { format: anotherFileIntake.comingSoonViewer.label }) : ''}
+        detail={t('intake.tryThese')}
+      />
+      <Notice
+        id="another-file-warning"
+        kind="warning"
+        className="border-b border-rule bg-paper-raised px-4 py-2"
+        message={anotherFileIntake.largeFileWarning ?? ''}
+      />
+    </div>
+  )
+
+  const viewerElement = (
+    <Suspense fallback={<p id="file-loading" className="p-6 text-ink-soft">{t('file.reading')}</p>}>
+      <Viewer
+        openedFile={openedFile}
+        mode={mode}
+        session={session}
+        editingComponents={editingModule?.components ?? null}
+        confirmDiscardEdits={confirmDiscardEdits}
+        onOpenAnotherFile={anotherFileIntake.openFilePicker}
+        onClose={() => void closeAfterConfirm()}
+        onSelectionChange={setSelection}
+        onCommandsChange={setViewerCommands}
+        onExportSourceChange={setExportSource}
+      />
+    </Suspense>
+  )
+
+  // A format that draws the whole screen (JSON) gets only the file chooser, the messages and dropping a file anywhere.
+  if (format.ownsWholePage) {
+    return (
+      <div id="file-page" data-file-type={viewer?.id} data-dragging={anotherFileIntake.isDraggingOver} {...anotherFileIntake.dropTargetProps}>
+        {anotherFileIntake.fileInput}
+        {fileMessages}
+        {viewerElement}
+      </div>
+    )
+  }
 
   return (
     <div id="file-page" data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[14px] leading-normal text-ink">
@@ -121,7 +186,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         controls={
           editing && (
             <>
-              <ViewEditToggle mode={mode} onChange={chooseMode} />
+              {!editing.alwaysEditable && <ViewEditToggle mode={mode} onChange={chooseMode} />}
               <ChangeCounter description={changeDescription} />
             </>
           )
@@ -162,30 +227,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         />
       )}
       {anotherFileIntake.fileInput}
-      <div id="file-messages" aria-live="polite">
-        <Notice
-          id="another-file-error"
-          kind={anotherFileIntake.errorDetail ? 'info' : 'error'}
-          alwaysToast
-          seconds={REJECTED_FILE_TOAST_SECONDS}
-          message={anotherFileIntake.errorMessage ?? ''}
-          detail={anotherFileIntake.errorDetail ?? undefined}
-        />
-        <Notice
-          id="another-file-coming-soon"
-          kind="info"
-          alwaysToast
-          seconds={REJECTED_FILE_TOAST_SECONDS}
-          message={anotherFileIntake.comingSoonViewer ? t('intake.comingSoon', { format: anotherFileIntake.comingSoonViewer.label }) : ''}
-          detail={t('intake.tryThese')}
-        />
-        <Notice
-          id="another-file-warning"
-          kind="warning"
-          className="border-b border-rule bg-paper-raised px-4 py-2"
-          message={anotherFileIntake.largeFileWarning ?? ''}
-        />
-      </div>
+      {fileMessages}
       <Notice
         id="editing-load-error"
         kind="error"
@@ -193,19 +235,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         className="border-b border-rule bg-paper-raised px-4 py-2 text-danger"
         message={editingLoadFailed ? t('file.editingLoadFailed') : ''}
       />
-      <Suspense fallback={<p id="file-loading" className="p-6 text-ink-soft">{t('file.reading')}</p>}>
-        <Viewer
-          openedFile={openedFile}
-          mode={mode}
-          session={session}
-          editingComponents={editingModule?.components ?? null}
-          confirmDiscardEdits={confirmDiscardEdits}
-          onOpenAnotherFile={anotherFileIntake.openFilePicker}
-          onSelectionChange={setSelection}
-          onCommandsChange={setViewerCommands}
-          onExportSourceChange={setExportSource}
-        />
-      </Suspense>
+      {viewerElement}
     </div>
   )
 }

@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import { isolateLeftToRight, translate, useT } from './i18n'
 import type { Locale } from './i18n'
+import { SAMPLE_JSON_TEXT } from './formats/json/jsonTools'
+import { findFormatForFileName } from './formats/registry'
 import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
 import { findReleasedFormat, getFormatCapabilities } from './whatsNew'
@@ -43,6 +45,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   const { locale, t } = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   // The grey line under an error toast, for the rejection that can say what to do instead.
+  // Counts every file the visitor tries, so the same rejection twice in a row is a new event (a toast shows again).
+  const [attemptCount, setAttemptCount] = useState(0)
   const [errorDetail, setErrorDetail] = useState<string | null>(null)
   const [redirectSuggestion, setRedirectSuggestion] = useState<RedirectSuggestion | null>(null)
   const [comingSoonViewer, setComingSoonViewer] = useState<Viewer | null>(null)
@@ -50,7 +54,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   const [isDraggingOver, setIsDraggingOver] = useState(false)
   const [isReading, setIsReading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
-  const acceptsPastedText = allowPaste && acceptedExtensions.includes('.csv')
+  const acceptsPastedJson = acceptedExtensions.includes('.json')
+  const acceptsPastedText = allowPaste && (acceptedExtensions.includes('.csv') || acceptsPastedJson)
 
   function hasAcceptedExtension(fileName: string) {
     const lowerCaseFileName = fileName.toLowerCase()
@@ -58,6 +63,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   }
 
   async function loadFile(file: File) {
+    setAttemptCount((count) => count + 1)
     setErrorMessage(null)
     setErrorDetail(null)
     setRedirectSuggestion(null)
@@ -68,6 +74,13 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     const droppedViewer = findViewerForFileName(file.name)
     if (droppedViewer && getFormatCapabilities(droppedViewer.id)?.isComingSoon) {
       setComingSoonViewer(droppedViewer)
+      return
+    }
+
+    const maxFileBytes = findFormatForFileName(file.name)?.maxFileBytes
+    if (maxFileBytes !== undefined && file.size > maxFileBytes) {
+      setErrorMessage(t('intake.tooLarge', { size: isolateLeftToRight(formatFileSize(file.size)) }))
+      setErrorDetail(t('intake.tooLargeDetail', { format: droppedViewer?.label ?? '', limit: isolateLeftToRight(`${maxFileBytes / (1024 * 1024)} MB`) }))
       return
     }
 
@@ -127,7 +140,9 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       if (pastedFiles.length > 0) {
         openChosenFiles(pastedFiles)
       } else if (pastedText.trim() !== '') {
-        loadFile(new File([pastedText], 'pasted.csv', { type: 'text/csv' }))
+        // Text that starts like JSON (or any text on the JSON page) opens as JSON; other text as CSV.
+        const isJson = acceptsPastedJson && (/^\s*[[{]/.test(pastedText) || !acceptedExtensions.includes('.csv'))
+        loadFile(isJson ? new File([pastedText], 'pasted.json', { type: 'application/json' }) : new File([pastedText], 'pasted.csv', { type: 'text/csv' }))
       }
     }
 
@@ -169,6 +184,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   return {
     acceptsPastedText,
+    attemptCount,
     clearRedirectSuggestion: () => setRedirectSuggestion(null),
     comingSoonViewer,
     dropTargetProps,
@@ -179,6 +195,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     isReading,
     largeFileWarning,
     openFilePicker: () => fileInputRef.current?.click(),
+    openSampleJson: () => loadFile(new File([SAMPLE_JSON_TEXT], 'sample.json', { type: 'application/json' })),
     promptText,
     redirectSuggestion,
   }

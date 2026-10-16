@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-10-16",
+    "version": "1.4.0",
+    "formats": [
+      "json"
+    ],
+    "items": [
+      "changelog.v1_4.split",
+      "changelog.v1_4.repair",
+      "changelog.v1_4.query",
+      "changelog.v1_4.numbers",
+      "changelog.v1_4.languages"
+    ],
+    "title": "changelog.v1_4.title"
+  },
+  {
     "date": "2026-10-15",
     "version": "1.3.0",
     "formats": [

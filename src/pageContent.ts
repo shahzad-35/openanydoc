@@ -89,33 +89,33 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
     '/json-viewer': {
       stepsTitle: 'How to open and format a JSON file online',
       steps: [
-        { title: 'Drop your JSON file on the page', text: 'Choose a .json file. It is read in your browser, so API responses, configuration files and other private data are never uploaded.' },
-        { title: 'Explore it three ways', text: 'View the file as a collapsible tree, as a table (when it is a list of objects) or as formatted code. Search works on keys and values.' },
-        { title: 'Fix errors', text: 'If the file is not valid JSON you see the message with its line and column, and in the code view "Go to error" puts the cursor on the problem.' },
-        { title: 'Format and edit', text: 'Switch to Edit. Choose 2 spaces, 4 spaces, a tab or minified from the Format menu, sort keys or lists, and change, add, duplicate, move or delete nodes.' },
-        { title: 'Download your JSON', text: 'Use the download icon to save the result. The original file on your device is never changed.' },
+        { title: 'Drop, paste or try a sample', text: 'Choose or drop a .json file, paste JSON with Ctrl+V, or try the sample. It is read in your browser, so API responses, configuration files and other private data are never uploaded.' },
+        { title: 'Text and tree side by side', text: 'The text sits next to a collapsible tree (or a table for a list of objects) and an inspector; selecting a node in one shows it in the other. Search keys and values, or type a path such as $.orders[*].total.' },
+        { title: 'Validate and repair', text: 'Validate shows the result with the size, keys, values and depth. If the JSON is not valid you see the line and column, and Repair fixes comments, trailing or missing commas, single quotes and unquoted keys.' },
+        { title: 'Format and edit', text: 'Type in the text, or use the tree and the inspector. Format with 1, 2, 3, 4 or 8 spaces or a tab, minify, sort keys, and change, add, duplicate, move or delete nodes. Long numbers are kept exactly.' },
+        { title: 'Download your JSON', text: 'Use the Download button to save the result. The original file on your device is never changed.' },
       ],
       faqTitle: 'JSON viewer and editor: common questions',
       faq: [
         {
           question: 'How do I format (pretty print) JSON online?',
-          answer: 'Open your file, switch to Edit and choose 2 spaces, 4 spaces or Tab from the Format menu. The code view shows the formatted result and the download uses the same layout.',
+          answer: 'Open your file and press Format, or choose 1, 2, 3, 4 or 8 spaces or Tab from the menu next to it. The text shows the formatted result and the download uses the same layout.',
         },
         {
           question: 'How do I minify JSON?',
-          answer: 'Switch to Edit, open the Format menu and choose "Minified (one line)". All spaces and line breaks outside strings are removed, which makes the file smaller.',
+          answer: 'Press Minify. All spaces and line breaks outside strings are removed, which makes the file smaller.',
         },
         {
-          question: 'How do I find the error in my JSON?',
-          answer: 'When the JSON is not valid, OpenAnyDoc shows what is wrong with the line and column number. In the code view, "Go to error" selects the place in the text. Typing in the code view re-checks the JSON as you type.',
+          question: 'How do I find and fix the error in my JSON?',
+          answer: 'When the JSON is not valid, OpenAnyDoc shows what is wrong with the line and column number, and "Go to error" selects the place in the text. Repair fixes the usual hand-written mistakes (comments, trailing or missing commas, single quotes, unquoted keys, True, None and NaN) and says what it changed.',
         },
         {
           question: 'Can I sort the keys of a JSON object alphabetically?',
-          answer: 'Yes. In Edit mode use the Sort keys menu for the selected object or the whole document, A to Z or Z to A, with or without the objects nested inside. You can also sort a selected list.',
+          answer: 'Yes. Press Sort keys: the keys of every object, including the objects nested inside, are put in order from A to Z. Undo takes it back.',
         },
         {
           question: 'Can I open a large JSON file?',
-          answer: 'Yes. A file of about 50 MB opens, because it is read in the background so the page stays responsive. Files over 50 MB show a warning, and the limit is your browser\'s memory.',
+          answer: 'JSON files up to 10 MB open, and a file of that size shows its tree in under a second. Larger files are refused, because every edit would make the page slow.',
         },
         {
           question: 'Is it safe to paste or open private JSON here?',
@@ -239,33 +239,33 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
     '/json-viewer': {
       stepsTitle: 'كيف تفتح ملف JSON وتنسّقه أونلاين',
       steps: [
-        { title: 'أفلت ملف JSON على الصفحة', text: 'اختر ملف .json. يُقرأ داخل متصفحك، فلا تُرفع استجابات API وملفات الإعدادات وغيرها من البيانات الخاصة.' },
-        { title: 'استعرضه بثلاث طرق', text: 'اعرض الملف كشجرة قابلة للطي، أو كجدول (إذا كان قائمة من الكائنات)، أو كشيفرة منسقة. يعمل البحث على المفاتيح والقيم.' },
-        { title: 'أصلح الأخطاء', text: 'إذا لم يكن الملف JSON صالحًا فستظهر رسالة تذكر السطر والعمود، وفي عرض الشيفرة يضع «الانتقال إلى الخطأ» المؤشر على موضع المشكلة.' },
-        { title: 'نسّق وعدّل', text: 'انتقل إلى التحرير. اختر مسافتين أو 4 مسافات أو علامة جدولة أو الضغط من قائمة التنسيق، ورتّب المفاتيح أو القوائم، وغيّر العقد وأضفها وكرّرها وانقلها واحذفها.' },
-        { title: 'نزّل ملف JSON', text: 'استخدم أيقونة التنزيل لحفظ النتيجة. الملف الأصلي على جهازك لا يتغير أبدًا.' },
+        { title: 'أفلت ملفًا أو الصق JSON أو جرّب مثالًا', text: 'اختر ملف .json أو أفلته، أو الصق JSON باستخدام Ctrl+V، أو جرّب المثال. يُقرأ داخل متصفحك، فلا تُرفع استجابات API وملفات الإعدادات وغيرها من البيانات الخاصة.' },
+        { title: 'النص والشجرة جنبًا إلى جنب', text: 'يظهر النص بجانب شجرة قابلة للطي (أو جدول لقائمة من الكائنات) ولوحة تفاصيل؛ تحديد عقدة في أحدهما يُظهرها في الآخر. ابحث في المفاتيح والقيم، أو اكتب مسارًا مثل $.orders[*].total.' },
+        { title: 'تحقّق وأصلح', text: 'يعرض «تحقّق» النتيجة مع الحجم وعدد المفاتيح والقيم والعمق. إذا لم يكن JSON صالحًا فسترى السطر والعمود، ويصلح «إصلاح» التعليقات والفواصل الزائدة أو الناقصة وعلامات الاقتباس المفردة والمفاتيح غير المقتبسة.' },
+        { title: 'نسّق وعدّل', text: 'اكتب في النص، أو استخدم الشجرة ولوحة التفاصيل. نسّق بمسافة واحدة أو 2 أو 3 أو 4 أو 8 مسافات أو علامة جدولة، واضغط الملف، ورتّب المفاتيح، وغيّر العقد وأضفها وكرّرها وانقلها واحذفها. تُحفظ الأرقام الطويلة كما هي.' },
+        { title: 'نزّل ملف JSON', text: 'استخدم زر «تنزيل» لحفظ النتيجة. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
       faqTitle: 'عارض ومحرر JSON: أسئلة شائعة',
       faq: [
         {
           question: 'كيف أنسّق JSON (Pretty Print) أونلاين؟',
-          answer: 'افتح ملفك، وانتقل إلى التحرير، واختر مسافتين أو 4 مسافات أو علامة جدولة من قائمة التنسيق. يعرض عرض الشيفرة النتيجة المنسقة، ويستخدم التنزيل التخطيط نفسه.',
+          answer: 'افتح ملفك واضغط «تنسيق»، أو اختر مسافة واحدة أو 2 أو 3 أو 4 أو 8 مسافات أو علامة جدولة من القائمة المجاورة له. يعرض النص النتيجة المنسقة، ويستخدم التنزيل التخطيط نفسه.',
         },
         {
           question: 'كيف أضغط ملف JSON؟',
-          answer: 'انتقل إلى التحرير، وافتح قائمة التنسيق، واختر «مضغوط (سطر واحد)». تُحذف كل المسافات وفواصل الأسطر خارج النصوص، فيصغر حجم الملف.',
+          answer: 'اضغط «تصغير». تُحذف كل المسافات وفواصل الأسطر خارج النصوص، فيصغر حجم الملف.',
         },
         {
-          question: 'كيف أجد الخطأ في ملف JSON؟',
-          answer: 'عندما لا يكون JSON صالحًا، يعرض OpenAnyDoc سبب الخطأ مع رقم السطر والعمود. وفي عرض الشيفرة يحدد «الانتقال إلى الخطأ» الموضع في النص. والكتابة في عرض الشيفرة تعيد فحص JSON أثناء الكتابة.',
+          question: 'كيف أجد الخطأ في ملف JSON وأصلحه؟',
+          answer: 'عندما لا يكون JSON صالحًا، يعرض OpenAnyDoc سبب الخطأ مع رقم السطر والعمود، ويحدد «انتقل إلى الخطأ» الموضع في النص. ويصلح «إصلاح» الأخطاء المعتادة في الكتابة اليدوية (التعليقات والفواصل الزائدة أو الناقصة وعلامات الاقتباس المفردة والمفاتيح غير المقتبسة وTrue وNone وNaN) ويذكر ما غيّره.',
         },
         {
           question: 'هل يمكنني ترتيب مفاتيح كائن JSON أبجديًا؟',
-          answer: 'نعم. في وضع التحرير استخدم قائمة ترتيب المفاتيح للكائن المحدد أو للمستند كله، من A إلى Z أو من Z إلى A، مع الكائنات المتداخلة أو بدونها. ويمكنك أيضًا فرز قائمة محددة.',
+          answer: 'نعم. اضغط «ترتيب المفاتيح»: تُرتَّب مفاتيح كل كائن، ومنها الكائنات المتداخلة، من A إلى Z. ويعيدها «تراجع» كما كانت.',
         },
         {
           question: 'هل يمكنني فتح ملف JSON كبير؟',
-          answer: 'نعم. يُفتح ملف بحجم نحو 50 ميغابايت، لأنه يُقرأ في الخلفية فتبقى الصفحة سريعة الاستجابة. تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، والحد هو ذاكرة متصفحك.',
+          answer: 'تُفتح ملفات JSON حتى 10 ميغابايت، ويَظهر ملف بهذا الحجم كشجرة في أقل من ثانية. أما الملفات الأكبر فلا تُفتح، لأن كل تعديل سيجعل الصفحة بطيئة.',
         },
         {
           question: 'هل من الآمن فتح JSON خاص أو لصقه هنا؟',

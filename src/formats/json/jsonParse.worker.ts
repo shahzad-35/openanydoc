@@ -1,4 +1,5 @@
-import type { JsonParseResult } from './jsonModel'
+import { parseKeepingBigNumbers } from './jsonTools'
+import type { JsonParseResult, JsonValue } from './jsonModel'
 
 // Line and column (both counted from 1) of a character position in the text.
 function findLineAndColumn(text: string, position: number) {
@@ -25,7 +26,8 @@ self.onmessage = (event: MessageEvent<string>) => {
   const text = event.data
   let result: JsonParseResult
   try {
-    result = { status: 'ok', value: JSON.parse(text) }
+    const { value, bigNumberCount } = parseKeepingBigNumbers(text)
+    result = { status: 'ok', value: value as JsonValue, bigNumberCount }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     result = { status: 'error', message, ...findErrorPosition(message, text) }

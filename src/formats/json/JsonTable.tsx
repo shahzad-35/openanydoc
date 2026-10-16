@@ -4,6 +4,7 @@ import DataTable, { CellInput, getRowNumberColumnWidthPx, measureColumnWidthsPx,
 import type { CellPosition, DataTableHandle, SortState } from '../DataTable'
 import { isolateText, useT } from '../../i18n'
 import { isPlainObject } from './jsonModel'
+import { parseValueExactly } from './jsonTools'
 import type { JsonValue } from './jsonModel'
 
 const COLUMN_SCAN_ROW_COUNT = 1000
@@ -13,11 +14,10 @@ type EditingCell = CellPosition & { draft: string }
 
 type JsonTableProps = {
   rows: JsonValue[]
-  // The document as it was opened, to mark the cells that were changed.
+  // The same list as it was opened, to mark the cells that were changed.
   originalRows: JsonValue
-  isEditable: boolean
-  // Lower-case search text; rows with no matching cell are hidden.
-  searchText: string
+  // Where the list is in the document, e.g. $.orders.
+  sourcePathText: string
   onSetCell: (rowPosition: number, columnName: string, newValue: JsonValue) => void
 }
 
@@ -38,7 +38,7 @@ function formatCell(value: JsonValue | undefined) {
 function parseCellText(cellText: string, currentValue: JsonValue | undefined): JsonValue {
   if (typeof currentValue === 'string') return cellText
   try {
-    return JSON.parse(cellText)
+    return parseValueExactly(cellText)
   } catch {
     return cellText
   }
@@ -55,9 +55,9 @@ function collectColumnNames(rows: JsonValue[]) {
   return Array.from(names)
 }
 
-// A JSON array of objects as a table: a row per item, a column per key. Cells can be edited in Edit mode; every change goes
-// to the viewer, which applies it to the document through the shared edit session.
-export default function JsonTable({ rows, originalRows, isEditable, searchText, onSetCell }: JsonTableProps) {
+// A JSON array of objects as a table: a row per item, a column per key. Cells can be edited; every change goes to the viewer,
+// which applies it to the document through the shared edit session.
+export default function JsonTable({ rows, originalRows, sourcePathText, onSetCell }: JsonTableProps) {
   const { t, tp } = useT()
   const [sort, setSort] = useState<SortState>(null)
   const [pickedCell, setPickedCell] = useState<CellPosition | null>(null)
@@ -83,7 +83,7 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
   const visibleRowIds = useVisibleRowIds({
     rowIds,
     columnIds,
-    searchText,
+    searchText: '',
     sort,
     readText: (rowId, columnId) => formatCell(readMember(rowsRef.current[rowId], columnNames[columnId])),
     dataKey: columnNames,
@@ -151,8 +151,8 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
     else if (event.key === 'ArrowUp') selectCellAtPosition(rowPosition - 1, columnPosition)
     else if (event.key === 'ArrowLeft') selectCellAtPosition(rowPosition, columnPosition - 1)
     else if (event.key === 'ArrowRight') selectCellAtPosition(rowPosition, columnPosition + 1)
-    else if (isEditable && (event.key === 'Enter' || event.key === 'F2')) beginEditing(selectedCell)
-    else if (isEditable && isPrintableKey) beginEditing(selectedCell, event.key)
+    else if (event.key === 'Enter' || event.key === 'F2') beginEditing(selectedCell)
+    else if (isPrintableKey) beginEditing(selectedCell, event.key)
     else return
     event.preventDefault()
   }
@@ -164,11 +164,20 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
     })
   }
 
-  const isSearching = searchText.trim() !== ''
   const hasHiddenColumns = allColumnNames.length > columnNames.length
 
   return (
     <>
+      <p id="table-meta" className="table-meta">
+        <span>
+          {t('json.wb.rowsFrom')}{' '}
+          <span className="mono" dir="ltr">
+            {sourcePathText}
+          </span>
+        </span>
+        · <span>{tp('json.table.rowCount', rows.length)}</span>· <span>{tp('json.table.columnCount', columnNames.length)}</span>
+        {hasHiddenColumns && <span>· {t('json.table.firstColumns', { count: MAX_COLUMNS })}</span>}
+      </p>
       <DataTable
         tableRef={tableRef}
         label="JSON"
@@ -185,26 +194,23 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
         selectedCell={selectedCell}
         sort={activeSort}
         onCycleSort={cycleSort}
-        isEditable={isEditable}
-        renderCellEditor={
-          isEditable
-            ? (rowId, columnId, columnName) =>
-                editingCell?.rowId === rowId && editingCell.columnId === columnId ? (
-                  <CellInput
-                    ariaLabel={t('json.table.editCell', { column: isolateText(columnName), row: rowId + 1 })}
-                    draft={editingCell.draft}
-                    onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
-                    onFinish={finishEditing}
-                    onBlur={() => {
-                      if (editWasCancelledRef.current) {
-                        editWasCancelledRef.current = false
-                        return
-                      }
-                      finishEditing(true)
-                    }}
-                  />
-                ) : null
-            : undefined
+        isEditable
+        renderCellEditor={(rowId, columnId, columnName) =>
+          editingCell?.rowId === rowId && editingCell.columnId === columnId ? (
+            <CellInput
+              ariaLabel={t('json.table.editCell', { column: isolateText(columnName), row: rowId + 1 })}
+              draft={editingCell.draft}
+              onDraftChange={(newDraft) => setEditingCell({ ...editingCell, draft: newDraft })}
+              onFinish={finishEditing}
+              onBlur={() => {
+                if (editWasCancelledRef.current) {
+                  editWasCancelledRef.current = false
+                  return
+                }
+                finishEditing(true)
+              }}
+            />
+          ) : null
         }
         onCellClick={setPickedCell}
         onCellDoubleClick={(position) => {
@@ -212,15 +218,8 @@ export default function JsonTable({ rows, originalRows, isEditable, searchText, 
           beginEditing(position)
         }}
         onKeyDown={handleGridKeyDown}
-        emptyMessage={isSearching ? t('json.table.noRowsMatch') : t('json.table.emptyArray')}
+        emptyMessage={t('json.table.emptyArray')}
       />
-      <p aria-live="polite" className="flex flex-wrap gap-x-6 border-t border-rule bg-paper px-4 py-1 text-xs">
-        <span className="font-semibold">
-          {isSearching ? tp('json.table.rowsFound', rows.length, { shown: visibleRowIds.length }) : `${tp('json.table.rowCount', rows.length)} × ${tp('json.table.columnCount', columnNames.length)}`}
-        </span>
-        {hasHiddenColumns && <span className="text-ink-soft">{t('json.table.firstColumns', { count: MAX_COLUMNS })}</span>}
-        {isEditable && <span className="text-ink-soft">{t('json.table.editHint')}</span>}
-      </p>
     </>
   )
 }

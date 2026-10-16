@@ -8,7 +8,7 @@ import { countExcelEdits, createEmptyExcelEdits, describeExcelChanges } from './
 import type { ExcelEdits } from './excel/excelEdits'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
-import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges } from './json/jsonModel'
+import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, jsonEditingModule } from './json/jsonModel'
 import { countTextChanges, createEmptyTextEdits, describeTextChanges } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
@@ -25,6 +25,8 @@ export type FormatViewerProps = {
   confirmDiscardEdits: () => Promise<boolean>
   // Opens the system file chooser (the "Open another file" button's action), for the way out of a fatal error.
   onOpenAnotherFile: () => void
+  // Goes back to the home page, asking first when there are unsaved edits (for a format that draws its own header).
+  onClose: () => void
   onSelectionChange: (selection: unknown) => void
   // Things the toolbar can ask the viewer to do (rename a column, open find and replace, scroll to a cell).
   onCommandsChange: (commands: unknown) => void
@@ -70,6 +72,8 @@ export type FormatEditing = {
   // "3 edited cells, 1 row deleted"; empty when nothing changed.
   describeChanges: (edits: unknown, locale: Locale) => string
   loadEditingModule: () => Promise<EditingModule>
+  // A workbench that is always editable (JSON): it opens in Edit mode with its tools loaded, and has no View / Edit switch.
+  alwaysEditable?: boolean
 }
 
 export type FormatDefinition = {
@@ -81,6 +85,10 @@ export type FormatDefinition = {
   // Formats worth suggesting to someone who just saved a file of this format.
   related?: Viewer['id'][]
   ViewerComponent: LazyExoticComponent<ComponentType<FormatViewerProps>>
+  // The viewer draws the whole screen itself (JSON): no shared header, edit toolbar or save tip around it.
+  ownsWholePage?: boolean
+  // Larger files are refused before they are read, because the page would become slow with them.
+  maxFileBytes?: number
   // Absent while a format cannot be edited yet; the View / Edit toggle is then not shown.
   editing?: FormatEditing
 }
@@ -121,11 +129,16 @@ export const formatDefinitions: FormatDefinition[] = [
     highlights: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'],
     related: ['csv', 'excel'],
     ViewerComponent: lazy(() => import('./json/JsonViewer')),
+    ownsWholePage: true,
+    // Measured 2026-10-16: up to 10 MB every action takes a third of a second or less; at 50 MB a tree edit takes 1.6 s and the
+    // page holds 1 GB of memory.
+    maxFileBytes: 10 * 1024 * 1024,
     editing: {
       createEmptyEdits: createEmptyJsonEdits,
       countChanges: countJsonChanges,
       describeChanges: describeJsonChanges,
-      loadEditingModule: () => import('./json/jsonToolbar').then((toolbarFile) => toolbarFile.jsonEditingModuleWithToolbar),
+      loadEditingModule: () => Promise.resolve(jsonEditingModule),
+      alwaysEditable: true,
     },
   },
   {
