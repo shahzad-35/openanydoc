@@ -1,5 +1,6 @@
-// Runs after `vite build`. Writes real, readable HTML for the changelog in English and Arabic (so search engines see the content),
-// plus sitemap.xml and robots.txt. The React page in src/pages/ChangelogPage.tsx shows the same words and structure and takes over
+// Runs after `vite build` and the server build of src/entry-server.tsx (into dist-ssr, deleted at the end). Writes every page in
+// English and Arabic with real markup in <div id="root">: the home, format, About, Privacy and Terms pages are React's own render
+// (the browser takes it over with hydrateRoot), the changelog is written by hand below. Plus sitemap.xml and robots.txt. The React page in src/pages/ChangelogPage.tsx shows the same words and structure and takes over
 // in the browser: keep the two in step. "New" badges are not written here on purpose: whether a format is new depends on the
 // visitor's date, so it is decided in the browser and never frozen into this HTML.
 //
@@ -8,13 +9,16 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { faqItems, features } from '../src/content.ts'
+import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
-import { CHECK_ICON_PATH, changelogClasses, changelogIds } from '../src/pages/changelogMarkup.ts'
-import { SITE_NAME, SITE_ORIGIN, pageSeo } from '../src/seo.ts'
+import { infoPages } from '../src/legalContent.ts'
+import { CHECK_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks } from '../src/pages/changelogMarkup.ts'
+import { SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
+const serverBuildFolder = path.join(projectRoot, 'dist-ssr')
+const { renderPage } = await import(path.join(serverBuildFolder, 'entry-server.js'))
 const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(projectRoot, relativePath), 'utf8'))
 
 const messages = { en: readJson('src/i18n/en.json'), ar: readJson('src/i18n/ar.json') }
@@ -28,6 +32,25 @@ const otherLocale = (locale) => (locale === 'en' ? 'ar' : 'en')
 // The address of a page in a language: '/csv-viewer' in Arabic is '/ar/csv-viewer', the home page is '/ar'.
 const localizePath = (locale, address) => (address === '/' ? `/${locale}` : `/${locale}${address}`)
 const viewerById = new Map(viewers.map((viewer) => [viewer.id, viewer]))
+
+// The site footer as src/components/SiteFooter.tsx draws it on the changelog page (without the "New" badges, for the same reason as above).
+function renderChangelogFooter(locale) {
+  const t = (key, values) => escapeHtml(translate(locale, key, values))
+  const f = footerClasses
+  const link = (id, address, label) => `<a id="${id}" href="${localizePath(locale, address)}" class="${f.link}">${label}</a>`
+  const viewerItems = viewers
+    .filter((viewer) => viewer.toolPath)
+    .map((viewer) => `<li class="${f.item}">${link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))}</li>`)
+    .join('')
+  const legalItems = legalFooterLinks.map((item) => `<li>${link(item.id, item.path, t(item.labelKey))}</li>`).join('')
+  return (
+    `<footer id="site-footer" class="${f.footer}"><div class="${f.columns}"><div><p class="${f.brand}">OpenAnyDoc</p><p class="${f.text}">${t('footer.text')}</p></div>` +
+    `<nav id="footer-viewers" aria-label="${t('footer.viewers')}"><h2 class="${f.heading}">${t('footer.viewers')}</h2><ul class="${f.list}">${viewerItems}</ul></nav>` +
+    `<nav id="footer-more" aria-label="${t('footer.more')}"><h2 class="${f.heading}">${t('footer.more')}</h2><ul class="${f.list}"><li>${link('footer-link-all-types', '/', t('footer.allTypes'))}</li></ul></nav>` +
+    `<nav id="footer-legal" aria-label="${t('footer.legal')}"><h2 class="${f.heading}">${t('footer.legal')}</h2><ul class="${f.list}">${legalItems}</ul></nav></div>` +
+    `<p id="footer-disclaimer" class="${f.disclaimer}">${t('legal.disclaimer')}</p></footer>`
+  )
+}
 
 function renderChangelogBody(locale) {
   const t = (key, values) => escapeHtml(translate(locale, key, values))
@@ -60,7 +83,7 @@ function renderChangelogBody(locale) {
     `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}">OpenAnyDoc</a></p>` +
     `<p><a id="${changelogIds.languageLink}" href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
     `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}"><h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
-    `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main></div>`
+    `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`
   )
 }
 
@@ -70,40 +93,64 @@ function checkSearchSnippet(label, title, description) {
   if (description.length < 110 || description.length > 165) throw new Error(`${label}: the description is ${description.length} characters (aim for 120 to 160).`)
 }
 
-function renderSocialTags(title, description, address) {
+// Canonical, language alternates and the share tags (Open Graph, X/Twitter) of a page; `address` is the page without its language.
+// src/pages/HomePage.tsx (usePageHead) sets the same tags when the page changes in the browser: keep the two in step.
+function renderHeadTags(locale, address, title, description) {
+  const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
+  const shareImage = getShareImage(locale, address)
+  const imageUrl = `${SITE_ORIGIN}${shareImage.path}`
   return [
-    `<meta property="og:type" content="website" data-changelog-head />`,
-    `<meta property="og:site_name" content="${SITE_NAME}" data-changelog-head />`,
-    `<meta property="og:title" content="${escapeHtml(title)}" data-changelog-head />`,
-    `<meta property="og:description" content="${escapeHtml(description)}" data-changelog-head />`,
-    `<meta property="og:url" content="${address}" data-changelog-head />`,
-    `<meta name="twitter:card" content="summary" data-changelog-head />`,
+    `<link rel="canonical" href="${pageUrl}" />`,
+    ...locales.map((alternate) => `<link rel="alternate" hreflang="${alternate}" href="${SITE_ORIGIN}${localizePath(alternate, address)}" />`),
+    `<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}${localizePath('en', address)}" />`,
+    `<meta property="og:type" content="website" />`,
+    `<meta property="og:site_name" content="${SITE_NAME}" />`,
+    `<meta property="og:title" content="${escapeHtml(title)}" />`,
+    `<meta property="og:description" content="${escapeHtml(description)}" />`,
+    `<meta property="og:url" content="${pageUrl}" />`,
+    `<meta property="og:image" content="${imageUrl}" />`,
+    `<meta property="og:image:width" content="1200" />`,
+    `<meta property="og:image:height" content="630" />`,
+    `<meta property="og:image:alt" content="${escapeHtml(shareImage.alt)}" />`,
+    `<meta property="og:locale" content="${openGraphLocales[locale]}" />`,
+    `<meta property="og:locale:alternate" content="${openGraphLocales[otherLocale(locale)]}" />`,
+    `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
+    `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
+    `<meta name="twitter:image" content="${imageUrl}" />`,
   ].join('\n    ')
 }
 
-function renderHead(locale) {
-  const alternates = [
-    `<link rel="canonical" href="${SITE_ORIGIN}/${locale}/changelog" data-changelog-head />`,
-    `<link rel="alternate" hreflang="en" href="${SITE_ORIGIN}/en/changelog" data-changelog-head />`,
-    `<link rel="alternate" hreflang="ar" href="${SITE_ORIGIN}/ar/changelog" data-changelog-head />`,
-    `<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/en/changelog" data-changelog-head />`,
-  ]
-  const title = translate(locale, 'changelog.title')
-  const description = translate(locale, 'changelog.description')
-  return [...alternates, renderSocialTags(title, description, `${SITE_ORIGIN}/${locale}/changelog`)].join('\n    ')
-}
-
 const indexHtml = fs.readFileSync(path.join(distFolder, 'index.html'), 'utf8')
+const assetNames = fs.readdirSync(path.join(distFolder, 'assets'))
+function findAsset(pattern) {
+  const name = assetNames.find((candidate) => pattern.test(candidate))
+  if (!name) throw new Error(`No file in dist/assets matches ${pattern}.`)
+  return `/assets/${name}`
+}
+// Arabic pages fetch their language file (src/i18n/ar.json, loaded by main.tsx before the first render) and the two Arabic font
+// weights seen first (headings 700, text 400) right away, instead of after the main script or the stylesheet.
+const arabicPreloads = [
+  `<link rel="modulepreload" crossorigin href="${findAsset(/^ar-[\w-]+\.js$/)}" />`,
+  ...[400, 700].map((weight) => `<link rel="preload" as="font" type="font/woff2" crossorigin href="${findAsset(new RegExp(`^ibm-plex-sans-arabic-arabic-${weight}-normal-[\\w-]+\\.woff2$`))}" />`),
+].join('\n    ')
+
+// dist/index.html in a language. Only "/" needs /locale-redirect.js (it picks /en or /ar); a page with a language skips that
+// render-blocking request.
+function pageShell(locale, { keepLocaleRedirect = false } = {}) {
+  const page = indexHtml.replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`)
+  if (keepLocaleRedirect) return page
+  return page.replace('<script src="/locale-redirect.js"></script>', locale === 'ar' ? arabicPreloads : '')
+}
 
 for (const locale of locales) {
   checkSearchSnippet(`${locale} changelog`, translate(locale, 'changelog.title'), translate(locale, 'changelog.description'))
-  const title = escapeHtml(translate(locale, 'changelog.title'))
-  const description = escapeHtml(translate(locale, 'changelog.description'))
-  const page = indexHtml
-    .replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`)
-    .replace(/<title>[\s\S]*?<\/title>/, `<title>${title}</title>`)
-    .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${description}$2`)
-    .replace('</head>', `  ${renderHead(locale)}\n  </head>`)
+  const title = translate(locale, 'changelog.title')
+  const description = translate(locale, 'changelog.description')
+  const page = pageShell(locale)
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
+    .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(description)}$2`)
+    .replace('</head>', `  ${renderHeadTags(locale, '/changelog', title, description)}\n  </head>`)
     .replace('<div id="root"></div>', `<div id="root">${renderChangelogBody(locale)}</div>`)
   if (!page.includes('id="main"')) throw new Error(`Could not write the ${locale} changelog: dist/index.html has a different shape than expected.`)
   const pageFolder = path.join(distFolder, locale, 'changelog')
@@ -115,13 +162,13 @@ for (const locale of locales) {
 
 const jsonLdScript = (data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
 
-// `address` is the page without its language ('/' or '/csv-viewer'); the page is written once per language.
-function renderSeoPage(locale, address) {
+// `address` is the page without its language ('/' or '/csv-viewer'); the page is written once per language. `rootMarkup` is React's
+// render of the page, or empty for an address the browser draws by itself.
+function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const seo = pageSeo[locale][address]
   const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
   const viewer = viewers.find((candidate) => candidate.toolPath === address)
   const liveViewers = viewers.filter((candidate) => candidate.toolPath)
-  const t = (key, values) => escapeHtml(translate(locale, key, values))
   const application = {
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
@@ -135,7 +182,9 @@ function renderSeoPage(locale, address) {
     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
     featureList: liveViewers.map((candidate) => translate(locale, `viewer.description.${candidate.id}`)),
   }
-  const structuredData = [application]
+  const infoPage = infoPages[locale][address]
+  // About, Privacy and Terms describe the site, not the application.
+  const structuredData = infoPage ? [] : [application]
   // The questions published as data are exactly the ones the page shows: the home page's, or this format's own.
   const guide = formatGuides[locale][address]
   const questions = address === '/' ? faqItems[locale] : (guide?.faq ?? [])
@@ -156,32 +205,14 @@ function renderSeoPage(locale, address) {
       ],
     })
   }
-  const head = [
-    `<link rel="canonical" href="${pageUrl}" />`,
-    ...locales.map((alternate) => `<link rel="alternate" hreflang="${alternate}" href="${SITE_ORIGIN}${localizePath(alternate, address)}" />`),
-    `<link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}${localizePath('en', address)}" />`,
-    `<meta property="og:type" content="website" />`,
-    `<meta property="og:site_name" content="${SITE_NAME}" />`,
-    `<meta property="og:title" content="${escapeHtml(seo.title)}" />`,
-    `<meta property="og:description" content="${escapeHtml(seo.description)}" />`,
-    `<meta property="og:url" content="${pageUrl}" />`,
-    `<meta property="og:locale" content="${locale === 'ar' ? 'ar_AR' : 'en_US'}" />`,
-    `<meta name="twitter:card" content="summary" />`,
-    ...structuredData.map(jsonLdScript),
-  ].join('\n    ')
-  // For readers and crawlers that do not run scripts. A visitor with scripts on never sees it: the app draws the real page.
-  const links = liveViewers.map((candidate) => `<li><a href="${localizePath(locale, candidate.toolPath)}">${escapeHtml(pageSeo[locale][candidate.toolPath].heading)}</a></li>`).join('')
-  const questionsHtml = questions.length > 0 ? `<h2>${escapeHtml(guide?.faqTitle ?? translate(locale, 'about.faqHeading'))}</h2>${questions.map((item) => `<h3>${escapeHtml(item.question)}</h3><p>${escapeHtml(item.answer)}</p>`).join('')}` : ''
-  const featureList = address === '/' ? `<h2>${t('static.featuresHeading')}</h2><ul>${features[locale].map((feature) => `<li>${escapeHtml(feature)}</li>`).join('')}</ul>` : ''
-  const stepsHtml = guide ? `<h2>${escapeHtml(guide.stepsTitle)}</h2><ol>${guide.steps.map((step) => `<li><strong>${escapeHtml(step.title)}.</strong> ${escapeHtml(step.text)}</li>`).join('')}</ol>` : ''
-  const noscript = `<noscript><main><h1>${escapeHtml(seo.heading)}</h1><p>${escapeHtml(seo.intro)}</p><p>${t('static.enableScripts')}</p><nav aria-label="${t('static.viewersLabel')}"><ul>${links}</ul></nav>${stepsHtml}${featureList}${questionsHtml}</main></noscript>`
-  checkSearchSnippet(`${locale} ${viewer ? viewer.label : 'home page'}`, seo.title, seo.description)
-  return indexHtml
-    .replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`)
+  const head = [renderHeadTags(locale, address, seo.title, seo.description), ...structuredData.map(jsonLdScript)].join('\n    ')
+  checkSearchSnippet(`${locale} ${viewer ? viewer.label : address}`, seo.title, seo.description)
+  return pageShell(locale, shellOptions)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(seo.title)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(seo.description)}$2`)
     .replace('</head>', `  ${head}\n  </head>`)
-    .replace('<div id="root"></div>', `<div id="root"></div>\n    ${noscript}`)
+    // A function, so a "$" in the markup is never read as a replacement pattern.
+    .replace('<div id="root"></div>', () => (rootMarkup ? `<div id="root" data-prerendered>${rootMarkup}</div>` : '<div id="root"></div>'))
 }
 
 const seoAddresses = Object.keys(pageSeo.en)
@@ -191,12 +222,13 @@ for (const locale of locales) {
   for (const address of seoAddresses) {
     const pageFolder = path.join(distFolder, localizePath(locale, address))
     fs.mkdirSync(pageFolder, { recursive: true })
-    fs.writeFileSync(path.join(pageFolder, 'index.html'), renderSeoPage(locale, address))
+    fs.writeFileSync(path.join(pageFolder, 'index.html'), renderSeoPage(locale, address, await renderPage(locale, address)))
   }
 }
 // "/" has no language of its own: /locale-redirect.js sends the visitor to /en or /ar. Its HTML is the English home page's head
-// pointing at /en, so a reader without scripts still gets real content (indexHtml was read before any page was written).
-fs.writeFileSync(path.join(distFolder, 'index.html'), renderSeoPage('en', '/'))
+// pointing at /en (indexHtml was read before any page was written). Its root stays empty because the host also serves this file
+// for unknown addresses, which the browser draws by itself.
+fs.writeFileSync(path.join(distFolder, 'index.html'), renderSeoPage('en', '/', '', { keepLocaleRedirect: true }))
 
 // Only pages that work as a page: no /view-* addresses (they exist only for a file open in one visitor's browser).
 const newestChangeDate = changelog[0].date
@@ -215,4 +247,5 @@ fs.writeFileSync(
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${sitemapEntries.join('\n')}\n</urlset>\n`,
 )
 fs.writeFileSync(path.join(distFolder, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`)
-console.log(`Wrote ${seoAddresses.length * locales.length} page heads, ${locales.length} changelog pages, sitemap.xml and robots.txt into dist/`)
+fs.rmSync(serverBuildFolder, { recursive: true, force: true })
+console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml and robots.txt into dist/`)

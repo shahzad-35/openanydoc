@@ -3,8 +3,8 @@ import { formatGuides } from '../pageContent'
 import type { Viewer } from '../viewers'
 import { PrivacySection } from './AboutSections'
 
-// The text that fills a format's own page under the drop zone: numbered steps, then that file type's questions and answers, then
-// the privacy note. Read from src/pageContent.ts, which the build also uses for the page's static HTML and FAQ data.
+// The text that fills a format's own page under the drop zone: numbered steps ("How it works"), what the viewer handles, then
+// that file type's questions and answers, then the privacy note. Read from src/pageContent.ts, which the build also uses for the page's static HTML and FAQ data.
 export default function FormatGuide({ address, viewerId }: { address: string; viewerId: Viewer['id'] }) {
   const { locale } = useT()
   const guide = formatGuides[locale][address]
@@ -26,6 +26,14 @@ export default function FormatGuide({ address, viewerId }: { address: string; vi
             </li>
           ))}
         </ol>
+      </section>
+      <section id="handles-section">
+        <h2 id="handles-heading" className="type-h3">{guide.handlesTitle}</h2>
+        <ul id="handles-list" className="mt-4 list-disc space-y-2 ps-6">
+          {guide.handles.map((item, position) => (
+            <li key={item} id={`handles-item-${position + 1}`}>{item}</li>
+          ))}
+        </ul>
       </section>
       <section id="format-faq-section">
         <h2 id="format-faq-heading" className="type-h3">{guide.faqTitle}</h2>

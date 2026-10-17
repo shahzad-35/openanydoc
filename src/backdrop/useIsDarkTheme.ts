@@ -6,7 +6,8 @@ function subscribeToThemeClass(onChange: () => void) {
   return () => observer.disconnect()
 }
 
-// True while the page is in dark mode; follows the theme toggle without a reload.
+// True while the page is in dark mode; follows the theme toggle without a reload. False in the build's server render (and in the
+// first browser render that takes over its markup), which cannot know the visitor's theme.
 export function useIsDarkTheme() {
-  return useSyncExternalStore(subscribeToThemeClass, () => document.documentElement.classList.contains('dark'))
+  return useSyncExternalStore(subscribeToThemeClass, () => document.documentElement.classList.contains('dark'), () => false)
 }

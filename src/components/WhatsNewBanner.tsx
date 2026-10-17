@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import { joinNodesAsList, localizePath, translateWithNodes, useT } from '../i18n'
 import { getNewFormats } from '../whatsNew'
+import { useHasMounted } from './NewBadge'
 import type { Viewer } from '../viewers'
 
 type WhatsNewBannerProps = {
@@ -39,7 +40,8 @@ const FADE_MILLISECONDS = 1000
 
 export default function WhatsNewBanner({ onNavigate, onDismiss }: WhatsNewBannerProps) {
   const { locale, t } = useT()
-  const announcedFormats = getNewFormats()
+  // "New" depends on today's date, so it is worked out only in the browser (see useHasMounted).
+  const announcedFormats = useHasMounted() ? getNewFormats() : []
   const hasAnnouncement = announcedFormats.length > 0
   const [isPaused, setIsPaused] = useState(false)
   const [isFading, setIsFading] = useState(false)

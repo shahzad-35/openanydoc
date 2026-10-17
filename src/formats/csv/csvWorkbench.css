@@ -246,6 +246,10 @@
 #csv-workbench .mi.danger,#csv-workbench .mi.danger .ico{color:var(--err)}
 #csv-workbench .mi:disabled{opacity:.45;cursor:not-allowed;background:transparent}
 #csv-workbench .mi-sep{height:1px;background:var(--line);margin:4px 2px}
+#csv-workbench a.mi{text-decoration:none}
+#csv-workbench .menu-note{max-width:250px;padding:4px 9px 6px;font-size:11px;line-height:1.45;color:var(--faint);white-space:normal}
+#csv-workbench #status-legal-links a{color:inherit;text-decoration:none}
+#csv-workbench #status-legal-links a:hover{color:var(--text);text-decoration:underline}
 #csv-workbench .pop input[type=text],#csv-workbench .pop input[type=number],#csv-workbench .pop input[type=date],#csv-workbench .pop select,#csv-workbench .pop textarea{height:28px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);padding-inline:8px;font-size:12.5px;min-width:0}
 #csv-workbench .pop input:focus,#csv-workbench .pop select:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
 #csv-workbench .checklist{max-height:180px;overflow:auto;display:grid;gap:1px;margin-top:6px}

@@ -1,6 +1,6 @@
 import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import DiscardEditsDialog from './components/DiscardEditsDialog'
-import { LocaleContext, SwitchLanguageContext, getBrowserLocale, localizePath, splitLocalePath } from './i18n'
+import { LocaleContext, PagePathContext, SwitchLanguageContext, getBrowserLocale, getLocaleFromPath, loadLocale, localizePath, splitLocalePath } from './i18n'
 import type { Locale } from './i18n'
 import { ToastProvider } from './components/Messages'
 import FileViewPage from './pages/FileViewPage'
@@ -9,6 +9,8 @@ import type { OpenedFile } from './useFileIntake'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
+const InfoPage = lazy(() => import('./pages/InfoPage'))
+const infoPageAddresses = ['/about', '/privacy', '/terms']
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
 // language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still
@@ -27,11 +29,12 @@ function showResolvedAddress() {
   return address
 }
 
-export default function App() {
+// `initialPathname` is set by the build's server render (src/entry-server.tsx), where there is no browser address to read.
+export default function App({ initialPathname }: { initialPathname?: string }) {
   const [openedFile, setOpenedFile] = useState<OpenedFile | null>(null)
   const [discardRequest, setDiscardRequest] = useState<{ answer: (shouldDiscard: boolean) => void } | null>(null)
   const [fileKey, setFileKey] = useState(0)
-  const [pathname, setPathname] = useState(showResolvedAddress)
+  const [pathname, setPathname] = useState(() => initialPathname ?? showResolvedAddress())
   // The "what's new" banner is closed in React state only, so it comes back when the tab is reloaded. Do not persist this
   // (no cookies, localStorage, sessionStorage or IndexedDB) and do not send it anywhere: DECISIONS.md, "What's new".
   const [isBannerDismissed, setIsBannerDismissed] = useState(false)
@@ -61,7 +64,8 @@ export default function App() {
   // reload or Forward lands on home instead. A format's own address (/en/json-viewer ...) shows its page with the drop zone.
   useEffect(() => {
     function sendHomeIfOnFileViewPath() {
-      setPathname(showResolvedAddress())
+      const address = showResolvedAddress()
+      void loadLocale(getLocaleFromPath(address)).then(() => setPathname(address))
     }
 
     function handleBrowserNavigation() {
@@ -110,7 +114,8 @@ export default function App() {
 
   // The same page in the other language. With a file open the entry is replaced (not added) so Back still closes the file and
   // the edits stay where they are; otherwise it is a normal visit.
-  function switchLanguage(newLocale: Locale) {
+  async function switchLanguage(newLocale: Locale) {
+    await loadLocale(newLocale)
     const newAddress = localizePath(newLocale, path)
     if (openedFile) {
       window.history.replaceState(window.history.state, '', newAddress)
@@ -149,36 +154,42 @@ export default function App() {
   return (
     <LocaleContext.Provider value={locale}>
       <SwitchLanguageContext.Provider value={switchLanguage}>
-        <ToastProvider>
-          {openedFile ? (
-            <FileViewPage
-              key={fileKey}
-              openedFile={openedFile}
-              onClose={closeFile}
-              onReplaceFile={replaceFile}
-              confirmDiscardEdits={confirmDiscardEdits}
-              onUnsavedEditsChange={reportUnsavedEdits}
-            />
-          ) : path === '/changelog' ? (
-            <Suspense fallback={null}>
-              <ChangelogPage onNavigate={navigateTo} />
-            </Suspense>
-          ) : (
-            <HomePage
-              onFileLoaded={openFile}
-              onNavigate={navigateTo}
-              toolViewer={findViewerByToolPath(path)}
-              isBannerDismissed={isBannerDismissed}
-              onDismissBanner={() => setIsBannerDismissed(true)}
-              handoffFile={handoffFile}
-              onHandoffConsumed={() => setHandoffFile(null)}
-              onOpenInViewer={openInViewer}
-            />
-          )}
-          {discardRequest && (
-            <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
-          )}
-      </ToastProvider>
+        <PagePathContext.Provider value={path}>
+          <ToastProvider>
+            {openedFile ? (
+              <FileViewPage
+                key={fileKey}
+                openedFile={openedFile}
+                onClose={closeFile}
+                onReplaceFile={replaceFile}
+                confirmDiscardEdits={confirmDiscardEdits}
+                onUnsavedEditsChange={reportUnsavedEdits}
+              />
+            ) : path === '/changelog' ? (
+              <Suspense fallback={null}>
+                <ChangelogPage onNavigate={navigateTo} />
+              </Suspense>
+            ) : infoPageAddresses.includes(path) ? (
+              <Suspense fallback={null}>
+                <InfoPage address={path} onNavigate={navigateTo} />
+              </Suspense>
+            ) : (
+              <HomePage
+                onFileLoaded={openFile}
+                onNavigate={navigateTo}
+                toolViewer={findViewerByToolPath(path)}
+                isBannerDismissed={isBannerDismissed}
+                onDismissBanner={() => setIsBannerDismissed(true)}
+                handoffFile={handoffFile}
+                onHandoffConsumed={() => setHandoffFile(null)}
+                onOpenInViewer={openInViewer}
+              />
+            )}
+            {discardRequest && (
+              <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
+            )}
+          </ToastProvider>
+        </PagePathContext.Provider>
       </SwitchLanguageContext.Provider>
     </LocaleContext.Provider>
   )

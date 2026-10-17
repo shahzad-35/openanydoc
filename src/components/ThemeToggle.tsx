@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useIsDarkTheme } from '../backdrop/useIsDarkTheme'
 import { useT } from '../i18n'
 import RoughIcon from './RoughIcon'
 import type { RoughSketch } from './RoughIcon'
@@ -31,7 +31,7 @@ function drawMoon(sketch: RoughSketch, roughness: number) {
 // `compact` is for the file page: smaller on a mouse, still 44px on touch screens.
 export default function ThemeToggle({ compact = false }: { compact?: boolean }) {
   const { t } = useT()
-  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
+  const isDark = useIsDarkTheme()
 
   function toggleTheme() {
     const nextIsDark = !isDark
@@ -41,7 +41,6 @@ export default function ThemeToggle({ compact = false }: { compact?: boolean }) 
     } catch {
       // Storage can be blocked; the theme still applies for this visit.
     }
-    setIsDark(nextIsDark)
   }
 
   // The icon shows the mode a click switches to: a sun while dark, a moon while light.

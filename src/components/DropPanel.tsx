@@ -9,59 +9,15 @@ import type { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 
-const EXTENSION_COLOR_COUNT = 10
-
-function shuffle<Item>(items: Item[]) {
-  const shuffled = [...items]
-  for (let index = shuffled.length - 1; index > 0; index--) {
-    const swapIndex = Math.floor(Math.random() * (index + 1))
-    ;[shuffled[index], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[index]]
-  }
-  return shuffled
-}
-
-const COLOR_ORDER_STORAGE_KEY = 'extensionColorOrder'
-
-function isValidColorOrder(value: unknown): value is number[] {
-  return (
-    Array.isArray(value) &&
-    value.length === EXTENSION_COLOR_COUNT &&
-    new Set(value).size === EXTENSION_COLOR_COUNT &&
-    value.every((colorNumber) => Number.isInteger(colorNumber) && colorNumber >= 1 && colorNumber <= EXTENSION_COLOR_COUNT)
-  )
-}
-
-// Random per browser session: the shuffled order is kept in sessionStorage, so it stays the same on every visit
-// (reloads, coming back from a file) until the tab or browser session ends.
-function loadOrCreateColorOrder() {
-  try {
-    const savedOrder: unknown = JSON.parse(sessionStorage.getItem(COLOR_ORDER_STORAGE_KEY) ?? 'null')
-    if (isValidColorOrder(savedOrder)) return savedOrder
-  } catch {
-    // Storage is blocked or holds something unreadable, so fall through to a fresh shuffle.
-  }
-  const newOrder = shuffle(Array.from({ length: EXTENSION_COLOR_COUNT }, (_, index) => index + 1))
-  try {
-    sessionStorage.setItem(COLOR_ORDER_STORAGE_KEY, JSON.stringify(newOrder))
-  } catch {
-    // The colors still work for this page load; they just will not be remembered.
-  }
-  return newOrder
-}
-
-// Each accepted extension gets its own color from the session's shuffled order.
-const shuffledColorNumbers = loadOrCreateColorOrder()
-const colorNumberByExtension = new Map(
-  supportedExtensions.map((extension, index) => [extension, shuffledColorNumbers[index % EXTENSION_COLOR_COUNT]]),
-)
+// One class per pill position (written out in full so Tailwind finds them). Each --ext-pill-N is pointed at a hue in the session's
+// shuffled order by public/theme-init.js before the first paint, so the server markup, the first browser render and the colours
+// the visitor sees all agree. A class, not a style attribute: the Content-Security-Policy blocks style attributes in the HTML.
+const extensionColorClasses = ['bg-(--ext-pill-1)', 'bg-(--ext-pill-2)', 'bg-(--ext-pill-3)', 'bg-(--ext-pill-4)', 'bg-(--ext-pill-5)', 'bg-(--ext-pill-6)', 'bg-(--ext-pill-7)', 'bg-(--ext-pill-8)', 'bg-(--ext-pill-9)', 'bg-(--ext-pill-10)']
 
 export function ExtensionPill({ extension }: { extension: string }) {
+  const colorClass = extensionColorClasses[supportedExtensions.indexOf(extension) % extensionColorClasses.length]
   return (
-    <span
-      dir="ltr"
-      style={{ backgroundColor: `var(--ext-${colorNumberByExtension.get(extension)})` }}
-      className="control-shape px-2.5 py-0.5 font-mono text-sm font-medium text-on-accent"
-    >
+    <span dir="ltr" className={`control-shape ${colorClass} px-2.5 py-0.5 font-mono text-sm font-medium text-on-accent`}>
       {extension}
     </span>
   )

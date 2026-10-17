@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import type { ReactNode } from 'react'
 import { compactSecondaryButtonClassName } from '../buttonStyles'
-import { useT } from '../i18n'
+import { localizePath, useT } from '../i18n'
 import { formatFileSize } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findTableFormat, findViewerForFileName } from '../viewers'
@@ -22,7 +22,7 @@ type FileViewHeaderProps = {
 
 // The app bar at the top of every file page: brand, file type, name and size, and the way back home.
 export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onOpenAnotherFile, controls }: FileViewHeaderProps) {
-  const { t } = useT()
+  const { locale, t } = useT()
   const viewer = findViewerForFileName(openedFile.file.name)
   const fileNameRef = useRef<HTMLHeadingElement>(null)
 
@@ -69,6 +69,33 @@ export default function FileViewHeader({ openedFile, onClose, onBeforeClear, onO
         <div className="order-2 ms-auto flex items-center gap-2 sm:order-none sm:ms-0">
           <LanguageSwitcher compact />
           <ThemeToggle compact />
+          <button
+            id="legal-menu-button"
+            type="button"
+            popoverTarget="legal-menu"
+            aria-haspopup="menu"
+            aria-controls="legal-menu"
+            aria-label={t('legal.menu')}
+            data-tip={t('legal.menu')}
+            data-tip-align="end"
+            className="control-shape grid min-h-8 min-w-8 cursor-pointer place-items-center transition-colors duration-200 hover:bg-paper pointer-coarse:min-h-11 pointer-coarse:min-w-11"
+          >
+            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round">
+              <path d="M5 12h.01M12 12h.01M19 12h.01" />
+            </svg>
+          </button>
+          {/* Links open in a new tab, so the open file and its edits stay where they are. */}
+          <div id="legal-menu" popover="auto" role="menu" aria-label={t('legal.menu')} className="box-shape solid-box fixed inset-auto end-4 top-12 m-0 w-64 border-rule bg-paper-raised p-1 text-sm text-ink">
+            <a id="menu-link-privacy" role="menuitem" href={localizePath(locale, '/privacy')} target="_blank" rel="noopener" className="block rounded px-3 py-1.5 hover:bg-paper focus-visible:bg-paper">
+              {t('legal.privacy')}
+            </a>
+            <a id="menu-link-terms" role="menuitem" href={localizePath(locale, '/terms')} target="_blank" rel="noopener" className="block rounded px-3 py-1.5 hover:bg-paper focus-visible:bg-paper">
+              {t('legal.terms')}
+            </a>
+            <p id="menu-disclaimer" className="mt-1 border-t border-rule px-3 pt-2 pb-1.5 text-xs text-ink-soft">
+              {t('legal.disclaimer')}
+            </p>
+          </div>
         </div>
       </div>
     </header>

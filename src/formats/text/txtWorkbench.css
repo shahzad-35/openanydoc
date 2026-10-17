@@ -130,6 +130,11 @@
 #txt-workbench .grp-label{display:flex;align-items:center;gap:5px;height:16px;margin-top:2px;font-size:11px;line-height:16px;color:var(--ink-3);white-space:nowrap}
 #txt-workbench .grp-label::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--gt-ink);opacity:.8;flex:none}
 #txt-workbench .tb.big:not([aria-pressed="true"]):not(:hover){background:color-mix(in srgb,var(--gt-ink) 9%,transparent);color:var(--gt-ink)}
+#txt-workbench .legal-links{display:flex;align-items:center;gap:2px}
+#txt-workbench .legal-note{max-width:330px;margin:0;margin-inline-start:6px;font-size:10.5px;line-height:12px;color:var(--ink-3);white-space:normal}
+#txt-workbench #status-legal-links{gap:4px}
+#txt-workbench #status-legal-links a{color:inherit;text-decoration:none}
+#txt-workbench #status-legal-links a:hover{color:var(--ink);text-decoration:underline}
 #txt-workbench .field{display:flex;align-items:center;gap:5px;height:32px;padding-inline:4px 2px;color:var(--ink-2);white-space:nowrap}
 #txt-workbench .field .ic{width:16px;height:16px}
 #txt-workbench .field select,#txt-workbench .field input{height:28px;border:1px solid var(--rule-strong);border-radius:7px;background:var(--surface);padding:0 6px;font-size:12.5px;color:var(--ink)}
@@ -396,6 +401,8 @@ html[lang="ar"] #txt-workbench .sg h3{letter-spacing:0}
 #txt-workbench .sg-grid{display:flex;flex-wrap:wrap;gap:6px}
 #txt-workbench .sg-grid .ib{width:54px;height:52px;border:1px solid var(--rule);border-radius:12px;background:var(--surface-2)}
 #txt-workbench .sg-grid .ib .ic{width:22px;height:22px}
+#txt-workbench .sg-grid .legal-links{display:contents}
+#txt-workbench .sg-grid .legal-note{flex-basis:100%;max-width:none;margin:0;font-size:12px;line-height:1.5}
 #txt-workbench .sg-grid .ib[aria-pressed="true"]{border-color:transparent}
 #txt-workbench .sg-grid .field{flex:1 1 100%;justify-content:space-between;height:52px;border:1px solid var(--rule);border-radius:12px;padding-inline:12px;background:var(--surface-2);font-size:13px}
 #txt-workbench .sg-grid .field .vh{position:static!important;width:auto;height:auto;overflow:visible;clip:auto;margin-inline-end:auto}

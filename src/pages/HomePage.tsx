@@ -1,13 +1,12 @@
 import { Suspense, lazy, useEffect, useState } from 'react'
-import type { ReactNode } from 'react'
 import AboutContent from '../components/AboutContent'
 import FormatGuide from '../components/FormatGuide'
 import DropPanel from '../components/DropPanel'
-import NewBadge from '../components/NewBadge'
 import WhatsNewBanner from '../components/WhatsNewBanner'
 import LanguageSwitcher from '../components/LanguageSwitcher'
-import { localizePath, useT } from '../i18n'
-import { pageSeo } from '../seo'
+import { LOCALES, localizePath, useT } from '../i18n'
+import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
+import SiteFooter, { PageLink } from '../components/SiteFooter'
 import ThemeToggle from '../components/ThemeToggle'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
@@ -15,30 +14,52 @@ import type { Viewer } from '../viewers'
 
 const AuroraBackdrop = lazy(() => import('../backdrop/AuroraBackdrop'))
 
-// Footer links read quietly until hovered.
-const footerLinkClassName = 'text-ink-soft underline-offset-2 hover:text-ink hover:underline'
+function setMetaTag(keyAttribute: 'name' | 'property', key: string, content: string) {
+  let tag = document.head.querySelector(`meta[${keyAttribute}="${key}"]`)
+  if (!tag) {
+    tag = document.createElement('meta')
+    tag.setAttribute(keyAttribute, key)
+    document.head.append(tag)
+  }
+  tag.setAttribute('content', content)
+}
 
-const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
+function setLinkTag(rel: string, href: string, hreflang?: string) {
+  let tag = document.head.querySelector(hreflang ? `link[rel="${rel}"][hreflang="${hreflang}"]` : `link[rel="${rel}"]`)
+  if (!tag) {
+    tag = document.createElement('link')
+    tag.setAttribute('rel', rel)
+    if (hreflang) tag.setAttribute('hreflang', hreflang)
+    document.head.append(tag)
+  }
+  tag.setAttribute('href', href)
+}
 
-// A link that changes the page without reloading (the app has no router package); modified clicks open a new tab as usual.
-// `path` is the address without its language ('/csv-viewer'); the link goes to the page in the current language.
-function PageLink({ id, path, onNavigate, children, className = 'underline underline-offset-2 hover:text-ink' }: { id?: string; path: string; onNavigate: (path: string) => void; children: ReactNode; className?: string }) {
+// The <head> tags scripts/build-static-pages.mjs writes for each page, set again when the page changes without a reload, so the
+// title, description, canonical, language alternates and share tags always describe the page shown. `address` is the page
+// without its language ('/csv-viewer'). <html lang> and dir are set by App.
+// oxlint-disable-next-line react/only-export-components
+export function usePageHead(address: string, title: string, description: string) {
   const { locale } = useT()
-  const localizedPath = localizePath(locale, path)
-  return (
-    <a
-      id={id}
-      href={localizedPath}
-      onClick={(event) => {
-        if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
-        event.preventDefault()
-        onNavigate(localizedPath)
-      }}
-      className={className}
-    >
-      {children}
-    </a>
-  )
+  useEffect(() => {
+    const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
+    const shareImage = getShareImage(locale, address)
+    document.title = title
+    setMetaTag('name', 'description', description)
+    setLinkTag('canonical', pageUrl)
+    for (const alternateLocale of LOCALES) setLinkTag('alternate', `${SITE_ORIGIN}${localizePath(alternateLocale, address)}`, alternateLocale)
+    setLinkTag('alternate', `${SITE_ORIGIN}${localizePath('en', address)}`, 'x-default')
+    setMetaTag('property', 'og:title', title)
+    setMetaTag('property', 'og:description', description)
+    setMetaTag('property', 'og:url', pageUrl)
+    setMetaTag('property', 'og:image', `${SITE_ORIGIN}${shareImage.path}`)
+    setMetaTag('property', 'og:image:alt', shareImage.alt)
+    setMetaTag('property', 'og:locale', openGraphLocales[locale])
+    setMetaTag('property', 'og:locale:alternate', openGraphLocales[locale === 'en' ? 'ar' : 'en'])
+    setMetaTag('name', 'twitter:title', title)
+    setMetaTag('name', 'twitter:description', description)
+    setMetaTag('name', 'twitter:image', `${SITE_ORIGIN}${shareImage.path}`)
+  }, [locale, address, title, description])
 }
 
 // The whole screen is the drop target: a file dropped anywhere on the page opens, over a slow field of drifting particles.
@@ -81,18 +102,9 @@ export default function HomePage({
   const intake = useFileIntake({ acceptedExtensions: toolViewer?.extensions ?? supportedExtensions, onFileLoaded, handoffFile, onHandoffConsumed })
 
   // Each page gets its own title and description, in the page's language, for search results and browser tabs.
-  const seo = pageSeo[locale][toolViewer?.toolPath ?? '/']
-  useEffect(() => {
-    const previousTitle = document.title
-    const descriptionTag = document.querySelector('meta[name="description"]')
-    const previousDescription = descriptionTag?.getAttribute('content') ?? ''
-    document.title = seo.title
-    descriptionTag?.setAttribute('content', seo.description)
-    return () => {
-      document.title = previousTitle
-      descriptionTag?.setAttribute('content', previousDescription)
-    }
-  }, [seo])
+  const address = toolViewer?.toolPath ?? '/'
+  const seo = pageSeo[locale][address]
+  usePageHead(address, seo.title, seo.description)
 
   return (
     <div id="home-page" {...intake.dropTargetProps} className="relative min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink">
@@ -145,48 +157,7 @@ export default function HomePage({
           </div>
         </main>
 
-        <footer id="site-footer" className="border-t border-rule bg-paper-raised/80 backdrop-blur-md">
-          <div className="mx-auto grid max-w-5xl gap-8 px-4 py-10 text-sm md:grid-cols-[2fr_1fr_1fr]">
-            <div>
-              <p className="type-h3">OpenAnyDoc</p>
-              <p className="mt-2 max-w-xs text-ink-soft">{t('footer.text')}</p>
-            </div>
-            <nav id="footer-viewers" aria-label={t('footer.viewers')}>
-              <h2 className="font-semibold">{t('footer.viewers')}</h2>
-              <ul className="mt-3 space-y-2">
-                {pagesWithOwnAddress
-                  .filter((viewer) => viewer !== toolViewer)
-                  .map((viewer) => (
-                    <li key={viewer.id} className="flex items-center">
-                      <PageLink id={`footer-link-${viewer.id}`} path={viewer.toolPath as string} onNavigate={onNavigate} className={footerLinkClassName}>
-                        {t('viewer.name', { format: viewer.label })}
-                      </PageLink>
-                      <NewBadge viewerId={viewer.id} />
-                    </li>
-                  ))}
-              </ul>
-            </nav>
-            <nav id="footer-more" aria-label={t('footer.more')}>
-              <h2 className="font-semibold">{t('footer.more')}</h2>
-              <ul className="mt-3 space-y-2">
-                {toolViewer && (
-                  <li>
-                    <PageLink id="footer-link-all-types" path="/" onNavigate={onNavigate} className={footerLinkClassName}>
-                      {t('footer.allTypes')}
-                    </PageLink>
-                  </li>
-                )}
-                {!toolViewer && (
-                  <li>
-                    <PageLink id="footer-link-changelog" path="/changelog" onNavigate={onNavigate} className={footerLinkClassName}>
-                      {t('footer.whatsNew')}
-                    </PageLink>
-                  </li>
-                )}
-              </ul>
-            </nav>
-          </div>
-        </footer>
+        <SiteFooter currentPath={address} onNavigate={onNavigate} />
       </div>
     </div>
   )

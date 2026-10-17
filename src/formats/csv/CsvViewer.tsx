@@ -2,10 +2,12 @@ import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
 import { FatalFileError, useIsPhone, useToast } from '../../components/Messages'
-import { useT } from '../../i18n'
+import { localizePath, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
-import { DELIMITER_OPTIONS, ENCODING_LABELS, describeParseNotice, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
-import type { DelimiterChoice, EncodingChoice, ParsedCsv } from '../../parseCsv'
+import { DELIMITER_OPTIONS, buildCsvFileText, describeParseNotice, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
+import { ENCODING_LABELS } from '../text/textEditing'
+import type { CsvFileOptions, DelimiterChoice, ParsedCsv } from '../../parseCsv'
+import type { EncodingChoice } from '../text/textEditing'
 import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
 import { columnLabel, measureColumnWidthsPx } from '../DataTable'
@@ -29,7 +31,6 @@ import {
 } from './csvAnalysis'
 import type { ColumnFilter, ColumnInfo, ColumnType, GroupAggregate, SortLevel } from './csvAnalysis'
 import {
-  buildCsvFileText,
   buildDisplayIds,
   cellKey,
   cellTextTransforms,
@@ -56,7 +57,7 @@ import {
   withoutDuplicateRows,
   withoutEmptyRows,
 } from './csvCells'
-import type { CellTextTransform, CsvEdits, CsvFileOptions } from './csvCells'
+import type { CellTextTransform, CsvEdits } from './csvCells'
 import './csvWorkbench.css'
 
 const MAX_LISTED_CHANGES = 200
@@ -1113,7 +1114,12 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   }
 
   // ---------------------------------------------------------------- popovers
-  type MenuItem = { id: string; label: string; icon?: string; hint?: string; isDanger?: boolean; isDisabled?: boolean; onSelect: () => void } | 'separator' | { heading: string }
+  type MenuItem =
+    | { id: string; label: string; icon?: string; hint?: string; isDanger?: boolean; isDisabled?: boolean; onSelect: () => void }
+    | { id: string; label: string; icon: string; href: string }
+    | { id: string; note: string }
+    | 'separator'
+    | { heading: string }
   function renderMenuItems(items: MenuItem[]) {
     return (
       <div role="menu">
@@ -1124,6 +1130,16 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             <div key={position} className="menu-label">
               {item.heading}
             </div>
+          ) : 'note' in item ? (
+            <p key={item.id} id={item.id} className="menu-note">
+              {item.note}
+            </p>
+          ) : 'href' in item ? (
+            // Opens in a new tab, so the open file and its edits stay where they are.
+            <a key={item.id} className="mi" id={item.id} role="menuitem" href={item.href} target="_blank" rel="noopener" onClick={() => setPopover(null)}>
+              <Icon name={item.icon} size="sm" />
+              {item.label}
+            </a>
           ) : (
             <button
               key={item.id}
@@ -1288,6 +1304,10 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               { id: 'more-menu-reading', label: t('csv.wb.readingMenu'), icon: 'settings', onSelect: () => openPopover('reading', document.getElementById(isNarrow ? 'mobile-more-button' : 'status-delimiter-button')) },
               { id: 'more-menu-download', label: t('csv.wb.downloadOptions'), icon: 'download', onSelect: openDownloadDialog },
               ...(offersExcelCopy ? [{ id: 'more-menu-excel-copy', label: t('csv.excelCopy.button'), icon: 'download', onSelect: downloadExcelCopy }] : []),
+              'separator',
+              { id: 'menu-link-privacy', label: t('legal.privacy'), icon: 'lock', href: localizePath(locale, '/privacy') },
+              { id: 'menu-link-terms', label: t('legal.terms'), icon: 'file', href: localizePath(locale, '/terms') },
+              { id: 'menu-disclaimer', note: t('legal.disclaimer') },
             ])
       case 'find':
         return renderFindPopover()
@@ -2673,6 +2693,16 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         <button className="sb" id="status-delimiter-button" type="button" title={t('csv.wb.readingMenu')} onClick={(event) => openPopover('reading', event.currentTarget)}>
           {statusDelimiter} · {statusEncoding} · {statusLineEnding}
         </button>
+        <span className="sb-sep" />
+        <span className="sb" id="status-legal-links">
+          <a id="status-link-privacy" href={localizePath(locale, '/privacy')} target="_blank" rel="noopener">
+            {t('legal.privacyShort')}
+          </a>
+          ·
+          <a id="status-link-terms" href={localizePath(locale, '/terms')} target="_blank" rel="noopener">
+            {t('legal.termsShort')}
+          </a>
+        </span>
       </footer>
       <div id="mobile-status">
         <span>

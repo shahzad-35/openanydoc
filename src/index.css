@@ -31,7 +31,8 @@
   --type-pdf: #b0214f;
   --type-powerpoint: #c2441a;
 
-  /* Ten hues for the extension pills in the "Choose a file" box; shuffled on every page load. */
+  /* Ten hues for the extension pills in the "Choose a file" box. Pill N is painted with --ext-pill-N, which public/theme-init.js
+     points at one of the hues in the order shuffled for this browser session, before the first paint. */
   --ext-1: #c2441a;
   --ext-2: #a15c07;
   --ext-3: #5b7a0a;
@@ -42,6 +43,16 @@
   --ext-8: #6a46b0;
   --ext-9: #a3238f;
   --ext-10: #b0214f;
+  --ext-pill-1: var(--ext-1);
+  --ext-pill-2: var(--ext-2);
+  --ext-pill-3: var(--ext-3);
+  --ext-pill-4: var(--ext-4);
+  --ext-pill-5: var(--ext-5);
+  --ext-pill-6: var(--ext-6);
+  --ext-pill-7: var(--ext-7);
+  --ext-pill-8: var(--ext-8);
+  --ext-pill-9: var(--ext-9);
+  --ext-pill-10: var(--ext-10);
 }
 
 /* Arabic pages: IBM Plex Sans Arabic first, then the system Arabic-capable fonts. The Latin letters inside Arabic text fall

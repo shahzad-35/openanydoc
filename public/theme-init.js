@@ -5,3 +5,27 @@ try {
     document.documentElement.classList.add('dark')
   }
 } catch {}
+
+// The extension pills on the home and format pages get ten hues in an order shuffled once per browser session (kept in
+// sessionStorage until the tab or browser session ends). Set here, before the first paint, so the colours never change after
+// the page appears. Setting a custom property from a script is allowed by the Content-Security-Policy (a style attribute is not).
+;(function applyExtensionColorOrder() {
+  const colorCount = 10
+  const isValidOrder = (order) =>
+    Array.isArray(order) && order.length === colorCount && new Set(order).size === colorCount && order.every((n) => Number.isInteger(n) && n >= 1 && n <= colorCount)
+  let order = null
+  try {
+    order = JSON.parse(sessionStorage.getItem('extensionColorOrder') || 'null')
+  } catch {}
+  if (!isValidOrder(order)) {
+    order = Array.from({ length: colorCount }, (_, index) => index + 1)
+    for (let index = colorCount - 1; index > 0; index--) {
+      const swapIndex = Math.floor(Math.random() * (index + 1))
+      ;[order[index], order[swapIndex]] = [order[swapIndex], order[index]]
+    }
+    try {
+      sessionStorage.setItem('extensionColorOrder', JSON.stringify(order))
+    } catch {}
+  }
+  order.forEach((colorNumber, index) => document.documentElement.style.setProperty(`--ext-pill-${index + 1}`, `var(--ext-${colorNumber})`))
+})()

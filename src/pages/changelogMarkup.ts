@@ -1,4 +1,4 @@
-// The look of the changelog page, shared by the React page (ChangelogPage.tsx) and the build script that writes the same page as
+// The look of the changelog page and the site footer, shared by the React components and the build script that writes the same page as
 // plain HTML (scripts/build-static-pages.mjs). Tailwind only generates the classes it finds in src/, so they live here.
 
 // Stable ids for the page's parts; a release is "release-1-3-0".
@@ -39,8 +39,28 @@ export const changelogClasses = {
   tryIt: 'mt-5 flex flex-wrap items-center gap-2 text-sm',
   tryItLabel: 'text-ink-soft',
   formatLink: 'control-shape solid-box inline-flex items-center border-rule px-3 py-1 font-medium transition-colors duration-200 hover:bg-paper',
-  backLink: 'mt-12 inline-block text-sm underline underline-offset-2 hover:text-accent',
+  backLink: 'mt-12 inline-block text-sm underline underline-offset-2 hover:text-accent pointer-coarse:py-3',
 } as const
 
 // A check mark, drawn inside a 24 x 24 box.
 export const CHECK_ICON_PATH = 'm5 13 4 4L19 7'
+
+// The site footer (src/components/SiteFooter.tsx). The build script writes the same footer as HTML into the changelog pages.
+export const footerClasses = {
+  footer: 'border-t border-rule bg-paper-raised/80 backdrop-blur-md',
+  columns: 'mx-auto grid max-w-5xl gap-8 px-4 pt-10 pb-6 text-sm md:grid-cols-[2fr_1fr_1fr_1fr]',
+  brand: 'type-h3',
+  text: 'mt-2 max-w-xs text-ink-soft',
+  heading: 'font-semibold',
+  list: 'mt-3 space-y-2',
+  item: 'flex items-center',
+  link: 'text-ink-soft underline-offset-2 hover:text-ink hover:underline pointer-coarse:inline-block pointer-coarse:py-3',
+  disclaimer: 'mx-auto max-w-5xl px-4 pb-8 text-xs text-ink-soft',
+} as const
+
+// The footer's "About and legal" links, in order: the page address and its element id.
+export const legalFooterLinks = [
+  { path: '/about', id: 'footer-link-about', labelKey: 'footer.about' },
+  { path: '/privacy', id: 'footer-link-privacy', labelKey: 'legal.privacy' },
+  { path: '/terms', id: 'footer-link-terms', labelKey: 'legal.terms' },
+] as const

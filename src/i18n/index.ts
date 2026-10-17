@@ -1,7 +1,7 @@
 import { Fragment, createContext, createElement, useContext } from 'react'
 import type { ReactNode } from 'react'
 import en from './en.json'
-import ar from './ar.json'
+import type ar from './ar.json'
 import { toElementId } from '../elementId'
 
 // A small translation helper: English and Arabic strings in en.json and ar.json, found by key. The language is the first part of
@@ -17,10 +17,17 @@ type Values = Record<string, string | number>
 
 export const LOCALES: Locale[] = ['en', 'ar']
 
-const messages: Record<Locale, Record<string, string>> = { en, ar }
+// English is always there (element ids are made from it); Arabic is fetched by loadLocale before an Arabic page is drawn.
+const messages: Partial<Record<Locale, Record<string, string>>> = { en }
 // Fails to compile when ar.json lacks a key that en.json has.
-const arabicHasEveryKey: Record<MessageKey, string> = ar
+const arabicHasEveryKey: Record<MessageKey, string> = {} as typeof ar
 void arabicHasEveryKey
+
+export async function loadLocale(locale: Locale) {
+  if (locale === 'ar') messages.ar ??= (await import('./ar.json')).default
+}
+
+const getMessages = (locale: Locale): Record<string, string> => messages[locale] ?? en
 
 // The address without its language: '/en/csv-viewer' is { locale: 'en', path: '/csv-viewer' }, '/ar' is { locale: 'ar', path: '/' }.
 // An address with no language (an old link like '/csv-viewer') gives a null locale.
@@ -58,6 +65,8 @@ export const isolateLeftToRight = (text: string) => `\u2066${text}\u2069`
 export const LocaleContext = createContext<Locale>('en')
 // Switches the page to the other language, keeping the same page (provided by App, which owns the address).
 export const SwitchLanguageContext = createContext<(locale: Locale) => void>(() => {})
+// The page's address without its language ('/csv-viewer'), provided by App so it is known in the build's server render too.
+export const PagePathContext = createContext('/')
 
 const formatNumber = (locale: Locale, count: number) => new Intl.NumberFormat(`${locale}-u-nu-latn`).format(count)
 
@@ -71,14 +80,14 @@ function fillValues(locale: Locale, text: string, values: Values) {
 
 // The text for a key with {name} placeholders filled in (numbers get thousands separators, Western digits in both languages).
 export function translate(locale: Locale, key: MessageKey, values: Values = {}) {
-  return fillValues(locale, messages[locale][key], values)
+  return fillValues(locale, getMessages(locale)[key], values)
 }
 
 // The text for a plural key and a count: "<key>.one", "<key>.other" ... chosen by the language's own plural rules (English has
 // two forms, Arabic six: zero, one, two, few, many, other). A form the language file lacks falls back to "<key>.other". {count} is filled in.
 export function translatePlural(locale: Locale, key: PluralKey, count: number, values: Values = {}) {
   const form = new Intl.PluralRules(locale).select(count)
-  const text = messages[locale][`${key}.${form}`] ?? messages[locale][`${key}.other`]
+  const text = getMessages(locale)[`${key}.${form}`] ?? getMessages(locale)[`${key}.other`]
   return fillValues(locale, text, { ...values, count })
 }
 
@@ -95,7 +104,7 @@ export function useT() {
 
 // The text for a key with each {name} replaced by an element, e.g. a sentence that holds links.
 export function translateWithNodes(locale: Locale, key: MessageKey, nodes: Record<string, ReactNode>): ReactNode[] {
-  return messages[locale][key].split(/(\{\w+\})/).map((piece, position) => {
+  return getMessages(locale)[key].split(/(\{\w+\})/).map((piece, position) => {
     const name = /^\{(\w+)\}$/.exec(piece)?.[1]
     return createElement(Fragment, { key: position }, name !== undefined && name in nodes ? nodes[name] : piece)
   })

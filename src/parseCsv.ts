@@ -1,6 +1,10 @@
 import Papa from 'papaparse'
 import { translate, translatePlural } from './i18n'
 import type { Locale, MessageKey } from './i18n'
+import { decodeTextBytes, looksLikeBinary } from './formats/text/textEditing'
+import type { EncodingChoice } from './formats/text/textEditing'
+import { getCellText } from './formats/csv/csvCells'
+import type { CsvEdits } from './formats/csv/csvCells'
 
 export type DelimiterChoice = 'auto' | ',' | ';' | '\t' | '|'
 
@@ -11,17 +15,6 @@ export const DELIMITER_OPTIONS: { value: DelimiterChoice; labelKey: MessageKey }
   { value: '\t', labelKey: 'csv.delimiter.tab' },
   { value: '|', labelKey: 'csv.delimiter.pipe' },
 ]
-
-// 'auto' finds the encoding (byte order mark, then UTF-8, else Windows-1256); the others read the bytes as that encoding.
-export type EncodingChoice = 'auto' | 'utf-8' | 'utf-16le' | 'utf-16be' | 'windows-1256' | 'iso-8859-1'
-
-export const ENCODING_LABELS: Record<Exclude<EncodingChoice, 'auto'>, string> = {
-  'utf-8': 'UTF-8',
-  'utf-16le': 'UTF-16 LE',
-  'utf-16be': 'UTF-16 BE',
-  'windows-1256': 'Windows-1256',
-  'iso-8859-1': 'ISO-8859-1',
-}
 
 // What went wrong or looks odd, kept as data so the page can show it in whichever language is active.
 export type ParseNotice =
@@ -58,38 +51,6 @@ export function describeParseNotice(notice: ParseNotice, locale: Locale) {
   }
 }
 
-const BINARY_CHECK_BYTE_COUNT = 64 * 1024
-
-export function decodeCsvBytes(fileContents: ArrayBuffer, encodingChoice: EncodingChoice = 'auto') {
-  const bytes = new Uint8Array(fileContents)
-  if (encodingChoice !== 'auto') return { text: new TextDecoder(encodingChoice).decode(bytes), encodingLabel: ENCODING_LABELS[encodingChoice] }
-
-  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) {
-    return { text: new TextDecoder('utf-8').decode(bytes), encodingLabel: 'UTF-8 with BOM' }
-  }
-  if (bytes[0] === 0xff && bytes[1] === 0xfe) {
-    return { text: new TextDecoder('utf-16le').decode(bytes), encodingLabel: 'UTF-16 LE' }
-  }
-  if (bytes[0] === 0xfe && bytes[1] === 0xff) {
-    return { text: new TextDecoder('utf-16be').decode(bytes), encodingLabel: 'UTF-16 BE' }
-  }
-
-  try {
-    return { text: new TextDecoder('utf-8', { fatal: true }).decode(bytes), encodingLabel: 'UTF-8' }
-  } catch {
-    return {
-      text: new TextDecoder('windows-1256').decode(bytes),
-      encodingLabel: 'Windows-1256 (the file was not valid UTF-8)',
-    }
-  }
-}
-
-export function looksLikeBinary(fileContents: ArrayBuffer) {
-  const bytes = new Uint8Array(fileContents, 0, Math.min(fileContents.byteLength, BINARY_CHECK_BYTE_COUNT))
-  const isUtf16 = (bytes[0] === 0xff && bytes[1] === 0xfe) || (bytes[0] === 0xfe && bytes[1] === 0xff)
-  return !isUtf16 && bytes.includes(0)
-}
-
 function findParseProblems(errors: Papa.ParseError[], columnCount: number, mismatchedRowCount: number) {
   const notices: ParseNotice[] = []
 
@@ -111,7 +72,7 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
   }
   if (looksLikeBinary(fileContents)) return { status: 'error', reason: 'binary' }
 
-  const { text, encodingLabel } = decodeCsvBytes(fileContents, encodingChoice)
+  const { text, encodingLabel } = decodeTextBytes(fileContents, encodingChoice)
   if (text.trim() === '') {
     return { status: 'error', reason: 'empty' }
   }
@@ -162,4 +123,23 @@ export function firstRowLooksLikeHeader(rows: string[][]) {
     const sampledCells = dataRows.slice(0, 100).map((row) => (row[columnPosition] ?? '').trim()).filter((cellText) => cellText !== '')
     return sampledCells.length > 0 && sampledCells.filter((cellText) => NUMBER_PATTERN.test(cellText)).length / sampledCells.length >= 0.8
   })
+}
+
+export type CsvFileOptions = {
+  rowIds: readonly number[]
+  columnIds: readonly number[]
+  // The header row (row 0) goes first; only when the table has one.
+  includeHeaderRow: boolean
+  delimiter: string
+  lineEnding: '\n' | '\r\n'
+  quoteAllFields: boolean
+  byteOrderMark: boolean
+}
+
+// The CSV text a download saves, with the edits applied.
+export function buildCsvFileText(rows: string[][], edits: CsvEdits, options: CsvFileOptions) {
+  const readRow = (rowId: number) => options.columnIds.map((columnId) => getCellText(rows, edits, rowId, columnId))
+  const tableRows = [...(options.includeHeaderRow ? [readRow(0)] : []), ...options.rowIds.map(readRow)]
+  const csvText = Papa.unparse(tableRows, { delimiter: options.delimiter, newline: options.lineEnding, quotes: options.quoteAllFields })
+  return `${options.byteOrderMark ? '﻿' : ''}${csvText}${options.lineEnding}`
 }

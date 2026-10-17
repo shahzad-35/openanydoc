@@ -6,7 +6,6 @@
 // Changes that rebuild the whole table (transpose, split or merge a column, apply the sort to the file) store the new table as
 // `table`; the ids then count from that table, and the earlier sparse edits are folded into it.
 
-import Papa from 'papaparse'
 import { translate, translatePlural } from '../../i18n'
 import type { Locale } from '../../i18n'
 
@@ -204,25 +203,6 @@ export function describeCsvChanges(edits: CsvEdits, locale: Locale) {
   ]
     .filter(Boolean)
     .join(translate(locale, 'csv.summary.separator'))
-}
-
-export type CsvFileOptions = {
-  rowIds: readonly number[]
-  columnIds: readonly number[]
-  // The header row (row 0) goes first; only when the table has one.
-  includeHeaderRow: boolean
-  delimiter: string
-  lineEnding: '\n' | '\r\n'
-  quoteAllFields: boolean
-  byteOrderMark: boolean
-}
-
-// The CSV text a download saves, with the edits applied.
-export function buildCsvFileText(rows: string[][], edits: CsvEdits, options: CsvFileOptions) {
-  const readRow = (rowId: number) => options.columnIds.map((columnId) => getCellText(rows, edits, rowId, columnId))
-  const tableRows = [...(options.includeHeaderRow ? [readRow(0)] : []), ...options.rowIds.map(readRow)]
-  const csvText = Papa.unparse(tableRows, { delimiter: options.delimiter, newline: options.lineEnding, quotes: options.quoteAllFields })
-  return `${options.byteOrderMark ? '﻿' : ''}${csvText}${options.lineEnding}`
 }
 
 // The table as it is now (edits applied), for a change that rebuilds it.

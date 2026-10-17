@@ -1,5 +1,6 @@
-// What each format page says beyond the hero: numbered steps for opening and editing a file, and questions people really ask about
-// that file type, in English and Arabic (with answers that match what the viewer does). It replaces the shared features and FAQ blocks on a format page,
+// What each format page says beyond the hero: numbered steps for opening and editing a file ("How it works"), a short list of what
+// the viewer handles, and questions people really ask about that file type (the seven shared questions first, answered for that
+// format), in English and Arabic (with answers that match what the viewer does). It replaces the shared features and FAQ blocks on a format page,
 // so every page has text of its own. Plain data with no imports, because scripts/build-static-pages.mjs also reads it to write
 // the same text, and the same questions as FAQPage data, into each page's static HTML. Keep the answers true: only what is built.
 
@@ -7,13 +8,13 @@ export type GuideStep = { title: string; text: string }
 export type GuideQuestion = { question: string; answer: string }
 type Locale = 'en' | 'ar'
 
-export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; faqTitle: string; faq: GuideQuestion[] }
+export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; handlesTitle: string; handles: string[]; faqTitle: string; faq: GuideQuestion[] }
 
 // Keyed by language, then by the format page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
 export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
   en: {
     '/csv-viewer': {
-      stepsTitle: 'How to open a CSV file online',
+      stepsTitle: 'How it works: open and edit a CSV file online',
       steps: [
         { title: 'Drop your file on the page', text: 'Drop a .csv, .tsv or .tab file on the page, or choose it from your device. It is read in your browser and never uploaded.' },
         { title: 'Check the columns', text: 'The delimiter (comma, semicolon, tab or pipe) and the encoding are detected for you. If the columns look wrong, click the delimiter in the status bar at the bottom to pick another one, or turn "First row is header" on or off.' },
@@ -21,8 +22,44 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'Edit and clean up', text: 'Every cell can be edited: click it and type, or paste cells copied from a spreadsheet. Add or delete rows and columns, use Find & replace, or open Clean up to change case, trim spaces, fill down blanks, split or merge columns, remove duplicate rows or transpose the table. Undo and redo are always there.' },
         { title: 'Download your CSV', text: 'Click Download to save every row with the file\'s own delimiter, or choose "Download options" in the More menu to change the delimiter, quotes or line endings, or to keep only the filtered rows. The original file on your device is never changed.' },
       ],
+      handlesTitle: 'What it handles: CSV, TSV and tab files',
+      handles: [
+        'Files: .csv, .tsv and .tab, with the delimiter (comma, semicolon, tab or pipe) detected for you.',
+        'Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic files, so Arabic text shows correctly and right to left.',
+        'Size: no row limit of its own; 100,000 rows open in under a second, and files over 50 MB show a warning first.',
+        'Editing: cells, rows and columns, find and replace, clean-up tools, filters, sorting and column profiles, with undo and redo.',
+        'Saving: a CSV with the file\'s own delimiter, or your choice of delimiter, quotes and line endings; leading zeros and long numbers stay as written.',
+      ],
       faqTitle: 'CSV viewer and editor: common questions',
       faq: [
+        {
+          question: 'Is my file uploaded?',
+          answer: 'No. Your browser reads the CSV file itself and draws the table on your screen. Nothing is sent to a server, so the file never leaves your device.',
+        },
+        {
+          question: 'Can I edit and save it?',
+          answer: 'Yes. Edit cells, add or delete rows and columns, find and replace or clean up the data, then click Download to save a CSV with the file\'s own delimiter, or pick another delimiter, quotes or line endings in Download options.',
+        },
+        {
+          question: 'Is the original changed?',
+          answer: 'No. Your edits stay in the page\'s memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first.',
+        },
+        {
+          question: 'Is there a file size limit?',
+          answer: 'There is no fixed limit: the limit is your browser\'s memory. 100,000 rows open in under a second, because only the rows on screen are drawn, and files over 50 MB show a warning but still open if memory allows. Unlike Excel, which stops at 1,048,576 rows per sheet, the CSV viewer has no row limit of its own.',
+        },
+        {
+          question: 'Does it work on mobile?',
+          answer: 'Yes. The CSV page has its own phone layout, with the tools in a menu and the table scrolling sideways, so you can view and edit a CSV file in a phone browser.',
+        },
+        {
+          question: 'Does it work offline?',
+          answer: 'Once the page and its CSV viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first.',
+        },
+        {
+          question: 'Can my company host its own copy?',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+        },
         {
           question: 'Why does my CSV file open in a single column?',
           answer: 'The file probably uses a different separator from the comma, such as a semicolon, which is common in files saved by Excel in many countries. OpenAnyDoc detects comma, semicolon, tab and pipe automatically, and you can choose the delimiter yourself by clicking it in the status bar at the bottom of the page.',
@@ -30,10 +67,6 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'How do I open a CSV file with Arabic or other non-English text?',
           answer: 'Just open it: UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Arabic cells display right-to-left. When you download, a byte order mark is added if the file has non-English text, so Excel shows it correctly.',
-        },
-        {
-          question: 'Can I open a large CSV file online?',
-          answer: 'Yes. A CSV file with 100,000 rows opens in under a second, because only the rows on screen are drawn, and it stays smooth while you edit. Files over 50 MB show a warning, and OpenAnyDoc still tries to open them; the limit is your browser\'s memory.',
         },
         {
           question: 'How do I remove duplicate rows from a CSV file?',
@@ -50,7 +83,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/excel-viewer': {
-      stepsTitle: 'How to open and edit an Excel file online',
+      stepsTitle: 'How it works: open and edit an Excel file online',
       steps: [
         { title: 'Drop your workbook on the page', text: 'Choose an .xlsx, .xls, .xlsm or .ods file. It is read in your browser and never uploaded.' },
         { title: 'Move between sheets', text: 'Every sheet is a tab at the bottom, like in Excel. Dates, percentages and currencies are shown as formatted in the file, and merged cells are drawn as one cell.' },
@@ -58,8 +91,45 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'Format your data', text: 'Use the toolbar to change number formats and currencies, insert or delete rows, columns and sheets, merge cells and, in .xlsx files, set bold, colours, fonts and borders.' },
         { title: 'Save the workbook', text: 'Use the save icon to download the workbook in the same format. The original file on your device is never changed.' },
       ],
+      handlesTitle: 'What it handles: XLSX, XLS, XLSM and ODS',
+      handles: [
+        'Files: .xlsx, .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument), with every sheet. Password-protected workbooks cannot be opened.',
+        'Display: number, date, percentage and currency formats and merged cells; fonts, colours and fills in .xlsx and .xlsm files up to 8 MB.',
+        'Editing: values and formulas that recalculate, rows, columns and sheets, merged cells and number formats; in .xlsx files also bold, italic, colours, fills and alignment.',
+        'Kept on save: values, formulas with their results, number formats, merged cells and column widths, in the file\'s own format. Cell styles are saved only in .xlsx files.',
+        'Not kept on save: charts, images, pivot tables, conditional formats, data validation, defined names and macros.',
+        'Size: no fixed limit; files over 50 MB show a warning first, and cell styles are read only for files up to 8 MB.',
+      ],
       faqTitle: 'Excel viewer and editor: common questions',
       faq: [
+        {
+          question: 'Is my file uploaded?',
+          answer: 'No. Your browser reads the workbook itself and draws the sheets on your screen. Nothing is sent to a server, so the file never leaves your device.',
+        },
+        {
+          question: 'Can I edit and save it?',
+          answer: 'Yes. Switch to Edit to change cells and formulas, insert or delete rows, columns and sheets, merge cells and change number formats, then save the workbook in its own format: .xlsx, .xls, .xlsm or .ods.',
+        },
+        {
+          question: 'Is the original changed?',
+          answer: 'No. Your edits stay in the page\'s memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first.',
+        },
+        {
+          question: 'Is there a file size limit?',
+          answer: 'There is no fixed limit: the limit is your browser\'s memory. A sheet with 100,000 rows opens in about two seconds, and files over 50 MB show a warning first. Cell styles are read only for files up to 8 MB, so larger workbooks open as values and formulas.',
+        },
+        {
+          question: 'Does it work on mobile?',
+          answer: 'Yes. The Excel page adapts to a phone screen, so you can open, view and edit a workbook in a phone browser. Big sheets are easier to work with on a larger screen.',
+        },
+        {
+          question: 'Does it work offline?',
+          answer: 'Once the page and its Excel viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first.',
+        },
+        {
+          question: 'Can my company host its own copy?',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+        },
         {
           question: 'How do I open an XLSX file without Excel?',
           answer: 'Drop the .xlsx file on this page. It opens in your browser with its sheets, formatting and merged cells, and you can edit it and save it again, with no Excel, no account and no upload.',
@@ -80,14 +150,10 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'Can I open a password-protected Excel file?',
           answer: 'No. Encrypted workbooks cannot be opened, because the file has to be read in your browser without sending it anywhere. Remove the password in Excel first, then open the file here.',
         },
-        {
-          question: 'How big an Excel file can I open?',
-          answer: 'A sheet with 100,000 rows opens in about two seconds and stays smooth while you edit, because only the rows on screen are drawn. For workbooks over 8 MB, cell styles are not loaded, so those files open as values and formulas.',
-        },
       ],
     },
     '/json-viewer': {
-      stepsTitle: 'How to open and format a JSON file online',
+      stepsTitle: 'How it works: view, format and edit JSON online',
       steps: [
         { title: 'Drop, paste or try a sample', text: 'Choose or drop a .json file, paste JSON with Ctrl+V, or try the sample. It is read in your browser, so API responses, configuration files and other private data are never uploaded.' },
         { title: 'Text and tree side by side', text: 'The text sits next to a collapsible tree (or a table for a list of objects) and an inspector; selecting a node in one shows it in the other. Search keys and values, or type a path such as $.orders[*].total.' },
@@ -95,8 +161,45 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'Format and edit', text: 'Type in the text, or use the tree and the inspector. Format with 1, 2, 3, 4 or 8 spaces or a tab, minify, sort keys, and change, add, duplicate, move or delete nodes. Long numbers are kept exactly.' },
         { title: 'Download your JSON', text: 'Use the Download button to save the result. The original file on your device is never changed.' },
       ],
+      handlesTitle: 'What it handles: JSON files and pasted JSON',
+      handles: [
+        'Input: .json files, or JSON pasted with Ctrl+V; a list of objects can also be shown as a table.',
+        'Size: up to 10 MB; larger files are refused before they are read. Above 5 MB the text pane starts closed.',
+        'Numbers: integers longer than JavaScript can hold (beyond 2^53) are kept exactly.',
+        'Errors: the line and column of the problem, and Repair for comments, trailing or missing commas, single quotes and unquoted keys.',
+        'Editing: in the text or the tree; change, add, duplicate, move or delete nodes, format with 1 to 8 spaces or a tab, minify and sort keys, with undo.',
+        'Saving: a .json file in the layout you chose.',
+      ],
       faqTitle: 'JSON viewer and editor: common questions',
       faq: [
+        {
+          question: 'Is my file uploaded?',
+          answer: 'No. Your browser reads and checks the JSON itself, and pasted JSON stays in the page too. Nothing is sent to a server, which makes it suitable for API responses, tokens and internal configuration.',
+        },
+        {
+          question: 'Can I edit and save it?',
+          answer: 'Yes. Type in the text or edit the tree: change, add, duplicate, move or delete nodes, format, minify or sort keys, then press Download to save a .json file.',
+        },
+        {
+          question: 'Is the original changed?',
+          answer: 'No. Your edits stay in the page\'s memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first.',
+        },
+        {
+          question: 'Is there a file size limit?',
+          answer: 'Yes: JSON files up to 10 MB open, and larger files are refused before they are read, because every edit would make the page slow. A file of that size shows its tree in under a second; above 5 MB the text pane starts closed and opens with "Show the text".',
+        },
+        {
+          question: 'Does it work on mobile?',
+          answer: 'Yes. On a phone the JSON page switches to Text, Tree and Inspector tabs instead of side-by-side panes, with the main actions in a bar at the bottom.',
+        },
+        {
+          question: 'Does it work offline?',
+          answer: 'Once the page and its JSON viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first.',
+        },
+        {
+          question: 'Can my company host its own copy?',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+        },
         {
           question: 'How do I format (pretty print) JSON online?',
           answer: 'Open your file and press Format, or choose 1, 2, 3, 4 or 8 spaces or Tab from the menu next to it. The text shows the formatted result and the download uses the same layout.',
@@ -113,18 +216,10 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'Can I sort the keys of a JSON object alphabetically?',
           answer: 'Yes. Press Sort keys: the keys of every object, including the objects nested inside, are put in order from A to Z. Undo takes it back.',
         },
-        {
-          question: 'Can I open a large JSON file?',
-          answer: 'JSON files up to 10 MB open, and a file of that size shows its tree in under a second. Larger files are refused, because every edit would make the page slow.',
-        },
-        {
-          question: 'Is it safe to paste or open private JSON here?',
-          answer: 'Your JSON is not uploaded: the browser reads the file and nothing is sent to a server, which makes it suitable for tokens, customer data in test files and internal configuration.',
-        },
       ],
     },
     '/txt-viewer': {
-      stepsTitle: 'How to open and edit a text file online',
+      stepsTitle: 'How it works: open and edit a text file online',
       steps: [
         { title: 'Drop your .txt file on the page', text: 'Choose or drop a text file, such as notes, a log or a list. It is read in your browser, never uploaded, and opens ready to edit.' },
         { title: 'Type, or pick a tool from the ribbon', text: 'Type in the text, or open a tab (Lines, Clean, Case, Find, Analyze, View, File) and click a tool: sort, de-duplicate, number or join lines, trim spaces, change case. With text selected, a tool changes only the selected lines. Each tool is one undo step.' },
@@ -132,8 +227,44 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'See what is hidden', text: 'Show hidden characters to spot tabs, trailing spaces, zero-width characters and line endings, then remove them with the Clean tools. Bookmarks and Go to line help in long files.' },
         { title: 'Download your text file', text: 'Click Download and choose UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256, and LF, CRLF or CR line endings. The original file on your device is never changed.' },
       ],
+      handlesTitle: 'What it handles: TXT files',
+      handles: [
+        'Files: plain text .txt files, such as notes, logs and lists.',
+        'Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic text; you can reopen a file with another encoding, and each line shows in its own reading direction.',
+        'Size: files over 50 MB show a warning first; above about 2 million characters the file opens in a fast read view.',
+        'Editing: typing, plus tools for sorting, duplicates, numbering, whitespace and case, find and replace with regular expressions, statistics and compare.',
+        'Saving: UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256, with LF, CRLF or CR line endings.',
+      ],
       faqTitle: 'Text file viewer and editor: common questions',
       faq: [
+        {
+          question: 'Is my file uploaded?',
+          answer: 'No. Your browser reads the text file itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device.',
+        },
+        {
+          question: 'Can I edit and save it?',
+          answer: 'Yes. The file opens ready to edit: type, or use the ribbon tools for lines, whitespace and case, then click Download and choose the encoding (UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256) and the line endings (LF, CRLF or CR).',
+        },
+        {
+          question: 'Is the original changed?',
+          answer: 'No. Your edits stay in the page\'s memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first.',
+        },
+        {
+          question: 'Is there a file size limit?',
+          answer: 'There is no fixed limit: the limit is your browser\'s memory, and files over 50 MB show a warning first. A file over about 2 million characters opens in a fast read view that draws only the visible lines, and every tool still works on the whole text. Choose Edit anyway to type in it; typing in a very large file is slower.',
+        },
+        {
+          question: 'Does it work on mobile?',
+          answer: 'Yes. On a phone the ribbon becomes a tools sheet and the text fills the screen, so you can read and edit text files in a phone browser.',
+        },
+        {
+          question: 'Does it work offline?',
+          answer: 'Once the page and its text viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first.',
+        },
+        {
+          question: 'Can my company host its own copy?',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+        },
         {
           question: 'How do I change line endings (LF to CRLF) in a text file?',
           answer: 'Open the file and click Download, then choose LF (macOS, Linux), CRLF (Windows) or CR for the saved file. If the file mixes line endings, File and then Fix mixed line endings makes them all the same.',
@@ -154,16 +285,12 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'Can I open text files with Arabic or other non-English characters?',
           answer: 'Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it.',
         },
-        {
-          question: 'Can I open a large text or log file?',
-          answer: 'Yes. A file over about 2 million characters opens in a fast read view that draws only the visible lines, and every tool still works on the whole text. Choose Edit anyway to type in it; typing in a very large file is slower and line numbers are hidden while you do.',
-        },
       ],
     },
   },
   ar: {
     '/csv-viewer': {
-      stepsTitle: 'كيف تفتح ملف CSV أونلاين',
+      stepsTitle: 'كيف يعمل: افتح ملف CSV وعدّله اونلاين',
       steps: [
         { title: 'أفلت ملفك على الصفحة', text: 'أفلت ملف .csv أو .tsv أو .tab على الصفحة، أو اخترْه من جهازك. يُقرأ الملف داخل متصفحك ولا يُرفع أبدًا.' },
         { title: 'تحقق من الأعمدة', text: 'يُكتشف الفاصل (فاصلة، فاصلة منقوطة، علامة جدولة أو شرطة عمودية) والترميز تلقائيًا. إذا بدت الأعمدة غير صحيحة، انقر على الفاصل في شريط الحالة في الأسفل لاختيار فاصل آخر، وفعّل «الصف الأول عناوين» أو أوقفه.' },
@@ -171,8 +298,44 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'حرّر ونظّف', text: 'كل خلية قابلة للتحرير: انقر عليها واكتب، أو الصق خلايا منسوخة من جدول بيانات. أضف الصفوف والأعمدة أو احذفها، واستخدم «بحث واستبدال»، أو افتح «تنظيف» لتغيير حالة الأحرف وحذف المسافات الزائدة وتعبئة الفراغات للأسفل وتقسيم الأعمدة أو دمجها وحذف الصفوف المكررة أو تبديل الصفوف والأعمدة. التراجع والإعادة متاحان دائمًا.' },
         { title: 'نزّل ملف CSV', text: 'انقر على «تنزيل» لحفظ كل الصفوف بفاصل الملف نفسه، أو اختر «خيارات التنزيل» من قائمة «المزيد» لتغيير الفاصل أو علامات الاقتباس أو نهايات الأسطر، أو لإبقاء الصفوف المصفّاة فقط. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
+      handlesTitle: 'ما الذي يدعمه: ملفات CSV وTSV والمفصولة بعلامة جدولة',
+      handles: [
+        'الملفات: .csv و.tsv و.tab، مع اكتشاف الفاصل تلقائيًا (فاصلة أو فاصلة منقوطة أو علامة جدولة أو شرطة عمودية).',
+        'الترميز: UTF-8 مع BOM أو بدونه، وUTF-16، وWindows-1256 لملفات العربية القديمة، فتظهر الحروف العربية صحيحة ومن اليمين إلى اليسار.',
+        'الحجم: لا حد لعدد الصفوف؛ يُفتح ملف بـ 100,000 صف في أقل من ثانية، وتظهر رسالة تحذير أولًا للملفات التي تزيد على 50 ميغابايت.',
+        'التحرير: الخلايا والصفوف والأعمدة، والبحث والاستبدال، وأدوات التنظيف، والتصفية والترتيب وملخص الأعمدة، مع التراجع والإعادة.',
+        'الحفظ: ملف CSV بفاصل الملف نفسه، أو بالفاصل وعلامات الاقتباس ونهايات الأسطر التي تختارها؛ وتبقى الأصفار البادئة والأرقام الطويلة كما كُتبت.',
+      ],
       faqTitle: 'عارض ومحرر CSV: أسئلة شائعة',
       faq: [
+        {
+          question: 'هل يُرفع ملفي؟',
+          answer: 'لا. يقرأ متصفحك ملف CSV بنفسه ويرسم الجدول على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك.',
+        },
+        {
+          question: 'هل يمكنني تعديله وحفظه؟',
+          answer: 'نعم. عدّل الخلايا، وأضف الصفوف والأعمدة أو احذفها، واستخدم البحث والاستبدال أو التنظيف، ثم انقر «تنزيل» لحفظ ملف CSV بفاصل الملف نفسه، أو اختر فاصلًا آخر أو علامات اقتباس أو نهايات أسطر من «خيارات التنزيل».',
+        },
+        {
+          question: 'هل يتغير الملف الأصلي؟',
+          answer: 'لا. تبقى تعديلاتك في ذاكرة الصفحة حتى تنزّل نسخة، ولا يُمس الملف الموجود على جهازك أبدًا. إغلاق التبويب يتجاهل التعديلات، ويسألك المتصفح أولًا إذا كانت هناك تعديلات لم تُحفظ.',
+        },
+        {
+          question: 'هل هناك حد لحجم الملف؟',
+          answer: 'لا يوجد حد ثابت: الحد هو ذاكرة متصفحك. يُفتح ملف بـ 100,000 صف في أقل من ثانية لأن الصفوف الظاهرة فقط هي التي تُرسم، وتظهر رسالة تحذير للملفات التي تزيد على 50 ميغابايت ثم تُفتح إذا سمحت الذاكرة. وبخلاف Excel الذي يتوقف عند 1,048,576 صفًا في الورقة، لا يضع عارض CSV حدًا لعدد الصفوف.',
+        },
+        {
+          question: 'هل يعمل على الجوال؟',
+          answer: 'نعم. لصفحة CSV تخطيط خاص بالجوال، فيه الأدوات في قائمة والجدول يتحرك أفقيًا، فتستطيع عرض ملف CSV وتعديله في متصفح الجوال.',
+        },
+        {
+          question: 'هل يعمل بدون إنترنت؟',
+          answer: 'بعد تحميل الصفحة وعارض CSV، لا يحتاج فتح الملفات وتعديلها إلى أي اتصال بالإنترنت. لكنه ليس تطبيقًا يُثبَّت للعمل دون اتصال: يجب تحميل الصفحة وأنت متصل أولًا.',
+        },
+        {
+          question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+        },
         {
           question: 'لماذا يُفتح ملف CSV في عمود واحد؟',
           answer: 'غالبًا يستخدم الملف فاصلًا غير الفاصلة، مثل الفاصلة المنقوطة، وهذا شائع في الملفات التي يحفظها Excel في كثير من البلدان. يكتشف OpenAnyDoc الفاصلة والفاصلة المنقوطة وعلامة الجدولة والشرطة العمودية تلقائيًا، ويمكنك اختيار الفاصل بنفسك بالنقر عليه في شريط الحالة أسفل الصفحة.',
@@ -180,10 +343,6 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'كيف أفتح ملف CSV فيه نص عربي أو بلغة غير الإنجليزية؟',
           answer: 'افتحه مباشرة: تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. وتُعرض الخلايا العربية من اليمين إلى اليسار. عند التنزيل تُضاف علامة ترتيب البايت (BOM) إذا كان في الملف نص بلغة غير الإنجليزية، حتى يعرضه Excel بشكل صحيح.',
-        },
-        {
-          question: 'هل يمكنني فتح ملف CSV كبير أونلاين؟',
-          answer: 'نعم. يُفتح ملف CSV بـ 100,000 صف في أقل من ثانية، لأن الصفوف الظاهرة على الشاشة فقط هي التي تُرسم، ويبقى سريعًا أثناء التحرير. تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك؛ والحد هو ذاكرة متصفحك.',
         },
         {
           question: 'كيف أحذف الصفوف المكررة من ملف CSV؟',
@@ -200,7 +359,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/excel-viewer': {
-      stepsTitle: 'كيف تفتح ملف Excel وتعدّله أونلاين',
+      stepsTitle: 'كيف يعمل: افتح ملف Excel وعدّله اونلاين',
       steps: [
         { title: 'أفلت المصنف على الصفحة', text: 'اختر ملف .xlsx أو .xls أو .xlsm أو .ods. يُقرأ داخل متصفحك ولا يُرفع أبدًا.' },
         { title: 'تنقّل بين الأوراق', text: 'كل ورقة تبويب في الأسفل، كما في Excel. تُعرض التواريخ والنسب المئوية والعملات بتنسيقها في الملف، وتُرسم الخلايا المدمجة كخلية واحدة.' },
@@ -208,8 +367,45 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'نسّق بياناتك', text: 'استخدم شريط الأدوات لتغيير تنسيقات الأرقام والعملات، وإدراج الصفوف والأعمدة والأوراق أو حذفها، ودمج الخلايا، وفي ملفات .xlsx اضبط الخط الغامق والألوان والخطوط والحدود.' },
         { title: 'احفظ المصنف', text: 'استخدم أيقونة الحفظ لتنزيل المصنف بالصيغة نفسها. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
+      handlesTitle: 'ما الذي يدعمه: XLSX وXLS وXLSM وODS',
+      handles: [
+        'الملفات: .xlsx و.xls (Excel 97 إلى 2003) و.xlsm (المفعّلة بالماكرو) و.ods (OpenDocument)، بكل أوراقها. لا يمكن فتح المصنفات المحمية بكلمة مرور.',
+        'العرض: تنسيقات الأرقام والتواريخ والنسب المئوية والعملات والخلايا المدمجة؛ والخطوط والألوان والتعبئة في ملفات .xlsx و.xlsm حتى 8 ميغابايت.',
+        'التحرير: القيم والصيغ التي تُعاد حسابها، والصفوف والأعمدة والأوراق، ودمج الخلايا وتنسيقات الأرقام؛ وفي ملفات .xlsx أيضًا الخط الغامق والمائل والألوان والتعبئة والمحاذاة.',
+        'ما يُحفظ: القيم، والصيغ مع نتائجها، وتنسيقات الأرقام، والخلايا المدمجة، وعرض الأعمدة، بصيغة الملف نفسها. وأنماط الخلايا تُحفظ في ملفات .xlsx فقط.',
+        'ما لا يُحفظ: المخططات والصور والجداول المحورية والتنسيق الشرطي والتحقق من صحة البيانات والأسماء المعرّفة وحزم الماكرو.',
+        'الحجم: لا يوجد حد ثابت؛ تظهر رسالة تحذير أولًا للملفات التي تزيد على 50 ميغابايت، ولا تُقرأ أنماط الخلايا إلا للملفات حتى 8 ميغابايت.',
+      ],
       faqTitle: 'عارض ومحرر Excel: أسئلة شائعة',
       faq: [
+        {
+          question: 'هل يُرفع ملفي؟',
+          answer: 'لا. يقرأ متصفحك المصنف بنفسه ويرسم الأوراق على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك.',
+        },
+        {
+          question: 'هل يمكنني تعديله وحفظه؟',
+          answer: 'نعم. انتقل إلى «تحرير» لتغيير الخلايا والصيغ، وإدراج الصفوف والأعمدة والأوراق أو حذفها، ودمج الخلايا وتغيير تنسيقات الأرقام، ثم احفظ المصنف بصيغته: .xlsx أو .xls أو .xlsm أو .ods.',
+        },
+        {
+          question: 'هل يتغير الملف الأصلي؟',
+          answer: 'لا. تبقى تعديلاتك في ذاكرة الصفحة حتى تنزّل نسخة، ولا يُمس الملف الموجود على جهازك أبدًا. إغلاق التبويب يتجاهل التعديلات، ويسألك المتصفح أولًا إذا كانت هناك تعديلات لم تُحفظ.',
+        },
+        {
+          question: 'هل هناك حد لحجم الملف؟',
+          answer: 'لا يوجد حد ثابت: الحد هو ذاكرة متصفحك. تُفتح ورقة بـ 100,000 صف في نحو ثانيتين، وتظهر رسالة تحذير أولًا للملفات التي تزيد على 50 ميغابايت. ولا تُقرأ أنماط الخلايا إلا للملفات حتى 8 ميغابايت، فتُفتح المصنفات الأكبر بالقيم والصيغ.',
+        },
+        {
+          question: 'هل يعمل على الجوال؟',
+          answer: 'نعم. تتكيف صفحة Excel مع شاشة الجوال، فتستطيع فتح المصنف وعرضه وتعديله في متصفح الجوال. والأوراق الكبيرة أسهل على شاشة أكبر.',
+        },
+        {
+          question: 'هل يعمل بدون إنترنت؟',
+          answer: 'بعد تحميل الصفحة وعارض Excel، لا يحتاج فتح الملفات وتعديلها إلى أي اتصال بالإنترنت. لكنه ليس تطبيقًا يُثبَّت للعمل دون اتصال: يجب تحميل الصفحة وأنت متصل أولًا.',
+        },
+        {
+          question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+        },
         {
           question: 'كيف أفتح ملف XLSX بدون Excel؟',
           answer: 'أفلت ملف .xlsx على هذه الصفحة. يُفتح في متصفحك مع أوراقه وتنسيقه وخلاياه المدمجة، ويمكنك تعديله وحفظه من جديد، بدون Excel وبدون حساب وبدون رفع.',
@@ -230,14 +426,10 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'هل يمكنني فتح ملف Excel محمي بكلمة مرور؟',
           answer: 'لا. لا يمكن فتح المصنفات المشفّرة، لأن الملف يجب أن يُقرأ في متصفحك دون إرساله إلى أي جهة. أزل كلمة المرور في Excel أولًا، ثم افتح الملف هنا.',
         },
-        {
-          question: 'ما أكبر حجم لملف Excel يمكنني فتحه؟',
-          answer: 'تُفتح ورقة بـ 100,000 صف في نحو ثانيتين، وتبقى سريعة أثناء التحرير، لأن الصفوف الظاهرة على الشاشة فقط هي التي تُرسم. أما المصنفات التي يزيد حجمها على 8 ميغابايت فلا تُحمَّل أنماط خلاياها، فتُفتح بالقيم والصيغ فقط.',
-        },
       ],
     },
     '/json-viewer': {
-      stepsTitle: 'كيف تفتح ملف JSON وتنسّقه أونلاين',
+      stepsTitle: 'كيف يعمل: اعرض JSON ونسّقه وعدّله اونلاين',
       steps: [
         { title: 'أفلت ملفًا أو الصق JSON أو جرّب مثالًا', text: 'اختر ملف .json أو أفلته، أو الصق JSON باستخدام Ctrl+V، أو جرّب المثال. يُقرأ داخل متصفحك، فلا تُرفع استجابات API وملفات الإعدادات وغيرها من البيانات الخاصة.' },
         { title: 'النص والشجرة جنبًا إلى جنب', text: 'يظهر النص بجانب شجرة قابلة للطي (أو جدول لقائمة من الكائنات) ولوحة تفاصيل؛ تحديد عقدة في أحدهما يُظهرها في الآخر. ابحث في المفاتيح والقيم، أو اكتب مسارًا مثل $.orders[*].total.' },
@@ -245,8 +437,45 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'نسّق وعدّل', text: 'اكتب في النص، أو استخدم الشجرة ولوحة التفاصيل. نسّق بمسافة واحدة أو 2 أو 3 أو 4 أو 8 مسافات أو علامة جدولة، واضغط الملف، ورتّب المفاتيح، وغيّر العقد وأضفها وكرّرها وانقلها واحذفها. تُحفظ الأرقام الطويلة كما هي.' },
         { title: 'نزّل ملف JSON', text: 'استخدم زر «تنزيل» لحفظ النتيجة. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
+      handlesTitle: 'ما الذي يدعمه: ملفات JSON وJSON الملصوق',
+      handles: [
+        'الإدخال: ملفات .json، أو JSON ملصوق باستخدام Ctrl+V؛ ويمكن عرض قائمة من الكائنات كجدول أيضًا.',
+        'الحجم: حتى 10 ميغابايت؛ تُرفض الملفات الأكبر قبل قراءتها. وفوق 5 ميغابايت تبدأ لوحة النص مغلقة.',
+        'الأرقام: تُحفظ الأعداد الصحيحة الأطول مما تتسع له JavaScript (أكبر من 2^53) كما هي تمامًا.',
+        'الأخطاء: السطر والعمود الذي فيه المشكلة، و«إصلاح» للتعليقات والفواصل الزائدة أو الناقصة وعلامات الاقتباس المفردة والمفاتيح غير المقتبسة.',
+        'التحرير: في النص أو في الشجرة؛ غيّر العقد وأضفها وكرّرها وانقلها واحذفها، ونسّق بمسافة إلى 8 مسافات أو بعلامة جدولة، واضغط الملف ورتّب المفاتيح، مع التراجع.',
+        'الحفظ: ملف .json بالتخطيط الذي اخترته.',
+      ],
       faqTitle: 'عارض ومحرر JSON: أسئلة شائعة',
       faq: [
+        {
+          question: 'هل يُرفع ملفي؟',
+          answer: 'لا. يقرأ متصفحك JSON ويتحقق منه بنفسه، ويبقى JSON الملصوق في الصفحة أيضًا. لا يُرسل شيء إلى أي خادم، ما يجعله مناسبًا لاستجابات API والرموز المميزة وإعدادات الأنظمة الداخلية.',
+        },
+        {
+          question: 'هل يمكنني تعديله وحفظه؟',
+          answer: 'نعم. اكتب في النص أو عدّل الشجرة: غيّر العقد وأضفها وكرّرها وانقلها واحذفها، ونسّق الملف أو اضغطه أو رتّب مفاتيحه، ثم اضغط «تنزيل» لحفظ ملف .json.',
+        },
+        {
+          question: 'هل يتغير الملف الأصلي؟',
+          answer: 'لا. تبقى تعديلاتك في ذاكرة الصفحة حتى تنزّل نسخة، ولا يُمس الملف الموجود على جهازك أبدًا. إغلاق التبويب يتجاهل التعديلات، ويسألك المتصفح أولًا إذا كانت هناك تعديلات لم تُحفظ.',
+        },
+        {
+          question: 'هل هناك حد لحجم الملف؟',
+          answer: 'نعم: تُفتح ملفات JSON حتى 10 ميغابايت، وتُرفض الملفات الأكبر قبل قراءتها، لأن كل تعديل سيجعل الصفحة بطيئة. ويَظهر ملف بهذا الحجم كشجرة في أقل من ثانية؛ وفوق 5 ميغابايت تبدأ لوحة النص مغلقة وتُفتح بزر «إظهار النص».',
+        },
+        {
+          question: 'هل يعمل على الجوال؟',
+          answer: 'نعم. على الجوال تتحول صفحة JSON إلى تبويبات النص والشجرة والتفاصيل بدل اللوحات المتجاورة، مع الإجراءات الرئيسية في شريط أسفل الشاشة.',
+        },
+        {
+          question: 'هل يعمل بدون إنترنت؟',
+          answer: 'بعد تحميل الصفحة وعارض JSON، لا يحتاج فتح الملفات وتعديلها إلى أي اتصال بالإنترنت. لكنه ليس تطبيقًا يُثبَّت للعمل دون اتصال: يجب تحميل الصفحة وأنت متصل أولًا.',
+        },
+        {
+          question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+        },
         {
           question: 'كيف أنسّق JSON (Pretty Print) أونلاين؟',
           answer: 'افتح ملفك واضغط «تنسيق»، أو اختر مسافة واحدة أو 2 أو 3 أو 4 أو 8 مسافات أو علامة جدولة من القائمة المجاورة له. يعرض النص النتيجة المنسقة، ويستخدم التنزيل التخطيط نفسه.',
@@ -263,18 +492,10 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'هل يمكنني ترتيب مفاتيح كائن JSON أبجديًا؟',
           answer: 'نعم. اضغط «ترتيب المفاتيح»: تُرتَّب مفاتيح كل كائن، ومنها الكائنات المتداخلة، من A إلى Z. ويعيدها «تراجع» كما كانت.',
         },
-        {
-          question: 'هل يمكنني فتح ملف JSON كبير؟',
-          answer: 'تُفتح ملفات JSON حتى 10 ميغابايت، ويَظهر ملف بهذا الحجم كشجرة في أقل من ثانية. أما الملفات الأكبر فلا تُفتح، لأن كل تعديل سيجعل الصفحة بطيئة.',
-        },
-        {
-          question: 'هل من الآمن فتح JSON خاص أو لصقه هنا؟',
-          answer: 'ملف JSON لا يُرفع: يقرأ المتصفح الملف ولا يُرسل شيء إلى أي خادم، ما يجعله مناسبًا للرموز المميزة وبيانات العملاء في ملفات الاختبار وإعدادات الأنظمة الداخلية.',
-        },
       ],
     },
     '/txt-viewer': {
-      stepsTitle: 'كيف تفتح ملفًا نصيًا وتعدّله أونلاين',
+      stepsTitle: 'كيف يعمل: افتح ملفًا نصيًا وعدّله اونلاين',
       steps: [
         { title: 'أفلت ملف .txt على الصفحة', text: 'اختر ملفًا نصيًا أو أفلته، مثل ملاحظات أو سجل أو قائمة. يُقرأ داخل متصفحك ولا يُرفع أبدًا، ويُفتح جاهزًا للتحرير.' },
         { title: 'اكتب أو اختر أداة من الشريط', text: 'اكتب في النص، أو افتح تبويبًا (الأسطر، تنظيف، حالة الأحرف، بحث، تحليل، عرض، ملف) وانقر أداة: فرز الأسطر أو حذف المكرر منها أو ترقيمها أو دمجها، وحذف المسافات، وتغيير حالة الأحرف. وعند تحديد نص تغيّر الأداة الأسطر المحددة فقط. وكل أداة خطوة تراجع واحدة.' },
@@ -282,8 +503,44 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         { title: 'شاهد المخفي', text: 'أظهر الأحرف المخفية لترى علامات الجدولة والمسافات في نهاية الأسطر والأحرف صفرية العرض ونهايات الأسطر، ثم احذفها بأدوات التنظيف. وتساعدك الإشارات المرجعية والانتقال إلى سطر في الملفات الطويلة.' },
         { title: 'نزّل ملفك النصي', text: 'انقر «تنزيل» واختر UTF-8 أو UTF-8 مع BOM أو UTF-16 أو Windows-1256، ونهايات الأسطر LF أو CRLF أو CR. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
+      handlesTitle: 'ما الذي يدعمه: ملفات TXT',
+      handles: [
+        'الملفات: الملفات النصية العادية .txt، مثل الملاحظات والسجلات والقوائم.',
+        'الترميز: UTF-8 مع BOM أو بدونه، وUTF-16، وWindows-1256 للنصوص العربية القديمة؛ ويمكنك إعادة فتح الملف بترميز آخر، ويُعرض كل سطر باتجاه القراءة الخاص به.',
+        'الحجم: تظهر رسالة تحذير أولًا للملفات التي تزيد على 50 ميغابايت؛ وفوق مليوني حرف تقريبًا يُفتح الملف في عرض سريع للقراءة.',
+        'التحرير: الكتابة، وأدوات للفرز والمكرر والترقيم والمسافات وحالة الأحرف، والبحث والاستبدال بالتعابير النمطية، والإحصاءات والمقارنة.',
+        'الحفظ: UTF-8 أو UTF-8 مع BOM أو UTF-16 أو Windows-1256، مع نهايات الأسطر LF أو CRLF أو CR.',
+      ],
       faqTitle: 'عارض ومحرر الملفات النصية: أسئلة شائعة',
       faq: [
+        {
+          question: 'هل يُرفع ملفي؟',
+          answer: 'لا. يقرأ متصفحك الملف النصي بنفسه ويعرضه على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك.',
+        },
+        {
+          question: 'هل يمكنني تعديله وحفظه؟',
+          answer: 'نعم. يُفتح الملف جاهزًا للتحرير: اكتب، أو استخدم أدوات الشريط للأسطر والمسافات وحالة الأحرف، ثم انقر «تنزيل» واختر الترميز (UTF-8 أو UTF-8 مع BOM أو UTF-16 أو Windows-1256) ونهايات الأسطر (LF أو CRLF أو CR).',
+        },
+        {
+          question: 'هل يتغير الملف الأصلي؟',
+          answer: 'لا. تبقى تعديلاتك في ذاكرة الصفحة حتى تنزّل نسخة، ولا يُمس الملف الموجود على جهازك أبدًا. إغلاق التبويب يتجاهل التعديلات، ويسألك المتصفح أولًا إذا كانت هناك تعديلات لم تُحفظ.',
+        },
+        {
+          question: 'هل هناك حد لحجم الملف؟',
+          answer: 'لا يوجد حد ثابت: الحد هو ذاكرة متصفحك، وتظهر رسالة تحذير أولًا للملفات التي تزيد على 50 ميغابايت. والملف الذي يزيد على مليوني حرف تقريبًا يُفتح في عرض سريع للقراءة يرسم الأسطر الظاهرة فقط، وتعمل كل الأدوات على النص كاملًا. اختر «التحرير على أي حال» للكتابة فيه؛ فالكتابة في ملف كبير جدًا أبطأ.',
+        },
+        {
+          question: 'هل يعمل على الجوال؟',
+          answer: 'نعم. على الجوال يتحول الشريط إلى لوحة أدوات ويملأ النص الشاشة، فتستطيع قراءة الملفات النصية وتعديلها في متصفح الجوال.',
+        },
+        {
+          question: 'هل يعمل بدون إنترنت؟',
+          answer: 'بعد تحميل الصفحة وعارض النصوص، لا يحتاج فتح الملفات وتعديلها إلى أي اتصال بالإنترنت. لكنه ليس تطبيقًا يُثبَّت للعمل دون اتصال: يجب تحميل الصفحة وأنت متصل أولًا.',
+        },
+        {
+          question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+        },
         {
           question: 'كيف أغيّر نهايات الأسطر (من LF إلى CRLF) في ملف نصي؟',
           answer: 'افتح الملف وانقر «تنزيل»، ثم اختر LF (macOS وLinux) أو CRLF (Windows) أو CR للملف المحفوظ. وإذا كانت نهايات الأسطر في الملف مختلطة، فإن «ملف» ثم «توحيد نهايات الأسطر المختلطة» يجعلها كلها متماثلة.',
@@ -303,10 +560,6 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل يمكنني فتح ملفات نصية فيها حروف عربية أو بلغات أخرى؟',
           answer: 'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. ويُعرض كل سطر باتجاه القراءة الخاص به. وإذا ظهر النص بشكل خاطئ، فاختر ترميزًا آخر في تبويب «ملف» وأعد فتحه.',
-        },
-        {
-          question: 'هل يمكنني فتح ملف نصي أو سجل كبير؟',
-          answer: 'نعم. يُفتح الملف الذي يزيد على مليوني حرف تقريبًا في عرض سريع للقراءة يرسم الأسطر الظاهرة فقط، وتعمل كل الأدوات على النص كاملًا. اختر «التحرير على أي حال» للكتابة فيه؛ فالكتابة في ملف كبير جدًا أبطأ، وتُخفى أرقام الأسطر أثناء ذلك.',
         },
       ],
     },

@@ -60,6 +60,8 @@ await new Promise((resolve) => (socket.onopen = resolve))
 let nextMessageId = 0
 const pendingReplies = new Map()
 const networkProblems = []
+// Uncaught errors and console errors of the page, such as React's hydration mismatches.
+const pageErrors = []
 socket.onmessage = (message) => {
   const data = JSON.parse(message.data)
   if (data.id && pendingReplies.has(data.id)) {
@@ -71,6 +73,10 @@ socket.onmessage = (message) => {
     if (url.startsWith('data:') || url.startsWith('blob:')) return
     if (new URL(url).origin !== siteOrigin) networkProblems.push(`request to another origin: ${url}`)
     if (['Fetch', 'XHR', 'Ping', 'WebSocket', 'EventSource'].includes(requestType)) networkProblems.push(`${requestType} request: ${url}`)
+  } else if (data.method === 'Runtime.exceptionThrown') {
+    pageErrors.push(data.params.exceptionDetails.exception?.description ?? data.params.exceptionDetails.text)
+  } else if (data.method === 'Runtime.consoleAPICalled' && data.params.type === 'error') {
+    pageErrors.push(data.params.args.map((argument) => argument.value ?? argument.description).join(' '))
   } else if (data.method === 'Page.javascriptDialogOpening') {
     send('Page.handleJavaScriptDialog', { accept: true })
   }
@@ -184,6 +190,15 @@ async function test(name, run) {
 function expect(condition, message) {
   if (!condition) throw new Error(message)
 }
+// The text of the page as the server sent it, before any script runs: the markup in #root without its tags.
+const prerenderedText = (html) =>
+  (html.split('<div id="root" data-prerendered>')[1] ?? '')
+    .replace(/<[^>]+>/g, ' ')
+    .replace(/&#x27;/g, "'")
+    .replace(/&quot;/g, '"')
+    .replace(/&lt;/g, '<')
+    .replace(/&gt;/g, '>')
+    .replace(/&amp;/g, '&')
 const bannerText = () => evaluate(`document.querySelector('[role=region]')?.innerText ?? null`)
 
 await test('home page shows the banner, the badges and takes no focus', async () => {
@@ -294,8 +309,13 @@ await test('home and format pages carry their own title, description, canonical 
     expect(description.length >= 120 && description.length <= 160, `${address}: description is ${description.length} characters`)
     expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)
     expect(html.includes('property="og:title"') && html.includes('property="og:description"'), `${address}: Open Graph tags are missing`)
-    expect(html.includes('<noscript>') && html.includes('<h1>'), `${address}: the no-script text is missing`)
     const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
+    const serverText = prerenderedText(html)
+    const heading = /<h1 id="page-heading"[^>]*>([^<]+)<\/h1>/.exec(html)?.[1] ?? ''
+    expect(heading.length > 0 && /<p id="page-intro"[^>]*>[^<]+<\/p>/.test(html), `${address}: the h1 or the intro is not in the server's HTML`)
+    const breadcrumb = structuredData.find((item) => item['@type'] === 'BreadcrumbList')
+    if (breadcrumb) expect(serverText.includes(breadcrumb.itemListElement[1].name), `${address}: the server's h1 is not the page heading`)
+    if (address.length > 3) expect(html.includes('id="how-to-section"') && html.includes('id="handles-section"'), `${address}: "How it works" or "What it handles" is not in the server's HTML`)
     expect(structuredData.some((item) => item['@type'] === 'WebApplication'), `${address}: WebApplication data is missing`)
     expect(!titles.has(title), `${address}: the title is used on another page`)
     expect(html.includes(`<html lang="${address.slice(1, 3)}" dir="${address.startsWith('/ar') ? 'rtl' : 'ltr'}">`), `${address}: lang and dir are missing from the static HTML`)
@@ -303,6 +323,14 @@ await test('home and format pages carry their own title, description, canonical 
     titles.add(title)
     const faq = structuredData.find((item) => item['@type'] === 'FAQPage')
     expect(faq, `${address}: there is no FAQPage data`)
+    const missingQuestion = faq.mainEntity.find((item) => !serverText.includes(item.name))
+    expect(!missingQuestion, `${address}: the server's HTML lacks the question "${missingQuestion?.name}"`)
+    const shareImage = /property="og:image" content="https:\/\/openanydoc\.com(\/og\/[\w-]+\.png)"/.exec(html)?.[1]
+    const imageFile = shareImage && path.join(distFolder, shareImage)
+    expect(imageFile && fs.existsSync(imageFile), `${address}: the og:image file is missing`)
+    const imageHeader = fs.readFileSync(imageFile)
+    expect(imageHeader.readUInt32BE(16) === 1200 && imageHeader.readUInt32BE(20) === 630, `${address}: the og:image is not 1200 x 630`)
+    expect(html.includes('name="twitter:card" content="summary_large_image"') && html.includes('name="twitter:image"'), `${address}: the twitter tags are missing`)
     await openPage(address)
     const visibleQuestions = await evaluate(`document.querySelectorAll('dt').length`)
     expect(faq.mainEntity.length === visibleQuestions, `${address}: FAQ data has ${faq.mainEntity.length} questions but the page shows ${visibleQuestions}`)
@@ -311,6 +339,15 @@ await test('home and format pages carry their own title, description, canonical 
     const firstAnswer = faq.mainEntity[0].acceptedAnswer.text
     expect(visibleText.includes(firstAnswer.slice(0, 60)), `${address}: the data answers are not the text on the page`)
     questionLists.set(address, faq.mainEntity.map((item) => item.name).join('|'))
+    if (address.length > 3) {
+      const isArabic = address.startsWith('/ar')
+      expect((await evaluate(`document.querySelector('#how-to-section h2')?.textContent ?? ''`)).startsWith(isArabic ? 'كيف يعمل' : 'How it works'), `${address}: the steps are not titled "How it works"`)
+      expect(await evaluate(`document.querySelectorAll('section#handles-section #handles-list li[id^="handles-item-"]').length >= 4`), `${address}: the "What it handles" list is missing`)
+      const sharedQuestions = isArabic
+        ? ['هل يُرفع ملفي؟', 'هل يمكنني تعديله وحفظه؟', 'هل يتغير الملف الأصلي؟', 'هل هناك حد لحجم الملف؟', 'هل يعمل على الجوال؟', 'هل يعمل بدون إنترنت؟', 'هل يمكن لشركتي استضافة نسخة خاصة بها؟']
+        : ['Is my file uploaded?', 'Can I edit and save it?', 'Is the original changed?', 'Is there a file size limit?', 'Does it work on mobile?', 'Does it work offline?', 'Can my company host its own copy?']
+      expect(faq.mainEntity.slice(0, 7).map((item) => item.name).join('|') === sharedQuestions.join('|'), `${address}: the seven shared questions are not first`)
+    }
   }
   expect(new Set(questionLists.values()).size === questionLists.size, 'two pages share the same questions: each page needs its own')
 })
@@ -366,7 +403,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -375,10 +412,79 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog']) {
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
+
+// ---------------------------------------------------------------- About, Privacy and Terms; footer and workbench links
+
+await test('About, Privacy and Terms pages: one h1, their own title and description, hreflang, real text', async () => {
+  const titles = new Set()
+  for (const address of ['en', 'ar'].flatMap((locale) => ['/about', '/privacy', '/terms'].map((page) => `/${locale}${page}`))) {
+    const html = await (await fetch(`${siteOrigin}${address}`)).text()
+    const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
+    const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
+    expect(title.length > 0 && title.length <= 60, `${address}: title is ${title.length} characters: ${title}`)
+    expect(description.length >= 120 && description.length <= 160, `${address}: description is ${description.length} characters`)
+    expect(!titles.has(title), `${address}: the title is used on another page`)
+    titles.add(title)
+    expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)
+    expect(html.includes('hreflang="ar"') && html.includes('hreflang="en"') && html.includes('hreflang="x-default"'), `${address}: hreflang alternates are missing`)
+    expect(html.includes(`<html lang="${address.slice(1, 3)}" dir="${address.startsWith('/ar') ? 'rtl' : 'ltr'}">`), `${address}: lang and dir are missing from the static HTML`)
+    expect(html.includes('id="info-sections"') && prerenderedText(html).includes('privacy@openanydoc.com'), `${address}: the server's HTML lacks the sections or the contact address`)
+    await openPage(address)
+    expect(await evaluate(`document.querySelectorAll('h1').length === 1 && document.querySelectorAll('main h2').length >= 3`), `${address}: needs one h1 and its h2 sections`)
+    expect((await evaluate('document.title')) === title, `${address}: the browser title differs from the static one`)
+    expect(await evaluate(`document.querySelector('#contact-email-link')?.getAttribute('href') === 'mailto:privacy@openanydoc.com'`), `${address}: the contact link is missing`)
+    expect(await evaluate(`document.documentElement.scrollWidth <= document.documentElement.clientWidth`), `${address}: the page scrolls sideways`)
+  }
+  await openPage('/en/privacy')
+  const privacyText = await evaluate('document.body.innerText')
+  expect(privacyText.includes('Last updated: 2026-10-17') && privacyText.includes('No analytics, no cookies, no tracking') && privacyText.includes('Cloudflare'), 'the privacy policy is missing a required part')
+})
+
+await test('the footer has About, Privacy and Terms links and the Microsoft disclaimer on every content page', async () => {
+  for (const address of ['/en', '/ar', '/en/csv-viewer', '/ar/excel-viewer', '/en/json-viewer', '/ar/txt-viewer', '/en/about', '/ar/privacy', '/en/terms', '/en/changelog', '/ar/changelog']) {
+    await openPage(address)
+    const locale = address.slice(1, 3)
+    for (const page of ['about', 'privacy', 'terms']) {
+      expect((await evaluate(`document.querySelector('footer nav#footer-legal #footer-link-${page}')?.getAttribute('href')`)) === `/${locale}/${page}`, `${address}: the ${page} link is missing from the footer`)
+    }
+    const disclaimer = await evaluate(`document.querySelector('footer p#footer-disclaimer')?.textContent ?? ''`)
+    const expected = locale === 'en' ? 'OpenAnyDoc is not affiliated with Microsoft. Word, Excel and PowerPoint are trademarks of Microsoft Corporation.' : 'OpenAnyDoc غير تابع لشركة Microsoft.'
+    expect(disclaimer.includes(expected), `${address}: the footer disclaimer is "${disclaimer}"`)
+  }
+  for (const locale of ['en', 'ar']) {
+    const html = await (await fetch(`${siteOrigin}/${locale}/changelog`)).text()
+    expect(html.includes('id="footer-disclaimer"') && html.includes(`id="footer-link-privacy" href="/${locale}/privacy"`), `${locale}: the static changelog has no footer`)
+  }
+  await openPage('/en/csv-viewer')
+  await evaluate(`document.querySelector('#footer-link-privacy').click()`)
+  await waitFor(`location.pathname === '/en/privacy' && document.querySelector('h1')?.innerText === 'Privacy Policy'`, 'the footer link to open the privacy policy in the page')
+})
+
+for (const [name, address, file, readyElement, menuButton] of [
+  ['CSV', '/en/csv-viewer', sampleCsv, '#data-table', '#more-menu-button:not(:disabled)'],
+  ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row', '#more-button'],
+  ['TXT', '/en/txt-viewer', sampleText, '#text-editor', '#ribbon-tab-file'],
+  ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table', '#legal-menu-button'],
+]) {
+  for (const locale of ['en', 'ar']) await test(`${name} (${locale}): Privacy, Terms and the disclaimer in the menu, and the status bar links, open in a new tab`, async () => {
+    await openPage(address.replace('/en/', `/${locale}/`))
+    await chooseFile(file)
+    await waitFor(`document.querySelector('${readyElement}') && document.querySelector('${menuButton}')`, `the ${name} file to show`)
+    await evaluate(`document.querySelector('${menuButton}').click()`)
+    await waitFor(`document.querySelector('#menu-link-privacy')?.checkVisibility()`, 'the menu with the legal links')
+    const links = name === 'Excel' ? ['menu-link-privacy', 'menu-link-terms'] : ['menu-link-privacy', 'menu-link-terms', 'status-link-privacy', 'status-link-terms']
+    for (const id of links) {
+      const link = await evaluate(`(() => { const link = document.querySelector('#${id}'); return link && { href: link.getAttribute('href'), target: link.target, rel: link.rel } })()`)
+      expect(link?.href === `/${locale}/${id.endsWith('privacy') ? 'privacy' : 'terms'}` && link.target === '_blank' && link.rel.includes('noopener'), `#${id} is ${JSON.stringify(link)}`)
+    }
+    expect((await evaluate(`document.querySelector('#menu-disclaimer')?.textContent ?? ''`)).includes('Microsoft Corporation'), 'the disclaimer is missing from the menu')
+    await expectCleanIds(`${name} with the legal links showing`)
+  })
+}
 
 
 
@@ -814,6 +920,78 @@ await test('JSON on a phone: Text, Tree and Inspector tabs instead of side by si
     expect(await evaluate(`${shown('#mobile-action-bar')}`), 'the action bar is missing on a phone')
     expect(await evaluate(`document.documentElement.scrollWidth <= innerWidth`), 'the page scrolls sideways on a phone')
   })
+})
+
+// ---------------------------------------------------------------- the <head> follows the page when it changes without a reload
+
+// The tags that describe a page, read from a document: the live page, or the HTML the build wrote for that address.
+const readHeadTags = `(document) => ({
+  lang: document.documentElement.lang,
+  title: document.title,
+  description: document.querySelector('meta[name="description"]')?.content,
+  canonical: document.querySelector('link[rel="canonical"]')?.getAttribute('href'),
+  alternates: [...document.querySelectorAll('link[rel="alternate"][hreflang]')].map((link) => link.hreflang + ' ' + link.getAttribute('href')).sort().join(', '),
+  ogUrl: document.querySelector('meta[property="og:url"]')?.content,
+  ogTitle: document.querySelector('meta[property="og:title"]')?.content,
+  ogImage: document.querySelector('meta[property="og:image"]')?.content,
+})`
+
+async function expectHeadOfBuiltPage(address) {
+  const builtHtml = fs.readFileSync(path.join(distFolder, address, 'index.html'), 'utf8')
+  const difference = await evaluate(`(() => {
+    const read = ${readHeadTags}
+    const live = read(document)
+    const built = read(new DOMParser().parseFromString(${JSON.stringify(builtHtml)}, 'text/html'))
+    return Object.keys(built).filter((key) => live[key] !== built[key]).map((key) => key + ': "' + live[key] + '" instead of "' + built[key] + '"').join('; ')
+  })()`)
+  expect(difference === '', `${address}: ${difference}`)
+}
+
+await test('following links and switching language updates the title, description, canonical, alternates, share tags and lang', async () => {
+  await openPage('/en')
+  await evaluate(`document.querySelector('#footer-link-csv').click()`)
+  await waitFor(`location.pathname === '/en/csv-viewer'`, 'the CSV page')
+  await expectHeadOfBuiltPage('/en/csv-viewer')
+  await evaluate(`document.querySelector('#footer-link-about').click()`)
+  await waitFor(`location.pathname === '/en/about' && document.querySelector('#info-page')`, 'the About page')
+  await expectHeadOfBuiltPage('/en/about')
+  await evaluate(`document.querySelector('#language-switch-link').click()`)
+  await waitFor(`location.pathname === '/ar/about' && document.documentElement.dir === 'rtl'`, 'the Arabic About page')
+  await expectHeadOfBuiltPage('/ar/about')
+  await evaluate(`document.querySelector('#footer-link-json').click()`)
+  await waitFor(`location.pathname === '/ar/json-viewer'`, 'the Arabic JSON page')
+  await expectHeadOfBuiltPage('/ar/json-viewer')
+  await evaluate(`document.querySelector('#language-switch-link').click()`)
+  await waitFor(`location.pathname === '/en/json-viewer' && document.documentElement.dir === 'ltr'`, 'the English JSON page')
+  await expectHeadOfBuiltPage('/en/json-viewer')
+})
+
+// ---------------------------------------------------------------- the browser takes over the build's markup without a mismatch
+
+await test('the build markup has no style attributes (the Content-Security-Policy would block them)', async () => {
+  const pagesWithStyle = ['en', 'ar']
+    .flatMap((locale) => ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/about', '/privacy', '/terms', '/changelog'].map((page) => `/${locale}${page}`))
+    .filter((address) => /<[^>]+\sstyle=/.test(fs.readFileSync(path.join(distFolder, address, 'index.html'), 'utf8')))
+  expect(pagesWithStyle.length === 0, `style attributes in ${pagesWithStyle.join(', ')}`)
+})
+
+await test('prerendered pages hydrate with no console error, in both languages, light and dark', async () => {
+  const addresses = ['en', 'ar'].flatMap((locale) => ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/about', '/privacy', '/terms', '/changelog'].map((page) => `/${locale}${page}`))
+  await openPage('/en')
+  for (const theme of ['light', 'dark']) {
+    await evaluate(`localStorage.setItem('theme', '${theme}')`)
+    for (const address of addresses) {
+      const errorsBefore = pageErrors.length
+      await openPage(address)
+      await sleep(400)
+      expect((await evaluate(`document.documentElement.classList.contains('dark')`)) === (theme === 'dark'), `${address}: the ${theme} theme is not applied`)
+      expect(pageErrors.length === errorsBefore, `${address} (${theme}): ${pageErrors.slice(errorsBefore).join(' | ').slice(0, 300)}`)
+    }
+  }
+  await evaluate(`localStorage.removeItem('theme')`)
+  await openPage('/en/csv-viewer')
+  await chooseFile(sampleCsv)
+  await waitFor(`document.querySelector('#data-table')`, 'the CSV file to open after hydration')
 })
 
 // ---------------------------------------------------------------- report

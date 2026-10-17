@@ -8,15 +8,14 @@ import '@fontsource/ibm-plex-mono/latin-400.css'
 import '@fontsource/ibm-plex-mono/latin-500.css'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
 import { FatalFileError } from '../../components/Messages'
-import { isolateLeftToRight, isolateText, useT } from '../../i18n'
+import { isolateLeftToRight, isolateText, localizePath, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
-import { ENCODING_LABELS } from '../../parseCsv'
-import type { EncodingChoice } from '../../parseCsv'
 import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import {
+  ENCODING_LABELS,
   applyTextTransform,
   applyToolChain,
   buildFindPattern,
@@ -34,7 +33,7 @@ import {
   withEditedText,
   withLineEnding,
 } from './textEditing'
-import type { TextChainStep, TextDiffRow, TextDownloadEncoding, TextEdits, TextLineEnding, TextMatch } from './textEditing'
+import type { EncodingChoice, TextChainStep, TextDiffRow, TextDownloadEncoding, TextEdits, TextLineEnding, TextMatch } from './textEditing'
 import { TEXT_TOOL_DEFAULT_OPTIONS, computeTextStats, countSelection, findHiddenCharacters, transformLines } from './textTools'
 import type { HiddenCharacterName, TextToolId, TextToolOptions, TextTransformId } from './textTools'
 import './txtWorkbench.css'
@@ -109,7 +108,7 @@ type ActionKey =
   | 'downloadOptions'
 type ToolKey = TextToolId | ActionKey
 type NoteKey = 'encoding' | 'endings' | 'large'
-type RibbonItem = ['big' | 'small', ToolKey] | ['wrapColumn'] | ['select', 'font' | 'size' | 'encoding'] | ['note', NoteKey]
+type RibbonItem = ['big' | 'small', ToolKey] | ['wrapColumn'] | ['select', 'font' | 'size' | 'encoding'] | ['note', NoteKey] | ['legal']
 type RibbonGroup = { labelKey: MessageKey; tint?: 'sky' | 'mint' | 'butter' | 'lilac'; items: RibbonItem[] }
 
 const RIBBON_TABS: [RibbonTabKey, MessageKey, string][] = [
@@ -185,6 +184,7 @@ const RIBBON: Record<RibbonTabKey, RibbonGroup[]> = {
     { labelKey: 'text.group.save', items: [['big', 'downloadOptions']] },
     { labelKey: 'text.group.output', items: [['small', 'copyAll'], ['small', 'print']] },
     { labelKey: 'text.group.largeFiles', items: [['note', 'large']] },
+    { labelKey: 'text.group.legal', items: [['legal']] },
   ],
 }
 
@@ -1453,6 +1453,23 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
         </button>
       )
     }
+    if (item[0] === 'legal') {
+      // Open in a new tab, so the open file and its edits stay where they are. The phone sheet draws the same group again.
+      const idPrefix = prefix === 'ribbon' ? 'menu' : 'sheet'
+      return (
+        <div key="legal" className="legal-links">
+          <a className="ib tb" id={`${idPrefix}-link-privacy`} href={localizePath(locale, '/privacy')} target="_blank" rel="noopener" aria-label={t('legal.privacy')} data-hint={t('legal.privacy')}>
+            <Icon name="lock" />
+          </a>
+          <a className="ib tb" id={`${idPrefix}-link-terms`} href={localizePath(locale, '/terms')} target="_blank" rel="noopener" aria-label={t('legal.terms')} data-hint={t('legal.terms')}>
+            <Icon name="file" />
+          </a>
+          <p className="legal-note" id={`${idPrefix}-disclaimer`}>
+            {t('legal.disclaimer')}
+          </p>
+        </div>
+      )
+    }
     if (item[0] === 'wrapColumn') {
       const inputId = `${prefix}-wrap-column-input`
       return (
@@ -1599,7 +1616,7 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
         <div id="sheet-body">
           {RIBBON[activeTab].map((group) => {
             // On a phone the sort menu is spread out into its tools.
-            const items = group.items.flatMap((item): RibbonItem[] => (item[0] !== 'wrapColumn' && item[1] === 'sortMenu' ? [...SORT_TOOL_IDS.map((id): RibbonItem => ['small', id]), ['small', 'sortIgnoreCase']] : [item]))
+            const items = group.items.flatMap((item): RibbonItem[] => ((item[0] === 'big' || item[0] === 'small') && item[1] === 'sortMenu' ? [...SORT_TOOL_IDS.map((id): RibbonItem => ['small', id]), ['small', 'sortIgnoreCase']] : [item]))
             const uniqueItems = items.filter((item) => item[0] !== 'big' && item[0] !== 'small' ? true : !shownKeys.has(item[1]) && Boolean(shownKeys.add(item[1])))
             return (
               <section key={group.labelKey} className="sg" data-tint={group.tint}>
@@ -2565,6 +2582,15 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
           </span>
         )}
         <div className="st-right">
+          <span className="st" id="status-legal-links">
+            <a id="status-link-privacy" href={localizePath(locale, '/privacy')} target="_blank" rel="noopener">
+              {t('legal.privacyShort')}
+            </a>
+            ·
+            <a id="status-link-terms" href={localizePath(locale, '/terms')} target="_blank" rel="noopener">
+              {t('legal.termsShort')}
+            </a>
+          </span>
           <span className="st" id="status-privacy">
             <Icon name="lock" />
             <span>{t('text.privacy')}</span>

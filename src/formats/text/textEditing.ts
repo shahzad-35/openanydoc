@@ -1,7 +1,5 @@
 import { translate, translatePlural } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
-import { decodeCsvBytes, looksLikeBinary } from '../../parseCsv'
-import type { EncodingChoice } from '../../parseCsv'
 import { CHARACTER_TOOL_IDS, transformLines } from './textTools'
 import type { TextToolId, TextToolOptions, TextTransformId } from './textTools'
 
@@ -79,6 +77,49 @@ function mostCommonLineEnding(counts: LineEndingCounts): TextLineEnding {
   return counts.cr > counts.lf ? '\r' : '\n'
 }
 
+// 'auto' finds the encoding (byte order mark, then UTF-8, else Windows-1256); the others read the bytes as that encoding.
+export type EncodingChoice = 'auto' | 'utf-8' | 'utf-16le' | 'utf-16be' | 'windows-1256' | 'iso-8859-1'
+
+export const ENCODING_LABELS: Record<Exclude<EncodingChoice, 'auto'>, string> = {
+  'utf-8': 'UTF-8',
+  'utf-16le': 'UTF-16 LE',
+  'utf-16be': 'UTF-16 BE',
+  'windows-1256': 'Windows-1256',
+  'iso-8859-1': 'ISO-8859-1',
+}
+
+const BINARY_CHECK_BYTE_COUNT = 64 * 1024
+
+export function decodeTextBytes(fileContents: ArrayBuffer, encodingChoice: EncodingChoice = 'auto') {
+  const bytes = new Uint8Array(fileContents)
+  if (encodingChoice !== 'auto') return { text: new TextDecoder(encodingChoice).decode(bytes), encodingLabel: ENCODING_LABELS[encodingChoice] }
+
+  if (bytes[0] === 0xef && bytes[1] === 0xbb && bytes[2] === 0xbf) {
+    return { text: new TextDecoder('utf-8').decode(bytes), encodingLabel: 'UTF-8 with BOM' }
+  }
+  if (bytes[0] === 0xff && bytes[1] === 0xfe) {
+    return { text: new TextDecoder('utf-16le').decode(bytes), encodingLabel: 'UTF-16 LE' }
+  }
+  if (bytes[0] === 0xfe && bytes[1] === 0xff) {
+    return { text: new TextDecoder('utf-16be').decode(bytes), encodingLabel: 'UTF-16 BE' }
+  }
+
+  try {
+    return { text: new TextDecoder('utf-8', { fatal: true }).decode(bytes), encodingLabel: 'UTF-8' }
+  } catch {
+    return {
+      text: new TextDecoder('windows-1256').decode(bytes),
+      encodingLabel: 'Windows-1256 (the file was not valid UTF-8)',
+    }
+  }
+}
+
+export function looksLikeBinary(fileContents: ArrayBuffer) {
+  const bytes = new Uint8Array(fileContents, 0, Math.min(fileContents.byteLength, BINARY_CHECK_BYTE_COUNT))
+  const isUtf16 = (bytes[0] === 0xff && bytes[1] === 0xfe) || (bytes[0] === 0xfe && bytes[1] === 0xff)
+  return !isUtf16 && bytes.includes(0)
+}
+
 export type ReadableText = ({ status: 'ok'; encodingLabel: string } & TextExportSource) | { status: 'error'; messageKey: MessageKey }
 
 // The file's text with every line ending turned into `\n`. 'auto' finds the encoding; another choice reopens the same bytes
@@ -90,7 +131,7 @@ export function readTextFile(fileContents: ArrayBuffer, encodingChoice: Encoding
     return { status: 'error', messageKey: 'text.error.binary' }
   }
 
-  const { text, encodingLabel } = decodeCsvBytes(fileContents, encodingChoice)
+  const { text, encodingLabel } = decodeTextBytes(fileContents, encodingChoice)
   if (text.trim() === '') return { status: 'error', messageKey: 'text.error.empty' }
 
   const lineEndingCounts = countLineEndings(text)

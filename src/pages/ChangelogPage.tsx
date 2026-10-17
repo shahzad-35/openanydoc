@@ -1,8 +1,9 @@
-import { useEffect } from 'react'
 import NewBadge from '../components/NewBadge'
+import SiteFooter from '../components/SiteFooter'
 import changelog from '../data/changelog.json'
 import { localizePath, useT } from '../i18n'
 import { CHECK_ICON_PATH, changelogClasses, changelogIds } from './changelogMarkup'
+import { usePageHead } from './HomePage'
 import type { Locale, MessageKey } from '../i18n'
 import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
@@ -10,48 +11,15 @@ import type { Viewer } from '../viewers'
 // scripts/build-static-pages.mjs writes the same page (same words, same structure) into dist/en/changelog and dist/ar/changelog
 // at build time, so search engines read real content. This component takes over in the browser; it must stay in step with that script.
 
-const SITE_ORIGIN = 'https://openanydoc.com'
 const otherLocale = (locale: Locale): Locale => (locale === 'en' ? 'ar' : 'en')
 
 function formatDate(isoDate: string, locale: Locale) {
   return new Intl.DateTimeFormat(`${locale}-u-nu-latn`, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${isoDate}T00:00:00Z`))
 }
 
-// The page's own address, language alternates and description, set for the time the page is open.
-function useChangelogHead(locale: Locale, title: string, description: string) {
-  useEffect(() => {
-    const previousTitle = document.title
-    const descriptionTag = document.querySelector('meta[name="description"]')
-    const previousDescription = descriptionTag?.getAttribute('content') ?? ''
-    document.title = title
-    descriptionTag?.setAttribute('content', description)
-    document.querySelectorAll('link[data-changelog-head]').forEach((tag) => tag.remove())
-    const headLinks: [string, string, string?][] = [
-      ['canonical', `${SITE_ORIGIN}/${locale}/changelog`],
-      ['alternate', `${SITE_ORIGIN}/en/changelog`, 'en'],
-      ['alternate', `${SITE_ORIGIN}/ar/changelog`, 'ar'],
-      ['alternate', `${SITE_ORIGIN}/en/changelog`, 'x-default'],
-    ]
-    const addedTags = headLinks.map(([relation, address, hreflang]) => {
-      const tag = document.createElement('link')
-      tag.rel = relation
-      tag.href = address
-      if (hreflang) tag.hreflang = hreflang
-      tag.dataset.changelogHead = ''
-      document.head.append(tag)
-      return tag
-    })
-    return () => {
-      document.title = previousTitle
-      descriptionTag?.setAttribute('content', previousDescription)
-      addedTags.forEach((tag) => tag.remove())
-    }
-  }, [locale, title, description])
-}
-
 export default function ChangelogPage({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
-  useChangelogHead(locale, t('changelog.title'), t('changelog.description'))
+  usePageHead('/changelog', t('changelog.title'), t('changelog.description'))
 
   function pageLink(id: string, path: string, className: string, children: React.ReactNode, hreflang?: Locale) {
     return (
@@ -122,6 +90,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
         </ol>
         {pageLink(changelogIds.backLink, localizePath(locale, '/'), changelogClasses.backLink, t('changelog.home'))}
       </main>
+      <SiteFooter currentPath="/changelog" onNavigate={onNavigate} />
     </div>
   )
 }

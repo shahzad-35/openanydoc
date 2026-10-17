@@ -1,4 +1,4 @@
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react'
 import type { ReactNode } from 'react'
 import { compactSecondaryButtonClassName, primaryButtonClassName, secondaryButtonClassName } from '../buttonStyles'
 import { useT } from '../i18n'
@@ -27,16 +27,16 @@ const TOAST_SECONDS: Record<ToastKind, number> = { success: 3, info: 5, warning:
 const ACTION_TOAST_SECONDS = 15
 
 // The hooks live next to the components that use them; fast refresh only matters while developing.
+// False in the build's server render (and the first browser render that takes over its markup), which has no screen to measure.
 // oxlint-disable-next-line react/only-export-components
 export function useIsPhone() {
-  const [isPhone, setIsPhone] = useState(() => window.matchMedia(PHONE_QUERY).matches)
-  useEffect(() => {
-    const phoneQuery = window.matchMedia(PHONE_QUERY)
-    const updateIsPhone = () => setIsPhone(phoneQuery.matches)
-    phoneQuery.addEventListener('change', updateIsPhone)
-    return () => phoneQuery.removeEventListener('change', updateIsPhone)
-  }, [])
-  return isPhone
+  return useSyncExternalStore(subscribeToPhoneQuery, () => window.matchMedia(PHONE_QUERY).matches, () => false)
+}
+
+function subscribeToPhoneQuery(onChange: () => void) {
+  const phoneQuery = window.matchMedia(PHONE_QUERY)
+  phoneQuery.addEventListener('change', onChange)
+  return () => phoneQuery.removeEventListener('change', onChange)
 }
 
 type ToastControls = { showToast: (toast: Omit<Toast, 'id'>) => number; dismissToast: (toastId: number) => void }

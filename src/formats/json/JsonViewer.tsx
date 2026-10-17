@@ -1,7 +1,7 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
-import { isolateLeftToRight, translatePlural, translateWithNodes, useT } from '../../i18n'
+import { isolateLeftToRight, localizePath, translatePlural, translateWithNodes, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
 import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { buildDownloadName, downloadTextFile } from '../registry'
@@ -225,6 +225,7 @@ const iconPaths: Record<string, ReactNode> = {
     </>
   ),
   x: <path d="M6 6l12 12M18 6 6 18" />,
+  more: <path d="M5 12h.01M12 12h.01M19 12h.01" strokeWidth="3" />,
   unfold: <path d="M12 3v6M9 6l3 3 3-3M12 21v-6M9 18l3-3 3 3M4 12h16" transform="rotate(180 12 12)" />,
   fold: <path d="M12 3v6M9 6l3 3 3-3M12 21v-6M9 18l3-3 3 3M4 12h16" />,
   tree: <path d="M5 4v14a2 2 0 0 0 2 2h3M5 9h5M14 7h6M14 13h6M14 19h6" />,
@@ -275,7 +276,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   const [isFindOpen, setIsFindOpen] = useState(false)
   const [findText, setFindText] = useState('')
   const [replaceText, setReplaceText] = useState('')
-  const [openMenu, setOpenMenu] = useState<'indent' | 'copy' | null>(null)
+  const [openMenu, setOpenMenu] = useState<'indent' | 'copy' | 'more' | null>(null)
   const [chosenIndent, setChosenIndent] = useState<Exclude<JsonIndent, 0>>(2)
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
   const [toast, setToast] = useState({ message: '', isShown: false })
@@ -1458,6 +1459,37 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           <SpriteIcon name="expand" />
         </button>
         <LanguageSwitcher className="btn" />
+        <span className="split-btn">
+          <button
+            className="btn icon"
+            type="button"
+            id="more-button"
+            aria-label={t('legal.menu')}
+            aria-haspopup="menu"
+            aria-expanded={openMenu === 'more'}
+            aria-controls="more-button-menu"
+            title={t('legal.menu')}
+            onClick={() => setOpenMenu(openMenu === 'more' ? null : 'more')}
+          >
+            <SpriteIcon name="more" />
+          </button>
+          {openMenu === 'more' && (
+            // The links open in a new tab, so the open file and its edits stay where they are.
+            <div className="menu right" id="more-button-menu" role="menu">
+              <a role="menuitem" id="menu-link-privacy" href={localizePath(locale, '/privacy')} target="_blank" rel="noopener" onClick={() => setOpenMenu(null)}>
+                <SpriteIcon name="lock" isSmall />
+                {t('legal.privacy')}
+              </a>
+              <a role="menuitem" id="menu-link-terms" href={localizePath(locale, '/terms')} target="_blank" rel="noopener" onClick={() => setOpenMenu(null)}>
+                <SpriteIcon name="file" isSmall />
+                {t('legal.terms')}
+              </a>
+              <p className="menu-note" id="menu-disclaimer">
+                {t('legal.disclaimer')}
+              </p>
+            </div>
+          )}
+        </span>
         <button className="btn icon" type="button" id="theme-toggle" aria-label={isDark ? t('theme.toLight') : t('theme.toDark')} title={isDark ? t('theme.toLight') : t('theme.toDark')} onClick={toggleTheme}>
           <SpriteIcon name="sun" className="i-sun" />
           <SpriteIcon name="moon" className="i-moon" />
@@ -1611,6 +1643,15 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           UTF-8
         </span>
         <div className="spacer" />
+        <span className="sb" id="status-legal-links">
+          <a id="status-link-privacy" href={localizePath(locale, '/privacy')} target="_blank" rel="noopener">
+            {t('legal.privacyShort')}
+          </a>
+          ·
+          <a id="status-link-terms" href={localizePath(locale, '/terms')} target="_blank" rel="noopener">
+            {t('legal.termsShort')}
+          </a>
+        </span>
         <span className="privacy privacy-desktop" id="privacy-note">
           <SpriteIcon name="lock" isSmall />
           {t('json.status.private')}
