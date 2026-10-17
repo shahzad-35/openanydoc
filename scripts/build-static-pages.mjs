@@ -6,6 +6,7 @@
 //
 // Run with Node 22.6 or newer (`--experimental-strip-types` reads src/viewers.ts as it is).
 
+import { execFileSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -230,8 +231,30 @@ for (const locale of locales) {
 // for unknown addresses, which the browser draws by itself.
 fs.writeFileSync(path.join(distFolder, 'index.html'), renderSeoPage('en', '/', '', { keepLocaleRedirect: true }))
 
-// Only pages that work as a page: no /view-* addresses (they exist only for a file open in one visitor's browser).
+// The day a page last changed, for the sitemap's <lastmod>: the date of the last commit that touched the page's source files.
+// The Cloudflare build may clone only the newest commit (a shallow clone, where every file looks changed that day) or have no
+// git at all; then every page gets the newest release date from the changelog instead.
 const newestChangeDate = changelog[0].date
+const hasFullGitHistory = (() => {
+  try {
+    return execFileSync('git', ['rev-parse', '--is-shallow-repository'], { cwd: projectRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim() === 'false'
+  } catch {
+    return false
+  }
+})()
+function lastChangeDate(sourceFiles) {
+  if (!hasFullGitHistory) return newestChangeDate
+  const commitDate = execFileSync('git', ['log', '-1', '--format=%cs', '--', ...sourceFiles], { cwd: projectRoot, encoding: 'utf8' }).trim()
+  return commitDate || newestChangeDate
+}
+function pageSourceFiles(address) {
+  if (address === '/') return ['src/seo.ts', 'src/content.ts', 'src/pages/HomePage.tsx', 'src/components/AboutSections.tsx']
+  if (infoPages.en[address]) return ['src/seo.ts', 'src/legalContent.ts', 'src/pages/InfoPage.tsx']
+  return ['src/seo.ts', 'src/pageContent.ts', 'src/pages/HomePage.tsx', 'src/components/FormatGuide.tsx']
+}
+const changelogLastChange = lastChangeDate(['src/data/changelog.json', 'src/pages/ChangelogPage.tsx'])
+
+// Only pages that work as a page: no /view-* addresses (they exist only for a file open in one visitor's browser).
 const changelogAlternates = [
   ...locales.map((locale) => `<xhtml:link rel="alternate" hreflang="${locale}" href="${SITE_ORIGIN}/${locale}/changelog"/>`),
   `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}/en/changelog"/>`,
@@ -239,8 +262,10 @@ const changelogAlternates = [
 const pageAlternates = (address) =>
   [...locales.map((locale) => `<xhtml:link rel="alternate" hreflang="${locale}" href="${SITE_ORIGIN}${localizePath(locale, address)}"/>`), `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}${localizePath('en', address)}"/>`].join('')
 const sitemapEntries = [
-  ...locales.flatMap((locale) => seoAddresses.map((address) => `<url><loc>${SITE_ORIGIN}${localizePath(locale, address)}</loc>${pageAlternates(address)}</url>`)),
-  ...locales.map((locale) => `<url><loc>${SITE_ORIGIN}/${locale}/changelog</loc><lastmod>${newestChangeDate}</lastmod>${changelogAlternates}</url>`),
+  ...locales.flatMap((locale) =>
+    seoAddresses.map((address) => `<url><loc>${SITE_ORIGIN}${localizePath(locale, address)}</loc><lastmod>${lastChangeDate(pageSourceFiles(address))}</lastmod>${pageAlternates(address)}</url>`),
+  ),
+  ...locales.map((locale) => `<url><loc>${SITE_ORIGIN}/${locale}/changelog</loc><lastmod>${changelogLastChange}</lastmod>${changelogAlternates}</url>`),
 ]
 fs.writeFileSync(
   path.join(distFolder, 'sitemap.xml'),
@@ -248,4 +273,4 @@ fs.writeFileSync(
 )
 fs.writeFileSync(path.join(distFolder, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`)
 fs.rmSync(serverBuildFolder, { recursive: true, force: true })
-console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml and robots.txt into dist/`)
+console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml (lastmod from ${hasFullGitHistory ? 'git' : `the newest release, ${newestChangeDate}: no full git history`}) and robots.txt into dist/`)

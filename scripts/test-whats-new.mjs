@@ -417,6 +417,44 @@ await test('sitemap.xml and robots.txt list the pages', async () => {
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
 
+const contentPages = ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/about', '/privacy', '/terms', '/changelog']
+
+await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
+  const alternatesOf = (html) =>
+    Object.fromEntries([...html.matchAll(/<link rel="alternate" hreflang="([\w-]+)" href="([^"]+)"/g)].map((match) => [match[1], match[2]]))
+  for (const page of contentPages) {
+    const pages = {}
+    for (const locale of ['en', 'ar']) pages[locale] = await (await fetch(`${siteOrigin}/${locale}${page}`)).text()
+    for (const locale of ['en', 'ar']) {
+      const address = `/${locale}${page}`
+      const html = pages[locale]
+      const alternates = alternatesOf(html)
+      const expected = { en: `https://openanydoc.com/en${page}`, ar: `https://openanydoc.com/ar${page}`, 'x-default': `https://openanydoc.com/en${page}` }
+      expect(JSON.stringify(alternates) === JSON.stringify(expected), `${address}: hreflang is ${JSON.stringify(alternates)}`)
+      // Reciprocal: the page in the other language lists the very same set.
+      expect(JSON.stringify(alternatesOf(pages[locale === 'en' ? 'ar' : 'en'])) === JSON.stringify(alternates), `${address}: the other language lists different alternates`)
+      const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
+      expect(canonical === alternates[locale], `${address}: canonical ${canonical} is not its hreflang address`)
+      expect(html.includes(`<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`), `${address}: lang or dir is wrong`)
+      const slashLinks = [...html.matchAll(/href="([^"]+)"/g)]
+        .map((match) => match[1])
+        .filter((href) => (href.startsWith('/') || href.startsWith('https://openanydoc.com')) && href.endsWith('/') && href !== 'https://openanydoc.com/')
+      expect(slashLinks.length === 0, `${address}: links end with a slash: ${slashLinks.join(', ')}`)
+    }
+  }
+})
+
+await test('every sitemap address has a lastmod date and is a built page without a trailing slash', async () => {
+  const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
+  const entries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1])
+  expect(entries.length === contentPages.length * 2, `the sitemap has ${entries.length} addresses, expected ${contentPages.length * 2}`)
+  for (const entry of entries) {
+    const address = /<loc>https:\/\/openanydoc\.com([^<]*)<\/loc>/.exec(entry)?.[1] ?? ''
+    expect(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(entry), `${address}: no lastmod`)
+    expect(!address.endsWith('/') && fs.existsSync(path.join(distFolder, address, 'index.html')), `${address}: not a built page, or it ends with a slash`)
+  }
+})
+
 // ---------------------------------------------------------------- About, Privacy and Terms; footer and workbench links
 
 await test('About, Privacy and Terms pages: one h1, their own title and description, hreflang, real text', async () => {
