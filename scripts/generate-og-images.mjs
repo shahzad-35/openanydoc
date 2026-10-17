@@ -1,5 +1,5 @@
 // Draws the share pictures (og:image, 1200 x 630) into public/og/<locale>-<page>.png: the home page and each format page, in
-// English and Arabic. Run by hand with `npm run og:images` after a heading in src/seo.ts changes, and commit the PNGs (the
+// English and Arabic. Also draws public/logo.png (512 x 512), the logo in the home page's structured data. Run by hand with `npm run og:images` after a heading in src/seo.ts changes, and commit the PNGs (the
 // Cloudflare build has no Chrome). It renders an HTML card in headless Chrome over the DevTools protocol, with the IBM Plex fonts
 // from node_modules and the colours of src/index.css. Set CHROME_PATH if Chrome is not in its usual macOS place.
 
@@ -128,6 +128,17 @@ try {
       console.log(`${path.relative(projectRoot, outputFile)}  ${Math.round(fs.statSync(outputFile).size / 1024)} KB`)
     }
   }
+  // The logo of the Organization in the home page's structured data: the brand mark at 512 x 512 on a transparent background, as a
+  // PNG because Google does not take an SVG logo.
+  await send('Emulation.setDeviceMetricsOverride', { width: 512, height: 512, deviceScaleFactor: 1, mobile: false })
+  await send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 0, g: 0, b: 0, a: 0 } })
+  const logoCardFile = path.join(scratchFolder, 'logo.html')
+  fs.writeFileSync(logoCardFile, `<!doctype html><style>* { margin: 0; } svg { display: block; width: 512px; height: 512px; }</style>${markSvg}`)
+  await send('Page.navigate', { url: pathToFileURL(logoCardFile).href })
+  await sleep(300)
+  const { data: logoData } = await send('Page.captureScreenshot', { format: 'png', clip: { x: 0, y: 0, width: 512, height: 512, scale: 1 } })
+  fs.writeFileSync(path.join(projectRoot, 'public/logo.png'), Buffer.from(logoData, 'base64'))
+  console.log('public/logo.png')
   socket.close()
 } finally {
   chrome.kill()

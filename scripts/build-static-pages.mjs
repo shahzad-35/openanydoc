@@ -12,7 +12,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
-import { infoPages } from '../src/legalContent.ts'
+import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { CHECK_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks } from '../src/pages/changelogMarkup.ts'
 import { SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { viewers } from '../src/viewers.ts'
@@ -169,25 +169,38 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const seo = pageSeo[locale][address]
   const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
   const viewer = viewers.find((candidate) => candidate.toolPath === address)
-  const liveViewers = viewers.filter((candidate) => candidate.toolPath)
-  const application = {
-    '@context': 'https://schema.org',
-    '@type': 'WebApplication',
-    name: SITE_NAME,
-    url: pageUrl,
-    inLanguage: locale,
-    description: seo.description,
-    applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Any',
-    browserRequirements: 'Requires a modern web browser',
-    offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-    featureList: liveViewers.map((candidate) => translate(locale, `viewer.description.${candidate.id}`)),
-  }
-  const infoPage = infoPages[locale][address]
-  // About, Privacy and Terms describe the site, not the application.
-  const structuredData = infoPage ? [] : [application]
-  // The questions published as data are exactly the ones the page shows: the home page's, or this format's own.
+  // A format page's "What it handles" lines are its application's feature list: true features only.
   const guide = formatGuides[locale][address]
+  const structuredData = []
+  if (address === '/') {
+    structuredData.push(
+      { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, alternateName: ['Open Any Doc', 'OpenAnyDoc.com'], url: pageUrl, inLanguage: locale },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: SITE_NAME,
+        url: SITE_ORIGIN,
+        logo: `${SITE_ORIGIN}/logo.png`,
+        email: CONTACT_EMAIL,
+        founder: { '@type': 'Person', name: 'Shahzad Ali' },
+      },
+    )
+  }
+  if (viewer) {
+    structuredData.push({
+      '@context': 'https://schema.org',
+      '@type': ['SoftwareApplication', 'WebApplication'],
+      name: `${SITE_NAME} ${translate(locale, 'viewer.name', { format: viewer.label })}`,
+      url: pageUrl,
+      inLanguage: locale,
+      description: seo.description,
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Any (web browser)',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: guide.handles,
+    })
+  }
+  // The questions published as data are exactly the ones the page shows: the home page's, or this format's own.
   const questions = address === '/' ? faqItems[locale] : (guide?.faq ?? [])
   if (questions.length > 0) {
     structuredData.push({

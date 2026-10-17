@@ -316,7 +316,8 @@ await test('home and format pages carry their own title, description, canonical 
     const breadcrumb = structuredData.find((item) => item['@type'] === 'BreadcrumbList')
     if (breadcrumb) expect(serverText.includes(breadcrumb.itemListElement[1].name), `${address}: the server's h1 is not the page heading`)
     if (address.length > 3) expect(html.includes('id="how-to-section"') && html.includes('id="handles-section"'), `${address}: "How it works" or "What it handles" is not in the server's HTML`)
-    expect(structuredData.some((item) => item['@type'] === 'WebApplication'), `${address}: WebApplication data is missing`)
+    const expectedType = address.length > 3 ? 'SoftwareApplication' : 'WebSite'
+    expect(structuredData.some((item) => [item['@type']].flat().includes(expectedType)), `${address}: ${expectedType} data is missing`)
     expect(!titles.has(title), `${address}: the title is used on another page`)
     expect(html.includes(`<html lang="${address.slice(1, 3)}" dir="${address.startsWith('/ar') ? 'rtl' : 'ltr'}">`), `${address}: lang and dir are missing from the static HTML`)
     expect(html.includes('hreflang="ar"') && html.includes('hreflang="en"') && html.includes('hreflang="x-default"'), `${address}: hreflang alternates are missing`)
@@ -452,6 +453,60 @@ await test('every sitemap address has a lastmod date and is a built page without
     const address = /<loc>https:\/\/openanydoc\.com([^<]*)<\/loc>/.exec(entry)?.[1] ?? ''
     expect(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(entry), `${address}: no lastmod`)
     expect(!address.endsWith('/') && fs.existsSync(path.join(distFolder, address, 'index.html')), `${address}: not a built page, or it ends with a slash`)
+  }
+})
+
+// The fields Google's rich-result documentation requires or recommends for each type we publish.
+await test('every JSON-LD block is valid data with the fields search engines need, and the logo exists', async () => {
+  const isAbsoluteUrl = (value) => typeof value === 'string' && value.startsWith('https://openanydoc.com')
+  for (const page of contentPages) {
+    for (const locale of ['en', 'ar']) {
+      const address = `/${locale}${page}`
+      const html = await (await fetch(`${siteOrigin}${address}`)).text()
+      const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
+      const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
+      const types = blocks.flatMap((block) => [block['@type']].flat())
+      const expectedTypes = { '': ['WebSite', 'Organization', 'FAQPage'], '/about': [], '/privacy': [], '/terms': [], '/changelog': [] }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
+      expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
+      for (const block of blocks) {
+        const type = [block['@type']].flat()[0]
+        const problem = (message) => `${address} ${type}: ${message}`
+        expect(block['@context'] === 'https://schema.org', problem('@context is not https://schema.org'))
+        if (type === 'WebSite') {
+          expect(block.name === 'OpenAnyDoc' && block.url === canonical && block.inLanguage === locale, problem('name, url or inLanguage is wrong'))
+          expect(JSON.stringify(block.alternateName) === JSON.stringify(['Open Any Doc', 'OpenAnyDoc.com']), problem('alternateName is wrong'))
+        } else if (type === 'Organization') {
+          expect(block.name === 'OpenAnyDoc' && block.url === 'https://openanydoc.com', problem('name or url is wrong'))
+          expect(block.founder?.['@type'] === 'Person' && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
+          expect(!('sameAs' in block), problem('sameAs is set, but there are no profiles yet'))
+          expect(isAbsoluteUrl(block.logo), problem('the logo is not an absolute URL'))
+          const logoFile = path.join(distFolder, new URL(block.logo).pathname)
+          expect(fs.existsSync(logoFile), problem(`the logo file ${block.logo} does not exist`))
+          const logoHeader = fs.readFileSync(logoFile)
+          expect(logoHeader.toString('ascii', 1, 4) === 'PNG' && logoHeader.readUInt32BE(16) === 512 && logoHeader.readUInt32BE(20) === 512, problem('the logo is not a 512 x 512 PNG'))
+        } else if (type === 'SoftwareApplication') {
+          expect(typeof block.name === 'string' && block.name.length > 0, problem('name is missing'))
+          expect(block.offers?.['@type'] === 'Offer' && block.offers.price === '0' && block.offers.priceCurrency === 'USD', problem('offers is not a free Offer in USD'))
+          expect(block.applicationCategory === 'UtilitiesApplication' && block.operatingSystem === 'Any (web browser)', problem('applicationCategory or operatingSystem is wrong'))
+          expect(Array.isArray(block.featureList) && block.featureList.length > 0, problem('featureList is empty'))
+          expect(block.url === canonical && block.inLanguage === locale, problem('url or inLanguage is wrong'))
+          expect(!('aggregateRating' in block) && !('review' in block), problem('ratings or reviews must not be published'))
+        } else if (type === 'FAQPage') {
+          expect(Array.isArray(block.mainEntity) && block.mainEntity.length > 0, problem('mainEntity is empty'))
+          for (const question of block.mainEntity) {
+            expect(question['@type'] === 'Question' && question.name?.length > 0, problem('a Question has no name'))
+            expect(question.acceptedAnswer?.['@type'] === 'Answer' && question.acceptedAnswer.text?.length > 0, problem(`"${question.name}" has no Answer text`))
+          }
+        } else if (type === 'BreadcrumbList') {
+          const items = block.itemListElement ?? []
+          expect(items.length >= 2, problem('fewer than two items'))
+          items.forEach((item, index) => expect(item['@type'] === 'ListItem' && item.position === index + 1 && item.name?.length > 0 && isAbsoluteUrl(item.item), problem(`item ${index + 1} needs position, name and item`)))
+          expect(items.at(-1).item === canonical, problem('the last item is not this page'))
+        } else {
+          throw new Error(problem('a type this test does not know'))
+        }
+      }
+    }
   }
 })
 
