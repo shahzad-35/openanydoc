@@ -48,7 +48,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/about': {
       title: 'About OpenAnyDoc – Private Online File Viewer',
-      description: 'OpenAnyDoc is a free file viewer and editor that runs in your browser and never uploads files: CSV, Excel, JSON and TXT now, and Word, PDF and PowerPoint soon.',
+      description: 'About OpenAnyDoc, built and run by Shahzad Ali: a free file viewer and editor that runs in your browser and never uploads files. CSV, Excel, JSON and TXT today.',
       heading: 'About OpenAnyDoc',
       intro: 'A free, privacy-first file viewer and editor that runs in your browser.',
     },
@@ -98,7 +98,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/about': {
       title: 'عن OpenAnyDoc – عارض ملفات خاص اون لاين',
-      description: 'عن OpenAnyDoc: عارض ومحرر ملفات اون لاين مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT، وقريبًا ملفات وورد وPDF وباوربوينت.',
+      description: 'عن OpenAnyDoc الذي يبنيه ويديره شهزاد علي: عارض ومحرر ملفات مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT، وقريبًا Word وPDF.',
       heading: 'عن OpenAnyDoc',
       intro: 'عارض ومحرر ملفات مجاني يضع الخصوصية أولًا ويعمل داخل متصفحك.',
     },

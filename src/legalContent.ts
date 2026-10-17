@@ -22,6 +22,16 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           ],
         },
         {
+          heading: 'Who makes it',
+          paragraphs: ['OpenAnyDoc is built and run by Shahzad Ali.'],
+        },
+        {
+          heading: 'Why it exists',
+          paragraphs: [
+            'Opening a file should not mean installing software or uploading a private document to someone else\'s server. OpenAnyDoc exists so that anyone can open common files quickly in a browser, while the file stays on their own device.',
+          ],
+        },
+        {
           heading: 'Your files never leave your browser',
           paragraphs: [
             'Most online viewers upload your file to a server. OpenAnyDoc does not: your browser reads the file and draws it on your screen, and your edits stay in the page until you download them. There is nothing for us to store, see or lose.',
@@ -127,6 +137,16 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'ما هو OpenAnyDoc',
           paragraphs: [
             'OpenAnyDoc عارض ومحرر ملفات مجاني على الإنترنت. أفلت ملفًا على الصفحة لتقرأه وتبحث فيه وتعدّله وتنزّل نسخة منه، بدون تسجيل وبدون تثبيت أي برنامج.',
+          ],
+        },
+        {
+          heading: 'من يقف وراءه',
+          paragraphs: ['يبني OpenAnyDoc ويديره شهزاد علي.'],
+        },
+        {
+          heading: 'لماذا وُجد',
+          paragraphs: [
+            'فتح ملف لا ينبغي أن يتطلب تثبيت برنامج أو رفع مستند خاص إلى خادم شخص آخر. وُجد OpenAnyDoc ليفتح أي شخص الملفات الشائعة بسرعة في متصفحه، ويبقى الملف على جهازه.',
           ],
         },
         {
