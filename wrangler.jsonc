@@ -1,10 +1,15 @@
-// Static site only: Wrangler uploads the already built dist/ folder (with its _headers and _redirects) and runs no worker code.
+// Cloudflare Worker with static assets: dist/ (with its _headers and _redirects) is served as files, and src/worker.ts runs only for "/".
 // Having this file stops `wrangler deploy` from auto-configuring the project, which added @cloudflare/vite-plugin and broke the prerender build.
 {
   "name": "openanydoc",
   "compatibility_date": "2026-10-12",
+  "main": "src/worker.ts",
   "assets": {
     "directory": "./dist",
-    "not_found_handling": "single-page-application"
+    "binding": "ASSETS",
+    // Pages live in dist/en/csv-viewer/index.html; serve them at /en/csv-viewer (the canonical address) and redirect /en/csv-viewer/ to it.
+    "html_handling": "drop-trailing-slash",
+    "not_found_handling": "single-page-application",
+    "run_worker_first": ["/"]
   }
 }

@@ -1,5 +1,5 @@
 # Addresses from before the Arabic version had no language: send them to the English page (301) so old links keep working.
-# The home page (/) picks English or Arabic from the browser's language in /locale-redirect.js.
+# The home page (/) is redirected to /en or /ar by the browser's language in src/worker.ts (and /locale-redirect.js on the development server).
 /csv-viewer /en/csv-viewer 301
 /excel-viewer /en/excel-viewer 301
 /json-viewer /en/json-viewer 301

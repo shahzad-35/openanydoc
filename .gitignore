@@ -29,3 +29,6 @@ CLAUDE.md
 DECISIONS.md
 DESIGN.md
 LOG.md
+
+# Wrangler local state
+.wrangler
