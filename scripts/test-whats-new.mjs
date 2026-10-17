@@ -306,7 +306,7 @@ await test('home and format pages carry their own title, description, canonical 
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
     expect(title.length > 0 && title.length <= 60, `${address}: title is ${title.length} characters: ${title}`)
-    expect(description.length >= 120 && description.length <= 160, `${address}: description is ${description.length} characters`)
+    expect(description.length >= 150 && description.length <= 160, `${address}: description is ${description.length} characters`)
     expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)
     expect(html.includes('property="og:title"') && html.includes('property="og:description"'), `${address}: Open Graph tags are missing`)
     const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
@@ -519,7 +519,7 @@ await test('About, Privacy and Terms pages: one h1, their own title and descript
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
     expect(title.length > 0 && title.length <= 60, `${address}: title is ${title.length} characters: ${title}`)
-    expect(description.length >= 120 && description.length <= 160, `${address}: description is ${description.length} characters`)
+    expect(description.length >= 150 && description.length <= 160, `${address}: description is ${description.length} characters`)
     expect(!titles.has(title), `${address}: the title is used on another page`)
     titles.add(title)
     expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)

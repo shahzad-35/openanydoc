@@ -18,7 +18,7 @@
   "privacy.newFeaturesHeading": "How we tell you about new features",
   "privacy.newFeaturesText": "Announcements are based on the release date shown to everyone, and nothing is stored on your device or sent anywhere.",
   "changelog.title": "OpenAnyDoc Changelog – New CSV, Excel, JSON & TXT Features",
-  "changelog.description": "See what's new in OpenAnyDoc: free online CSV, Excel (XLSX), JSON and TXT viewers and editors, with every new feature listed by release.",
+  "changelog.description": "See what's new in OpenAnyDoc, the free online viewer and editor for CSV, Excel (XLSX), JSON and TXT files, with every new feature listed by release and date.",
   "changelog.heading": "OpenAnyDoc changelog: what's new in our online CSV, Excel, JSON and TXT editors",
   "changelog.intro": "Every new feature of our free online file viewers and editors, newest release first. Your files stay private: they are never uploaded.",
   "changelog.version": "Version {version}",

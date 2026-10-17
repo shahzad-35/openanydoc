@@ -88,10 +88,10 @@ function renderChangelogBody(locale) {
   )
 }
 
-// What a search result shows: a title of at most 60 characters (65 is the hard stop) and a description of 120 to 160.
+// What a search result shows: a title of at most 60 characters (65 is the hard stop) and a description of 150 to 160.
 function checkSearchSnippet(label, title, description) {
   if (title.length > 65) throw new Error(`${label}: the title is ${title.length} characters (keep it at 60 or fewer).`)
-  if (description.length < 110 || description.length > 165) throw new Error(`${label}: the description is ${description.length} characters (aim for 120 to 160).`)
+  if (description.length < 150 || description.length > 160) throw new Error(`${label}: the description is ${description.length} characters (it must be 150 to 160).`)
 }
 
 // Canonical, language alternates and the share tags (Open Graph, X/Twitter) of a page; `address` is the page without its language.
