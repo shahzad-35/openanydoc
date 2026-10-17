@@ -1,9 +1,10 @@
-import { faqItems, features } from '../content'
+import { faqItems, features, toolCards } from '../content'
 import { useT } from '../i18n'
-import { viewers } from '../viewers'
-import { FormatCapabilities } from './DropPanel'
+import { findViewerByToolPath } from '../viewers'
+import type { Viewer } from '../viewers'
 import FileTypeChip from './FileTypeChip'
 import NewBadge from './NewBadge'
+import { PageLink } from './SiteFooter'
 
 export function PrivacySection() {
   const { t } = useT()
@@ -17,23 +18,27 @@ export function PrivacySection() {
   )
 }
 
-export function SupportedFilesSection() {
-  const { t } = useT()
+// The home page's links to each tool page, one card per line of toolCards in src/content.ts.
+export function ToolCardsSection({ onNavigate }: { onNavigate: (path: string) => void }) {
+  const { locale, t } = useT()
   return (
-    <div id="supported-files-section">
-      <h2 id="supported-files-heading" className="type-h3">{t('about.supportedHeading')}</h2>
-      <ul id="supported-files-list" className="mt-2 space-y-3">
-        {viewers.map((viewer) => (
-          <li key={viewer.label} id={`supported-file-${viewer.id}`}>
-            <FileTypeChip viewer={viewer} />
-            <NewBadge viewerId={viewer.id} />{' '}
-            <span dir="ltr" className="inline-block font-mono text-sm text-ink-soft">{viewer.extensions.join('  ')}</span>
-            <span className="block text-ink-soft">{t(`viewer.description.${viewer.id}`)}</span>
-            <span className="block text-sm text-ink-soft">
-              <FormatCapabilities idPrefix="supported-capabilities" viewerId={viewer.id} />
-            </span>
-          </li>
-        ))}
+    <div id="tool-cards-section">
+      <h2 id="tool-cards-heading" className="type-h3">{t('about.supportedHeading')}</h2>
+      <ul id="tool-cards-list" className="mt-4 grid gap-3 sm:grid-cols-2 md:grid-cols-1">
+        {toolCards[locale].map((card) => {
+          const viewer = findViewerByToolPath(card.path) as Viewer
+          const cardId = card.path.slice(1)
+          return (
+            <li key={card.path} id={`tool-card-${cardId}`} className="box-shape solid-box border-rule bg-paper-raised p-4">
+              <FileTypeChip viewer={viewer} />
+              <NewBadge viewerId={viewer.id} />
+              <h3 className="mt-2 font-semibold">
+                <PageLink id={`tool-card-link-${cardId}`} path={card.path} onNavigate={onNavigate}>{card.linkText}</PageLink>
+              </h3>
+              <p className="mt-1 text-ink-soft">{card.text}</p>
+            </li>
+          )
+        })}
       </ul>
       <p className="mt-3 text-ink-soft">{t('about.notSupported')}</p>
     </div>

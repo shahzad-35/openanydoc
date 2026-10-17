@@ -456,6 +456,18 @@ await test('every sitemap address has a lastmod date and is a built page without
   }
 })
 
+await test('the home page has 600 to 900 words in its server HTML, eight questions and a card linking to each tool page', async () => {
+  for (const locale of ['en', 'ar']) {
+    const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
+    const wordCount = prerenderedText(html).split(/\s+/).filter(Boolean).length
+    expect(wordCount >= 600 && wordCount <= 900, `/${locale}: ${wordCount} words`)
+    expect((html.match(/id="faq-item-\d+"/g) ?? []).length === 8, `/${locale}: the FAQ does not have eight questions`)
+    for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer']) {
+      expect(new RegExp(`id="tool-card-link-${page}" href="/${locale}/${page}"`).test(html), `/${locale}: no card links to /${locale}/${page}`)
+    }
+  }
+})
+
 // The fields Google's rich-result documentation requires or recommends for each type we publish.
 await test('every JSON-LD block is valid data with the fields search engines need, and the logo exists', async () => {
   const isAbsoluteUrl = (value) => typeof value === 'string' && value.startsWith('https://openanydoc.com')

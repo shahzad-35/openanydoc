@@ -153,7 +153,7 @@ export default function HomePage({
           </section>
 
           <div id="about-content" className="box-shape mt-12 bg-paper-raised/90 p-6 backdrop-blur-md md:p-10">
-            {toolViewer ? <FormatGuide address={toolViewer.toolPath as string} viewerId={toolViewer.id} /> : <AboutContent />}
+            {toolViewer ? <FormatGuide address={toolViewer.toolPath as string} viewerId={toolViewer.id} /> : <AboutContent onNavigate={onNavigate} />}
           </div>
         </main>
 
