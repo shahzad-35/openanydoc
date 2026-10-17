@@ -1,5 +1,5 @@
 // Draws the share pictures (og:image, 1200 x 630) into public/og/<locale>-<page>.png: the home page and each format page, in
-// English and Arabic. Also draws public/logo.png (512 x 512), the logo in the home page's structured data. Run by hand with `npm run og:images` after a heading in src/seo.ts changes, and commit the PNGs (the
+// English and Arabic, and each landing page. Also draws public/logo.png (512 x 512), the logo in the home page's structured data. Run by hand with `npm run og:images` after a heading in src/seo.ts changes, and commit the PNGs (the
 // Cloudflare build has no Chrome). It renders an HTML card in headless Chrome over the DevTools protocol, with the IBM Plex fonts
 // from node_modules and the colours of src/index.css. Set CHROME_PATH if Chrome is not in its usual macOS place.
 
@@ -9,7 +9,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 import { getShareImage, pageSeo, pagesWithShareImage } from '../src/seo.ts'
-import { viewers } from '../src/viewers.ts'
+import { findViewerByToolPath, viewers } from '../src/viewers.ts'
 
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const outputFolder = path.join(projectRoot, 'public/og')
@@ -26,7 +26,7 @@ const markSvg = fs.readFileSync(path.join(projectRoot, 'public/favicon.svg'), 'u
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 
 function renderCard(locale, address) {
-  const viewer = viewers.find((candidate) => candidate.toolPath === address)
+  const viewer = findViewerByToolPath(address)
   const shownViewers = viewer ? [viewer] : viewers.filter((candidate) => candidate.toolPath)
   const chips = shownViewers
     .flatMap((shown) => shown.extensions.map((extension) => `<span class="chip" style="background:${palette[`type-${shown.id}`]}">${extension}</span>`))
@@ -141,6 +141,9 @@ try {
   console.log('public/logo.png')
   socket.close()
 } finally {
+  // Chrome holds files in the scratch folder until it has exited.
+  const chromeHasExited = new Promise((resolve) => chrome.once('exit', resolve))
   chrome.kill()
+  await chromeHasExited
   fs.rmSync(scratchFolder, { recursive: true, force: true })
 }

@@ -15,7 +15,7 @@ import { formatGuides } from '../src/pageContent.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { CHECK_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks } from '../src/pages/changelogMarkup.ts'
 import { SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
-import { viewers } from '../src/viewers.ts'
+import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
 const serverBuildFolder = path.join(projectRoot, 'dist-ssr')
@@ -168,8 +168,11 @@ const jsonLdScript = (data) => `<script type="application/ld+json">${JSON.string
 function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const seo = pageSeo[locale][address]
   const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
-  const viewer = viewers.find((candidate) => candidate.toolPath === address)
-  // A format page's "What it handles" lines are its application's feature list: true features only.
+  const viewer = findViewerByToolPath(address)
+  // A landing page (/json-formatter) sits under its viewer's page in the breadcrumb: Home › JSON viewer › JSON formatter.
+  const landingPage = landingPages.find((page) => page.path === address)
+  const parentAddress = landingPage && viewers.find((candidate) => candidate.id === landingPage.viewerId).toolPath
+  // A format or landing page's "What it handles" lines are its application's feature list: true features only.
   const guide = formatGuides[locale][address]
   const structuredData = []
   if (address === '/') {
@@ -190,7 +193,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
     structuredData.push({
       '@context': 'https://schema.org',
       '@type': ['SoftwareApplication', 'WebApplication'],
-      name: `${SITE_NAME} ${translate(locale, 'viewer.name', { format: viewer.label })}`,
+      name: `${SITE_NAME} ${seo.linkText}`,
       url: pageUrl,
       inLanguage: locale,
       description: seo.description,
@@ -214,13 +217,14 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
-        { '@type': 'ListItem', position: 2, name: seo.heading, item: pageUrl },
-      ],
+        { name: SITE_NAME, item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
+        ...(parentAddress ? [{ name: pageSeo[locale][parentAddress].linkText, item: `${SITE_ORIGIN}${localizePath(locale, parentAddress)}` }] : []),
+        { name: seo.heading, item: pageUrl },
+      ].map((crumb, index) => ({ '@type': 'ListItem', position: index + 1, ...crumb })),
     })
   }
   const head = [renderHeadTags(locale, address, seo.title, seo.description), ...structuredData.map(jsonLdScript)].join('\n    ')
-  checkSearchSnippet(`${locale} ${viewer ? viewer.label : address}`, seo.title, seo.description)
+  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description)
   return pageShell(locale, shellOptions)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(seo.title)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(seo.description)}$2`)

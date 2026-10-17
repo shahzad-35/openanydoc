@@ -167,6 +167,9 @@ async function openPage(pathname) {
 
 // ---------------------------------------------------------------- the tests
 
+const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer']
+const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer']
+
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
 const comingSoonFile = path.join(scratchFolder, 'letter.docx')
@@ -298,10 +301,12 @@ for (const locale of ['en', 'ar']) {
   })
 }
 
-await test('home and format pages carry their own title, description, canonical and structured data', async () => {
+await test('home, format and landing pages carry their own title, h1, intro, questions, canonical and structured data', async () => {
   const titles = new Set()
+  const headings = new Set()
+  const intros = new Set()
   const questionLists = new Map()
-  for (const address of ['en', 'ar'].flatMap((locale) => ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer'].map((page) => `/${locale}${page}`))) {
+  for (const address of ['en', 'ar'].flatMap((locale) => ['', ...formatPages, ...landingPages].map((page) => `/${locale}${page}`))) {
     const html = await (await fetch(`${siteOrigin}${address}`)).text()
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
@@ -312,9 +317,13 @@ await test('home and format pages carry their own title, description, canonical 
     const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
     const serverText = prerenderedText(html)
     const heading = /<h1 id="page-heading"[^>]*>([^<]+)<\/h1>/.exec(html)?.[1] ?? ''
-    expect(heading.length > 0 && /<p id="page-intro"[^>]*>[^<]+<\/p>/.test(html), `${address}: the h1 or the intro is not in the server's HTML`)
+    const intro = /<p id="page-intro"[^>]*>([^<]+)<\/p>/.exec(html)?.[1] ?? ''
+    expect(heading.length > 0 && intro.length > 0, `${address}: the h1 or the intro is not in the server's HTML`)
+    expect(!headings.has(heading) && !intros.has(intro), `${address}: the h1 or the intro is used on another page`)
+    headings.add(heading)
+    intros.add(intro)
     const breadcrumb = structuredData.find((item) => item['@type'] === 'BreadcrumbList')
-    if (breadcrumb) expect(serverText.includes(breadcrumb.itemListElement[1].name), `${address}: the server's h1 is not the page heading`)
+    if (breadcrumb) expect(serverText.includes(breadcrumb.itemListElement.at(-1).name), `${address}: the server's h1 is not the page heading`)
     if (address.length > 3) expect(html.includes('id="how-to-section"') && html.includes('id="handles-section"'), `${address}: "How it works" or "What it handles" is not in the server's HTML`)
     const expectedType = address.length > 3 ? 'SoftwareApplication' : 'WebSite'
     expect(structuredData.some((item) => [item['@type']].flat().includes(expectedType)), `${address}: ${expectedType} data is missing`)
@@ -340,6 +349,11 @@ await test('home and format pages carry their own title, description, canonical 
     const firstAnswer = faq.mainEntity[0].acceptedAnswer.text
     expect(visibleText.includes(firstAnswer.slice(0, 60)), `${address}: the data answers are not the text on the page`)
     questionLists.set(address, faq.mainEntity.map((item) => item.name).join('|'))
+    const isLandingPage = landingPages.includes(address.slice(3))
+    if (isLandingPage) {
+      expect(faq.mainEntity.length >= 5 && faq.mainEntity.length <= 8, `${address}: a landing page needs 5 to 8 questions, it has ${faq.mainEntity.length}`)
+      expect(breadcrumb?.itemListElement.length === 3, `${address}: the breadcrumb is not Home › viewer › this page`)
+    }
     if (address.length > 3) {
       const isArabic = address.startsWith('/ar')
       expect((await evaluate(`document.querySelector('#how-to-section h2')?.textContent ?? ''`)).startsWith(isArabic ? 'كيف يعمل' : 'How it works'), `${address}: the steps are not titled "How it works"`)
@@ -347,7 +361,7 @@ await test('home and format pages carry their own title, description, canonical 
       const sharedQuestions = isArabic
         ? ['هل يُرفع ملفي؟', 'هل يمكنني تعديله وحفظه؟', 'هل يتغير الملف الأصلي؟', 'هل هناك حد لحجم الملف؟', 'هل يعمل على الجوال؟', 'هل يعمل بدون إنترنت؟', 'هل يمكن لشركتي استضافة نسخة خاصة بها؟']
         : ['Is my file uploaded?', 'Can I edit and save it?', 'Is the original changed?', 'Is there a file size limit?', 'Does it work on mobile?', 'Does it work offline?', 'Can my company host its own copy?']
-      expect(faq.mainEntity.slice(0, 7).map((item) => item.name).join('|') === sharedQuestions.join('|'), `${address}: the seven shared questions are not first`)
+      if (!isLandingPage) expect(faq.mainEntity.slice(0, 7).map((item) => item.name).join('|') === sharedQuestions.join('|'), `${address}: the seven shared questions are not first`)
     }
   }
   expect(new Set(questionLists.values()).size === questionLists.size, 'two pages share the same questions: each page needs its own')
@@ -418,7 +432,7 @@ await test('sitemap.xml and robots.txt list the pages', async () => {
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
 
-const contentPages = ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/about', '/privacy', '/terms', '/changelog']
+const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
   const alternatesOf = (html) =>
@@ -1075,13 +1089,13 @@ await test('following links and switching language updates the title, descriptio
 
 await test('the build markup has no style attributes (the Content-Security-Policy would block them)', async () => {
   const pagesWithStyle = ['en', 'ar']
-    .flatMap((locale) => ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/about', '/privacy', '/terms', '/changelog'].map((page) => `/${locale}${page}`))
+    .flatMap((locale) => contentPages.map((page) => `/${locale}${page}`))
     .filter((address) => /<[^>]+\sstyle=/.test(fs.readFileSync(path.join(distFolder, address, 'index.html'), 'utf8')))
   expect(pagesWithStyle.length === 0, `style attributes in ${pagesWithStyle.join(', ')}`)
 })
 
 await test('prerendered pages hydrate with no console error, in both languages, light and dark', async () => {
-  const addresses = ['en', 'ar'].flatMap((locale) => ['', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/about', '/privacy', '/terms', '/changelog'].map((page) => `/${locale}${page}`))
+  const addresses = ['en', 'ar'].flatMap((locale) => contentPages.map((page) => `/${locale}${page}`))
   await openPage('/en')
   for (const theme of ['light', 'dark']) {
     await evaluate(`localStorage.setItem('theme', '${theme}')`)
@@ -1097,6 +1111,25 @@ await test('prerendered pages hydrate with no console error, in both languages, 
   await openPage('/en/csv-viewer')
   await chooseFile(sampleCsv)
   await waitFor(`document.querySelector('#data-table')`, 'the CSV file to open after hydration')
+})
+
+await test('landing pages accept their own file types, offer another type its viewer, and open a file after hydration', async () => {
+  const sampleTsv = path.join(scratchFolder, 'sample.tsv')
+  fs.writeFileSync(sampleTsv, 'id\tname\n1\tAlpha\n2\tBeta\n')
+  await openPage('/en/tsv-viewer')
+  expect((await evaluate(`document.querySelector('#file-input').accept`)) === '.tsv,.tab', 'the TSV page accepts other types')
+  await chooseFile(sampleCsv)
+  await waitFor(`document.querySelector('#open-in-viewer-button')`, 'the CSV viewer to be offered for a .csv file')
+  await chooseFile(sampleTsv)
+  await waitFor(`[...document.querySelectorAll('#data-table [id^="cell-"]')].some((cell) => cell.textContent.trim() === 'Alpha')`, 'the TSV file to open with tabs as columns')
+  expect((await evaluate('location.pathname')) === '/en/csv-viewer', 'the open TSV file does not have the CSV viewer address')
+  await openPage('/en/xls-viewer')
+  expect((await evaluate(`document.querySelector('#file-input').accept`)) === '.xls', 'the XLS page accepts other types')
+  for (const address of ['/en/json-formatter', '/ar/json-validator']) {
+    await openPage(address)
+    await chooseFile(sampleJson)
+    await waitFor(`document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json' && document.querySelector('#tree-view .row')`, `the JSON file to open on ${address}`)
+  }
 })
 
 // ---------------------------------------------------------------- report

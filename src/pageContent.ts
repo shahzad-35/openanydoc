@@ -1,7 +1,7 @@
 // What each format page says beyond the hero: numbered steps for opening and editing a file ("How it works"), a short list of what
 // the viewer handles, and questions people really ask about that file type (the seven shared questions first, answered for that
 // format), in English and Arabic (with answers that match what the viewer does). It replaces the shared features and FAQ blocks on a format page,
-// so every page has text of its own. Plain data with no imports, because scripts/build-static-pages.mjs also reads it to write
+// so every page has text of its own. Landing pages (/json-formatter ...) have only questions about their own job, none shared. Plain data with no imports, because scripts/build-static-pages.mjs also reads it to write
 // the same text, and the same questions as FAQPage data, into each page's static HTML. Keep the answers true: only what is built.
 
 export type GuideStep = { title: string; text: string }
@@ -10,7 +10,7 @@ type Locale = 'en' | 'ar'
 
 export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; handlesTitle: string; handles: string[]; faqTitle: string; faq: GuideQuestion[] }
 
-// Keyed by language, then by the format page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
+// Keyed by language, then by the format or landing page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
 export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
   en: {
     '/csv-viewer': {
@@ -287,6 +287,226 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
       ],
     },
+    '/json-formatter': {
+      stepsTitle: 'How it works: format JSON in a few steps',
+      steps: [
+        { title: 'Paste or open your JSON', text: 'Press Ctrl+V anywhere on this page to paste JSON, or drop a .json file. Try a sample JSON if you just want to see it work.' },
+        { title: 'Pick the indentation', text: 'Open the menu next to Format and choose 1, 2, 3, 4 or 8 spaces or a tab. Format pretty prints the whole document with it.' },
+        { title: 'Minify or sort keys if you need to', text: 'Minify removes every space and line break outside strings and shows how much smaller the file became. Sort keys puts the keys of every object in order from A to Z.' },
+        { title: 'Copy or download', text: 'Copy formatted or Copy minified puts the result on your clipboard; Download saves a .json file in the layout you chose.' },
+      ],
+      handlesTitle: 'What the JSON beautifier handles',
+      handles: [
+        'Indentation: 1, 2, 3, 4 or 8 spaces, or a tab.',
+        'Minify: one line, with the size before and after.',
+        'Sort keys: A to Z in every object, nested ones included, as one undo step.',
+        'Long numbers: integers beyond 2^53 are written back exactly as they were, not rounded.',
+        'Input: pasted JSON or a .json file up to 10 MB.',
+      ],
+      faqTitle: 'JSON formatter: questions and answers',
+      faq: [
+        {
+          question: 'What is the difference between formatting and minifying JSON?',
+          answer: 'Formatting, or pretty printing, puts each key and value on its own indented line so people can read it. Minifying removes all spaces and line breaks outside strings, so the file is as small as possible. The data is the same either way.',
+        },
+        {
+          question: 'Which indentation should I use to pretty print JSON?',
+          answer: 'Two spaces is the most common choice and the default here. Four spaces is common in some code styles, and a tab lets each reader\'s editor choose the width. The formatter offers 1, 2, 3, 4 and 8 spaces and tab.',
+        },
+        {
+          question: 'Will formatting change my numbers or the order of keys?',
+          answer: 'No. Format and Minify only change spaces and line breaks. Keys keep their order unless you press Sort keys, and integers too long for JavaScript are kept digit for digit.',
+        },
+        {
+          question: 'Can I format JSON that has an error in it?',
+          answer: 'Not until the error is fixed, because formatting needs valid JSON. The page shows the line and column of the problem, and Repair fixes common mistakes such as trailing commas, comments and single quotes; then Format works.',
+        },
+        {
+          question: 'Is it safe to format JSON with API keys or tokens in it?',
+          answer: 'The JSON is formatted inside your browser and is not uploaded or stored anywhere, so tokens and internal settings stay on your device.',
+        },
+        {
+          question: 'How large a JSON file can I format?',
+          answer: 'Up to 10 MB. Larger files are refused before they are read, because every action on them would be slow.',
+        },
+      ],
+    },
+    '/json-validator': {
+      stepsTitle: 'How it works: validate JSON and fix errors',
+      steps: [
+        { title: 'Paste or open the JSON', text: 'Press Ctrl+V on this page or drop a .json file. A file with a syntax error opens too, and the error shows right away.' },
+        { title: 'Press Validate', text: 'Press Validate (Ctrl+Enter, or ⌘+Enter on a Mac). Valid JSON shows its size and how many keys and values it has, and how deep it goes.' },
+        { title: 'Go to the error', text: 'Invalid JSON shows the parser\'s message with the line and column. Go to error selects that place in the text so you can fix it by hand.' },
+        { title: 'Repair common mistakes', text: 'Repair fixes comments, trailing or missing commas, single and curly quotes, unquoted keys and the words True, False, None and NaN, then says what it changed. Validate again to confirm.' },
+      ],
+      handlesTitle: 'What the JSON syntax checker looks at',
+      handles: [
+        'Syntax: standard JSON, checked with your browser\'s own JSON parser.',
+        'Error location: the parser\'s message with the line and column, and Go to error.',
+        'Repair: comments, trailing and missing commas, single and curly quotes, unquoted keys, and True, False, None, NaN, undefined and Infinity.',
+        'Not checked: JSON Schema. The validator checks the syntax, not whether the data matches a schema.',
+        'Size: files up to 10 MB.',
+      ],
+      faqTitle: 'JSON validator: questions and answers',
+      faq: [
+        {
+          question: 'How do I check if my JSON is valid?',
+          answer: 'Paste it on this page or open the file, then press Validate. "Valid JSON" means any standard parser can read it; otherwise the message, line and column show what to fix.',
+        },
+        {
+          question: 'Why is my JSON invalid?',
+          answer: 'The usual causes are a comma after the last item, comments, single quotes instead of double quotes, keys without quotes, and values such as True, None or NaN copied from Python or JavaScript. Standard JSON allows none of these, and Repair fixes all of them.',
+        },
+        {
+          question: 'Does it validate against a JSON Schema?',
+          answer: 'No. It checks that the text is well-formed JSON. It does not compare the data with a JSON Schema.',
+        },
+        {
+          question: 'What does Repair change, and can I undo it?',
+          answer: 'Only the mistakes listed in its message, and never the text inside strings. If you do not like the result, press Undo. If something else is still wrong, that error is shown with its place.',
+        },
+        {
+          question: 'Is my JSON sent anywhere to be validated?',
+          answer: 'No. Validation runs with your browser\'s own JSON parser on your device, and nothing is sent to a server.',
+        },
+        {
+          question: 'Can it validate large JSON files?',
+          answer: 'Yes, up to 10 MB. Larger files are refused before they are read.',
+        },
+      ],
+    },
+    '/tsv-viewer': {
+      stepsTitle: 'How it works: open a TSV file online',
+      steps: [
+        { title: 'Drop a .tsv or .tab file', text: 'Choose the file or drop it anywhere on the page. It opens with tab as the separator, read in your browser and never uploaded.' },
+        { title: 'Check the header row', text: 'Whether the first row holds column names is worked out from how the rows look. If that is wrong, click the delimiter in the status bar at the bottom and turn "First row is header" on or off.' },
+        { title: 'Search, filter and sort', text: 'Search every column, add filters, and Shift+click column headers to sort by more than one column.' },
+        { title: 'Edit and download', text: 'Edit cells, rows and columns, then press Download: the file is saved with tabs again, with its own line endings.' },
+      ],
+      handlesTitle: 'What the TSV file viewer handles',
+      handles: [
+        'Files: .tsv and .tab, read with tab as the separator.',
+        'Header row: worked out from the data, and you can switch it.',
+        'Quoted values: read the way Excel and Google Sheets write them, so a tab or line break inside quotes stays in one cell.',
+        'Encodings: UTF-8, UTF-16 and Windows-1256 for older Arabic files.',
+        'Saving: tab-separated again with the file\'s line endings; Download options set quotes and line endings or keep only the filtered rows.',
+      ],
+      faqTitle: 'TSV files: questions and answers',
+      faq: [
+        {
+          question: 'What is a TSV file?',
+          answer: 'A TSV (tab-separated values) file is a plain text table: one row per line, with a tab between the columns. Databases, spreadsheets and many data tools export it, because tabs rarely appear inside values.',
+        },
+        {
+          question: 'How do I open a TSV file online?',
+          answer: 'Drop the .tsv file on this page or choose it with the button. It opens as a table in your browser, without Excel and without uploading it.',
+        },
+        {
+          question: 'What is the difference between TSV and CSV?',
+          answer: 'Both are plain text tables. CSV separates columns with commas (or semicolons in many countries), TSV with tabs. TSV needs quotes less often, because values rarely contain tabs.',
+        },
+        {
+          question: 'Can I edit a TSV file and keep it as TSV?',
+          answer: 'Yes. Edit cells, add or delete rows and columns, then press Download: the file is written with tabs, as it came.',
+        },
+        {
+          question: 'My .txt file is tab-separated. Can I open it here?',
+          answer: 'This page opens .tsv and .tab files. A .txt file opens in the TXT editor as text; rename it to .tsv to see it as a table.',
+        },
+        {
+          question: 'Does the TSV viewer handle large files?',
+          answer: 'Yes. It uses the same table as the CSV viewer, where a 120,000-row file opened in under a second in our tests. Files over 50 MB show a warning first.',
+        },
+      ],
+    },
+    '/large-csv-viewer': {
+      stepsTitle: 'How it works: view a large CSV file',
+      steps: [
+        { title: 'Drop the big file', text: 'Choose or drop the .csv, .tsv or .tab file. Files over 50 MB show a warning that they may be slow, and still open if your browser has the memory.' },
+        { title: 'Scroll the whole table', text: 'Only the rows on screen are drawn, so scrolling stays smooth however many rows the file has.' },
+        { title: 'Find the rows you need', text: 'Search every column, add filters, or sort by one or more columns. Group by shows counts, sums or averages by a column.' },
+        { title: 'Save a smaller file', text: 'Download options in the More menu can keep only the filtered rows, so you can cut a big export down to the part you need.' },
+      ],
+      handlesTitle: 'What the big CSV viewer handles',
+      handles: [
+        'Rows: no row limit of its own; the limit is your browser\'s memory. Excel stops at 1,048,576 rows per sheet.',
+        'Measured on a 120,000-row file: open 0.9 s, sort by two columns 0.9 s, search 0.4 s, filter 0.1 s, download 0.4 s.',
+        'Files over 50 MB: a warning first, then the file still opens if memory allows.',
+        'Column profile: blanks, distinct values, numbers and a chart for the selected column.',
+        'Encodings: UTF-8, UTF-16 and Windows-1256.',
+      ],
+      faqTitle: 'Large CSV files: questions and answers',
+      faq: [
+        {
+          question: 'How do I open a CSV file that is too large for Excel?',
+          answer: 'Excel shows at most 1,048,576 rows per sheet and leaves out the rest. Drop the file here instead: this viewer has no row limit of its own, only your browser\'s memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning.',
+        },
+        {
+          question: 'How fast does a large CSV file open?',
+          answer: 'In our tests a 120,000-row file with 8 columns opened in 0.9 seconds, a sort by two columns took 0.9 s, a search 0.4 s and a filter 0.1 s. Times depend on your device.',
+        },
+        {
+          question: 'What happens with a CSV file over 50 MB?',
+          answer: 'You see a warning that it may be slow or run out of memory, and the viewer still tries to open it. How far it gets depends on your browser and your device\'s memory.',
+        },
+        {
+          question: 'Can I cut a big CSV down to the rows I need?',
+          answer: 'Yes. Filter or search for the rows, then choose Download options in the More menu and keep only the filtered rows. The original file is not changed.',
+        },
+        {
+          question: 'Why does a large CSV scroll smoothly here?',
+          answer: 'Only the rows on screen, and a few around them, exist in the page at any time; the rest are drawn as you scroll. Search and sort work on lists of row numbers, not copies of the rows.',
+        },
+        {
+          question: 'Is a large CSV file uploaded to a server to open it?',
+          answer: 'No. Even a big file is read by your browser on your device, so there is no upload to wait for, and the limit is your device\'s memory.',
+        },
+      ],
+    },
+    '/xls-viewer': {
+      stepsTitle: 'How it works: open an XLS file online',
+      steps: [
+        { title: 'Drop the .xls file', text: 'Choose the file or drop it on the page. It is read in your browser and never uploaded. For .xlsx, .xlsm and .ods files, use the Excel viewer.' },
+        { title: 'Look through the sheets', text: 'Each sheet is a tab at the bottom. Dates, percentages and currencies show as formatted in the file, and merged cells are drawn as one cell.' },
+        { title: 'Edit values and formulas', text: 'Switch to Edit and type values or formulas such as =SUM(B2:B10); formulas recalculate as you edit. Insert or delete rows, columns and sheets.' },
+        { title: 'Save as .xls', text: 'The save icon downloads an .xls file again. Keep your original: some parts of an .xls file are not written back (see below).' },
+      ],
+      handlesTitle: 'What the XLS file viewer handles, and what it does not',
+      handles: [
+        'Files: .xls (Excel 97 to 2003). Password-protected workbooks cannot be opened.',
+        'Shown: values, formulas with their results, number and date formats, merged cells and every sheet.',
+        'Not shown: fonts, colours, fills and borders. Cell styles are read only from .xlsx and .xlsm files, so the style buttons are off for .xls.',
+        'Kept on save: values, formulas with their results, number formats, merged cells and column widths, as .xls.',
+        'Not kept on save: cell styles, charts, images, pivot tables, conditional formats, data validation, defined names and macros. Keep your original file.',
+      ],
+      faqTitle: 'XLS files: questions and answers',
+      faq: [
+        {
+          question: 'What is an XLS file?',
+          answer: 'XLS is the workbook format of Excel 97 to 2003, used before .xlsx arrived with Excel 2007. Many old reports, archives and exports from older systems are still .xls files.',
+        },
+        {
+          question: 'How do I open an XLS file without Excel?',
+          answer: 'Drop it on this page. It opens in your browser with all its sheets, and you can read, edit and save it without installing Excel or creating an account.',
+        },
+        {
+          question: 'Why don\'t I see the colours and fonts of my .xls file?',
+          answer: 'This viewer reads cell styles only from .xlsx and .xlsm files. In an .xls file you see the values, formulas, number formats and merged cells, but not fonts, colours, fills or borders.',
+        },
+        {
+          question: 'Will saving an .xls file here lose anything?',
+          answer: 'Yes, some things. Values, formulas, number formats, merged cells and column widths are written back, but cell styles, charts, images, pivot tables, conditional formats, data validation, defined names and macros are not. The saved file is a new copy; your original is not changed.',
+        },
+        {
+          question: 'Can I convert XLS to XLSX here?',
+          answer: 'No. Saving keeps the file\'s own format, so an .xls file is saved as .xls.',
+        },
+        {
+          question: 'Do the formulas in an XLS file still work?',
+          answer: 'Yes. Formulas show their saved results, and after you edit a cell the formulas that depend on it are recalculated, for common functions such as SUM, IF, VLOOKUP and INDEX/MATCH. A formula with a function that is not supported keeps its saved result.',
+        },
+      ],
+    },
   },
   ar: {
     '/csv-viewer': {
@@ -560,6 +780,226 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل يمكنني فتح ملفات نصية فيها حروف عربية أو بلغات أخرى؟',
           answer: 'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. ويُعرض كل سطر باتجاه القراءة الخاص به. وإذا ظهر النص بشكل خاطئ، فاختر ترميزًا آخر في تبويب «ملف» وأعد فتحه.',
+        },
+      ],
+    },
+    '/json-formatter': {
+      stepsTitle: 'كيف يعمل: تنسيق JSON في خطوات قليلة',
+      steps: [
+        { title: 'الصق JSON أو افتح ملفه', text: 'اضغط Ctrl+V في أي مكان من هذه الصفحة للصق JSON، أو أفلت ملف .json. وإن أردت أن ترى طريقة العمل فقط، فاضغط «جرّب مثال JSON».' },
+        { title: 'اختر المسافة البادئة', text: 'افتح القائمة بجانب «تنسيق» واختر 1 أو 2 أو 3 أو 4 أو 8 مسافات أو علامة جدولة، فيُرتَّب المستند كله بها.' },
+        { title: 'صغّره أو رتّب مفاتيحه عند الحاجة', text: 'يحذف «تصغير» كل المسافات وفواصل الأسطر خارج النصوص ويعرض حجم الملف قبل التصغير وبعده، ويرتب «ترتيب المفاتيح» مفاتيح كل كائن من A إلى Z.' },
+        { title: 'انسخ النتيجة أو نزّلها', text: 'يضع «نسخ منسّقًا» أو «نسخ مصغّرًا» النتيجة في الحافظة، ويحفظ «تنزيل» ملف .json بالتنسيق الذي اخترته.' },
+      ],
+      handlesTitle: 'ما يدعمه منسق JSON',
+      handles: [
+        'المسافة البادئة: 1 أو 2 أو 3 أو 4 أو 8 مسافات، أو علامة جدولة.',
+        'التصغير: سطر واحد، مع الحجم قبل التصغير وبعده.',
+        'ترتيب المفاتيح: من A إلى Z في كل كائن، بما فيها الكائنات المتداخلة، بخطوة تراجع واحدة.',
+        'الأرقام الطويلة: الأعداد الصحيحة التي تتجاوز 2^53 تُكتب كما كانت دون تقريب.',
+        'المدخلات: JSON ملصوق أو ملف .json حتى 10 ميغابايت.',
+      ],
+      faqTitle: 'تنسيق JSON: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'ما الفرق بين تنسيق JSON وتصغيره؟',
+          answer: 'التنسيق يضع كل مفتاح وقيمة في سطر خاص بمسافة بادئة ليسهل على الناس قراءته، والتصغير يحذف كل المسافات وفواصل الأسطر خارج النصوص ليصبح الملف أصغر ما يمكن. والبيانات نفسها لا تتغير في الحالتين.',
+        },
+        {
+          question: 'ما المسافة البادئة المناسبة لتنسيق JSON؟',
+          answer: 'المسافتان هما الاختيار الأكثر شيوعًا وهما الافتراضي هنا، وتُستخدم أربع مسافات في بعض أنماط البرمجة، أما علامة الجدولة فتترك لمحرر كل قارئ تحديد عرضها. وتتوفر 1 و2 و3 و4 و8 مسافات وعلامة الجدولة.',
+        },
+        {
+          question: 'هل يغيّر التنسيق أرقامي أو ترتيب المفاتيح؟',
+          answer: 'لا. يغيّر «تنسيق» و«تصغير» المسافات وفواصل الأسطر فقط. وتبقى المفاتيح بترتيبها ما لم تضغط «ترتيب المفاتيح»، وتُحفظ الأعداد الصحيحة الطويلة رقمًا رقمًا.',
+        },
+        {
+          question: 'هل يمكنني تنسيق JSON فيه خطأ؟',
+          answer: 'ليس قبل إصلاح الخطأ، لأن التنسيق يحتاج إلى JSON صالح. تعرض الصفحة سطر الخطأ وعموده، ويصلح زر «إصلاح» الأخطاء الشائعة مثل الفواصل الزائدة والتعليقات وعلامات الاقتباس المفردة، ثم يعمل التنسيق.',
+        },
+        {
+          question: 'هل من الآمن تنسيق JSON فيه مفاتيح API أو رموز دخول؟',
+          answer: 'يُنسَّق JSON داخل متصفحك ولا يُرفع إلى أي خادم ولا يُحفظ في أي مكان، فتبقى الرموز والإعدادات الداخلية على جهازك.',
+        },
+        {
+          question: 'ما أكبر ملف JSON يمكن تنسيقه؟',
+          answer: 'حتى 10 ميغابايت. تُرفض الملفات الأكبر قبل قراءتها، لأن كل عملية عليها ستكون بطيئة.',
+        },
+      ],
+    },
+    '/json-validator': {
+      stepsTitle: 'كيف يعمل: التحقق من JSON وإصلاح أخطائه',
+      steps: [
+        { title: 'الصق JSON أو افتح الملف', text: 'اضغط Ctrl+V في هذه الصفحة أو أفلت ملف .json. ويُفتح الملف حتى لو كان فيه خطأ في الصياغة، ويظهر الخطأ فورًا.' },
+        { title: 'اضغط «تحقّق»', text: 'اضغط «تحقّق» (أو Ctrl+Enter، و⌘+Enter على Mac). ويعرض JSON الصالح حجمه وعدد مفاتيحه وقيمه وعمقه.' },
+        { title: 'انتقل إلى الخطأ', text: 'يعرض JSON غير الصالح رسالة المحلل مع السطر والعمود، ويحدد «انتقل إلى الخطأ» ذلك الموضع في النص لتصلحه بنفسك.' },
+        { title: 'أصلح الأخطاء الشائعة', text: 'يصلح «إصلاح» التعليقات والفواصل الزائدة أو الناقصة وعلامات الاقتباس المفردة والمنحنية والمفاتيح غير المقتبسة والكلمات True وFalse وNone وNaN، ثم يخبرك بما غيّره. اضغط «تحقّق» مرة أخرى للتأكد.' },
+      ],
+      handlesTitle: 'ما يفحصه مدقق صياغة JSON',
+      handles: [
+        'الصياغة: JSON القياسي، يُفحص بمحلل JSON الموجود في متصفحك.',
+        'موضع الخطأ: رسالة المحلل مع السطر والعمود، وزر «انتقل إلى الخطأ».',
+        'الإصلاح: التعليقات، والفواصل الزائدة والناقصة، وعلامات الاقتباس المفردة والمنحنية، والمفاتيح غير المقتبسة، وTrue وFalse وNone وNaN وundefined وInfinity.',
+        'لا يُفحص: مخطط JSON Schema. تتحقق الأداة من الصياغة لا من مطابقة البيانات لمخطط.',
+        'الحجم: ملفات حتى 10 ميغابايت.',
+      ],
+      faqTitle: 'التحقق من JSON: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'كيف أعرف إن كان JSON صالحًا؟',
+          answer: 'الصقه في هذه الصفحة أو افتح الملف ثم اضغط «تحقّق». وعبارة «JSON صالح» تعني أن أي محلل قياسي يستطيع قراءته، وإلا فالرسالة والسطر والعمود تبيّن ما يجب إصلاحه.',
+        },
+        {
+          question: 'لماذا JSON الخاص بي غير صالح؟',
+          answer: 'أكثر الأسباب شيوعًا: فاصلة بعد آخر عنصر، أو تعليقات، أو علامات اقتباس مفردة بدل المزدوجة، أو مفاتيح بلا علامات اقتباس، أو قيم مثل True وNone وNaN منسوخة من Python أو JavaScript. لا يسمح JSON القياسي بأي منها، وزر «إصلاح» يصلحها كلها.',
+        },
+        {
+          question: 'هل يتحقق من مطابقة JSON Schema؟',
+          answer: 'لا. يتحقق من أن النص JSON سليم الصياغة فقط، ولا يقارن البيانات بمخطط JSON Schema.',
+        },
+        {
+          question: 'ماذا يغيّر زر «إصلاح»، وهل يمكنني التراجع عنه؟',
+          answer: 'يغيّر الأخطاء المذكورة في رسالته فقط، ولا يمس النص داخل السلاسل النصية. وإذا لم تعجبك النتيجة فاضغط «تراجع». وإذا بقي خطأ آخر فإنه يظهر مع موضعه.',
+        },
+        {
+          question: 'هل يُرسل JSON إلى أي مكان للتحقق منه؟',
+          answer: 'لا. يجري التحقق بمحلل JSON الموجود في متصفحك وعلى جهازك، ولا يُرسل شيء إلى أي خادم.',
+        },
+        {
+          question: 'هل يمكن التحقق من ملفات JSON الكبيرة؟',
+          answer: 'نعم، حتى 10 ميغابايت. تُرفض الملفات الأكبر قبل قراءتها.',
+        },
+      ],
+    },
+    '/tsv-viewer': {
+      stepsTitle: 'كيف يعمل: فتح ملف TSV اون لاين',
+      steps: [
+        { title: 'أفلت ملف .tsv أو .tab', text: 'اختر الملف أو أفلته في أي مكان من الصفحة. يُفتح وعلامة الجدولة هي الفاصل، ويُقرأ في متصفحك ولا يُرفع أبدًا.' },
+        { title: 'تحقق من صف العناوين', text: 'يُستنتج من شكل الصفوف إن كان الصف الأول يحمل أسماء الأعمدة. وإن كان الاستنتاج خاطئًا، فانقر على الفاصل في شريط الحالة في الأسفل وفعّل «الصف الأول هو صف العناوين» أو أوقفه.' },
+        { title: 'ابحث وصفِّ ورتّب', text: 'ابحث في كل الأعمدة، وأضف عوامل تصفية، وانقر مع Shift على عناوين الأعمدة للترتيب حسب أكثر من عمود.' },
+        { title: 'عدّل ونزّل', text: 'عدّل الخلايا والصفوف والأعمدة، ثم اضغط «تنزيل»: يُحفظ الملف بعلامات الجدولة من جديد مع نهايات أسطره.' },
+      ],
+      handlesTitle: 'ما يدعمه عارض ملفات TSV',
+      handles: [
+        'الملفات: .tsv و.tab، تُقرأ وعلامة الجدولة هي الفاصل.',
+        'صف العناوين: يُستنتج من البيانات ويمكنك تغييره.',
+        'القيم بين علامات الاقتباس: تُقرأ كما يكتبها Excel وGoogle Sheets، فتبقى علامة الجدولة أو السطر الجديد داخل الاقتباس في خلية واحدة.',
+        'الترميز: UTF-8 وUTF-16 وWindows-1256 للملفات العربية القديمة.',
+        'الحفظ: بعلامات الجدولة من جديد مع نهايات أسطر الملف، وتضبط «خيارات التنزيل» علامات الاقتباس ونهايات الأسطر أو تبقي الصفوف المصفّاة فقط.',
+      ],
+      faqTitle: 'ملفات TSV: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'ما هو ملف TSV؟',
+          answer: 'ملف TSV (قيم مفصولة بعلامات جدولة) جدول بنص عادي: صف في كل سطر، وعلامة جدولة بين الأعمدة. تصدّره قواعد البيانات وجداول البيانات وأدوات كثيرة، لأن علامة الجدولة نادرًا ما تظهر داخل القيم.',
+        },
+        {
+          question: 'كيف أفتح ملف TSV اون لاين؟',
+          answer: 'أفلت ملف .tsv على هذه الصفحة أو اختره بالزر، فيُفتح كجدول في متصفحك بدون Excel وبدون رفعه.',
+        },
+        {
+          question: 'ما الفرق بين TSV وCSV؟',
+          answer: 'كلاهما جدول بنص عادي. يفصل CSV الأعمدة بالفواصل (أو بالفاصلة المنقوطة في بلدان كثيرة)، ويفصلها TSV بعلامات الجدولة، ولذلك يحتاج TSV إلى علامات الاقتباس أقل.',
+        },
+        {
+          question: 'هل يمكنني تعديل ملف TSV وحفظه بصيغة TSV؟',
+          answer: 'نعم. عدّل الخلايا وأضف الصفوف والأعمدة أو احذفها، ثم اضغط «تنزيل»، فيُكتب الملف بعلامات الجدولة كما جاء.',
+        },
+        {
+          question: 'ملف .txt عندي مفصول بعلامات جدولة، فهل أفتحه هنا؟',
+          answer: 'تفتح هذه الصفحة ملفات .tsv و.tab. أما ملف .txt فيُفتح في محرر TXT كنص؛ غيّر امتداده إلى .tsv لتراه جدولًا.',
+        },
+        {
+          question: 'هل يتعامل عارض TSV مع الملفات الكبيرة؟',
+          answer: 'نعم، فهو يستخدم جدول عارض CSV نفسه، الذي فتح ملفًا من 120,000 صف في أقل من ثانية في اختباراتنا. وتظهر رسالة تحذير أولًا للملفات الأكبر من 50 ميغابايت.',
+        },
+      ],
+    },
+    '/large-csv-viewer': {
+      stepsTitle: 'كيف يعمل: عرض ملف CSV كبير',
+      steps: [
+        { title: 'أفلت الملف الكبير', text: 'اختر ملف .csv أو .tsv أو .tab أو أفلته. تظهر للملفات الأكبر من 50 ميغابايت رسالة تحذير بأنها قد تكون بطيئة، ثم تُفتح إن كانت ذاكرة متصفحك تكفي.' },
+        { title: 'تصفّح الجدول كله', text: 'لا تُرسم إلا الصفوف الظاهرة على الشاشة، فيبقى التمرير سلسًا مهما كان عدد صفوف الملف.' },
+        { title: 'اعثر على الصفوف التي تحتاجها', text: 'ابحث في كل الأعمدة، وأضف عوامل تصفية، أو رتّب حسب عمود أو أكثر. ويعرض «تجميع حسب» العدد أو المجموع أو المتوسط حسب عمود.' },
+        { title: 'احفظ ملفًا أصغر', text: 'تتيح «خيارات التنزيل» في قائمة «المزيد» إبقاء الصفوف المصفّاة فقط، فتختصر ملف التصدير الكبير إلى الجزء الذي تحتاجه.' },
+      ],
+      handlesTitle: 'ما يدعمه عارض CSV الكبير',
+      handles: [
+        'الصفوف: لا حد لها من عند العارض، والحد هو ذاكرة متصفحك. أما Excel فيتوقف عند 1,048,576 صفًا في الورقة.',
+        'القياسات على ملف من 120,000 صف: الفتح 0.9 ثانية، والترتيب حسب عمودين 0.9 ثانية، والبحث 0.4 ثانية، والتصفية 0.1 ثانية، والتنزيل 0.4 ثانية.',
+        'الملفات الأكبر من 50 ميغابايت: رسالة تحذير أولًا، ثم يُفتح الملف إن كانت الذاكرة تكفي.',
+        'ملخص العمود: الخلايا الفارغة والقيم المختلفة والأرقام ومخطط للعمود المحدد.',
+        'الترميز: UTF-8 وUTF-16 وWindows-1256.',
+      ],
+      faqTitle: 'ملفات CSV الكبيرة: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'كيف أفتح ملف CSV أكبر من أن يفتحه Excel؟',
+          answer: 'يعرض Excel 1,048,576 صفًا على الأكثر في الورقة ويترك الباقي. أفلت الملف هنا بدلًا من ذلك: لا حد للصفوف من عند هذا العارض، والحد هو ذاكرة متصفحك. وأكبر ملف قسناه فيه 120,000 صف، فجرّب ملفك وانتبه لتحذير الـ 50 ميغابايت.',
+        },
+        {
+          question: 'ما سرعة فتح ملف CSV كبير؟',
+          answer: 'في اختباراتنا فُتح ملف من 120,000 صف و8 أعمدة في 0.9 ثانية، واستغرق ترتيبه حسب عمودين 0.9 ثانية، والبحث 0.4 ثانية، والتصفية 0.1 ثانية. وتختلف الأوقات حسب جهازك.',
+        },
+        {
+          question: 'ماذا يحدث مع ملف CSV أكبر من 50 ميغابايت؟',
+          answer: 'تظهر رسالة تحذير بأنه قد يكون بطيئًا أو قد تنفد معه الذاكرة، ثم يحاول العارض فتحه. ويتوقف ذلك على متصفحك وذاكرة جهازك.',
+        },
+        {
+          question: 'هل يمكنني اختصار ملف CSV كبير إلى الصفوف التي أحتاجها؟',
+          answer: 'نعم. صفِّ الصفوف أو ابحث عنها، ثم اختر «خيارات التنزيل» من قائمة «المزيد» وأبقِ الصفوف المصفّاة فقط. ولا يتغير الملف الأصلي.',
+        },
+        {
+          question: 'لماذا يبقى التمرير سلسًا في ملف CSV كبير هنا؟',
+          answer: 'لا يوجد في الصفحة في أي وقت إلا الصفوف الظاهرة على الشاشة وبضعة صفوف حولها، ويُرسم الباقي أثناء التمرير. ويعمل البحث والترتيب على قوائم بأرقام الصفوف لا على نسخ منها.',
+        },
+        {
+          question: 'هل يُرفع ملف CSV الكبير إلى خادم لفتحه؟',
+          answer: 'لا. حتى الملف الكبير يقرؤه متصفحك على جهازك، فلا تنتظر أي رفع، والحد هو ذاكرة جهازك.',
+        },
+      ],
+    },
+    '/xls-viewer': {
+      stepsTitle: 'كيف يعمل: فتح ملف XLS اون لاين',
+      steps: [
+        { title: 'أفلت ملف .xls', text: 'اختر الملف أو أفلته على الصفحة، فيُقرأ في متصفحك ولا يُرفع أبدًا. أما ملفات .xlsx و.xlsm و.ods فتُفتح في عارض Excel.' },
+        { title: 'تصفّح الأوراق', text: 'كل ورقة تبويب في الأسفل. وتظهر التواريخ والنسب المئوية والعملات كما نُسّقت في الملف، وتُرسم الخلايا المدمجة خلية واحدة.' },
+        { title: 'عدّل القيم والصيغ', text: 'انتقل إلى «تحرير» واكتب قيمًا أو صيغًا مثل =SUM(B2:B10)، فيُعاد حساب الصيغ أثناء التعديل. وأدرج الصفوف والأعمدة والأوراق أو احذفها.' },
+        { title: 'احفظ بصيغة .xls', text: 'تنزّل أيقونة الحفظ ملف .xls من جديد. احتفظ بملفك الأصلي، فبعض محتويات ملف .xls لا تُكتب عند الحفظ (انظر أدناه).' },
+      ],
+      handlesTitle: 'ما يدعمه عارض ملفات XLS، وما لا يدعمه',
+      handles: [
+        'الملفات: .xls (Excel 97 إلى 2003). لا يمكن فتح المصنفات المحمية بكلمة مرور.',
+        'يظهر: القيم، والصيغ مع نتائجها، وتنسيقات الأرقام والتواريخ، والخلايا المدمجة، وكل الأوراق.',
+        'لا يظهر: الخطوط والألوان والتعبئة والحدود، لأن أنماط الخلايا تُقرأ من ملفات .xlsx و.xlsm فقط، ولذلك تتعطل أزرار التنسيق في ملفات .xls.',
+        'يُحفظ: القيم، والصيغ مع نتائجها، وتنسيقات الأرقام، والخلايا المدمجة، وعرض الأعمدة، بصيغة .xls.',
+        'لا يُحفظ: أنماط الخلايا والمخططات والصور والجداول المحورية والتنسيق الشرطي والتحقق من صحة البيانات والأسماء المعرّفة وحزم الماكرو. احتفظ بملفك الأصلي.',
+      ],
+      faqTitle: 'ملفات XLS: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'ما هو ملف XLS؟',
+          answer: 'XLS صيغة مصنفات Excel 97 إلى 2003، قبل أن تأتي صيغة .xlsx مع Excel 2007. وما زالت تقارير وأرشيفات قديمة كثيرة وملفات مصدّرة من أنظمة قديمة بصيغة .xls.',
+        },
+        {
+          question: 'كيف أفتح ملف XLS بدون Excel؟',
+          answer: 'أفلته على هذه الصفحة، فيُفتح في متصفحك بكل أوراقه، وتقرؤه وتعدّله وتحفظه بدون تثبيت Excel وبدون إنشاء حساب.',
+        },
+        {
+          question: 'لماذا لا أرى ألوان ملف .xls وخطوطه؟',
+          answer: 'يقرأ هذا العارض أنماط الخلايا من ملفات .xlsx و.xlsm فقط. في ملف .xls ترى القيم والصيغ وتنسيقات الأرقام والخلايا المدمجة، لا الخطوط والألوان والتعبئة والحدود.',
+        },
+        {
+          question: 'هل أفقد شيئًا عند حفظ ملف .xls هنا؟',
+          answer: 'نعم، بعض الأشياء. تُكتب القيم والصيغ وتنسيقات الأرقام والخلايا المدمجة وعرض الأعمدة، أما أنماط الخلايا والمخططات والصور والجداول المحورية والتنسيق الشرطي والتحقق من صحة البيانات والأسماء المعرّفة وحزم الماكرو فلا تُكتب. والملف الذي تحفظه نسخة جديدة، وملفك الأصلي لا يتغير.',
+        },
+        {
+          question: 'هل يمكنني تحويل XLS إلى XLSX هنا؟',
+          answer: 'لا. يحتفظ الحفظ بصيغة الملف نفسها، فيُحفظ ملف .xls بصيغة .xls.',
+        },
+        {
+          question: 'هل تعمل الصيغ في ملف XLS؟',
+          answer: 'نعم. تظهر الصيغ بنتائجها المحفوظة، وبعد تعديل خلية يُعاد حساب الصيغ التي تعتمد عليها، للدوال الشائعة مثل SUM وIF وVLOOKUP وINDEX/MATCH. أما الصيغة التي فيها دالة غير مدعومة فتحتفظ بنتيجتها المحفوظة.',
         },
       ],
     },

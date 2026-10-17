@@ -35,6 +35,19 @@ export function findTableFormat(fileName: string): TableFormat {
 
 export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions)
 
+// Pages for one job of a live viewer (/json-formatter is the JSON viewer's page with its own words in seo.ts and pageContent.ts),
+// served like a format page at /en/json-formatter and /ar/json-formatter. `extensions` narrows what their drop zone accepts.
+// Only jobs the viewer really does: no conversions.
+export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: string[] }
+
+export const landingPages: LandingPage[] = [
+  { path: '/json-formatter', viewerId: 'json' },
+  { path: '/json-validator', viewerId: 'json' },
+  { path: '/tsv-viewer', viewerId: 'csv', extensions: ['.tsv', '.tab'] },
+  { path: '/large-csv-viewer', viewerId: 'csv' },
+  { path: '/xls-viewer', viewerId: 'excel', extensions: ['.xls'] },
+]
+
 const LEGACY_FILE_VIEW_PATH = '/view'
 
 // A file keeps the address of its format's own page (/csv-viewer, /txt-viewer, /json-viewer), so the address and a reload
@@ -49,8 +62,14 @@ export function isFileViewPath(pathname: string) {
   return pathname === LEGACY_FILE_VIEW_PATH || viewers.some((viewer) => pathname === `/view-${viewer.id}`)
 }
 
-export function findViewerByToolPath(pathname: string) {
-  return viewers.find((viewer) => viewer.toolPath === pathname)
+// The viewer of a format page or a landing page, as that page uses it: `toolPath` is the page's own address and `extensions` the
+// ones its drop zone accepts.
+export function findViewerByToolPath(pathname: string): Viewer | undefined {
+  const formatViewer = viewers.find((viewer) => viewer.toolPath === pathname)
+  if (formatViewer) return formatViewer
+  const landingPage = landingPages.find((page) => page.path === pathname)
+  const landingViewer = landingPage && viewers.find((viewer) => viewer.id === landingPage.viewerId)
+  return landingViewer && { ...landingViewer, toolPath: landingPage.path, extensions: landingPage.extensions ?? landingViewer.extensions }
 }
 
 export function findViewerForFileName(fileName: string) {
