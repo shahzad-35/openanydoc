@@ -73,7 +73,7 @@ export type FormatEditing = {
   countChanges: (edits: unknown) => number
   // "3 edited cells, 1 row deleted"; empty when nothing changed.
   describeChanges: (edits: unknown, locale: Locale) => string
-  // Absent for a format that draws its own page with its own tools (CSV, JSON).
+  // Absent for a format that draws its own page with its own tools (CSV, JSON, TXT).
   loadEditingModule?: () => Promise<EditingModule>
   // A workbench that is always editable (JSON): it opens in Edit mode with its tools loaded, and has no View / Edit switch.
   alwaysEditable?: boolean
@@ -120,11 +120,12 @@ export const formatDefinitions: FormatDefinition[] = [
     highlights: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'],
     related: ['csv', 'json'],
     ViewerComponent: lazy(() => import('./text/TextViewer')),
+    ownsWholePage: true,
     editing: {
       createEmptyEdits: createEmptyTextEdits,
       countChanges: countTextChanges,
       describeChanges: describeTextChanges,
-      loadEditingModule: () => import('./text/textToolbar').then((toolbarFile) => toolbarFile.textEditingModuleWithToolbar),
+      alwaysEditable: true,
     },
   },
   {

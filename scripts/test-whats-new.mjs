@@ -239,11 +239,14 @@ await test('a file nobody opens keeps the friendly rejection', async () => {
 })
 
 await test('saving a file shows one dismissible tip', async () => {
-  const tipText = path.join(scratchFolder, 'tip.txt')
-  fs.writeFileSync(tipText, 'one\ntwo\n')
-  await openPage('/en/txt-viewer')
-  await chooseFile(tipText)
-  await waitFor(`document.querySelector('h1')?.innerText === 'tip.txt'`, 'the file to open')
+  // Excel is the format still drawn in the shared page, which has the tip (CSV, JSON and TXT draw their own pages).
+  const tipWorkbook = path.join(scratchFolder, 'tip.xlsx')
+  const tipBook = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(tipBook, XLSX.utils.aoa_to_sheet([['one'], ['two']]), 'Data')
+  fs.writeFileSync(tipWorkbook, XLSX.write(tipBook, { type: 'buffer', bookType: 'xlsx' }))
+  await openPage('/en/excel-viewer')
+  await chooseFile(tipWorkbook)
+  await waitFor(`document.querySelector('h1')?.innerText === 'tip.xlsx'`, 'the file to open')
   await evaluate(`document.querySelector('#mode-edit-button').click()`)
   const downloadButton = `document.querySelector('#download-button')`
   await waitFor(`${downloadButton} && !${downloadButton}.disabled`, 'the Download button')
@@ -341,7 +344,7 @@ fs.writeFileSync(sampleWorkbook, XLSX.write(workbook, { type: 'buffer', bookType
 
 for (const [name, address, file, readyElement] of [
   ['CSV', '/en/csv-viewer', sampleCsv, '#data-table'],
-  ['TXT', '/en/txt-viewer', sampleText, '#text-view'],
+  ['TXT', '/en/txt-viewer', sampleText, '#text-editor'],
   ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row'],
   ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table'],
 ]) {
@@ -351,9 +354,10 @@ for (const [name, address, file, readyElement] of [
     await chooseFile(file)
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
     await expectCleanIds(`${name} view mode`)
-    // JSON and CSV draw their own page, always editable, with their own menus; the other formats switch to Edit.
-    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
+    // JSON, CSV and TXT draw their own page, always editable, with their own menus; the other formats switch to Edit.
+    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : name === 'TXT' ? '#ribbon-sort-menu-button' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
     await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
+    if (name === 'TXT') await evaluate(`document.querySelector('#ribbon-tab-lines').click()`)
     await waitFor(`document.querySelector('${menuButton}')`, 'the editing tools')
     await expectCleanIds(`${name} edit mode`)
     await evaluate(`document.querySelector('${menuButton}').click()`)
@@ -397,10 +401,10 @@ await test('one drop zone opens every live format with its View / Edit toggle an
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
     await chooseFile(file)
-    await waitFor(`document.querySelector('#mode-toggle') || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench'))`, `the ${name} file page with its toggle`)
+    await waitFor(`document.querySelector('#mode-toggle') || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench'))`, `the ${name} file page with its toggle`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
     await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
-    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled)')`, `the ${name} tools`)
+    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)

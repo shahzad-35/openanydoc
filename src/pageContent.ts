@@ -126,37 +126,37 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
     '/txt-viewer': {
       stepsTitle: 'How to open and edit a text file online',
       steps: [
-        { title: 'Drop your .txt file on the page', text: 'Choose a text file, such as notes, a log or a list. It is read in your browser and never uploaded.' },
-        { title: 'Read it comfortably', text: 'Turn line numbers and wrapping on or off, pick a font and a size, and search the text (press / to jump to the search box).' },
-        { title: 'Switch to Edit', text: 'Type in the text box, or use the toolbar: change case, tidy spaces, sort, reverse or de-duplicate lines, indent, insert the date and time, and find and replace. With text selected, a tool works on the selection only.' },
-        { title: 'Choose the line endings', text: 'Pick LF (Unix, macOS) or CRLF (Windows) for the saved file. Without a choice, the file keeps the line endings it had.' },
-        { title: 'Download your text file', text: 'Use the download icon to save it. The original file on your device is never changed.' },
+        { title: 'Drop your .txt file on the page', text: 'Choose or drop a text file, such as notes, a log or a list. It is read in your browser, never uploaded, and opens ready to edit.' },
+        { title: 'Type, or pick a tool from the ribbon', text: 'Type in the text, or open a tab (Lines, Clean, Case, Find, Analyze, View, File) and click a tool: sort, de-duplicate, number or join lines, trim spaces, change case. With text selected, a tool changes only the selected lines. Each tool is one undo step.' },
+        { title: 'Find, replace and check', text: 'Press Ctrl+F (or /) to find and replace, with match case, whole word and regular expressions. Statistics count words, sentences and reading time, and Compare shows every change against the original file.' },
+        { title: 'See what is hidden', text: 'Show hidden characters to spot tabs, trailing spaces, zero-width characters and line endings, then remove them with the Clean tools. Bookmarks and Go to line help in long files.' },
+        { title: 'Download your text file', text: 'Click Download and choose UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256, and LF, CRLF or CR line endings. The original file on your device is never changed.' },
       ],
       faqTitle: 'Text file viewer and editor: common questions',
       faq: [
         {
           question: 'How do I change line endings (LF to CRLF) in a text file?',
-          answer: 'Open the file, switch to Edit, open the line endings menu in the toolbar and choose LF or CRLF. The download uses your choice; a file that already ends its lines that way is left as it is.',
+          answer: 'Open the file and click Download, then choose LF (macOS, Linux), CRLF (Windows) or CR for the saved file. If the file mixes line endings, File and then Fix mixed line endings makes them all the same.',
         },
         {
           question: 'How do I sort lines or remove duplicate lines in a text file?',
-          answer: 'In Edit mode, open the lines menu and choose Sort A to Z, Sort Z to A, Reverse order or Remove duplicate lines. Select some lines first to change only those, or select nothing to change the whole text.',
+          answer: 'Open the Lines tab and choose Sort A–Z, Z–A, numeric, natural or by length, Reverse, Shuffle or Remove duplicate lines. Select some lines first to change only those; Ignore case applies to sorting and to duplicates.',
         },
         {
-          question: 'How do I change the case of text?',
-          answer: 'Use the case menu in the toolbar: UPPERCASE, lowercase, Capitalize Each Word or Sentence case, on the selected text or on the whole file.',
+          question: 'How do I find and replace text with a regular expression?',
+          answer: 'Press Ctrl+F, turn on the regular expression button and type a pattern such as TODO: (\\w+). In the replacement, $1 inserts a group, \\n a line break and \\t a tab. Replace all is one undo step, and you can also keep or remove the matching lines.',
+        },
+        {
+          question: 'How do I count the words and characters in a text file?',
+          answer: 'The status line always shows the lines, words and characters, and the counts of the selected text. Analyze and then Statistics adds sentences, paragraphs, unique words, reading time, the most frequent words and the longest lines.',
         },
         {
           question: 'Can I open text files with Arabic or other non-English characters?',
-          answer: 'Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction.',
+          answer: 'Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it.',
         },
         {
           question: 'Can I open a large text or log file?',
-          answer: 'Yes. In View mode only the visible lines are drawn, so large files stay fast. Editing a very large file (over about 2 million characters) can feel slower, and line numbers are hidden while you edit it.',
-        },
-        {
-          question: 'Does it keep my file\'s line endings and encoding?',
-          answer: 'Yes. Line endings stay as they were unless you choose others, and a file that started with a byte order mark keeps it. Saved text files are UTF-8.',
+          answer: 'Yes. A file over about 2 million characters opens in a fast read view that draws only the visible lines, and every tool still works on the whole text. Choose Edit anyway to type in it; typing in a very large file is slower and line numbers are hidden while you do.',
         },
       ],
     },
@@ -276,37 +276,37 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
     '/txt-viewer': {
       stepsTitle: 'كيف تفتح ملفًا نصيًا وتعدّله أونلاين',
       steps: [
-        { title: 'أفلت ملف .txt على الصفحة', text: 'اختر ملفًا نصيًا، مثل ملاحظات أو سجل أو قائمة. يُقرأ داخل متصفحك ولا يُرفع أبدًا.' },
-        { title: 'اقرأه براحة', text: 'فعّل أرقام الأسطر والتفاف النص أو أوقفهما، واختر الخط وحجمه، وابحث في النص (اضغط / للانتقال إلى مربع البحث).' },
-        { title: 'انتقل إلى التحرير', text: 'اكتب في مربع النص، أو استخدم شريط الأدوات: غيّر حالة الأحرف، ورتّب المسافات، وافرز الأسطر أو اعكسها أو احذف المكرر منها، وأضف مسافة بادئة، وأدرج التاريخ والوقت، واستخدم البحث والاستبدال. وعند تحديد نص تعمل الأداة على التحديد فقط.' },
-        { title: 'اختر نهايات الأسطر', text: 'اختر LF (Unix وmacOS) أو CRLF (Windows) للملف المحفوظ. وإن لم تختر، يحتفظ الملف بنهايات الأسطر التي كانت فيه.' },
-        { title: 'نزّل ملفك النصي', text: 'استخدم أيقونة التنزيل لحفظه. الملف الأصلي على جهازك لا يتغير أبدًا.' },
+        { title: 'أفلت ملف .txt على الصفحة', text: 'اختر ملفًا نصيًا أو أفلته، مثل ملاحظات أو سجل أو قائمة. يُقرأ داخل متصفحك ولا يُرفع أبدًا، ويُفتح جاهزًا للتحرير.' },
+        { title: 'اكتب أو اختر أداة من الشريط', text: 'اكتب في النص، أو افتح تبويبًا (الأسطر، تنظيف، حالة الأحرف، بحث، تحليل، عرض، ملف) وانقر أداة: فرز الأسطر أو حذف المكرر منها أو ترقيمها أو دمجها، وحذف المسافات، وتغيير حالة الأحرف. وعند تحديد نص تغيّر الأداة الأسطر المحددة فقط. وكل أداة خطوة تراجع واحدة.' },
+        { title: 'ابحث واستبدل وراجع', text: 'اضغط Ctrl+F (أو /) للبحث والاستبدال، مع مطابقة حالة الأحرف والكلمة الكاملة والتعابير النمطية. وتعدّ الإحصاءات الكلمات والجمل ووقت القراءة، وتعرض المقارنة كل تغيير مقارنةً بالملف الأصلي.' },
+        { title: 'شاهد المخفي', text: 'أظهر الأحرف المخفية لترى علامات الجدولة والمسافات في نهاية الأسطر والأحرف صفرية العرض ونهايات الأسطر، ثم احذفها بأدوات التنظيف. وتساعدك الإشارات المرجعية والانتقال إلى سطر في الملفات الطويلة.' },
+        { title: 'نزّل ملفك النصي', text: 'انقر «تنزيل» واختر UTF-8 أو UTF-8 مع BOM أو UTF-16 أو Windows-1256، ونهايات الأسطر LF أو CRLF أو CR. الملف الأصلي على جهازك لا يتغير أبدًا.' },
       ],
       faqTitle: 'عارض ومحرر الملفات النصية: أسئلة شائعة',
       faq: [
         {
           question: 'كيف أغيّر نهايات الأسطر (من LF إلى CRLF) في ملف نصي؟',
-          answer: 'افتح الملف، وانتقل إلى التحرير، وافتح قائمة نهايات الأسطر في شريط الأدوات واختر LF أو CRLF. يستخدم التنزيل اختيارك؛ أما الملف الذي تنتهي أسطره بهذه الطريقة أصلًا فيبقى كما هو.',
+          answer: 'افتح الملف وانقر «تنزيل»، ثم اختر LF (macOS وLinux) أو CRLF (Windows) أو CR للملف المحفوظ. وإذا كانت نهايات الأسطر في الملف مختلطة، فإن «ملف» ثم «توحيد نهايات الأسطر المختلطة» يجعلها كلها متماثلة.',
         },
         {
           question: 'كيف أفرز الأسطر أو أحذف الأسطر المكررة في ملف نصي؟',
-          answer: 'في وضع التحرير، افتح قائمة الأسطر واختر الفرز من A إلى Z أو من Z إلى A أو عكس الترتيب أو حذف الأسطر المكررة. حدّد بعض الأسطر أولًا لتغيير هذه الأسطر فقط، أو لا تحدد شيئًا لتغيير النص كله.',
+          answer: 'افتح تبويب «الأسطر» واختر الفرز من A إلى Z أو من Z إلى A أو الفرز الرقمي أو الطبيعي أو حسب الطول، أو عكس الترتيب، أو الخلط، أو حذف الأسطر المكررة. حدّد بعض الأسطر أولًا لتغييرها وحدها؛ ويسري «تجاهل حالة الأحرف» على الفرز وعلى المكرر.',
         },
         {
-          question: 'كيف أغيّر حالة الأحرف في النص؟',
-          answer: 'استخدم قائمة حالة الأحرف في شريط الأدوات: أحرف كبيرة، أو أحرف صغيرة، أو أول حرف من كل كلمة كبير، أو حالة الجملة، على النص المحدد أو على الملف كله.',
+          question: 'كيف أبحث عن نص وأستبدله باستخدام تعبير نمطي؟',
+          answer: 'اضغط Ctrl+F، وفعّل زر التعبير النمطي، واكتب نمطًا مثل TODO: (\\w+). وفي نص الاستبدال يُدرج $1 مجموعة، و\\n سطرًا جديدًا، و\\t علامة جدولة. و«استبدال الكل» خطوة تراجع واحدة، ويمكنك أيضًا إبقاء الأسطر المطابقة أو حذفها.',
+        },
+        {
+          question: 'كيف أعدّ الكلمات والأحرف في ملف نصي؟',
+          answer: 'يعرض سطر الحالة دائمًا عدد الأسطر والكلمات والأحرف، وأعداد النص المحدد. ويضيف «تحليل» ثم «الإحصاءات» الجمل والفقرات والكلمات الفريدة ووقت القراءة والكلمات الأكثر تكرارًا وأطول الأسطر.',
         },
         {
           question: 'هل يمكنني فتح ملفات نصية فيها حروف عربية أو بلغات أخرى؟',
-          answer: 'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. ويُعرض كل سطر باتجاه القراءة الخاص به.',
+          answer: 'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. ويُعرض كل سطر باتجاه القراءة الخاص به. وإذا ظهر النص بشكل خاطئ، فاختر ترميزًا آخر في تبويب «ملف» وأعد فتحه.',
         },
         {
           question: 'هل يمكنني فتح ملف نصي أو سجل كبير؟',
-          answer: 'نعم. في وضع العرض تُرسم الأسطر الظاهرة فقط، فتبقى الملفات الكبيرة سريعة. وقد يكون تحرير ملف كبير جدًا (أكثر من مليوني حرف تقريبًا) أبطأ، وتُخفى أرقام الأسطر أثناء تحريره.',
-        },
-        {
-          question: 'هل يحافظ على نهايات الأسطر وترميز ملفي؟',
-          answer: 'نعم. تبقى نهايات الأسطر كما كانت ما لم تختر غيرها، والملف الذي بدأ بعلامة ترتيب البايت (BOM) يحتفظ بها. والملفات النصية المحفوظة بترميز UTF-8.',
+          answer: 'نعم. يُفتح الملف الذي يزيد على مليوني حرف تقريبًا في عرض سريع للقراءة يرسم الأسطر الظاهرة فقط، وتعمل كل الأدوات على النص كاملًا. اختر «التحرير على أي حال» للكتابة فيه؛ فالكتابة في ملف كبير جدًا أبطأ، وتُخفى أرقام الأسطر أثناء ذلك.',
         },
       ],
     },

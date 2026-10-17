@@ -42,7 +42,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/txt-viewer': {
       title: 'Text File Viewer & Editor Online (TXT) – OpenAnyDoc',
-      description: 'Free online TXT viewer and editor: open text files, search, change case, sort lines, remove duplicate lines, set line endings and save. No upload.',
+      description: 'Free online TXT editor: find and replace with regex, sort lines, remove duplicate lines, change case, count words and compare changes. No upload.',
       heading: 'Online Text File (TXT) Viewer and Editor',
       intro: 'Read and edit plain text files in the browser, with search, line numbers and handy tools for lines and whitespace. Your file never leaves your device.',
     },
@@ -74,7 +74,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/txt-viewer': {
       title: 'عارض ومحرر الملفات النصية أونلاين (TXT) – OpenAnyDoc',
-      description: 'عارض ومحرر TXT مجاني عبر الإنترنت: افتح الملفات النصية، وابحث، وغيّر حالة الأحرف، وافرز الأسطر، واحذف المكرر منها، واختر نهايات الأسطر ثم احفظ. بدون رفع.',
+      description: 'محرر TXT مجاني عبر الإنترنت: بحث واستبدال بالتعابير النمطية، وفرز الأسطر، وحذف المكرر منها، وتغيير حالة الأحرف، وعدّ الكلمات ومقارنة التغييرات. بدون رفع.',
       heading: 'عارض ومحرر الملفات النصية (TXT) أونلاين',
       intro: 'اقرأ الملفات النصية العادية وعدّلها في المتصفح، مع البحث وأرقام الأسطر وأدوات عملية للأسطر والمسافات. ملفك لا يغادر جهازك أبدًا.',
     },
