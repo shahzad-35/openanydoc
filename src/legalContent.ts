@@ -5,7 +5,7 @@
 
 type Locale = 'en' | 'ar'
 
-export const CONTACT_EMAIL = 'privacy@openanydoc.com'
+export const CONTACT_EMAIL = 'support@openanydoc.com'
 
 export type InfoSection = { heading: string; paragraphs: string[]; list?: string[] }
 export type InfoPageContent = { lastUpdated?: string; sections: InfoSection[] }

@@ -432,11 +432,11 @@ await test('About, Privacy and Terms pages: one h1, their own title and descript
     expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)
     expect(html.includes('hreflang="ar"') && html.includes('hreflang="en"') && html.includes('hreflang="x-default"'), `${address}: hreflang alternates are missing`)
     expect(html.includes(`<html lang="${address.slice(1, 3)}" dir="${address.startsWith('/ar') ? 'rtl' : 'ltr'}">`), `${address}: lang and dir are missing from the static HTML`)
-    expect(html.includes('id="info-sections"') && prerenderedText(html).includes('privacy@openanydoc.com'), `${address}: the server's HTML lacks the sections or the contact address`)
+    expect(html.includes('id="info-sections"') && prerenderedText(html).includes('support@openanydoc.com'), `${address}: the server's HTML lacks the sections or the contact address`)
     await openPage(address)
     expect(await evaluate(`document.querySelectorAll('h1').length === 1 && document.querySelectorAll('main h2').length >= 3`), `${address}: needs one h1 and its h2 sections`)
     expect((await evaluate('document.title')) === title, `${address}: the browser title differs from the static one`)
-    expect(await evaluate(`document.querySelector('#contact-email-link')?.getAttribute('href') === 'mailto:privacy@openanydoc.com'`), `${address}: the contact link is missing`)
+    expect(await evaluate(`document.querySelector('#contact-email-link')?.getAttribute('href') === 'mailto:support@openanydoc.com'`), `${address}: the contact link is missing`)
     expect(await evaluate(`document.documentElement.scrollWidth <= document.documentElement.clientWidth`), `${address}: the page scrolls sideways`)
   }
   await openPage('/en/privacy')

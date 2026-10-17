@@ -58,7 +58,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
         },
         {
           question: 'Why does my CSV file open in a single column?',
@@ -128,7 +128,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
         },
         {
           question: 'How do I open an XLSX file without Excel?',
@@ -198,7 +198,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
         },
         {
           question: 'How do I format (pretty print) JSON online?',
@@ -263,7 +263,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to privacy@openanydoc.com.',
+          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
         },
         {
           question: 'How do I change line endings (LF to CRLF) in a text file?',
@@ -334,7 +334,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
         },
         {
           question: 'لماذا يُفتح ملف CSV في عمود واحد؟',
@@ -404,7 +404,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
         },
         {
           question: 'كيف أفتح ملف XLSX بدون Excel؟',
@@ -474,7 +474,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
         },
         {
           question: 'كيف أنسّق JSON (Pretty Print) أونلاين؟',
@@ -539,7 +539,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على privacy@openanydoc.com.',
+          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
         },
         {
           question: 'كيف أغيّر نهايات الأسطر (من LF إلى CRLF) في ملف نصي؟',
