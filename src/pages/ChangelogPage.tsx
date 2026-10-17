@@ -1,5 +1,6 @@
 import NewBadge from '../components/NewBadge'
 import SiteFooter from '../components/SiteFooter'
+import SiteNav from '../components/SiteNav'
 import changelog from '../data/changelog.json'
 import { localizePath, useT } from '../i18n'
 import { CHECK_ICON_PATH, changelogClasses, changelogIds } from './changelogMarkup'
@@ -45,6 +46,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
     <div id={changelogIds.page} className={changelogClasses.page}>
       <header id={changelogIds.header} className={changelogClasses.header}>
         <p>{pageLink(changelogIds.brandLink, localizePath(locale, '/'), changelogClasses.brandLink, 'OpenAnyDoc')}</p>
+        <SiteNav currentPath="/changelog" onNavigate={onNavigate} />
         <p>{pageLink(changelogIds.languageLink, `/${otherLocale(locale)}/changelog`, changelogClasses.languageLink, t('changelog.otherLanguage'), otherLocale(locale))}</p>
       </header>
       <main id={changelogIds.main} className={changelogClasses.main}>

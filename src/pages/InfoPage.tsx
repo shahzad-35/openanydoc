@@ -1,5 +1,6 @@
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import SiteFooter, { PageLink } from '../components/SiteFooter'
+import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { usePageHead } from './HomePage'
 import { useT } from '../i18n'
@@ -38,10 +39,11 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
       >
         {t('skip.toContent')}
       </a>
-      <header id="site-header" className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5">
+      <header id="site-header" className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5">
         <p id="site-brand" className="type-h3">
           <PageLink id="brand-home-link" path="/" onNavigate={onNavigate}>OpenAnyDoc</PageLink>
         </p>
+        <SiteNav currentPath={address} onNavigate={onNavigate} />
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
           <ThemeToggle />

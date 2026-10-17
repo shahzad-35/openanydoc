@@ -1041,6 +1041,69 @@ await test('JSON on a phone: Text, Tree and Inspector tabs instead of side by si
   })
 })
 
+// ---------------------------------------------------------------- internal links: header nav, related tools, footer, home
+
+await test('the header nav, related tools, footer and home links point at built pages, with descriptive text and the current page marked', async () => {
+  const builtPage = (href) => fs.existsSync(path.join(distFolder, href, 'index.html'))
+  const linksIn = (html, startTag, endTag) => {
+    const start = html.indexOf(startTag)
+    if (start === -1) return null
+    const block = html.slice(start, html.indexOf(endTag, start))
+    return [...block.matchAll(/<a [^>]*?href="([^"]+)"[^>]*>([^<]+)<\/a>/g)].map((match) => ({ tag: match[0], href: match[1], text: match[2].trim() }))
+  }
+  for (const page of contentPages) {
+    for (const locale of ['en', 'ar']) {
+      const address = `/${locale}${page}`
+      const html = await (await fetch(`${siteOrigin}${address}`)).text()
+      const navLinks = linksIn(html, '<nav id="site-nav"', '</nav>')
+      expect(navLinks?.length === formatPages.length, `${address}: the header nav does not link the ${formatPages.length} viewers`)
+      expect(JSON.stringify(navLinks.map((link) => link.href).sort()) === JSON.stringify(formatPages.map((formatPage) => `/${locale}${formatPage}`).sort()), `${address}: the nav links are ${navLinks.map((link) => link.href).join(', ')}`)
+      const currentLinks = navLinks.filter((link) => link.tag.includes('aria-current="page"'))
+      const expectedCurrent = formatPages.includes(page) ? [`/${locale}${page}`] : []
+      expect(JSON.stringify(currentLinks.map((link) => link.href)) === JSON.stringify(expectedCurrent), `${address}: aria-current is on ${currentLinks.map((link) => link.href).join(', ') || 'no link'}`)
+      const relatedLinks = linksIn(html, '<section id="related-tools"', '</section>')
+      if (formatPages.includes(page) || landingPages.includes(page)) expect(relatedLinks?.length >= 2, `${address}: no related tools`)
+      else expect(relatedLinks === null, `${address}: related tools on a page that is not a tool page`)
+      const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
+      expect(landingPages.every((landingPage) => landingPage === page || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
+      for (const link of [...navLinks, ...(relatedLinks ?? []), ...footerLinks]) {
+        expect(builtPage(link.href), `${address}: ${link.href} is not a built page`)
+        expect(!/^(click here|here|tools|more|read more|اضغط هنا|هنا|أدوات|المزيد)$/i.test(link.text), `${address}: the link text "${link.text}" does not say where it goes`)
+      }
+      const selfLinks = [...(relatedLinks ?? []), ...linksIn(html, '<nav id="footer-viewers"', '</nav>')].filter((link) => link.href === address)
+      expect(selfLinks.length === 0, `${address}: related tools or the footer's viewer links point at the page itself`)
+    }
+  }
+  for (const locale of ['en', 'ar']) {
+    const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
+    for (const landingPage of landingPages) expect(html.includes(`id="landing-link-${landingPage.slice(1)}" href="/${locale}${landingPage}"`), `/${locale}: the home page does not link ${landingPage}`)
+  }
+})
+
+await test('the changelog writes the same nav as the browser draws, and the nav folds into one disclosure on a phone', async () => {
+  for (const locale of ['en', 'ar']) {
+    const html = await (await fetch(`${siteOrigin}/${locale}/changelog`)).text()
+    const staticNav = html.slice(html.indexOf('<nav id="site-nav"'), html.indexOf('</nav>', html.indexOf('<nav id="site-nav"')) + 6)
+    await openPage(`/${locale}/changelog`)
+    const liveNav = await evaluate(`document.querySelector('#site-nav').outerHTML`)
+    expect(liveNav === staticNav, `/${locale}/changelog: the static nav differs from the React one:\n${staticNav}\n${liveNav}`)
+  }
+  const navState = () => evaluate(`({ toggle: document.querySelector('#site-nav-toggle').checkVisibility(), links: document.querySelector('#site-nav-link-csv').checkVisibility(), sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth })`)
+  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/changelog']) {
+    await openPage(address)
+    const desktop = await navState()
+    expect(!desktop.toggle && desktop.links, `${address} at 1280px: the links should show without the disclosure (${JSON.stringify(desktop)})`)
+    await onPhone(async () => {
+      await openPage(address)
+      const closed = await navState()
+      expect(closed.toggle && !closed.links && !closed.sideways, `${address} at 390px: the disclosure should be closed (${JSON.stringify(closed)})`)
+      await evaluate(`document.querySelector('#site-nav-toggle').click()`)
+      const opened = await navState()
+      expect(opened.links && !opened.sideways, `${address} at 390px: the disclosure does not open (${JSON.stringify(opened)})`)
+    })
+  }
+})
+
 // ---------------------------------------------------------------- the <head> follows the page when it changes without a reload
 
 // The tags that describe a page, read from a document: the live page, or the HTML the build wrote for that address.

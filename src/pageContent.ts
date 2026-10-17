@@ -10,6 +10,20 @@ type Locale = 'en' | 'ar'
 
 export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; handlesTitle: string; handles: string[]; faqTitle: string; faq: GuideQuestion[] }
 
+// The "Related tools" links at the end of each format and landing page: other live pages a visitor of that page may want next.
+// Keyed by the page's address; the link text is each page's `linkText` in seo.ts, in the page's language.
+export const relatedPages: Record<string, string[]> = {
+  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer'],
+  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer'],
+  '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer'],
+  '/excel-viewer': ['/xls-viewer', '/csv-viewer'],
+  '/xls-viewer': ['/excel-viewer', '/csv-viewer'],
+  '/json-viewer': ['/json-formatter', '/json-validator', '/csv-viewer'],
+  '/json-formatter': ['/json-validator', '/json-viewer'],
+  '/json-validator': ['/json-formatter', '/json-viewer'],
+  '/txt-viewer': ['/csv-viewer', '/json-viewer'],
+}
+
 // Keyed by language, then by the format or landing page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
 export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
   en: {

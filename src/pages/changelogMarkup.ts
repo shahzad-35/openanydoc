@@ -19,7 +19,7 @@ export const changelogIds = {
 
 export const changelogClasses = {
   page: 'min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink',
-  header: 'mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-5',
+  header: 'mx-auto flex max-w-3xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5',
   brandLink: 'type-h3 hover:text-accent',
   languageLink: 'control-shape solid-box border-rule bg-paper-raised/80 px-4 py-1 text-sm font-medium transition-colors duration-200 hover:bg-paper-raised',
   main: 'mx-auto max-w-3xl px-4 pb-24',
@@ -44,6 +44,21 @@ export const changelogClasses = {
 
 // A check mark, drawn inside a 24 x 24 box.
 export const CHECK_ICON_PATH = 'm5 13 4 4L19 7'
+
+// The header's links to the viewer pages (src/components/SiteNav.tsx), on every content page; the build script writes the same nav
+// into the changelog pages. On a phone the links fold into one disclosure on a row of their own; from md up the disclosure's
+// content is always shown (::details-content) and its summary hidden.
+export const navClasses = {
+  nav: 'order-last w-full md:order-none md:w-auto',
+  details: 'group md:[&::details-content]:[content-visibility:visible]',
+  summary: 'control-shape solid-box inline-flex min-h-11 cursor-pointer list-none items-center gap-2 border-rule bg-paper-raised/80 px-4 text-sm font-medium md:hidden [&::-webkit-details-marker]:hidden',
+  chevron: 'size-4 transition-transform duration-200 group-open:rotate-180',
+  list: 'mt-2 flex flex-col md:mt-0 md:flex-row md:gap-x-5',
+  link: 'inline-block py-1 text-ink-soft underline-offset-2 hover:text-ink hover:underline aria-[current=page]:font-semibold aria-[current=page]:text-ink pointer-coarse:py-3',
+} as const
+
+// A downward chevron, drawn inside a 24 x 24 box.
+export const CHEVRON_ICON_PATH = 'm6 9 6 6 6-6'
 
 // The site footer (src/components/SiteFooter.tsx). The build script writes the same footer as HTML into the changelog pages.
 export const footerClasses = {

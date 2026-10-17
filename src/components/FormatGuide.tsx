@@ -1,12 +1,14 @@
 import { useT } from '../i18n'
-import { formatGuides } from '../pageContent'
+import { formatGuides, relatedPages } from '../pageContent'
+import { pageSeo } from '../seo'
 import type { Viewer } from '../viewers'
 import { PrivacySection } from './AboutSections'
+import { PageLink } from './SiteFooter'
 
-// The text that fills a format's own page under the drop zone: numbered steps ("How it works"), what the viewer handles, then
-// that file type's questions and answers, then the privacy note. Read from src/pageContent.ts, which the build also uses for the page's static HTML and FAQ data.
-export default function FormatGuide({ address, viewerId }: { address: string; viewerId: Viewer['id'] }) {
-  const { locale } = useT()
+// The text that fills a format or landing page under the drop zone: numbered steps ("How it works"), what the viewer handles, then
+// that page's questions and answers, links to related pages, then the privacy note. Read from src/pageContent.ts, which the build also uses for the page's static HTML and FAQ data.
+export default function FormatGuide({ address, viewerId, onNavigate }: { address: string; viewerId: Viewer['id']; onNavigate: (path: string) => void }) {
+  const { locale, t } = useT()
   const guide = formatGuides[locale][address]
   if (!guide) return null
   return (
@@ -45,6 +47,23 @@ export default function FormatGuide({ address, viewerId }: { address: string; vi
             </div>
           ))}
         </dl>
+      </section>
+      <section id="related-tools">
+        <h2 id="related-tools-heading" className="type-h3">{t('related.heading')}</h2>
+        <ul id="related-tools-list" className="mt-4 flex flex-wrap gap-3">
+          {relatedPages[address].map((path) => (
+            <li key={path}>
+              <PageLink
+                id={`related-link-${path.slice(1)}`}
+                path={path}
+                onNavigate={onNavigate}
+                className="control-shape solid-box inline-flex min-h-11 items-center border-rule bg-paper-raised px-4 font-medium transition-colors duration-200 hover:bg-paper"
+              >
+                {pageSeo[locale][path].linkText}
+              </PageLink>
+            </li>
+          ))}
+        </ul>
       </section>
       <PrivacySection />
     </div>

@@ -7,6 +7,7 @@ import LanguageSwitcher from '../components/LanguageSwitcher'
 import { LOCALES, localizePath, useT } from '../i18n'
 import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
 import SiteFooter, { PageLink } from '../components/SiteFooter'
+import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
@@ -128,8 +129,9 @@ export default function HomePage({
       </a>
 
       <div className="relative z-10">
-        <header id="site-header" className="mx-auto flex max-w-5xl items-center justify-between px-4 py-5">
+        <header id="site-header" className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5">
           <p id="site-brand" className="type-h3">{toolViewer ? <PageLink id="brand-home-link" path="/" onNavigate={onNavigate}>OpenAnyDoc</PageLink> : 'OpenAnyDoc'}</p>
+          <SiteNav currentPath={address} onNavigate={onNavigate} />
           <div className="flex items-center gap-2">
             <LanguageSwitcher />
             <ThemeToggle />
@@ -153,7 +155,7 @@ export default function HomePage({
           </section>
 
           <div id="about-content" className="box-shape mt-12 bg-paper-raised/90 p-6 backdrop-blur-md md:p-10">
-            {toolViewer ? <FormatGuide address={toolViewer.toolPath as string} viewerId={toolViewer.id} /> : <AboutContent onNavigate={onNavigate} />}
+            {toolViewer ? <FormatGuide address={address} viewerId={toolViewer.id} onNavigate={onNavigate} /> : <AboutContent onNavigate={onNavigate} />}
           </div>
         </main>
 

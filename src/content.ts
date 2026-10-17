@@ -9,18 +9,16 @@ export const features: Record<Locale, string[]> = {
   en: [
     'CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files open in your browser today; Word, PDF and PowerPoint are coming.',
     'Edit as well as view, with undo and redo, then download the file in its own format.',
-    'Large files: a 120,000-row CSV opens in under a second and a 46 MB text file has been tested. Files over 50 MB show a warning, and JSON opens up to 10 MB.',
+    'Large files: a 120,000-row CSV opens in under a second, and files over 50 MB show a warning.',
     'Arabic and right-to-left text is shown correctly (UTF-8, UTF-16 and Windows-1256), and the whole site is in English and Arabic.',
     'Works in a phone browser, in light and dark themes, with keyboard-friendly controls.',
-    'Drag and drop a file, click to browse, or paste CSV or JSON text.',
   ],
   ar: [
     'تُفتح ملفات CSV وExcel (XLSX وXLS وXLSM وODS) وJSON وTXT في متصفحك اليوم، وملفات Word وPDF وPowerPoint قادمة.',
     'عرض وتعديل معًا، مع التراجع والإعادة، ثم تنزيل الملف بصيغته نفسها.',
-    'الملفات الكبيرة: يُفتح ملف CSV من 120,000 صف في أقل من ثانية، وقد جُرّب ملف نصي بحجم 46 ميغابايت. وتظهر رسالة تحذير للملفات الأكبر من 50 ميغابايت، وتُفتح ملفات JSON حتى 10 ميغابايت.',
+    'الملفات الكبيرة: يُفتح ملف CSV من 120,000 صف في أقل من ثانية، وتظهر رسالة تحذير للملفات الأكبر من 50 ميغابايت.',
     'يُعرض النص العربي من اليمين إلى اليسار بشكل صحيح (UTF-8 وUTF-16 وWindows-1256)، والموقع كله بالعربية والإنجليزية.',
     'يعمل في متصفح الجوال، بمظهر فاتح وآخر داكن، مع عناصر تحكم تعمل بلوحة المفاتيح.',
-    'اسحب الملف وأفلته، أو انقر لاختياره، أو الصق نص CSV أو JSON.',
   ],
 }
 

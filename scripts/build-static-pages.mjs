@@ -13,7 +13,7 @@ import { fileURLToPath } from 'node:url'
 import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
-import { CHECK_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks } from '../src/pages/changelogMarkup.ts'
+import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
 import { SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -34,6 +34,22 @@ const otherLocale = (locale) => (locale === 'en' ? 'ar' : 'en')
 const localizePath = (locale, address) => (address === '/' ? `/${locale}` : `/${locale}${address}`)
 const viewerById = new Map(viewers.map((viewer) => [viewer.id, viewer]))
 
+// The header nav as src/components/SiteNav.tsx draws it on the changelog page (no link is the current page there).
+function renderChangelogNav(locale) {
+  const label = escapeHtml(translate(locale, 'footer.viewers'))
+  // The classes hold "&" (arbitrary variants), which React writes as &amp;.
+  const n = Object.fromEntries(Object.entries(navClasses).map(([part, classes]) => [part, escapeHtml(classes)]))
+  const items = viewers
+    .filter((viewer) => viewer.toolPath)
+    .map((viewer) => `<li><a id="site-nav-link-${viewer.id}" href="${localizePath(locale, viewer.toolPath)}" class="${n.link}">${escapeHtml(pageSeo[locale][viewer.toolPath].linkText)}</a></li>`)
+    .join('')
+  return (
+    `<nav id="site-nav" aria-label="${label}" class="${n.nav}"><details id="site-nav-menu" class="${n.details}"><summary id="site-nav-toggle" class="${n.summary}">${label}` +
+    `<svg aria-hidden="true" viewBox="0 0 24 24" class="${n.chevron}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${CHEVRON_ICON_PATH}"></path></svg></summary>` +
+    `<ul id="site-nav-list" class="${n.list}">${items}</ul></details></nav>`
+  )
+}
+
 // The site footer as src/components/SiteFooter.tsx draws it on the changelog page (without the "New" badges, for the same reason as above).
 function renderChangelogFooter(locale) {
   const t = (key, values) => escapeHtml(translate(locale, key, values))
@@ -43,10 +59,11 @@ function renderChangelogFooter(locale) {
     .filter((viewer) => viewer.toolPath)
     .map((viewer) => `<li class="${f.item}">${link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))}</li>`)
     .join('')
+  const landingItems = landingPages.map((page) => `<li class="${f.item}">${link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))}</li>`).join('')
   const legalItems = legalFooterLinks.map((item) => `<li>${link(item.id, item.path, t(item.labelKey))}</li>`).join('')
   return (
     `<footer id="site-footer" class="${f.footer}"><div class="${f.columns}"><div><p class="${f.brand}">OpenAnyDoc</p><p class="${f.text}">${t('footer.text')}</p></div>` +
-    `<nav id="footer-viewers" aria-label="${t('footer.viewers')}"><h2 class="${f.heading}">${t('footer.viewers')}</h2><ul class="${f.list}">${viewerItems}</ul></nav>` +
+    `<nav id="footer-viewers" aria-label="${t('footer.viewers')}"><h2 class="${f.heading}">${t('footer.viewers')}</h2><ul class="${f.list}">${viewerItems}${landingItems}</ul></nav>` +
     `<nav id="footer-more" aria-label="${t('footer.more')}"><h2 class="${f.heading}">${t('footer.more')}</h2><ul class="${f.list}"><li>${link('footer-link-all-types', '/', t('footer.allTypes'))}</li></ul></nav>` +
     `<nav id="footer-legal" aria-label="${t('footer.legal')}"><h2 class="${f.heading}">${t('footer.legal')}</h2><ul class="${f.list}">${legalItems}</ul></nav></div>` +
     `<p id="footer-disclaimer" class="${f.disclaimer}">${t('legal.disclaimer')}</p></footer>`
@@ -81,7 +98,7 @@ function renderChangelogBody(locale) {
   const other = otherLocale(locale)
   return (
     `<div id="${changelogIds.page}" class="${c.page}">` +
-    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}">OpenAnyDoc</a></p>` +
+    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}">OpenAnyDoc</a></p>${renderChangelogNav(locale)}` +
     `<p><a id="${changelogIds.languageLink}" href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
     `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}"><h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
     `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`

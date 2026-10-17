@@ -1,6 +1,7 @@
 import { faqItems, features, toolCards } from '../content'
 import { useT } from '../i18n'
-import { findViewerByToolPath } from '../viewers'
+import { pageSeo } from '../seo'
+import { findViewerByToolPath, landingPages } from '../viewers'
 import type { Viewer } from '../viewers'
 import FileTypeChip from './FileTypeChip'
 import NewBadge from './NewBadge'
@@ -18,7 +19,8 @@ export function PrivacySection() {
   )
 }
 
-// The home page's links to each tool page, one card per line of toolCards in src/content.ts.
+// The home page's links to each tool page, one card per line of toolCards in src/content.ts, then a short line of links to the
+// landing pages (landingPages in viewers.ts, named by their linkText in seo.ts).
 export function ToolCardsSection({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
   return (
@@ -39,6 +41,15 @@ export function ToolCardsSection({ onNavigate }: { onNavigate: (path: string) =>
             </li>
           )
         })}
+      </ul>
+      <ul id="landing-links-list" aria-label={t('about.moreFileTools')} className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
+        {landingPages.map((page) => (
+          <li key={page.path}>
+            <PageLink id={`landing-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className="underline underline-offset-2 hover:text-ink pointer-coarse:inline-block pointer-coarse:py-3">
+              {pageSeo[locale][page.path].linkText}
+            </PageLink>
+          </li>
+        ))}
       </ul>
       <p className="mt-3 text-ink-soft">{t('about.notSupported')}</p>
     </div>
