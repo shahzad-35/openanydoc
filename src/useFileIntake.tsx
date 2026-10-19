@@ -6,9 +6,9 @@ import { SAMPLE_JSON_TEXT } from './formats/json/jsonTools'
 import { findFormatForFileName } from './formats/registry'
 import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
-import { findReleasedFormat, getFormatCapabilities } from './whatsNew'
+import { findReleasedFormat, getFormatCapabilities, getReleasedFormats } from './whatsNew'
 
-const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
+export const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
 
 export type OpenedFile = {
   file: File
@@ -152,6 +152,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   const dropTargetProps = {
     onDragOver: (event: DragEvent<HTMLElement>) => {
+      // Files only: the home page's demo drags its own sample chips, which the demo handles itself.
+      if (!event.dataTransfer.types.includes('Files')) return
       event.preventDefault()
       setIsDraggingOver(true)
     },
@@ -165,13 +167,16 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     },
   }
 
+  // The file chooser offers only the formats that open today; a dropped coming-soon file still gets its "coming soon" message.
+  const releasedExtensions = new Set(getReleasedFormats().flatMap(({ viewer }) => viewer.extensions))
+  const choosableExtensions = acceptedExtensions.filter((extension) => releasedExtensions.has(extension))
   const fileInput = (
     <input
       id="file-input"
       ref={fileInputRef}
       type="file"
-      accept={acceptedExtensions.join(',')}
-      aria-label={t('intake.fileInputLabel', { extensions: isolateLeftToRight(acceptedExtensions.join(', ')) })}
+      accept={choosableExtensions.join(',')}
+      aria-label={t('intake.fileInputLabel', { extensions: isolateLeftToRight(choosableExtensions.join(', ')) })}
       className="hidden"
       onChange={(event) => {
         openChosenFiles(Array.from(event.target.files ?? []))
@@ -179,8 +184,6 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       }}
     />
   )
-
-  const promptText = isReading ? t('drop.reading') : isDraggingOver ? t('drop.release') : t('drop.prompt')
 
   return {
     acceptsPastedText,
@@ -197,7 +200,6 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     openFilePicker: () => fileInputRef.current?.click(),
     openFiles: openChosenFiles,
     openSampleJson: () => loadFile(new File([SAMPLE_JSON_TEXT], 'sample.json', { type: 'application/json' })),
-    promptText,
     redirectSuggestion,
   }
 }

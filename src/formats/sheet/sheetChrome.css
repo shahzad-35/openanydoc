@@ -1,0 +1,273 @@
+/* The shared chrome of the sheet-like pages (CSV, Excel): the title row, the toolbar, the value bar, the sidebar, the status bar,
+   the sheet tabs, the popover, the dialogs and the small controls. Scoped to the two workbench roots; every rule is nested
+   under them. Colours come from the site's tokens (light and dark follow `.dark`); each workbench sets `--accent` to its
+   format's colour, which only marks selection, edits and the active chip. The chrome's own buttons are neutral; Download is the
+   one filled button, in the site's accent captured on #file-page before the workbench changes `--accent`. Nothing is bold but
+   the file name. */
+#file-page{--chrome-accent:var(--accent);--chrome-on-accent:var(--on-accent)}
+#csv-workbench,#excel-workbench,#docs-workbench{
+  --ui:var(--font-body);
+  --mono:ui-monospace,"SF Mono",Menlo,Consolas,"IBM Plex Sans Arabic","Liberation Mono",monospace;
+  --bg:var(--paper); --panel:var(--paper-raised); --panel-2:var(--surface-2); --raised:var(--paper-raised);
+  --hover:color-mix(in srgb,var(--ink) 7%,transparent);
+  --line:var(--rule); --line-strong:color-mix(in srgb,var(--rule) 55%,var(--ink-soft)); --grid-line:var(--rule); --head:var(--surface-2); --row-alt:var(--surface-2);
+  --text:var(--ink); --muted:var(--ink-soft); --faint:var(--ink-3);
+  --accent-text:color-mix(in srgb,var(--accent) 88%,var(--ink)); --accent-soft:color-mix(in srgb,var(--accent) 11%,transparent); --accent-line:color-mix(in srgb,var(--accent) 50%,transparent);
+  --sel:color-mix(in srgb,var(--accent) 12%,transparent); --sel-line:var(--accent); --hit:color-mix(in srgb,var(--accent) 24%,transparent);
+  --bar:var(--accent); --bar-dim:color-mix(in srgb,var(--accent) 22%,transparent);
+  --ok:#17773f; --warn:#8a5200; --warn-soft:rgba(176,104,0,.12); --err:var(--danger); --err-soft:color-mix(in srgb,var(--danger) 8%,transparent);
+  --shadow:0 12px 30px -10px rgba(16,24,40,.25),0 2px 6px rgba(16,24,40,.08);
+  --font-mono:var(--mono);
+  color-scheme:light;
+  background:var(--bg);color:var(--text);font:13px/1.4 var(--ui);height:100dvh;display:flex;flex-direction:column;overflow:hidden;-webkit-font-smoothing:antialiased;
+  & *{box-sizing:border-box}
+  &>*{flex:none}
+  & svg{display:inline-block;flex:none}
+  & button,& input,& select,& textarea{font:inherit;color:inherit}
+  & button{cursor:pointer}
+  & :focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+  & [hidden]{display:none!important}
+  & .mono{font-family:var(--mono)}
+  & .num{font-variant-numeric:tabular-nums}
+  & .spacer{flex:1}
+  & .ico{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  & .ico.sm{width:14px;height:14px}
+  & .ico.xs{width:12px;height:12px}
+  & .ico.flipped{transform:scaleY(-1)}
+  & .vsep{width:1px;height:18px;background:var(--line);flex:none;margin-inline:3px}
+  & .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  & kbd{font:500 10.5px var(--mono);padding:0 5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;color:var(--muted);line-height:16px}
+  & .btn{min-height:0;box-shadow:none;height:28px;padding-inline:9px;display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:6px;background:transparent;white-space:nowrap;font-weight:400;font-size:13px;color:var(--text);text-decoration:none}
+  & .btn:hover{background:var(--hover)}
+  & .btn:disabled{opacity:.45;cursor:not-allowed}
+  & .btn.icon{width:28px;padding:0;justify-content:center}
+  & .btn.sm{height:24px;padding-inline:8px;font-size:12px}
+  & .btn.sm.icon{width:24px;padding:0}
+  & .btn.primary{background:var(--chrome-accent);color:var(--chrome-on-accent);font-weight:500}
+  & .btn.primary:hover{filter:brightness(1.07);background:var(--chrome-accent)}
+  & .btn.outline{border-color:var(--line-strong);background:var(--panel)}
+  & .btn.danger{color:var(--err)}
+  & .btn[aria-pressed="true"],& .btn.on{background:var(--accent-soft);color:var(--accent-text)}
+  & .link{border:0;background:transparent;color:var(--accent-text);font-size:12px;padding:0;font-weight:500}
+  & .link:hover{text-decoration:underline}
+
+  /* title row */
+  & #top-bar{display:flex;align-items:center;gap:10px;height:48px;padding-inline:12px;background:var(--panel);border-bottom:1px solid var(--line)}
+  & .brand{display:flex;align-items:center;gap:8px;flex:none;border:0;background:transparent;padding:0 4px 0 0;height:28px;border-radius:6px}
+  & .brand:hover{background:var(--hover)}
+  & .logo{width:24px;height:24px;display:grid;place-items:center;flex:none}
+  & .logo svg{width:20px;height:20px;stroke:var(--chrome-accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  & .brand-name{font:600 17px/1 var(--font-display);letter-spacing:-.01em}
+  & .file-title{display:flex;align-items:center;gap:8px;min-width:0}
+  & #file-name{margin:0;font-size:15px;font-weight:600;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}
+  & .file-size{color:var(--faint);font:11px var(--mono);white-space:nowrap}
+  & .mod{width:7px;height:7px;border-radius:50%;background:var(--accent);flex:none}
+  & .privacy-pill{display:inline-flex;align-items:center;gap:6px;height:24px;padding-inline:8px;border-radius:12px;background:var(--panel-2);color:var(--muted);font-size:12px;white-space:nowrap}
+
+  /* toolbar */
+  & #toolbar{display:flex;align-items:center;gap:1px;height:36px;padding-inline:8px;background:var(--panel);border-bottom:1px solid var(--line)}
+  & .tbtn{position:relative;width:28px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:0;border-radius:6px;background:transparent;color:var(--text);padding:0;flex:none}
+  & .tbtn:hover{background:var(--hover)}
+  & .tbtn:disabled{opacity:.4;cursor:not-allowed}
+  & .tbtn[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent-text)}
+  & .tbtn .count{position:absolute;top:1px;inset-inline-end:0;min-width:14px;height:14px;padding:0 3px;border-radius:7px;background:var(--accent);color:var(--on-accent);font:500 9.5px/14px var(--mono);text-align:center}
+  & .search{display:flex;align-items:center;gap:7px;height:28px;width:220px;padding-inline:8px 6px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);color:var(--muted);margin-inline:4px}
+  & .search:focus-within{border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
+  & .search input{flex:1;min-width:0;border:0;background:transparent;outline:none;font-size:13px;color:var(--text)}
+  & .search input::placeholder{color:var(--faint)}
+  & #search-count{font:11px var(--mono);color:var(--accent-text);white-space:nowrap}
+
+  /* value bar */
+  & #value-bar{display:flex;align-items:center;gap:8px;height:32px;padding-inline:8px;background:var(--panel);border-bottom:1px solid var(--line)}
+  & #cell-address-input{width:64px;height:24px;padding-inline:6px;border:1px solid var(--line);border-radius:5px;background:var(--panel);font:500 12px var(--mono);text-align:center}
+  & .vb-col{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap}
+  & .fx{font:italic 500 12px Georgia,serif;color:var(--faint);padding-inline:4px}
+  & #cell-value-input{flex:1;min-width:0;height:24px;padding-inline:8px;border:1px solid transparent;border-radius:5px;background:transparent;font:13px var(--mono)}
+  & #cell-value-input:disabled{cursor:default}
+  & #cell-value-input:focus,& #cell-address-input:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft);background:var(--panel)}
+  & .vb-note{font-size:11.5px;color:var(--faint);white-space:nowrap}
+  & .vb-note b{color:var(--accent-text);font-weight:500}
+
+  /* grid and sidebar */
+  & #studio{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 1px var(--sidebar-w,300px);min-height:0}
+  &.sidebar-closed #studio{grid-template-columns:minmax(0,1fr)}
+  &.sidebar-closed #sidebar,&.sidebar-closed #sidebar-resizer{display:none}
+  & #grid-pane{position:relative;min-width:0;min-height:0;background:var(--panel);display:flex;flex-direction:column}
+  & #sidebar-resizer{background:var(--line);cursor:col-resize;position:relative;border:0;padding:0}
+  & #sidebar-resizer::after{content:"";position:absolute;inset:0 -3px}
+  & #sidebar-resizer:hover,& #sidebar-resizer.dragging,& #sidebar-resizer:focus-visible{background:var(--accent);outline:none}
+  & #sidebar-resizer .grip{position:absolute;top:50%;left:50%;width:3px;height:28px;margin:-14px 0 0 -1.5px;border-radius:2px;background:var(--line-strong)}
+  & #sidebar{display:flex;flex-direction:column;min-height:0;background:var(--panel);min-width:0}
+  & .sidebar-top{display:flex;align-items:center;gap:4px;height:36px;padding-inline:8px 6px;border-bottom:1px solid var(--line);flex:none}
+  & #sidebar-tabs{display:flex;align-items:center;gap:2px;flex:1;min-width:0;overflow:hidden}
+  & #sidebar-tabs [role=tab]{height:28px;padding-inline:9px;border:0;border-radius:6px;background:transparent;font-size:12.5px;color:var(--muted);white-space:nowrap}
+  & #sidebar-tabs [role=tab]:hover{background:var(--hover);color:var(--text)}
+  & #sidebar-tabs [role=tab][aria-selected="true"]{background:var(--accent-soft);color:var(--accent-text)}
+  & .sidebar-head{display:flex;align-items:baseline;gap:8px;padding:12px 16px 2px;flex:none;min-width:0}
+  & .sidebar-head h2{margin:0;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  & .sidebar-sub{font-size:12px;color:var(--faint);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  & .sheet-handle{display:none}
+  & .sidebar-panel{display:flex;flex:1;min-height:0;flex-direction:column}
+  & .scroll{overflow:auto;min-height:0;flex:1}
+  & .sec{padding:12px 16px}
+  & .sec-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:0 0 9px}
+  & .empty-note{padding:18px 14px;color:var(--muted);font-size:12.5px}
+
+  /* status bar and sheet tabs */
+  & #status-bar{display:flex;align-items:center;gap:0;height:26px;padding-inline:4px;background:var(--panel-2);border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden}
+  & .sb{display:inline-flex;align-items:center;gap:5px;height:26px;padding-inline:8px;border:0;background:transparent;font-size:11.5px;color:var(--muted)}
+  & button.sb:hover{background:var(--hover);color:var(--text)}
+  & .sb b{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
+  & .sb .v{font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums}
+  & .sb-sep{width:1px;height:14px;background:var(--line-strong)}
+  & .sb.accent{color:var(--accent-text)}
+  & .sb.quiet .ico{color:var(--warn)}
+  & #status-legal-links a{color:inherit;text-decoration:none}
+  & #status-legal-links a:hover{color:var(--text);text-decoration:underline}
+  & #sheet-tabs{display:flex;align-items:center;gap:4px;height:28px;padding-inline:8px;background:var(--panel);border-top:1px solid var(--line)}
+  & #sheet-tablist{display:flex;align-items:stretch;gap:2px;height:100%;overflow:auto;scrollbar-width:none}
+  & .sheet-tab{height:100%;padding-inline:14px;border:0;border-top:2px solid transparent;background:transparent;font-size:12.5px;color:var(--muted);white-space:nowrap;max-width:220px;overflow:hidden;text-overflow:ellipsis}
+  & .sheet-tab:hover{background:var(--hover);color:var(--text)}
+  & .sheet-tab[aria-selected="true"]{color:var(--text);background:var(--panel-2);border-top-color:var(--accent)}
+  & #mobile-status{display:none}
+  & #action-bar{display:none}
+  & .phone-only{display:none}
+
+  /* popover: one at a time, under its button or at the pointer */
+  & .pop{position:fixed;z-index:50;min-width:200px;max-width:min(360px,calc(100vw - 16px));background:var(--raised);border:1px solid var(--line-strong);border-radius:8px;box-shadow:var(--shadow);padding:4px}
+  & .pop-head{display:flex;align-items:center;gap:8px;padding:8px 10px 6px}
+  & .pop-title{font-weight:500;font-size:13px}
+  & .pop-sec{padding:8px 10px;border-top:1px solid var(--line)}
+  & .pop-sec:first-child{border-top:0}
+  & .pop .menu-label{padding:6px 9px 4px;font-size:10.5px;color:var(--faint);font-weight:500;letter-spacing:.05em;text-transform:uppercase}
+  & .pop .mi{display:flex;align-items:center;gap:9px;width:100%;height:28px;padding-inline:9px;border:0;border-radius:5px;background:transparent;font-size:13px;text-align:start;color:var(--text);white-space:nowrap}
+  & .pop .mi:hover,& .pop .mi:focus-visible{background:var(--hover);outline:none}
+  & .pop .mi .hint{margin-inline-start:auto;color:var(--faint);font:11px var(--mono)}
+  & .pop .mi .ico{color:var(--muted)}
+  & .pop .mi.danger,& .pop .mi.danger .ico{color:var(--err)}
+  & .pop .mi:disabled{opacity:.45;cursor:not-allowed;background:transparent}
+  & .pop .mi-sep{height:1px;background:var(--line);margin:4px 2px}
+  & .pop input[type=text],& .pop input[type=number],& .pop input[type=date],& .pop select,& .pop textarea{height:28px;border:1px solid var(--line);border-radius:5px;background:var(--panel-2);padding-inline:8px;font-size:13px;min-width:0}
+  & .pop input:focus,& .pop select:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
+  & .pop-actions{display:flex;align-items:center;gap:6px;padding:8px 10px 6px;border-top:1px solid var(--line)}
+  & .checklist{max-height:180px;overflow:auto;display:grid;gap:1px;margin-top:6px}
+  & .checklist label{display:flex;align-items:center;gap:8px;height:26px;padding-inline:6px;border-radius:5px;font-size:13px}
+  & .checklist label:hover{background:var(--hover)}
+  & .checklist .c{margin-inline-start:auto;font:11px var(--mono);color:var(--faint)}
+  & input[type=checkbox],& input[type=radio]{accent-color:var(--accent);margin:0;width:14px;height:14px}
+  & .field{display:grid;gap:4px;font-size:11.5px;color:var(--muted)}
+  & .field select,& .field input{width:100%;height:28px;border:1px solid var(--line);border-radius:5px;background:var(--panel-2);font-size:13px;padding-inline:6px;color:var(--text)}
+  & .toggle-row{display:flex;align-items:center;gap:8px;font-size:13px;height:28px}
+  & .small-note{font-size:11.5px;color:var(--faint);line-height:1.45}
+  & .seg{display:inline-flex;border:1px solid var(--line);border-radius:6px;padding:2px;background:var(--panel-2)}
+  & .seg button{height:22px;padding-inline:8px;border:0;border-radius:4px;background:transparent;font-size:11.5px;color:var(--muted)}
+  & .seg button[aria-pressed="true"]{background:var(--raised);color:var(--text);box-shadow:0 0 0 1px var(--line-strong)}
+  & .notice{display:flex;align-items:center;gap:8px;padding:5px 6px 5px 10px;border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);background:var(--warn-soft);border-radius:6px;font-size:12px;color:var(--text)}
+  & .notice .ico{color:var(--warn)}
+  & .preview{border:1px solid var(--line);border-radius:6px;overflow:hidden;font:11.5px var(--mono)}
+  & .preview div{display:flex;gap:8px;padding:4px 8px;border-bottom:1px solid var(--line)}
+  & .preview div:last-child{border-bottom:0}
+  & .preview del{color:var(--err)}
+  & .preview ins{color:var(--ok);text-decoration:none}
+  & .opt-label{font-size:11.5px;color:var(--muted);margin-bottom:4px}
+  & .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+  /* dialogs */
+  & dialog{border:1px solid var(--line-strong);border-radius:10px;background:var(--raised);color:var(--text);box-shadow:var(--shadow);padding:0;width:min(480px,calc(100vw - 24px))}
+  & dialog::backdrop{background:rgba(5,8,12,.5)}
+  & .dlg-head{display:flex;align-items:center;gap:8px;padding:14px 16px 10px}
+  & .dlg-head h2{margin:0;font-size:15px;font-weight:500}
+  & .dlg-body{padding:4px 16px 14px;display:grid;gap:12px}
+  & .dlg-foot{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--panel-2);border-radius:0 0 10px 10px}
+  & .dlg-body .field select,& .dlg-body .field input,& .dlg-body textarea{height:28px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);padding-inline:8px;font-size:13px;color:var(--text)}
+  & .dlg-body textarea{height:150px;padding:8px;font:12px/1.5 var(--mono);resize:vertical;width:100%}
+
+  /* toast and drop overlay */
+  & .toast-region{position:fixed;inset-block-end:40px;inset-inline-start:50%;transform:translateX(-50%);z-index:80;display:grid;gap:6px;pointer-events:none}
+  & .toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 12px;border-radius:8px;background:var(--ink);color:var(--paper);font-size:13px;box-shadow:var(--shadow);white-space:nowrap}
+  & .toast .btn{color:var(--paper);height:24px}
+  & #drop-overlay{position:fixed;inset:10px;border:2px dashed var(--accent);border-radius:14px;background:color-mix(in srgb,var(--bg) 82%,transparent);display:none;place-items:center;z-index:90;font-size:15px;font-weight:500;color:var(--accent-text)}
+  & .fatal{padding:24px}
+}
+
+/* Excel: the workbook draws its own value row, grid, sheet tabs and status bar; the frame gives them the CSV page's look. The
+   shared edit toolbar (ToolbarControls buttons) becomes one slim icon row. Download and selection take the Excel green. */
+#excel-workbench{
+  --accent:#19733d; --chrome-accent:#19733d; --on-accent:#ffffff; --chrome-on-accent:#ffffff;
+  &>*:last-child{flex:1 1 auto;min-height:0;display:flex;flex-direction:column}
+  & #edit-toolbar{display:flex;align-items:center;gap:8px;height:36px;padding-inline:8px;background:var(--panel);border-bottom:1px solid var(--line)}
+  & #edit-toolbar-tools{display:flex;align-items:center;gap:1px;flex:1;min-width:0;overflow-x:auto;scrollbar-width:none}
+  & #edit-toolbar-tools button{display:inline-flex;align-items:center;justify-content:center;gap:2px;width:auto;min-width:28px;height:28px;min-height:28px;padding-inline:5px;border:0;border-radius:6px;background:transparent;color:var(--text);font-size:13px;font-weight:400}
+  & #edit-toolbar-tools button:hover{background:var(--hover)}
+  & #edit-toolbar-tools button[aria-pressed="true"],& #edit-toolbar-tools button[aria-expanded="true"]{background:var(--accent-soft);color:var(--accent-text)}
+  & #edit-toolbar-tools button:disabled{opacity:.4;background:transparent}
+  & #edit-toolbar-tools>span[aria-hidden="true"]{width:1px;height:18px;margin-inline:4px;background:var(--line)}
+  & #change-counter{font-size:12px;font-weight:400;color:var(--muted);white-space:nowrap}
+  & #main{background:var(--panel)}
+  & #sheet-tablist [role="tab"]{height:100%;min-height:0;max-width:220px;padding-inline:14px;border:0;border-top:2px solid transparent;background:transparent;font-size:12.5px;font-weight:400;color:var(--muted)}
+  & #sheet-tablist [role="tab"]:hover{background:var(--hover);color:var(--text)}
+  & #sheet-tablist [role="tab"][aria-selected="true"]{color:var(--text);background:var(--panel-2);border-top-color:var(--accent)}
+  & #add-sheet-button{width:24px;height:24px;min-height:0;border-radius:6px}
+  & #excel-status-bar{flex-wrap:nowrap;gap:16px;height:26px;padding-block:0;padding-inline:12px;background:var(--panel-2);border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden}
+  & #sheet-size{font-weight:500;color:var(--text)}
+}
+.dark #excel-workbench{--accent:#4fd18a; --chrome-accent:#2ead60; --on-accent:#06110a; --chrome-on-accent:#06110a}
+.dark #csv-workbench,.dark #excel-workbench,.dark #docs-workbench{--ok:#6fdc9a;--warn:#f3bb69;--warn-soft:rgba(243,187,105,.12);--shadow:0 18px 44px -12px rgba(0,0,0,.75),0 2px 8px rgba(0,0,0,.45);color-scheme:dark}
+#file-page[data-dragging="true"] #drop-overlay{display:grid}
+@media (max-width:760px){
+#csv-workbench,#excel-workbench,#docs-workbench{
+  & #top-bar{height:48px;gap:6px;padding-inline:8px}
+  & .brand-name,& .privacy-pill,& #undo-button,& #redo-button,& .desk-only{display:none!important}
+  & .brand{padding:0}
+  & .file-title{flex:1}
+  & #file-name{font-size:14px}
+  & #toolbar{padding-inline:6px}
+  & .search{width:auto;flex:1;margin:0}
+  & .phone-only{display:inline-flex}
+  & #value-bar{display:none}
+  & #studio{display:block;position:relative}
+  &.sidebar-closed #sidebar{display:flex}
+  & #grid-pane{height:100%}
+  & #sidebar-resizer{display:none}
+  & #status-bar,& #sheet-tabs{display:none}
+  & #mobile-status{display:flex;align-items:center;gap:8px;height:30px;padding-inline:12px;font-size:11.5px;color:var(--muted);background:var(--panel-2);border-top:1px solid var(--line);white-space:nowrap;overflow:hidden}
+  & #mobile-status b{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
+  & #mobile-status .v{font-family:var(--mono);color:var(--text)}
+  & #action-bar{display:grid;grid-template-columns:repeat(5,1fr);height:calc(58px + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:var(--panel);border-top:1px solid var(--line)}
+  & .ab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;font-size:10.5px;font-weight:500;color:var(--muted);position:relative}
+  & .ab .ico{width:20px;height:20px}
+  & .ab .dot{position:absolute;top:8px;inset-inline-start:calc(50% + 6px);min-width:15px;height:15px;border-radius:8px;background:var(--accent);color:var(--on-accent);font:500 9.5px/15px var(--mono);padding:0 3px}
+  & #mobile-status,& #action-bar{position:relative;z-index:45}
+  & #sidebar{position:fixed;inset-inline:0;bottom:calc(88px + env(safe-area-inset-bottom));height:74dvh;z-index:40;border-radius:16px 16px 0 0;border:1px solid var(--line-strong);border-bottom:0;box-shadow:0 -14px 34px -14px rgba(0,0,0,.55);transform:translateY(calc(100% - 92px));transition:transform .25s ease}
+  & #sidebar.open{transform:none}
+  & .sheet-handle{display:block;border:0;background:transparent;padding:8px 14px 4px;text-align:start;width:100%}
+  & .sheet-handle .bar{display:block;width:38px;height:4px;border-radius:2px;background:var(--line-strong);margin:0 auto 8px}
+  & .sheet-sum{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+  & .sheet-sum .prof-name{font-size:13.5px;color:var(--text)}
+  & .sheet-sum .v{font-family:var(--mono);color:var(--text)}
+  & #sidebar:not(.open) .sidebar-top,& #sidebar:not(.open) .sidebar-head{display:none}
+  & #sidebar.open .sheet-sum{display:none}
+  & #grid-scroll{padding-bottom:92px}
+  & .pop{left:8px!important;right:8px!important;top:auto!important;bottom:calc(64px + env(safe-area-inset-bottom))!important;max-width:none;width:auto!important;max-height:72dvh;overflow:auto;border-radius:14px;z-index:60}
+  & .toast-region{inset-block-end:110px}
+}
+}
+@media (prefers-reduced-motion:reduce){
+#csv-workbench #sidebar,#excel-workbench #sidebar{transition:none}
+}
+#excel-workbench #value-bar{
+  & #selected-cell-label{min-width:64px;min-height:0;height:24px;padding-inline:6px;border:1px solid var(--line);border-radius:5px;background:var(--panel);font:500 12px var(--mono)}
+  & #cell-value-input{min-height:0;height:24px;border-radius:5px;background:transparent;font:13px var(--mono)}
+  & label{margin-inline-start:auto}
+  & #search-input{min-height:0;height:28px;width:220px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);font-size:13px}
+}
+#excel-workbench [role="columnheader"],#excel-workbench [role="rowheader"]{background:var(--head)}
+
+/* The word-processor frame of the formats not built yet: a white page on a grey canvas. */
+#docs-workbench{
+  & .docs-canvas{flex:1 1 auto;min-height:0;overflow:auto;padding:28px 24px;background:color-mix(in srgb,var(--ink) 6%,var(--surface-2))}
+  & .docs-page{max-width:816px;min-height:60vh;margin-inline:auto;padding:56px 64px;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:0 1px 3px rgba(16,24,40,.08),0 6px 18px -8px rgba(16,24,40,.16);font-size:15px;line-height:1.6}
+}
+@media (max-width:760px){#docs-workbench .docs-canvas{padding:12px}#docs-workbench .docs-page{padding:28px 20px}}
+/* On a phone Excel keeps its sheet tabs: there is no other way to switch sheets. */
+@media (max-width:760px){#excel-workbench #sheet-tabs{display:flex}}

@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import type { ComponentType, LazyExoticComponent } from 'react'
+import type { MenuDefinition } from '../components/MenuBar'
 import type { Locale } from '../i18n'
 import type { OpenedFile } from '../useFileIntake'
 import { viewers } from '../viewers'
@@ -65,6 +66,8 @@ export type EditingModule = {
   getDefaultByteOrderMark(exportSource: unknown): boolean
   // Extra toolbar content for this format (menus), drawn in the edit toolbar's single row after Undo and Redo.
   ToolbarContent?: ComponentType<{ selection: unknown; commands: unknown }>
+  // This format's menus for the menu bar of the file page (between File and Help).
+  getMenus?: (selection: unknown, commands: unknown, locale: Locale) => MenuDefinition[]
   components: unknown
 }
 
@@ -156,11 +159,12 @@ export const formatDefinitions: FormatDefinition[] = [
       countChanges: (edits) => countExcelEdits(edits as ExcelEdits),
       describeChanges: (edits, locale) => describeExcelChanges(edits as ExcelEdits, locale),
       loadEditingModule: () => import('./excel/excelEditing').then((editingFile) => editingFile.excelEditingModule),
+      alwaysEditable: true,
     },
   },
-  { viewerId: 'word', ViewerComponent: comingSoonViewer },
-  { viewerId: 'pdf', ViewerComponent: comingSoonViewer },
-  { viewerId: 'powerpoint', ViewerComponent: comingSoonViewer },
+  { viewerId: 'word', ViewerComponent: comingSoonViewer, ownsWholePage: true },
+  { viewerId: 'pdf', ViewerComponent: comingSoonViewer, ownsWholePage: true },
+  { viewerId: 'powerpoint', ViewerComponent: comingSoonViewer, ownsWholePage: true },
 ]
 
 // Extensions come from `viewers.ts`, the one place that lists what each format accepts.

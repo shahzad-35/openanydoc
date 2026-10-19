@@ -1,4 +1,3 @@
-import { primaryButtonClassName, secondaryButtonClassName } from '../buttonStyles'
 import { joinNodesAsList, localizePath, translate, translateWithNodes, useT } from '../i18n'
 import type { MessageKey } from '../i18n'
 import { getFormatCapabilities, getOtherReleasedFormats } from '../whatsNew'
@@ -57,11 +56,9 @@ function ExtensionList({ id, className, shownViewers }: { id: string; className:
   )
 }
 
-const stepKeys = ['drop.step1', 'drop.step2', 'drop.step3'] as const
-
-// The big centered drop panel plus the slim three-step strip. The whole home screen is the drop target (see HomePage);
-// this panel is where the prompt, the accepted types and the Choose a file button live.
-// `shownViewers` are the formats listed: all of them on the home page, one on a format's own page.
+// The hero's controls: the Choose a file button, the paste hint and the messages a dropped file can cause. The whole screen is
+// the drop target (see HomePage). `shownViewers` are the formats listed on a format's own page; the home page lists its formats
+// in its own grid (home/HomeSections.tsx) and passes `showExtensions={false}` and its own `pasteHint`.
 type DropPanelProps = {
   intake: ReturnType<typeof useFileIntake>
   shownViewers?: Viewer[]
@@ -70,9 +67,11 @@ type DropPanelProps = {
   onNavigate?: (path: string) => void
   // The "Open it in the ... viewer" button: gives the same File to that viewer's page.
   onOpenInViewer?: (file: File, toolPath: string) => void
+  showExtensions?: boolean
+  pasteHint?: string
 }
 
-export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer }: DropPanelProps) {
+export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer, showExtensions = true, pasteHint }: DropPanelProps) {
   const { locale, t } = useT()
   const otherFormats = currentViewerId ? getOtherReleasedFormats(currentViewerId) : []
   const suggestion = intake.redirectSuggestion
@@ -81,30 +80,22 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
   const openSuggestedViewer = () => suggestion && onOpenInViewer?.(suggestion.file, localizePath(locale, suggestion.viewer.toolPath as string))
   return (
     <>
-      <div
-        id="drop-panel"
-        className={`box-shape solid-box mx-auto w-full max-w-3xl bg-paper-raised/80 p-6 text-center backdrop-blur-md transition-colors duration-200 md:p-8 ${
-          intake.isDraggingOver ? 'border-accent' : 'border-rule'
-        }`}
-      >
-        <p id="drop-prompt" className="type-h3 text-3xl md:text-4xl">{intake.promptText}</p>
-        <p id="drop-subprompt" className="mt-2 text-ink-soft">{t('drop.subprompt')}</p>
-
-        <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />
+      <div id="drop-panel" className="text-center">
+        {showExtensions && <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mb-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />}
 
         {intake.fileInput}
-        <div className="mt-6 flex flex-wrap justify-center gap-3">
-          <button id="choose-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className={primaryButtonClassName}>
+        <div className="flex flex-wrap justify-center gap-3">
+          <button id="choose-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--hero press">
             {t('drop.chooseFile')}
           </button>
           {currentViewerId === 'json' && (
-            <button id="open-sample-json-button" type="button" disabled={intake.isReading} onClick={intake.openSampleJson} className={secondaryButtonClassName}>
+            <button id="open-sample-json-button" type="button" disabled={intake.isReading} onClick={intake.openSampleJson} className="btn btn--quiet btn--hero press">
               {t('drop.trySampleJson')}
             </button>
           )}
         </div>
-        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{t(currentViewerId === 'json' ? 'drop.pasteHintJson' : 'drop.pasteHint')}</p>}
-        <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>
+        {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{pasteHint ?? t(currentViewerId === 'json' ? 'drop.pasteHintJson' : 'drop.pasteHint')}</p>}
+        {showExtensions && <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>}
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
           <Notice id="large-file-warning" kind="warning" message={intake.largeFileWarning ?? ''} />
@@ -121,7 +112,7 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
           {suggestion && !isPhone && (
             <div id="wrong-file-redirect" className="flex flex-col items-center gap-3">
               <p id="wrong-file-message" className="font-medium">{wrongFileMessage}</p>
-              <button id="open-in-viewer-button" type="button" onClick={openSuggestedViewer} className={secondaryButtonClassName}>
+              <button id="open-in-viewer-button" type="button" onClick={openSuggestedViewer} className="btn btn--quiet press">
                 {t('redirect.open', { format: suggestion.viewer.label })}
               </button>
             </div>
@@ -129,10 +120,10 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
           {suggestion && isPhone && (
             <ModalDialog id="dialog-wrong-file" title={wrongFileMessage} onClose={intake.clearRedirectSuggestion}>
               <div className="mt-6 flex flex-wrap justify-end gap-3">
-                <button id="open-in-viewer-button" type="button" autoFocus onClick={openSuggestedViewer} className={primaryButtonClassName}>
+                <button id="open-in-viewer-button" type="button" autoFocus onClick={openSuggestedViewer} className="btn btn--primary press">
                   {t('redirect.open', { format: suggestion.viewer.label })}
                 </button>
-                <button id="wrong-file-close-button" type="button" onClick={intake.clearRedirectSuggestion} className={secondaryButtonClassName}>
+                <button id="wrong-file-close-button" type="button" onClick={intake.clearRedirectSuggestion} className="btn btn--quiet press">
                   {t('find.close')}
                 </button>
               </div>
@@ -165,17 +156,6 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
           })}
         </p>
       )}
-
-      <ol id="drop-steps" className="mt-6 flex flex-wrap justify-center gap-x-8 gap-y-2 text-ink-soft">
-        {stepKeys.map((stepKey, index) => (
-          <li key={stepKey} className="flex items-center gap-2">
-            <span className="control-shape type-h3 grid size-8 place-items-center bg-paper-raised/80 text-sm text-ink">
-              {index + 1}
-            </span>
-            {t(stepKey)}
-          </li>
-        ))}
-      </ol>
     </>
   )
 }

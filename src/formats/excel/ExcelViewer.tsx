@@ -817,7 +817,7 @@ export default function ExcelViewer({
   return (
     <div className="flex min-h-0 flex-1 flex-col text-[13px]">
       {parsed && (
-        <div className="flex items-center gap-2 overflow-x-auto border-b border-rule bg-paper px-4 py-1 md:flex-wrap md:overflow-visible">
+        <div id="value-bar">
           {isEditable && (
             <editing.EditBar
               selectedCellLabel={selectedCellLabel}

@@ -1,8 +1,10 @@
 import type { ReactNode } from 'react'
 import { localizePath, useT } from '../i18n'
+import { CONTACT_EMAIL } from '../legalContent'
 import { footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
 import { pageSeo } from '../seo'
 import { landingPages, viewers } from '../viewers'
+import { Wordmark } from './KitIcon'
 import NewBadge from './NewBadge'
 
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
@@ -39,7 +41,9 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
     <footer id="site-footer" className={footerClasses.footer}>
       <div className={footerClasses.columns}>
         <div>
-          <p className={footerClasses.brand}>OpenAnyDoc</p>
+          <p className={footerClasses.brand}>
+            <Wordmark />
+          </p>
           <p className={footerClasses.text}>{t('footer.text')}</p>
         </div>
         <nav id="footer-viewers" aria-label={t('footer.viewers')}>
@@ -95,6 +99,11 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
                 </PageLink>
               </li>
             ))}
+            <li>
+              <a id="footer-link-contact" href={`mailto:${CONTACT_EMAIL}`} className={footerClasses.link}>
+                {t('footer.contact')}
+              </a>
+            </li>
           </ul>
         </nav>
       </div>

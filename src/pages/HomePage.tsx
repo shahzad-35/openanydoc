@@ -1,19 +1,19 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
-import AboutContent from '../components/AboutContent'
-import FormatGuide from '../components/FormatGuide'
+import { useEffect } from 'react'
 import DropPanel from '../components/DropPanel'
-import WhatsNewBanner from '../components/WhatsNewBanner'
+import FormatGuide from '../components/FormatGuide'
 import LanguageSwitcher from '../components/LanguageSwitcher'
-import { LOCALES, localizePath, useT } from '../i18n'
-import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
 import SiteFooter, { PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
-import ThemeToggle from '../components/ThemeToggle'
+import WhatsNewBanner from '../components/WhatsNewBanner'
+import DemoStage from '../components/home/DemoStage'
+import { ClosingCta, DemoNote, FaqSection, FormatGrid, PrivacyContrast, StatsRow } from '../components/home/HomeSections'
+import { Wordmark } from '../components/KitIcon'
+import ShortcutTabs, { useIsMacKeyboard } from '../components/home/ShortcutTabs'
+import { LOCALES, localizePath, useT } from '../i18n'
+import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
-
-const AuroraBackdrop = lazy(() => import('../backdrop/AuroraBackdrop'))
 
 function setMetaTag(keyAttribute: 'name' | 'property', key: string, content: string) {
   let tag = document.head.querySelector(`meta[${keyAttribute}="${key}"]`)
@@ -63,8 +63,9 @@ export function usePageHead(address: string, title: string, description: string)
   }, [locale, address, title, description])
 }
 
-// The whole screen is the drop target: a file dropped anywhere on the page opens, over a slow field of drifting particles.
-// With `toolViewer` it is that format's own page (/json-viewer ...): the same screen for one format.
+// The whole screen is the drop target: a file dropped anywhere on the page opens in its viewer. The home page is the Toy Blocks
+// landing page (hero with the simulated demo, stats, shortcuts, formats, privacy, questions, closing call); with `toolViewer` it
+// is that format's own page (/json-viewer ...): the same hero for one format, with that page's guide under it.
 export default function HomePage({
   onFileLoaded,
   onNavigate,
@@ -85,82 +86,95 @@ export default function HomePage({
   onOpenInViewer: (file: File, toolPath: string) => void
 }) {
   const { locale, t } = useT()
-  // The animated backdrop is decoration: it is fetched only after the page has appeared and the browser is idle, and not at all
-  // when the visitor asked their browser to save data.
-  const [isBackdropWanted, setIsBackdropWanted] = useState(false)
-  useEffect(() => {
-    const saveData = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection?.saveData === true
-    if (saveData) return
-    const wantBackdrop = () => setIsBackdropWanted(true)
-    if ('requestIdleCallback' in window) {
-      const idleId = window.requestIdleCallback(wantBackdrop, { timeout: 2000 })
-      return () => window.cancelIdleCallback(idleId)
-    }
-    const timerId = setTimeout(wantBackdrop, 500)
-    return () => clearTimeout(timerId)
-  }, [])
-
+  const isMac = useIsMacKeyboard()
   const intake = useFileIntake({ acceptedExtensions: toolViewer?.extensions ?? supportedExtensions, onFileLoaded, handoffFile, onHandoffConsumed })
 
   // Each page gets its own title and description, in the page's language, for search results and browser tabs.
   const address = toolViewer?.toolPath ?? '/'
   const seo = pageSeo[locale][address]
   usePageHead(address, seo.title, seo.description)
+  const isHomePage = !toolViewer
 
   return (
-    <div id="home-page" {...intake.dropTargetProps} className="relative min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink">
-      <div id="page-backdrop" aria-hidden="true" className="pointer-events-none fixed inset-0 z-0">
-        {isBackdropWanted && (
-          <Suspense fallback={null}>
-            <AuroraBackdrop />
-          </Suspense>
-        )}
-      </div>
-      {intake.isDraggingOver && (
-        <div id="drag-over-outline" aria-hidden="true" className="pointer-events-none fixed inset-3 z-20 box-shape border-2 border-dashed border-accent" />
-      )}
+    <div id="home-page" {...intake.dropTargetProps} className="toy-page relative min-h-dvh text-[17px] leading-normal text-ink">
+      {intake.isDraggingOver && <div id="drag-over-outline" aria-hidden="true" className="pointer-events-none fixed inset-3 z-20 rounded-[30px] border-[3px] border-dashed border-accent" />}
 
       <a
         id="skip-to-content-link"
         href="#main"
-        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper"
+        className="sr-only focus:not-sr-only focus:absolute focus:start-4 focus:top-4 focus:z-30 focus:rounded-full focus:bg-ink focus:px-4 focus:py-2 focus:text-paper-raised"
       >
         {t('skip.toContent')}
       </a>
 
-      <div className="relative z-10">
-        <header id="site-header" className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5">
-          <p id="site-brand" className="type-h3">{toolViewer ? <PageLink id="brand-home-link" path="/" onNavigate={onNavigate}>OpenAnyDoc</PageLink> : 'OpenAnyDoc'}</p>
-          <SiteNav currentPath={address} onNavigate={onNavigate} />
-          <div className="flex items-center gap-2">
-            <LanguageSwitcher />
-            <ThemeToggle />
+      <header id="site-header" className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5">
+        <p id="site-brand" className="flex items-center">
+          {toolViewer ? (
+            <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full">
+              <Wordmark />
+            </PageLink>
+          ) : (
+            <Wordmark />
+          )}
+        </p>
+        <SiteNav currentPath={address} onNavigate={onNavigate} />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <PageLink id="header-link-privacy" path="/privacy" onNavigate={onNavigate} className="pill-link hidden sm:inline-flex">
+            {t('legal.privacyShort')}
+          </PageLink>
+          <LanguageSwitcher className="pill-link" />
+          <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary press ms-1">
+            {t('nav.openFile')}
+          </button>
+        </div>
+      </header>
+
+      {/* What's new is announced on the home page only, not on a format's own page. */}
+      {isHomePage && !isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} />}
+
+      <main id="main" className="mx-auto max-w-[1120px] px-5 pb-24">
+        <section id="hero" className="pt-10 md:pt-16">
+          <div className="mx-auto max-w-[640px] text-center">
+            <h1 id="page-heading" className="type-display hero-in text-balance">{seo.heading}</h1>
+            <p id="page-intro" className="type-lead hero-in mt-5 text-ink-soft">{seo.intro}</p>
+            {isHomePage && <p id="hero-fine-print" className="hero-in mt-3 text-sm font-semibold text-ink-soft">{t('hero.finePrint')}</p>}
+            <div className="hero-in mt-8">
+              <DropPanel
+                intake={intake}
+                shownViewers={toolViewer ? [toolViewer] : viewers}
+                currentViewerId={toolViewer?.id}
+                onNavigate={onNavigate}
+                onOpenInViewer={onOpenInViewer}
+                showExtensions={!isHomePage}
+                pasteHint={isHomePage ? t('hero.pasteHint', { shortcut: isMac ? '⌘' : 'Ctrl' }) : undefined}
+              />
+            </div>
           </div>
-        </header>
+          {isHomePage && (
+            <div className="mt-12 md:mt-16">
+              <DemoStage />
+            </div>
+          )}
+        </section>
 
-        {/* What's new is announced on the home page only, not on a format's own page. */}
-        {!toolViewer && !isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} />}
-
-        <main id="main" className="mx-auto max-w-5xl px-4 pb-20">
-          <section id="hero" className="flex min-h-[calc(100dvh-6rem)] flex-col justify-center py-8 text-center">
-            <h1 id="page-heading" className="type-h1 mx-auto max-w-3xl text-balance">{seo.heading}</h1>
-            <p id="page-intro" className="mb-8 mt-3 text-ink-soft">{seo.intro}</p>
-            <DropPanel
-              intake={intake}
-              shownViewers={toolViewer ? [toolViewer] : viewers}
-              currentViewerId={toolViewer?.id}
-              onNavigate={onNavigate}
-              onOpenInViewer={onOpenInViewer}
-            />
-          </section>
-
-          <div id="about-content" className="box-shape mt-12 bg-paper-raised/90 p-6 backdrop-blur-md md:p-10">
-            {toolViewer ? <FormatGuide address={address} viewerId={toolViewer.id} onNavigate={onNavigate} /> : <AboutContent onNavigate={onNavigate} />}
+        {toolViewer ? (
+          <div id="about-content" className="section-gap">
+            <FormatGuide address={address} viewerId={toolViewer.id} onNavigate={onNavigate} />
           </div>
-        </main>
+        ) : (
+          <>
+            <StatsRow />
+            <ShortcutTabs />
+            <FormatGrid onNavigate={onNavigate} />
+            <PrivacyContrast />
+            <FaqSection />
+            <ClosingCta onOpenFile={intake.openFilePicker} />
+          </>
+        )}
+      </main>
 
-        <SiteFooter currentPath={address} onNavigate={onNavigate} />
-      </div>
+      <SiteFooter currentPath={address} onNavigate={onNavigate} />
+      {isHomePage && <DemoNote />}
     </div>
   )
 }

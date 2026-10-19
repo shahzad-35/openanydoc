@@ -6,22 +6,51 @@
 @import "@fontsource/ibm-plex-sans-arabic/arabic-500.css";
 @import "@fontsource/ibm-plex-sans-arabic/arabic-700.css";
 
+/* Toy Blocks type: Fredoka for display, Nunito Sans for body, Baloo Bhaijaan 2 for Arabic display. Bundled
+   from our own domain, because the Content-Security-Policy allows no other font or style origin. */
+@import "@fontsource/fredoka/latin-400.css";
+@import "@fontsource/fredoka/latin-500.css";
+@import "@fontsource/fredoka/latin-600.css";
+@import "@fontsource/fredoka/latin-700.css";
+@import "@fontsource/nunito-sans/latin-400.css";
+@import "@fontsource/nunito-sans/latin-600.css";
+@import "@fontsource/nunito-sans/latin-700.css";
+@import "@fontsource/baloo-bhaijaan-2/arabic-600.css";
+@import "@fontsource/baloo-bhaijaan-2/arabic-700.css";
+
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Neutral base: color on this page comes from the file types below. */
 :root {
   --paper: #eef3fb;
   --paper-raised: #ffffff;
-  --ink: #0f1a33;
-  --ink-soft: #4a5878;
-  --rule: #d4dcec;
-  --accent: #2b50c8;
+  --ink: #1f2433;
+  --ink-soft: #4a5573;
+  --rule: #e3e7f0;
+  --accent: #2d5bff;
   --on-accent: #ffffff;
   --font-display: "Avenir Next", Avenir, "Century Gothic", "Gill Sans", "Trebuchet MS", system-ui, sans-serif;
   --radius-box: 20px;
   --danger: #b3261e;
   --edit-mark: #b45309;
   --icon-roughness: 0;
+
+  /* Toy Blocks tokens: quiet surfaces, one block colour per format (face, base, glow and the
+     label ink that passes AA on the face), status colours and the two easings. */
+  --surface: #f1f3f8;
+  --surface-2: #f6f8fc;
+  --ink-3: #7a849e;
+  --accent-hover: #1a3fcc;
+  --csv: #18b39a; --csv-base: #0a7a68; --csv-glow: rgba(10, 122, 104, 0.5); --csv-ink: #063f36;
+  --xlsx: #2ead60; --xlsx-base: #19733d; --xlsx-glow: rgba(25, 115, 61, 0.5); --xlsx-ink: #0b3a1e;
+  --json: #7a5cff; --json-base: #4a31c4; --json-glow: rgba(74, 49, 196, 0.5); --json-ink: #ffffff;
+  --txt: #ff8a3d; --txt-base: #c25a16; --txt-glow: rgba(194, 90, 22, 0.5); --txt-ink: #2a1300;
+  --yellow: #ffd84d; --yellow-base: #d9a900; --yellow-glow: rgba(217, 169, 0, 0.55); --yellow-ink: #2a2100;
+  --warn: #ffb020; --warn-base: #c27c00; --warn-ink: #2a1d00; --warn-bg: #fff8ec;
+  --ok: #2ead60; --ok-base: #19733d;
+  --block-base-neutral: #d5dbe8;
+  --ease-press: cubic-bezier(0.3, 0.7, 0.4, 1.5);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
   --type-csv: #6a46b0;
   --type-text: #4a5a73;
@@ -78,6 +107,18 @@ html[lang="ar"] {
   --on-accent: #0a1128;
   --danger: #ff8a80;
   --edit-mark: #fbbf24;
+
+  --surface: #1c2130;
+  --surface-2: #171b27;
+  --ink-3: #8a93aa;
+  --accent-hover: #a5baff;
+  --warn-bg: #2a2312;
+  --block-base-neutral: #0b0e17;
+  --csv-glow: rgba(10, 122, 104, 0.35);
+  --xlsx-glow: rgba(25, 115, 61, 0.35);
+  --json-glow: rgba(74, 49, 196, 0.35);
+  --txt-glow: rgba(194, 90, 22, 0.35);
+  --yellow-glow: rgba(217, 169, 0, 0.35);
 
   --type-csv: #b79bff;
   --type-text: #a9b9d4;
@@ -138,6 +179,10 @@ html[lang="ar"] {
   --color-on-accent: var(--on-accent);
   --color-danger: var(--danger);
   --color-edit-mark: var(--edit-mark);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--rule);
 }
 
 @theme {
@@ -148,7 +193,7 @@ html[lang="ar"] {
 @utility type-h1 {
   font-family: var(--font-display, var(--font-rounded));
   font-size: clamp(2.4rem, 5.5vw, 3rem);
-  font-weight: 700;
+  font-weight: 500;
   letter-spacing: -0.02em;
   line-height: 1.1;
 }
@@ -156,7 +201,7 @@ html[lang="ar"] {
 @utility type-h3 {
   font-family: var(--font-display, var(--font-rounded));
   font-size: 1.4rem;
-  font-weight: 700;
+  font-weight: 400;
   letter-spacing: -0.02em;
   line-height: 1.2;
 }
@@ -164,7 +209,7 @@ html[lang="ar"] {
 @utility type-button {
   font-family: var(--font-display, var(--font-rounded));
   font-size: 1.05rem;
-  font-weight: 700;
+  font-weight: 400;
 }
 
 @utility box-shape {
@@ -257,4 +302,485 @@ html {
     transition-duration: 0.01ms !important;
     transform: none !important;
   }
+}
+
+/* ---- Toy Blocks: the home, format and landing pages (src/pages/HomePage.tsx). ---- */
+
+/* The Toy Blocks type on every page, Arabic included (Baloo Bhaijaan 2 and Plex Arabic carry the Arabic letters). */
+:root,
+html[lang="ar"] {
+  --font-display: "Fredoka", "Baloo Bhaijaan 2", ui-rounded, "Arial Rounded MT Bold", system-ui, sans-serif;
+  --font-body: "Nunito Sans", "IBM Plex Sans Arabic", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+
+body {
+  font-family: var(--font-body);
+}
+
+.toy-page {
+  font-family: var(--font-body);
+  background: var(--paper-raised);
+}
+
+html[lang="ar"] .toy-page {
+  --font-display: "Baloo Bhaijaan 2", "Fredoka", system-ui, sans-serif;
+  --font-body: "IBM Plex Sans Arabic", "Nunito Sans", system-ui, sans-serif;
+}
+
+.toy-page :focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 3px;
+}
+
+/* In the components layer so Tailwind's utilities (md:hidden, min-h-10, ms-auto ...) can still adjust a block, button or pill. */
+@layer components {
+
+.wordmark {
+  font: 700 26px/1 var(--font-display);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.type-display {
+  font-family: var(--font-display);
+  font-size: clamp(40px, 4.4vw + 1rem, 70px);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+}
+
+.type-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 2vw + 1rem, 40px);
+  font-weight: 500;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+/* Arabic: no tracking (it breaks the joins) and room above the line for the marks. */
+html[lang="ar"] .type-display,
+html[lang="ar"] .type-h2 {
+  letter-spacing: 0;
+  line-height: 1.25;
+}
+
+.type-lead {
+  font-size: clamp(17px, 0.5vw + 0.9rem, 19px);
+  line-height: 1.5;
+}
+
+/* The gap between sections: 72px on a phone, up to 140px on a desktop. */
+.section-gap {
+  margin-top: clamp(72px, 9vw, 140px);
+}
+
+/* Anything pressable sinks into its base when pressed. */
+.press {
+  cursor: pointer;
+  transition: transform 120ms var(--ease-press), box-shadow 120ms ease-out, background-color 120ms ease-out;
+}
+
+.press:hover {
+  transform: translateY(-2px);
+}
+
+.press:active {
+  transform: translateY(var(--press-depth, 3px));
+  --lift: 2px;
+}
+
+/* Buttons: a pill with a solid base under it. */
+.btn {
+  --lift: 5px;
+  --press-depth: 3px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 9999px;
+  font: 400 18px/1 var(--font-display);
+  box-shadow: 0 var(--lift) 0 var(--base);
+}
+
+.btn--primary {
+  --base: #000;
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+
+.dark .btn--primary {
+  --base: #9aa3b8;
+  background: var(--paper-raised);
+  color: var(--ink);
+}
+
+.btn--quiet {
+  --base: var(--block-base-neutral);
+  --lift: 4px;
+  background: var(--surface);
+  color: var(--ink);
+}
+
+.btn--hero {
+  min-height: 54px;
+  padding: 0 28px;
+}
+
+.btn:disabled {
+  background: var(--rule);
+  color: var(--ink-3);
+  box-shadow: none;
+  transform: none;
+  cursor: not-allowed;
+}
+
+/* Quiet pill links (header, footer, nav). */
+.pill-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 16px;
+  border-radius: 9999px;
+  font-weight: 600;
+  color: var(--ink);
+  transition: background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.pill-link:hover {
+  background: var(--surface);
+  color: var(--accent);
+}
+
+.pill-link[aria-current="page"] {
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+
+/* Extension chips (.csv, .xlsx ...). */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: 500 14px/1 var(--font-mono, ui-monospace, Menlo, monospace);
+  box-shadow: 0 3px 0 var(--block-base-neutral);
+}
+
+.chip--soft {
+  border: 1px solid var(--rule);
+  background: var(--paper-raised);
+  box-shadow: none;
+}
+
+/* A keycap: light face, a darker bottom edge, the symbol large and the key's name small under it. */
+.keycap {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  min-height: 56px;
+  padding: 6px 12px;
+  border: 1px solid var(--rule);
+  border-bottom-width: 3px;
+  border-bottom-color: color-mix(in srgb, var(--ink) 22%, var(--rule));
+  border-radius: 12px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font-family: var(--font-display);
+  direction: ltr;
+}
+
+.dark .keycap {
+  background: var(--surface);
+}
+
+.keycap-symbol {
+  font-size: 22px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.keycap-symbol--text {
+  font-size: 16px;
+}
+
+.keycap-name {
+  margin-top: 3px;
+  font: 600 11px/1 var(--font-body);
+  color: var(--ink-soft);
+}
+
+.keycap-plus {
+  color: var(--ink-soft);
+  font-weight: 400;
+}
+
+/* The format tabs above the shortcuts. */
+.format-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 48px;
+  padding: 0 18px;
+  border: 2px solid var(--rule);
+  border-radius: 9999px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: 400 17px/1 var(--font-display);
+  cursor: pointer;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out, color 120ms ease-out;
+}
+
+.format-tab:hover {
+  border-color: var(--ink-3);
+}
+
+.format-tab[aria-selected="true"] {
+  border-color: var(--ink);
+  background: var(--ink);
+  color: var(--paper-raised);
+}
+
+/* The demo stage, the one bold element of the page: a soft panel with a drawn dot grid and a solid base. */
+.demo-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 30px;
+  background:
+    radial-gradient(60% 80% at 15% 10%, color-mix(in srgb, var(--yellow) 22%, transparent), transparent 70%),
+    radial-gradient(50% 70% at 90% 90%, color-mix(in srgb, var(--json) 14%, transparent), transparent 70%),
+    radial-gradient(40% 50% at 80% 10%, color-mix(in srgb, var(--csv) 14%, transparent), transparent 70%),
+    var(--surface-2);
+  box-shadow:
+    0 12px 0 var(--rule),
+    0 40px 40px -20px rgba(31, 36, 51, 0.2);
+}
+
+.demo-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, color-mix(in srgb, var(--ink) 14%, transparent) 1px, transparent 1.4px);
+  background-size: 18px 18px;
+  mask-image: radial-gradient(70% 70% at 50% 50%, #000 40%, transparent 100%);
+  pointer-events: none;
+}
+
+.demo-chip {
+  --lift: 4px;
+  --press-depth: 2px;
+  --base: var(--block-base-neutral);
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 56px;
+  padding: 0 16px 0 12px;
+  border: 2px solid transparent;
+  border-radius: 16px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: 500 15px/1 var(--font-mono, ui-monospace, Menlo, monospace);
+  box-shadow: 0 var(--lift) 0 var(--base);
+  cursor: grab;
+  touch-action: manipulation;
+}
+
+.demo-chip:active {
+  cursor: grabbing;
+}
+
+.demo-chip[aria-pressed="true"] {
+  border-color: var(--accent);
+  transform: translateY(-6px) rotate(-2deg);
+  box-shadow:
+    0 10px 0 var(--base),
+    0 24px 24px -12px rgba(31, 36, 51, 0.3);
+}
+
+.demo-target {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 240px;
+  padding: 24px;
+  border: 2px dashed color-mix(in srgb, var(--ink) 35%, transparent);
+  border-radius: 22px;
+  background: color-mix(in srgb, var(--paper-raised) 70%, transparent);
+  color: var(--ink);
+  text-align: center;
+  cursor: default;
+  transition: border-color 120ms ease-out, background-color 120ms ease-out, transform 160ms var(--ease-press);
+}
+
+.demo-target.is-armed {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 6%, var(--paper-raised));
+  cursor: pointer;
+}
+
+.demo-target.is-over {
+  border-color: var(--accent);
+  border-style: solid;
+  background: color-mix(in srgb, var(--accent) 10%, var(--paper-raised));
+  transform: scale(1.02);
+}
+
+.demo-viewer {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--rule);
+  border-radius: 22px;
+  background: var(--paper-raised);
+  box-shadow: 0 8px 0 var(--rule);
+}
+
+.demo-viewer-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+}
+
+.demo-scroll {
+  max-height: 248px;
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.demo-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 14px;
+  text-align: left;
+}
+
+.demo-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--surface-2);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.demo-table td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+
+.demo-table tr:hover td {
+  background: var(--surface-2);
+}
+
+.demo-code {
+  margin: 0;
+  padding: 12px 16px;
+  font: 14px/1.6 var(--font-mono, ui-monospace, Menlo, monospace);
+  direction: ltr;
+  text-align: left;
+}
+
+.demo-indent {
+  padding-left: 2ch;
+}
+
+.demo-code .k { color: var(--ink); }
+.demo-code .s { color: var(--csv-base); }
+.demo-code .n { color: var(--json-base); }
+.demo-code .b { color: var(--txt-base); }
+.demo-code .p { color: var(--ink-soft); }
+.dark .demo-code .s { color: var(--csv); }
+.dark .demo-code .n { color: #b3a4ff; }
+.dark .demo-code .b { color: var(--txt); }
+
+.demo-lines {
+  margin: 0;
+  padding: 12px 0;
+  font: 14px/1.7 var(--font-mono, ui-monospace, Menlo, monospace);
+  direction: ltr;
+  text-align: left;
+  counter-reset: line;
+  list-style: none;
+}
+
+.demo-lines li {
+  display: grid;
+  grid-template-columns: 3ch 1fr;
+  gap: 16px;
+  padding: 0 16px;
+}
+
+.demo-lines li::before {
+  counter-increment: line;
+  content: counter(line);
+  text-align: right;
+  color: var(--ink-soft);
+}
+
+.status-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 28px;
+  padding: 0 10px;
+  border-radius: 9999px;
+  background: color-mix(in srgb, var(--ok) 14%, var(--paper-raised));
+  color: var(--ok-base);
+  font: 600 13px/1 var(--font-body);
+}
+
+.dark .status-chip {
+  color: var(--ok);
+}
+
+.stat-number {
+  font: 700 clamp(56px, 6vw, 84px)/1 var(--font-display);
+  letter-spacing: -0.02em;
+  direction: ltr;
+}
+
+/* Quiet cards for the format groups and the privacy comparison. */
+.soft-card {
+  padding: 24px;
+  border-radius: 22px;
+  background: var(--surface-2);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes demo-viewer-in {
+    from { opacity: 0; transform: translateY(12px) scale(0.97); }
+    to { opacity: 1; transform: none; }
+  }
+
+  @keyframes hero-in {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: none; }
+  }
+
+  .demo-viewer { animation: demo-viewer-in 360ms var(--ease-spring) both; }
+  /* The one page-load moment: the hero settles in, line by line, then the stage. */
+  .hero-in { animation: hero-in 500ms ease-out both; }
+  .hero-in:nth-child(2) { animation-delay: 70ms; }
+  .hero-in:nth-child(3) { animation-delay: 140ms; }
+  .hero-in:nth-child(4) { animation-delay: 210ms; }
+  .demo-stage.hero-in { animation-delay: 280ms; }
+}
+
 }

@@ -6,7 +6,10 @@ import '@fontsource/ibm-plex-sans/latin-500.css'
 import '@fontsource/ibm-plex-sans/latin-600.css'
 import '@fontsource/ibm-plex-mono/latin-400.css'
 import '@fontsource/ibm-plex-mono/latin-500.css'
+import { MiniFormatIcon, Wordmark } from '../../components/KitIcon'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
+import MenuBar from '../../components/MenuBar'
+import type { MenuDefinition, MenuEntry } from '../../components/MenuBar'
 import { FatalFileError } from '../../components/Messages'
 import { isolateLeftToRight, isolateText, localizePath, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
@@ -307,18 +310,18 @@ const TOOL_ICONS: Record<ToolKey, string> = {
 
 // The icons, drawn once and used by name (as in the design file). Static markup, no file content.
 const ICON_SPRITE = `<defs>
-<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></symbol>
-<symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13"/></symbol>
-<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="m7 10 5 5 5-5"/><path d="M5 20h14"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 5 4.5 9.5 9 14"/><path d="M4.5 9.5H14a5.5 5.5 0 0 1 0 11h-3"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 5 4.5 4.5L15 14"/><path d="M19.5 9.5H10a5.5 5.5 0 0 0 0 11h3"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v2.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V15"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><path d="M12 3 5 6v6c0 4.5 3 7.5 7 9 4-1.5 7-4.5 7-9V6Z"/><path d="m9 12 2 2 4-4"/></symbol>
-<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8Z"/><path d="M14 3v5h5M9 13h6M9 17h4"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/></symbol>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 <symbol id="i-chev" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
 <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 15 6-6 6 6"/></symbol>
-<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5v-2A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></symbol>
 <symbol id="i-print" viewBox="0 0 24 24"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></symbol>
 <symbol id="i-find" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4.5 4.5"/></symbol>
 <symbol id="i-replace" viewBox="0 0 24 24"><path d="M4 8h11a4 4 0 0 1 4 4"/><path d="m12 5 3 3-3 3"/><path d="M20 16H9a4 4 0 0 1-4-4"/><path d="m12 13-3 3 3 3"/></symbol>
@@ -328,7 +331,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-sort-num" viewBox="0 0 24 24"><path d="M7 4v16M4 17l3 3 3-3"/><path d="M14.5 5.5 16.5 4v6.5"/><circle cx="16" cy="15.5" r="2"/><path d="M18 15.5V18a2 2 0 0 1-2 2h-1"/></symbol>
 <symbol id="i-sort-nat" viewBox="0 0 24 24"><path d="M7 4v16M4 17l3 3 3-3"/><path d="M13 6h2M17.5 6h1M13 12h2M17.5 12h2.5M13 18h2M17.5 18h4"/></symbol>
 <symbol id="i-sort-len" viewBox="0 0 24 24"><path d="M7 4v16M4 17l3 3 3-3"/><path d="M13 6h3M13 12h5M13 18h8"/></symbol>
-<symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16M4 17l3 3 3-3"/><path d="M13 6h7M13 11h5M13 16h3"/></symbol>
+<symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16"/><path d="m3.5 7.5 3.5-3.5 3.5 3.5"/><path d="M17 20V4"/><path d="m13.5 16.5 3.5 3.5 3.5-3.5"/></symbol>
 <symbol id="i-reverse" viewBox="0 0 24 24"><path d="M7 4v16M4 7l3-3 3 3"/><path d="M17 20V4M14 17l3 3 3-3"/></symbol>
 <symbol id="i-shuffle" viewBox="0 0 24 24"><path d="M4 7h3c4 0 6 10 10 10h3M4 17h3c1.5 0 2.7-1.4 3.7-3.2M13.3 10.2C14.3 8.4 15.5 7 17 7h3"/><path d="m18 5 2 2-2 2M18 15l2 2-2 2"/></symbol>
 <symbol id="i-dedupe" viewBox="0 0 24 24"><rect x="4" y="4" width="11" height="11" rx="2"/><path d="M9 19h9a2 2 0 0 0 2-2V8"/><path d="m7.5 9.5 2 2 3.5-4"/></symbol>
@@ -355,7 +358,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-invisible" viewBox="0 0 24 24"><rect x="6" y="4" width="12" height="16" rx="2.5" stroke-dasharray="2 3"/><path d="M4 20 20 4"/></symbol>
 <symbol id="i-nonprint" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="3"/><path d="M7.5 12h.01M12 12h.01M16.5 12h.01"/></symbol>
 <symbol id="i-html" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M14 4l-4 16"/></symbol>
-<symbol id="i-clock" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="3"/><path d="M4 10h16M9 3v4M15 3v4"/><path d="M12 13v2.5l1.5 1"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
 <symbol id="i-chain" viewBox="0 0 24 24"><path d="M10 14a4 4 0 0 0 5.6 0l3-3a4 4 0 0 0-5.6-5.6l-1 1"/><path d="M14 10a4 4 0 0 0-5.6 0l-3 3a4 4 0 0 0 5.6 5.6l1-1"/></symbol>
 <symbol id="i-play" viewBox="0 0 24 24"><path d="M8 5.5v13l10-6.5Z"/></symbol>
 <symbol id="i-keep" viewBox="0 0 24 24"><path d="M4 6h12M4 12h7M4 18h7"/><path d="m14 16 2.5 2.5L21 14"/></symbol>
@@ -391,7 +394,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-logo" viewBox="0 0 24 24"><path d="M7 6.5h7M7 11h10M7 15.5h6"/><path d="M15.5 15.5 18 18"/></symbol>
 <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 11 12 4l8 7"/><path d="M6 9.5V20h12V9.5"/><path d="M10 20v-5h4v5"/></symbol>
 <symbol id="i-clean" viewBox="0 0 24 24"><path d="M11 3c.6 4 2 5.4 6 6-4 .6-5.4 2-6 6-.6-4-2-5.4-6-6 4-.6 5.4-2 6-6Z"/><path d="M18.5 14.5c.3 1.6.9 2.2 2.5 2.5-1.6.3-2.2.9-2.5 2.5-.3-1.6-.9-2.2-2.5-2.5 1.6-.3 2.2-.9 2.5-2.5Z"/></symbol>
-<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z"/><circle cx="12" cy="12" r="3"/></symbol>
+<symbol id="i-eye" viewBox="0 0 24 24"><path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12z"/><circle cx="12" cy="12" r="3"/></symbol>
 <symbol id="i-replace-all" viewBox="0 0 24 24"><path d="M3 5h10a4 4 0 0 1 4 4v1"/><path d="m14 7 3 3 3-3"/><path d="M3 11h7M3 15h7M3 19h14"/></symbol>
 <symbol id="i-upper" viewBox="0 0 24 24"><path d="M3 18 6.5 6 10 18M4.2 14h4.6"/><path d="M13 6h3.5a3 3 0 0 1 0 6H13ZM13 12h4a3 3 0 0 1 0 6h-4Z"/></symbol>
 <symbol id="i-lower" viewBox="0 0 24 24"><circle cx="7" cy="15" r="3"/><path d="M10 12v6M14 6v12"/><circle cx="17" cy="15" r="3"/></symbol>
@@ -1528,6 +1531,41 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
     )
   }
 
+  // The menu bar, like a word processor's: one menu per ribbon tab (File first), listing the tab's tools by group. The toolbar
+  // under it shows the open tab's tools as icons.
+  function buildMenus(): MenuDefinition[] {
+    const menuTabs = [...RIBBON_TABS.filter(([key]) => key === 'file'), ...RIBBON_TABS.filter(([key]) => key !== 'file')]
+    return menuTabs.map(([tabKey, labelKey]) => ({
+      id: tabKey,
+      label: t(labelKey),
+      items: RIBBON[tabKey].flatMap((group): MenuEntry[] => {
+        const tools = group.items.flatMap((item): MenuEntry[] => {
+          if (item[0] === 'legal') {
+            return [
+              { id: 'menu-link-privacy', label: t('legal.privacy'), icon: 'lock', href: localizePath(locale, '/privacy') },
+              { id: 'menu-link-terms', label: t('legal.terms'), icon: 'file', href: localizePath(locale, '/terms') },
+              { id: 'menu-disclaimer', note: t('legal.disclaimer') },
+            ]
+          }
+          if ((item[0] !== 'big' && item[0] !== 'small') || item[1] === 'sortMenu') return []
+          const key = item[1]
+          const tool = describeTool(key)
+          return [{
+            id: toKebabCase(key),
+            label: tool.label,
+            icon: tool.icon,
+            hint: tool.keys,
+            kind: tool.isPressed === undefined ? undefined : 'checkbox',
+            isChecked: tool.isPressed,
+            isDisabled: tool.isDisabled,
+            onSelect: () => tool.run(document.getElementById(`ribbon-${toKebabCase(key)}-button`) ?? (document.getElementById(`menu-${tabKey}`) as HTMLElement)),
+          }]
+        })
+        return tools.length ? [{ heading: t(group.labelKey) }, ...tools] : []
+      }),
+    }))
+  }
+
   function renderRibbon() {
     return (
       <nav id="ribbon" className={`${isRibbonCollapsed ? 'collapsed' : ''}${isRibbonPeekOpen ? ' peek' : ''}`} aria-label={t('text.ribbon.label')}>
@@ -2645,15 +2683,11 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
       <header id="top-bar">
         <div className="brand">
           <button type="button" id="home-button" aria-label={t('text.home')} data-hint={t('text.home')} onClick={onClose}>
-            <span className="logo" aria-hidden="true">
-              <svg viewBox="0 0 24 24">
-                <use href="#i-logo" />
-              </svg>
-            </span>
+            <MiniFormatIcon format="txt" size={28} className="logo" />
           </button>
           <div className="title-stack">
             <div className="product">
-              <b>OpenAnyDoc</b>
+              <Wordmark className="brand-name" />
               <span aria-hidden="true">·</span>
               <h1 id="page-title">{t('text.pageTitle')}</h1>
             </div>
@@ -2695,6 +2729,8 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
           </button>
         </div>
       </header>
+
+      <MenuBar menus={buildMenus()} isCompact={isPhone} label={t('menu.bar')} />
 
       {renderRibbon()}
 

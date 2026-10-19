@@ -1,5 +1,7 @@
 import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
+import { MiniFormatIcon, Wordmark, uiIconShapes } from '../../components/KitIcon'
+import type { UiIconName } from '../../components/KitIcon'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
 import { isolateLeftToRight, localizePath, translatePlural, translateWithNodes, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
@@ -1330,20 +1332,16 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         {Object.entries(iconPaths).map(([name, paths]) => (
           <symbol key={name} id={`i-${name}`} viewBox="0 0 24 24">
-            {paths}
+            {uiIconShapes[name as UiIconName] ?? paths}
           </symbol>
         ))}
       </svg>
 
       <header id="command-bar" className={isSearchOpen ? 'search-open' : undefined}>
         <button className="brand" type="button" id="home-button" aria-label={t('json.wb.home')} onClick={onClose}>
-          <span className="logo" aria-hidden="true">
-            <svg>
-              <use href="#i-braces" />
-            </svg>
-          </span>
+          <MiniFormatIcon format="json" size={26} className="logo" />
           <span className="brand-text">
-            <span className="brand-name">OpenAnyDoc</span>
+            <Wordmark className="brand-name" />
             <h1 className="page-title" id="page-title">
               {t('json.wb.title')}
             </h1>
@@ -1494,9 +1492,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           <SpriteIcon name="sun" className="i-sun" />
           <SpriteIcon name="moon" className="i-moon" />
         </button>
-        <button className="btn primary" type="button" id="download-button" aria-label={t('json.wb.downloadFile', { name: fileName })} onClick={() => void downloadDocument()}>
+        <button className="btn primary icon" type="button" id="download-button" aria-label={t('json.wb.downloadFile', { name: fileName })} title={t('json.wb.downloadFile', { name: fileName })} onClick={() => void downloadDocument()}>
           <SpriteIcon name="download" />
-          <span className="download-label">{t('json.wb.download')}</span>
         </button>
       </header>
 

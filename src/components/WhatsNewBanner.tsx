@@ -120,7 +120,7 @@ export default function WhatsNewBanner({ onNavigate, onDismiss }: WhatsNewBanner
           <path d="m6 6 12 12M18 6 6 18" />
         </svg>
       </button>
-      <p id="banner-title" className="hidden pe-8 font-[family-name:var(--font-display)] text-base font-bold leading-tight sm:block">{t('banner.title')}</p>
+      <p id="banner-title" className="hidden pe-8 font-[family-name:var(--font-display)] text-base font-semibold leading-tight sm:block">{t('banner.title')}</p>
       <p id="banner-message" className="mt-1 hidden text-sm leading-snug text-ink-soft sm:block sm:pe-16">
         {translateWithNodes(locale, canEditAll ? 'banner.openAndEdit' : 'banner.open', { formats: joinNodesAsList(locale, formatLinks) })}
       </p>

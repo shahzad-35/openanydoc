@@ -4,7 +4,7 @@
    bookmarks, find marks and hidden characters; both must lay the text out the same way, so they share every text property. */
 #txt-workbench{
   color-scheme:light;
-  --ui:"IBM Plex Sans","IBM Plex Sans Arabic",system-ui,sans-serif;
+  --ui:var(--font-body);
   --mono:"IBM Plex Mono","IBM Plex Sans Arabic",ui-monospace,monospace;
   --gutter:54px;
   --shade:22,24,52;
@@ -55,7 +55,7 @@
 }
 
 #txt-workbench *{box-sizing:border-box}
-#txt-workbench{background:var(--bg);color:var(--ink);font:13.5px/1.45 var(--ui);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto minmax(0,1fr) auto auto;height:100dvh;overflow:hidden}
+#txt-workbench{background:var(--bg);color:var(--ink);font:13.5px/1.45 var(--ui);-webkit-font-smoothing:antialiased;display:grid;grid-template-columns:minmax(0,1fr);grid-template-rows:auto auto auto minmax(0,1fr) auto auto;height:100dvh;overflow:hidden}
 #txt-workbench > *{min-width:0}
 #txt-workbench button,#txt-workbench input,#txt-workbench select,#txt-workbench textarea{font:inherit;color:inherit}
 #txt-workbench button{cursor:pointer}
@@ -481,3 +481,20 @@ html[lang="ar"] #txt-workbench .sg h3{letter-spacing:0}
 /* The site's own tokens, pointed at the page's, so shared parts (the file error box) match */
 #txt-workbench{--paper:var(--surface-2);--paper-raised:var(--surface);--ink-soft:var(--ink-3);--danger:var(--del-ink);--file-color:var(--accent);--font-mono:var(--mono);--on-accent:var(--btn-ink)}
 html[lang="ar"] #txt-workbench{--ui:"IBM Plex Sans Arabic",system-ui,"Segoe UI",Tahoma,"Geeza Pro","Noto Sans Arabic",sans-serif}
+
+/* Word-processor look (2026-10-19): the menu bar replaces the ribbon's tab row, the open tab's tools are one slim icon row with
+   no group labels, and on a wide screen the text sits on a white page on a grey canvas. Nothing bold but the file name. */
+#txt-workbench .logo{background:none;border-radius:0;width:28px;height:28px}
+#txt-workbench .brand-name{font:600 15px/1 var(--font-display);letter-spacing:-.01em;color:var(--ink)}
+#txt-workbench .rtab,#txt-workbench #find-count,#txt-workbench .view-head h2,#txt-workbench .kpi .v,#txt-workbench .stat-card h3,#txt-workbench #status-position{font-weight:500}
+#txt-workbench #ribbon-tab-row{display:none}
+#txt-workbench #ribbon-panel{height:40px;padding:2px 6px;border-top:0;background:var(--bg)}
+#txt-workbench .grp-label{display:none}
+#txt-workbench .grp{padding-inline:5px}
+#txt-workbench .grp-items{height:36px}
+#txt-workbench .ib.tb.big{width:32px;height:32px}
+#txt-workbench .tb.big:not([aria-pressed="true"]):not(:hover){background:transparent;color:var(--ink-2)}
+@media (min-width:721px){
+  #txt-workbench #view-text{padding:20px 24px 0;background:color-mix(in srgb,var(--ink) 6%,var(--surface))}
+  #txt-workbench #editor-scroll{max-width:860px;margin-inline:auto;border:1px solid var(--rule);border-bottom:0;border-radius:4px 4px 0 0;box-shadow:0 1px 3px rgba(16,24,40,.08),0 6px 18px -8px rgba(16,24,40,.16)}
+}

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { useT } from '../i18n'
 import { buildDownloadName, downloadTextFile } from '../formats/registry'
-import type { EditingModule, ViewMode } from '../formats/registry'
+import type { EditingModule } from '../formats/registry'
 import type { EditSession } from '../formats/useEditSession'
 import type { OpenedFile } from '../useFileIntake'
 
@@ -19,67 +19,6 @@ function HistoryIcon({ children }: { children: ReactNode }) {
   )
 }
 
-function ModeIcon({ mode }: { mode: ViewMode }) {
-  return (
-    <svg
-      aria-hidden="true"
-      viewBox="0 0 24 24"
-      className="size-4 pointer-coarse:size-6"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.8"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      {mode === 'view' ? (
-        <>
-          <path d="M2.5 12S6 5.5 12 5.5 21.5 12 21.5 12 18 18.5 12 18.5 2.5 12 2.5 12Z" />
-          <circle cx="12" cy="12" r="3" />
-        </>
-      ) : (
-        <>
-          <path d="M4 20l1-4.5L16.5 4a2.1 2.1 0 0 1 3 3L8 18.5 4 20Z" />
-          <path d="m14.5 6 3.5 3.5" />
-        </>
-      )}
-    </svg>
-  )
-}
-
-const modeOptions = ['view', 'edit'] as const
-
-// A sliding switch in the spirit of the light/dark toggle: the accent thumb glides to the chosen side. Each side is an
-// icon (an eye to look, a pencil to edit) with no visible text; the names are in the tooltip and for screen readers.
-export function ViewEditToggle({ mode, onChange }: { mode: ViewMode; onChange: (newMode: ViewMode) => void }) {
-  const { t } = useT()
-  return (
-    <div id="mode-toggle" role="group" aria-label={t('mode.label')} className="control-shape solid-box relative grid shrink-0 grid-cols-2 border-ink bg-paper p-0.5">
-      <span
-        aria-hidden="true"
-        className={`control-shape absolute inset-y-0.5 start-0.5 w-[calc(50%-0.125rem)] bg-accent transition-transform duration-300 ease-out ${
-          mode === 'edit' ? 'translate-x-full rtl:-translate-x-full' : ''
-        }`}
-      />
-      {modeOptions.map((optionMode) => (
-        <button
-          key={optionMode}
-          id={`mode-${optionMode}-button`}
-          type="button"
-          aria-pressed={mode === optionMode}
-          data-tip={t(optionMode === 'view' ? 'mode.view' : 'mode.edit')}
-          onClick={() => onChange(optionMode)}
-          className={`control-shape relative grid min-h-7 min-w-10 pointer-coarse:min-h-10 pointer-coarse:min-w-14 cursor-pointer place-items-center transition-colors duration-300 ${
-            mode === optionMode ? 'text-on-accent' : 'text-ink hover:text-accent'
-          }`}
-        >
-          <ModeIcon mode={optionMode} />
-          <span className="sr-only">{t(optionMode === 'view' ? 'mode.view' : 'mode.edit')}</span>
-        </button>
-      ))}
-    </div>
-  )
-}
-
 // A live region: screen readers hear "3 edited cells, 1 row deleted" whenever it changes.
 export function ChangeCounter({ description }: { description: string }) {
   return (
@@ -94,111 +33,46 @@ export function ChangeCounter({ description }: { description: string }) {
   )
 }
 
-type DownloadControlProps = {
-  openedFile: OpenedFile
-  editingModule: EditingModule
-  edits: unknown
-  exportSource: unknown
-  hasEdits: boolean
-}
-
-// An icon only, and one click saves what you see: CSV with the edits, the current sort order and only the rows the search
-// leaves, named like sales-edited.csv. The tooltip says which rows.
-function DownloadControl({ openedFile, editingModule, edits, exportSource, hasEdits }: DownloadControlProps) {
-  const { locale, t } = useT()
+// One click saves the file with every edit, named like sales-edited.xlsx.
+export async function downloadEditedFile(openedFile: OpenedFile, editingModule: EditingModule, edits: unknown, exportSource: unknown, hasEdits: boolean) {
   const { downloadOption } = editingModule
-  const downloadLabel = exportSource === null ? t('toolbar.download') : `${downloadOption.getLabel(exportSource, locale)}: ${editingModule.describeDownload(exportSource, locale)}`
-
-  async function downloadWhatYouSee() {
-    const includeByteOrderMark = editingModule.getDefaultByteOrderMark(exportSource)
-    downloadTextFile(
-      buildDownloadName(openedFile.file.name, hasEdits, downloadOption.extension),
-      await downloadOption.createFile(edits, exportSource, { includeByteOrderMark }),
-      downloadOption.getMimeType(exportSource),
-    )
-  }
-
-  return (
-    <button
-      id="download-button"
-      type="button"
-      disabled={exportSource === null}
-      onClick={() => void downloadWhatYouSee()}
-      aria-label={downloadLabel}
-      data-tip={downloadLabel}
-      data-tip-align="end"
-      className="control-shape grid size-8 pointer-coarse:size-11 shrink-0 cursor-pointer place-items-center bg-accent text-on-accent transition duration-200 hover:bg-ink active:scale-[0.98] disabled:cursor-not-allowed disabled:bg-rule disabled:text-ink-soft"
-    >
-      <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 pointer-coarse:size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M12 4v11" />
-        <path d="m7 11 5 5 5-5" />
-        <path d="M5 20h14" />
-      </svg>
-    </button>
+  downloadTextFile(
+    buildDownloadName(openedFile.file.name, hasEdits, downloadOption.extension),
+    await downloadOption.createFile(edits, exportSource, { includeByteOrderMark: editingModule.getDefaultByteOrderMark(exportSource) }),
+    downloadOption.getMimeType(exportSource),
   )
 }
 
 type EditToolbarProps = {
-  openedFile: OpenedFile
   session: EditSession<unknown>
   editingModule: EditingModule | null
   selection: unknown
   viewerCommands: unknown
-  exportSource: unknown
+  changeDescription: string
 }
 
-// Shown in Edit mode: undo, redo and revert all for every format, then this format's own tools and the Download icon.
-export function EditToolbar({ openedFile, session, editingModule, selection, viewerCommands, exportSource }: EditToolbarProps) {
+// The slim toolbar under the menu bar: revert all, then this format's own tools, and the live count of changes at the end.
+// Undo, redo and Download are in the title row.
+export function EditToolbar({ session, editingModule, selection, viewerCommands, changeDescription }: EditToolbarProps) {
   const { t } = useT()
   return (
-    <div id="edit-toolbar" role="toolbar" aria-label={t('toolbar.label')} className="flex items-start gap-2 border-b border-rule bg-paper px-4 py-1">
-      <div id="edit-toolbar-tools" className="flex min-w-0 flex-1 items-center gap-1 overflow-x-auto md:flex-wrap md:overflow-visible">
-      <button id="undo-button" type="button" disabled={!session.canUndo} onClick={session.undo} aria-label={t('toolbar.undo')} data-tip={t('toolbar.undoTip')} className={historyButtonClassName}>
-        <HistoryIcon>
-          <path d="M9 14 4 9l5-5" />
-          <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
-        </HistoryIcon>
-      </button>
-      <button id="redo-button" type="button" disabled={!session.canRedo} onClick={session.redo} aria-label={t('toolbar.redo')} data-tip={t('toolbar.redoTip')} className={historyButtonClassName}>
-        <HistoryIcon>
-          <path d="m15 14 5-5-5-5" />
-          <path d="M20 9H9.5a5.5 5.5 0 0 0 0 11H13" />
-        </HistoryIcon>
-      </button>
-      <button id="revert-all-button" type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label={t('toolbar.revertAll')} data-tip={t('toolbar.revertAll')} className={historyButtonClassName}>
-        <HistoryIcon>
-          <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
-          <path d="M3 3v5h5" />
-          <path d="M12 8v4l3 2" />
-        </HistoryIcon>
-      </button>
-      {editingModule?.ToolbarContent && <editingModule.ToolbarContent selection={selection} commands={viewerCommands} />}
-      {editingModule?.tools.map((tool) => (
-        <button
-          key={tool.id}
-          id={`tool-${tool.id}-button`}
-          type="button"
-          disabled={!tool.isEnabled(selection)}
-          onClick={() => tool.run(session, selection, viewerCommands)}
-          className={toolbarButtonClassName}
-        >
-          {tool.label}
+    <div id="edit-toolbar" role="toolbar" aria-label={t('toolbar.label')}>
+      <div id="edit-toolbar-tools">
+        <button id="revert-all-button" type="button" disabled={session.changeCount === 0} onClick={session.revertAll} aria-label={t('toolbar.revertAll')} data-tip={t('toolbar.revertAll')} className={historyButtonClassName}>
+          <HistoryIcon>
+            <path d="M3 12a9 9 0 1 0 3-6.7L3 8" />
+            <path d="M3 3v5h5" />
+            <path d="M12 8v4l3 2" />
+          </HistoryIcon>
         </button>
-      ))}
+        {editingModule?.ToolbarContent ? <editingModule.ToolbarContent selection={selection} commands={viewerCommands} /> : <p className="text-sm text-ink-soft">{t('toolbar.loading')}</p>}
+        {editingModule?.tools.map((tool) => (
+          <button key={tool.id} id={`tool-${tool.id}-button`} type="button" disabled={!tool.isEnabled(selection)} onClick={() => tool.run(session, selection, viewerCommands)} className={toolbarButtonClassName}>
+            {tool.label}
+          </button>
+        ))}
       </div>
-      <div className="shrink-0">
-        {editingModule ? (
-          <DownloadControl
-            openedFile={openedFile}
-            editingModule={editingModule}
-            edits={session.edits}
-            exportSource={exportSource}
-            hasEdits={session.changeCount > 0}
-          />
-        ) : (
-          <p className="text-sm text-ink-soft">{t('toolbar.loading')}</p>
-        )}
-      </div>
+      <ChangeCounter description={changeDescription} />
     </div>
   )
 }

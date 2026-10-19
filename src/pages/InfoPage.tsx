@@ -1,3 +1,4 @@
+import { Wordmark } from '../components/KitIcon'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import SiteFooter, { PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
@@ -31,7 +32,7 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
   usePageHead(address, seo.title, seo.description)
 
   return (
-    <div id="info-page" className="min-h-dvh bg-paper font-sans text-[18px] leading-normal text-ink">
+    <div id="info-page" className="toy-page min-h-dvh text-[17px] leading-normal text-ink">
       <a
         id="skip-to-content-link"
         href="#main"
@@ -39,13 +40,15 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
       >
         {t('skip.toContent')}
       </a>
-      <header id="site-header" className="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-x-4 gap-y-2 px-4 py-5">
-        <p id="site-brand" className="type-h3">
-          <PageLink id="brand-home-link" path="/" onNavigate={onNavigate}>OpenAnyDoc</PageLink>
+      <header id="site-header" className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5">
+        <p id="site-brand" className="flex items-center">
+          <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full">
+            <Wordmark />
+          </PageLink>
         </p>
         <SiteNav currentPath={address} onNavigate={onNavigate} />
-        <div className="flex items-center gap-2">
-          <LanguageSwitcher />
+        <div className="flex items-center gap-1 sm:gap-2">
+          <LanguageSwitcher className="pill-link" />
           <ThemeToggle />
         </div>
       </header>
@@ -56,7 +59,7 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
           <p id="page-intro" className="mt-4 text-ink-soft">{seo.intro}</p>
           {content.lastUpdated && <p id="last-updated" className="mt-2 text-sm text-ink-soft">{content.lastUpdated}</p>}
         </div>
-        <div id="info-sections" className="box-shape solid-box space-y-10 border-rule bg-paper-raised/90 p-6 md:p-10">
+        <div id="info-sections" className="space-y-10 rounded-[22px] border-2 border-rule bg-paper-raised p-6 md:p-10">
           {content.sections.map((section, position) => (
             <section key={section.heading} id={`info-section-${position + 1}`}>
               <h2 className="type-h3">{section.heading}</h2>

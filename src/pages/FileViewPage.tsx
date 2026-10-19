@@ -1,12 +1,15 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { ChangeCounter, EditToolbar, ViewEditToggle } from '../components/EditControls'
-import FileViewHeader from '../components/FileViewHeader'
+import { EditToolbar, downloadEditedFile } from '../components/EditControls'
+import MenuBar from '../components/MenuBar'
+import type { MenuDefinition } from '../components/MenuBar'
 import { Notice, REJECTED_FILE_TOAST_SECONDS } from '../components/Messages'
 import { FILE_SAVED_EVENT, findFormatForFileName } from '../formats/registry'
-import type { EditingModule, ViewMode } from '../formats/registry'
+import type { EditingModule } from '../formats/registry'
+import { SheetIconSprite, TopBar, useIsNarrowScreen, useThemeToggle } from '../formats/sheet/SheetChrome'
+import '../formats/sheet/sheetChrome.css'
 import { useEditSession } from '../formats/useEditSession'
 import { localizePath, translateWithNodes, useT } from '../i18n'
-import { useFileIntake } from '../useFileIntake'
+import { formatFileSize, useFileIntake } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findViewerForFileName, supportedExtensions } from '../viewers'
 import { pickRelatedFormat } from '../whatsNew'
@@ -33,7 +36,8 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const format = findFormatForFileName(openedFile.file.name)
   const editing = format?.editing
   const session = useEditSession<unknown>(editing?.createEmptyEdits ?? noEdits, editing?.countChanges ?? countNoEdits)
-  const [mode, setMode] = useState<ViewMode>(editing?.alwaysEditable ? 'edit' : 'view')
+  // Every editable format opens ready to edit; one that cannot be edited yet only shows the file.
+  const mode = editing ? 'edit' : 'view'
   const [editingModule, setEditingModule] = useState<EditingModule | null>(null)
   const [editingLoadFailed, setEditingLoadFailed] = useState(false)
   const [selection, setSelection] = useState<unknown>(null)
@@ -42,18 +46,12 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   // One tip after a save, closed in React state only (nothing is stored); the page's key resets it for the next file.
   const [isSaveTipShown, setIsSaveTipShown] = useState(false)
   const { undo, redo } = session
+  const [isDark, toggleTheme] = useThemeToggle()
+  const isNarrow = useIsNarrowScreen()
   const hasUnsavedEdits = session.changeCount > 0
   const changeDescription = useMemo(() => editing?.describeChanges(session.edits, locale) ?? '', [editing, session.edits, locale])
 
-  // The editing code is fetched the first time Edit is chosen, never while only viewing.
-  function chooseMode(newMode: ViewMode) {
-    setMode(newMode)
-    if (newMode === 'edit' && editing && !editingModule) {
-      editing.loadEditingModule?.().then(setEditingModule, () => setEditingLoadFailed(true))
-    }
-  }
-
-  // An always-editable format (JSON) loads its tools straight away.
+  // The editing code is fetched as the file opens.
   useEffect(() => {
     if (editing?.alwaysEditable) editing.loadEditingModule?.().then(setEditingModule, () => setEditingLoadFailed(true))
   }, [editing])
@@ -177,22 +175,56 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
     )
   }
 
+  const menus: MenuDefinition[] = [
+    {
+      id: 'file',
+      label: t('menu.file'),
+      items: [
+        { id: 'open', label: t('menu.openAnother'), icon: 'open', onSelect: anotherFileIntake.openFilePicker },
+        { id: 'download', label: t('menu.download'), icon: 'download', isDisabled: !editingModule || exportSource === null, onSelect: () => void downloadFile() },
+        'separator',
+        { id: 'close', label: t('menu.close'), icon: 'x', onSelect: () => void closeAfterConfirm() },
+      ],
+    },
+    ...(editingModule?.getMenus?.(selection, viewerCommands, locale) ?? []),
+    {
+      id: 'help',
+      label: t('menu.help'),
+      items: [
+        { id: 'menu-link-privacy', label: t('legal.privacy'), icon: 'lock', href: localizePath(locale, '/privacy') },
+        { id: 'menu-link-terms', label: t('legal.terms'), icon: 'file', href: localizePath(locale, '/terms') },
+        { id: 'menu-disclaimer', note: t('legal.disclaimer') },
+      ],
+    },
+  ]
+
+  async function downloadFile() {
+    if (editingModule) await downloadEditedFile(openedFile, editingModule, session.edits, exportSource, hasUnsavedEdits)
+  }
+
+  // The spreadsheet frame (Excel), the same as the CSV page's: title row, menu bar, one slim toolbar, then the workbook.
   return (
-    <div id="file-page" data-file-type={viewer?.id} className="flex h-dvh flex-col bg-paper font-sans text-[14px] leading-normal text-ink">
-      <FileViewHeader
-        openedFile={openedFile}
-        onClose={onClose}
-        onBeforeClear={confirmBeforeClear}
-        onOpenAnotherFile={anotherFileIntake.openFilePicker}
-        controls={
-          editing && (
-            <>
-              {!editing.alwaysEditable && <ViewEditToggle mode={mode} onChange={chooseMode} />}
-              <ChangeCounter description={changeDescription} />
-            </>
-          )
-        }
+    <div id="file-page" data-file-type={viewer?.id} data-dragging={anotherFileIntake.isDraggingOver} {...anotherFileIntake.dropTargetProps}>
+      <div id="excel-workbench" className="sidebar-closed">
+      <SheetIconSprite />
+      <TopBar
+        format="xlsx"
+        fileName={openedFile.file.name}
+        fileSize={formatFileSize(openedFile.file.size)}
+        isModified={hasUnsavedEdits}
+        canUndo={session.canUndo}
+        canRedo={session.canRedo}
+        onUndo={undo}
+        onRedo={redo}
+        canDownload={Boolean(editingModule) && exportSource !== null}
+        downloadLabel={editingModule && exportSource !== null ? editingModule.downloadOption.getLabel(exportSource, locale) : t('toolbar.download')}
+        downloadTip={editingModule && exportSource !== null ? editingModule.describeDownload(exportSource, locale) : t('toolbar.download')}
+        onDownload={() => void downloadFile()}
+        onHome={() => void closeAfterConfirm()}
+        isDark={isDark}
+        onToggleTheme={toggleTheme}
       />
+      <MenuBar menus={menus} isCompact={isNarrow} label={t('menu.bar')} />
       {isSaveTipShown && tipFormat && (
         <div id="save-tip" role="status" className="flex items-center gap-3 border-b border-rule bg-paper-raised px-4 py-1.5 text-sm">
           <p id="save-tip-message" className="min-w-0 flex-1">
@@ -217,16 +249,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
           </button>
         </div>
       )}
-      {mode === 'edit' && (
-        <EditToolbar
-          openedFile={openedFile}
-          session={session}
-          editingModule={editingModule}
-          selection={selection}
-          viewerCommands={viewerCommands}
-          exportSource={exportSource}
-        />
-      )}
+      <EditToolbar session={session} editingModule={editingModule} selection={selection} viewerCommands={viewerCommands} changeDescription={changeDescription} />
       {anotherFileIntake.fileInput}
       {fileMessages}
       <Notice
@@ -237,6 +260,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         message={editingLoadFailed ? t('file.editingLoadFailed') : ''}
       />
       {viewerElement}
+      </div>
     </div>
   )
 }

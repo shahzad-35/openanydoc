@@ -4,9 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { FocusEventHandler, KeyboardEventHandler, ReactNode } from 'react'
 import { compactSecondaryButtonClassName, primaryButtonClassName, textControlClassName } from '../../buttonStyles'
 import { toElementId } from '../../elementId'
-import { isolateText, translate, useT } from '../../i18n'
+import { isolateText, translate, translatePlural, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
 import FindReplaceBar from '../../components/FindReplaceBar'
+import type { MenuDefinition } from '../../components/MenuBar'
 import ModalDialog from '../../components/ModalDialog'
 import { ActionMenu, Icon, IconButton, IconMenuButton, iconButtonClassName } from '../../components/ToolbarControls'
 import { CellInput } from '../DataTable'
@@ -685,6 +686,77 @@ function SheetDialogs({
   )
 }
 
+// The workbook's own menus in the menu bar (Edit, Insert, Format, Data). Every item calls an action the toolbar also offers.
+function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale): MenuDefinition[] {
+  const viewerCommands = commands as ExcelViewerCommands | null
+  if (!viewerCommands) return []
+  const current = selection as NonNullable<ExcelSelection> | null
+  const text = (key: MessageKey) => translate(locale, key)
+  const hasCell = current?.hasCell ?? false
+  const styleDisabled = !hasCell || !current?.canStyle
+  const run = (pick: (actions: ExcelActions) => void) => () => pick(viewerCommands.getActions())
+  return [
+    {
+      id: 'edit',
+      label: text('menu.edit'),
+      items: [
+        { id: 'find', label: text('menu.findReplace'), icon: 'search', onSelect: viewerCommands.toggleFindReplace },
+        'separator',
+        { id: 'clear-cells', label: text('excel.menu.clearCells'), isDisabled: !hasCell, onSelect: run((actions) => actions.clearCells()) },
+        { id: 'fill-down', label: text('excel.menu.fillDown'), isDisabled: !hasCell, onSelect: run((actions) => actions.fillDown()) },
+        { id: 'fill-right', label: text('excel.menu.fillRight'), isDisabled: !hasCell, onSelect: run((actions) => actions.fillRight()) },
+        'separator',
+        { id: 'rename-sheet', label: text('excel.menu.renameSheet'), onSelect: run((actions) => actions.openRenameSheet()) },
+        { id: 'delete-sheet', label: text('excel.menu.deleteSheet'), isDanger: true, isDisabled: !current?.canDeleteSheet, onSelect: run((actions) => actions.openDeleteSheet()) },
+      ],
+    },
+    {
+      id: 'insert',
+      label: text('menu.insert'),
+      items: [
+        { id: 'row-above', label: text('excel.menu.insertRowAbove'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertRows('above')) },
+        { id: 'row-below', label: text('excel.menu.insertRowBelow'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertRows('below')) },
+        { id: 'column-left', label: text('excel.menu.insertColumnLeft'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertColumns('left')) },
+        { id: 'column-right', label: text('excel.menu.insertColumnRight'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertColumns('right')) },
+        'separator',
+        { id: 'sheet', label: text('excel.menu.addSheet'), icon: 'plus', onSelect: run((actions) => actions.openAddSheet()) },
+        { id: 'link', label: text('excel.toolbar.insertOrEditLink'), isDisabled: !hasCell, onSelect: run((actions) => actions.openLink()) },
+      ],
+    },
+    {
+      id: 'format',
+      label: text('menu.format'),
+      items: [
+        { id: 'bold', label: text('excel.toolbar.bold'), kind: 'checkbox', isChecked: current?.isBold, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleBold()) },
+        { id: 'italic', label: text('excel.toolbar.italic'), kind: 'checkbox', isChecked: current?.isItalic, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleItalic()) },
+        { id: 'underline', label: text('excel.toolbar.underline'), kind: 'checkbox', isChecked: current?.isUnderlined, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleUnderline()) },
+        { id: 'strikethrough', label: text('excel.toolbar.strikethrough'), kind: 'checkbox', isChecked: current?.isStruckThrough, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleStrikethrough()) },
+        'separator',
+        { id: 'align-left', label: text('excel.toolbar.alignLeft'), kind: 'radio', isChecked: current?.alignment === 'left', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('left')) },
+        { id: 'align-center', label: text('excel.toolbar.alignCenter'), kind: 'radio', isChecked: current?.alignment === 'center', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('center')) },
+        { id: 'align-right', label: text('excel.toolbar.alignRight'), kind: 'radio', isChecked: current?.alignment === 'right', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('right')) },
+        'separator',
+        { id: 'merge', label: text(current?.isMerged ? 'excel.toolbar.unmergeCells' : 'excel.toolbar.mergeCells'), isDisabled: !hasCell, onSelect: run((actions) => actions.toggleMerge()) },
+        { id: 'column-width', label: text('excel.menu.columnWidth'), isDisabled: !hasCell, onSelect: run((actions) => actions.openColumnWidth()) },
+        { id: 'clear-formatting', label: text('excel.toolbar.clearFormatting'), isDisabled: styleDisabled, onSelect: run((actions) => actions.clearFormatting()) },
+      ],
+    },
+    {
+      id: 'data',
+      label: text('menu.data'),
+      items: [
+        { id: 'upper', label: text('excel.menu.upperCase'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('upper')) },
+        { id: 'lower', label: text('excel.menu.lowerCase'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('lower')) },
+        { id: 'capitalize', label: text('excel.menu.capitalizeEachWord'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('capitalize')) },
+        { id: 'trim', label: text('excel.menu.trimExtraSpaces'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('trim')) },
+        'separator',
+        { id: 'delete-rows', label: translatePlural(locale, 'excel.menu.deleteRows', current?.selectedRowCount ?? 0), isDanger: true, isDisabled: !current?.selectedRowCount, onSelect: run((actions) => actions.deleteRows()) },
+        { id: 'delete-columns', label: translatePlural(locale, 'excel.menu.deleteColumns', current?.selectedColumnCount ?? 0), isDanger: true, isDisabled: !current?.selectedColumnCount, onSelect: run((actions) => actions.deleteColumns()) },
+      ],
+    },
+  ]
+}
+
 export type ExcelEditingComponents = {
   EditBar: typeof EditBar
   CellInput: typeof CellInput
@@ -699,5 +771,6 @@ export const excelEditingModule: EditingModule = {
   describeDownload,
   getDefaultByteOrderMark: () => false,
   ToolbarContent: ToolbarMenus,
+  getMenus: buildExcelMenus,
   components: { EditBar, CellInput, FindReplaceBar, ColumnMenu, SheetDialogs } satisfies ExcelEditingComponents,
 }

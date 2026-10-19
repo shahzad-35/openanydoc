@@ -1,6 +1,9 @@
 import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
+import { MiniFormatIcon, Wordmark } from '../../components/KitIcon'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
+import MenuBar from '../../components/MenuBar'
+import type { MenuDefinition } from '../../components/MenuBar'
 import { FatalFileError, useIsPhone, useToast } from '../../components/Messages'
 import { localizePath, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
@@ -84,9 +87,9 @@ const ENCODING_CHOICES: EncodingChoice[] = ['auto', 'utf-8', 'utf-16le', 'utf-16
 
 // The icons, drawn once and used by name (as in the design file). Static markup, no file content.
 const ICON_SPRITE = `<defs>
-<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m20 20-4.2-4.2"/></symbol>
-<symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4-2v-4.5z"/></symbol>
-<symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16M3.5 16.5 7 20l3.5-3.5M14 6h7M14 11h5M14 16h3"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 4.5 4.5"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><path d="M4 5h16l-6 7.5V19l-4 1.5v-8z"/></symbol>
+<symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16"/><path d="m3.5 7.5 3.5-3.5 3.5 3.5"/><path d="M17 20V4"/><path d="m13.5 16.5 3.5 3.5 3.5-3.5"/></symbol>
 <symbol id="i-group" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M21 20H3"/></symbol>
 <symbol id="i-columns" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M9.5 4.5v15M14.5 4.5v15"/></symbol>
 <symbol id="i-wand" viewBox="0 0 24 24"><path d="m4 20 11-11M14 4v2M18 8h2M17 4.5l-1.2 1.2M19.5 11l-1.2-1.2M13 9l2 2"/></symbol>
@@ -96,17 +99,17 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
 <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
 <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
-<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/></symbol>
-<symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 14 5-5-5-5"/><path d="M20 9H10a6 6 0 0 0 0 12h3"/></symbol>
-<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M9 5 4.5 9.5 9 14"/><path d="M4.5 9.5H14a5.5 5.5 0 0 1 0 11h-3"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="m15 5 4.5 4.5L15 14"/><path d="M19.5 9.5H10a5.5 5.5 0 0 0 0 11h3"/></symbol>
+<symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v2.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V15"/></symbol>
 <symbol id="i-open" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
-<symbol id="i-file" viewBox="0 0 24 24"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h6"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
-<symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 4 2.8 19.5h18.4z"/><path d="M12 10v4.5M12 17.2v.3"/></symbol>
+<symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 4.2 2.9 17.5A2 2 0 0 0 4.6 20.5h14.8a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4"/><path d="M12 17h.01"/></symbol>
 <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5"/><path d="M12 11v5M12 8v.2"/></symbol>
-<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="11" height="11" rx="2"/><path d="M15.5 8.5V6a1.5 1.5 0 0 0-1.5-1.5H6A1.5 1.5 0 0 0 4.5 6v8A1.5 1.5 0 0 0 6 15.5h2.5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8.5" y="8.5" width="12" height="12" rx="2.5"/><path d="M15.5 8.5v-2A2.5 2.5 0 0 0 13 4H6.5A2.5 2.5 0 0 0 4 6.5V13a2.5 2.5 0 0 0 2.5 2.5h2"/></symbol>
 <symbol id="i-paste" viewBox="0 0 24 24"><rect x="5" y="5" width="14" height="15.5" rx="2"/><path d="M9 5V3.5h6V5"/></symbol>
 <symbol id="i-grid-x" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M3.5 10h17M10 4.5v15"/></symbol>
 <symbol id="i-review" viewBox="0 0 24 24"><path d="M5 5h14M5 10h14M5 15h8"/><path d="m15 18 2 2 4-4"/></symbol>
@@ -116,7 +119,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19.5h16"/><rect x="5.5" y="11" width="3" height="6" rx=".6"/><rect x="10.5" y="6" width="3" height="11" rx=".6"/><rect x="15.5" y="13" width="3" height="4" rx=".6"/></symbol>
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 4h6l-1 5 3 3H7l3-3zM12 12v8"/></symbol>
 <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A9 9 0 0 1 12 6c5 0 8.5 6 8.5 6a15 15 0 0 1-3 3.5M6.6 7.7A15 15 0 0 0 3.5 12S7 18 12 18a8 8 0 0 0 3.4-.8"/></symbol>
-<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9l-4-4L4 16z"/></symbol>
+<symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
 <symbol id="i-panel" viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="2"/><path d="M14.5 4.5v15"/></symbol>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></symbol>
 </defs>`
@@ -1163,6 +1166,114 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     )
   }
 
+  // The Clean up button's menu, also listed under Data in the menu bar.
+  const cleanUpMenuItems: MenuItem[] = [
+    { heading: selectedColumnId !== null ? t('csv.wb.columnHeading', { name: nameOf(selectedColumnId) }) : t('csv.wb.columnHeadingNone') },
+    { id: 'clean-menu-upper', label: t('csv.wb.upperCase'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('upper') },
+    { id: 'clean-menu-lower', label: t('csv.wb.lowerCase'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('lower') },
+    { id: 'clean-menu-capitalize', label: t('csv.wb.capitalize'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('capitalize') },
+    { id: 'clean-menu-trim', label: t('csv.wb.trimSpaces'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('trim') },
+    { id: 'clean-menu-fill-down', label: t('csv.wb.fillDown'), icon: 'down', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('fillDown') },
+    { id: 'clean-menu-split', label: t('csv.wb.splitColumn'), icon: 'columns', onSelect: () => openCleanTool('split') },
+    { id: 'clean-menu-merge', label: t('csv.wb.mergeColumns'), icon: 'columns', isDisabled: displayColumnIds.length < 2, onSelect: () => openCleanTool('merge') },
+    'separator',
+    { heading: t('csv.wb.wholeFile') },
+    {
+      id: 'clean-menu-trim-all',
+      label: t('csv.wb.trimAll'),
+      icon: 'grid-x',
+      onSelect: () => {
+        if (!applyEdits(withMappedCells(edits, rows, displayRowIds, displayColumnIds, cellTextTransforms.trim).edits, t('csv.wb.trimmedAll'))) showToast(t('csv.wb.nothingToTrim'))
+      },
+    },
+    {
+      id: 'clean-menu-remove-empty-rows',
+      label: t('csv.wb.removeEmptyRows'),
+      icon: 'rows',
+      onSelect: () => {
+        const { edits: cleanedEdits, removedCount } = withoutEmptyRows(edits, rows, displayRowIds, displayColumnIds)
+        if (!applyEdits(cleanedEdits, tp('csv.cleanUp.removedEmptyRows', removedCount))) showToast(t('csv.wb.noEmptyRows'))
+      },
+    },
+    { id: 'clean-menu-remove-duplicates', label: t('csv.wb.removeDuplicates'), icon: 'rows', onSelect: () => openCleanTool('dupes') },
+    { id: 'clean-menu-transpose', label: t('csv.wb.transpose'), icon: 'grid-x', onSelect: () => openCleanTool('transpose') },
+    { id: 'clean-menu-apply-sort', label: t('csv.wb.applySort'), icon: 'sort', isDisabled: sortLevels.length === 0, onSelect: applySortToFile },
+  ]
+
+  // The menu bar under the title row, like a spreadsheet application's. Every action is one the buttons and popovers already offer.
+  const hasNoTable = !readableCsv
+  const menus: MenuDefinition[] = [
+    {
+      id: 'file',
+      label: t('menu.file'),
+      items: [
+        { id: 'open', label: t('csv.wb.openFile'), icon: 'open', hint: shortcutLabel('O'), onSelect: onOpenAnotherFile },
+        { id: 'paste', label: t('csv.wb.pasteCsv'), icon: 'paste', onSelect: () => { setPastedText(''); setOpenDialog('paste') } },
+        'separator',
+        { id: 'download', label: t('csv.wb.downloadFormat', { format: tableFormat.label }), icon: 'download', isDisabled: hasNoTable, onSelect: () => downloadCsv(defaultDownloadSettings()) },
+        { id: 'download-options', label: t('csv.wb.downloadOptions'), icon: 'download', isDisabled: hasNoTable, onSelect: openDownloadDialog },
+        ...(offersExcelCopy ? [{ id: 'excel-copy', label: t('csv.excelCopy.button'), icon: 'download', onSelect: downloadExcelCopy }] : []),
+        'separator',
+        { id: 'reading', label: t('csv.wb.readingMenu'), icon: 'settings', isDisabled: hasNoTable, onSelect: () => openPopover('reading', document.getElementById(isNarrow ? 'mobile-more-button' : 'status-delimiter-button')) },
+        'separator',
+        { id: 'close', label: t('menu.close'), icon: 'x', onSelect: onClose },
+      ],
+    },
+    {
+      id: 'edit',
+      label: t('menu.edit'),
+      items: [
+        { id: 'undo', label: t('toolbar.undo'), icon: 'undo', hint: shortcutLabel('Z'), isDisabled: !session.canUndo, onSelect: session.undo },
+        { id: 'redo', label: t('toolbar.redo'), icon: 'redo', isDisabled: !session.canRedo, onSelect: session.redo },
+        'separator',
+        { id: 'copy', label: t('csv.wb.copy'), icon: 'copy', hint: shortcutLabel('C'), isDisabled: !selection, onSelect: () => copySelection(false) },
+        { id: 'find', label: t('csv.wb.findReplace'), icon: 'replace', isDisabled: hasNoTable, onSelect: () => openPopover('find', document.getElementById(isNarrow ? 'mobile-find-button' : 'find-replace-button')) },
+        { id: 'go-to', label: t('csv.wb.goToRow'), icon: 'goto', hint: shortcutLabel('G'), isDisabled: hasNoTable, onSelect: openGoToDialog },
+        'separator',
+        { id: 'delete-rows', label: t('csv.wb.deleteSelectedRows'), icon: 'trash', isDanger: true, isDisabled: !selection, onSelect: deleteSelectedRows },
+      ],
+    },
+    {
+      id: 'view',
+      label: t('menu.view'),
+      items: [
+        { id: 'panel', label: t('csv.wb.panel'), kind: 'checkbox', isChecked: isDockOpen, onSelect: () => setIsDockOpen(!isDockOpen) },
+        { id: 'columns', label: t('csv.wb.columns'), icon: 'columns', isDisabled: hasNoTable, onSelect: () => openPopover('columns', document.getElementById('columns-button')) },
+        'separator',
+        { id: 'issues', label: t('csv.wb.issues'), icon: 'warn', onSelect: () => showDockTab('issues') },
+        { id: 'changes', label: t('csv.wb.reviewChanges'), icon: 'review', onSelect: () => showDockTab('changes') },
+      ],
+    },
+    {
+      id: 'insert',
+      label: t('menu.insert'),
+      items: [
+        { id: 'row', label: t('csv.wb.addRow'), icon: 'plus', isDisabled: hasNoTable, onSelect: addRow },
+        { id: 'column', label: t('csv.wb.insertColumn'), icon: 'plus', isDisabled: selectedColumnId === null, onSelect: () => selectedColumnId !== null && insertColumnAfter(selectedColumnId) },
+      ],
+    },
+    {
+      id: 'data',
+      label: t('menu.data'),
+      items: [
+        { id: 'filter', label: t('csv.wb.filter'), icon: 'filter', isDisabled: hasNoTable, onSelect: () => openPopover('filterPick', document.getElementById(isNarrow ? 'mobile-filter-button' : 'filter-button')) },
+        { id: 'sort', label: t('csv.wb.sort'), icon: 'sort', isDisabled: hasNoTable, onSelect: () => openPopover('sort', document.getElementById('sort-button')) },
+        { id: 'group', label: t('csv.wb.groupBy'), icon: 'group', isDisabled: hasNoTable, onSelect: () => showDockTab('group') },
+        'separator',
+        ...(hasNoTable ? [] : cleanUpMenuItems),
+      ],
+    },
+    {
+      id: 'help',
+      label: t('menu.help'),
+      items: [
+        { id: 'menu-link-privacy', label: t('legal.privacy'), icon: 'lock', href: localizePath(locale, '/privacy') },
+        { id: 'menu-link-terms', label: t('legal.terms'), icon: 'file', href: localizePath(locale, '/terms') },
+        { id: 'menu-disclaimer', note: t('legal.disclaimer') },
+      ],
+    },
+  ]
+
   function renderPopoverContent(): ReactNode {
     if (!popover) return null
     switch (popover.kind) {
@@ -1175,38 +1286,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       case 'columns':
         return renderColumnsPopover()
       case 'clean':
-        return renderMenuItems([
-              { heading: selectedColumnId !== null ? t('csv.wb.columnHeading', { name: nameOf(selectedColumnId) }) : t('csv.wb.columnHeadingNone') },
-              { id: 'clean-menu-upper', label: t('csv.wb.upperCase'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('upper') },
-              { id: 'clean-menu-lower', label: t('csv.wb.lowerCase'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('lower') },
-              { id: 'clean-menu-capitalize', label: t('csv.wb.capitalize'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('capitalize') },
-              { id: 'clean-menu-trim', label: t('csv.wb.trimSpaces'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('trim') },
-              { id: 'clean-menu-fill-down', label: t('csv.wb.fillDown'), icon: 'down', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('fillDown') },
-              { id: 'clean-menu-split', label: t('csv.wb.splitColumn'), icon: 'columns', onSelect: () => openCleanTool('split') },
-              { id: 'clean-menu-merge', label: t('csv.wb.mergeColumns'), icon: 'columns', isDisabled: displayColumnIds.length < 2, onSelect: () => openCleanTool('merge') },
-              'separator',
-              { heading: t('csv.wb.wholeFile') },
-              {
-                id: 'clean-menu-trim-all',
-                label: t('csv.wb.trimAll'),
-                icon: 'grid-x',
-                onSelect: () => {
-                  if (!applyEdits(withMappedCells(edits, rows, displayRowIds, displayColumnIds, cellTextTransforms.trim).edits, t('csv.wb.trimmedAll'))) showToast(t('csv.wb.nothingToTrim'))
-                },
-              },
-              {
-                id: 'clean-menu-remove-empty-rows',
-                label: t('csv.wb.removeEmptyRows'),
-                icon: 'rows',
-                onSelect: () => {
-                  const { edits: cleanedEdits, removedCount } = withoutEmptyRows(edits, rows, displayRowIds, displayColumnIds)
-                  if (!applyEdits(cleanedEdits, tp('csv.cleanUp.removedEmptyRows', removedCount))) showToast(t('csv.wb.noEmptyRows'))
-                },
-              },
-              { id: 'clean-menu-remove-duplicates', label: t('csv.wb.removeDuplicates'), icon: 'rows', onSelect: () => openCleanTool('dupes') },
-              { id: 'clean-menu-transpose', label: t('csv.wb.transpose'), icon: 'grid-x', onSelect: () => openCleanTool('transpose') },
-              { id: 'clean-menu-apply-sort', label: t('csv.wb.applySort'), icon: 'sort', isDisabled: sortLevels.length === 0, onSelect: applySortToFile },
-            ])
+        return renderMenuItems(cleanUpMenuItems)
       case 'file':
         return (
           <div role="menu">
@@ -2221,13 +2301,8 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
 
       <header id="top-bar">
         <button className="brand" type="button" id="home-button" aria-label={t('csv.wb.home')} onClick={onClose} style={{ border: 0, background: 'transparent', padding: 0 }}>
-          <span className="logo" aria-hidden="true">
-            <svg viewBox="0 0 24 24">
-              <rect x="3.5" y="3.5" width="17" height="17" rx="3" />
-              <path d="M3.5 9.5h17M9.5 3.5v17" />
-            </svg>
-          </span>
-          <span className="brand-name">OpenAnyDoc</span>
+          <MiniFormatIcon format="csv" size={24} className="logo" />
+          <Wordmark className="brand-name" />
           <span className="slash" aria-hidden="true">
             /
           </span>
@@ -2257,15 +2332,16 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         </button>
         <span className="vsep desk-only" />
         <LanguageSwitcher className="btn desk-only" />
-        <button className="btn primary" id="download-button" type="button" disabled={!readableCsv} title={t('csv.wb.downloadTip')} onClick={() => downloadCsv(defaultDownloadSettings())}>
+        <button className="btn primary icon" id="download-button" type="button" disabled={!readableCsv} aria-label={t('csv.wb.downloadFormat', { format: tableFormat.label })} title={t('csv.wb.downloadTip')} onClick={() => downloadCsv(defaultDownloadSettings())}>
           <Icon name="download" />
-          <span className="lbl">{t('csv.wb.downloadFormat', { format: tableFormat.label })}</span>
         </button>
         <button className="btn icon" id="theme-toggle" type="button" aria-label={isDark ? t('theme.toLight') : t('theme.toDark')} onClick={toggleTheme}>
           <Icon name="sun" className="i-sun" />
           <Icon name="moon" className="i-moon" />
         </button>
       </header>
+
+      <MenuBar menus={menus} isCompact={isNarrow} label={t('menu.bar')} />
 
       <nav id="command-bar" aria-label={t('csv.wb.commands')}>
         <label className="search" htmlFor="search-input">

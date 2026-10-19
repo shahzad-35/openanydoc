@@ -1,7 +1,7 @@
 /* The CSV file page: "Grid studio" (.claude/design-options/csv-viewer/option-1-grid-studio.html), ported as it is. Every rule is
    scoped to #csv-workbench, so no other page gets them. Light and dark follow the site's .dark class. The site's own tokens are
    pointed at the studio's colours so shared parts (the file error box) match. The grid stays left-to-right in Arabic. */
-#csv-workbench{--ui:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Inter,Roboto,"Helvetica Neue",sans-serif;
+#csv-workbench{--ui:var(--font-body);
   --mono:"SF Mono",ui-monospace,Menlo,Consolas,"Liberation Mono",monospace;
   --bg:#eceef1; --panel:#ffffff; --panel-2:#f6f7f9; --raised:#ffffff; --hover:rgba(15,23,35,.055);
   --line:#e1e4e9; --line-strong:#cdd2da; --grid-line:#eaedf1; --head:#f6f7f9; --row-alt:#fbfbfc;
@@ -48,18 +48,18 @@
 #csv-workbench .vsep{width:1px;height:18px;background:var(--line);flex:none}
 #csv-workbench .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 #csv-workbench kbd{font:500 10.5px var(--mono);padding:0 5px;border:1px solid var(--line-strong);border-bottom-width:2px;border-radius:4px;color:var(--muted);line-height:16px}
-#csv-workbench .btn{height:30px;padding-inline:9px;display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:7px;background:transparent;white-space:nowrap;font-weight:500;font-size:12.5px;color:var(--text)}
+#csv-workbench .btn{min-height:0;box-shadow:none;height:30px;padding-inline:9px;display:inline-flex;align-items:center;gap:6px;border:1px solid transparent;border-radius:7px;background:transparent;white-space:nowrap;font-weight:500;font-size:12.5px;color:var(--text)}
 #csv-workbench .btn:hover{background:var(--hover)}
 #csv-workbench .btn:disabled{opacity:.45;cursor:not-allowed}
 #csv-workbench .btn.icon{width:30px;padding:0;justify-content:center}
 #csv-workbench .btn.sm{height:26px;padding-inline:8px;font-size:12px}
 #csv-workbench .btn.sm.icon{width:26px;padding:0}
-#csv-workbench .btn.primary{background:var(--accent);color:var(--on-accent);font-weight:600}
+#csv-workbench .btn.primary{background:var(--accent);color:var(--on-accent);font-weight:500}
 #csv-workbench .btn.primary:hover{filter:brightness(1.07);background:var(--accent)}
 #csv-workbench .btn.outline{border-color:var(--line-strong);background:var(--panel)}
 #csv-workbench .btn.danger{color:var(--err)}
 #csv-workbench .btn[aria-pressed="true"],#csv-workbench .btn.on{background:var(--accent-soft);color:var(--accent-text)}
-#csv-workbench .btn .count{min-width:17px;height:17px;padding:0 5px;border-radius:9px;background:var(--accent-soft);color:var(--accent-text);font:600 10.5px/17px var(--mono);text-align:center}
+#csv-workbench .btn .count{min-width:17px;height:17px;padding:0 5px;border-radius:9px;background:var(--accent-soft);color:var(--accent-text);font:500 10.5px/17px var(--mono);text-align:center}
 #csv-workbench .btn.warnish{color:var(--warn)}
 #csv-workbench .btn.warnish .count{background:var(--warn-soft);color:var(--warn)}
 #csv-workbench .btn .caret{width:10px;height:10px;opacity:.7}
@@ -67,7 +67,7 @@
 #csv-workbench .brand{display:flex;align-items:center;gap:9px;min-width:0}
 #csv-workbench .logo{width:22px;height:22px;display:grid;place-items:center;flex:none}
 #csv-workbench .logo svg{width:20px;height:20px;stroke:var(--accent);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-#csv-workbench .brand-name{font-weight:650;letter-spacing:-.01em}
+#csv-workbench .brand-name{font:500 17px/1 var(--font-display);letter-spacing:-.01em}
 #csv-workbench .slash{color:var(--line-strong);font-size:18px;font-weight:300}
 #csv-workbench .page-title{margin:0;font-size:13px;font-weight:500;color:var(--muted);white-space:nowrap}
 #csv-workbench .file-chip{display:inline-flex;align-items:center;gap:7px;height:28px;padding-inline:8px 6px;border:1px solid var(--line);border-radius:7px;background:var(--panel-2);font-size:12px;min-width:0}
@@ -86,15 +86,15 @@
 #csv-workbench .cmd-group{display:flex;align-items:center;gap:1px}
 #csv-workbench #value-bar[hidden],#csv-workbench #chips-bar[hidden]{display:none}
 #csv-workbench #value-bar{display:flex;align-items:center;gap:8px;height:36px;padding-inline:10px;background:var(--panel-2);border-bottom:1px solid var(--line)}
-#csv-workbench #cell-address-input{width:62px;height:26px;padding-inline:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:600 12px var(--mono);text-align:center}
+#csv-workbench #cell-address-input{width:62px;height:26px;padding-inline:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:500 12px var(--mono);text-align:center}
 #csv-workbench .vb-col{display:inline-flex;align-items:center;gap:6px;font-size:12px;color:var(--muted);white-space:nowrap}
 #csv-workbench .fx{font:italic 600 12px Georgia,serif;color:var(--faint);padding-inline:4px}
 #csv-workbench #cell-value-input{flex:1;min-width:0;height:26px;padding-inline:9px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font:12.5px var(--mono)}
 #csv-workbench #cell-value-input:focus,#csv-workbench #cell-address-input:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
 #csv-workbench .vb-note{font-size:11.5px;color:var(--faint);white-space:nowrap}
-#csv-workbench .vb-note b{color:var(--accent-text);font-weight:600}
+#csv-workbench .vb-note b{color:var(--accent-text);font-weight:500}
 #csv-workbench #chips-bar{display:flex;align-items:center;gap:6px;min-height:38px;padding:5px 10px;background:var(--panel);border-bottom:1px solid var(--line);overflow-x:auto;scrollbar-width:none}
-#csv-workbench .chips-label{font-size:11px;font-weight:650;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-inline-end:2px;white-space:nowrap}
+#csv-workbench .chips-label{font-size:11px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;color:var(--faint);margin-inline-end:2px;white-space:nowrap}
 #csv-workbench .chip{display:inline-flex;align-items:center;gap:5px;height:26px;padding-inline:9px 3px;border:1px solid var(--line-strong);border-radius:999px;background:var(--panel-2);font-size:12px;white-space:nowrap}
 #csv-workbench .chip .k{font-family:var(--mono);font-size:11.5px;color:var(--accent-text)}
 #csv-workbench .chip .op{color:var(--muted)}
@@ -102,13 +102,13 @@
 #csv-workbench .chip .x:hover{background:var(--hover);color:var(--text)}
 #csv-workbench .chip-body{border:0;background:transparent;padding:0;display:inline-flex;gap:5px;align-items:center;font-size:12px}
 #csv-workbench .chip.sort{border-style:dashed;padding-inline:7px 3px}
-#csv-workbench .chip .ord{width:16px;height:16px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);font:600 10px/16px var(--mono);text-align:center}
+#csv-workbench .chip .ord{width:16px;height:16px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);font:500 10px/16px var(--mono);text-align:center}
 #csv-workbench .chip-add{height:26px;border:1px dashed var(--line-strong);border-radius:999px;background:transparent;padding-inline:9px;font-size:12px;color:var(--muted);display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
 #csv-workbench .chip-add:hover{color:var(--text);border-color:var(--accent-line)}
 #csv-workbench .match-mode{height:24px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:11.5px;padding-inline:4px;color:var(--muted)}
 #csv-workbench .type-select{height:26px;border:1px solid var(--line);border-radius:6px;background:var(--panel);font-size:12px;padding-inline:4px;color:var(--text)}
 #csv-workbench .row-count{font-size:12px;color:var(--muted);white-space:nowrap}
-#csv-workbench .row-count b{color:var(--text);font-weight:650}
+#csv-workbench .row-count b{color:var(--text);font-weight:500}
 #csv-workbench #studio{flex:1;display:grid;grid-template-columns:minmax(0,1fr) 1px var(--dock-w,316px);min-height:0}
 #csv-workbench.dock-closed #studio{grid-template-columns:minmax(0,1fr)}
 #csv-workbench.dock-closed #dock,#csv-workbench.dock-closed #dock-resizer{display:none}
@@ -120,7 +120,7 @@
 #csv-workbench #dock-resizer .grip{position:absolute;top:50%;left:50%;width:3px;height:28px;margin:-14px 0 0 -1.5px;border-radius:2px;background:var(--line-strong)}
 #csv-workbench #data-table{border-collapse:separate;border-spacing:0;table-layout:fixed;font-size:12.5px}
 #csv-workbench #data-table th,#csv-workbench #data-table td{border-inline-end:1px solid var(--grid-line);border-bottom:1px solid var(--grid-line);padding:0}
-#csv-workbench #data-table thead th{position:sticky;top:0;z-index:3;background:var(--head);text-align:left;font-weight:600;vertical-align:top;border-bottom:1px solid var(--line-strong)}
+#csv-workbench #data-table thead th{position:sticky;top:0;z-index:3;background:var(--head);text-align:left;font-weight:500;vertical-align:top;border-bottom:1px solid var(--line-strong)}
 #csv-workbench #data-table td{height:30px;padding-inline:9px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:cell;user-select:none;position:relative;background:var(--panel)}
 #csv-workbench #data-table tbody tr:hover td{background:color-mix(in srgb,var(--hover) 100%,var(--panel))}
 #csv-workbench #data-table th.rn,#csv-workbench #data-table td.rn{position:sticky;left:0;z-index:2;width:46px;text-align:right;padding-inline:0 8px;color:var(--faint);font:11px var(--mono);background:var(--head)!important;cursor:pointer}
@@ -145,7 +145,7 @@
 #csv-workbench #data-table td.editing input{width:100%;height:100%;border:0;padding-inline:8px;background:var(--raised);outline:none;font:inherit}
 #csv-workbench .hd{height:36px;position:relative}
 #csv-workbench .hd-inner{display:flex;align-items:center;gap:6px;height:100%;padding-inline:9px 8px;cursor:pointer;min-width:0}
-#csv-workbench .hd-name{font-size:12.5px;font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
+#csv-workbench .hd-name{font-size:12.5px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1;min-width:0}
 #csv-workbench .hd-type{font-size:10.5px;font-weight:500;color:var(--faint);white-space:nowrap;flex:none}
 #csv-workbench .grip-h{width:10px;height:16px;color:var(--faint);cursor:grab;opacity:0;display:grid;place-items:center}
 #csv-workbench .hd .grip-h{position:absolute;left:0;top:10px}
@@ -155,7 +155,7 @@
 #csv-workbench .hd-btn:hover{color:var(--text);box-shadow:inset 0 0 0 1px var(--line-strong)}
 #csv-workbench .hd.filtered .hd-btn{color:var(--accent-text)}
 #csv-workbench .hd:hover .hd-type,#csv-workbench .hd:focus-within .hd-type,#csv-workbench .hd.filtered .hd-type,#csv-workbench .hd.col-selected .hd-type{visibility:hidden}
-#csv-workbench .sort-ind{display:inline-flex;align-items:center;gap:1px;font:600 10px var(--mono);color:var(--accent-text);flex:none}
+#csv-workbench .sort-ind{display:inline-flex;align-items:center;gap:1px;font:500 10px var(--mono);color:var(--accent-text);flex:none}
 #csv-workbench .hd.col-selected{box-shadow:inset 0 -2px 0 var(--accent)}
 #csv-workbench .hd.drop-before{box-shadow:inset 3px 0 0 var(--accent)}
 #csv-workbench .col-resize{position:absolute;top:0;right:-4px;width:8px;height:100%;cursor:col-resize;z-index:5}
@@ -166,22 +166,22 @@
 #csv-workbench #grid-empty{display:none;padding:40px;text-align:center;color:var(--muted)}
 #csv-workbench #dock{display:flex;flex-direction:column;min-height:0;background:var(--panel);min-width:0}
 #csv-workbench .dock-head{display:flex;align-items:baseline;gap:8px;padding:14px 16px 4px;flex:none;min-width:0}
-#csv-workbench .dock-head h2{margin:0;font-size:14px;font-weight:650;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#csv-workbench .dock-head h2{margin:0;font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #csv-workbench .dock-sub{font-size:12px;color:var(--faint);white-space:nowrap}
 #csv-workbench .sheet-handle{display:none}
 #csv-workbench .dock-panel{display:none;flex:1;min-height:0;flex-direction:column}
 #csv-workbench .dock-panel.on{display:flex}
 #csv-workbench .sec{padding:12px 16px}
-#csv-workbench .sec-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:650;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 9px}
+#csv-workbench .sec-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 9px}
 #csv-workbench .scroll{overflow:auto;min-height:0}
 #csv-workbench #profile-scroll{flex:1}
-#csv-workbench .prof-name{font:650 15px var(--mono);letter-spacing:-.01em}
+#csv-workbench .prof-name{font:500 15px var(--mono);letter-spacing:-.01em}
 #csv-workbench .seg{display:inline-flex;border:1px solid var(--line);border-radius:7px;padding:2px;background:var(--panel-2)}
 #csv-workbench .seg button{height:22px;padding-inline:8px;border:0;border-radius:5px;background:transparent;font-size:11.5px;color:var(--muted)}
 #csv-workbench .seg button[aria-pressed="true"]{background:var(--raised);color:var(--text);box-shadow:0 0 0 1px var(--line-strong)}
 #csv-workbench .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px;margin-top:4px}
 #csv-workbench .stat .l{font-size:11.5px;color:var(--faint)}
-#csv-workbench .stat .v{font:600 16px var(--mono);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+#csv-workbench .stat .v{font:500 16px var(--mono);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
 #csv-workbench .fill-list{display:grid;gap:7px;margin:0;padding:0;list-style:none}
 #csv-workbench .fill-list li{display:grid;grid-template-columns:minmax(0,1fr) 54px 92px;gap:10px;align-items:center;font-size:12px}
 #csv-workbench .fill-list .n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -215,9 +215,9 @@
 #csv-workbench .issue{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:10px 14px;border-bottom:1px solid var(--line)}
 #csv-workbench .issue .badge{width:22px;height:22px;border-radius:6px;display:grid;place-items:center;background:var(--warn-soft);color:var(--warn)}
 #csv-workbench .issue .badge.info{background:var(--hover);color:var(--muted)}
-#csv-workbench .issue .t{font-size:12.5px;font-weight:600}
+#csv-workbench .issue .t{font-size:12.5px;font-weight:500}
 #csv-workbench .issue .d{font-size:12px;color:var(--muted);margin-top:2px}
-#csv-workbench .addr{font:700 12px var(--mono);padding:2px 7px;border-radius:5px;background:var(--accent-soft);color:var(--accent-text)}
+#csv-workbench .addr{font:600 12px var(--mono);padding:2px 7px;border-radius:5px;background:var(--accent-soft);color:var(--accent-text)}
 #csv-workbench .change{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:center;padding:8px 14px;border-bottom:1px solid var(--line);font-size:12px}
 #csv-workbench .change .diff{font-family:var(--mono);font-size:11.5px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 #csv-workbench .change del{color:var(--err);text-decoration:line-through;opacity:.85}
@@ -226,7 +226,7 @@
 #csv-workbench #status-bar{display:flex;align-items:center;gap:0;height:28px;padding-inline:4px;background:var(--panel-2);border-top:1px solid var(--line);font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden}
 #csv-workbench .sb{display:inline-flex;align-items:center;gap:5px;height:28px;padding-inline:8px;border:0;background:transparent;font-size:11.5px;color:var(--muted)}
 #csv-workbench button.sb:hover{background:var(--hover);color:var(--text)}
-#csv-workbench .sb b{color:var(--text);font-weight:600;font-variant-numeric:tabular-nums}
+#csv-workbench .sb b{color:var(--text);font-weight:500;font-variant-numeric:tabular-nums}
 #csv-workbench .sb .v{font-family:var(--mono);color:var(--text);font-variant-numeric:tabular-nums}
 #csv-workbench .sb-sep{width:1px;height:14px;background:var(--line-strong)}
 #csv-workbench .sb.accent{color:var(--accent-text)}
@@ -235,10 +235,10 @@
 #csv-workbench .pop{position:fixed;z-index:50;min-width:200px;max-width:min(360px,calc(100vw - 16px));background:var(--raised);border:1px solid var(--line-strong);border-radius:10px;box-shadow:var(--shadow);padding:4px}
 #csv-workbench .pop[hidden]{display:none}
 #csv-workbench .pop-head{display:flex;align-items:center;gap:8px;padding:8px 10px 6px}
-#csv-workbench .pop-title{font-weight:650;font-size:12.5px}
+#csv-workbench .pop-title{font-weight:500;font-size:12.5px}
 #csv-workbench .pop-sec{padding:8px 10px;border-top:1px solid var(--line)}
 #csv-workbench .pop-sec:first-child{border-top:0}
-#csv-workbench .pop .menu-label{padding:6px 9px 4px;font-size:10.5px;color:var(--faint);font-weight:650;letter-spacing:.06em;text-transform:uppercase}
+#csv-workbench .pop .menu-label{padding:6px 9px 4px;font-size:10.5px;color:var(--faint);font-weight:500;letter-spacing:.06em;text-transform:uppercase}
 #csv-workbench .mi{display:flex;align-items:center;gap:9px;width:100%;height:30px;padding-inline:9px;border:0;border-radius:6px;background:transparent;font-size:12.5px;text-align:start;color:var(--text)}
 #csv-workbench .mi:hover,#csv-workbench .mi:focus-visible{background:var(--accent-soft);outline:none}
 #csv-workbench .mi .hint{margin-inline-start:auto;color:var(--faint);font:11px var(--mono)}
@@ -261,7 +261,7 @@
 #csv-workbench .range-row{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center}
 #csv-workbench .range-row span{color:var(--faint);font-size:12px}
 #csv-workbench .sort-level{display:grid;grid-template-columns:18px 1fr auto auto;gap:6px;align-items:center;margin-bottom:6px}
-#csv-workbench .sort-level .ord{width:18px;height:18px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);font:600 10.5px/18px var(--mono);text-align:center}
+#csv-workbench .sort-level .ord{width:18px;height:18px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);font:500 10.5px/18px var(--mono);text-align:center}
 #csv-workbench .col-item{display:grid;grid-template-columns:14px 16px 1fr auto;gap:8px;align-items:center;height:28px;padding-inline:6px;border-radius:6px;font-size:12.5px}
 #csv-workbench .col-item:hover{background:var(--hover)}
 #csv-workbench .col-item .grip-h{opacity:1;margin:0}
@@ -277,7 +277,7 @@
 #csv-workbench dialog{border:1px solid var(--line-strong);border-radius:12px;background:var(--raised);color:var(--text);box-shadow:var(--shadow);padding:0;width:min(480px,calc(100vw - 24px))}
 #csv-workbench dialog::backdrop{background:rgba(5,8,12,.5)}
 #csv-workbench .dlg-head{display:flex;align-items:center;gap:8px;padding:14px 16px 10px}
-#csv-workbench .dlg-head h2{margin:0;font-size:15px;font-weight:650}
+#csv-workbench .dlg-head h2{margin:0;font-size:15px;font-weight:500}
 #csv-workbench .dlg-body{padding:4px 16px 14px;display:grid;gap:12px}
 #csv-workbench .dlg-foot{display:flex;align-items:center;gap:8px;padding:12px 16px;border-top:1px solid var(--line);background:var(--panel-2);border-radius:0 0 12px 12px}
 #csv-workbench .dlg-body .field select,#csv-workbench .dlg-body .field input,#csv-workbench .dlg-body textarea{height:30px;border:1px solid var(--line);border-radius:7px;background:var(--panel-2);padding-inline:8px;font-size:12.5px;color:var(--text)}
@@ -287,7 +287,7 @@
 #csv-workbench #csv-toast-region{position:fixed;inset-block-end:40px;inset-inline-start:50%;transform:translateX(-50%);z-index:80;display:grid;gap:6px;pointer-events:none}
 #csv-workbench .toast{pointer-events:auto;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 12px;border-radius:9px;background:var(--text);color:var(--panel);font-size:12.5px;box-shadow:var(--shadow);white-space:nowrap}
 #csv-workbench .toast .btn{color:var(--panel);height:24px}
-#csv-workbench #drop-overlay{position:fixed;inset:10px;border:2px dashed var(--accent);border-radius:14px;background:color-mix(in srgb,var(--bg) 82%,transparent);display:none;place-items:center;z-index:90;font-size:15px;font-weight:600;color:var(--accent-text)}
+#csv-workbench #drop-overlay{position:fixed;inset:10px;border:2px dashed var(--accent);border-radius:14px;background:color-mix(in srgb,var(--bg) 82%,transparent);display:none;place-items:center;z-index:90;font-size:15px;font-weight:500;color:var(--accent-text)}
 #file-page[data-dragging="true"] #csv-workbench #drop-overlay{display:grid}
 #csv-workbench #action-bar{display:none}
 #csv-workbench .phone-only{display:none}
@@ -296,8 +296,6 @@
 #csv-workbench .page-title,#csv-workbench .slash,#csv-workbench .privacy-pill,#csv-workbench #undo-button,#csv-workbench #redo-button,#csv-workbench #panel-toggle-button,#csv-workbench .desk-only{display:none!important}
 #csv-workbench .brand-name{display:none}
 #csv-workbench .file-chip{flex:1}
-#csv-workbench #download-button{padding-inline:10px}
-#csv-workbench #download-button .lbl{display:none}
 #csv-workbench #command-bar{height:auto;padding:8px 10px;gap:6px;overflow:hidden}
 #csv-workbench .file-chip{justify-content:flex-start}
 #csv-workbench #command-bar .cmd-group,#csv-workbench #command-bar .vsep,#csv-workbench #command-bar .spacer{display:none}
@@ -319,7 +317,7 @@
 #csv-workbench .ab{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;border:0;background:transparent;font-size:10.5px;font-weight:500;color:var(--muted);position:relative}
 #csv-workbench .ab .ico{width:20px;height:20px}
 #csv-workbench .ab.on{color:var(--accent-text)}
-#csv-workbench .ab .dot{position:absolute;top:8px;inset-inline-start:calc(50% + 6px);min-width:15px;height:15px;border-radius:8px;background:var(--accent);color:var(--on-accent);font:700 9.5px/15px var(--mono);padding:0 3px}
+#csv-workbench .ab .dot{position:absolute;top:8px;inset-inline-start:calc(50% + 6px);min-width:15px;height:15px;border-radius:8px;background:var(--accent);color:var(--on-accent);font:600 9.5px/15px var(--mono);padding:0 3px}
 #csv-workbench #mobile-status,#csv-workbench #action-bar{position:relative;z-index:45}
 #csv-workbench #dock{position:fixed;inset-inline:0;bottom:calc(88px + env(safe-area-inset-bottom));height:74dvh;z-index:40;border-radius:16px 16px 0 0;border:1px solid var(--line-strong);border-bottom:0;box-shadow:0 -14px 34px -14px rgba(0,0,0,.55);transform:translateY(calc(100% - 92px));transition:transform .25s ease}
 #csv-workbench #dock.open{transform:none}

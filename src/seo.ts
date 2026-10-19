@@ -21,8 +21,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     '/': {
       title: 'Free Online File Viewer and Editor – OpenAnyDoc',
       description: 'Free online file viewer and editor: open CSV, Excel (XLSX), JSON and TXT files without software and edit them in your browser. Private: no upload, no sign-up.',
-      heading: 'Free Online File Viewer and Editor',
-      intro: 'OpenAnyDoc is a free online file viewer and editor for CSV, Excel, JSON and TXT files. Open files online without software, edit them in your browser and download a copy: no upload, no sign-up, and your files never leave your device.',
+      heading: 'Open any file. Upload nothing.',
+      intro: 'Drop a CSV, Excel, JSON or text file and it opens right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
     },
     '/csv-viewer': {
       title: 'CSV Viewer Online – Free CSV Editor, No Upload',
@@ -110,8 +110,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     '/': {
       title: 'عارض ملفات اون لاين مجاني – فتح الملفات بدون برامج',
       description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV وExcel وJSON وTXT وعدّلها في متصفحك. فتح الملفات بدون برامج وبدون تسجيل، وملفاتك لا تُرفع ولا تغادر جهازك أبدًا.',
-      heading: 'عارض ملفات اون لاين مجاني ومحرر للملفات',
-      intro: 'OpenAnyDoc عارض ملفات اون لاين مجاني تفتح به ملفات CSV وExcel وJSON وTXT وتعدّلها ثم تنزّل نسخة منها. فتح الملفات بدون برامج وبدون تسجيل، والملف يُقرأ داخل متصفحك فلا يُرفع ولا يغادر جهازك.',
+      heading: 'افتح أي ملف. لا ترفع شيئًا.',
+      intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا وسيُفتح هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
     },
     '/csv-viewer': {
       title: 'عارض CSV اون لاين – فتح ملف CSV وتعديله مجانًا',

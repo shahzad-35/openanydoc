@@ -265,7 +265,6 @@ await test('saving a file shows one dismissible tip', async () => {
   await openPage('/en/excel-viewer')
   await chooseFile(tipWorkbook)
   await waitFor(`document.querySelector('h1')?.innerText === 'tip.xlsx'`, 'the file to open')
-  await evaluate(`document.querySelector('#mode-edit-button').click()`)
   const downloadButton = `document.querySelector('#download-button')`
   await waitFor(`${downloadButton} && !${downloadButton}.disabled`, 'the Download button')
   await evaluate(`${downloadButton}.click()`)
@@ -406,9 +405,8 @@ for (const [name, address, file, readyElement] of [
     await chooseFile(file)
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
     await expectCleanIds(`${name} view mode`)
-    // JSON, CSV and TXT draw their own page, always editable, with their own menus; the other formats switch to Edit.
+    // Every editable format opens ready to edit, with its own menus.
     const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : name === 'TXT' ? '#ribbon-sort-menu-button' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
-    await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
     if (name === 'TXT') await evaluate(`document.querySelector('#ribbon-tab-lines').click()`)
     await waitFor(`document.querySelector('${menuButton}')`, 'the editing tools')
     await expectCleanIds(`${name} edit mode`)
@@ -470,11 +468,13 @@ await test('every sitemap address has a lastmod date and is a built page without
   }
 })
 
-await test('the home page has 600 to 900 words in its server HTML, eight questions and a card linking to each tool page', async () => {
+// The upper bound was 900 before the home page gained its stats row, shortcut keycaps, privacy comparison and the note on how
+// the demo works (2026-10-19).
+await test('the home page has 600 to 1000 words in its server HTML, eight questions and a card linking to each tool page', async () => {
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
     const wordCount = prerenderedText(html).split(/\s+/).filter(Boolean).length
-    expect(wordCount >= 600 && wordCount <= 900, `/${locale}: ${wordCount} words`)
+    expect(wordCount >= 600 && wordCount <= 1000, `/${locale}: ${wordCount} words`)
     expect((html.match(/id="faq-item-\d+"/g) ?? []).length === 8, `/${locale}: the FAQ does not have eight questions`)
     for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer']) {
       expect(new RegExp(`id="tool-card-link-${page}" href="/${locale}/${page}"`).test(html), `/${locale}: no card links to /${locale}/${page}`)
@@ -587,7 +587,7 @@ for (const [name, address, file, readyElement, menuButton] of [
   ['CSV', '/en/csv-viewer', sampleCsv, '#data-table', '#more-menu-button:not(:disabled)'],
   ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row', '#more-button'],
   ['TXT', '/en/txt-viewer', sampleText, '#text-editor', '#ribbon-tab-file'],
-  ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table', '#legal-menu-button'],
+  ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table', '#menu-help'],
 ]) {
   for (const locale of ['en', 'ar']) await test(`${name} (${locale}): Privacy, Terms and the disclaimer in the menu, and the status bar links, open in a new tab`, async () => {
     await openPage(address.replace('/en/', `/${locale}/`))
@@ -621,14 +621,13 @@ await test('the format list is read from the registry: View and edit, or Coming 
   }
 })
 
-await test('one drop zone opens every live format with its View / Edit toggle and tools; Coming soon stays on the page', async () => {
+await test('one drop zone opens every live format with its tools; Coming soon stays on the page', async () => {
   const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook]]
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
     await chooseFile(file)
-    await waitFor(`document.querySelector('#mode-toggle') || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench'))`, `the ${name} file page with its toggle`)
+    await waitFor(`(${name === 'Excel'} && document.querySelector('#excel-workbench')) || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench'))`, `the ${name} file page`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
-    await evaluate(`document.querySelector('#mode-edit-button')?.click()`)
     await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
@@ -1067,7 +1066,8 @@ await test('the header nav, related tools, footer and home links point at built 
       const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
       expect(landingPages.every((landingPage) => landingPage === page || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
       for (const link of [...navLinks, ...(relatedLinks ?? []), ...footerLinks]) {
-        expect(builtPage(link.href), `${address}: ${link.href} is not a built page`)
+        // The footer's Contact link is a mailto: address, the only link that is not a page.
+        expect(link.href.startsWith('mailto:') || builtPage(link.href), `${address}: ${link.href} is not a built page`)
         expect(!/^(click here|here|tools|more|read more|اضغط هنا|هنا|أدوات|المزيد)$/i.test(link.text), `${address}: the link text "${link.text}" does not say where it goes`)
       }
       const selfLinks = [...(relatedLinks ?? []), ...linksIn(html, '<nav id="footer-viewers"', '</nav>')].filter((link) => link.href === address)
