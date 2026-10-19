@@ -43,7 +43,7 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
       <header id="site-header" className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5">
         <p id="site-brand" className="flex items-center">
           <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full">
-            <Wordmark />
+            <Wordmark withMark />
           </PageLink>
         </p>
         <SiteNav currentPath={address} onNavigate={onNavigate} />

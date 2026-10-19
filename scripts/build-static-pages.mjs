@@ -63,8 +63,8 @@ function renderChangelogFooter(locale) {
   const legalItems =
     legalFooterLinks.map((item) => `<li>${link(item.id, item.path, t(item.labelKey))}</li>`).join('') +
     `<li><a id="footer-link-contact" href="mailto:${CONTACT_EMAIL}" class="${f.link}">${t('footer.contact')}</a></li>`
-  // The wordmark as src/components/home/KitIcon.tsx draws it.
-  const wordmark = '<span dir="ltr" class="wordmark">open<span class="text-accent">any</span>doc</span>'
+  // The wordmark with the brand mark, as src/components/KitIcon.tsx draws it.
+  const wordmark = '<span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span>'
   return (
     `<footer id="site-footer" class="${f.footer}"><div class="${f.columns}"><div><p class="${f.brand}">${wordmark}</p><p class="${f.text}">${t('footer.text')}</p></div>` +
     `<nav id="footer-viewers" aria-label="${t('footer.viewers')}"><h2 class="${f.heading}">${t('footer.viewers')}</h2><ul class="${f.list}">${viewerItems}${landingItems}</ul></nav>` +
@@ -102,7 +102,7 @@ function renderChangelogBody(locale) {
   const other = otherLocale(locale)
   return (
     `<div id="${changelogIds.page}" class="${c.page}">` +
-    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark">open<span class="text-accent">any</span>doc</span></a></p>${renderChangelogNav(locale)}` +
+    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p>${renderChangelogNav(locale)}` +
     `<p><a id="${changelogIds.languageLink}" href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
     `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}"><h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
     `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`

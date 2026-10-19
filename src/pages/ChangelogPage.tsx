@@ -46,7 +46,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
   return (
     <div id={changelogIds.page} className={changelogClasses.page}>
       <header id={changelogIds.header} className={changelogClasses.header}>
-        <p>{pageLink(changelogIds.brandLink, localizePath(locale, '/'), changelogClasses.brandLink, <Wordmark />)}</p>
+        <p>{pageLink(changelogIds.brandLink, localizePath(locale, '/'), changelogClasses.brandLink, <Wordmark withMark />)}</p>
         <SiteNav currentPath="/changelog" onNavigate={onNavigate} />
         <p>{pageLink(changelogIds.languageLink, `/${otherLocale(locale)}/changelog`, changelogClasses.languageLink, t('changelog.otherLanguage'), otherLocale(locale))}</p>
       </header>

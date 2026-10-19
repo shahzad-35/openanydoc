@@ -185,9 +185,11 @@ export function MiniFormatIcon({ format, size = 24, className }: { format: MiniF
 }
 
 // The wordmark: lowercase display type with "any" in the accent colour.
-export function Wordmark({ className = '' }: { className?: string }) {
+// `withMark` puts the brand mark (public/favicon.svg, a yellow block holding a page) in front, as in the site header and footer.
+export function Wordmark({ className = '', withMark = false }: { className?: string; withMark?: boolean }) {
   return (
     <span dir="ltr" className={`wordmark ${className}`}>
+      {withMark && <img src="/favicon.svg" alt="" width="34" height="34" className="wordmark-mark" />}
       open<span className="text-accent">any</span>doc
     </span>
   )

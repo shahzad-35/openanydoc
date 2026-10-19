@@ -341,6 +341,12 @@ html[lang="ar"] .toy-page {
   color: var(--ink);
 }
 
+.wordmark-mark {
+  display: inline-block;
+  margin-inline-end: 10px;
+  vertical-align: -9px;
+}
+
 .type-display {
   font-family: var(--font-display);
   font-size: clamp(40px, 4.4vw + 1rem, 70px);

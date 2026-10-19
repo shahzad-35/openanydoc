@@ -42,7 +42,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
       <div className={footerClasses.columns}>
         <div>
           <p className={footerClasses.brand}>
-            <Wordmark />
+            <Wordmark withMark />
           </p>
           <p className={footerClasses.text}>{t('footer.text')}</p>
         </div>

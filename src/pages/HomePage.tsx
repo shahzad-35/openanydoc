@@ -111,10 +111,10 @@ export default function HomePage({
         <p id="site-brand" className="flex items-center">
           {toolViewer ? (
             <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full">
-              <Wordmark />
+              <Wordmark withMark />
             </PageLink>
           ) : (
-            <Wordmark />
+            <Wordmark withMark />
           )}
         </p>
         <SiteNav currentPath={address} onNavigate={onNavigate} />
