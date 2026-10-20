@@ -105,6 +105,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'Terms of Use',
       intro: 'The short rules for using OpenAnyDoc.',
     },
+    '/fix-arabic-csv-in-excel': {
+      title: 'Why Your CSV Shows Broken Arabic in Excel (and the Fix)',
+      description: 'Arabic in a CSV turns into Ø§Ù„ symbols or question marks in Excel because the file has no UTF-8 marker. Three fixes, one of them free with no upload at all.',
+      heading: 'Why your CSV shows broken Arabic text in Excel',
+      intro: 'Excel guesses the wrong encoding when a UTF-8 file has no byte order mark. Here is what happens, and three ways to fix it.',
+      linkText: 'Fix broken Arabic in a CSV',
+    },
   },
   ar: {
     '/': {
@@ -194,15 +201,22 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'شروط الاستخدام',
       intro: 'القواعد المختصرة لاستخدام OpenAnyDoc.',
     },
+    '/fix-arabic-csv-in-excel': {
+      title: 'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel؟',
+      description: 'تظهر العربية في ملف CSV على شكل رموز أو علامات استفهام في Excel لأن الملف لا يحمل علامة UTF-8. ثلاثة حلول، منها حل مجاني لا يرفع ملفك أبدًا ولا يغادر جهازك.',
+      heading: 'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel',
+      intro: 'يخمّن Excel ترميزًا خاطئًا عندما يخلو ملف UTF-8 من علامة ترتيب البايتات. إليك ما يحدث وثلاث طرق لإصلاحه.',
+      linkText: 'إصلاح العربية المشوّهة في CSV',
+    },
   },
 }
 
 // The Open Graph name of each language (og:locale and og:locale:alternate).
 export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_AR' }
 
-// The pages with a share picture of their own, format and landing pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
+// The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/fix-arabic-csv-in-excel']
 
 export function getShareImage(locale: Locale, address: string) {
   const imageAddress = pagesWithShareImage.includes(address) ? address : '/'

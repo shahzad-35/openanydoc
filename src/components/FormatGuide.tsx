@@ -1,9 +1,25 @@
 import { useT } from '../i18n'
-import { formatGuides, relatedPages } from '../pageContent'
+import { formatGuides, relatedPages, type GuideQuestion } from '../pageContent'
 import { pageSeo } from '../seo'
 import type { Viewer } from '../viewers'
 import { PrivacySection } from './AboutSections'
 import { PageLink } from './SiteFooter'
+
+// The answer's `link` phrase becomes a link to that page; the text stays the same as the FAQPage data the build writes.
+function withPageLink(item: GuideQuestion, onNavigate: (path: string) => void) {
+  if (!item.link) return item.answer
+  const [before, after] = item.answer.split(item.link.text)
+  if (after === undefined) return item.answer
+  return (
+    <>
+      {before}
+      <PageLink id={`format-faq-link-${item.link.path.slice(1)}`} path={item.link.path} onNavigate={onNavigate} className="underline underline-offset-2 hover:text-accent">
+        {item.link.text}
+      </PageLink>
+      {after}
+    </>
+  )
+}
 
 // The text that fills a format or landing page under the drop zone: numbered steps ("How it works"), what the viewer handles, then
 // that page's questions and answers, links to related pages, then the privacy note. Read from src/pageContent.ts, which the build also uses for the page's static HTML and FAQ data.
@@ -43,7 +59,7 @@ export default function FormatGuide({ address, viewerId, onNavigate }: { address
           {guide.faq.map((item, position) => (
             <div key={item.question} id={`format-faq-item-${position + 1}`} className="py-4">
               <dt className="font-medium">{item.question}</dt>
-              <dd className="mt-1 text-ink-soft">{item.answer}</dd>
+              <dd className="mt-1 text-ink-soft">{withPageLink(item, onNavigate)}</dd>
             </div>
           ))}
         </dl>

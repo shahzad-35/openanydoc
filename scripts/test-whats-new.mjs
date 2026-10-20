@@ -416,7 +416,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -425,12 +425,12 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/abou
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
 
-const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/changelog']
+const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel', '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
   const alternatesOf = (html) =>
@@ -492,7 +492,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
       const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
       const types = blocks.flatMap((block) => [block['@type']].flat())
-      const expectedTypes = { '': ['WebSite', 'Organization', 'FAQPage'], '/about': [], '/privacy': [], '/terms': [], '/changelog': [] }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
+      const expectedTypes = { '': ['WebSite', 'Organization', 'FAQPage'], '/about': [], '/privacy': [], '/terms': [], '/fix-arabic-csv-in-excel': [], '/changelog': [] }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
       expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
       for (const block of blocks) {
         const type = [block['@type']].flat()[0]
@@ -538,9 +538,9 @@ await test('every JSON-LD block is valid data with the fields search engines nee
 
 // ---------------------------------------------------------------- About, Privacy and Terms; footer and workbench links
 
-await test('About, Privacy and Terms pages: one h1, their own title and description, hreflang, real text', async () => {
+await test('About, Privacy, Terms and guide pages: one h1, their own title and description, hreflang, real text', async () => {
   const titles = new Set()
-  for (const address of ['en', 'ar'].flatMap((locale) => ['/about', '/privacy', '/terms'].map((page) => `/${locale}${page}`))) {
+  for (const address of ['en', 'ar'].flatMap((locale) => ['/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel'].map((page) => `/${locale}${page}`))) {
     const html = await (await fetch(`${siteOrigin}${address}`)).text()
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
@@ -563,6 +563,22 @@ await test('About, Privacy and Terms pages: one h1, their own title and descript
   expect(privacyText.includes('Last updated: 2026-10-17') && privacyText.includes('No analytics, no cookies, no tracking') && privacyText.includes('Cloudflare'), 'the privacy policy is missing a required part')
 })
 
+await test('the Arabic CSV guide links to built pages, and the CSV page, its FAQ and the footer link to the guide', async () => {
+  for (const locale of ['en', 'ar']) {
+    await openPage(`/${locale}/fix-arabic-csv-in-excel`)
+    const guideLinks = await evaluate(`[...document.querySelectorAll('#info-sections a[href^="/"]')].map((link) => link.getAttribute('href'))`)
+    expect(guideLinks.length >= 4, `/${locale}: the guide links only ${guideLinks.length} pages`)
+    for (const href of guideLinks) expect(fs.existsSync(path.join(distFolder, href, 'index.html')), `/${locale}: the guide links ${href}, which is not a built page`)
+    expect(await evaluate(`document.querySelector('#footer-link-fix-arabic-csv-in-excel') === null`), `/${locale}: the footer links the guide to itself`)
+  }
+  await openPage('/en/csv-viewer')
+  for (const [id, where] of [['related-link-fix-arabic-csv-in-excel', 'related tools'], ['format-faq-link-fix-arabic-csv-in-excel', 'FAQ answer'], ['footer-link-fix-arabic-csv-in-excel', 'footer']]) {
+    expect((await evaluate(`document.querySelector('#${id}')?.getAttribute('href')`)) === '/en/fix-arabic-csv-in-excel', `the CSV page's ${where} does not link to the guide`)
+  }
+  await evaluate(`document.querySelector('#format-faq-link-fix-arabic-csv-in-excel').click()`)
+  await waitFor(`location.pathname === '/en/fix-arabic-csv-in-excel' && document.querySelector('#info-sections') !== null`, 'the FAQ link to open the guide')
+})
+
 await test('the footer has About, Privacy and Terms links and the Microsoft disclaimer on every content page', async () => {
   for (const address of ['/en', '/ar', '/en/csv-viewer', '/ar/excel-viewer', '/en/json-viewer', '/ar/txt-viewer', '/en/about', '/ar/privacy', '/en/terms', '/en/changelog', '/ar/changelog']) {
     await openPage(address)
@@ -578,6 +594,15 @@ await test('the footer has About, Privacy and Terms links and the Microsoft disc
     const html = await (await fetch(`${siteOrigin}/${locale}/changelog`)).text()
     expect(html.includes('id="footer-disclaimer"') && html.includes(`id="footer-link-privacy" href="/${locale}/privacy"`), `${locale}: the static changelog has no footer`)
   }
+  await openPage('/en')
+  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === 4 && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
+  await openPage('/ar')
+  const arabicFooterFits = await evaluate(`(() => {
+    const width = document.documentElement.clientWidth
+    const inside = (link) => { const box = link.getBoundingClientRect(); return box.left >= 0 && box.right <= width }
+    return document.documentElement.scrollWidth <= width && [...document.querySelectorAll('#site-footer a')].every(inside)
+  })()`)
+  expect(arabicFooterFits, 'the Arabic footer has a link outside the viewport')
   await openPage('/en/csv-viewer')
   await evaluate(`document.querySelector('#footer-link-privacy').click()`)
   await waitFor(`location.pathname === '/en/privacy' && document.querySelector('h1')?.innerText === 'Privacy Policy'`, 'the footer link to open the privacy policy in the page')
@@ -1089,7 +1114,7 @@ await test('the changelog writes the same nav as the browser draws, and the nav 
     expect(liveNav === staticNav, `/${locale}/changelog: the static nav differs from the React one:\n${staticNav}\n${liveNav}`)
   }
   const navState = () => evaluate(`({ toggle: document.querySelector('#site-nav-toggle').checkVisibility(), links: document.querySelector('#site-nav-link-csv').checkVisibility(), sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth })`)
-  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/changelog']) {
+  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/fix-arabic-csv-in-excel', '/ar/changelog']) {
     await openPage(address)
     const desktop = await navState()
     expect(!desktop.toggle && desktop.links, `${address} at 1280px: the links should show without the disclosure (${JSON.stringify(desktop)})`)

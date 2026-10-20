@@ -7,7 +7,8 @@ type Locale = 'en' | 'ar'
 
 export const CONTACT_EMAIL = 'support@openanydoc.com'
 
-export type InfoSection = { heading: string; paragraphs: string[]; list?: string[] }
+// `links`: phrases of this section's text that become links to other pages (each page linked once per page, its id is made from the path).
+export type InfoSection = { heading: string; paragraphs: string[]; list?: string[]; links?: { text: string; path: string }[] }
 export type InfoPageContent = { lastUpdated?: string; sections: InfoSection[] }
 
 // Keyed by language, then by the page address, like pageSeo in seo.ts.

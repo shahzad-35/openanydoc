@@ -173,8 +173,8 @@ export default function HomePage({
         )}
       </main>
 
-      <SiteFooter currentPath={address} onNavigate={onNavigate} />
       {isHomePage && <DemoNote />}
+      <SiteFooter currentPath={address} onNavigate={onNavigate} />
     </div>
   )
 }

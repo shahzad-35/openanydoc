@@ -10,7 +10,7 @@ import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 const InfoPage = lazy(() => import('./pages/InfoPage'))
-const infoPageAddresses = ['/about', '/privacy', '/terms']
+const infoPageAddresses = ['/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel']
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
 // language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still

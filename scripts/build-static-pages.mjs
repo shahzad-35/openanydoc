@@ -12,6 +12,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
+import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
 import { SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
@@ -50,27 +51,34 @@ function renderChangelogNav(locale) {
   )
 }
 
-// The site footer as src/components/SiteFooter.tsx draws it on the changelog page (without the "New" badges, for the same reason as above).
+// The site footer as src/components/SiteFooter.tsx draws it on the changelog page, without the format glyphs and the "New" badges
+// (the changelog page is not hydrated, so React redraws the footer with them as soon as it loads).
 function renderChangelogFooter(locale) {
   const t = (key, values) => escapeHtml(translate(locale, key, values))
   const f = footerClasses
   const link = (id, address, label) => `<a id="${id}" href="${localizePath(locale, address)}" class="${f.link}">${label}</a>`
+  const item = (content) => `<li class="${f.item}">${content}</li>`
   const viewerItems = viewers
     .filter((viewer) => viewer.toolPath)
-    .map((viewer) => `<li class="${f.item}">${link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))}</li>`)
+    .map((viewer) => item(link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))))
     .join('')
-  const landingItems = landingPages.map((page) => `<li class="${f.item}">${link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))}</li>`).join('')
+  const moreItems =
+    landingPages.map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText)))).join('') +
+    Object.keys(guidePages.en).map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
+    item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =
-    legalFooterLinks.map((item) => `<li>${link(item.id, item.path, t(item.labelKey))}</li>`).join('') +
-    `<li><a id="footer-link-contact" href="mailto:${CONTACT_EMAIL}" class="${f.link}">${t('footer.contact')}</a></li>`
+    legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
+    item(`<a id="footer-link-contact" href="mailto:${CONTACT_EMAIL}" class="${f.link}">${t('footer.contact')}</a>`)
   // The wordmark with the brand mark, as src/components/KitIcon.tsx draws it.
   const wordmark = '<span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span>'
+  const column = (id, headingKey, items) => `<nav id="${id}" aria-label="${t(headingKey)}"><h2 class="${f.heading}">${t(headingKey)}</h2><ul class="${f.list}">${items}</ul></nav>`
   return (
-    `<footer id="site-footer" class="${f.footer}"><div class="${f.columns}"><div><p class="${f.brand}">${wordmark}</p><p class="${f.text}">${t('footer.text')}</p></div>` +
-    `<nav id="footer-viewers" aria-label="${t('footer.viewers')}"><h2 class="${f.heading}">${t('footer.viewers')}</h2><ul class="${f.list}">${viewerItems}${landingItems}</ul></nav>` +
-    `<nav id="footer-more" aria-label="${t('footer.more')}"><h2 class="${f.heading}">${t('footer.more')}</h2><ul class="${f.list}"><li>${link('footer-link-all-types', '/', t('footer.allTypes'))}</li></ul></nav>` +
-    `<nav id="footer-legal" aria-label="${t('footer.legal')}"><h2 class="${f.heading}">${t('footer.legal')}</h2><ul class="${f.list}">${legalItems}</ul></nav></div>` +
-    `<p id="footer-disclaimer" class="${f.disclaimer}">${t('legal.disclaimer')}</p></footer>`
+    `<footer id="site-footer" class="${f.footer}"><div class="${f.inner}"><div class="${f.columns}">` +
+    `<div class="${f.brand}"><p class="${f.brandMark}">${wordmark}</p><p class="${f.brandText}">${t('footer.text')}</p></div>` +
+    column('footer-viewers', 'footer.viewers', viewerItems) +
+    column('footer-more', 'about.moreFileTools', moreItems) +
+    column('footer-legal', 'footer.legal', legalItems) +
+    `</div><div class="${f.bottom}"><p id="footer-disclaimer" class="${f.disclaimer}">${t('legal.disclaimer')}</p></div></div></footer>`
   )
 }
 
@@ -288,6 +296,7 @@ function lastChangeDate(sourceFiles) {
 function pageSourceFiles(address) {
   if (address === '/') return ['src/seo.ts', 'src/content.ts', 'src/pages/HomePage.tsx', 'src/components/AboutSections.tsx']
   if (infoPages.en[address]) return ['src/seo.ts', 'src/legalContent.ts', 'src/pages/InfoPage.tsx']
+  if (guidePages.en[address]) return ['src/seo.ts', 'src/guides.ts', 'src/pages/InfoPage.tsx']
   return ['src/seo.ts', 'src/pageContent.ts', 'src/pages/HomePage.tsx', 'src/components/FormatGuide.tsx']
 }
 const changelogLastChange = lastChangeDate(['src/data/changelog.json', 'src/pages/ChangelogPage.tsx'])

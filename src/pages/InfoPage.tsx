@@ -4,31 +4,42 @@ import SiteFooter, { PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { usePageHead } from './HomePage'
+import { guidePages } from '../guides'
 import { useT } from '../i18n'
-import { CONTACT_EMAIL, infoPages } from '../legalContent'
+import { CONTACT_EMAIL, infoPages, type InfoSection } from '../legalContent'
 import { pageSeo } from '../seo'
 
-// The contact address inside a sentence becomes a mailto link.
-function withContactEmailLink(text: string) {
-  const [before, after] = text.split(CONTACT_EMAIL)
-  if (after === undefined) return text
-  return (
-    <>
-      {before}
-      <a id="contact-email-link" href={`mailto:${CONTACT_EMAIL}`} className="underline underline-offset-2 hover:text-accent">
-        <bdi dir="ltr">{CONTACT_EMAIL}</bdi>
-      </a>
-      {after}
-    </>
-  )
+const escapeForRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const inlineLinkClassName = 'underline underline-offset-2 hover:text-accent'
+
+// The contact address inside a sentence becomes a mailto link, and a section's `links` phrases become links to their pages. Longer
+// phrases are matched first, so "large CSV viewer" is not cut at "CSV viewer".
+function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavigate: (path: string) => void) {
+  const phrases = [CONTACT_EMAIL, ...links.map((link) => link.text)].sort((a, b) => b.length - a.length)
+  return text.split(new RegExp(`(${phrases.map(escapeForRegExp).join('|')})`)).map((part, position) => {
+    if (part === CONTACT_EMAIL) {
+      return (
+        <a key={position} id="contact-email-link" href={`mailto:${CONTACT_EMAIL}`} className={inlineLinkClassName}>
+          <bdi dir="ltr">{CONTACT_EMAIL}</bdi>
+        </a>
+      )
+    }
+    const link = links.find((candidate) => candidate.text === part)
+    if (!link) return part
+    return (
+      <PageLink key={position} id={`info-link-${link.path.slice(1)}`} path={link.path} onNavigate={onNavigate} className={inlineLinkClassName}>
+        {part}
+      </PageLink>
+    )
+  })
 }
 
-// About, Privacy Policy and Terms of Use: a page of h2 sections drawn from src/legalContent.ts, with the home page's header and the
-// site footer. `address` is the page without its language ('/privacy').
+// About, Privacy Policy, Terms of Use and the guides: a page of h2 sections drawn from src/legalContent.ts or src/guides.ts, with the
+// home page's header and the site footer. `address` is the page without its language ('/privacy').
 export default function InfoPage({ address, onNavigate }: { address: string; onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
   const seo = pageSeo[locale][address]
-  const content = infoPages[locale][address]
+  const content = infoPages[locale][address] ?? guidePages[locale][address]
   usePageHead(address, seo.title, seo.description)
 
   return (
@@ -64,12 +75,12 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
             <section key={section.heading} id={`info-section-${position + 1}`}>
               <h2 className="type-h3">{section.heading}</h2>
               {section.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="mt-2">{withContactEmailLink(paragraph)}</p>
+                <p key={paragraph} className="mt-2">{withInlineLinks(paragraph, section.links, onNavigate)}</p>
               ))}
               {section.list && (
                 <ul className="mt-2 list-disc space-y-1 ps-6">
                   {section.list.map((item) => (
-                    <li key={item}>{item}</li>
+                    <li key={item}>{withInlineLinks(item, section.links, onNavigate)}</li>
                   ))}
                 </ul>
               )}

@@ -1,13 +1,15 @@
 import type { ReactNode } from 'react'
+import { guidePages } from '../guides'
 import { localizePath, useT } from '../i18n'
 import { CONTACT_EMAIL } from '../legalContent'
 import { footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
 import { pageSeo } from '../seo'
-import { landingPages, viewers } from '../viewers'
-import { Wordmark } from './KitIcon'
+import { landingPages, viewers, type Viewer } from '../viewers'
+import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
 
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
+const viewerGlyphs: Partial<Record<Viewer['id'], MiniFormat>> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx' }
 
 // A link that changes the page without reloading (the app has no router package); modified clicks open a new tab as usual.
 // `path` is the address without its language ('/csv-viewer'); the link goes to the page in the current language.
@@ -32,84 +34,102 @@ export function PageLink({ id, path, onNavigate, children, className = 'underlin
   )
 }
 
-// The footer of every content page (home, format pages, About, Privacy, Terms, changelog). `currentPath` is the page's address
+// The footer of every content page (home, format pages, About, Privacy, Terms, guides, changelog). `currentPath` is the page's address
 // without its language. scripts/build-static-pages.mjs writes the same footer into the changelog pages: keep the two in step.
+// The glyph sits next to the link, not inside it, so the anchor stays plain text (the link test reads anchors with a regular expression).
 export default function SiteFooter({ currentPath, onNavigate }: { currentPath: string; onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
   const isFormatPage = pagesWithOwnAddress.some((viewer) => viewer.toolPath === currentPath)
   return (
     <footer id="site-footer" className={footerClasses.footer}>
-      <div className={footerClasses.columns}>
-        <div>
-          <p className={footerClasses.brand}>
-            <Wordmark withMark />
-          </p>
-          <p className={footerClasses.text}>{t('footer.text')}</p>
+      <div className={footerClasses.inner}>
+        <div className={footerClasses.columns}>
+          <div className={footerClasses.brand}>
+            <p className={footerClasses.brandMark}>
+              <Wordmark withMark />
+            </p>
+            <p className={footerClasses.brandText}>{t('footer.text')}</p>
+          </div>
+          <nav id="footer-viewers" aria-label={t('footer.viewers')}>
+            <h2 className={footerClasses.heading}>{t('footer.viewers')}</h2>
+            <ul className={footerClasses.list}>
+              {pagesWithOwnAddress
+                .filter((viewer) => viewer.toolPath !== currentPath)
+                .map((viewer) => {
+                  const glyph = viewerGlyphs[viewer.id]
+                  return (
+                    <li key={viewer.id} className={footerClasses.item}>
+                      {glyph && <MiniFormatIcon format={glyph} size={20} className="shrink-0" />}
+                      <PageLink id={`footer-link-${viewer.id}`} path={viewer.toolPath as string} onNavigate={onNavigate} className={footerClasses.link}>
+                        {t('viewer.name', { format: viewer.label })}
+                      </PageLink>
+                      <NewBadge viewerId={viewer.id} />
+                    </li>
+                  )
+                })}
+            </ul>
+          </nav>
+          <nav id="footer-more" aria-label={t('about.moreFileTools')}>
+            <h2 className={footerClasses.heading}>{t('about.moreFileTools')}</h2>
+            <ul className={footerClasses.list}>
+              {landingPages
+                .filter((page) => page.path !== currentPath)
+                .map((page) => (
+                  <li key={page.path} className={footerClasses.item}>
+                    <PageLink id={`footer-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className={footerClasses.link}>
+                      {pageSeo[locale][page.path].linkText}
+                    </PageLink>
+                  </li>
+                ))}
+              {Object.keys(guidePages.en)
+                .filter((address) => address !== currentPath)
+                .map((address) => (
+                  <li key={address} className={footerClasses.item}>
+                    <PageLink id={`footer-link-${address.slice(1)}`} path={address} onNavigate={onNavigate} className={footerClasses.link}>
+                      {pageSeo[locale][address].linkText}
+                    </PageLink>
+                  </li>
+                ))}
+              {currentPath !== '/' && (
+                <li className={footerClasses.item}>
+                  <PageLink id="footer-link-all-types" path="/" onNavigate={onNavigate} className={footerClasses.link}>
+                    {t('footer.allTypes')}
+                  </PageLink>
+                </li>
+              )}
+              {!isFormatPage && currentPath !== '/changelog' && (
+                <li className={footerClasses.item}>
+                  <PageLink id="footer-link-changelog" path="/changelog" onNavigate={onNavigate} className={footerClasses.link}>
+                    {t('footer.whatsNew')}
+                  </PageLink>
+                </li>
+              )}
+            </ul>
+          </nav>
+          <nav id="footer-legal" aria-label={t('footer.legal')}>
+            <h2 className={footerClasses.heading}>{t('footer.legal')}</h2>
+            <ul className={footerClasses.list}>
+              {legalFooterLinks.map((link) => (
+                <li key={link.id} className={footerClasses.item}>
+                  <PageLink id={link.id} path={link.path} onNavigate={onNavigate} className={footerClasses.link}>
+                    {t(link.labelKey)}
+                  </PageLink>
+                </li>
+              ))}
+              <li className={footerClasses.item}>
+                <a id="footer-link-contact" href={`mailto:${CONTACT_EMAIL}`} className={footerClasses.link}>
+                  {t('footer.contact')}
+                </a>
+              </li>
+            </ul>
+          </nav>
         </div>
-        <nav id="footer-viewers" aria-label={t('footer.viewers')}>
-          <h2 className={footerClasses.heading}>{t('footer.viewers')}</h2>
-          <ul className={footerClasses.list}>
-            {pagesWithOwnAddress
-              .filter((viewer) => viewer.toolPath !== currentPath)
-              .map((viewer) => (
-                <li key={viewer.id} className={footerClasses.item}>
-                  <PageLink id={`footer-link-${viewer.id}`} path={viewer.toolPath as string} onNavigate={onNavigate} className={footerClasses.link}>
-                    {t('viewer.name', { format: viewer.label })}
-                  </PageLink>
-                  <NewBadge viewerId={viewer.id} />
-                </li>
-              ))}
-            {landingPages
-              .filter((page) => page.path !== currentPath)
-              .map((page) => (
-                <li key={page.path} className={footerClasses.item}>
-                  <PageLink id={`footer-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className={footerClasses.link}>
-                    {pageSeo[locale][page.path].linkText}
-                  </PageLink>
-                </li>
-              ))}
-          </ul>
-        </nav>
-        <nav id="footer-more" aria-label={t('footer.more')}>
-          <h2 className={footerClasses.heading}>{t('footer.more')}</h2>
-          <ul className={footerClasses.list}>
-            {currentPath !== '/' && (
-              <li>
-                <PageLink id="footer-link-all-types" path="/" onNavigate={onNavigate} className={footerClasses.link}>
-                  {t('footer.allTypes')}
-                </PageLink>
-              </li>
-            )}
-            {!isFormatPage && currentPath !== '/changelog' && (
-              <li>
-                <PageLink id="footer-link-changelog" path="/changelog" onNavigate={onNavigate} className={footerClasses.link}>
-                  {t('footer.whatsNew')}
-                </PageLink>
-              </li>
-            )}
-          </ul>
-        </nav>
-        <nav id="footer-legal" aria-label={t('footer.legal')}>
-          <h2 className={footerClasses.heading}>{t('footer.legal')}</h2>
-          <ul className={footerClasses.list}>
-            {legalFooterLinks.map((link) => (
-              <li key={link.id}>
-                <PageLink id={link.id} path={link.path} onNavigate={onNavigate} className={footerClasses.link}>
-                  {t(link.labelKey)}
-                </PageLink>
-              </li>
-            ))}
-            <li>
-              <a id="footer-link-contact" href={`mailto:${CONTACT_EMAIL}`} className={footerClasses.link}>
-                {t('footer.contact')}
-              </a>
-            </li>
-          </ul>
-        </nav>
+        <div className={footerClasses.bottom}>
+          <p id="footer-disclaimer" className={footerClasses.disclaimer}>
+            {t('legal.disclaimer')}
+          </p>
+        </div>
       </div>
-      <p id="footer-disclaimer" className={footerClasses.disclaimer}>
-        {t('legal.disclaimer')}
-      </p>
     </footer>
   )
 }

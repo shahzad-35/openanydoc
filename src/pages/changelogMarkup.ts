@@ -61,16 +61,21 @@ export const navClasses = {
 export const CHEVRON_ICON_PATH = 'm6 9 6 6 6-6'
 
 // The site footer (src/components/SiteFooter.tsx). The build script writes the same footer as HTML into the changelog pages.
+// A soft band with a four-column grid (brand, File viewers, More file tools, About and legal) and a bottom bar for the disclaimer.
+// A grid, not flex-wrap, so the columns keep their place in Arabic too. No `&` in any class: the static copy is not HTML-escaped.
 export const footerClasses = {
-  footer: 'border-t border-line',
-  columns: 'mx-auto flex max-w-[1120px] flex-wrap items-start gap-x-12 gap-y-6 px-5 pt-10 pb-4 text-sm',
-  brand: 'flex items-center',
-  text: 'mt-2 max-w-xs text-ink-soft',
-  heading: 'text-sm font-semibold',
-  list: 'mt-2 flex flex-wrap gap-x-4 gap-y-1',
-  item: 'flex items-center',
-  link: 'inline-block py-1 text-ink-soft underline-offset-4 hover:text-ink hover:underline pointer-coarse:py-3',
-  disclaimer: 'mx-auto max-w-[1120px] px-5 pb-8 text-xs text-ink-soft',
+  footer: 'mt-16 border-t border-line bg-surface-2',
+  inner: 'mx-auto max-w-[1120px] px-5 pt-12 pb-6',
+  columns: 'grid grid-cols-2 gap-x-8 gap-y-10 md:grid-cols-[1.4fr_1fr_1fr_1fr] md:gap-x-10',
+  brand: 'col-span-2 md:col-span-1',
+  brandMark: 'flex items-center',
+  brandText: 'mt-4 max-w-[36ch] text-[15px] leading-relaxed text-ink-soft',
+  heading: 'font-[family-name:var(--font-display)] text-[17px] font-medium text-ink',
+  list: 'mt-4 space-y-1',
+  item: 'flex items-center gap-2',
+  link: 'inline-flex min-h-8 items-center text-[15px] text-ink-soft underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline pointer-coarse:min-h-11',
+  bottom: 'mt-10 border-t border-line pt-5',
+  disclaimer: 'text-[13px] leading-relaxed text-ink-3',
 } as const
 
 // The footer's "About and legal" links, in order: the page address and its element id.

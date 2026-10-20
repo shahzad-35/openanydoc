@@ -5,7 +5,8 @@
 // the same text, and the same questions as FAQPage data, into each page's static HTML. Keep the answers true: only what is built.
 
 export type GuideStep = { title: string; text: string }
-export type GuideQuestion = { question: string; answer: string }
+// `link`: a phrase of the answer that becomes a link to another page; the FAQPage data keeps the plain answer.
+export type GuideQuestion = { question: string; answer: string; link?: { text: string; path: string } }
 type Locale = 'en' | 'ar'
 
 export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; handlesTitle: string; handles: string[]; faqTitle: string; faq: GuideQuestion[] }
@@ -13,8 +14,8 @@ export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; handlesTitle
 // The "Related tools" links at the end of each format and landing page: other live pages a visitor of that page may want next.
 // Keyed by the page's address; the link text is each page's `linkText` in seo.ts, in the page's language.
 export const relatedPages: Record<string, string[]> = {
-  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer'],
-  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer'],
+  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/fix-arabic-csv-in-excel'],
+  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/fix-arabic-csv-in-excel'],
   '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer'],
   '/excel-viewer': ['/xls-viewer', '/csv-viewer'],
   '/xls-viewer': ['/excel-viewer', '/csv-viewer'],
@@ -80,7 +81,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'How do I open a CSV file with Arabic or other non-English text?',
-          answer: 'Just open it: UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Arabic cells display right-to-left. When you download, a byte order mark is added if the file has non-English text, so Excel shows it correctly.',
+          answer: 'Just open it: UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Arabic cells display right-to-left. When you download, a byte order mark is added if the file has non-English text, so Excel shows it correctly. For the Excel side of the problem, read Fix broken Arabic in a CSV.',
+          link: { text: 'Fix broken Arabic in a CSV', path: '/fix-arabic-csv-in-excel' },
         },
         {
           question: 'How do I remove duplicate rows from a CSV file?',
@@ -576,7 +578,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'كيف أفتح ملف CSV فيه نص عربي أو بلغة غير الإنجليزية؟',
-          answer: 'افتحه مباشرة: تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. وتُعرض الخلايا العربية من اليمين إلى اليسار. عند التنزيل تُضاف علامة ترتيب البايت (BOM) إذا كان في الملف نص بلغة غير الإنجليزية، حتى يعرضه Excel بشكل صحيح.',
+          answer: 'افتحه مباشرة: تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. وتُعرض الخلايا العربية من اليمين إلى اليسار. عند التنزيل تُضاف علامة ترتيب البايت (BOM) إذا كان في الملف نص بلغة غير الإنجليزية، حتى يعرضه Excel بشكل صحيح. ولمعرفة جانب Excel من المشكلة اقرأ إصلاح العربية المشوّهة في CSV.',
+          link: { text: 'إصلاح العربية المشوّهة في CSV', path: '/fix-arabic-csv-in-excel' },
         },
         {
           question: 'كيف أحذف الصفوف المكررة من ملف CSV؟',
