@@ -291,7 +291,7 @@ for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}/changelog`)).text()
     expect(html.includes('Version 1.3.0') || html.includes('الإصدار 1.3.0'), 'the changelog entries are not in the HTML')
     expect(html.includes('hreflang="en"') && html.includes('hreflang="ar"') && html.includes('hreflang="x-default"'), 'hreflang tags are missing')
-    expect(html.includes(`rel="canonical" href="https://openanydoc.com/${locale}/changelog"`), 'canonical is missing')
+    expect(html.includes(`rel="canonical" href="https://www.openanydoc.com/${locale}/changelog"`), 'canonical is missing')
     expect(/<title>[^<]+<\/title>/.test(html) && /name="description"\s+content="[^"]+/.test(html), 'title or description is missing')
     await openPage(`/${locale}/changelog`)
     expect((await evaluate(`document.documentElement.dir`)) === (locale === 'ar' ? 'rtl' : 'ltr'), 'wrong text direction')
@@ -309,9 +309,9 @@ await test('home, format and landing pages carry their own title, h1, intro, que
     const html = await (await fetch(`${siteOrigin}${address}`)).text()
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
-    expect(title.length > 0 && title.length <= 60, `${address}: title is ${title.length} characters: ${title}`)
+    expect(title.length >= 50 && title.length <= 60, `${address}: title is ${title.length} characters (50 to 60 for home, format and landing pages): ${title}`)
     expect(description.length >= 150 && description.length <= 160, `${address}: description is ${description.length} characters`)
-    expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)
+    expect(html.includes(`<link rel="canonical" href="https://www.openanydoc.com${address}"`), `${address}: canonical is missing`)
     expect(html.includes('property="og:title"') && html.includes('property="og:description"'), `${address}: Open Graph tags are missing`)
     const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
     const serverText = prerenderedText(html)
@@ -334,7 +334,7 @@ await test('home, format and landing pages carry their own title, h1, intro, que
     expect(faq, `${address}: there is no FAQPage data`)
     const missingQuestion = faq.mainEntity.find((item) => !serverText.includes(item.name))
     expect(!missingQuestion, `${address}: the server's HTML lacks the question "${missingQuestion?.name}"`)
-    const shareImage = /property="og:image" content="https:\/\/openanydoc\.com(\/og\/[\w-]+\.png)"/.exec(html)?.[1]
+    const shareImage = /property="og:image" content="https:\/\/www\.openanydoc\.com(\/og\/[\w-]+\.png)"/.exec(html)?.[1]
     const imageFile = shareImage && path.join(distFolder, shareImage)
     expect(imageFile && fs.existsSync(imageFile), `${address}: the og:image file is missing`)
     const imageHeader = fs.readFileSync(imageFile)
@@ -425,9 +425,9 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/abou
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel']) expect(sitemap.includes(`https://openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
-  expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
+  expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://www.openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
 
 const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel', '/changelog']
@@ -442,7 +442,7 @@ await test('every page: hreflang en, ar and x-default match the canonical addres
       const address = `/${locale}${page}`
       const html = pages[locale]
       const alternates = alternatesOf(html)
-      const expected = { en: `https://openanydoc.com/en${page}`, ar: `https://openanydoc.com/ar${page}`, 'x-default': `https://openanydoc.com/en${page}` }
+      const expected = { en: `https://www.openanydoc.com/en${page}`, ar: `https://www.openanydoc.com/ar${page}`, 'x-default': `https://www.openanydoc.com/en${page}` }
       expect(JSON.stringify(alternates) === JSON.stringify(expected), `${address}: hreflang is ${JSON.stringify(alternates)}`)
       // Reciprocal: the page in the other language lists the very same set.
       expect(JSON.stringify(alternatesOf(pages[locale === 'en' ? 'ar' : 'en'])) === JSON.stringify(alternates), `${address}: the other language lists different alternates`)
@@ -451,7 +451,7 @@ await test('every page: hreflang en, ar and x-default match the canonical addres
       expect(html.includes(`<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`), `${address}: lang or dir is wrong`)
       const slashLinks = [...html.matchAll(/href="([^"]+)"/g)]
         .map((match) => match[1])
-        .filter((href) => (href.startsWith('/') || href.startsWith('https://openanydoc.com')) && href.endsWith('/') && href !== 'https://openanydoc.com/')
+        .filter((href) => (href.startsWith('/') || href.startsWith('https://www.openanydoc.com')) && href.endsWith('/') && href !== 'https://www.openanydoc.com/')
       expect(slashLinks.length === 0, `${address}: links end with a slash: ${slashLinks.join(', ')}`)
     }
   }
@@ -462,7 +462,7 @@ await test('every sitemap address has a lastmod date and is a built page without
   const entries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1])
   expect(entries.length === contentPages.length * 2, `the sitemap has ${entries.length} addresses, expected ${contentPages.length * 2}`)
   for (const entry of entries) {
-    const address = /<loc>https:\/\/openanydoc\.com([^<]*)<\/loc>/.exec(entry)?.[1] ?? ''
+    const address = /<loc>https:\/\/www\.openanydoc\.com([^<]*)<\/loc>/.exec(entry)?.[1] ?? ''
     expect(/<lastmod>\d{4}-\d{2}-\d{2}<\/lastmod>/.test(entry), `${address}: no lastmod`)
     expect(!address.endsWith('/') && fs.existsSync(path.join(distFolder, address, 'index.html')), `${address}: not a built page, or it ends with a slash`)
   }
@@ -484,7 +484,7 @@ await test('the home page has 600 to 1000 words in its server HTML, eight questi
 
 // The fields Google's rich-result documentation requires or recommends for each type we publish.
 await test('every JSON-LD block is valid data with the fields search engines need, and the logo exists', async () => {
-  const isAbsoluteUrl = (value) => typeof value === 'string' && value.startsWith('https://openanydoc.com')
+  const isAbsoluteUrl = (value) => typeof value === 'string' && value.startsWith('https://www.openanydoc.com')
   for (const page of contentPages) {
     for (const locale of ['en', 'ar']) {
       const address = `/${locale}${page}`
@@ -502,7 +502,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           expect(block.name === 'OpenAnyDoc' && block.url === canonical && block.inLanguage === locale, problem('name, url or inLanguage is wrong'))
           expect(JSON.stringify(block.alternateName) === JSON.stringify(['Open Any Doc', 'OpenAnyDoc.com']), problem('alternateName is wrong'))
         } else if (type === 'Organization') {
-          expect(block.name === 'OpenAnyDoc' && block.url === 'https://openanydoc.com', problem('name or url is wrong'))
+          expect(block.name === 'OpenAnyDoc' && block.url === 'https://www.openanydoc.com', problem('name or url is wrong'))
           expect(block.founder?.['@type'] === 'Person' && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
           expect(!('sameAs' in block), problem('sameAs is set, but there are no profiles yet'))
           expect(isAbsoluteUrl(block.logo), problem('the logo is not an absolute URL'))
@@ -548,7 +548,7 @@ await test('About, Privacy, Terms and guide pages: one h1, their own title and d
     expect(description.length >= 150 && description.length <= 160, `${address}: description is ${description.length} characters`)
     expect(!titles.has(title), `${address}: the title is used on another page`)
     titles.add(title)
-    expect(html.includes(`<link rel="canonical" href="https://openanydoc.com${address}"`), `${address}: canonical is missing`)
+    expect(html.includes(`<link rel="canonical" href="https://www.openanydoc.com${address}"`), `${address}: canonical is missing`)
     expect(html.includes('hreflang="ar"') && html.includes('hreflang="en"') && html.includes('hreflang="x-default"'), `${address}: hreflang alternates are missing`)
     expect(html.includes(`<html lang="${address.slice(1, 3)}" dir="${address.startsWith('/ar') ? 'rtl' : 'ltr'}">`), `${address}: lang and dir are missing from the static HTML`)
     expect(html.includes('id="info-sections"') && prerenderedText(html).includes('support@openanydoc.com'), `${address}: the server's HTML lacks the sections or the contact address`)

@@ -6,7 +6,7 @@
 // title and the heading; a title is at most 60 characters and a description 150 to 160; every page has its own; say only what
 // the page really does (no format that is not built); the heading is the only h1 of the page.
 
-export const SITE_ORIGIN = 'https://openanydoc.com'
+export const SITE_ORIGIN = 'https://www.openanydoc.com'
 export const SITE_NAME = 'OpenAnyDoc'
 
 type Locale = 'en' | 'ar'
@@ -19,13 +19,13 @@ export type PageSeo = { title: string; description: string; heading: string; int
 export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
   en: {
     '/': {
-      title: 'Free Online File Viewer and Editor – OpenAnyDoc',
+      title: 'Free Online File Viewer and Editor, No Upload – OpenAnyDoc',
       description: 'Free online file viewer and editor: open CSV, Excel (XLSX), JSON and TXT files without software and edit them in your browser. Private: no upload, no sign-up.',
       heading: 'Open any file. Upload nothing.',
       intro: 'Drop a CSV, Excel, JSON or text file and it opens right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
     },
     '/csv-viewer': {
-      title: 'CSV Viewer Online – Free CSV Editor, No Upload',
+      title: 'CSV Viewer Online – Free CSV File Editor, No Upload',
       description: 'CSV viewer online and free CSV editor: open a CSV file online, view large CSV files, search, sort, edit cells and download. Private: nothing is uploaded.',
       heading: 'CSV Viewer Online and CSV Editor',
       intro: 'A free CSV viewer online and CSV editor: open a CSV or TSV file as a searchable table, view large CSV files (a 120,000-row file opens in under a second) and edit CSV in your browser before you download it. Your file never leaves your device.',
@@ -60,28 +60,28 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'JSON formatter',
     },
     '/json-validator': {
-      title: 'JSON Validator Online – Find and Fix JSON Errors',
+      title: 'JSON Validator Online – Find and Fix JSON Syntax Errors',
       description: 'JSON validator online: check JSON syntax, see the line and column of an error, jump to it and repair trailing commas, comments and quotes. Free, no upload.',
       heading: 'JSON Validator Online: Check and Fix JSON',
       intro: 'A free JSON validator online: paste JSON or open a .json file and press Validate. If the JSON is not valid, you see what is wrong with its line and column, Go to error selects the spot, and Repair fixes the usual mistakes. Your JSON is checked in your browser and never uploaded.',
       linkText: 'JSON validator',
     },
     '/tsv-viewer': {
-      title: 'TSV Viewer Online – Open TSV Files as a Table',
+      title: 'TSV Viewer Online – Open TSV Files as a Table, No Upload',
       description: 'TSV viewer online: open a TSV or .tab file as a table, with tabs read as columns and the header row detected. Search, sort, edit and save it as TSV. No upload.',
       heading: 'TSV Viewer Online: Open Tab-Separated Files',
       intro: 'A free TSV viewer online: open a TSV file online and read its tab-separated values as a table, with the header row detected for you. Search, filter, sort and edit the cells, then download it as TSV again. The file is read in your browser and never uploaded.',
       linkText: 'TSV viewer',
     },
     '/large-csv-viewer': {
-      title: 'Large CSV File Viewer – Open Big CSV Files Online',
+      title: 'Large CSV File Viewer – Open Big CSV Files Online, Free',
       description: 'Large CSV file viewer: open big CSV files in your browser with no row limit of its own. 120,000 rows opened in 0.9 s in our tests. Search and sort. No upload.',
       heading: 'Large CSV File Viewer: Open Big CSV Files Fast',
       intro: 'A free large CSV file viewer: view large CSV files in your browser, with no row limit of its own and only the rows on screen drawn. In our tests a 120,000-row file opened in 0.9 s, and sorting it by two columns took 0.9 s. Nothing is uploaded, so big exports stay on your device.',
       linkText: 'Large CSV file viewer',
     },
     '/xls-viewer': {
-      title: 'XLS Viewer Online – Open Old Excel 97-2003 Files',
+      title: 'XLS Viewer Online – Open Old Excel 97-2003 Files, No Upload',
       description: 'XLS viewer online: open old Excel 97-2003 .xls files without Excel, see every sheet, edit cells and formulas, and save as .xls. Free and private, no upload.',
       heading: 'XLS Viewer Online: Open Excel 97-2003 Files',
       intro: 'A free XLS viewer online: open an XLS file online, the older Excel 97-2003 format, without Excel and without an account. See every sheet with its values, formulas, number formats and merged cells, edit it and save it as .xls again. Fonts and colours are not shown for .xls files.',
@@ -121,14 +121,14 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا وسيُفتح هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
     },
     '/csv-viewer': {
-      title: 'عارض CSV اون لاين – فتح ملف CSV وتعديله مجانًا',
+      title: 'عارض CSV اون لاين – فتح ملف CSV وتعديله مجانًا بدون رفع',
       description: 'عارض CSV اون لاين مجاني: فتح ملف CSV كجدول، والبحث والفرز وتعديل الخلايا مع عرض صحيح للحروف العربية، ثم التنزيل. تعديل ملف CSV اون لاين بدون رفع أي ملف.',
       heading: 'عارض CSV اون لاين ومحرر مجاني',
       intro: 'عارض CSV اون لاين مجاني: افتح ملف CSV كجدول تبحث فيه وتفرزه، حتى الملفات الكبيرة (يُفتح ملف من 120,000 صف في أقل من ثانية)، وتظهر الحروف العربية سليمة حتى في ملفات Windows-1256 القديمة. عدّل الخلايا ثم نزّل الملف، وملفك لا يغادر جهازك.',
       linkText: 'عارض CSV',
     },
     '/excel-viewer': {
-      title: 'فتح ملف اكسل اون لاين – عارض ملفات XLSX مجاني',
+      title: 'فتح ملف اكسل اون لاين – عارض ملفات XLSX مجاني بدون برامج',
       description: 'فتح ملف اكسل اون لاين مجانًا: عارض ملفات XLSX وXLS وXLSM وODS، مع تعديل الخلايا والصيغ التي تُعاد حسابها ثم الحفظ. فتح ملف اكسل بدون برنامج وبدون رفع.',
       heading: 'فتح ملف اكسل اون لاين وتعديله بدون برنامج',
       intro: 'فتح ملف اكسل اون لاين بكل أوراقه، بدون برنامج Excel وبدون تسجيل: عارض ملفات XLSX وXLS وXLSM وODS يعرض التنسيقات والخلايا المدمجة، وتعدّل فيه الخلايا والصيغ ثم تحفظ المصنف بصيغته نفسها. ملفك لا يغادر جهازك.',
@@ -142,14 +142,14 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'عارض JSON',
     },
     '/txt-viewer': {
-      title: 'فتح ملف TXT اون لاين – محرر نصوص اون لاين مجاني',
+      title: 'فتح ملف TXT اون لاين – محرر نصوص مجاني بدون رفع أو تسجيل',
       description: 'فتح ملف TXT اون لاين وتعديله مجانًا: محرر نصوص اون لاين فيه بحث واستبدال، وفرز الأسطر وحذف المكرر منها، وتغيير حالة الأحرف وعدّ الكلمات. ملفك لا يُرفع أبدًا.',
       heading: 'فتح ملف TXT اون لاين: عارض ومحرر نصوص مجاني',
       intro: 'فتح ملف TXT اون لاين وقراءته وتعديله في متصفحك: محرر نصوص اون لاين مع البحث وأرقام الأسطر وأدوات للأسطر والمسافات وحالة الأحرف، ويعرض النص العربي من اليمين إلى اليسار. ملفك لا يغادر جهازك.',
       linkText: 'محرر TXT',
     },
     '/json-formatter': {
-      title: 'تنسيق JSON اون لاين – تجميل JSON وتصغيره مجانًا',
+      title: 'تنسيق JSON اون لاين – تجميل JSON وتصغيره مجانًا بدون رفع',
       description: 'تنسيق JSON اون لاين مجانًا: اجعل JSON مقروءًا بمسافة بادئة من 1 أو 2 أو 3 أو 4 أو 8 مسافات أو علامة جدولة، أو صغّره في سطر واحد ورتّب مفاتيحه. بدون رفع أي ملف.',
       heading: 'تنسيق JSON اون لاين: تجميل JSON وتصغيره',
       intro: 'أداة مجانية لتنسيق JSON اون لاين: الصق JSON أو افتح ملف .json، ثم اضغط «تنسيق» لعرضه مرتبًا بالمسافة البادئة التي تختارها، أو «تصغير» لجعله في سطر واحد. تحافظ الأداة على الأرقام الطويلة كما هي، وتعمل في متصفحك فلا يُرفع شيء.',
@@ -163,21 +163,21 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'التحقق من JSON',
     },
     '/tsv-viewer': {
-      title: 'فتح ملف TSV اون لاين – عارض TSV مجاني كجدول',
+      title: 'فتح ملف TSV اون لاين – عارض TSV مجاني كجدول بدون رفع',
       description: 'فتح ملف TSV اون لاين مجانًا: اعرض ملف TSV أو .tab كجدول تُقرأ فيه علامات الجدولة كأعمدة ويُكتشف صف العناوين، ثم ابحث ورتّب وعدّل ونزّله TSV. بدون رفع.',
       heading: 'فتح ملف TSV اون لاين وعرضه كجدول',
       intro: 'فتح ملف TSV اون لاين مجانًا: تُقرأ القيم المفصولة بعلامات الجدولة كجدول، ويُكتشف صف العناوين تلقائيًا. ابحث في الخلايا وصفِّها ورتّبها وعدّلها، ثم نزّل الملف بصيغة TSV من جديد. يُقرأ الملف في متصفحك ولا يُرفع أبدًا.',
       linkText: 'عارض TSV',
     },
     '/large-csv-viewer': {
-      title: 'عارض ملفات CSV الكبيرة – فتح ملف CSV كبير بسرعة',
+      title: 'عارض ملفات CSV الكبيرة – فتح ملف CSV كبير بسرعة اون لاين',
       description: 'عارض ملفات CSV الكبيرة مجانًا: افتح ملف CSV كبيرًا في متصفحك بلا حد للصفوف من عنده؛ فُتح ملف من 120,000 صف في 0.9 ثانية في اختباراتنا. بدون رفع أي ملف.',
       heading: 'عارض ملفات CSV الكبيرة: افتح الملفات الضخمة بسرعة',
       intro: 'عارض ملفات CSV الكبيرة مجاني يعمل في متصفحك: لا حد لعدد الصفوف من عنده، ولا يرسم إلا الصفوف الظاهرة على الشاشة. في اختباراتنا فُتح ملف من 120,000 صف في 0.9 ثانية، واستغرق ترتيبه حسب عمودين 0.9 ثانية. لا يُرفع شيء، فتبقى ملفات التصدير الكبيرة على جهازك.',
       linkText: 'عارض ملفات CSV الكبيرة',
     },
     '/xls-viewer': {
-      title: 'فتح ملف XLS اون لاين – عارض ملفات Excel 97-2003',
+      title: 'فتح ملف XLS اون لاين – عارض ملفات Excel 97-2003 مجاني',
       description: 'فتح ملف XLS اون لاين مجانًا: اعرض ملفات Excel 97-2003 القديمة بدون برنامج Excel، بكل أوراقها، وعدّل الخلايا والصيغ واحفظها بصيغة .xls. بدون رفع وبدون تسجيل.',
       heading: 'فتح ملف XLS اون لاين بدون برنامج Excel',
       intro: 'فتح ملف XLS اون لاين مجانًا، وهي صيغة Excel 97-2003 القديمة، بدون برنامج Excel وبدون حساب. تظهر كل الأوراق بقيمها وصيغها وتنسيقات أرقامها وخلاياها المدمجة، وتعدّلها ثم تحفظها بصيغة .xls من جديد. لا تظهر الخطوط والألوان في ملفات .xls.',
