@@ -9,19 +9,31 @@ export type GuideStep = { title: string; text: string }
 export type GuideQuestion = { question: string; answer: string; link?: { text: string; path: string } }
 type Locale = 'en' | 'ar'
 
-export type FormatGuide = { stepsTitle: string; steps: GuideStep[]; handlesTitle: string; handles: string[]; faqTitle: string; faq: GuideQuestion[] }
+// `screenshot`: the picture of the viewer with a synthetic file (public/screenshots/<locale>-<viewer>.webp, 1200 x 750, drawn by scripts/take-screenshots.mjs).
+// `comparison`: a small table against the two usual alternatives; only facts, nothing about other services' plans or limits.
+export type ComparisonTable = { title: string; columns: [string, string, string]; rows: { label: string; cells: [string, string, string] }[] }
+export type FormatGuide = {
+  stepsTitle: string
+  steps: GuideStep[]
+  handlesTitle: string
+  handles: string[]
+  faqTitle: string
+  faq: GuideQuestion[]
+  screenshot?: { alt: string; caption: string }
+  comparison?: ComparisonTable
+}
 
 // The "Related tools" links at the end of each format and landing page: other live pages a visitor of that page may want next.
 // Keyed by the page's address; the link text is each page's `linkText` in seo.ts, in the page's language.
 export const relatedPages: Record<string, string[]> = {
-  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/fix-arabic-csv-in-excel'],
-  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/fix-arabic-csv-in-excel'],
-  '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer'],
+  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column'],
+  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-opens-in-one-column'],
+  '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer', '/csv-too-big-for-excel'],
   '/excel-viewer': ['/xls-viewer', '/csv-viewer'],
   '/xls-viewer': ['/excel-viewer', '/csv-viewer'],
   '/json-viewer': ['/json-formatter', '/json-validator', '/csv-viewer'],
-  '/json-formatter': ['/json-validator', '/json-viewer'],
-  '/json-validator': ['/json-formatter', '/json-viewer'],
+  '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token'],
+  '/json-validator': ['/json-formatter', '/json-viewer', '/json-unexpected-token'],
   '/txt-viewer': ['/csv-viewer', '/json-viewer'],
 }
 
@@ -29,6 +41,19 @@ export const relatedPages: Record<string, string[]> = {
 export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
   en: {
     '/csv-viewer': {
+      screenshot: { alt: 'The CSV viewer showing a table with the delimiter and encoding in the status bar, a column profile and the search box', caption: 'A CSV file open in the viewer: the table, a column profile on the right, and the delimiter and encoding in the status bar.' },
+      comparison: {
+        title: 'CSV viewer compared with Excel Online, Google Sheets and upload-based viewers',
+        columns: ['OpenAnyDoc', 'Excel Online or Google Sheets', 'Upload-based online viewers'],
+        rows: [
+          { label: 'Your file is uploaded', cells: ['No. It is read in your browser.', 'Yes, to Microsoft or Google servers.', 'Yes, to the service\'s server.'] },
+          { label: 'Account or sign-in', cells: ['None.', 'A Microsoft or Google account.', 'Often none; sometimes an email address.'] },
+          { label: 'Edit and save', cells: ['Yes. Download keeps the file\'s own format.', 'Yes, in the cloud copy.', 'Often view only.'] },
+          { label: 'Works without a network once loaded', cells: ['Yes.', 'No.', 'No.'] },
+          { label: 'Size', cells: ['Your device\'s memory; a warning above 50 MB. 120,000 rows open in under a second.', 'Set by the service.', 'Set by the service.'] },
+          { label: 'Cost', cells: ['Free, no ads.', 'Free with an account; paid plans for more.', 'Free with ads, or paid.'] },
+        ],
+      },
       stepsTitle: 'How it works: open and edit a CSV file online',
       steps: [
         { title: 'Drop your file on the page', text: 'Drop a .csv, .tsv or .tab file on the page, or choose it from your device. It is read in your browser and never uploaded.' },
@@ -77,7 +102,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Why does my CSV file open in a single column?',
-          answer: 'The file probably uses a different separator from the comma, such as a semicolon, which is common in files saved by Excel in many countries. OpenAnyDoc detects comma, semicolon, tab and pipe automatically, and you can choose the delimiter yourself by clicking it in the status bar at the bottom of the page.',
+          answer: 'The file probably uses a different separator from the comma, such as a semicolon, which is common in files saved by Excel in many countries. OpenAnyDoc detects comma, semicolon, tab and pipe automatically, and you can choose the delimiter yourself by clicking it in the status bar at the bottom of the page. The guide CSV opens in one column explains the Excel side and the fixes.',
+          link: { text: 'CSV opens in one column', path: '/csv-opens-in-one-column' },
         },
         {
           question: 'How do I open a CSV file with Arabic or other non-English text?',
@@ -99,6 +125,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/excel-viewer': {
+      screenshot: { alt: 'The Excel viewer showing a workbook with its sheet tabs, formulas and merged cells, and the formatting toolbar', caption: 'An XLSX workbook open in the viewer: sheet tabs, number formats and the formatting toolbar.' },
+      comparison: {
+        title: 'Excel viewer compared with Excel Online, Google Sheets and upload-based viewers',
+        columns: ['OpenAnyDoc', 'Excel Online or Google Sheets', 'Upload-based online viewers'],
+        rows: [
+          { label: 'Your file is uploaded', cells: ['No. It is read in your browser.', 'Yes, to Microsoft or Google servers.', 'Yes, to the service\'s server.'] },
+          { label: 'Account or sign-in', cells: ['None.', 'A Microsoft or Google account.', 'Often none; sometimes an email address.'] },
+          { label: 'Edit and save', cells: ['Yes. Download keeps the file\'s own format.', 'Yes, in the cloud copy.', 'Often view only.'] },
+          { label: 'Works without a network once loaded', cells: ['Yes.', 'No.', 'No.'] },
+          { label: 'Size', cells: ['Your device\'s memory; a warning above 50 MB. Cell styles are read up to 8 MB.', 'Set by the service.', 'Set by the service.'] },
+          { label: 'Cost', cells: ['Free, no ads.', 'Free with an account; paid plans for more.', 'Free with ads, or paid.'] },
+        ],
+      },
       stepsTitle: 'How it works: view an Excel file in your browser and edit it',
       steps: [
         { title: 'Drop your workbook on the page', text: 'Choose an .xlsx, .xls, .xlsm or .ods file. It is read in your browser and never uploaded.' },
@@ -169,6 +208,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/json-viewer': {
+      screenshot: { alt: 'The JSON viewer showing the text pane with syntax colours on the left and the tree view with types on the right', caption: 'A JSON file open in the viewer: the text on the left, the tree on the right, the validity in the status bar.' },
+      comparison: {
+        title: 'JSON viewer compared with Excel Online, Google Sheets and upload-based viewers',
+        columns: ['OpenAnyDoc', 'Excel Online or Google Sheets', 'Upload-based online viewers'],
+        rows: [
+          { label: 'Your file is uploaded', cells: ['No. It is read in your browser.', 'Yes, to Microsoft or Google servers.', 'Yes, to the service\'s server.'] },
+          { label: 'Account or sign-in', cells: ['None.', 'A Microsoft or Google account.', 'Often none; sometimes an email address.'] },
+          { label: 'Edit and save', cells: ['Yes. Download keeps the file\'s own format.', 'Yes, in the cloud copy.', 'Often view only.'] },
+          { label: 'Works without a network once loaded', cells: ['Yes.', 'No.', 'No.'] },
+          { label: 'Size', cells: ['Up to 10 MB; the text pane starts closed above 5 MB.', 'Set by the service.', 'Set by the service.'] },
+          { label: 'Cost', cells: ['Free, no ads.', 'Free with an account; paid plans for more.', 'Free with ads, or paid.'] },
+        ],
+      },
       stepsTitle: 'How it works: open a JSON file online, format and edit it',
       steps: [
         { title: 'Drop, paste or try a sample', text: 'Choose or drop a .json file, paste JSON with Ctrl+V, or try the sample. It is read in your browser, so API responses, configuration files and other private data are never uploaded.' },
@@ -235,6 +287,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/txt-viewer': {
+      screenshot: { alt: 'The text editor showing a file with line numbers, the ribbon of text tools and the encoding in the status bar', caption: 'A text file open in the editor: line numbers, the tools ribbon and the encoding and line endings in the status bar.' },
+      comparison: {
+        title: 'Text editor compared with Excel Online, Google Sheets and upload-based viewers',
+        columns: ['OpenAnyDoc', 'Excel Online or Google Sheets', 'Upload-based online viewers'],
+        rows: [
+          { label: 'Your file is uploaded', cells: ['No. It is read in your browser.', 'Yes, to Microsoft or Google servers.', 'Yes, to the service\'s server.'] },
+          { label: 'Account or sign-in', cells: ['None.', 'A Microsoft or Google account.', 'Often none; sometimes an email address.'] },
+          { label: 'Edit and save', cells: ['Yes. Download keeps the file\'s own format.', 'Yes, in the cloud copy.', 'Often view only.'] },
+          { label: 'Works without a network once loaded', cells: ['Yes.', 'No.', 'No.'] },
+          { label: 'Size', cells: ['A 46 MB file has been tested; a warning above 50 MB; a fast read view above 2 million characters.', 'Set by the service.', 'Set by the service.'] },
+          { label: 'Cost', cells: ['Free, no ads.', 'Free with an account; paid plans for more.', 'Free with ads, or paid.'] },
+        ],
+      },
       stepsTitle: 'How it works: open TXT file online and edit it',
       steps: [
         { title: 'Drop your .txt file on the page', text: 'Choose or drop a text file, such as notes, a log or a list. It is read in your browser, never uploaded, and opens ready to edit.' },
@@ -371,7 +436,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Why is my JSON invalid?',
-          answer: 'The usual causes are a comma after the last item, comments, single quotes instead of double quotes, keys without quotes, and values such as True, None or NaN copied from Python or JavaScript. Standard JSON allows none of these, and Repair fixes all of them.',
+          answer: 'The usual causes are a comma after the last item, comments, single quotes instead of double quotes, keys without quotes, and values such as True, None or NaN copied from Python or JavaScript. Standard JSON allows none of these, and Repair fixes all of them. The guide JSON unexpected token explains each error message.',
+          link: { text: 'JSON unexpected token', path: '/json-unexpected-token' },
         },
         {
           question: 'Does it validate against a JSON Schema?',
@@ -455,7 +521,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'How do I open a CSV file that is too large for Excel?',
-          answer: 'Excel shows at most 1,048,576 rows per sheet and leaves out the rest. Drop the file here instead: this viewer has no row limit of its own, only your browser\'s memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning.',
+          answer: 'Excel shows at most 1,048,576 rows per sheet and leaves out the rest. Drop the file here instead: this viewer has no row limit of its own, only your browser\'s memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning. The guide CSV too big for Excel covers the other options.',
+          link: { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' },
         },
         {
           question: 'How fast does a large CSV file open?',
@@ -526,6 +593,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
   },
   ar: {
     '/csv-viewer': {
+      screenshot: { alt: 'عارض CSV يعرض جدولًا مع الفاصل والترميز في شريط الحالة وملخص عمود ومربع البحث', caption: 'ملف CSV مفتوح في العارض: الجدول، وملخص عمود على الجانب، والفاصل والترميز في شريط الحالة.' },
+      comparison: {
+        title: 'عارض CSV مقارنةً بـ Excel Online وGoogle Sheets والعارضات التي ترفع الملف',
+        columns: ['OpenAnyDoc', 'Excel Online أو Google Sheets', 'عارضات اون لاين ترفع الملف'],
+        rows: [
+          { label: 'هل يُرفع ملفك؟', cells: ['لا. يُقرأ في متصفحك.', 'نعم، إلى خوادم Microsoft أو Google.', 'نعم، إلى خادم الخدمة.'] },
+          { label: 'حساب أو تسجيل دخول', cells: ['لا شيء.', 'حساب Microsoft أو Google.', 'غالبًا لا؛ وأحيانًا بريد إلكتروني.'] },
+          { label: 'التحرير والحفظ', cells: ['نعم. يحفظ «تنزيل» الملف بصيغته نفسها.', 'نعم، في النسخة السحابية.', 'غالبًا عرض فقط.'] },
+          { label: 'يعمل بلا شبكة بعد تحميل الصفحة', cells: ['نعم.', 'لا.', 'لا.'] },
+          { label: 'الحجم', cells: ['ذاكرة جهازك؛ تحذير فوق 50 ميغابايت. يُفتح 120,000 صف في أقل من ثانية.', 'تحدده الخدمة.', 'تحدده الخدمة.'] },
+          { label: 'التكلفة', cells: ['مجاني بلا إعلانات.', 'مجاني مع حساب، وخطط مدفوعة للمزيد.', 'مجاني مع إعلانات، أو مدفوع.'] },
+        ],
+      },
       stepsTitle: 'كيف يعمل: فتح ملف CSV وتعديله اون لاين',
       steps: [
         { title: 'أفلت ملفك على الصفحة', text: 'أفلت ملف .csv أو .tsv أو .tab على الصفحة، أو اخترْه من جهازك. يُقرأ الملف داخل متصفحك ولا يُرفع أبدًا.' },
@@ -574,7 +654,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'لماذا يُفتح ملف CSV في عمود واحد؟',
-          answer: 'غالبًا يستخدم الملف فاصلًا غير الفاصلة، مثل الفاصلة المنقوطة، وهذا شائع في الملفات التي يحفظها Excel في كثير من البلدان. يكتشف OpenAnyDoc الفاصلة والفاصلة المنقوطة وعلامة الجدولة والشرطة العمودية تلقائيًا، ويمكنك اختيار الفاصل بنفسك بالنقر عليه في شريط الحالة أسفل الصفحة.',
+          answer: 'غالبًا يستخدم الملف فاصلًا غير الفاصلة، مثل الفاصلة المنقوطة، وهذا شائع في الملفات التي يحفظها Excel في كثير من البلدان. يكتشف OpenAnyDoc الفاصلة والفاصلة المنقوطة وعلامة الجدولة والشرطة العمودية تلقائيًا، ويمكنك اختيار الفاصل بنفسك بالنقر عليه في شريط الحالة أسفل الصفحة. ويشرح دليل ملف CSV في عمود واحد جانب Excel من المشكلة وحلولها.',
+          link: { text: 'ملف CSV في عمود واحد', path: '/csv-opens-in-one-column' },
         },
         {
           question: 'كيف أفتح ملف CSV فيه نص عربي أو بلغة غير الإنجليزية؟',
@@ -596,6 +677,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/excel-viewer': {
+      screenshot: { alt: 'عارض Excel يعرض مصنفًا بأوراقه ومعادلاته وخلاياه المدمجة وشريط أدوات التنسيق', caption: 'مصنف XLSX مفتوح في العارض: تبويبات الأوراق وتنسيقات الأرقام وشريط أدوات التنسيق.' },
+      comparison: {
+        title: 'عارض Excel مقارنةً بـ Excel Online وGoogle Sheets والعارضات التي ترفع الملف',
+        columns: ['OpenAnyDoc', 'Excel Online أو Google Sheets', 'عارضات اون لاين ترفع الملف'],
+        rows: [
+          { label: 'هل يُرفع ملفك؟', cells: ['لا. يُقرأ في متصفحك.', 'نعم، إلى خوادم Microsoft أو Google.', 'نعم، إلى خادم الخدمة.'] },
+          { label: 'حساب أو تسجيل دخول', cells: ['لا شيء.', 'حساب Microsoft أو Google.', 'غالبًا لا؛ وأحيانًا بريد إلكتروني.'] },
+          { label: 'التحرير والحفظ', cells: ['نعم. يحفظ «تنزيل» الملف بصيغته نفسها.', 'نعم، في النسخة السحابية.', 'غالبًا عرض فقط.'] },
+          { label: 'يعمل بلا شبكة بعد تحميل الصفحة', cells: ['نعم.', 'لا.', 'لا.'] },
+          { label: 'الحجم', cells: ['ذاكرة جهازك؛ تحذير فوق 50 ميغابايت. تُقرأ أنماط الخلايا حتى 8 ميغابايت.', 'تحدده الخدمة.', 'تحدده الخدمة.'] },
+          { label: 'التكلفة', cells: ['مجاني بلا إعلانات.', 'مجاني مع حساب، وخطط مدفوعة للمزيد.', 'مجاني مع إعلانات، أو مدفوع.'] },
+        ],
+      },
       stepsTitle: 'كيف يعمل: افتح ملف اكسل في متصفحك وعدّله',
       steps: [
         { title: 'أفلت المصنف على الصفحة', text: 'اختر ملف .xlsx أو .xls أو .xlsm أو .ods. يُقرأ داخل متصفحك ولا يُرفع أبدًا.' },
@@ -666,6 +760,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/json-viewer': {
+      screenshot: { alt: 'عارض JSON يعرض لوحة النص بألوان الصياغة على جانب والشجرة بالأنواع على الجانب الآخر', caption: 'ملف JSON مفتوح في العارض: النص على جانب، والشجرة على الجانب الآخر، والصلاحية في شريط الحالة.' },
+      comparison: {
+        title: 'عارض JSON مقارنةً بـ Excel Online وGoogle Sheets والعارضات التي ترفع الملف',
+        columns: ['OpenAnyDoc', 'Excel Online أو Google Sheets', 'عارضات اون لاين ترفع الملف'],
+        rows: [
+          { label: 'هل يُرفع ملفك؟', cells: ['لا. يُقرأ في متصفحك.', 'نعم، إلى خوادم Microsoft أو Google.', 'نعم، إلى خادم الخدمة.'] },
+          { label: 'حساب أو تسجيل دخول', cells: ['لا شيء.', 'حساب Microsoft أو Google.', 'غالبًا لا؛ وأحيانًا بريد إلكتروني.'] },
+          { label: 'التحرير والحفظ', cells: ['نعم. يحفظ «تنزيل» الملف بصيغته نفسها.', 'نعم، في النسخة السحابية.', 'غالبًا عرض فقط.'] },
+          { label: 'يعمل بلا شبكة بعد تحميل الصفحة', cells: ['نعم.', 'لا.', 'لا.'] },
+          { label: 'الحجم', cells: ['حتى 10 ميغابايت؛ تبدأ لوحة النص مغلقة فوق 5 ميغابايت.', 'تحدده الخدمة.', 'تحدده الخدمة.'] },
+          { label: 'التكلفة', cells: ['مجاني بلا إعلانات.', 'مجاني مع حساب، وخطط مدفوعة للمزيد.', 'مجاني مع إعلانات، أو مدفوع.'] },
+        ],
+      },
       stepsTitle: 'كيف يعمل: فتح ملف JSON وتنسيقه وتعديله اون لاين',
       steps: [
         { title: 'أفلت ملفًا أو الصق JSON أو جرّب مثالًا', text: 'اختر ملف .json أو أفلته، أو الصق JSON باستخدام Ctrl+V، أو جرّب المثال. يُقرأ داخل متصفحك، فلا تُرفع استجابات API وملفات الإعدادات وغيرها من البيانات الخاصة.' },
@@ -732,6 +839,19 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       ],
     },
     '/txt-viewer': {
+      screenshot: { alt: 'محرر النصوص يعرض ملفًا بأرقام الأسطر وشريط أدوات النص والترميز في شريط الحالة', caption: 'ملف نصي مفتوح في المحرر: أرقام الأسطر، وشريط الأدوات، والترميز ونهايات الأسطر في شريط الحالة.' },
+      comparison: {
+        title: 'محرر النصوص مقارنةً بـ Excel Online وGoogle Sheets والعارضات التي ترفع الملف',
+        columns: ['OpenAnyDoc', 'Excel Online أو Google Sheets', 'عارضات اون لاين ترفع الملف'],
+        rows: [
+          { label: 'هل يُرفع ملفك؟', cells: ['لا. يُقرأ في متصفحك.', 'نعم، إلى خوادم Microsoft أو Google.', 'نعم، إلى خادم الخدمة.'] },
+          { label: 'حساب أو تسجيل دخول', cells: ['لا شيء.', 'حساب Microsoft أو Google.', 'غالبًا لا؛ وأحيانًا بريد إلكتروني.'] },
+          { label: 'التحرير والحفظ', cells: ['نعم. يحفظ «تنزيل» الملف بصيغته نفسها.', 'نعم، في النسخة السحابية.', 'غالبًا عرض فقط.'] },
+          { label: 'يعمل بلا شبكة بعد تحميل الصفحة', cells: ['نعم.', 'لا.', 'لا.'] },
+          { label: 'الحجم', cells: ['جُرّب ملف من 46 ميغابايت؛ تحذير فوق 50 ميغابايت؛ عرض قراءة سريع فوق مليوني حرف.', 'تحدده الخدمة.', 'تحدده الخدمة.'] },
+          { label: 'التكلفة', cells: ['مجاني بلا إعلانات.', 'مجاني مع حساب، وخطط مدفوعة للمزيد.', 'مجاني مع إعلانات، أو مدفوع.'] },
+        ],
+      },
       stepsTitle: 'كيف يعمل: فتح ملف TXT اون لاين وتعديله',
       steps: [
         { title: 'أفلت ملف .txt على الصفحة', text: 'اختر ملفًا نصيًا أو أفلته، مثل ملاحظات أو سجل أو قائمة. يُقرأ داخل متصفحك ولا يُرفع أبدًا، ويُفتح جاهزًا للتحرير.' },
@@ -868,7 +988,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'لماذا JSON الخاص بي غير صالح؟',
-          answer: 'أكثر الأسباب شيوعًا: فاصلة بعد آخر عنصر، أو تعليقات، أو علامات اقتباس مفردة بدل المزدوجة، أو مفاتيح بلا علامات اقتباس، أو قيم مثل True وNone وNaN منسوخة من Python أو JavaScript. لا يسمح JSON القياسي بأي منها، وزر «إصلاح» يصلحها كلها.',
+          answer: 'أكثر الأسباب شيوعًا: فاصلة بعد آخر عنصر، أو تعليقات، أو علامات اقتباس مفردة بدل المزدوجة، أو مفاتيح بلا علامات اقتباس، أو قيم مثل True وNone وNaN منسوخة من Python أو JavaScript. لا يسمح JSON القياسي بأي منها، وزر «إصلاح» يصلحها كلها. ويشرح دليل خطأ JSON unexpected token كل رسالة خطأ.',
+          link: { text: 'خطأ JSON unexpected token', path: '/json-unexpected-token' },
         },
         {
           question: 'هل يتحقق من مطابقة JSON Schema؟',
@@ -952,7 +1073,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'كيف أفتح ملف CSV أكبر من أن يفتحه Excel؟',
-          answer: 'يعرض Excel 1,048,576 صفًا على الأكثر في الورقة ويترك الباقي. أفلت الملف هنا بدلًا من ذلك: لا حد للصفوف من عند هذا العارض، والحد هو ذاكرة متصفحك. وأكبر ملف قسناه فيه 120,000 صف، فجرّب ملفك وانتبه لتحذير الـ 50 ميغابايت.',
+          answer: 'يعرض Excel 1,048,576 صفًا على الأكثر في الورقة ويترك الباقي. أفلت الملف هنا بدلًا من ذلك: لا حد للصفوف من عند هذا العارض، والحد هو ذاكرة متصفحك. وأكبر ملف قسناه فيه 120,000 صف، فجرّب ملفك وانتبه لتحذير الـ 50 ميغابايت. ويغطي دليل ملف CSV أكبر من Excel الخيارات الأخرى.',
+          link: { text: 'ملف CSV أكبر من Excel', path: '/csv-too-big-for-excel' },
         },
         {
           question: 'ما سرعة فتح ملف CSV كبير؟',

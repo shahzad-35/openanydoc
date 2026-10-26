@@ -10,9 +10,11 @@ import { findReleasedFormat, getFormatCapabilities, getReleasedFormats } from '.
 
 export const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
 
+// `openedFrom`: the page the file was opened on, without its language ('/json-validator'); a landing page opens its viewer in its own mode.
 export type OpenedFile = {
   file: File
   contents: ArrayBuffer
+  openedFrom?: string
 }
 
 type FileIntakeOptions = {

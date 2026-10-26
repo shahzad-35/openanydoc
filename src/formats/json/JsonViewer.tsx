@@ -79,6 +79,7 @@ type MobileTab = 'text' | 'tree' | 'inspector'
 // What the message above the text says after an action (the parse error, when there is one, takes its place).
 type WorkbenchNotice =
   | { kind: 'opened' }
+  | { kind: 'formatterHint' }
   | { kind: 'largeFile'; message: string }
   | { kind: 'valid' }
   | { kind: 'repaired'; fixes: string }
@@ -269,8 +270,11 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   const [cursor, setCursor] = useState<{ line: number; column: number } | null>(null)
   const [notice, setNotice] = useState<WorkbenchNotice>(() => {
     const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
-    return largeFileWarning ? { kind: 'largeFile', message: largeFileWarning } : { kind: 'opened' }
+    if (largeFileWarning) return { kind: 'largeFile', message: largeFileWarning }
+    return openedFile.openedFrom === '/json-formatter' ? { kind: 'formatterHint' } : { kind: 'opened' }
   })
+  // Opened from the validator page: validate once as soon as the file is read, so the result is the first thing shown.
+  const hasValidatedOnOpenRef = useRef(false)
   const [validityPulseCount, setValidityPulseCount] = useState(0)
   const [pathQuery, setPathQuery] = useState('')
   const [isQueryOpen, setIsQueryOpen] = useState(false)
@@ -539,6 +543,14 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     }
     setNotice({ kind: 'valid' })
   }
+
+  useEffect(() => {
+    if (openedFile.openedFrom !== '/json-validator' || parseResult === null || hasValidatedOnOpenRef.current) return
+    hasValidatedOnOpenRef.current = true
+    void validateNow()
+    // validateNow reads the latest draft through refs; it is not a dependency.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [openedFile.openedFrom, parseResult])
 
   // Repair: fix the usual hand-written mistakes, then read the result. The text box then shows the repaired document.
   async function repairText() {
@@ -835,6 +847,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     switch (currentNotice.kind) {
       case 'opened':
         return { className: 'info', icon: 'sparkle', canUndo: false, content: translateWithNodes(locale, 'json.wb.openedNotice', { name: <strong dir="auto">{fileName}</strong> }) }
+      case 'formatterHint':
+        return { className: 'info', icon: 'sparkle', canUndo: false, content: t('json.wb.formatterHint') }
       case 'largeFile':
         return { className: 'info', icon: 'sparkle', canUndo: false, content: currentNotice.message }
       case 'valid':
@@ -1328,7 +1342,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   )
 
   return (
-    <div id="json-workbench" data-mtab={mobileTab}>
+    <div id="json-workbench" data-mtab={mobileTab} data-opened-from={openedFile.openedFrom?.slice(1)}>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
         {Object.entries(iconPaths).map(([name, paths]) => (
           <symbol key={name} id={`i-${name}`} viewBox="0 0 24 24">

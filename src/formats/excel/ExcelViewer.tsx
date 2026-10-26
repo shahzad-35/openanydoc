@@ -917,6 +917,14 @@ export default function ExcelViewer({
         message={parsed && largeFileWarning ? largeFileWarning : ''}
       />
 
+      <Notice
+        id="legacy-format-note"
+        kind="info"
+        role="status"
+        className="border-b border-rule bg-paper-raised px-4 py-1 text-sm"
+        message={parsed?.bookType === 'biff8' ? t('excel.legacyNote') : ''}
+      />
+
       <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
         {parseResult === null && <p className="p-6 text-ink-soft">{t('excel.view.reading')}</p>}
 

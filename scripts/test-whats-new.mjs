@@ -22,21 +22,45 @@ const SAVED_TEST_YEAR_START = Date.UTC(2027, 0, 1)
 
 // ---------------------------------------------------------------- static server with the site's CSP
 
-const contentSecurityPolicy = fs.readFileSync(path.join(projectRoot, 'public/_headers'), 'utf8').match(/Content-Security-Policy:\s*(.*)/i)?.[1]
+// The built _headers (the build adds the inline theme script's hash to the policy), _redirects, and the nearest 404.html for an
+// unknown address with status 404: the same behaviour as Cloudflare's static assets.
+const contentSecurityPolicy = fs.readFileSync(path.join(distFolder, '_headers'), 'utf8').match(/Content-Security-Policy:\s*(.*)/i)?.[1]
 const contentTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain' }
+const redirects = Object.fromEntries(
+  fs
+    .readFileSync(path.join(distFolder, '_redirects'), 'utf8')
+    .split('\n')
+    .filter((line) => line.trim() && !line.startsWith('#'))
+    .map((line) => {
+      const [from, to, status] = line.trim().split(/\s+/)
+      return [from, { to, status: Number(status) || 301 }]
+    }),
+)
 
-function resolveFile(urlPath) {
-  const candidate = path.join(distFolder, decodeURIComponent(urlPath.split('?')[0]))
+function resolveFile(pathname) {
+  const candidate = path.join(distFolder, pathname)
   if (fs.existsSync(candidate) && fs.statSync(candidate).isFile()) return candidate
   const folderIndex = path.join(candidate, 'index.html')
   if (fs.existsSync(folderIndex)) return folderIndex
-  return path.join(distFolder, 'index.html')
+  return null
+}
+function nearestNotFoundPage(pathname) {
+  const localized = path.join(distFolder, pathname.split('/')[1] ?? '', '404.html')
+  return fs.existsSync(localized) ? localized : path.join(distFolder, '404.html')
 }
 
 const server = http.createServer((request, response) => {
-  const filePath = resolveFile(request.url ?? '/')
-  response.writeHead(200, { 'content-type': contentTypes[path.extname(filePath)] ?? 'application/octet-stream', 'content-security-policy': contentSecurityPolicy ?? '' })
-  fs.createReadStream(filePath).pipe(response)
+  const pathname = decodeURIComponent((request.url ?? '/').split('?')[0])
+  const redirect = redirects[pathname]
+  if (redirect) {
+    response.writeHead(redirect.status, { location: redirect.to })
+    response.end()
+    return
+  }
+  const filePath = resolveFile(pathname)
+  const headers = { 'content-type': filePath ? (contentTypes[path.extname(filePath)] ?? 'application/octet-stream') : contentTypes['.html'], 'content-security-policy': contentSecurityPolicy ?? '' }
+  response.writeHead(filePath ? 200 : 404, headers)
+  fs.createReadStream(filePath ?? nearestNotFoundPage(pathname)).pipe(response)
 })
 await new Promise((resolve) => server.listen(0, resolve))
 const siteOrigin = `http://localhost:${server.address().port}`
@@ -392,6 +416,8 @@ const sampleWorkbook = path.join(scratchFolder, 'sample.xlsx')
 const workbook = XLSX.utils.book_new()
 XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['Name', 'Qty'], ['A', 1], ['B', 2]]), 'Data')
 fs.writeFileSync(sampleWorkbook, XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }))
+const sampleLegacyWorkbook = path.join(scratchFolder, 'legacy.xls')
+fs.writeFileSync(sampleLegacyWorkbook, XLSX.write(workbook, { type: 'buffer', bookType: 'biff8' }))
 
 for (const [name, address, file, readyElement] of [
   ['CSV', '/en/csv-viewer', sampleCsv, '#data-table'],
@@ -416,7 +442,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -425,12 +451,42 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/abou
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://www.openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
 
-const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel', '/changelog']
+await test('unknown addresses get a real 404 page with noindex, and open-file addresses redirect to their viewer', async () => {
+  for (const locale of ['en', 'ar']) {
+    const address = `/${locale}/this-page-does-not-exist`
+    const response = await fetch(`${siteOrigin}${address}`)
+    const html = await response.text()
+    expect(response.status === 404, `${address}: status ${response.status}`)
+    expect(html.includes('<meta name="robots" content="noindex" />') && html.includes(`<html lang="${locale}"`) && html.includes('id="not-found-page"'), `${address}: not the static not-found page`)
+    expect(!html.includes('<script type="module"'), `${address}: the 404 page loads the app script (it would redraw the home page)`)
+    await openPage(address)
+    await expectCleanIds(address)
+    expect(await evaluate(`document.querySelectorAll('h1').length === 1 && document.querySelector('#not-found-link-csv')?.getAttribute('href') === '/${locale}/csv-viewer'`), `${address}: the not-found page lacks its links`)
+  }
+  for (const [address, target] of [['/en/view-csv', '/en/csv-viewer'], ['/ar/view-excel', '/ar/excel-viewer'], ['/en/view-pdf', '/en'], ['/ar/view', '/ar']]) {
+    const response = await fetch(`${siteOrigin}${address}`, { redirect: 'manual' })
+    expect(response.status === 302 && response.headers.get('location') === target, `${address}: expected 302 to ${target}, got ${response.status} ${response.headers.get('location')}`)
+  }
+})
+
+await test('security headers: HSTS, the inline theme script allowed by its hash only, Early Hints and font preloads', async () => {
+  const headers = fs.readFileSync(path.join(distFolder, '_headers'), 'utf8')
+  expect(headers.includes('Strict-Transport-Security: max-age=31536000; includeSubDomains'), 'HSTS is missing from _headers')
+  expect(/script-src 'self' 'sha256-[A-Za-z0-9+/=]+';/.test(headers) && !headers.includes('unsafe-inline'), 'the CSP does not allow the theme script by hash alone')
+  expect(/^\/en\n  Link: <\/assets\/fredoka-latin-700[^>]+>; rel=preload; as=font; crossorigin/m.test(headers) && /^\/ar\/\*\n  Link: <\/assets\/ibm-plex-sans-arabic/m.test(headers), 'the Early Hints Link headers for the fonts are missing')
+  const html = await (await fetch(`${siteOrigin}/en`)).text()
+  expect(/<link rel="preload" as="font" type="font\/woff2" crossorigin href="\/assets\/fredoka-latin-700/.test(html) && !html.includes('theme-init.js'), 'English pages should preload the display font and have no theme-init.js request')
+  await openPage('/en')
+  expect((await evaluate(`document.documentElement.style.getPropertyValue('--ext-pill-1')`)) !== '', 'the inline theme script did not run (blocked by the CSP?)')
+})
+
+const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
+const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
   const alternatesOf = (html) =>
@@ -492,7 +548,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
       const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
       const types = blocks.flatMap((block) => [block['@type']].flat())
-      const expectedTypes = { '': ['WebSite', 'Organization', 'FAQPage'], '/about': [], '/privacy': [], '/terms': [], '/fix-arabic-csv-in-excel': [], '/changelog': [] }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
+      const expectedTypes = { '': ['WebSite', 'Organization', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['BreadcrumbList'], '/changelog': [], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
       expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
       for (const block of blocks) {
         const type = [block['@type']].flat()[0]
@@ -504,7 +560,8 @@ await test('every JSON-LD block is valid data with the fields search engines nee
         } else if (type === 'Organization') {
           expect(block.name === 'OpenAnyDoc' && block.url === 'https://www.openanydoc.com', problem('name or url is wrong'))
           expect(block.founder?.['@type'] === 'Person' && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
-          expect(!('sameAs' in block), problem('sameAs is set, but there are no profiles yet'))
+          expect(Array.isArray(block.sameAs) && block.sameAs.every((profile) => /^https:\/\//.test(profile)), problem('sameAs must list the public profiles as absolute URLs'))
+          expect(block.contactPoint?.email === 'support@openanydoc.com' && block.foundingDate === '2026-10', problem('contactPoint or foundingDate is wrong'))
           expect(isAbsoluteUrl(block.logo), problem('the logo is not an absolute URL'))
           const logoFile = path.join(distFolder, new URL(block.logo).pathname)
           expect(fs.existsSync(logoFile), problem(`the logo file ${block.logo} does not exist`))
@@ -523,6 +580,11 @@ await test('every JSON-LD block is valid data with the fields search engines nee
             expect(question['@type'] === 'Question' && question.name?.length > 0, problem('a Question has no name'))
             expect(question.acceptedAnswer?.['@type'] === 'Answer' && question.acceptedAnswer.text?.length > 0, problem(`"${question.name}" has no Answer text`))
           }
+        } else if (type === 'Article') {
+          expect(block.headline?.length > 0 && isAbsoluteUrl(block.image) && /^\d{4}-\d{2}-\d{2}T00:00:00\+00:00$/.test(block.datePublished) && /^\d{4}-\d{2}-\d{2}T/.test(block.dateModified), problem('headline, image or dates are wrong'))
+          expect(block.author?.['@type'] === 'Person' && block.author.name?.length > 0 && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
+        } else if (type === 'ProfilePage') {
+          expect(block.mainEntity?.['@type'] === 'Person' && block.mainEntity.name === 'Shahzad Ali' && block.url === canonical, problem('mainEntity or url is wrong'))
         } else if (type === 'BreadcrumbList') {
           const items = block.itemListElement ?? []
           expect(items.length >= 2, problem('fewer than two items'))
@@ -540,7 +602,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
 
 await test('About, Privacy, Terms and guide pages: one h1, their own title and description, hreflang, real text', async () => {
   const titles = new Set()
-  for (const address of ['en', 'ar'].flatMap((locale) => ['/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel'].map((page) => `/${locale}${page}`))) {
+  for (const address of ['en', 'ar'].flatMap((locale) => ['/about', '/privacy', '/terms', '/guides', ...guidePagesList].map((page) => `/${locale}${page}`))) {
     const html = await (await fetch(`${siteOrigin}${address}`)).text()
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
@@ -563,20 +625,34 @@ await test('About, Privacy, Terms and guide pages: one h1, their own title and d
   expect(privacyText.includes('Last updated: 2026-10-17') && privacyText.includes('No analytics, no cookies, no tracking') && privacyText.includes('Cloudflare'), 'the privacy policy is missing a required part')
 })
 
+await test('format pages show a real screenshot and a comparison table in both languages', async () => {
+  for (const locale of ['en', 'ar']) {
+    for (const [page, viewerId] of [['/csv-viewer', 'csv'], ['/excel-viewer', 'excel'], ['/json-viewer', 'json'], ['/txt-viewer', 'text']]) {
+      const html = await (await fetch(`${siteOrigin}/${locale}${page}`)).text()
+      const image = /<img src="(\/screenshots\/[\w-]+\.webp)" width="1200" height="750" loading="lazy" decoding="async" alt="([^"]+)"/.exec(html)
+      expect(image !== null && image[1] === `/screenshots/${locale}-${viewerId}.webp` && image[2].length > 20, `/${locale}${page}: the screenshot is missing its size, lazy loading or alt text`)
+      expect(fs.existsSync(path.join(distFolder, image[1])), `/${locale}${page}: ${image[1]} is not a built file`)
+      expect((html.match(/<th scope="row"/g) ?? []).length === 6 && html.includes('id="comparison-table"'), `/${locale}${page}: the comparison table is missing or has the wrong rows`)
+    }
+  }
+})
+
 await test('the Arabic CSV guide links to built pages, and the CSV page, its FAQ and the footer link to the guide', async () => {
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}/fix-arabic-csv-in-excel`)
     const guideLinks = await evaluate(`[...document.querySelectorAll('#info-sections a[href^="/"]')].map((link) => link.getAttribute('href'))`)
     expect(guideLinks.length >= 4, `/${locale}: the guide links only ${guideLinks.length} pages`)
     for (const href of guideLinks) expect(fs.existsSync(path.join(distFolder, href, 'index.html')), `/${locale}: the guide links ${href}, which is not a built page`)
-    expect(await evaluate(`document.querySelector('#footer-link-fix-arabic-csv-in-excel') === null`), `/${locale}: the footer links the guide to itself`)
+    expect(await evaluate(`document.querySelector('#footer-link-guides')?.getAttribute('href') === '/${locale}/guides' && document.querySelector('#page-byline time')?.getAttribute('datetime') === '2026-10-20'`), `/${locale}: the guide lacks the Guides link or its byline date`)
   }
   await openPage('/en/csv-viewer')
-  for (const [id, where] of [['related-link-fix-arabic-csv-in-excel', 'related tools'], ['format-faq-link-fix-arabic-csv-in-excel', 'FAQ answer'], ['footer-link-fix-arabic-csv-in-excel', 'footer']]) {
-    expect((await evaluate(`document.querySelector('#${id}')?.getAttribute('href')`)) === '/en/fix-arabic-csv-in-excel', `the CSV page's ${where} does not link to the guide`)
+  for (const [id, target, where] of [['related-link-fix-arabic-csv-in-excel', '/en/fix-arabic-csv-in-excel', 'related tools'], ['format-faq-link-fix-arabic-csv-in-excel', '/en/fix-arabic-csv-in-excel', 'FAQ answer'], ['footer-link-guides', '/en/guides', 'footer'], ['related-link-csv-opens-in-one-column', '/en/csv-opens-in-one-column', 'related tools (one column)']]) {
+    expect((await evaluate(`document.querySelector('#${id}')?.getAttribute('href')`)) === target, `the CSV page's ${where} does not link to ${target}`)
   }
   await evaluate(`document.querySelector('#format-faq-link-fix-arabic-csv-in-excel').click()`)
   await waitFor(`location.pathname === '/en/fix-arabic-csv-in-excel' && document.querySelector('#info-sections') !== null`, 'the FAQ link to open the guide')
+  await openPage('/en/guides')
+  expect(await evaluate(`['fix-arabic-csv-in-excel', 'csv-opens-in-one-column', 'csv-too-big-for-excel', 'json-unexpected-token'].every((guide) => document.querySelector('#info-link-' + guide)?.getAttribute('href') === '/en/' + guide)`), 'the guides index does not link every guide')
 })
 
 await test('the footer has About, Privacy and Terms links and the Microsoft disclaimer on every content page', async () => {
@@ -1218,6 +1294,18 @@ await test('landing pages accept their own file types, offer another type its vi
     await chooseFile(sampleJson)
     await waitFor(`document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json' && document.querySelector('#tree-view .row')`, `the JSON file to open on ${address}`)
   }
+  // Each landing page opens its viewer in its own mode, so the pages are not copies of one funnel.
+  expect(await evaluate(`document.querySelector('#json-workbench').dataset.openedFrom === 'json-validator'`), 'the validator page did not tell the viewer where the file came from')
+  await waitFor(`document.querySelector('#editor-notice.notice.ok')`, 'the validator page to validate the file on open')
+  await openPage('/en/json-formatter')
+  await chooseFile(sampleJson)
+  await waitFor(`document.querySelector('#editor-notice')?.innerText.includes('2 spaces')`, 'the formatter page to open with the formatted-view hint')
+  await openPage('/en/large-csv-viewer')
+  await chooseFile(sampleCsv)
+  await waitFor(`document.querySelector('#toast-region')?.innerText.includes('only the shown rows')`, 'the large-CSV page to show the cut-down hint')
+  await openPage('/en/xls-viewer')
+  await chooseFile(sampleLegacyWorkbook)
+  await waitFor(`document.querySelector('#legacy-format-note')?.innerText.includes('97-2003')`, 'the XLS page to show the legacy-format note')
 })
 
 // ---------------------------------------------------------------- report

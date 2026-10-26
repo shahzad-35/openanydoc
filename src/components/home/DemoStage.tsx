@@ -268,7 +268,6 @@ export default function DemoStage() {
               ref={targetRef}
               role="button"
               tabIndex={0}
-              aria-label={liftedSample ? t('demo.targetArmedLabel', { name: liftedSample.name }) : t('demo.targetLabel')}
               className={`demo-target ${liftedSample ? 'is-armed' : ''} ${isOverTarget ? 'is-over' : ''}`}
               onClick={() => liftedSample && openSample(liftedSample)}
               onKeyDown={handleTargetKeyDown}

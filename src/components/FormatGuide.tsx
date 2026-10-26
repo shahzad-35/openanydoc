@@ -45,6 +45,12 @@ export default function FormatGuide({ address, viewerId, onNavigate }: { address
           ))}
         </ol>
       </section>
+      {guide.screenshot && (
+        <figure id="viewer-screenshot" className="overflow-hidden rounded-[22px] border-2 border-rule bg-paper-raised">
+          <img src={`/screenshots/${locale}-${viewerId}.webp`} width="1200" height="750" loading="lazy" decoding="async" alt={guide.screenshot.alt} className="block h-auto w-full" />
+          <figcaption className="border-t border-rule px-4 py-3 text-sm text-ink-soft">{guide.screenshot.caption}</figcaption>
+        </figure>
+      )}
       <section id="handles-section">
         <h2 id="handles-heading" className="type-h3">{guide.handlesTitle}</h2>
         <ul id="handles-list" className="mt-4 list-disc space-y-2 ps-6">
@@ -53,6 +59,33 @@ export default function FormatGuide({ address, viewerId, onNavigate }: { address
           ))}
         </ul>
       </section>
+      {guide.comparison && (
+        <section id="comparison-section">
+          <h2 id="comparison-heading" className="type-h3">{guide.comparison.title}</h2>
+          <div className="mt-4 overflow-x-auto">
+            <table id="comparison-table" className="w-full min-w-[560px] border-collapse text-[15px]">
+              <thead>
+                <tr>
+                  <th scope="col" className="border-b-2 border-rule py-2 pe-3 text-start font-semibold"></th>
+                  {guide.comparison.columns.map((column) => (
+                    <th key={column} scope="col" className="border-b-2 border-rule px-3 py-2 text-start font-semibold">{column}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {guide.comparison.rows.map((row) => (
+                  <tr key={row.label}>
+                    <th scope="row" className="border-b border-rule py-2 pe-3 text-start align-top font-medium">{row.label}</th>
+                    {row.cells.map((cell, position) => (
+                      <td key={position} className={`border-b border-rule px-3 py-2 align-top ${position === 0 ? 'text-ink' : 'text-ink-soft'}`}>{cell}</td>
+                    ))}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </section>
+      )}
       <section id="format-faq-section">
         <h2 id="format-faq-heading" className="type-h3">{guide.faqTitle}</h2>
         <dl id="format-faq-list" className="rule-list mt-2">

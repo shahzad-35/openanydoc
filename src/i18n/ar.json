@@ -1608,8 +1608,6 @@
   "demo.dropHere": "أفلِته هنا",
   "demo.dropArmed": "اضغط Enter أو انقر لإفلات {name}",
   "demo.dropSub": "ملفك الخاص يُفتح في العارض الحقيقي.",
-  "demo.targetLabel": "مربع إفلات الملفات التجريبية",
-  "demo.targetArmedLabel": "مربع الإفلات. اضغط Enter لإفلات {name}.",
   "demo.pickedUp": "التُقط {name}. انتقل إلى مربع الإفلات واضغط Enter، أو اضغط Escape لإعادته.",
   "demo.putBack": "أُعيد {name}.",
   "demo.opened": "فُتح {name}: {summary}. لم يُرفع شيء.",
@@ -1693,5 +1691,14 @@
   "sheet.privacy": "يعمل في متصفحك. لا يُرفع أي شيء.",
   "sheet.resizePanel": "تغيير حجم اللوحة",
   "sheet.sheets": "الأوراق",
-  "menu.help": "مساعدة"
+  "menu.help": "مساعدة",
+  "notFound.title": "الصفحة غير موجودة – OpenAnyDoc",
+  "notFound.heading": "الصفحة غير موجودة",
+  "notFound.text": "لا توجد صفحة على هذا العنوان. افتح أحد عارضي الملفات أدناه، أو عد إلى الصفحة الرئيسية.",
+  "guide.byline": "بقلم {name}",
+  "guide.published": "نُشر في {date}",
+  "guide.updated": "حُدّث في {date}",
+  "json.wb.formatterHint": "معروض منسّقًا بمسافتين. اختر إزاحة أخرى أو «تصغير» من الشريط أعلاه؛ ويحفظه «تنزيل» بهذا الشكل.",
+  "csv.largeMode.hint": "أكبر من أن يفتحه Excel؟ صفِّ الصفوف التي تحتاجها، ثم اختر «خيارات التنزيل» وعلّم على «الصفوف الظاهرة فقط».",
+  "excel.legacyNote": "ملف Excel 97-2003 (.xls): لا تظهر الخطوط والألوان، ويُحفظ الملف بصيغة .xls من جديد."
 }

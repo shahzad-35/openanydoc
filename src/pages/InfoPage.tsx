@@ -7,13 +7,14 @@ import { usePageHead } from './HomePage'
 import { guidePages } from '../guides'
 import { useT } from '../i18n'
 import { CONTACT_EMAIL, infoPages, type InfoSection } from '../legalContent'
-import { pageSeo } from '../seo'
+import { AUTHOR_NAME, pageSeo } from '../seo'
 
 const escapeForRegExp = (text: string) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const formatDate = (isoDate: string, locale: string) => new Intl.DateTimeFormat(`${locale}-u-nu-latn`, { dateStyle: 'long', timeZone: 'UTC' }).format(new Date(`${isoDate}T00:00:00Z`))
 const inlineLinkClassName = 'underline underline-offset-2 hover:text-accent'
 
-// The contact address inside a sentence becomes a mailto link, and a section's `links` phrases become links to their pages. Longer
-// phrases are matched first, so "large CSV viewer" is not cut at "CSV viewer".
+// The contact address inside a sentence becomes a mailto link, and a section's `links` phrases become links to their pages (or to an
+// outside address when the path is a full https address). Longer phrases are matched first, so "large CSV viewer" is not cut at "CSV viewer".
 function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavigate: (path: string) => void) {
   const phrases = [CONTACT_EMAIL, ...links.map((link) => link.text)].sort((a, b) => b.length - a.length)
   return text.split(new RegExp(`(${phrases.map(escapeForRegExp).join('|')})`)).map((part, position) => {
@@ -26,6 +27,13 @@ function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavig
     }
     const link = links.find((candidate) => candidate.text === part)
     if (!link) return part
+    if (link.path.startsWith('https://')) {
+      return (
+        <a key={position} id={`info-link-${new URL(link.path).hostname.split('.')[0]}`} href={link.path} rel="noopener" className={inlineLinkClassName}>
+          {part}
+        </a>
+      )
+    }
     return (
       <PageLink key={position} id={`info-link-${link.path.slice(1)}`} path={link.path} onNavigate={onNavigate} className={inlineLinkClassName}>
         {part}
@@ -69,6 +77,22 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
           <h1 id="page-heading" className="type-h1 text-balance">{seo.heading}</h1>
           <p id="page-intro" className="mt-4 text-ink-soft">{seo.intro}</p>
           {content.lastUpdated && <p id="last-updated" className="mt-2 text-sm text-ink-soft">{content.lastUpdated}</p>}
+          {content.published && (
+            <p id="page-byline" className="mt-3 text-sm text-ink-soft">
+              {t('guide.byline', { name: '' })}
+              <PageLink id="byline-author-link" path="/about" onNavigate={onNavigate} className={inlineLinkClassName}>
+                {AUTHOR_NAME}
+              </PageLink>
+              {' · '}
+              <time dateTime={content.published}>{t('guide.published', { date: formatDate(content.published, locale) })}</time>
+              {content.updated && content.updated !== content.published && (
+                <>
+                  {' · '}
+                  <time dateTime={content.updated}>{t('guide.updated', { date: formatDate(content.updated, locale) })}</time>
+                </>
+              )}
+            </p>
+          )}
         </div>
         <div id="info-sections" className="space-y-10 rounded-[22px] border-2 border-rule bg-paper-raised p-6 md:p-10">
           {content.sections.map((section, position) => (

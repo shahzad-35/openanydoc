@@ -7,6 +7,7 @@
 // Run with Node 22.6 or newer (`--experimental-strip-types` reads src/viewers.ts as it is).
 
 import { execFileSync } from 'node:child_process'
+import { createHash } from 'node:crypto'
 import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -15,7 +16,7 @@ import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
-import { SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { AUTHOR_NAME, REPOSITORY_URL, SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
@@ -64,7 +65,7 @@ function renderChangelogFooter(locale) {
     .join('')
   const moreItems =
     landingPages.map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText)))).join('') +
-    Object.keys(guidePages.en).map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
+    item(link('footer-link-guides', '/guides', escapeHtml(pageSeo[locale]['/guides'].linkText))) +
     item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =
     legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
@@ -158,20 +159,70 @@ function findAsset(pattern) {
   if (!name) throw new Error(`No file in dist/assets matches ${pattern}.`)
   return `/assets/${name}`
 }
-// Arabic pages fetch their language file (src/i18n/ar.json, loaded by main.tsx before the first render) and the two Arabic font
-// weights seen first (headings 700, text 400) right away, instead of after the main script or the stylesheet.
-const arabicPreloads = [
-  `<link rel="modulepreload" crossorigin href="${findAsset(/^ar-[\w-]+\.js$/)}" />`,
-  ...[400, 700].map((weight) => `<link rel="preload" as="font" type="font/woff2" crossorigin href="${findAsset(new RegExp(`^ibm-plex-sans-arabic-arabic-${weight}-normal-[\\w-]+\\.woff2$`))}" />`),
-].join('\n    ')
+// The fonts seen first on a page are fetched right away instead of after the stylesheet: the wordmark and headings (Fredoka 700 and
+// 500, Baloo Bhaijaan 2 700 in Arabic) and the body text (Nunito Sans 400, IBM Plex Sans Arabic 400 and 700). Arabic pages also fetch
+// their language file (src/i18n/ar.json, loaded by main.tsx before the first render).
+const preloadedFonts = {
+  en: [/^fredoka-latin-700-normal-[\w-]+\.woff2$/, /^fredoka-latin-500-normal-[\w-]+\.woff2$/, /^nunito-sans-latin-400-normal-[\w-]+\.woff2$/].map(findAsset),
+  ar: [/^ibm-plex-sans-arabic-arabic-400-normal-[\w-]+\.woff2$/, /^ibm-plex-sans-arabic-arabic-700-normal-[\w-]+\.woff2$/, /^baloo-bhaijaan-2-arabic-700-normal-[\w-]+\.woff2$/].map(findAsset),
+}
+const fontPreloadTag = (asset) => `<link rel="preload" as="font" type="font/woff2" crossorigin href="${asset}" />`
+const preloadTags = {
+  en: preloadedFonts.en.map(fontPreloadTag).join('\n    '),
+  ar: [`<link rel="modulepreload" crossorigin href="${findAsset(/^ar-[\w-]+\.js$/)}" />`, ...preloadedFonts.ar.map(fontPreloadTag)].join('\n    '),
+}
+
+// The theme script is inline in index.html (no render-blocking request) and so is the stylesheet (17 KB gzipped: one round trip
+// less before the first paint); the Content-Security-Policy allows exactly those two by their hashes. The same fonts go into Link
+// headers, so Cloudflare's Early Hints can announce them before the HTML.
+const sha256 = (text) => `'sha256-${createHash('sha256').update(text).digest('base64')}'`
+const inlineThemeScript = /<script>([\s\S]*?)<\/script>/.exec(indexHtml)?.[1]
+if (!inlineThemeScript) throw new Error('index.html has no inline theme script to allow in the Content-Security-Policy.')
+const stylesheetTag = /<link rel="stylesheet"[^>]*href="(\/assets\/index-[\w-]+\.css)"[^>]*>/.exec(indexHtml)
+if (!stylesheetTag) throw new Error('dist/index.html has no stylesheet link to inline.')
+const stylesheetText = fs.readFileSync(path.join(distFolder, stylesheetTag[1]), 'utf8')
+const headersFile = path.join(distFolder, '_headers')
+const earlyHintHeader = (locale) => `  Link: ${preloadedFonts[locale].map((asset) => `<${asset}>; rel=preload; as=font; crossorigin`).join(', ')}`
+fs.writeFileSync(
+  headersFile,
+  fs.readFileSync(headersFile, 'utf8').replace("script-src 'self'", `script-src 'self' ${sha256(inlineThemeScript)}`).replace("style-src 'self'", `style-src 'self' ${sha256(stylesheetText)}`) +
+    locales.map((locale) => `\n/${locale}\n${earlyHintHeader(locale)}\n\n/${locale}/*\n${earlyHintHeader(locale)}\n`).join(''),
+)
 
 // dist/index.html in a language. Only "/" needs /locale-redirect.js (it picks /en or /ar); a page with a language skips that
 // render-blocking request.
 function pageShell(locale, { keepLocaleRedirect = false } = {}) {
-  const page = indexHtml.replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`)
+  const page = indexHtml.replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`).replace(stylesheetTag[0], () => `<style>${stylesheetText}</style>`)
   if (keepLocaleRedirect) return page
-  return page.replace('<script src="/locale-redirect.js"></script>', locale === 'ar' ? arabicPreloads : '')
+  return page.replace('<script src="/locale-redirect.js"></script>', preloadTags[locale])
 }
+
+// A real "not found" page in each language: Cloudflare serves the nearest 404.html with status 404 (wrangler.jsonc). It is static
+// (no app script), so the browser does not redraw it as the home page, and it tells search engines not to index it.
+function renderNotFoundPage(locale) {
+  const t = (key, values) => escapeHtml(translate(locale, key, values))
+  const c = changelogClasses
+  const other = otherLocale(locale)
+  const viewerLinks = viewers
+    .filter((viewer) => viewer.toolPath)
+    .map((viewer) => `<li><a id="not-found-link-${viewer.id}" href="${localizePath(locale, viewer.toolPath)}" class="${c.formatLink}">${t('viewer.name', { format: viewer.label })}</a></li>`)
+    .join('')
+  const body =
+    `<div id="not-found-page" class="${c.page}">` +
+    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p>${renderChangelogNav(locale)}` +
+    `<p><a id="${changelogIds.languageLink}" href="/${other}" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
+    `<main id="main" class="${c.main}"><div class="${c.intro}"><h1 id="page-heading" class="${c.heading}">${t('notFound.heading')}</h1><p id="page-intro" class="${c.introText}">${t('notFound.text')}</p></div>` +
+    `<ul id="not-found-links" class="mt-8 flex flex-wrap gap-3">${viewerLinks}</ul><a id="not-found-home-link" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`
+  return pageShell(locale)
+    .replace(/<title>[\s\S]*?<\/title>/, `<title>${t('notFound.title')}</title>`)
+    .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${t('notFound.text')}$2`)
+    .replace('</head>', '  <meta name="robots" content="noindex" />\n  </head>')
+    .replace(/\s*<script type="module"[^>]*><\/script>/, '')
+    .replace('<div id="root"></div>', () => `<div id="root">${body}</div>`)
+}
+fs.writeFileSync(path.join(distFolder, '404.html'), renderNotFoundPage('en'))
+fs.mkdirSync(path.join(distFolder, 'ar'), { recursive: true })
+fs.writeFileSync(path.join(distFolder, 'ar', '404.html'), renderNotFoundPage('ar'))
 
 for (const locale of locales) {
   checkSearchSnippet(`${locale} changelog`, translate(locale, 'changelog.title'), translate(locale, 'changelog.description'))
@@ -214,9 +265,39 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         url: SITE_ORIGIN,
         logo: `${SITE_ORIGIN}/logo.png`,
         email: CONTACT_EMAIL,
-        founder: { '@type': 'Person', name: 'Shahzad Ali' },
+        contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: CONTACT_EMAIL, availableLanguage: ['en', 'ar'] },
+        foundingDate: '2026-10',
+        founder: { '@type': 'Person', name: AUTHOR_NAME },
+        sameAs: [REPOSITORY_URL],
       },
     )
+  }
+  // The About page is the author's page; a guide is an article with its author and dates (the byline InfoPage draws).
+  if (address === '/about') {
+    structuredData.push({
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
+      url: pageUrl,
+      inLanguage: locale,
+      mainEntity: { '@type': 'Person', name: AUTHOR_NAME, url: pageUrl, email: CONTACT_EMAIL, sameAs: [REPOSITORY_URL], knowsAbout: ['CSV files', 'Excel workbooks', 'JSON', 'text encodings', 'Arabic and right-to-left text'] },
+    })
+  }
+  const guidePage = guidePages[locale][address]
+  if (guidePage?.published) {
+    const shareImage = getShareImage(locale, address)
+    structuredData.push({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: seo.heading,
+      description: seo.description,
+      image: `${SITE_ORIGIN}${shareImage.path}`,
+      datePublished: `${guidePage.published}T00:00:00+00:00`,
+      dateModified: `${guidePage.updated ?? guidePage.published}T00:00:00+00:00`,
+      author: { '@type': 'Person', name: AUTHOR_NAME, url: `${SITE_ORIGIN}${localizePath(locale, '/about')}` },
+      publisher: { '@type': 'Organization', name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/logo.png` } },
+      mainEntityOfPage: pageUrl,
+      inLanguage: locale,
+    })
   }
   if (viewer) {
     structuredData.push({

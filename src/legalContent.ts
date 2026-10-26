@@ -9,7 +9,8 @@ export const CONTACT_EMAIL = 'support@openanydoc.com'
 
 // `links`: phrases of this section's text that become links to other pages (each page linked once per page, its id is made from the path).
 export type InfoSection = { heading: string; paragraphs: string[]; list?: string[]; links?: { text: string; path: string }[] }
-export type InfoPageContent = { lastUpdated?: string; sections: InfoSection[] }
+// `published` and `updated` (YYYY-MM-DD) draw a byline with dates and give the page Article data; `links` paths may also be full https addresses.
+export type InfoPageContent = { lastUpdated?: string; published?: string; updated?: string; sections: InfoSection[] }
 
 // Keyed by language, then by the page address, like pageSeo in seo.ts.
 export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
@@ -24,7 +25,11 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Who makes it',
-          paragraphs: ['OpenAnyDoc is built and run by Shahzad Ali.'],
+          paragraphs: [
+            'OpenAnyDoc is built and run by Shahzad Ali, a software developer. It started with a simple observation: people at work keep pasting customer files into online tools that upload them, because opening a CSV or a workbook without the right software is harder than it should be.',
+            'Every viewer here is tested against synthetic files before it ships: a 120,000-row CSV, Arabic text saved as Windows-1256, a 100,000-row workbook, JSON files at the 10 MB limit. The privacy rule is not a promise but a test: the build fails if any page makes a network request, sets a cookie or stores anything beyond the theme choice. The source code is public on GitHub.',
+          ],
+          links: [{ text: 'public on GitHub', path: 'https://github.com/shahzad-35/openanydoc' }],
         },
         {
           heading: 'Why it exists',
@@ -142,7 +147,11 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'من يقف وراءه',
-          paragraphs: ['يبني OpenAnyDoc ويديره شهزاد علي.'],
+          paragraphs: [
+            'يبني OpenAnyDoc ويديره شهزاد علي، وهو مطوّر برمجيات. بدأت الفكرة من ملاحظة بسيطة: كثيرون في العمل يلصقون ملفات العملاء في أدوات على الإنترنت ترفعها إلى خوادمها، لأن فتح ملف CSV أو مصنف من دون البرنامج المناسب أصعب مما ينبغي.',
+            'كل عارض هنا يُختبر على ملفات اصطناعية قبل نشره: ملف CSV من 120,000 صف، ونص عربي محفوظ بترميز Windows-1256، ومصنف من 100,000 صف، وملفات JSON عند حد 10 ميغابايت. وقاعدة الخصوصية ليست وعدًا بل اختبار: يفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر. الكود المصدري متاح للجميع على GitHub.',
+          ],
+          links: [{ text: 'متاح للجميع على GitHub', path: 'https://github.com/shahzad-35/openanydoc' }],
         },
         {
           heading: 'لماذا وُجد',

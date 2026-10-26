@@ -1248,8 +1248,6 @@
   "demo.dropHere": "Drop it here",
   "demo.dropArmed": "Press Enter or tap to drop {name}",
   "demo.dropSub": "Your own file opens in the real viewer.",
-  "demo.targetLabel": "Drop box for the sample files",
-  "demo.targetArmedLabel": "Drop box. Press Enter to drop {name}.",
   "demo.pickedUp": "{name} picked up. Move to the drop box and press Enter, or press Escape to put it back.",
   "demo.putBack": "{name} put back.",
   "demo.opened": "{name} opened: {summary}. Nothing was uploaded.",
@@ -1333,5 +1331,14 @@
   "sheet.privacy": "Runs in your browser. Nothing is uploaded.",
   "sheet.resizePanel": "Resize panel",
   "sheet.sheets": "Sheets",
-  "menu.help": "Help"
+  "menu.help": "Help",
+  "notFound.title": "Page not found – OpenAnyDoc",
+  "notFound.heading": "Page not found",
+  "notFound.text": "There is no page at this address. Open one of the file viewers below, or go back to the home page.",
+  "guide.byline": "By {name}",
+  "guide.published": "Published {date}",
+  "guide.updated": "Updated {date}",
+  "json.wb.formatterHint": "Shown formatted with 2 spaces. Pick another indent, or Minify, in the bar above; Download saves it that way.",
+  "csv.largeMode.hint": "Too big for Excel? Filter the rows you need, then choose Download options and tick \"only the shown rows\".",
+  "excel.legacyNote": "Excel 97-2003 file (.xls): fonts and colours are not shown, and the file is saved as .xls again."
 }

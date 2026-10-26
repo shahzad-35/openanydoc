@@ -75,7 +75,7 @@ export const footerClasses = {
   item: 'flex items-center gap-2',
   link: 'inline-flex min-h-8 items-center text-[15px] text-ink-soft underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline pointer-coarse:min-h-11',
   bottom: 'mt-10 border-t border-line pt-5',
-  disclaimer: 'text-[13px] leading-relaxed text-ink-3',
+  disclaimer: 'text-[13px] leading-relaxed text-ink-soft',
 } as const
 
 // The footer's "About and legal" links, in order: the page address and its element id.

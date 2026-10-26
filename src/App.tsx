@@ -10,7 +10,7 @@ import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 const InfoPage = lazy(() => import('./pages/InfoPage'))
-const infoPageAddresses = ['/about', '/privacy', '/terms', '/fix-arabic-csv-in-excel']
+const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
 // language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still
@@ -89,7 +89,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   }, [confirmDiscardEdits])
 
   function openFile(file: File, fileContents: ArrayBuffer) {
-    setOpenedFile({ file, contents: fileContents })
+    setOpenedFile({ file, contents: fileContents, openedFrom: path })
     setFileKey((currentKey) => currentKey + 1)
     openedFilePathRef.current = localizePath(locale, getFileViewPath(file.name))
     window.history.pushState({ fromHomePage: true }, '', openedFilePathRef.current)
@@ -99,7 +99,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   // Another file on the same file page: no new history entry, but the address follows the new file's type. The new key gives
   // the page a fresh edit session and mode.
   function replaceFile(file: File, fileContents: ArrayBuffer) {
-    setOpenedFile({ file, contents: fileContents })
+    setOpenedFile({ file, contents: fileContents, openedFrom: path })
     setFileKey((currentKey) => currentKey + 1)
     openedFilePathRef.current = localizePath(locale, getFileViewPath(file.name))
     window.history.replaceState(window.history.state, '', openedFilePathRef.current)

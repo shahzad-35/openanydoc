@@ -1,5 +1,4 @@
 import type { ReactNode } from 'react'
-import { guidePages } from '../guides'
 import { localizePath, useT } from '../i18n'
 import { CONTACT_EMAIL } from '../legalContent'
 import { footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
@@ -81,7 +80,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
                     </PageLink>
                   </li>
                 ))}
-              {Object.keys(guidePages.en)
+              {['/guides']
                 .filter((address) => address !== currentPath)
                 .map((address) => (
                   <li key={address} className={footerClasses.item}>

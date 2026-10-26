@@ -4,3 +4,23 @@
 /excel-viewer /en/excel-viewer 301
 /json-viewer /en/json-viewer 301
 /txt-viewer /en/txt-viewer 301
+
+# Addresses that exist only while a file is open (/en/view-csv ...): the file lives in memory, so after a reload there is nothing to show. Go to that format's page (302).
+/en/view-csv /en/csv-viewer 302
+/en/view-text /en/txt-viewer 302
+/en/view-json /en/json-viewer 302
+/en/view-excel /en/excel-viewer 302
+/en/view-word /en 302
+/en/view-pdf /en 302
+/en/view-powerpoint /en 302
+/en/view-file /en 302
+/en/view /en 302
+/ar/view-csv /ar/csv-viewer 302
+/ar/view-text /ar/txt-viewer 302
+/ar/view-json /ar/json-viewer 302
+/ar/view-excel /ar/excel-viewer 302
+/ar/view-word /ar 302
+/ar/view-pdf /ar 302
+/ar/view-powerpoint /ar 302
+/ar/view-file /ar 302
+/ar/view /ar 302

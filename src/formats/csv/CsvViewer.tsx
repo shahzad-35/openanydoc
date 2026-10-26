@@ -765,6 +765,14 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     const toastId = showSiteToast({ message: excelCopyReason, kind: 'info', action: { label: excelCopyButtonLabel, onClick: () => downloadExcelCopyRef.current() } })
     return () => dismissSiteToast(toastId)
   }, [isPhone, offersExcelCopy, excelCopyReason, excelCopyButtonLabel, showSiteToast, dismissSiteToast])
+  // Opened from the large-CSV page: say how to cut the file down for Excel once it is on screen.
+  const largeModeHint = t('csv.largeMode.hint')
+  const isLargeModeFileShown = openedFile.openedFrom === '/large-csv-viewer' && readableCsv !== null
+  useEffect(() => {
+    if (!isLargeModeFileShown) return
+    const toastId = showSiteToast({ message: largeModeHint, kind: 'info', seconds: 12 })
+    return () => dismissSiteToast(toastId)
+  }, [isLargeModeFileShown, largeModeHint, showSiteToast, dismissSiteToast])
 
   // ---------------------------------------------------------------- reading options
   async function changeReading(change: () => void) {
@@ -2296,7 +2304,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   )
 
   return (
-    <div id="csv-workbench" className={isDockOpen ? undefined : 'dock-closed'} style={{ '--dock-w': `${dockWidthPx}px` } as CSSProperties}>
+    <div id="csv-workbench" data-opened-from={openedFile.openedFrom?.slice(1)} className={isDockOpen ? undefined : 'dock-closed'} style={{ '--dock-w': `${dockWidthPx}px` } as CSSProperties}>
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: ICON_SPRITE }} />
 
       <header id="top-bar">

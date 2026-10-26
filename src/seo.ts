@@ -8,6 +8,8 @@
 
 export const SITE_ORIGIN = 'https://www.openanydoc.com'
 export const SITE_NAME = 'OpenAnyDoc'
+export const AUTHOR_NAME = 'Shahzad Ali'
+export const REPOSITORY_URL = 'https://github.com/shahzad-35/openanydoc'
 
 type Locale = 'en' | 'ar'
 
@@ -21,7 +23,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     '/': {
       title: 'Free Online File Viewer and Editor, No Upload – OpenAnyDoc',
       description: 'Free online file viewer and editor: open CSV, Excel (XLSX), JSON and TXT files without software and edit them in your browser. Private: no upload, no sign-up.',
-      heading: 'Open any file. Upload nothing.',
+      heading: 'Free online file viewer and editor: open any file, upload nothing',
       intro: 'Drop a CSV, Excel, JSON or text file and it opens right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
     },
     '/csv-viewer': {
@@ -112,12 +114,40 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Excel guesses the wrong encoding when a UTF-8 file has no byte order mark. Here is what happens, and three ways to fix it.',
       linkText: 'Fix broken Arabic in a CSV',
     },
+    '/csv-opens-in-one-column': {
+      title: 'CSV Opens in One Column in Excel? Fix the Delimiter',
+      description: 'Excel puts a whole CSV row into one cell when the file\'s separator is not the one your region uses. Why it happens and three fixes, one free in your browser.',
+      heading: 'CSV opens in one column in Excel: how to fix the delimiter',
+      intro: 'Excel splits a CSV on your region\'s list separator, not on commas. Here is why the file lands in column A and three ways to fix it.',
+      linkText: 'CSV opens in one column',
+    },
+    '/csv-too-big-for-excel': {
+      title: 'CSV Too Big for Excel? The Row Limit and What to Do',
+      description: 'A worksheet stops at 1,048,576 rows and big CSV files freeze Excel. Three ways to open, cut down or load a large CSV, one of them free with nothing uploaded.',
+      heading: 'CSV too big for Excel: the 1,048,576-row limit and what to do',
+      intro: 'A worksheet holds 1,048,576 rows and large files freeze Excel long before that. Here is why, and how to open, cut down or load the file anyway.',
+      linkText: 'CSV too big for Excel',
+    },
+    '/json-unexpected-token': {
+      title: 'JSON Unexpected Token Error: Find the Line and Fix It',
+      description: 'Unexpected token in JSON means the parser hit something the format forbids: a trailing comma, a quote, HTML. What each token means, where to look, and the fix.',
+      heading: 'JSON "unexpected token" errors: find the line and fix it',
+      intro: 'The parser stopped at a character JSON does not allow. Here is what each token means, how to find the exact line, and how to fix it.',
+      linkText: 'JSON unexpected token',
+    },
+    '/guides': {
+      title: 'Guides: Fix CSV, Excel and JSON File Problems',
+      description: 'Short, practical guides to the problems people hit with CSV, Excel and JSON files: broken Arabic, one-column CSVs, files too big for Excel, JSON syntax errors.',
+      heading: 'Guides',
+      intro: 'Practical answers to common file problems, each with the free tool that fixes it in your browser.',
+      linkText: 'Guides',
+    },
   },
   ar: {
     '/': {
       title: 'عارض ملفات اون لاين مجاني – فتح الملفات بدون برامج',
       description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV وExcel وJSON وTXT وعدّلها في متصفحك. فتح الملفات بدون برامج وبدون تسجيل، وملفاتك لا تُرفع ولا تغادر جهازك أبدًا.',
-      heading: 'افتح أي ملف. لا ترفع شيئًا.',
+      heading: 'عارض ومحرر ملفات اون لاين مجاني: افتح أي ملف بدون رفع',
       intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا وسيُفتح هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
     },
     '/csv-viewer': {
@@ -208,6 +238,34 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'يخمّن Excel ترميزًا خاطئًا عندما يخلو ملف UTF-8 من علامة ترتيب البايتات. إليك ما يحدث وثلاث طرق لإصلاحه.',
       linkText: 'إصلاح العربية المشوّهة في CSV',
     },
+    '/csv-opens-in-one-column': {
+      title: 'ملف CSV يُفتح في عمود واحد في Excel؟ هكذا تصلح الفاصل',
+      description: 'يضع Excel صف CSV كاملًا في خلية واحدة عندما يستخدم الملف فاصلًا غير فاصل منطقتك. إليك سبب المشكلة وثلاثة حلول عملية، أحدها مجاني في متصفحك ولا يرفع ملفك.',
+      heading: 'ملف CSV يُفتح في عمود واحد في Excel: كيف تصلح الفاصل',
+      intro: 'يقسّم Excel ملف CSV على فاصل القائمة في منطقتك لا على الفواصل. إليك لماذا يستقر الملف في العمود A وثلاث طرق لإصلاحه.',
+      linkText: 'ملف CSV في عمود واحد',
+    },
+    '/csv-too-big-for-excel': {
+      title: 'ملف CSV أكبر من أن يفتحه Excel؟ حد الصفوف وما تفعله',
+      description: 'تتوقف ورقة العمل عند 1,048,576 صفًا وتجمّد ملفات CSV الكبيرة Excel. ثلاث طرق لفتح ملف CSV كبير أو اقتطاعه أو تحميله، إحداها مجانية في متصفحك ولا ترفع شيئًا.',
+      heading: 'ملف CSV أكبر من أن يفتحه Excel: حد 1,048,576 صفًا وما تفعله',
+      intro: 'تتسع ورقة العمل لـ 1,048,576 صفًا، وتجمّد الملفات الكبيرة Excel قبل ذلك بكثير. إليك السبب وكيف تفتح الملف أو تقتطعه أو تحمّله.',
+      linkText: 'ملف CSV أكبر من Excel',
+    },
+    '/json-unexpected-token': {
+      title: 'خطأ JSON Unexpected Token: اعثر على السطر وأصلحه',
+      description: 'يعني Unexpected token في JSON أن المحلل صادف ما تمنعه الصيغة: فاصلة زائدة أو علامة اقتباس أو HTML. ماذا يعني كل رمز، وأين تبحث عنه، وكيف تصلحه مجانًا في متصفحك.',
+      heading: 'أخطاء JSON "unexpected token": اعثر على السطر وأصلحه',
+      intro: 'توقف المحلل عند حرف لا يسمح به JSON. إليك ما يعنيه كل رمز، وكيف تعثر على السطر بالضبط، وكيف تصلحه.',
+      linkText: 'خطأ JSON unexpected token',
+    },
+    '/guides': {
+      title: 'أدلة: حل مشكلات ملفات CSV وExcel وJSON',
+      description: 'أدلة قصيرة وعملية للمشكلات التي يصطدم بها الناس مع ملفات CSV وExcel وJSON: العربية المشوّهة، وملف CSV في عمود واحد، وملف أكبر من Excel، وأخطاء صياغة JSON.',
+      heading: 'الأدلة',
+      intro: 'إجابات عملية لمشكلات الملفات الشائعة، مع الأداة المجانية التي تحلها في متصفحك.',
+      linkText: 'الأدلة',
+    },
   },
 }
 
@@ -216,7 +274,7 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/fix-arabic-csv-in-excel']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
 
 export function getShareImage(locale: Locale, address: string) {
   const imageAddress = pagesWithShareImage.includes(address) ? address : '/'

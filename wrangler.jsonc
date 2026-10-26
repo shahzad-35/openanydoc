@@ -9,7 +9,8 @@
     "binding": "ASSETS",
     // Pages live in dist/en/csv-viewer/index.html; serve them at /en/csv-viewer (the canonical address) and redirect /en/csv-viewer/ to it.
     "html_handling": "drop-trailing-slash",
-    "not_found_handling": "single-page-application",
+    // Unknown addresses get the nearest 404.html (dist/404.html, dist/ar/404.html) with status 404, not the home page with 200 (a soft 404 to search engines).
+    "not_found_handling": "404-page",
     "run_worker_first": ["/"]
   }
 }
