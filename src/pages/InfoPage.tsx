@@ -29,7 +29,7 @@ function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavig
     if (!link) return part
     if (link.path.startsWith('https://')) {
       return (
-        <a key={position} id={`info-link-${new URL(link.path).hostname.split('.')[0]}`} href={link.path} rel="noopener" className={inlineLinkClassName}>
+        <a key={position} id={`info-link-${new URL(link.path).hostname.split('.')[0]}`} href={link.path} target="_blank" rel="noopener" className={inlineLinkClassName}>
           {part}
         </a>
       )

@@ -1238,6 +1238,8 @@ await test('following links and switching language updates the title, descriptio
   await evaluate(`document.querySelector('#footer-link-about').click()`)
   await waitFor(`location.pathname === '/en/about' && document.querySelector('#info-page')`, 'the About page')
   await expectHeadOfBuiltPage('/en/about')
+  const githubLink = await evaluate(`(() => { const link = document.querySelector('#info-link-github'); return link && { target: link.target, rel: link.rel } })()`)
+  expect(githubLink?.target === '_blank' && githubLink.rel.includes('noopener'), `the About page's GitHub link is ${JSON.stringify(githubLink)}; it should open in a new tab`)
   await evaluate(`document.querySelector('#language-switch-link').click()`)
   await waitFor(`location.pathname === '/ar/about' && document.documentElement.dir === 'rtl'`, 'the Arabic About page')
   await expectHeadOfBuiltPage('/ar/about')

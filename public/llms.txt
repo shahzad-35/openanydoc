@@ -1,0 +1,39 @@
+# OpenAnyDoc
+
+> Free online viewer and editor for CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files. The file is read in the browser and never uploaded: no server sees it, no account, no cookies, no analytics. English and Arabic. Open source (MIT).
+
+How it keeps files private: the site's Content-Security-Policy is `default-src 'self'; connect-src 'self'`, so the browser refuses any request to another origin, and an automated test suite fails the build if any page makes a network request or writes browser storage beyond the theme choice. Anyone can confirm this in the browser's Network tab while opening a file.
+
+What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices. Files download back in their own format. Word, PDF and PowerPoint are not supported yet.
+
+## Pricing
+
+- Free. No plans, no ads, no account. The source is public under the MIT licence and the built site can be hosted on an internal network.
+
+## Tools
+
+- [CSV viewer and editor](https://www.openanydoc.com/en/csv-viewer): open, search, sort, filter, edit and download CSV and TSV files
+- [Excel viewer and editor](https://www.openanydoc.com/en/excel-viewer): XLSX, XLS, XLSM and ODS workbooks with formulas and styles
+- [JSON viewer](https://www.openanydoc.com/en/json-viewer): tree, table and text views
+- [JSON formatter](https://www.openanydoc.com/en/json-formatter): pretty print with 1 to 8 spaces or tabs, minify, sort keys
+- [JSON validator](https://www.openanydoc.com/en/json-validator): errors with line and column, repair of common mistakes
+- [TXT viewer and editor](https://www.openanydoc.com/en/txt-viewer): line numbers, find and replace, encodings and line endings
+- [Large CSV viewer](https://www.openanydoc.com/en/large-csv-viewer): files beyond Excel's row limit
+- [TSV viewer](https://www.openanydoc.com/en/tsv-viewer)
+- [XLS viewer](https://www.openanydoc.com/en/xls-viewer): legacy Excel 97-2003 files
+
+## Guides
+
+- [Why your CSV shows broken Arabic text in Excel](https://www.openanydoc.com/en/fix-arabic-csv-in-excel)
+- [CSV opens in one column in Excel: how to fix the delimiter](https://www.openanydoc.com/en/csv-opens-in-one-column)
+- [CSV too big for Excel: the 1,048,576-row limit and what to do](https://www.openanydoc.com/en/csv-too-big-for-excel)
+- [JSON "unexpected token" errors: find the line and fix it](https://www.openanydoc.com/en/json-unexpected-token)
+- [All guides](https://www.openanydoc.com/en/guides)
+
+## About
+
+- [About OpenAnyDoc](https://www.openanydoc.com/en/about)
+- [Privacy](https://www.openanydoc.com/en/privacy)
+- [Terms](https://www.openanydoc.com/en/terms)
+- [Source code on GitHub](https://github.com/shahzad-35/openanydoc)
+- [Arabic site](https://www.openanydoc.com/ar)
