@@ -244,7 +244,7 @@ const iconPaths: Record<string, ReactNode> = {
 // inspector on the other, linked both ways, and a status bar with the document's stats and a path query. It fills the whole
 // screen (the format is marked `ownsWholePage`). The file is parsed in a Web Worker; edits are kept as the parsed document
 // (changing a node copies only the path to it), so undo stays small.
-export default function JsonViewer({ openedFile, session: untypedSession, onOpenAnotherFile, onClose }: FormatViewerProps) {
+export default function JsonViewer({ openedFile, session: untypedSession, onOpenAnotherFile, onClose, onOpenConvertedFile }: FormatViewerProps) {
   const { locale, t, tp } = useT()
   const session = untypedSession as EditSession<JsonEdits>
   const edits = session.edits
@@ -282,7 +282,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   const [isFindOpen, setIsFindOpen] = useState(false)
   const [findText, setFindText] = useState('')
   const [replaceText, setReplaceText] = useState('')
-  const [openMenu, setOpenMenu] = useState<'indent' | 'copy' | 'more' | null>(null)
+  const [openMenu, setOpenMenu] = useState<'indent' | 'copy' | 'more' | 'convert' | null>(null)
   const [chosenIndent, setChosenIndent] = useState<Exclude<JsonIndent, 0>>(2)
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
   const [toast, setToast] = useState({ message: '', isShown: false })
@@ -681,17 +681,33 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     }
   }
 
-  async function downloadDocument() {
+  // The JSON as Download saves it, with typing in the text pane committed first; null when that typing is not valid JSON.
+  async function buildDocumentText() {
     const hasUncommittedTyping = showText && latestDraftRef.current !== codeText
     if (hasUncommittedTyping) {
       const typingError = await commitDraft(latestDraftRef.current)
       if (typingError) {
         setIsGoToErrorRequested(true)
-        return
+        return null
       }
     }
-    const fileText = hasUncommittedTyping ? latestDraftRef.current : buildJsonDownload(edits, { originalText })
-    downloadTextFile(buildDownloadName(fileName, hasUncommittedTyping || session.changeCount > 0, null), fileText, 'application/json;charset=utf-8')
+    return { fileText: hasUncommittedTyping ? latestDraftRef.current : buildJsonDownload(edits, { originalText }), hasUncommittedTyping }
+  }
+
+  async function downloadDocument() {
+    const documentText = await buildDocumentText()
+    if (!documentText) return
+    downloadTextFile(buildDownloadName(fileName, documentText.hasUncommittedTyping || session.changeCount > 0, null), documentText.fileText, 'application/json;charset=utf-8')
+  }
+
+  // The JSON as Download would save it, converted to CSV and opened in the CSV viewer.
+  async function convertToCsv() {
+    const documentText = await buildDocumentText()
+    if (!documentText) return
+    const { convertForViewer } = await import('../conversion')
+    const result = await convertForViewer(new File([documentText.fileText], fileName, { type: 'application/json' }), 'json', 'csv', locale)
+    if ('error' in result) showToast(result.error)
+    else onOpenConvertedFile(result.file)
   }
 
   function replaceNextInText() {
@@ -1470,6 +1486,38 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         <button className="btn icon" type="button" id="fullscreen-button" aria-label={t(isFullscreen ? 'json.toolbar.exitFullscreen' : 'json.toolbar.fullscreen')} title={t(isFullscreen ? 'json.toolbar.exitFullscreen' : 'json.toolbar.fullscreen')} onClick={() => void toggleFullscreen()}>
           <SpriteIcon name="expand" />
         </button>
+        <span className="split-btn">
+          <button
+            className="btn"
+            type="button"
+            id="convert-button"
+            aria-label={t('convert.menuHeading')}
+            aria-haspopup="menu"
+            aria-expanded={openMenu === 'convert'}
+            aria-controls="convert-button-menu"
+            onClick={() => setOpenMenu(openMenu === 'convert' ? null : 'convert')}
+          >
+            <SpriteIcon name="replace" />
+            <span className="convert-label">{t('convert.menuHeading')}</span>
+            <SpriteIcon name="chev-down" isSmall />
+          </button>
+          {openMenu === 'convert' && (
+            <div className="menu right" id="convert-button-menu" role="menu">
+              <button
+                role="menuitem"
+                type="button"
+                id="convert-button-menu-to-csv"
+                onClick={() => {
+                  setOpenMenu(null)
+                  void convertToCsv()
+                }}
+              >
+                <SpriteIcon name="file" isSmall />
+                {t('convert.toCsv')}
+              </button>
+            </div>
+          )}
+        </span>
         <LanguageSwitcher className="btn" />
         <span className="split-btn">
           <button

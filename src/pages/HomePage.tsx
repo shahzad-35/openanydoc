@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import DropPanel from '../components/DropPanel'
 import FormatGuide from '../components/FormatGuide'
 import LanguageSwitcher from '../components/LanguageSwitcher'
@@ -14,6 +14,7 @@ import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
+import { Notice } from '../components/Messages'
 
 function setMetaTag(keyAttribute: 'name' | 'property', key: string, content: string) {
   let tag = document.head.querySelector(`meta[${keyAttribute}="${key}"]`)
@@ -65,7 +66,8 @@ export function usePageHead(address: string, title: string, description: string)
 
 // The whole screen is the drop target: a file dropped anywhere on the page opens in its viewer. The home page is the Toy Blocks
 // landing page (hero with the simulated demo, stats, shortcuts, formats, privacy, questions, closing call); with `toolViewer` it
-// is that format's own page (/json-viewer ...): the same hero for one format, with that page's guide under it.
+// is that format's own page (/json-viewer ...): the same hero for one format, with that page's guide under it. On a conversion page
+// (/csv-to-excel ...) the chosen file is converted at once and the result opens in the viewer of its new format.
 export default function HomePage({
   onFileLoaded,
   onNavigate,
@@ -87,7 +89,30 @@ export default function HomePage({
 }) {
   const { locale, t } = useT()
   const isMac = useIsMacKeyboard()
-  const intake = useFileIntake({ acceptedExtensions: toolViewer?.extensions ?? supportedExtensions, onFileLoaded, handoffFile, onHandoffConsumed })
+  // What a conversion page shows while it converts, or why it could not; it belongs to that page (`address`).
+  const [conversionState, setConversionState] = useState<{ address: string; errorMessage: string | null } | null>(null)
+  const convertTo = toolViewer?.convertTo
+
+  async function convertAndOpen(file: File) {
+    if (!toolViewer || !convertTo) return
+    const conversionAddress = toolViewer.toolPath as string
+    setConversionState({ address: conversionAddress, errorMessage: null })
+    const { convertForViewer } = await import('../formats/conversion')
+    const result = await convertForViewer(file, toolViewer.id, convertTo, locale)
+    if ('error' in result) {
+      setConversionState({ address: conversionAddress, errorMessage: result.error })
+      return
+    }
+    setConversionState(null)
+    onFileLoaded(result.file, await result.file.arrayBuffer())
+  }
+
+  const intake = useFileIntake({
+    acceptedExtensions: toolViewer?.extensions ?? supportedExtensions,
+    onFileLoaded: convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
+    handoffFile,
+    onHandoffConsumed,
+  })
 
   // Each page gets its own title and description, in the page's language, for search results and browser tabs.
   const address = toolViewer?.toolPath ?? '/'
@@ -146,10 +171,21 @@ export default function HomePage({
                 onNavigate={onNavigate}
                 onOpenInViewer={onOpenInViewer}
                 showExtensions={!isHomePage}
+                showOtherFormats={!convertTo}
                 pasteHint={isHomePage ? t('hero.pasteHint', { shortcut: isMac ? '⌘' : 'Ctrl' }) : undefined}
               />
             </div>
           </div>
+          {conversionState?.address === address && (
+            <div id="conversion-messages" aria-live="polite" className="mx-auto mt-6 max-w-[640px] text-center">
+              {conversionState.errorMessage === null && (
+                <p id="conversion-status" role="status" className="font-medium text-ink-soft">
+                  {t('convert.converting')}
+                </p>
+              )}
+              <Notice id="conversion-error" kind="error" role="alert" className="font-medium text-danger" message={conversionState.errorMessage ?? ''} />
+            </div>
+          )}
           {isHomePage && (
             <div className="mt-12 md:mt-16">
               <DemoStage />

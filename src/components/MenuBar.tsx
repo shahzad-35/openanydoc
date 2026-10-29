@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
-import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { useT } from '../i18n'
 import './menuBar.css'
 
@@ -9,7 +9,11 @@ import './menuBar.css'
 // popover in the browser's top layer, so nothing on the page covers it. On a phone the bar is one Menu button that opens the
 // same menus as a bottom sheet with the list of menu names first.
 //
-// Ids: a menu's button is `menu-<menu id>`, its open list `menu-<menu id>-menu`, and an action in it `menu-<menu id>-<item id>`.
+// A submenu (Format › Font) opens in place of its menu, with a row at the top that goes back (Left in English, Right in Arabic,
+// or Escape, do the same).
+//
+// Ids: a menu's button is `menu-<menu id>`, its open list `menu-<menu id>-menu`, and an action in it `menu-<menu id>-<item id>`;
+// in a submenu, `menu-<menu id>-<submenu id>-<item id>`.
 // Links and notes keep the id they are given (the legal links are `menu-link-privacy`, `menu-link-terms`, `menu-disclaimer` on
 // every page). Ids never come from a translated label.
 
@@ -24,21 +28,27 @@ export type MenuAction = {
   isChecked?: boolean
   isDisabled?: boolean
   isDanger?: boolean
+  // A colour shown as a small square in place of the icon (a colour picker's items), as a hex value such as "FF0000".
+  swatch?: string
   onSelect: () => void
 }
 export type MenuLink = { id: string; label: string; href: string; icon?: string; external?: boolean }
 export type MenuNote = { id: string; note: string }
-export type MenuEntry = MenuAction | MenuLink | MenuNote | { heading: string } | 'separator'
+export type MenuSubmenu = { id: string; label: string; icon?: string; isDisabled?: boolean; items: MenuEntry[] }
+export type MenuEntry = MenuAction | MenuLink | MenuNote | MenuSubmenu | { heading: string } | 'separator'
 export type MenuDefinition = { id: string; label: string; items: MenuEntry[] }
 
-type OpenMenu = { menuId: string | null } // menuId null: the phone's list of menu names
+// menuId null: the phone's list of menu names. submenuId: the submenu shown in place of the menu.
+type OpenMenu = { menuId: string | null; submenuId?: string }
 const MENU_ITEM_SELECTOR = '[role^="menuitem"]:not([disabled])'
 
 function isRightToLeftPage() {
   return document.documentElement.dir === 'rtl'
 }
 
-export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefinition[]; isCompact: boolean; label: string }) {
+// `tools`: icon buttons drawn in the same row after the menu names (the Excel page's most-used formatting tools), as a toolbar
+// of their own beside the menubar.
+export default function MenuBar({ menus, isCompact, label, tools }: { menus: MenuDefinition[]; isCompact: boolean; label: string; tools?: ReactNode }) {
   const { t } = useT()
   const [openMenu, setOpenMenu] = useState<OpenMenu | null>(null)
   // Roving tabindex: one menu button is in the Tab order.
@@ -46,16 +56,31 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
   const barRef = useRef<HTMLElement>(null)
   const popRef = useRef<HTMLDivElement>(null)
   const openerRef = useRef<HTMLElement | null>(null)
-  const focusItemOnOpenRef = useRef<'first' | 'last' | null>(null)
+  // Which item takes the focus once the menu shows: the first, the last, or the one with this id.
+  const focusItemOnOpenRef = useRef<string | null>(null)
 
   const menuIds = menus.map((menu) => menu.id)
   const openDefinition = openMenu?.menuId ? menus.find((menu) => menu.id === openMenu.menuId) : undefined
+  const openSubmenu = openMenu?.submenuId
+    ? openDefinition?.items.find((entry): entry is MenuSubmenu => typeof entry === 'object' && 'items' in entry && entry.id === openMenu.submenuId)
+    : undefined
 
-  function open(menuId: string | null, focusItem: 'first' | 'last' | null = null) {
+  function open(menuId: string | null, focusItem: string | null = null) {
     openerRef.current = document.getElementById(isCompact ? 'menu-button' : `menu-${menuId}`)
     focusItemOnOpenRef.current = focusItem
     setOpenMenu({ menuId })
     if (menuId) setTabbableMenuId(menuId)
+  }
+
+  function openSubmenuOf(menuId: string, submenuId: string) {
+    focusItemOnOpenRef.current = 'first'
+    setOpenMenu({ menuId, submenuId })
+  }
+
+  // Back from a submenu to its menu, with the focus on the row that opened it.
+  function closeSubmenu(menuId: string, submenuId: string) {
+    focusItemOnOpenRef.current = `menu-${menuId}-${submenuId}`
+    setOpenMenu({ menuId })
   }
 
   function close(returnFocus: boolean) {
@@ -88,7 +113,10 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
     focusItemOnOpenRef.current = null
     if (focusItem) {
       const items = pop.querySelectorAll<HTMLElement>(MENU_ITEM_SELECTOR)
-      items[focusItem === 'first' ? 0 : items.length - 1]?.focus()
+      // "First" is the first choice, after the row that goes back.
+      const firstChoice = Array.from(items).find((item) => !item.classList.contains('menu-back')) ?? items[0]
+      const itemToFocus = focusItem === 'first' ? firstChoice : focusItem === 'last' ? items[items.length - 1] : document.getElementById(focusItem)
+      itemToFocus?.focus()
     }
   }, [openMenu, isCompact])
 
@@ -121,9 +149,12 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
     const position = items.indexOf(document.activeElement as HTMLElement)
     const isRightToLeft = isRightToLeftPage()
     const menuStep = event.key === 'ArrowRight' ? (isRightToLeft ? -1 : 1) : event.key === 'ArrowLeft' ? (isRightToLeft ? 1 : -1) : 0
+    const focusedSubmenuId = (document.activeElement as HTMLElement | null)?.dataset.submenu
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') items[(position + (event.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length]?.focus()
     else if (event.key === 'Home') items[0]?.focus()
     else if (event.key === 'End') items[items.length - 1]?.focus()
+    else if (menuStep === 1 && focusedSubmenuId && openMenu?.menuId) openSubmenuOf(openMenu.menuId, focusedSubmenuId)
+    else if ((menuStep === -1 || event.key === 'Escape') && openMenu?.menuId && openMenu.submenuId) closeSubmenu(openMenu.menuId, openMenu.submenuId)
     else if (menuStep && openMenu?.menuId && !isCompact) moveToMenu(openMenu.menuId, menuStep, true)
     else if (event.key === 'Escape') close(true)
     else if (event.key === 'Tab') close(false)
@@ -153,7 +184,37 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
         </p>
       )
     }
-    const icon = entry.icon ? (
+    if ('items' in entry) {
+      return (
+        <button
+          key={entry.id}
+          id={`menu-${menuId}-${entry.id}`}
+          className="mi"
+          type="button"
+          role="menuitem"
+          aria-haspopup="menu"
+          data-submenu={entry.id}
+          disabled={entry.isDisabled}
+          onClick={() => openSubmenuOf(menuId, entry.id)}
+        >
+          {entry.icon ? (
+            <svg className="mi-ico" aria-hidden="true">
+              <use href={`#i-${entry.icon}`} />
+            </svg>
+          ) : (
+            <span className="mi-ico" aria-hidden="true" />
+          )}
+          {entry.label}
+          <svg className="mi-ico mi-chevron mi-submenu-arrow" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m9 6 6 6-6 6" />
+          </svg>
+        </button>
+      )
+    }
+    const icon = 'swatch' in entry && entry.swatch ? (
+      // Menus are drawn only in the browser (never in the prerendered page), so this style is not blocked by the CSP.
+      <span className="mi-ico mi-swatch" style={{ backgroundColor: `#${entry.swatch}` }} aria-hidden="true" />
+    ) : entry.icon ? (
       <svg className="mi-ico" aria-hidden="true">
         <use href={`#i-${entry.icon}`} />
       </svg>
@@ -208,6 +269,19 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
       ))
     }
     if (!openDefinition) return null
+    if (openSubmenu) {
+      return (
+        <>
+          <button id="menu-submenu-back-button" className="mi menu-back" type="button" role="menuitem" onClick={() => closeSubmenu(openDefinition.id, openSubmenu.id)}>
+            <svg className="mi-ico mi-chevron" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m15 6-6 6 6 6" />
+            </svg>
+            {openSubmenu.label}
+          </button>
+          {openSubmenu.items.map((entry, position) => renderEntry(`${openDefinition.id}-${openSubmenu.id}`, entry, position))}
+        </>
+      )
+    }
     return (
       <>
         {isCompact && (
@@ -224,8 +298,7 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
   }
 
   const popId = openMenu ? (openMenu.menuId ? `menu-${openMenu.menuId}-menu` : 'menu-root-menu') : undefined
-  return (
-    <>
+  const menuBar = (
       <nav id="menu-bar" ref={barRef} role="menubar" aria-label={label} className={isCompact ? 'compact' : undefined}>
         {isCompact ? (
           <button id="menu-button" className="menu-top" type="button" role="menuitem" aria-haspopup="menu" aria-expanded={openMenu !== null} aria-controls={popId} onClick={() => (openMenu ? close(false) : open(null))}>
@@ -255,8 +328,21 @@ export default function MenuBar({ menus, isCompact, label }: { menus: MenuDefini
           ))
         )}
       </nav>
+  )
+  return (
+    <>
+      {tools ? (
+        <div id="menu-bar-row">
+          {menuBar}
+          <div id="menu-bar-tools" role="toolbar" aria-label={t('toolbar.label')}>
+            {tools}
+          </div>
+        </div>
+      ) : (
+        menuBar
+      )}
       {openMenu && (
-        <div id={popId} ref={popRef} className={`menu-pop${isCompact ? ' sheet' : ''}`} popover="manual" role="menu" aria-label={openDefinition?.label ?? t('menu.menu')} onKeyDown={handleMenuKeyDown}>
+        <div id={popId} ref={popRef} className={`menu-pop${isCompact ? ' sheet' : ''}`} popover="manual" role="menu" aria-label={openSubmenu?.label ?? openDefinition?.label ?? t('menu.menu')} onKeyDown={handleMenuKeyDown}>
           {renderPopContents()}
         </div>
       )}

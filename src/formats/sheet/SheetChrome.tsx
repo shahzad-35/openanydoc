@@ -4,6 +4,8 @@ import type { KeyboardEvent as ReactKeyboardEvent, ReactNode, Ref } from 'react'
 import { MiniFormatIcon, Wordmark } from '../../components/KitIcon'
 import type { MiniFormat } from '../../components/KitIcon'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
+import { ActionMenu } from '../../components/ToolbarControls'
+import type { MenuItem } from '../../components/ToolbarControls'
 import { useT } from '../../i18n'
 import './sheetChrome.css'
 
@@ -132,10 +134,13 @@ type TopBarProps = {
   onHome: () => void
   isDark: boolean
   onToggleTheme: () => void
+  // The Convert button's choices for the open file (to CSV, to JSON); no button when there are none.
+  convertItems?: MenuItem[]
 }
 
-export function TopBar({ format, fileName, fileSize, isModified, canUndo, canRedo, onUndo, onRedo, canDownload, downloadLabel, downloadTip, onDownload, onHome, isDark, onToggleTheme }: TopBarProps) {
+export function TopBar({ format, fileName, fileSize, isModified, canUndo, canRedo, onUndo, onRedo, canDownload, downloadLabel, downloadTip, onDownload, onHome, isDark, onToggleTheme, convertItems = [] }: TopBarProps) {
   const { t } = useT()
+  const [convertMenuPosition, setConvertMenuPosition] = useState<{ left: number; top: number } | null>(null)
   return (
     <header id="top-bar">
       <button className="brand" type="button" id="home-button" aria-label={t('sheet.home')} onClick={onHome}>
@@ -156,6 +161,25 @@ export function TopBar({ format, fileName, fileSize, isModified, canUndo, canRed
         {t('sheet.privacy')}
       </span>
       <span className="spacer" />
+      {convertItems.length > 0 && (
+        <button
+          className="btn"
+          id="convert-button"
+          type="button"
+          aria-label={t('convert.menuHeading')}
+          aria-haspopup="menu"
+          aria-expanded={convertMenuPosition !== null}
+          onClick={(event) => {
+            const buttonBox = event.currentTarget.getBoundingClientRect()
+            setConvertMenuPosition({ left: document.documentElement.dir === 'rtl' ? buttonBox.right - 224 : buttonBox.left, top: buttonBox.bottom + 4 })
+          }}
+        >
+          <Icon name="replace" />
+          <span className="desk-only">{t('convert.menuHeading')}</span>
+          <Icon name="down" size="xs" />
+        </button>
+      )}
+      {convertMenuPosition && <ActionMenu id="convert-button-menu" ariaLabel={t('convert.menuHeading')} {...convertMenuPosition} items={convertItems} onClose={() => setConvertMenuPosition(null)} />}
       <button className="btn icon" id="undo-button" type="button" aria-label={t('toolbar.undo')} data-tip={t('toolbar.undoTip')} disabled={!canUndo} onClick={onUndo}>
         <Icon name="undo" />
       </button>

@@ -12,8 +12,6 @@
   "redirect.looksLike.json": "This looks like a JSON file.",
   "redirect.looksLike.excel": "This looks like an Excel file.",
   "redirect.open": "Open it in the {format} viewer",
-  "tip.alsoOpens": "OpenAnyDoc also opens and edits {format} files.",
-  "tip.close": "Dismiss tip",
   "footer.whatsNew": "What's new",
   "privacy.newFeaturesHeading": "How we tell you about new features",
   "privacy.newFeaturesText": "Announcements are based on the release date shown to everyone, and nothing is stored on your device or sent anywhere.",
@@ -1340,5 +1338,14 @@
   "guide.updated": "Updated {date}",
   "json.wb.formatterHint": "Shown formatted with 2 spaces. Pick another indent, or Minify, in the bar above; Download saves it that way.",
   "csv.largeMode.hint": "Too big for Excel? Filter the rows you need, then choose Download options and tick \"only the shown rows\".",
-  "excel.legacyNote": "Excel 97-2003 file (.xls): fonts and colours are not shown, and the file is saved as .xls again."
+  "excel.legacyNote": "Excel 97-2003 file (.xls): fonts and colours are not shown, and the file is saved as .xls again.",
+  "convert.menuHeading": "Convert",
+  "convert.toCsv": "Convert to CSV",
+  "convert.toExcel": "Convert to Excel (.xlsx)",
+  "convert.toJson": "Convert to JSON",
+  "convert.readFailed": "This file could not be read. Check that it is not damaged, then choose it again.",
+  "convert.notATable": "Only a list of objects, or a single object, can become a table. This JSON holds something else.",
+  "excel.menu.numberFormat": "Number format",
+  "excel.menu.stylesXlsxOnly": "Fonts, colours, borders and alignment can be changed in .xlsx files only.",
+  "convert.converting": "Converting…"
 }

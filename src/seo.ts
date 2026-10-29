@@ -89,6 +89,41 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'A free XLS viewer online: open an XLS file online, the older Excel 97-2003 format, without Excel and without an account. See every sheet with its values, formulas, number formats and merged cells, edit it and save it as .xls again. Fonts and colours are not shown for .xls files.',
       linkText: 'XLS viewer',
     },
+    '/excel-to-csv': {
+      title: 'Excel to CSV Converter Online – Free XLSX to CSV, No Upload',
+      description: 'Excel to CSV converter online: drop an XLSX, XLS or ODS file and its first sheet opens as a UTF-8 CSV that keeps Arabic text, ready to edit. Free, no upload.',
+      heading: 'Excel to CSV Converter Online',
+      intro: 'Convert Excel to CSV in your browser: drop an XLSX, XLS or ODS file and its first sheet opens as a CSV in the CSV viewer, where you can edit it, pick another delimiter and download it. Arabic text gets the UTF-8 marker Excel needs. Your file never leaves your device.',
+      linkText: 'Excel to CSV',
+    },
+    '/csv-to-excel': {
+      title: 'CSV to Excel Converter Online – Make an XLSX File, Free',
+      description: 'CSV to Excel converter online: drop a CSV or TSV file and it opens as an XLSX workbook with a bold header row and columns sized to fit, ready to edit. Private.',
+      heading: 'CSV to Excel Converter: Make an XLSX File',
+      intro: 'Convert CSV to Excel in your browser: drop a CSV or TSV file and it opens as an .xlsx workbook in the Excel viewer, with a bold header row and each column as wide as its text. Codes with leading zeros stay text. Edit it, then download. Your file never leaves your device.',
+      linkText: 'CSV to Excel',
+    },
+    '/excel-to-json': {
+      title: 'Excel to JSON Converter Online – XLSX to JSON Array, Free',
+      description: 'Excel to JSON converter online: drop an XLSX, XLS or ODS file and its first sheet opens as a JSON array of objects keyed by the header row. Free, no upload.',
+      heading: 'Excel to JSON Converter Online',
+      intro: 'Convert Excel to JSON in your browser: drop a workbook and its first sheet opens in the JSON viewer as an array of objects, one per row, with the header row as keys. Numbers stay numbers and dates become ISO text. Format, copy or download it there. Nothing is uploaded.',
+      linkText: 'Excel to JSON',
+    },
+    '/csv-to-json': {
+      title: 'CSV to JSON Converter Online – Free, Private, No Upload',
+      description: 'CSV to JSON converter online: drop a CSV file and it opens as a JSON array of objects keyed by the header row, ready to format, copy or download. No upload.',
+      heading: 'CSV to JSON Converter Online',
+      intro: 'Convert CSV to JSON in your browser: drop or paste a CSV or TSV file and it opens in the JSON viewer as an array of objects, one per row, with the header row as keys. The delimiter and encoding are detected for you. Your file never leaves your device.',
+      linkText: 'CSV to JSON',
+    },
+    '/json-to-csv': {
+      title: 'JSON to CSV Converter Online – Flatten Nested JSON, Free',
+      description: 'JSON to CSV converter online: turn a JSON array of objects into a CSV table, with nested objects flattened into dot-notation columns like address.city. Private.',
+      heading: 'JSON to CSV Converter: Flatten JSON to a Table',
+      intro: 'Convert JSON to CSV in your browser: drop or paste a JSON array of objects and it opens in the CSV viewer with one row per object. Nested objects become columns such as address.city, and lists become items.0, items.1. Edit, filter and download it there. Nothing is uploaded.',
+      linkText: 'JSON to CSV',
+    },
     '/about': {
       title: 'About OpenAnyDoc – Private Online File Viewer',
       description: 'About OpenAnyDoc, built and run by Shahzad Ali: a free file viewer and editor that runs in your browser and never uploads files. CSV, Excel, JSON and TXT today.',
@@ -213,6 +248,41 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'فتح ملف XLS اون لاين مجانًا، وهي صيغة Excel 97-2003 القديمة، بدون برنامج Excel وبدون حساب. تظهر كل الأوراق بقيمها وصيغها وتنسيقات أرقامها وخلاياها المدمجة، وتعدّلها ثم تحفظها بصيغة .xls من جديد. لا تظهر الخطوط والألوان في ملفات .xls.',
       linkText: 'عارض XLS',
     },
+    '/excel-to-csv': {
+      title: 'تحويل Excel إلى CSV اون لاين – مجانًا وبدون رفع الملف',
+      description: 'تحويل Excel إلى CSV اون لاين مجانًا: أفلت ملف XLSX أو XLS أو ODS فتُفتح ورقته الأولى ملفَّ CSV بترميز UTF-8 يحافظ على النص العربي، جاهزًا للتعديل. بدون رفع.',
+      heading: 'تحويل Excel إلى CSV اون لاين',
+      intro: 'حوّل ملف Excel إلى CSV في متصفحك: أفلت ملف XLSX أو XLS أو ODS فتُفتح ورقته الأولى ملفَّ CSV في عارض CSV، حيث تعدّله وتختار فاصلًا آخر وتنزّله. ويحصل النص العربي على علامة UTF-8 التي يحتاجها Excel. ملفك لا يغادر جهازك.',
+      linkText: 'تحويل Excel إلى CSV',
+    },
+    '/csv-to-excel': {
+      title: 'تحويل CSV إلى Excel اون لاين – إنشاء ملف XLSX مجانًا',
+      description: 'تحويل CSV إلى Excel اون لاين مجانًا: أفلت ملف CSV أو TSV فيُفتح مصنف XLSX بصف عناوين عريض وأعمدة بعرض محتواها، جاهزًا للتعديل. خاص تمامًا، بدون رفع أي ملف.',
+      heading: 'تحويل CSV إلى Excel: أنشئ ملف XLSX',
+      intro: 'حوّل ملف CSV إلى Excel في متصفحك: أفلت ملف CSV أو TSV فيُفتح مصنف .xlsx في عارض Excel، بصف عناوين عريض وكل عمود بعرض نصه. تبقى الأرقام التي تبدأ بصفر نصًا كما هي. عدّله ثم نزّله. ملفك لا يغادر جهازك.',
+      linkText: 'تحويل CSV إلى Excel',
+    },
+    '/excel-to-json': {
+      title: 'تحويل Excel إلى JSON اون لاين – من XLSX إلى JSON مجانًا',
+      description: 'تحويل Excel إلى JSON اون لاين مجانًا: أفلت ملف XLSX أو XLS أو ODS فتُفتح ورقته الأولى مصفوفة كائنات JSON مفاتيحها صف العناوين. بدون رفع أي ملف إلى أي خادم.',
+      heading: 'تحويل Excel إلى JSON اون لاين',
+      intro: 'حوّل ملف Excel إلى JSON في متصفحك: أفلت المصنف فتُفتح ورقته الأولى في عارض JSON مصفوفة كائنات، كائن لكل صف، ومفاتيحها من صف العناوين. تبقى الأرقام أرقامًا وتصبح التواريخ نصًا بصيغة ISO. نسّقه أو انسخه أو نزّله هناك. لا يُرفع شيء.',
+      linkText: 'تحويل Excel إلى JSON',
+    },
+    '/csv-to-json': {
+      title: 'تحويل CSV إلى JSON اون لاين – مجاني وخاص وبدون رفع',
+      description: 'تحويل CSV إلى JSON اون لاين مجانًا: أفلت ملف CSV فيُفتح مصفوفة كائنات JSON مفاتيحها صف العناوين، جاهزًا للتنسيق والنسخ والتنزيل. لا يُرفع أي ملف أبدًا.',
+      heading: 'تحويل CSV إلى JSON اون لاين',
+      intro: 'حوّل ملف CSV إلى JSON في متصفحك: أفلت ملف CSV أو TSV أو الصقه فيُفتح في عارض JSON مصفوفة كائنات، كائن لكل صف، ومفاتيحها من صف العناوين. يُكتشف الفاصل والترميز تلقائيًا. ملفك لا يغادر جهازك.',
+      linkText: 'تحويل CSV إلى JSON',
+    },
+    '/json-to-csv': {
+      title: 'تحويل JSON إلى CSV اون لاين – تسطيح JSON المتداخل مجانًا',
+      description: 'تحويل JSON إلى CSV اون لاين مجانًا: حوّل مصفوفة كائنات JSON إلى جدول CSV، وتصبح الكائنات المتداخلة أعمدة بأسماء نقطية مثل address.city. بدون رفع أي ملف.',
+      heading: 'تحويل JSON إلى CSV: من JSON إلى جدول',
+      intro: 'حوّل JSON إلى CSV في متصفحك: أفلت أو الصق مصفوفة كائنات JSON فتُفتح في عارض CSV بصف لكل كائن. تصبح الكائنات المتداخلة أعمدة مثل address.city، والقوائم أعمدة مثل items.0 وitems.1. عدّله وصفِّه ونزّله هناك. لا يُرفع شيء.',
+      linkText: 'تحويل JSON إلى CSV',
+    },
     '/about': {
       title: 'عن OpenAnyDoc – عارض ملفات خاص اون لاين',
       description: 'عن OpenAnyDoc الذي يبنيه ويديره شهزاد علي: عارض ومحرر ملفات مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT، وقريبًا Word وPDF.',
@@ -274,7 +344,7 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
 
 export function getShareImage(locale: Locale, address: string) {
   const imageAddress = pagesWithShareImage.includes(address) ? address : '/'

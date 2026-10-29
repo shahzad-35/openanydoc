@@ -2,12 +2,12 @@
 /* oxlint-disable react/only-export-components */
 import { useEffect, useRef, useState } from 'react'
 import type { FocusEventHandler, KeyboardEventHandler, ReactNode } from 'react'
-import { compactSecondaryButtonClassName, primaryButtonClassName, textControlClassName } from '../../buttonStyles'
+import { textControlClassName } from '../../buttonStyles'
 import { toElementId } from '../../elementId'
 import { isolateText, translate, translatePlural, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
 import FindReplaceBar from '../../components/FindReplaceBar'
-import type { MenuDefinition } from '../../components/MenuBar'
+import type { MenuDefinition, MenuEntry } from '../../components/MenuBar'
 import ModalDialog from '../../components/ModalDialog'
 import { ActionMenu, Icon, IconButton, IconMenuButton, iconButtonClassName } from '../../components/ToolbarControls'
 import { CellInput } from '../DataTable'
@@ -118,9 +118,6 @@ function currencyFormat({ prefix, decimals }: { prefix: string; decimals: number
   return `"${prefix}"#,##0${decimals > 0 ? `.${'0'.repeat(decimals)}` : ''}`
 }
 
-// The English text of a menu item that names a count ("Delete 3 rows"): its element id is made from it, so ids stay the same in every language.
-const countedItemId = (verb: string, count: number, noun: string) => toElementId(`${verb} ${count.toLocaleString('en')} ${noun}${count === 1 ? '' : 's'}`, true)
-
 // ---------------------------------------------------------------- menus
 
 const COLOR_CHOICES: { hexColor: string; nameKey: MessageKey }[] = [
@@ -135,6 +132,7 @@ const COLOR_CHOICES: { hexColor: string; nameKey: MessageKey }[] = [
   { hexColor: '0070C0', nameKey: 'excel.toolbar.colorBlue' },
   { hexColor: '7030A0', nameKey: 'excel.toolbar.colorPurple' },
 ]
+
 
 const COLOR_MENU_WIDTH_PX = 176 // the menu's w-44
 
@@ -243,16 +241,13 @@ function AlignIcon({ alignment }: { alignment: 'left' | 'center' | 'right' }) {
   )
 }
 
-// Like a Google Sheets toolbar: icon buttons for number format, text style, colours, alignment and merge, then icon menus for
-// rows, columns, cells and sheets. All of it sits in the page's edit toolbar row, after Undo and Redo.
-function ToolbarMenus({ selection, commands }: { selection: unknown; commands: unknown }) {
-  const { t, tp, idFor } = useT()
-  const { hasCell, selectedRowCount, selectedColumnCount, canDeleteSheet, canStyle, isBold, isItalic, isUnderlined, isStruckThrough, alignment, isMerged } =
+// The most-used formatting tools as icons in the menu bar row, after the menu names (everything is also in the menus):
+// number format, text style, colours, borders, alignment and merge.
+function MenuBarTools({ selection, commands }: { selection: unknown; commands: unknown }) {
+  const { t, idFor } = useT()
+  const { hasCell, canStyle, isBold, isItalic, isUnderlined, isStruckThrough, alignment, isMerged } =
     (selection as NonNullable<ExcelSelection> | null) ?? {
       hasCell: false,
-      selectedRowCount: 0,
-      selectedColumnCount: 0,
-      canDeleteSheet: false,
       canStyle: false,
       isBold: false,
       isItalic: false,
@@ -289,14 +284,6 @@ function ToolbarMenus({ selection, commands }: { selection: unknown; commands: u
       <IconButton id={toolbarId('excel.toolbar.moreDecimals')} label={t('excel.toolbar.moreDecimals')} isDisabled={!hasSelection} onClick={() => getActions().changeDecimals(1)}>
         <span dir="ltr" className="text-[11px] font-semibold">.00→</span>
       </IconButton>
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.moreNumberFormats')}
-        label={t('excel.toolbar.moreNumberFormats')}
-        isDisabled={!hasSelection}
-        items={NUMBER_FORMATS.map(({ labelKey, format, idSuffix = '' }) => ({ id: `${idFor(labelKey, true)}${idSuffix}`, label: t(labelKey), onSelect: () => getActions().setNumberFormat(format) }))}
-      >
-        <span className="text-[11px] font-semibold">123</span>
-      </IconMenuButton>
       {divider}
       <IconButton id={toolbarId('excel.toolbar.bold')} label={styledLabel('excel.toolbar.bold')} isPressed={isBold} isDisabled={styleDisabled} onClick={() => getActions().toggleBold()}>
         <span className="font-bold">B</span>
@@ -320,22 +307,6 @@ function ToolbarMenus({ selection, commands }: { selection: unknown; commands: u
         </Icon>
       </ColorMenuButton>
       <IconMenuButton
-        id={toolbarId('excel.toolbar.font')}
-        label={styledLabel('excel.toolbar.font')}
-        isDisabled={styleDisabled}
-        items={FONT_FAMILIES.map((fontName) => ({ id: toElementId(fontName, true), label: fontName, onSelect: () => getActions().setFontFamily(fontName) }))}
-      >
-        <span className="text-[12px] font-semibold">Aa</span>
-      </IconMenuButton>
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.fontSize')}
-        label={styledLabel('excel.toolbar.fontSize')}
-        isDisabled={styleDisabled}
-        items={FONT_SIZES.map((size) => ({ id: String(size), label: String(size), onSelect: () => getActions().setFontSize(size) }))}
-      >
-        <span className="text-[11px] font-semibold">pt</span>
-      </IconMenuButton>
-      <IconMenuButton
         id={toolbarId('excel.toolbar.borders')}
         label={styledLabel('excel.toolbar.borders')}
         isDisabled={styleDisabled}
@@ -355,11 +326,6 @@ function ToolbarMenus({ selection, commands }: { selection: unknown; commands: u
           <path d="M4 12h16" strokeDasharray="2 2" />
         </Icon>
       </IconMenuButton>
-      <IconButton id={toolbarId('excel.toolbar.clearFormatting')} label={styledLabel('excel.toolbar.clearFormatting')} isDisabled={styleDisabled} onClick={() => getActions().clearFormatting()}>
-        <span className="text-[13px]">
-          T<sub className="text-[9px]">x</sub>
-        </span>
-      </IconButton>
       {divider}
       {(
         [
@@ -372,18 +338,6 @@ function ToolbarMenus({ selection, commands }: { selection: unknown; commands: u
           <AlignIcon alignment={side} />
         </IconButton>
       ))}
-      <IconButton id={toolbarId('excel.toolbar.decreaseIndent')} label={styledLabel('excel.toolbar.decreaseIndent')} isDisabled={styleDisabled} onClick={() => getActions().changeIndent(-1)}>
-        <Icon>
-          <path d="M4 6h16M12 10h8M12 14h8M4 18h16" />
-          <path d="m8 9-3 3 3 3" />
-        </Icon>
-      </IconButton>
-      <IconButton id={toolbarId('excel.toolbar.increaseIndent')} label={styledLabel('excel.toolbar.increaseIndent')} isDisabled={styleDisabled} onClick={() => getActions().changeIndent(1)}>
-        <Icon>
-          <path d="M4 6h16M12 10h8M12 14h8M4 18h16" />
-          <path d="m5 9 3 3-3 3" />
-        </Icon>
-      </IconButton>
       <IconButton
         id="toolbar-merge-cells"
         label={t(isMerged ? 'excel.toolbar.unmergeCells' : 'excel.toolbar.mergeCells')}
@@ -398,97 +352,6 @@ function ToolbarMenus({ selection, commands }: { selection: unknown; commands: u
           <path d="m14 9 2 3-2 3" />
         </Icon>
       </IconButton>
-      {divider}
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.rows')}
-        label={t('excel.toolbar.rows')}
-        items={[
-          { id: idFor('excel.menu.insertRowAbove', true), label: t('excel.menu.insertRowAbove'), onSelect: () => getActions().insertRows('above') },
-          { id: idFor('excel.menu.insertRowBelow', true), label: t('excel.menu.insertRowBelow'), onSelect: () => getActions().insertRows('below') },
-          { id: countedItemId('Delete', selectedRowCount, 'row'), label: tp('excel.menu.deleteRows', selectedRowCount), onSelect: () => getActions().deleteRows(), isDisabled: !hasSelection },
-          { id: countedItemId('Clear', selectedRowCount, 'row'), label: tp('excel.menu.clearRows', selectedRowCount), onSelect: () => getActions().clearRows(), isDisabled: !hasSelection },
-        ]}
-      >
-        <Icon>
-          <rect x="3" y="4" width="18" height="16" rx="1" />
-          <path d="M3 10h18" />
-          <path d="M3 15h18" />
-        </Icon>
-      </IconMenuButton>
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.columns')}
-        label={t('excel.toolbar.columns')}
-        items={[
-          { id: idFor('excel.menu.insertColumnLeft', true), label: t('excel.menu.insertColumnLeft'), onSelect: () => getActions().insertColumns('left') },
-          { id: idFor('excel.menu.insertColumnRight', true), label: t('excel.menu.insertColumnRight'), onSelect: () => getActions().insertColumns('right') },
-          { id: countedItemId('Delete', selectedColumnCount, 'column'), label: tp('excel.menu.deleteColumns', selectedColumnCount), onSelect: () => getActions().deleteColumns(), isDisabled: !hasSelection },
-          { id: countedItemId('Clear', selectedColumnCount, 'column'), label: tp('excel.menu.clearColumns', selectedColumnCount), onSelect: () => getActions().clearColumns(), isDisabled: !hasSelection },
-          { id: idFor('excel.menu.columnWidth', true), label: t('excel.menu.columnWidth'), onSelect: () => getActions().openColumnWidth(), isDisabled: !hasSelection },
-        ]}
-      >
-        <Icon>
-          <rect x="3" y="4" width="18" height="16" rx="1" />
-          <path d="M9 4v16" />
-          <path d="M15 4v16" />
-        </Icon>
-      </IconMenuButton>
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.cells')}
-        label={t('excel.toolbar.cells')}
-        items={[
-          { id: idFor('excel.menu.clearCells', true), label: t('excel.menu.clearCells'), onSelect: () => getActions().clearCells(), isDisabled: !hasSelection },
-          { id: idFor('excel.menu.fillDown', true), label: t('excel.menu.fillDown'), onSelect: () => getActions().fillDown(), isDisabled: !hasSelection || selectedRowCount < 2 },
-          { id: idFor('excel.menu.fillRight', true), label: t('excel.menu.fillRight'), onSelect: () => getActions().fillRight(), isDisabled: !hasSelection || selectedColumnCount < 2 },
-        ]}
-      >
-        <Icon>
-          <rect x="4" y="4" width="16" height="16" rx="1" />
-          <path d="M12 4v16" />
-          <path d="M4 12h16" />
-        </Icon>
-      </IconMenuButton>
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.cleanUpText')}
-        label={t('excel.toolbar.cleanUpText')}
-        isDisabled={!hasSelection}
-        items={[
-          { id: idFor('excel.menu.upperCase', true), label: t('excel.menu.upperCase'), onSelect: () => getActions().transformText('upper') },
-          { id: idFor('excel.menu.lowerCase', true), label: t('excel.menu.lowerCase'), onSelect: () => getActions().transformText('lower') },
-          { id: idFor('excel.menu.capitalizeEachWord', true), label: t('excel.menu.capitalizeEachWord'), onSelect: () => getActions().transformText('capitalize') },
-          { id: idFor('excel.menu.trimExtraSpaces', true), label: t('excel.menu.trimExtraSpaces'), onSelect: () => getActions().transformText('trim') },
-        ]}
-      >
-        <span className="text-[11px] font-semibold">Aa</span>
-      </IconMenuButton>
-      <IconButton id={toolbarId('excel.toolbar.insertOrEditLink')} label={t('excel.toolbar.insertOrEditLink')} isDisabled={!hasSelection} onClick={() => getActions().openLink()}>
-        <Icon>
-          <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
-          <path d="M14 10a4 4 0 0 0-5.7 0l-3 3A4 4 0 0 0 11 18.7l1-1" />
-        </Icon>
-      </IconButton>
-      <IconMenuButton
-        id={toolbarId('excel.toolbar.sheets')}
-        label={t('excel.toolbar.sheets')}
-        items={[
-          { id: idFor('excel.menu.addSheet', true), label: t('excel.menu.addSheet'), onSelect: () => getActions().openAddSheet() },
-          { id: idFor('excel.menu.renameSheet', true), label: t('excel.menu.renameSheet'), onSelect: () => getActions().openRenameSheet() },
-          { id: idFor('excel.menu.moveSheetLeft', true), label: t('excel.menu.moveSheetLeft'), onSelect: () => getActions().moveSheet(-1) },
-          { id: idFor('excel.menu.moveSheetRight', true), label: t('excel.menu.moveSheetRight'), onSelect: () => getActions().moveSheet(1) },
-          { id: idFor('excel.menu.deleteSheet', true), label: t('excel.menu.deleteSheet'), onSelect: () => getActions().openDeleteSheet(), isDisabled: !canDeleteSheet },
-        ]}
-      >
-        <Icon>
-          <rect x="8" y="3" width="13" height="13" rx="1" />
-          <path d="M5 8H4a1 1 0 0 0-1 1v11a1 1 0 0 0 1 1h11a1 1 0 0 0 1-1v-1" />
-        </Icon>
-      </IconMenuButton>
-      <IconButton id={toolbarId('find.label')} label={t('find.label')} onClick={() => (commands as ExcelViewerCommands).toggleFindReplace()}>
-        <Icon>
-          <circle cx="11" cy="11" r="6" />
-          <path d="m20 20-4.5-4.5" />
-        </Icon>
-      </IconButton>
-      {divider}
     </>
   )
 }
@@ -642,42 +505,43 @@ function SheetDialogs({
   }
 
   return (
-    <ModalDialog title={t(titleKey)} id={`dialog-${idFor(titleKey)}`} onClose={onClose} widthClassName="w-[min(26rem,calc(100vw-2rem))]">
+    <ModalDialog title={t(titleKey)} id={`dialog-${idFor(titleKey)}`} onClose={onClose} inWorkbench>
       <form
         id="sheet-dialog-form"
         onSubmit={(event) => {
           event.preventDefault()
           submit()
         }}
-        className="mt-3 space-y-3"
       >
-        {dialog.kind === 'delete-sheet' ? (
-          <p>{t('excel.toolbar.deleteSheetConfirm', { name: isolateText(activeSheetName) })}</p>
-        ) : (
-          <label htmlFor="dialog-input" className="block">
-            <span className="text-sm text-ink-soft">{dialog.kind === 'column-width' ? t('excel.toolbar.widthLabel') : dialog.kind === 'link' ? t('excel.toolbar.linkLabel') : t('excel.toolbar.sheetNameLabel')}</span>
-            <input
-              id="dialog-input"
-              autoFocus
-              dir={dialog.kind === 'column-width' || dialog.kind === 'link' ? 'ltr' : 'auto'}
-              inputMode={dialog.kind === 'column-width' ? 'numeric' : dialog.kind === 'link' ? 'url' : undefined}
-              value={draft}
-              onChange={(event) => setDraft(event.target.value)}
-              aria-invalid={problem !== null}
-              className={`${textControlClassName} mt-1 w-full`}
-            />
-          </label>
-        )}
-        {problem && draft !== '' && (
-          <p id="dialog-error" role="alert" className="text-sm text-danger">
-            {problem}
-          </p>
-        )}
-        <div className="flex justify-end gap-2">
-          <button id="dialog-cancel-button" type="button" onClick={onClose} className={compactSecondaryButtonClassName}>
+        <div className="dlg-body">
+          {dialog.kind === 'delete-sheet' ? (
+            <p>{t('excel.toolbar.deleteSheetConfirm', { name: isolateText(activeSheetName) })}</p>
+          ) : (
+            <label htmlFor="dialog-input" className="field">
+              {dialog.kind === 'column-width' ? t('excel.toolbar.widthLabel') : dialog.kind === 'link' ? t('excel.toolbar.linkLabel') : t('excel.toolbar.sheetNameLabel')}
+              <input
+                id="dialog-input"
+                autoFocus
+                dir={dialog.kind === 'column-width' || dialog.kind === 'link' ? 'ltr' : 'auto'}
+                inputMode={dialog.kind === 'column-width' ? 'numeric' : dialog.kind === 'link' ? 'url' : undefined}
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                aria-invalid={problem !== null}
+              />
+            </label>
+          )}
+          {problem && draft !== '' && (
+            <p id="dialog-error" role="alert" className="text-sm text-danger">
+              {problem}
+            </p>
+          )}
+        </div>
+        <div className="dlg-foot">
+          <span className="spacer" />
+          <button id="dialog-cancel-button" type="button" onClick={onClose} className="btn outline">
             {t('excel.toolbar.dialogCancel')}
           </button>
-          <button id="dialog-submit-button" type="submit" disabled={problem !== null} className={`${primaryButtonClassName} disabled:cursor-not-allowed disabled:opacity-50`}>
+          <button id="dialog-submit-button" type="submit" disabled={problem !== null} className="btn primary">
             {t(dialog.kind === 'delete-sheet' ? 'excel.toolbar.dialogDelete' : dialog.kind === 'add-sheet' ? 'excel.toolbar.dialogAdd' : 'excel.toolbar.dialogSave')}
           </button>
         </div>
@@ -687,14 +551,36 @@ function SheetDialogs({
 }
 
 // The workbook's own menus in the menu bar (Edit, Insert, Format, Data). Every item calls an action the toolbar also offers.
+// "excel.menu.numDateIso" -> "date-iso": a stable menu item id from a message key, never from the translated text.
+const idFromKey = (key: MessageKey, prefix: string) => key.slice(prefix.length).replace(/[A-Z]/g, (letter, offset: number) => `${offset > 0 ? '-' : ''}${letter.toLowerCase()}`)
+
+const BORDER_CHOICES: { side: 'all' | 'outer' | 'top' | 'bottom' | 'left' | 'right' | 'none'; labelKey: MessageKey }[] = [
+  { side: 'all', labelKey: 'excel.menu.allBorders' },
+  { side: 'outer', labelKey: 'excel.menu.outerBorders' },
+  { side: 'top', labelKey: 'excel.menu.topBorder' },
+  { side: 'bottom', labelKey: 'excel.menu.bottomBorder' },
+  { side: 'left', labelKey: 'excel.menu.leftBorder' },
+  { side: 'right', labelKey: 'excel.menu.rightBorder' },
+  { side: 'none', labelKey: 'excel.menu.noBorders' },
+]
+
+// Every editing tool of the workbook, in the menu bar: Edit, Insert, Format (with submenus for number formats, currencies,
+// fonts, sizes, colours and borders), Data and Sheets.
 function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale): MenuDefinition[] {
   const viewerCommands = commands as ExcelViewerCommands | null
   if (!viewerCommands) return []
   const current = selection as NonNullable<ExcelSelection> | null
   const text = (key: MessageKey) => translate(locale, key)
   const hasCell = current?.hasCell ?? false
+  const selectedRowCount = current?.selectedRowCount ?? 0
+  const selectedColumnCount = current?.selectedColumnCount ?? 0
   const styleDisabled = !hasCell || !current?.canStyle
   const run = (pick: (actions: ExcelActions) => void) => () => pick(viewerCommands.getActions())
+  const colorItems = (setColor: (actions: ExcelActions, hexColor: string | null) => void): MenuEntry[] => [
+    ...COLOR_CHOICES.map(({ hexColor, nameKey }) => ({ id: hexColor.toLowerCase(), label: text(nameKey), swatch: hexColor, onSelect: run((actions) => setColor(actions, hexColor)) })),
+    'separator',
+    { id: 'none', label: text('excel.toolbar.colorNone'), onSelect: run((actions) => setColor(actions, null)) },
+  ]
   return [
     {
       id: 'edit',
@@ -703,11 +589,8 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
         { id: 'find', label: text('menu.findReplace'), icon: 'search', onSelect: viewerCommands.toggleFindReplace },
         'separator',
         { id: 'clear-cells', label: text('excel.menu.clearCells'), isDisabled: !hasCell, onSelect: run((actions) => actions.clearCells()) },
-        { id: 'fill-down', label: text('excel.menu.fillDown'), isDisabled: !hasCell, onSelect: run((actions) => actions.fillDown()) },
-        { id: 'fill-right', label: text('excel.menu.fillRight'), isDisabled: !hasCell, onSelect: run((actions) => actions.fillRight()) },
-        'separator',
-        { id: 'rename-sheet', label: text('excel.menu.renameSheet'), onSelect: run((actions) => actions.openRenameSheet()) },
-        { id: 'delete-sheet', label: text('excel.menu.deleteSheet'), isDanger: true, isDisabled: !current?.canDeleteSheet, onSelect: run((actions) => actions.openDeleteSheet()) },
+        { id: 'fill-down', label: text('excel.menu.fillDown'), isDisabled: !hasCell || selectedRowCount < 2, onSelect: run((actions) => actions.fillDown()) },
+        { id: 'fill-right', label: text('excel.menu.fillRight'), isDisabled: !hasCell || selectedColumnCount < 2, onSelect: run((actions) => actions.fillRight()) },
       ],
     },
     {
@@ -727,18 +610,42 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
       id: 'format',
       label: text('menu.format'),
       items: [
+        {
+          id: 'number-format',
+          label: text('excel.menu.numberFormat'),
+          isDisabled: !hasCell,
+          items: NUMBER_FORMATS.map(({ labelKey, format }) => ({ id: idFromKey(labelKey, 'excel.menu.num'), label: text(labelKey), onSelect: run((actions) => actions.setNumberFormat(format)) })),
+        },
+        {
+          id: 'currency',
+          label: text('excel.toolbar.formatAsCurrency'),
+          isDisabled: !hasCell,
+          items: CURRENCIES.map((currency) => ({ id: idFromKey(currency.labelKey, 'excel.menu.currency'), label: text(currency.labelKey), onSelect: run((actions) => actions.setNumberFormat(currencyFormat(currency))) })),
+        },
+        { id: 'percent', label: text('excel.toolbar.formatAsPercent'), isDisabled: !hasCell, onSelect: run((actions) => actions.setNumberFormat('0.00%')) },
+        { id: 'fewer-decimals', label: text('excel.toolbar.fewerDecimals'), isDisabled: !hasCell, onSelect: run((actions) => actions.changeDecimals(-1)) },
+        { id: 'more-decimals', label: text('excel.toolbar.moreDecimals'), isDisabled: !hasCell, onSelect: run((actions) => actions.changeDecimals(1)) },
+        'separator',
         { id: 'bold', label: text('excel.toolbar.bold'), kind: 'checkbox', isChecked: current?.isBold, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleBold()) },
         { id: 'italic', label: text('excel.toolbar.italic'), kind: 'checkbox', isChecked: current?.isItalic, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleItalic()) },
         { id: 'underline', label: text('excel.toolbar.underline'), kind: 'checkbox', isChecked: current?.isUnderlined, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleUnderline()) },
         { id: 'strikethrough', label: text('excel.toolbar.strikethrough'), kind: 'checkbox', isChecked: current?.isStruckThrough, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleStrikethrough()) },
+        { id: 'font', label: text('excel.toolbar.font'), isDisabled: styleDisabled, items: FONT_FAMILIES.map((fontName) => ({ id: toElementId(fontName, true), label: fontName, onSelect: run((actions) => actions.setFontFamily(fontName)) })) },
+        { id: 'font-size', label: text('excel.toolbar.fontSize'), isDisabled: styleDisabled, items: FONT_SIZES.map((size) => ({ id: `size-${size}`, label: String(size), onSelect: run((actions) => actions.setFontSize(size)) })) },
+        { id: 'text-colour', label: text('excel.toolbar.textColour'), isDisabled: styleDisabled, items: colorItems((actions, hexColor) => actions.setTextColor(hexColor)) },
+        { id: 'fill-colour', label: text('excel.toolbar.fillColour'), isDisabled: styleDisabled, items: colorItems((actions, hexColor) => actions.setFillColor(hexColor)) },
         'separator',
         { id: 'align-left', label: text('excel.toolbar.alignLeft'), kind: 'radio', isChecked: current?.alignment === 'left', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('left')) },
         { id: 'align-center', label: text('excel.toolbar.alignCenter'), kind: 'radio', isChecked: current?.alignment === 'center', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('center')) },
         { id: 'align-right', label: text('excel.toolbar.alignRight'), kind: 'radio', isChecked: current?.alignment === 'right', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('right')) },
+        { id: 'decrease-indent', label: text('excel.toolbar.decreaseIndent'), isDisabled: styleDisabled, onSelect: run((actions) => actions.changeIndent(-1)) },
+        { id: 'increase-indent', label: text('excel.toolbar.increaseIndent'), isDisabled: styleDisabled, onSelect: run((actions) => actions.changeIndent(1)) },
+        { id: 'borders', label: text('excel.toolbar.borders'), isDisabled: styleDisabled, items: BORDER_CHOICES.map(({ side, labelKey }) => ({ id: side, label: text(labelKey), onSelect: run((actions) => actions.setBorders(side)) })) },
         'separator',
         { id: 'merge', label: text(current?.isMerged ? 'excel.toolbar.unmergeCells' : 'excel.toolbar.mergeCells'), isDisabled: !hasCell, onSelect: run((actions) => actions.toggleMerge()) },
         { id: 'column-width', label: text('excel.menu.columnWidth'), isDisabled: !hasCell, onSelect: run((actions) => actions.openColumnWidth()) },
         { id: 'clear-formatting', label: text('excel.toolbar.clearFormatting'), isDisabled: styleDisabled, onSelect: run((actions) => actions.clearFormatting()) },
+        ...(current && !current.canStyle ? [{ id: 'menu-styles-note', note: text('excel.menu.stylesXlsxOnly') }] : []),
       ],
     },
     {
@@ -750,8 +657,22 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
         { id: 'capitalize', label: text('excel.menu.capitalizeEachWord'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('capitalize')) },
         { id: 'trim', label: text('excel.menu.trimExtraSpaces'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('trim')) },
         'separator',
-        { id: 'delete-rows', label: translatePlural(locale, 'excel.menu.deleteRows', current?.selectedRowCount ?? 0), isDanger: true, isDisabled: !current?.selectedRowCount, onSelect: run((actions) => actions.deleteRows()) },
-        { id: 'delete-columns', label: translatePlural(locale, 'excel.menu.deleteColumns', current?.selectedColumnCount ?? 0), isDanger: true, isDisabled: !current?.selectedColumnCount, onSelect: run((actions) => actions.deleteColumns()) },
+        { id: 'clear-rows', label: translatePlural(locale, 'excel.menu.clearRows', selectedRowCount), isDisabled: !hasCell, onSelect: run((actions) => actions.clearRows()) },
+        { id: 'clear-columns', label: translatePlural(locale, 'excel.menu.clearColumns', selectedColumnCount), isDisabled: !hasCell, onSelect: run((actions) => actions.clearColumns()) },
+        { id: 'delete-rows', label: translatePlural(locale, 'excel.menu.deleteRows', selectedRowCount), isDanger: true, isDisabled: !selectedRowCount, onSelect: run((actions) => actions.deleteRows()) },
+        { id: 'delete-columns', label: translatePlural(locale, 'excel.menu.deleteColumns', selectedColumnCount), isDanger: true, isDisabled: !selectedColumnCount, onSelect: run((actions) => actions.deleteColumns()) },
+      ],
+    },
+    {
+      id: 'sheets',
+      label: text('excel.toolbar.sheets'),
+      items: [
+        { id: 'add-sheet', label: text('excel.menu.addSheet'), icon: 'plus', onSelect: run((actions) => actions.openAddSheet()) },
+        { id: 'rename-sheet', label: text('excel.menu.renameSheet'), onSelect: run((actions) => actions.openRenameSheet()) },
+        { id: 'move-sheet-left', label: text('excel.menu.moveSheetLeft'), onSelect: run((actions) => actions.moveSheet(-1)) },
+        { id: 'move-sheet-right', label: text('excel.menu.moveSheetRight'), onSelect: run((actions) => actions.moveSheet(1)) },
+        'separator',
+        { id: 'delete-sheet', label: text('excel.menu.deleteSheet'), isDanger: true, isDisabled: !current?.canDeleteSheet, onSelect: run((actions) => actions.openDeleteSheet()) },
       ],
     },
   ]
@@ -770,7 +691,7 @@ export const excelEditingModule: EditingModule = {
   downloadOption,
   describeDownload,
   getDefaultByteOrderMark: () => false,
-  ToolbarContent: ToolbarMenus,
+  ToolbarContent: MenuBarTools,
   getMenus: buildExcelMenus,
   components: { EditBar, CellInput, FindReplaceBar, ColumnMenu, SheetDialogs } satisfies ExcelEditingComponents,
 }

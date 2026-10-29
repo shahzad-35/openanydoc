@@ -69,11 +69,13 @@ type DropPanelProps = {
   onOpenInViewer?: (file: File, toolPath: string) => void
   showExtensions?: boolean
   pasteHint?: string
+  // Off on a conversion page, which takes only its own format: the other viewers are not things it can do.
+  showOtherFormats?: boolean
 }
 
-export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer, showExtensions = true, pasteHint }: DropPanelProps) {
+export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer, showExtensions = true, pasteHint, showOtherFormats = true }: DropPanelProps) {
   const { locale, t } = useT()
-  const otherFormats = currentViewerId ? getOtherReleasedFormats(currentViewerId) : []
+  const otherFormats = currentViewerId && showOtherFormats ? getOtherReleasedFormats(currentViewerId) : []
   const suggestion = intake.redirectSuggestion
   const isPhone = useIsPhone()
   const wrongFileMessage = suggestion ? translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey) : ''

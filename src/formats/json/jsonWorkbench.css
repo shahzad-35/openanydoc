@@ -305,7 +305,7 @@
   #json-workbench .brand-text { display: flex; flex-direction: column; line-height: 1.15 }
   #json-workbench .brand-name { font-size: 11px; color: var(--muted); font-weight: 500; order: 2 }
   #json-workbench .page-title { display: block; font-size: 14px; font-weight: 500; color: var(--text); order: 1 }
-  #json-workbench :is(.slash, .cmds, #file-chip-button, #fullscreen-button, .download-label) { display: none }
+  #json-workbench :is(.slash, .cmds, #file-chip-button, #fullscreen-button, .download-label, .convert-label) { display: none }
   #json-workbench .search { display: none; position: absolute; top: 58px; left: 12px; right: 12px; width: auto; height: 38px; background: var(--raised); box-shadow: var(--shadow); z-index: 40 }
   #json-workbench #command-bar.search-open .search { display: flex }
   #json-workbench #mobile-search-button { display: inline-flex }

@@ -12,8 +12,6 @@
   "redirect.looksLike.json": "يبدو أن هذا ملف JSON.",
   "redirect.looksLike.excel": "يبدو أن هذا ملف Excel.",
   "redirect.open": "افتحه في عارض {format}",
-  "tip.alsoOpens": "يفتح OpenAnyDoc ملفات {format} ويحرّرها أيضًا.",
-  "tip.close": "إخفاء النصيحة",
   "footer.whatsNew": "الجديد",
   "privacy.newFeaturesHeading": "كيف نخبرك بالميزات الجديدة",
   "privacy.newFeaturesText": "تعتمد الإعلانات على تاريخ الإصدار المعروض للجميع، ولا يُخزَّن شيء على جهازك ولا يُرسَل إلى أي مكان.",
@@ -1700,5 +1698,14 @@
   "guide.updated": "حُدّث في {date}",
   "json.wb.formatterHint": "معروض منسّقًا بمسافتين. اختر إزاحة أخرى أو «تصغير» من الشريط أعلاه؛ ويحفظه «تنزيل» بهذا الشكل.",
   "csv.largeMode.hint": "أكبر من أن يفتحه Excel؟ صفِّ الصفوف التي تحتاجها، ثم اختر «خيارات التنزيل» وعلّم على «الصفوف الظاهرة فقط».",
-  "excel.legacyNote": "ملف Excel 97-2003 (.xls): لا تظهر الخطوط والألوان، ويُحفظ الملف بصيغة .xls من جديد."
+  "excel.legacyNote": "ملف Excel 97-2003 (.xls): لا تظهر الخطوط والألوان، ويُحفظ الملف بصيغة .xls من جديد.",
+  "convert.menuHeading": "تحويل",
+  "convert.toCsv": "تحويل إلى CSV",
+  "convert.toExcel": "تحويل إلى Excel ‏(.xlsx)",
+  "convert.toJson": "تحويل إلى JSON",
+  "convert.readFailed": "تعذّرت قراءة هذا الملف. تأكد من أنه غير تالف، ثم اختره مرة أخرى.",
+  "convert.notATable": "يمكن تحويل قائمة من الكائنات، أو كائن واحد، إلى جدول فقط. يحتوي ملف JSON هذا على شيء آخر.",
+  "excel.menu.numberFormat": "تنسيق الأرقام",
+  "excel.menu.stylesXlsxOnly": "يمكن تغيير الخطوط والألوان والحدود والمحاذاة في ملفات .xlsx فقط.",
+  "convert.converting": "جارٍ التحويل…"
 }

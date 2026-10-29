@@ -34,6 +34,9 @@ export type FormatViewerProps = {
   // Things the toolbar can ask the viewer to do (rename a column, open find and replace, scroll to a cell).
   onCommandsChange: (commands: unknown) => void
   onExportSourceChange: (exportSource: unknown) => void
+  // Opens a file converted from this one (Convert in the top bar) in the viewer of its format, in place of this file. The
+  // edits are inside the converted file, so this does not ask about them.
+  onOpenConvertedFile: (file: File) => void
 }
 
 // One button in the edit toolbar, for this format only (undo, redo and revert all are shared and always there).
@@ -65,8 +68,9 @@ export type EditingModule = {
   describeDownload(exportSource: unknown, locale: Locale): string
   getDefaultByteOrderMark(exportSource: unknown): boolean
   // Extra toolbar content for this format (menus), drawn in the edit toolbar's single row after Undo and Redo.
-  ToolbarContent?: ComponentType<{ selection: unknown; commands: unknown }>
   // This format's menus for the menu bar of the file page (between File and Help).
+  // Icon tools for this format, drawn in the menu bar row after the menu names (the same actions are in the menus).
+  ToolbarContent?: ComponentType<{ selection: unknown; commands: unknown }>
   getMenus?: (selection: unknown, commands: unknown, locale: Locale) => MenuDefinition[]
   components: unknown
 }
@@ -88,8 +92,6 @@ export type FormatDefinition = {
   addedOn?: string
   // Two or three short feature keys (translated in src/i18n/en.json and ar.json), used in the changelog.
   highlights?: string[]
-  // Formats worth suggesting to someone who just saved a file of this format.
-  related?: Viewer['id'][]
   ViewerComponent: LazyExoticComponent<ComponentType<FormatViewerProps>>
   // The viewer draws the whole screen itself (JSON): no shared header, edit toolbar or save tip around it.
   ownsWholePage?: boolean
@@ -107,7 +109,6 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'csv',
     addedOn: '2026-10-05',
     highlights: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'],
-    related: ['excel', 'json'],
     ViewerComponent: lazy(() => import('./csv/CsvViewer')),
     ownsWholePage: true,
     editing: {
@@ -121,7 +122,6 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'text',
     addedOn: '2026-10-14',
     highlights: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'],
-    related: ['csv', 'json'],
     ViewerComponent: lazy(() => import('./text/TextViewer')),
     ownsWholePage: true,
     editing: {
@@ -135,7 +135,6 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'json',
     addedOn: '2026-10-14',
     highlights: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'],
-    related: ['csv', 'excel'],
     ViewerComponent: lazy(() => import('./json/JsonViewer')),
     ownsWholePage: true,
     // Measured 2026-10-16: up to 10 MB every action takes a third of a second or less; at 50 MB a tree edit takes 1.6 s and the
@@ -152,7 +151,6 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'excel',
     addedOn: '2026-10-15',
     highlights: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'],
-    related: ['csv', 'json'],
     ViewerComponent: lazy(() => import('./excel/ExcelViewer')),
     editing: {
       createEmptyEdits: createEmptyExcelEdits,
@@ -191,9 +189,6 @@ export function buildDownloadName(fileName: string, hasEdits: boolean, newExtens
   return `${baseName}${hasEdits ? '-edited' : ''}${extension}`
 }
 
-// Sent on the window after a file is saved, so the page can offer a tip. It carries nothing: no file name, no content.
-export const FILE_SAVED_EVENT = 'openanydoc:saved'
-
 // Saves text (or bytes) as a file by clicking a temporary link to it.
 export function downloadTextFile(fileName: string, fileText: BlobPart, mimeType: string) {
   const downloadUrl = URL.createObjectURL(new Blob([fileText], { type: mimeType }))
@@ -201,6 +196,5 @@ export function downloadTextFile(fileName: string, fileText: BlobPart, mimeType:
   downloadLink.href = downloadUrl
   downloadLink.download = fileName
   downloadLink.click()
-  window.dispatchEvent(new Event(FILE_SAVED_EVENT))
   setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
 }

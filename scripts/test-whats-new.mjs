@@ -12,6 +12,7 @@ import http from 'node:http'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
+import ExcelJS from 'exceljs'
 import * as XLSX from 'xlsx'
 
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -192,7 +193,8 @@ async function openPage(pathname) {
 // ---------------------------------------------------------------- the tests
 
 const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer']
-const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer']
+const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
+const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages]
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
@@ -203,6 +205,7 @@ fs.writeFileSync(unknownFile, 'not a real document')
 
 const results = []
 async function test(name, run) {
+  if (process.env.TEST_ONLY && !new RegExp(process.env.TEST_ONLY).test(name)) return
   const problemsBefore = networkProblems.length
   try {
     await run()
@@ -280,8 +283,8 @@ await test('a file nobody opens keeps the friendly rejection', async () => {
   expect(!(await evaluate(`document.body.innerText.includes('This looks like')`)), 'a redirect was offered for an unregistered type')
 })
 
-await test('saving a file shows one dismissible tip', async () => {
-  // Excel is the format still drawn in the shared page, which has the tip (CSV, JSON and TXT draw their own pages).
+await test('saving a file shows no tip about other formats', async () => {
+  // Excel is the format drawn in the shared page, which used to show a tip after a save (removed 2026-10-29).
   const tipWorkbook = path.join(scratchFolder, 'tip.xlsx')
   const tipBook = XLSX.utils.book_new()
   XLSX.utils.book_append_sheet(tipBook, XLSX.utils.aoa_to_sheet([['one'], ['two']]), 'Data')
@@ -292,9 +295,8 @@ await test('saving a file shows one dismissible tip', async () => {
   const downloadButton = `document.querySelector('#download-button')`
   await waitFor(`${downloadButton} && !${downloadButton}.disabled`, 'the Download button')
   await evaluate(`${downloadButton}.click()`)
-  await waitFor(`[...document.querySelectorAll('[role=status]')].some((status) => status.innerText.includes('also opens and edits'))`, 'the tip')
-  await evaluate(`document.querySelector('button[aria-label="Dismiss tip"]').click()`)
-  await waitFor(`![...document.querySelectorAll('[role=status]')].some((status) => status.innerText.includes('also opens and edits'))`, 'the tip to close')
+  await sleep(500)
+  expect(await evaluate(`document.querySelector('#save-tip') === null && !document.body.innerText.includes('also opens and edits')`), 'a tip showed after the save')
 })
 
 await test('after the window ends there are no badges and no banner', async () => {
@@ -432,7 +434,7 @@ for (const [name, address, file, readyElement] of [
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
     await expectCleanIds(`${name} view mode`)
     // Every editable format opens ready to edit, with its own menus.
-    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : name === 'TXT' ? '#ribbon-sort-menu-button' : '#edit-toolbar [aria-haspopup=menu]:not(:disabled)'
+    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : name === 'TXT' ? '#ribbon-sort-menu-button' : '#menu-bar #menu-format'
     if (name === 'TXT') await evaluate(`document.querySelector('#ribbon-tab-lines').click()`)
     await waitFor(`document.querySelector('${menuButton}')`, 'the editing tools')
     await expectCleanIds(`${name} edit mode`)
@@ -525,12 +527,12 @@ await test('every sitemap address has a lastmod date and is a built page without
 })
 
 // The upper bound was 900 before the home page gained its stats row, shortcut keycaps, privacy comparison and the note on how
-// the demo works (2026-10-19).
-await test('the home page has 600 to 1000 words in its server HTML, eight questions and a card linking to each tool page', async () => {
+// the demo works (2026-10-19), and 1000 before the five conversion pages joined the home page's tool links (2026-10-29).
+await test('the home page has 600 to 1050 words in its server HTML, eight questions and a card linking to each tool page', async () => {
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
     const wordCount = prerenderedText(html).split(/\s+/).filter(Boolean).length
-    expect(wordCount >= 600 && wordCount <= 1000, `/${locale}: ${wordCount} words`)
+    expect(wordCount >= 600 && wordCount <= 1050, `/${locale}: ${wordCount} words`)
     expect((html.match(/id="faq-item-\d+"/g) ?? []).length === 8, `/${locale}: the FAQ does not have eight questions`)
     for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer']) {
       expect(new RegExp(`id="tool-card-link-${page}" href="/${locale}/${page}"`).test(html), `/${locale}: no card links to /${locale}/${page}`)
@@ -729,7 +731,7 @@ await test('one drop zone opens every live format with its tools; Coming soon st
     await chooseFile(file)
     await waitFor(`(${name === 'Excel'} && document.querySelector('#excel-workbench')) || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench'))`, `the ${name} file page`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
-    await waitFor(`document.querySelector('#edit-toolbar [aria-haspopup=menu]:not(:disabled), #edit-toolbar #toolbar-find-and-replace, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button')`, `the ${name} tools`)
+    await waitFor(`document.querySelector('#menu-bar #menu-format, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
@@ -1155,17 +1157,20 @@ await test('the header nav, related tools, footer and home links point at built 
     for (const locale of ['en', 'ar']) {
       const address = `/${locale}${page}`
       const html = await (await fetch(`${siteOrigin}${address}`)).text()
+      // The header links the viewers, then the conversion pages in its Convert menu.
       const navLinks = linksIn(html, '<nav id="site-nav"', '</nav>')
-      expect(navLinks?.length === formatPages.length, `${address}: the header nav does not link the ${formatPages.length} viewers`)
-      expect(JSON.stringify(navLinks.map((link) => link.href).sort()) === JSON.stringify(formatPages.map((formatPage) => `/${locale}${formatPage}`).sort()), `${address}: the nav links are ${navLinks.map((link) => link.href).join(', ')}`)
+      const navPages = [...formatPages, ...conversionPages]
+      expect(navLinks?.length === navPages.length, `${address}: the header nav does not link the ${formatPages.length} viewers and ${conversionPages.length} converters`)
+      expect(JSON.stringify(navLinks.map((link) => link.href).sort()) === JSON.stringify(navPages.map((navPage) => `/${locale}${navPage}`).sort()), `${address}: the nav links are ${navLinks.map((link) => link.href).join(', ')}`)
       const currentLinks = navLinks.filter((link) => link.tag.includes('aria-current="page"'))
-      const expectedCurrent = formatPages.includes(page) ? [`/${locale}${page}`] : []
+      const expectedCurrent = navPages.includes(page) ? [`/${locale}${page}`] : []
       expect(JSON.stringify(currentLinks.map((link) => link.href)) === JSON.stringify(expectedCurrent), `${address}: aria-current is on ${currentLinks.map((link) => link.href).join(', ') || 'no link'}`)
       const relatedLinks = linksIn(html, '<section id="related-tools"', '</section>')
       if (formatPages.includes(page) || landingPages.includes(page)) expect(relatedLinks?.length >= 2, `${address}: no related tools`)
       else expect(relatedLinks === null, `${address}: related tools on a page that is not a tool page`)
       const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
-      expect(landingPages.every((landingPage) => landingPage === page || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
+      expect(landingPages.every((landingPage) => landingPage === page || conversionPages.includes(landingPage) || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
+      expect(!footerLinks.some((link) => conversionPages.some((conversionPage) => link.href === `/${locale}${conversionPage}`)), `${address}: the footer still links a conversion page (they are in the header's Convert menu)`)
       for (const link of [...navLinks, ...(relatedLinks ?? []), ...footerLinks]) {
         // The footer's Contact link is a mailto: address, the only link that is not a page.
         expect(link.href.startsWith('mailto:') || builtPage(link.href), `${address}: ${link.href} is not a built page`)
@@ -1308,6 +1313,175 @@ await test('landing pages accept their own file types, offer another type its vi
   await openPage('/en/xls-viewer')
   await chooseFile(sampleLegacyWorkbook)
   await waitFor(`document.querySelector('#legacy-format-note')?.innerText.includes('97-2003')`, 'the XLS page to show the legacy-format note')
+})
+
+await test('Excel: the tools are in the menu bar (icons and menus), ready on open, and a submenu opens in place, goes back and applies its choice', async () => {
+  await openPage('/en/excel-viewer')
+  await chooseFile(sampleWorkbook)
+  await waitFor(`document.querySelector('#cell-1-0')`, 'the workbook')
+  expect(await evaluate(`document.querySelector('#edit-toolbar') === null`), 'the edit toolbar is still drawn')
+  // Like a spreadsheet, the first cell is selected when the workbook opens, so the tools work without a click first.
+  await waitFor(`document.querySelector('#menu-bar-row #menu-bar-tools #toolbar-bold:not(:disabled)') && document.querySelector('#menu-bar-tools #toolbar-text-colour:not(:disabled)')`, 'the icon tools in the menu bar row, ready to use')
+  await evaluate(`document.querySelector('#menu-format').click()`)
+  await waitFor(`document.querySelector('#menu-format-text-colour:not(:disabled)')`, 'Text colour in the Format menu')
+  for (const submenuId of ['number-format', 'currency', 'font', 'font-size', 'fill-colour', 'borders']) {
+    expect(await evaluate(`document.querySelector('#menu-format-${submenuId}')?.getAttribute('aria-haspopup') === 'menu'`), `Format has no ${submenuId} submenu`)
+  }
+  await evaluate(`document.querySelector('#menu-format-text-colour').focus()`)
+  await pressKey('ArrowRight', 'ArrowRight', 39)
+  await waitFor(`document.activeElement?.id === 'menu-format-text-colour-000000'`, 'the colours, with the first one focused')
+  await expectCleanIds('Excel with a submenu open')
+  await pressKey('ArrowLeft', 'ArrowLeft', 37)
+  await waitFor(`document.activeElement?.id === 'menu-format-text-colour' && !document.querySelector('#menu-submenu-back-button')`, 'Left to go back to the Format menu')
+  await evaluate(`document.querySelector('#menu-format-text-colour').click()`)
+  await waitFor(`document.querySelector('#menu-format-text-colour-ff0000')`, 'the colours again')
+  await evaluate(`document.querySelector('#menu-format-text-colour-ff0000').click()`)
+  await waitFor(`[document.querySelector('#cell-1-0'), ...document.querySelectorAll('#cell-1-0 *')].some((element) => getComputedStyle(element).color === 'rgb(255, 0, 0)')`, 'the cell to turn red')
+  await evaluate(`document.querySelector('#menu-file').click()`)
+  await waitFor(`document.querySelector('#menu-changes-note') && document.querySelector('#menu-file-revert-all:not(:disabled)')`, 'the change count and Revert all in the File menu')
+  await evaluate(`document.querySelector('#menu-sheets').click()`)
+  await waitFor(`document.querySelector('#menu-sheets-add-sheet') && document.querySelector('#menu-sheets-move-sheet-right')`, 'the Sheets menu')
+})
+
+const captureDownloads = `window.__blobs = []; const make = URL.createObjectURL; URL.createObjectURL = (blob) => { window.__blobs.push(blob); return make(blob) }`
+const chooseOption = (selector, value) =>
+  evaluate(`(() => { const select = document.querySelector('${selector}'); const setter = Object.getOwnPropertyDescriptor(HTMLSelectElement.prototype, 'value').set; setter.call(select, '${value}'); select.dispatchEvent(new Event('change', { bubbles: true })) })()`)
+const peopleCsv = path.join(scratchFolder, 'people.csv')
+fs.writeFileSync(peopleCsv, ['name,city,code,score', ...Array.from({ length: 25 }, (_, position) => `Person ${position + 1},الرياض,00${position},${position}.5`)].join('\n'))
+
+await test('conversion pages open the converted file in its own viewer: CSV to JSON and CSV to Excel', async () => {
+  await openPage('/en/csv-to-json')
+  await expectCleanIds('/en/csv-to-json')
+  await chooseFile(peopleCsv)
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'people.json'`, 'people.json in the JSON viewer')
+  await waitFor(`document.querySelector('#json-text-input')?.value.length > 0 || document.querySelector('#tree-view .row')`, 'the converted JSON')
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#download-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the JSON download from the viewer')
+  const records = JSON.parse(await evaluate(`window.__blobs[0].text()`))
+  expect(records.length === 25 && records[0].code === '000' && records[0].score === 0.5 && records[0].city === 'الرياض', `the first object was: ${JSON.stringify(records[0])}`)
+
+  await openPage('/ar/csv-to-excel')
+  await chooseFile(peopleCsv)
+  await waitFor(`location.pathname === '/ar/excel-viewer' && document.querySelector('#file-name')?.innerText === 'people.xlsx'`, 'people.xlsx in the Excel viewer')
+  await waitFor(`[...document.querySelectorAll('#data-table [id^="cell-"]')].some((cell) => cell.textContent === '000')`, 'the code with its leading zero in the workbook')
+  await waitFor(`document.querySelector('#download-button') && !document.querySelector('#download-button').disabled`, 'the Excel Download button')
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#download-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the Excel download from the viewer')
+  const workbookBase64 = await evaluate(`window.__blobs[0].arrayBuffer().then((buffer) => { let text = ''; for (const byte of new Uint8Array(buffer)) text += String.fromCharCode(byte); return btoa(text) })`)
+  const convertedWorkbook = new ExcelJS.Workbook()
+  await convertedWorkbook.xlsx.load(Buffer.from(workbookBase64, 'base64'))
+  const convertedSheet = convertedWorkbook.worksheets[0]
+  expect(convertedSheet.getCell('A1').font?.bold === true, 'the header row is not bold')
+  expect(convertedSheet.getCell('C2').value === '000' && convertedSheet.getCell('D2').value === 0.5 && convertedSheet.getCell('B2').value === 'الرياض', 'the cells lost their leading zero, their number or their Arabic text')
+})
+
+await test('conversion pages open the converted file in its own viewer: Excel to CSV (first sheet), Excel to JSON, JSON to CSV, and a JSON that is not a table', async () => {
+  const reportWorkbook = path.join(scratchFolder, 'report.xlsx')
+  const twoSheets = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(twoSheets, XLSX.utils.aoa_to_sheet([['Name', 'City'], ['A', 'جدة']]), 'Q1')
+  XLSX.utils.book_append_sheet(twoSheets, XLSX.utils.aoa_to_sheet([['Name', 'City'], ['B', 'Riyadh, KSA']]), 'Q2')
+  fs.writeFileSync(reportWorkbook, XLSX.write(twoSheets, { type: 'buffer', bookType: 'xlsx' }))
+  await openPage('/en/excel-to-csv')
+  await chooseFile(reportWorkbook)
+  await waitFor(`location.pathname === '/en/csv-viewer' && document.querySelector('#open-menu-button')?.innerText.includes('report-Q1.csv')`, 'the first sheet as report-Q1.csv in the CSV viewer')
+  await waitFor(`[...document.querySelectorAll('#data-table [id^="cell-"]')].some((cell) => cell.textContent === 'جدة')`, 'the first sheet with its Arabic text')
+  expect(await evaluate(`document.querySelector('#status-bar').innerText.includes('UTF-8 with BOM')`), 'the CSV has no UTF-8 byte order mark for its Arabic text')
+
+  await openPage('/en/excel-to-json')
+  await chooseFile(sampleWorkbook)
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json'`, 'the workbook in the JSON viewer')
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#download-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the JSON download')
+  const sheetJson = await evaluate(`window.__blobs[0].text()`)
+  expect(JSON.stringify(JSON.parse(sheetJson)) === '[{"Name":"A","Qty":1},{"Name":"B","Qty":2}]', `the Excel JSON was: ${sheetJson}`)
+
+  const nestedJson = path.join(scratchFolder, 'orders.json')
+  fs.writeFileSync(nestedJson, JSON.stringify([{ id: 1, address: { city: 'Riyadh', zip: '11564' }, tags: ['a', 'b'] }, { id: 2, address: { city: 'Jeddah' }, extra: true }]))
+  await openPage('/en/json-to-csv')
+  await chooseFile(nestedJson)
+  await waitFor(`location.pathname === '/en/csv-viewer' && document.querySelector('#open-menu-button')?.innerText.includes('orders.csv')`, 'orders.csv in the CSV viewer')
+  await evaluate(captureDownloads)
+  await waitFor(`document.querySelector('#download-button') && !document.querySelector('#download-button').disabled`, 'the CSV Download button')
+  await evaluate(`document.querySelector('#download-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the CSV download')
+  const flatCsv = await evaluate(`window.__blobs[0].text()`)
+  expect(flatCsv.replace(/\r\n/g, '\n') === 'id,address.city,address.zip,tags.0,tags.1,extra\n1,Riyadh,11564,a,b,\n2,Jeddah,,,,true\n', `the flattened CSV was: ${JSON.stringify(flatCsv)}`)
+
+  const listOfNumbers = path.join(scratchFolder, 'numbers.json')
+  fs.writeFileSync(listOfNumbers, '[1, 2, 3]')
+  await openPage('/en/json-to-csv')
+  await chooseFile(listOfNumbers)
+  await waitFor(`document.querySelector('#conversion-error')?.innerText.includes('list of objects')`, 'the message that a list of numbers is not a table')
+  expect((await evaluate('location.pathname')) === '/en/json-to-csv', 'a file that cannot be converted left the conversion page')
+  await expectCleanIds('/en/json-to-csv with an error')
+})
+
+await test('Convert in the top bar of the CSV, JSON and Excel viewers opens the converted file, with the edits, in its own viewer', async () => {
+  await openPage('/en/csv-viewer')
+  await chooseFile(sampleCsv)
+  await waitFor(`document.querySelector('#cell-0-1')?.textContent === 'Alpha'`, 'the CSV table')
+  const nameCell = await evaluate(`(() => { const box = document.querySelector('#cell-0-1').getBoundingClientRect(); return { x: box.x + box.width / 2, y: box.y + box.height / 2 } })()`)
+  await send('Input.dispatchMouseEvent', { type: 'mousePressed', x: nameCell.x, y: nameCell.y, button: 'left', clickCount: 1 })
+  await send('Input.dispatchMouseEvent', { type: 'mouseReleased', x: nameCell.x, y: nameCell.y, button: 'left', clickCount: 1 })
+  await pressKey('G', 'KeyG', 71, 'G')
+  await waitFor(`document.querySelector('#cell-value-inline-input')`, 'the cell editor')
+  await send('Input.insertText', { text: 'amma' })
+  await pressKey('Enter', 'Enter', 13)
+  await waitFor(`document.querySelector('#cell-0-1')?.textContent === 'Gamma'`, 'the edited cell')
+  expect(await evaluate(`document.querySelector('#menu-file-convert-to-json') === null`), 'Convert is still in the File menu')
+  await evaluate(`document.querySelector('#convert-button').click()`)
+  await waitFor(`document.querySelector('#convert-menu-to-json')`, 'the Convert menu')
+  await expectCleanIds('CSV viewer with the Convert menu open')
+  await evaluate(`document.querySelector('#convert-menu-to-json').click()`)
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json'`, 'the converted file in the JSON viewer')
+  await waitFor(`document.querySelector('#json-text-input')?.value.includes('"Gamma"') || document.querySelector('#tree-view')?.innerText.includes('Gamma')`, 'the edit in the converted JSON')
+  expect(await evaluate(`document.querySelector('dialog[open]') === null`), 'converting asked to discard the edits')
+
+  await evaluate(`document.querySelector('#convert-button').click()`)
+  await waitFor(`document.querySelector('#convert-button-menu-to-csv')`, 'the JSON viewer Convert menu')
+  await evaluate(`document.querySelector('#convert-button-menu-to-csv').click()`)
+  await waitFor(`location.pathname === '/en/csv-viewer' && [...document.querySelectorAll('#data-table [id^="cell-"]')].some((cell) => cell.textContent === 'Gamma')`, 'the JSON converted back to CSV in the CSV viewer')
+
+  const twoSheetWorkbook = path.join(scratchFolder, 'two-sheets.xlsx')
+  const twoSheets = XLSX.utils.book_new()
+  XLSX.utils.book_append_sheet(twoSheets, XLSX.utils.aoa_to_sheet([['Name', 'Qty'], ['A', 1]]), 'First')
+  XLSX.utils.book_append_sheet(twoSheets, XLSX.utils.aoa_to_sheet([['Name', 'Qty'], ['B', 2]]), 'Second')
+  fs.writeFileSync(twoSheetWorkbook, XLSX.write(twoSheets, { type: 'buffer', bookType: 'xlsx' }))
+  await openPage('/en/excel-viewer')
+  await chooseFile(twoSheetWorkbook)
+  await waitFor(`document.querySelector('#data-table') && document.querySelectorAll('[id^="sheet-tab-"]').length === 2`, 'the workbook with two sheets')
+  await evaluate(`document.querySelectorAll('[id^="sheet-tab-"]')[1].click()`)
+  await waitFor(`document.querySelector('[id^="sheet-tab-"][aria-selected="true"]')?.textContent.includes('Second')`, 'the second sheet')
+  await waitFor(`document.querySelector('#convert-button')`, 'the Convert button in the top bar')
+  await evaluate(`document.querySelector('#convert-button').click()`)
+  await waitFor(`document.querySelector('#convert-button-menu-to-json')`, 'the Excel Convert menu')
+  await evaluate(`document.querySelector('#convert-button-menu-to-json').click()`)
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'two-sheets-Second.json'`, 'the sheet on screen, opened as JSON')
+})
+
+await test('the header has a Convert menu with every conversion page, and picking one then a file opens the result in its viewer', async () => {
+  for (const locale of ['en', 'ar']) {
+    await openPage(`/${locale}`)
+    expect(await evaluate(`document.querySelector('#site-header').getBoundingClientRect().height < 100`), `/${locale}: the header no longer fits on one line at 1280 px`)
+    await evaluate(`document.querySelector('#site-nav-convert-toggle').click()`)
+    await waitFor(`document.querySelector('#site-nav-convert[open] #site-nav-link-csv-to-excel')?.checkVisibility()`, `/${locale}: the Convert menu`)
+    const menuBox = await evaluate(`JSON.stringify(document.querySelector('#site-nav-convert-list').getBoundingClientRect())`)
+    const { left, right } = JSON.parse(menuBox)
+    expect(left >= 0 && right <= 1280, `/${locale}: the Convert menu is cut off at the edge (${menuBox})`)
+    await pressKey('Escape', 'Escape', 27)
+    await waitFor(`!document.querySelector('#site-nav-convert').open`, `/${locale}: Escape to close the Convert menu`)
+  }
+  // Picking a converter from the menu, then a file, lands in the viewer of the converted format.
+  await openPage('/en')
+  await evaluate(`document.querySelector('#site-nav-convert-toggle').click()`)
+  await waitFor(`document.querySelector('#site-nav-link-csv-to-json')?.checkVisibility()`, 'the Convert menu')
+  await evaluate(`document.querySelector('#site-nav-link-csv-to-json').click()`)
+  await waitFor(`location.pathname === '/en/csv-to-json' && !document.querySelector('#site-nav-convert').open`, 'the CSV to JSON page, with the menu closed')
+  await chooseFile(peopleCsv)
+  await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'people.json'`, 'the converted file in the JSON viewer')
 })
 
 // ---------------------------------------------------------------- report

@@ -274,7 +274,7 @@
 #csv-workbench .preview div:last-child{border-bottom:0}
 #csv-workbench .preview del{color:var(--err)}
 #csv-workbench .preview ins{color:var(--ok);text-decoration:none}
-#csv-workbench dialog{border:1px solid var(--line-strong);border-radius:12px;background:var(--raised);color:var(--text);box-shadow:var(--shadow);padding:0;width:min(480px,calc(100vw - 24px))}
+#csv-workbench dialog{margin:auto;border:1px solid var(--line-strong);border-radius:12px;background:var(--raised);color:var(--text);box-shadow:var(--shadow);padding:0;width:min(480px,calc(100vw - 24px))}
 #csv-workbench dialog::backdrop{background:rgba(5,8,12,.5)}
 #csv-workbench .dlg-head{display:flex;align-items:center;gap:8px;padding:14px 16px 10px}
 #csv-workbench .dlg-head h2{margin:0;font-size:15px;font-weight:500}

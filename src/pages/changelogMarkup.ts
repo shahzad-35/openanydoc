@@ -54,7 +54,14 @@ export const navClasses = {
   summary: 'pill-link cursor-pointer list-none gap-2 border-2 border-line text-sm md:hidden [&::-webkit-details-marker]:hidden',
   chevron: 'size-4 transition-transform duration-200 group-open:rotate-180',
   list: 'mt-2 flex flex-col items-start md:mt-0 md:flex-row md:items-center md:gap-x-1',
-  link: 'pill-link text-[15px]',
+  // 12 px sides on a wide screen (not the pill's 16 px), so the five header items fit beside the logo and the actions.
+  link: 'pill-link text-[15px] md:px-3',
+  // The Convert menu, the last item of the list: a dropdown card on a wide screen, an indented list inside the disclosure on a phone.
+  convertDetails: 'group/convert relative',
+  convertSummary: 'pill-link cursor-pointer list-none gap-1.5 text-[15px] md:px-3 [&::-webkit-details-marker]:hidden',
+  convertChevron: 'size-4 transition-transform duration-200 group-open/convert:rotate-180',
+  convertList: 'mt-1 flex flex-col items-start ps-4 md:absolute md:end-0 md:top-full md:z-30 md:mt-2 md:w-56 md:rounded-2xl md:border-2 md:border-line md:bg-paper-raised md:p-2 md:shadow-lg',
+  convertLink: 'pill-link w-full text-[15px]',
 } as const
 
 // A downward chevron, drawn inside a 24 x 24 box.

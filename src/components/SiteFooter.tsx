@@ -71,8 +71,9 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
           <nav id="footer-more" aria-label={t('about.moreFileTools')}>
             <h2 className={footerClasses.heading}>{t('about.moreFileTools')}</h2>
             <ul className={footerClasses.list}>
+              {/* The conversion pages are in the header's Convert menu, not here. */}
               {landingPages
-                .filter((page) => page.path !== currentPath)
+                .filter((page) => page.path !== currentPath && !page.convertTo)
                 .map((page) => (
                   <li key={page.path} className={footerClasses.item}>
                     <PageLink id={`footer-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className={footerClasses.link}>

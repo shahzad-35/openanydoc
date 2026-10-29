@@ -53,8 +53,3 @@ export function findReleasedFormat(viewerId: Viewer['id']) {
   return getReleasedFormats().find(({ viewer }) => viewer.id === viewerId)
 }
 
-// The format to suggest after a save: the first related one that is live.
-export function pickRelatedFormat(currentViewerId: Viewer['id']) {
-  const related = formatDefinitions.find((definition) => definition.viewerId === currentViewerId)?.related ?? []
-  return related.map(findReleasedFormat).find((released) => released !== undefined)
-}

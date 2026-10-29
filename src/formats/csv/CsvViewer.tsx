@@ -13,6 +13,7 @@ import type { CsvFileOptions, DelimiterChoice, ParsedCsv } from '../../parseCsv'
 import type { EncodingChoice } from '../text/textEditing'
 import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
+import type { ConversionTarget } from '../../viewers'
 import { columnLabel, measureColumnWidthsPx } from '../DataTable'
 import { buildDownloadName, downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
@@ -126,7 +127,7 @@ const ICON_SPRITE = `<defs>
 
 type DockTab = 'profile' | 'group' | 'issues' | 'changes'
 type CleanTool = 'split' | 'merge' | 'dupes' | 'transpose'
-type PopoverKind = 'column' | 'filterPick' | 'sort' | 'columns' | 'clean' | 'file' | 'reading' | 'more' | 'find' | 'context'
+type PopoverKind = 'column' | 'filterPick' | 'sort' | 'columns' | 'clean' | 'file' | 'reading' | 'more' | 'find' | 'context' | 'convert'
 type Popover = { kind: PopoverKind; anchor: HTMLElement | null; point?: { x: number; y: number }; columnPosition?: number }
 type Toast = { id: number; message: string; canUndo: boolean }
 type FindState = { text: string; replacement: string; matchCase: boolean; wholeCell: boolean; isRegularExpression: boolean; columnId: number | null }
@@ -185,7 +186,9 @@ function WorkbenchDialog({ id, titleId, isOpen, onClose, children }: { id: strin
     if (!isOpen && dialog.open) dialog.close()
   }, [isOpen])
   return (
-    <dialog id={id} ref={dialogRef} aria-labelledby={titleId} onClose={onClose}>
+    // A dialog closed by the page fires its close event a frame late; by then another dialog may be open, so only a dialog that
+    // was still meant to be open (closed by Escape) reports it.
+    <dialog id={id} ref={dialogRef} aria-labelledby={titleId} onClose={isOpen ? onClose : undefined}>
       {isOpen && children}
     </dialog>
   )
@@ -274,7 +277,7 @@ function WeekChart({ dateTexts, locale }: { dateTexts: string[]; locale: Locale 
 // frozen columns, a side panel (column profile, group by, issues, changes) and a status bar with selection stats. It fills the
 // whole screen (the format is `ownsWholePage`). Every change goes through the shared edit session (one change, one undo step);
 // filters, sort, hidden and frozen columns and widths are view settings that the download can use or leave out.
-export default function CsvViewer({ openedFile, session: untypedSession, confirmDiscardEdits, onOpenAnotherFile, onOpenFile, onClose }: FormatViewerProps) {
+export default function CsvViewer({ openedFile, session: untypedSession, confirmDiscardEdits, onOpenAnotherFile, onOpenFile, onClose, onOpenConvertedFile }: FormatViewerProps) {
   const { locale, t, tp } = useT()
   const session = untypedSession as EditSession<CsvEdits>
   const edits = session.edits
@@ -734,8 +737,8 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     byteOrderMark: (readableCsv?.hasUtf8Bom ?? false) || rows.some((row) => row.some((cellText) => /[^\p{ASCII}]/u.test(cellText))),
   })
 
-  function downloadCsv(settings: DownloadSettings) {
-    const options: CsvFileOptions = {
+  function buildCsvFileOptions(settings: DownloadSettings): CsvFileOptions {
+    return {
       rowIds: settings.onlyShownRows ? visibleRowIds : displayRowIds,
       columnIds: settings.onlyShownRows ? shownColumnIds : displayColumnIds,
       includeHeaderRow: settings.includeHeaderRow && hasHeaderRow,
@@ -744,8 +747,21 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       quoteAllFields: settings.quoteAllFields,
       byteOrderMark: settings.byteOrderMark,
     }
+  }
+
+  function downloadCsv(settings: DownloadSettings) {
+    const options = buildCsvFileOptions(settings)
     downloadTextFile(settings.fileName, buildCsvFileText(rows, edits, options), `${tableFormat.mimeType};charset=utf-8`)
     showToast(tp('csv.wb.saved', options.rowIds.length, { name: settings.fileName }))
+  }
+
+  // The table as Download would save it, edits included, converted and opened in the viewer of its new format.
+  async function convertCsv(convertTo: ConversionTarget) {
+    const csvText = buildCsvFileText(rows, edits, buildCsvFileOptions(defaultDownloadSettings()))
+    const { convertForViewer } = await import('../conversion')
+    const result = await convertForViewer(new File([csvText], fileName, { type: tableFormat.mimeType }), 'csv', convertTo, locale)
+    if ('error' in result) showToast(result.error)
+    else onOpenConvertedFile(result.file)
   }
 
   // Excel shows Arabic letters as garbled text unless the file starts with the UTF-8 marker, so offer a copy that has it.
@@ -1219,10 +1235,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         { id: 'paste', label: t('csv.wb.pasteCsv'), icon: 'paste', onSelect: () => { setPastedText(''); setOpenDialog('paste') } },
         'separator',
         { id: 'download', label: t('csv.wb.downloadFormat', { format: tableFormat.label }), icon: 'download', isDisabled: hasNoTable, onSelect: () => downloadCsv(defaultDownloadSettings()) },
-        { id: 'download-options', label: t('csv.wb.downloadOptions'), icon: 'download', isDisabled: hasNoTable, onSelect: openDownloadDialog },
         ...(offersExcelCopy ? [{ id: 'excel-copy', label: t('csv.excelCopy.button'), icon: 'download', onSelect: downloadExcelCopy }] : []),
-        'separator',
-        { id: 'reading', label: t('csv.wb.readingMenu'), icon: 'settings', isDisabled: hasNoTable, onSelect: () => openPopover('reading', document.getElementById(isNarrow ? 'mobile-more-button' : 'status-delimiter-button')) },
         'separator',
         { id: 'close', label: t('menu.close'), icon: 'x', onSelect: onClose },
       ],
@@ -1361,6 +1374,11 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             <div className="pop-sec small-note">{t('csv.wb.readingNote', { lines: rows.length, lineEnding: statusLineEnding })}</div>
           </>
         )
+      case 'convert':
+        return renderMenuItems([
+          { id: 'convert-menu-to-excel', label: t('convert.toExcel'), icon: 'grid-x', onSelect: () => void convertCsv('xlsx') },
+          { id: 'convert-menu-to-json', label: t('convert.toJson'), icon: 'file', onSelect: () => void convertCsv('json') },
+        ])
       case 'more':
         return renderMenuItems([
               ...(isNarrow
@@ -2332,6 +2350,11 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
           {t('csv.wb.privacy')}
         </span>
         <span className="spacer" />
+        <button className="btn" id="convert-button" type="button" aria-haspopup="menu" aria-label={t('convert.menuHeading')} disabled={!readableCsv} onClick={(event) => openPopover('convert', event.currentTarget)}>
+          <Icon name="replace" />
+          <span className="desk-only">{t('convert.menuHeading')}</span>
+          <Icon name="down" size="xs" />
+        </button>
         <button className="btn icon" id="undo-button" type="button" aria-label={t('toolbar.undo')} title={t('toolbar.undoTip')} disabled={!session.canUndo} onClick={session.undo}>
           <Icon name="undo" />
         </button>

@@ -26,15 +26,20 @@ export type FormatGuide = {
 // The "Related tools" links at the end of each format and landing page: other live pages a visitor of that page may want next.
 // Keyed by the page's address; the link text is each page's `linkText` in seo.ts, in the page's language.
 export const relatedPages: Record<string, string[]> = {
-  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column'],
-  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-opens-in-one-column'],
+  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-to-json', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column'],
+  '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-opens-in-one-column'],
   '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer', '/csv-too-big-for-excel'],
-  '/excel-viewer': ['/xls-viewer', '/csv-viewer'],
-  '/xls-viewer': ['/excel-viewer', '/csv-viewer'],
-  '/json-viewer': ['/json-formatter', '/json-validator', '/csv-viewer'],
+  '/excel-viewer': ['/xls-viewer', '/csv-viewer', '/excel-to-csv', '/excel-to-json'],
+  '/xls-viewer': ['/excel-viewer', '/csv-viewer', '/excel-to-csv'],
+  '/json-viewer': ['/json-formatter', '/json-validator', '/json-to-csv', '/csv-viewer'],
   '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token'],
   '/json-validator': ['/json-formatter', '/json-viewer', '/json-unexpected-token'],
   '/txt-viewer': ['/csv-viewer', '/json-viewer'],
+  '/excel-to-csv': ['/excel-to-json', '/excel-viewer', '/fix-arabic-csv-in-excel'],
+  '/csv-to-excel': ['/csv-to-json', '/csv-viewer', '/csv-too-big-for-excel'],
+  '/excel-to-json': ['/excel-to-csv', '/excel-viewer', '/json-viewer'],
+  '/csv-to-json': ['/csv-to-excel', '/json-to-csv', '/csv-viewer'],
+  '/json-to-csv': ['/csv-to-json', '/json-viewer', '/json-validator'],
 }
 
 // Keyed by language, then by the format or landing page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
@@ -590,6 +595,233 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
       ],
     },
+    '/excel-to-csv': {
+      stepsTitle: 'How it works: convert Excel to CSV',
+      steps: [
+        { title: 'Drop your Excel file', text: 'Drop an .xlsx, .xls, .xlsm or .ods file on this page or choose it. It is read in your browser and never uploaded.' },
+        { title: 'It opens as a CSV', text: 'The first sheet is converted at once and opens in the CSV viewer, with commas between the columns and Arabic text kept intact.' },
+        { title: 'Check and edit it', text: 'Search, sort, filter and edit the rows in the CSV viewer, so the CSV holds exactly what you need.' },
+        { title: 'Download', text: 'Download saves the CSV. For a semicolon, tab or pipe instead of a comma, choose Download options in the More menu.' },
+      ],
+      handlesTitle: 'What the Excel to CSV converter handles',
+      handles: [
+        'Files: .xlsx, .xls, .xlsm and .ods workbooks.',
+        'Values: each cell as Excel shows it, so dates, percentages and currencies keep their format, and formulas give their saved result.',
+        'Sheets: the first sheet; for another, open the workbook in the Excel viewer, pick the sheet and use Convert.',
+        'Encoding: UTF-8, with the byte order mark Excel needs for Arabic and other non-Latin text whenever the sheet has any.',
+        'Delimiters: a comma, or a semicolon, tab or pipe from the CSV viewer\'s Download options.',
+      ],
+      faqTitle: 'Excel to CSV: questions and answers',
+      faq: [
+        {
+          question: 'How do I convert an Excel file with several sheets to CSV?',
+          answer: 'This page converts the first sheet. For another sheet, open the workbook in the Excel viewer, click the sheet\'s tab, then click Convert at the top and choose Convert to CSV: the sheet on screen opens as a CSV.',
+          link: { text: 'Excel viewer', path: '/excel-viewer' },
+        },
+        {
+          question: 'Why does Arabic text look broken when I open the CSV in Excel?',
+          answer: 'Excel reads a UTF-8 file without a byte order mark as an older Windows encoding. The CSV made here gets that mark whenever the sheet has Arabic or other non-Latin text, so Excel shows it correctly.',
+          link: { text: 'Fix broken Arabic in a CSV', path: '/fix-arabic-csv-in-excel' },
+        },
+        {
+          question: 'Can I use a semicolon instead of a comma?',
+          answer: 'Yes. The CSV opens in the CSV viewer: choose Download options in the More menu and pick a semicolon, tab or pipe. A semicolon suits Excel in regions that write decimals with a comma, where a comma-separated file lands in one column.',
+          link: { text: 'CSV opens in one column', path: '/csv-opens-in-one-column' },
+        },
+        {
+          question: 'Are formulas kept in the CSV?',
+          answer: 'No. CSV holds text only, so each formula is written as the result saved in the workbook. Keep the Excel file if you still need the formulas.',
+        },
+        {
+          question: 'Are dates and numbers written the way Excel shows them?',
+          answer: 'Yes. Each cell is written as the text Excel shows, so a date stays 05/01/2026 and a price keeps its currency sign, instead of becoming the number Excel stores behind it.',
+        },
+        {
+          question: 'Is my workbook uploaded to convert it?',
+          answer: 'No. The workbook is read and converted by your browser on your device; nothing is sent to a server.',
+        },
+      ],
+    },
+    '/csv-to-excel': {
+      stepsTitle: 'How it works: convert CSV to Excel',
+      steps: [
+        { title: 'Drop or paste your CSV', text: 'Drop a .csv, .tsv or .tab file, choose it, or press Ctrl+V to paste CSV text. The delimiter and encoding are detected for you.' },
+        { title: 'It opens as a workbook', text: 'The table is converted at once and opens as an .xlsx file in the Excel viewer, with a bold header row and each column as wide as its text.' },
+        { title: 'Edit it', text: 'Change cells, write formulas, and add formats, colours or sheets in the Excel viewer.' },
+        { title: 'Download', text: 'Download saves the .xlsx file, ready for Excel, Google Sheets, Numbers or LibreOffice.' },
+      ],
+      handlesTitle: 'What the CSV to Excel converter handles',
+      handles: [
+        'Files: .csv, .tsv and .tab, or CSV text you paste.',
+        'Delimiters: comma, semicolon, tab and pipe, detected for you; UTF-8 and other common encodings.',
+        'Layout: one sheet, a bold header row, and columns sized to their longest text (up to 60 characters).',
+        'Numbers: plain numbers such as 42 or 3.5 become real numbers; values like 007, phone numbers and long IDs stay text, so no digit is lost.',
+        'Arabic and other non-Latin text is kept exactly in the workbook.',
+      ],
+      faqTitle: 'CSV to Excel: questions and answers',
+      faq: [
+        {
+          question: 'Why convert a CSV to Excel instead of opening it in Excel?',
+          answer: 'Opening a CSV makes Excel guess the delimiter and encoding, which can put every row in one column or garble Arabic. An .xlsx file has no such guesses: the columns, the text and the header are fixed.',
+        },
+        {
+          question: 'Are leading zeros kept, for example in codes like 00123?',
+          answer: 'Yes. Only plain numbers become numbers in the workbook. A value that starts with 0, a phone number or an ID longer than 15 digits stays text, exactly as it was in the CSV.',
+        },
+        {
+          question: 'What if the columns come out wrong?',
+          answer: 'The delimiter is detected from the file: comma, semicolon, tab or pipe. If the columns still look wrong, open the file in the CSV viewer, pick the delimiter in its reading settings, then click Convert at the top and choose Convert to Excel.',
+          link: { text: 'CSV viewer', path: '/csv-viewer' },
+        },
+        {
+          question: 'How many rows can the Excel file hold?',
+          answer: 'Excel shows up to 1,048,576 rows per sheet. A CSV with more rows converts, but Excel will not show the rows past that limit.',
+          link: { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' },
+        },
+        {
+          question: 'Does the converter keep my edits from the CSV viewer?',
+          answer: 'Yes. In the CSV viewer, click Convert at the top, then Convert to Excel: the table, with your unsaved edits, opens as an .xlsx file in the Excel viewer, ready to edit and download.',
+        },
+        {
+          question: 'Is my CSV uploaded to make the Excel file?',
+          answer: 'No. The workbook is built by your browser on your device, and nothing is sent to a server.',
+        },
+      ],
+    },
+    '/excel-to-json': {
+      stepsTitle: 'How it works: convert Excel to JSON',
+      steps: [
+        { title: 'Drop your Excel file', text: 'Drop an .xlsx, .xls, .xlsm or .ods file on this page or choose it. It is read in your browser and never uploaded.' },
+        { title: 'It opens as JSON', text: 'The first sheet becomes an array of objects, one per row, keyed by the header row, and opens in the JSON viewer.' },
+        { title: 'Explore and edit it', text: 'See it as a tree, a table or formatted text, edit values, or minify it to one line.' },
+        { title: 'Copy or download', text: 'Copy formatted or minified JSON to your clipboard, or download a .json file.' },
+      ],
+      handlesTitle: 'What the Excel to JSON converter handles',
+      handles: [
+        'Files: .xlsx, .xls, .xlsm and .ods workbooks; the first sheet, or any sheet through Convert in the Excel viewer.',
+        'Shape: an array of objects, one per row, keyed by the header row.',
+        'Types: numbers and true/false stay numbers and booleans, dates become ISO 8601 text, empty cells become null.',
+        'Keys: an empty header cell becomes its column letter (C), and a repeated header gets _2, _3.',
+        'Output: indented with 2 spaces; minify or re-indent it in the JSON viewer.',
+      ],
+      faqTitle: 'Excel to JSON: questions and answers',
+      faq: [
+        {
+          question: 'What does the JSON look like?',
+          answer: 'An array with one object per row. The header row gives the keys, so a sheet with Name and Price columns becomes [{"Name": "Pen", "Price": 2.5}, ...].',
+        },
+        {
+          question: 'Are numbers written as numbers or as text?',
+          answer: 'As numbers. A cell that holds a number in Excel becomes a JSON number, TRUE and FALSE become true and false, and text stays a string.',
+        },
+        {
+          question: 'How are dates converted?',
+          answer: 'Dates become ISO 8601 text such as "2026-01-05T00:00:00.000Z", which every programming language can read back.',
+        },
+        {
+          question: 'What happens to empty cells and empty header cells?',
+          answer: 'An empty cell becomes null, so every object has the same keys. An empty header cell takes its column letter as the key, and a header that appears twice gets _2.',
+        },
+        {
+          question: 'Can I convert a sheet other than the first?',
+          answer: 'Yes. This page converts the first sheet. For another, open the workbook in the Excel viewer, click the sheet\'s tab, then click Convert at the top and choose Convert to JSON.',
+          link: { text: 'Excel viewer', path: '/excel-viewer' },
+        },
+        {
+          question: 'Is my spreadsheet sent anywhere?',
+          answer: 'No. Your browser reads the workbook and writes the JSON on your device; nothing is uploaded.',
+        },
+      ],
+    },
+    '/csv-to-json': {
+      stepsTitle: 'How it works: convert CSV to JSON',
+      steps: [
+        { title: 'Drop or paste your CSV', text: 'Drop a .csv, .tsv or .tab file, choose it, or press Ctrl+V to paste CSV text. The delimiter and encoding are detected for you.' },
+        { title: 'It opens as JSON', text: 'The rows become an array of objects keyed by the header row, and open in the JSON viewer.' },
+        { title: 'Check and edit it', text: 'See it as a tree, a table or formatted text, and edit any value.' },
+        { title: 'Copy or download', text: 'Copy formatted or minified JSON to your clipboard, or download a .json file with the CSV\'s name.' },
+      ],
+      handlesTitle: 'What the CSV to JSON converter handles',
+      handles: [
+        'Files: .csv, .tsv and .tab, or CSV text you paste; comma, semicolon, tab and pipe delimiters.',
+        'Shape: an array of objects keyed by the header row, one object per row.',
+        'Numbers: plain numbers such as 42 or 3.5 become JSON numbers; 007, phone numbers and long IDs stay strings.',
+        'Keys: an empty header cell becomes its column letter, and a repeated header gets _2, _3.',
+        'Text: UTF-8 and other common encodings, Arabic included, written as UTF-8 JSON.',
+      ],
+      faqTitle: 'CSV to JSON: questions and answers',
+      faq: [
+        {
+          question: 'Which row becomes the JSON keys?',
+          answer: 'The first row of the CSV. Every row below it becomes one object with those keys, in the same column order.',
+        },
+        {
+          question: 'Does the converter turn numbers into JSON numbers?',
+          answer: 'Plain numbers, yes: 42 and -3.5 become numbers. Values that would lose something as a number, such as 00123, a phone number or an ID over 15 digits, stay strings.',
+        },
+        {
+          question: 'What if a row has fewer cells than the header?',
+          answer: 'The missing cells become null, so every object has every key. Empty cells that are present stay empty strings.',
+        },
+        {
+          question: 'Does it work with semicolon-separated CSV files?',
+          answer: 'Yes. The delimiter is detected from the file, whether it is a comma, semicolon, tab or pipe, so CSV files saved by Excel in Europe convert too.',
+        },
+        {
+          question: 'Can I convert the CSV I am editing in the CSV viewer?',
+          answer: 'Yes. In the CSV viewer, click Convert at the top, then Convert to JSON: the table, with your unsaved edits, opens as a .json file in the JSON viewer, ready to edit and download.',
+        },
+        {
+          question: 'Is the CSV uploaded?',
+          answer: 'No. Your browser reads the CSV and writes the JSON on your device; nothing is sent to a server.',
+        },
+      ],
+    },
+    '/json-to-csv': {
+      stepsTitle: 'How it works: convert JSON to CSV',
+      steps: [
+        { title: 'Open or paste your JSON', text: 'Drop a .json file, choose it, or press Ctrl+V to paste JSON. It should be an array of objects, or a single object.' },
+        { title: 'It opens as a table', text: 'Each object becomes a row in the CSV viewer. Nested objects are flattened with dots (address.city) and lists with their position (items.0.name).' },
+        { title: 'Filter and edit it', text: 'Search, sort, filter and edit the rows in the CSV viewer before you save.' },
+        { title: 'Download', text: 'Download saves a .csv file with the JSON file\'s name. For a semicolon, tab or pipe, choose Download options in the More menu.' },
+      ],
+      handlesTitle: 'What the JSON to CSV converter handles',
+      handles: [
+        'Input: a JSON array of objects, or one object, from a .json file or pasted text, up to 10 MB.',
+        'Nested data: objects flattened into dot-notation columns such as address.city; lists into items.0, items.1.',
+        'Columns: every key that appears in any object, in the order they first appear; missing values are left empty.',
+        'Long numbers: integers beyond 2^53 are written digit for digit, not rounded.',
+        'Delimiters: a comma, with the byte order mark Excel needs when there is non-Latin text; a semicolon, tab or pipe from Download options.',
+      ],
+      faqTitle: 'JSON to CSV: questions and answers',
+      faq: [
+        {
+          question: 'How are nested objects turned into columns?',
+          answer: 'Each nested key is joined to its parent with a dot. {"address": {"city": "Riyadh"}} becomes a column named address.city holding Riyadh.',
+        },
+        {
+          question: 'What happens to arrays inside the objects?',
+          answer: 'Each item gets its position in the column name: tags.0, tags.1, or items.0.name for a list of objects. An empty list is written as [].',
+        },
+        {
+          question: 'What JSON shapes can be converted?',
+          answer: 'An array of objects, which gives one row per object, or a single object, which gives one row. A list of plain values or a number on its own is not a table, so the page says so.',
+        },
+        {
+          question: 'My objects do not all have the same keys. Is that a problem?',
+          answer: 'No. The CSV gets a column for every key found in any object, and a row leaves the cell empty where its object has no such key.',
+        },
+        {
+          question: 'My JSON has an error. Can I still convert it?',
+          answer: 'Not until it is valid. The page shows what is wrong; the JSON validator shows the line and column and repairs common mistakes.',
+          link: { text: 'JSON validator', path: '/json-validator' },
+        },
+        {
+          question: 'Is my JSON uploaded?',
+          answer: 'No. The JSON is parsed and converted by your browser on your device; nothing is sent to a server.',
+        },
+      ],
+    },
   },
   ar: {
     '/csv-viewer': {
@@ -1139,6 +1371,233 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل تعمل الصيغ في ملف XLS؟',
           answer: 'نعم. تظهر الصيغ بنتائجها المحفوظة، وبعد تعديل خلية يُعاد حساب الصيغ التي تعتمد عليها، للدوال الشائعة مثل SUM وIF وVLOOKUP وINDEX/MATCH. أما الصيغة التي فيها دالة غير مدعومة فتحتفظ بنتيجتها المحفوظة.',
+        },
+      ],
+    },
+    '/excel-to-csv': {
+      stepsTitle: 'كيف يعمل: تحويل Excel إلى CSV',
+      steps: [
+        { title: 'أفلت ملف Excel', text: 'أفلت ملف .xlsx أو .xls أو .xlsm أو .ods على هذه الصفحة أو اختره. يُقرأ الملف في متصفحك ولا يُرفع أبدًا.' },
+        { title: 'يُفتح ملف CSV', text: 'تُحوَّل الورقة الأولى فورًا وتُفتح في عارض CSV، بفواصل بين الأعمدة ومع الحفاظ على النص العربي كما هو.' },
+        { title: 'راجعه وعدّله', text: 'ابحث في الصفوف ورتّبها وصفِّها وعدّلها في عارض CSV، ليحمل الملف ما تحتاجه بالضبط.' },
+        { title: 'نزّل الملف', text: 'يحفظ «تنزيل» ملف CSV. ولاستخدام فاصلة منقوطة أو علامة جدولة أو خط عمودي بدل الفاصلة، اختر «خيارات التنزيل» من قائمة «المزيد».' },
+      ],
+      handlesTitle: 'ما يدعمه محوّل Excel إلى CSV',
+      handles: [
+        'الملفات: مصنفات .xlsx و.xls و.xlsm و.ods.',
+        'القيم: كل خلية كما يعرضها Excel، فتبقى التواريخ والنسب المئوية والعملات بتنسيقها، وتُكتب الصيغ بنتائجها المحفوظة.',
+        'الأوراق: الورقة الأولى؛ ولغيرها افتح المصنف في عارض Excel واختر الورقة واستخدم «تحويل».',
+        'الترميز: UTF-8، مع علامة ترتيب البايت التي يحتاجها Excel للعربية وغيرها من النصوص غير اللاتينية متى وُجدت في الورقة.',
+        'الفواصل: فاصلة، أو فاصلة منقوطة أو علامة جدولة أو خط عمودي من «خيارات التنزيل» في عارض CSV.',
+      ],
+      faqTitle: 'تحويل Excel إلى CSV: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'كيف أحوّل ملف Excel فيه عدة أوراق إلى CSV؟',
+          answer: 'تحوّل هذه الصفحة الورقة الأولى. ولورقة أخرى، افتح المصنف في عارض Excel وانقر تبويب الورقة، ثم انقر «تحويل» في الأعلى واختر «تحويل إلى CSV»، فتُفتح الورقة المعروضة ملفَّ CSV.',
+          link: { text: 'عارض Excel', path: '/excel-viewer' },
+        },
+        {
+          question: 'لماذا يظهر النص العربي مشوهًا عند فتح ملف CSV في Excel؟',
+          answer: 'يقرأ Excel ملف UTF-8 الذي ليس فيه علامة ترتيب البايت بترميز Windows قديم. ويحصل ملف CSV الناتج هنا على هذه العلامة متى كان في الورقة نص عربي أو غير لاتيني، فيعرضه Excel بشكل صحيح.',
+          link: { text: 'إصلاح العربية المشوهة في CSV', path: '/fix-arabic-csv-in-excel' },
+        },
+        {
+          question: 'هل يمكنني استخدام فاصلة منقوطة بدل الفاصلة؟',
+          answer: 'نعم. يُفتح ملف CSV في عارض CSV: اختر «خيارات التنزيل» من قائمة «المزيد» واختر فاصلة منقوطة أو علامة جدولة أو خطًا عموديًا. تناسب الفاصلة المنقوطة Excel في المناطق التي تكتب الكسور العشرية بفاصلة، حيث يظهر الملف المفصول بفواصل في عمود واحد.',
+          link: { text: 'ملف CSV يفتح في عمود واحد', path: '/csv-opens-in-one-column' },
+        },
+        {
+          question: 'هل تبقى الصيغ في ملف CSV؟',
+          answer: 'لا. يحمل CSV نصًا فقط، فتُكتب كل صيغة بنتيجتها المحفوظة في المصنف. احتفظ بملف Excel إذا كنت ما زلت تحتاج الصيغ.',
+        },
+        {
+          question: 'هل تُكتب التواريخ والأرقام كما يعرضها Excel؟',
+          answer: 'نعم. تُكتب كل خلية بالنص الذي يعرضه Excel، فيبقى التاريخ 05/01/2026 ويحتفظ السعر برمز العملة، بدل أن يصبح الرقم الذي يخزنه Excel خلفه.',
+        },
+        {
+          question: 'هل يُرفع المصنف لتحويله؟',
+          answer: 'لا. يقرأ متصفحك المصنف ويحوّله على جهازك، ولا يُرسل شيء إلى أي خادم.',
+        },
+      ],
+    },
+    '/csv-to-excel': {
+      stepsTitle: 'كيف يعمل: تحويل CSV إلى Excel',
+      steps: [
+        { title: 'أفلت ملف CSV أو الصقه', text: 'أفلت ملف .csv أو .tsv أو .tab أو اختره، أو اضغط Ctrl+V للصق نص CSV. يُكتشف الفاصل والترميز تلقائيًا.' },
+        { title: 'يُفتح مصنفًا', text: 'يُحوَّل الجدول فورًا ويُفتح ملفَّ .xlsx في عارض Excel، بصف عناوين عريض وكل عمود بعرض نصه.' },
+        { title: 'عدّله', text: 'غيّر الخلايا واكتب الصيغ، وأضف التنسيقات والألوان والأوراق في عارض Excel.' },
+        { title: 'نزّل الملف', text: 'يحفظ «تنزيل» ملف .xlsx، جاهزًا لـ Excel أو Google Sheets أو Numbers أو LibreOffice.' },
+      ],
+      handlesTitle: 'ما يدعمه محوّل CSV إلى Excel',
+      handles: [
+        'الملفات: .csv و.tsv و.tab، أو نص CSV تلصقه.',
+        'الفواصل: الفاصلة والفاصلة المنقوطة وعلامة الجدولة والخط العمودي، تُكتشف تلقائيًا، مع UTF-8 والترميزات الشائعة الأخرى.',
+        'التخطيط: ورقة واحدة، وصف عناوين عريض، وأعمدة بعرض أطول نص فيها (حتى 60 حرفًا).',
+        'الأرقام: تصبح الأرقام البسيطة مثل 42 أو 3.5 أرقامًا حقيقية، وتبقى قيم مثل 007 وأرقام الهواتف والمعرّفات الطويلة نصًا، فلا يضيع أي رقم.',
+        'يبقى النص العربي وغيره من النصوص غير اللاتينية كما هو تمامًا في المصنف.',
+      ],
+      faqTitle: 'تحويل CSV إلى Excel: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'لماذا أحوّل CSV إلى Excel بدل فتحه في Excel مباشرة؟',
+          answer: 'عند فتح ملف CSV يخمّن Excel الفاصل والترميز، فقد يضع كل صف في عمود واحد أو يشوّه العربية. أما ملف .xlsx فلا تخمين فيه: الأعمدة والنص وصف العناوين ثابتة.',
+        },
+        {
+          question: 'هل تبقى الأصفار في البداية، مثلًا في رموز مثل 00123؟',
+          answer: 'نعم. لا تصبح أرقامًا في المصنف إلا الأرقام البسيطة. أما القيمة التي تبدأ بصفر أو رقم الهاتف أو المعرّف الأطول من 15 رقمًا فتبقى نصًا كما كانت في ملف CSV.',
+        },
+        {
+          question: 'ماذا لو ظهرت الأعمدة بشكل خاطئ؟',
+          answer: 'يُكتشف الفاصل من الملف: فاصلة أو فاصلة منقوطة أو علامة جدولة أو خط عمودي. وإن بقيت الأعمدة خاطئة، فافتح الملف في عارض CSV واختر الفاصل من إعدادات القراءة، ثم انقر «تحويل» في الأعلى واختر «تحويل إلى Excel».',
+          link: { text: 'عارض CSV', path: '/csv-viewer' },
+        },
+        {
+          question: 'كم صفًا يمكن أن يحمل ملف Excel؟',
+          answer: 'يعرض Excel حتى 1,048,576 صفًا في الورقة. يُحوَّل ملف CSV الأكبر من ذلك، لكن Excel لن يعرض الصفوف بعد هذا الحد.',
+          link: { text: 'ملف CSV أكبر من Excel', path: '/csv-too-big-for-excel' },
+        },
+        {
+          question: 'هل يحتفظ المحوّل بتعديلاتي من عارض CSV؟',
+          answer: 'نعم. في عارض CSV انقر «تحويل» في الأعلى ثم «تحويل إلى Excel»، فيُفتح الجدول بتعديلاتك غير المحفوظة ملفَّ .xlsx في عارض Excel، جاهزًا للتعديل والتنزيل.',
+        },
+        {
+          question: 'هل يُرفع ملف CSV لإنشاء ملف Excel؟',
+          answer: 'لا. يبني متصفحك المصنف على جهازك، ولا يُرسل شيء إلى أي خادم.',
+        },
+      ],
+    },
+    '/excel-to-json': {
+      stepsTitle: 'كيف يعمل: تحويل Excel إلى JSON',
+      steps: [
+        { title: 'أفلت ملف Excel', text: 'أفلت ملف .xlsx أو .xls أو .xlsm أو .ods على هذه الصفحة أو اختره. يُقرأ الملف في متصفحك ولا يُرفع أبدًا.' },
+        { title: 'يُفتح JSON', text: 'تصبح الورقة الأولى مصفوفة كائنات، كائن لكل صف، مفاتيحها من صف العناوين، وتُفتح في عارض JSON.' },
+        { title: 'تصفّحه وعدّله', text: 'اعرضه شجرةً أو جدولًا أو نصًا منسقًا، وعدّل القيم، أو صغّره في سطر واحد.' },
+        { title: 'انسخه أو نزّله', text: 'انسخ JSON منسقًا أو مصغّرًا إلى الحافظة، أو نزّل ملف .json.' },
+      ],
+      handlesTitle: 'ما يدعمه محوّل Excel إلى JSON',
+      handles: [
+        'الملفات: مصنفات .xlsx و.xls و.xlsm و.ods؛ الورقة الأولى، أو أي ورقة عبر «تحويل» في عارض Excel.',
+        'الشكل: مصفوفة كائنات، كائن لكل صف، ومفاتيحها من صف العناوين.',
+        'الأنواع: تبقى الأرقام والقيم المنطقية أرقامًا وقيمًا منطقية، وتصبح التواريخ نصًا بصيغة ISO 8601، والخلايا الفارغة null.',
+        'المفاتيح: تأخذ خلية العنوان الفارغة حرف عمودها (C)، ويأخذ العنوان المكرر _2 و_3.',
+        'الناتج: بمسافة بادئة من مسافتين؛ صغّره أو غيّر المسافة البادئة في عارض JSON.',
+      ],
+      faqTitle: 'تحويل Excel إلى JSON: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'كيف يبدو ملف JSON الناتج؟',
+          answer: 'مصفوفة فيها كائن لكل صف. يعطي صف العناوين المفاتيح، فتصبح ورقة فيها عمودا Name وPrice هكذا: [{"Name": "Pen", "Price": 2.5}, ...].',
+        },
+        {
+          question: 'هل تُكتب الأرقام أرقامًا أم نصًا؟',
+          answer: 'أرقامًا. الخلية التي فيها رقم في Excel تصبح رقمًا في JSON، وتصبح TRUE وFALSE القيمتين true وfalse، ويبقى النص نصًا.',
+        },
+        {
+          question: 'كيف تُحوَّل التواريخ؟',
+          answer: 'تصبح التواريخ نصًا بصيغة ISO 8601 مثل "2026-01-05T00:00:00.000Z"، وهي صيغة تقرؤها كل لغات البرمجة.',
+        },
+        {
+          question: 'ماذا يحدث للخلايا الفارغة وخلايا العناوين الفارغة؟',
+          answer: 'تصبح الخلية الفارغة null، فيكون لكل كائن المفاتيح نفسها. وتأخذ خلية العنوان الفارغة حرف عمودها مفتاحًا، ويأخذ العنوان المكرر _2.',
+        },
+        {
+          question: 'هل يمكنني تحويل ورقة غير الأولى؟',
+          answer: 'نعم. تحوّل هذه الصفحة الورقة الأولى. ولغيرها افتح المصنف في عارض Excel وانقر تبويب الورقة، ثم انقر «تحويل» في الأعلى واختر «تحويل إلى JSON».',
+          link: { text: 'عارض Excel', path: '/excel-viewer' },
+        },
+        {
+          question: 'هل يُرسل جدولي إلى أي مكان؟',
+          answer: 'لا. يقرأ متصفحك المصنف ويكتب JSON على جهازك، ولا يُرفع شيء.',
+        },
+      ],
+    },
+    '/csv-to-json': {
+      stepsTitle: 'كيف يعمل: تحويل CSV إلى JSON',
+      steps: [
+        { title: 'أفلت ملف CSV أو الصقه', text: 'أفلت ملف .csv أو .tsv أو .tab أو اختره، أو اضغط Ctrl+V للصق نص CSV. يُكتشف الفاصل والترميز تلقائيًا.' },
+        { title: 'يُفتح JSON', text: 'تصبح الصفوف مصفوفة كائنات مفاتيحها صف العناوين، وتُفتح في عارض JSON.' },
+        { title: 'راجعه وعدّله', text: 'اعرضه شجرةً أو جدولًا أو نصًا منسقًا، وعدّل أي قيمة.' },
+        { title: 'انسخه أو نزّله', text: 'انسخ JSON منسقًا أو مصغّرًا إلى الحافظة، أو نزّل ملف .json باسم ملف CSV.' },
+      ],
+      handlesTitle: 'ما يدعمه محوّل CSV إلى JSON',
+      handles: [
+        'الملفات: .csv و.tsv و.tab، أو نص CSV تلصقه، بفواصل من فاصلة أو فاصلة منقوطة أو علامة جدولة أو خط عمودي.',
+        'الشكل: مصفوفة كائنات مفاتيحها من صف العناوين، كائن لكل صف.',
+        'الأرقام: تصبح الأرقام البسيطة مثل 42 أو 3.5 أرقامًا في JSON، وتبقى 007 وأرقام الهواتف والمعرّفات الطويلة نصوصًا.',
+        'المفاتيح: تأخذ خلية العنوان الفارغة حرف عمودها، ويأخذ العنوان المكرر _2 و_3.',
+        'النص: UTF-8 والترميزات الشائعة الأخرى، والعربية منها، ويُكتب JSON بترميز UTF-8.',
+      ],
+      faqTitle: 'تحويل CSV إلى JSON: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'أي صف يصبح مفاتيح JSON؟',
+          answer: 'الصف الأول من ملف CSV. ويصبح كل صف بعده كائنًا واحدًا بهذه المفاتيح، بترتيب الأعمدة نفسه.',
+        },
+        {
+          question: 'هل يحوّل المحوّل الأرقام إلى أرقام JSON؟',
+          answer: 'الأرقام البسيطة نعم: تصبح 42 و-3.5 أرقامًا. أما القيم التي تفقد شيئًا إذا صارت رقمًا، مثل 00123 أو رقم هاتف أو معرّف أطول من 15 رقمًا، فتبقى نصوصًا.',
+        },
+        {
+          question: 'ماذا لو كان في صف خلايا أقل من صف العناوين؟',
+          answer: 'تصبح الخلايا الناقصة null، فيكون لكل كائن كل المفاتيح. أما الخلايا الفارغة الموجودة فتبقى نصوصًا فارغة.',
+        },
+        {
+          question: 'هل يعمل مع ملفات CSV المفصولة بفاصلة منقوطة؟',
+          answer: 'نعم. يُكتشف الفاصل من الملف، فاصلة كان أو فاصلة منقوطة أو علامة جدولة أو خطًا عموديًا، فتُحوَّل أيضًا ملفات CSV التي يحفظها Excel في أوروبا.',
+        },
+        {
+          question: 'هل يمكنني تحويل ملف CSV الذي أعدّله في عارض CSV؟',
+          answer: 'نعم. في عارض CSV انقر «تحويل» في الأعلى ثم «تحويل إلى JSON»، فيُفتح الجدول بتعديلاتك غير المحفوظة ملفَّ .json في عارض JSON، جاهزًا للتعديل والتنزيل.',
+        },
+        {
+          question: 'هل يُرفع ملف CSV؟',
+          answer: 'لا. يقرأ متصفحك ملف CSV ويكتب JSON على جهازك، ولا يُرسل شيء إلى أي خادم.',
+        },
+      ],
+    },
+    '/json-to-csv': {
+      stepsTitle: 'كيف يعمل: تحويل JSON إلى CSV',
+      steps: [
+        { title: 'افتح JSON أو الصقه', text: 'أفلت ملف .json أو اختره، أو اضغط Ctrl+V للصق JSON. يجب أن يكون مصفوفة كائنات أو كائنًا واحدًا.' },
+        { title: 'يُفتح جدولًا', text: 'يصبح كل كائن صفًا في عارض CSV. تُسطَّح الكائنات المتداخلة بنقاط (address.city) والقوائم بمواضع عناصرها (items.0.name).' },
+        { title: 'صفِّه وعدّله', text: 'ابحث في الصفوف ورتّبها وصفِّها وعدّلها في عارض CSV قبل الحفظ.' },
+        { title: 'نزّل الملف', text: 'يحفظ «تنزيل» ملف .csv باسم ملف JSON. ولفاصلة منقوطة أو علامة جدولة أو خط عمودي، اختر «خيارات التنزيل» من قائمة «المزيد».' },
+      ],
+      handlesTitle: 'ما يدعمه محوّل JSON إلى CSV',
+      handles: [
+        'المدخلات: مصفوفة كائنات JSON أو كائن واحد، من ملف .json أو نص ملصوق، حتى 10 ميجابايت.',
+        'البيانات المتداخلة: تُسطَّح الكائنات في أعمدة بأسماء نقطية مثل address.city، والقوائم في items.0 وitems.1.',
+        'الأعمدة: كل مفتاح يظهر في أي كائن، بترتيب ظهوره أول مرة، وتُترك القيم الناقصة فارغة.',
+        'الأرقام الطويلة: تُكتب الأعداد الصحيحة الأكبر من 2^53 رقمًا رقمًا بلا تقريب.',
+        'الفواصل: فاصلة، مع علامة ترتيب البايت التي يحتاجها Excel عند وجود نص غير لاتيني؛ وفاصلة منقوطة أو علامة جدولة أو خط عمودي من «خيارات التنزيل».',
+      ],
+      faqTitle: 'تحويل JSON إلى CSV: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'كيف تصبح الكائنات المتداخلة أعمدة؟',
+          answer: 'يُوصل كل مفتاح متداخل بمفتاح أبيه بنقطة. فيصبح {"address": {"city": "Riyadh"}} عمودًا اسمه address.city قيمته Riyadh.',
+        },
+        {
+          question: 'ماذا يحدث للقوائم داخل الكائنات؟',
+          answer: 'يأخذ كل عنصر موضعه في اسم العمود: tags.0 وtags.1، أو items.0.name لقائمة كائنات. وتُكتب القائمة الفارغة [].',
+        },
+        {
+          question: 'ما أشكال JSON التي يمكن تحويلها؟',
+          answer: 'مصفوفة كائنات، فيصبح كل كائن صفًا، أو كائن واحد فيصبح صفًا واحدًا. أما قائمة القيم البسيطة أو الرقم المنفرد فليست جدولًا، وتخبرك الصفحة بذلك.',
+        },
+        {
+          question: 'ليس لكل كائناتي المفاتيح نفسها. هل هذه مشكلة؟',
+          answer: 'لا. يحصل ملف CSV على عمود لكل مفتاح يظهر في أي كائن، وتبقى الخلية فارغة في الصف الذي ليس في كائنه هذا المفتاح.',
+        },
+        {
+          question: 'في JSON خطأ. هل يمكنني تحويله رغم ذلك؟',
+          answer: 'ليس قبل أن يصبح صالحًا. تعرض الصفحة سبب الخطأ، ويعرض مدقق JSON السطر والعمود ويصلح الأخطاء الشائعة.',
+          link: { text: 'التحقق من JSON', path: '/json-validator' },
+        },
+        {
+          question: 'هل يُرفع ملف JSON؟',
+          answer: 'لا. يحلل متصفحك JSON ويحوّله على جهازك، ولا يُرسل شيء إلى أي خادم.',
         },
       ],
     },

@@ -1,18 +1,19 @@
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
-import { EditToolbar, downloadEditedFile } from '../components/EditControls'
+import { ChangeCounter, downloadEditedFile } from '../components/EditControls'
 import MenuBar from '../components/MenuBar'
 import type { MenuDefinition } from '../components/MenuBar'
-import { Notice, REJECTED_FILE_TOAST_SECONDS } from '../components/Messages'
-import { FILE_SAVED_EVENT, findFormatForFileName } from '../formats/registry'
+import { Notice, REJECTED_FILE_TOAST_SECONDS, useToast } from '../components/Messages'
+import { findFormatForFileName } from '../formats/registry'
 import type { EditingModule } from '../formats/registry'
+import type { ExcelSelection } from '../formats/excel/excelModel'
 import { SheetIconSprite, TopBar, useIsNarrowScreen, useThemeToggle } from '../formats/sheet/SheetChrome'
 import '../formats/sheet/sheetChrome.css'
 import { useEditSession } from '../formats/useEditSession'
-import { localizePath, translateWithNodes, useT } from '../i18n'
+import { localizePath, useT } from '../i18n'
 import { formatFileSize, useFileIntake } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findViewerForFileName, supportedExtensions } from '../viewers'
-import { pickRelatedFormat } from '../whatsNew'
+import type { ConversionTarget } from '../viewers'
 
 type FileViewPageProps = {
   openedFile: OpenedFile
@@ -32,6 +33,7 @@ const countNoEdits = () => 0
 // session, so edits survive switching between View and Edit.
 export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange }: FileViewPageProps) {
   const { locale, t } = useT()
+  const { showToast } = useToast()
   const viewer = findViewerForFileName(openedFile.file.name)
   const format = findFormatForFileName(openedFile.file.name)
   const editing = format?.editing
@@ -43,8 +45,6 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const [selection, setSelection] = useState<unknown>(null)
   const [viewerCommands, setViewerCommands] = useState<unknown>(null)
   const [exportSource, setExportSource] = useState<unknown>(null)
-  // One tip after a save, closed in React state only (nothing is stored); the page's key resets it for the next file.
-  const [isSaveTipShown, setIsSaveTipShown] = useState(false)
   const { undo, redo } = session
   const [isDark, toggleTheme] = useThemeToggle()
   const isNarrow = useIsNarrowScreen()
@@ -60,14 +60,6 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
     onUnsavedEditsChange(hasUnsavedEdits)
     return () => onUnsavedEditsChange(false)
   }, [hasUnsavedEdits, onUnsavedEditsChange])
-
-  useEffect(() => {
-    function showTipAfterSave() {
-      setIsSaveTipShown(true)
-    }
-    window.addEventListener(FILE_SAVED_EVENT, showTipAfterSave)
-    return () => window.removeEventListener(FILE_SAVED_EVENT, showTipAfterSave)
-  }, [])
 
   // Closing or reloading the tab with unsaved edits makes the browser ask first.
   useEffect(() => {
@@ -108,6 +100,10 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
     },
   })
 
+  function openConvertedFile(convertedFile: File) {
+    void convertedFile.arrayBuffer().then((convertedContents) => onReplaceFile(convertedFile, convertedContents))
+  }
+
   const confirmBeforeClear = useCallback(async () => !hasUnsavedEdits || (await confirmDiscardEdits()), [hasUnsavedEdits, confirmDiscardEdits])
   const closeAfterConfirm = useCallback(async () => {
     if (await confirmBeforeClear()) onClose()
@@ -115,7 +111,6 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
 
   if (!format) return null
   const Viewer = format.ViewerComponent
-  const tipFormat = viewer ? pickRelatedFormat(viewer.id) : undefined
 
   const fileMessages = (
     <div id="file-messages" aria-live="polite">
@@ -160,6 +155,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         onSelectionChange={setSelection}
         onCommandsChange={setViewerCommands}
         onExportSourceChange={setExportSource}
+        onOpenConvertedFile={openConvertedFile}
       />
     </Suspense>
   )
@@ -182,6 +178,8 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
       items: [
         { id: 'open', label: t('menu.openAnother'), icon: 'open', onSelect: anotherFileIntake.openFilePicker },
         { id: 'download', label: t('menu.download'), icon: 'download', isDisabled: !editingModule || exportSource === null, onSelect: () => void downloadFile() },
+        { id: 'revert-all', label: t('toolbar.revertAll'), icon: 'undo', isDisabled: !hasUnsavedEdits, onSelect: session.revertAll },
+        ...(changeDescription ? [{ id: 'menu-changes-note', note: changeDescription }] : []),
         'separator',
         { id: 'close', label: t('menu.close'), icon: 'x', onSelect: () => void closeAfterConfirm() },
       ],
@@ -201,6 +199,18 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   async function downloadFile() {
     if (editingModule) await downloadEditedFile(openedFile, editingModule, session.edits, exportSource, hasUnsavedEdits)
   }
+
+  // The workbook as Download would save it, edits included; the sheet on screen is converted and opened in its new viewer.
+  async function convertFile(convertTo: ConversionTarget) {
+    if (!editingModule || !viewer) return
+    const fileContents = await editingModule.downloadOption.createFile(session.edits, exportSource, { includeByteOrderMark: false })
+    const { convertForViewer } = await import('../formats/conversion')
+    const activeSheetName = (selection as ExcelSelection | null)?.activeSheetName
+    const result = await convertForViewer(new File([fileContents], openedFile.file.name), viewer.id, convertTo, locale, activeSheetName)
+    if ('error' in result) showToast({ message: result.error, kind: 'error' })
+    else openConvertedFile(result.file)
+  }
+  const canConvert = viewer?.id === 'excel' && Boolean(editingModule) && exportSource !== null
 
   // The spreadsheet frame (Excel), the same as the CSV page's: title row, menu bar, one slim toolbar, then the workbook.
   return (
@@ -223,33 +233,25 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         onHome={() => void closeAfterConfirm()}
         isDark={isDark}
         onToggleTheme={toggleTheme}
+        convertItems={
+          canConvert
+            ? [
+                { id: 'to-csv', label: t('convert.toCsv'), onSelect: () => void convertFile('csv') },
+                { id: 'to-json', label: t('convert.toJson'), onSelect: () => void convertFile('json') },
+              ]
+            : []
+        }
       />
-      <MenuBar menus={menus} isCompact={isNarrow} label={t('menu.bar')} />
-      {isSaveTipShown && tipFormat && (
-        <div id="save-tip" role="status" className="flex items-center gap-3 border-b border-rule bg-paper-raised px-4 py-1.5 text-sm">
-          <p id="save-tip-message" className="min-w-0 flex-1">
-            {translateWithNodes(locale, 'tip.alsoOpens', {
-              format: (
-                <a href={localizePath(locale, tipFormat.viewer.toolPath as string)} target="_blank" rel="noopener noreferrer" className="font-medium underline underline-offset-2 hover:text-accent">
-                  {tipFormat.viewer.label}
-                </a>
-              ),
-            })}
-          </p>
-          <button
-            id="save-tip-close-button"
-            type="button"
-            aria-label={t('tip.close')}
-            onClick={() => setIsSaveTipShown(false)}
-            className="control-shape grid size-8 shrink-0 cursor-pointer place-items-center transition-colors duration-200 hover:bg-paper"
-          >
-            <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-              <path d="m6 6 12 12M18 6 6 18" />
-            </svg>
-          </button>
-        </div>
-      )}
-      <EditToolbar session={session} editingModule={editingModule} selection={selection} viewerCommands={viewerCommands} changeDescription={changeDescription} />
+      <MenuBar
+        menus={menus}
+        isCompact={isNarrow}
+        label={t('menu.bar')}
+        tools={editingModule?.ToolbarContent && <editingModule.ToolbarContent selection={selection} commands={viewerCommands} />}
+      />
+      {/* The change count is in the File menu; screen readers still hear it as it changes. */}
+      <div className="sr-only">
+        <ChangeCounter description={changeDescription} />
+      </div>
       {anotherFileIntake.fileInput}
       {fileMessages}
       <Notice

@@ -88,7 +88,7 @@ export default function ExcelViewer({
   const [headerChoiceBySheetId, setHeaderChoiceBySheetId] = useState<Record<number, boolean>>({})
   const [searchText, setSearchText] = useState('')
   const [sortState, setSortState] = useState<SortState>(null)
-  const [range, setRange] = useState<CellRange | null>(null)
+  const [pickedRange, setRange] = useState<CellRange | null>(null)
   const [editingCell, setEditingCell] = useState<EditingCell | null>(null)
   const [inputMessage, setInputMessage] = useState('')
   const [columnMenu, setColumnMenu] = useState<{ columnId: number; left: number; top: number } | null>(null)
@@ -250,6 +250,13 @@ export default function ExcelViewer({
     return spans
   }, [sheet, visiblePositionByRowId, columnPositionById])
 
+  // Like a spreadsheet, a cell is always selected: the first one until the visitor picks another, so every tool works at once.
+  const firstRowId = visibleRowIds[0]
+  const firstColumnId = columnIds[0]
+  const range = useMemo(
+    () => pickedRange ?? (firstRowId !== undefined && firstColumnId !== undefined ? { anchor: { rowId: firstRowId, columnId: firstColumnId }, focus: { rowId: firstRowId, columnId: firstColumnId } } : null),
+    [pickedRange, firstRowId, firstColumnId],
+  )
   // The selected cell is the end of the range; it stays selected only while its row and column are still shown.
   const selectedCell = range && visiblePositionByRowId.has(range.focus.rowId) && columnPositionById.has(range.focus.columnId) ? range.focus : null
   const rangeBounds = useMemo(() => {

@@ -45,10 +45,19 @@ function renderChangelogNav(locale) {
     .filter((viewer) => viewer.toolPath)
     .map((viewer) => `<li><a id="site-nav-link-${viewer.id}" href="${localizePath(locale, viewer.toolPath)}" class="${n.link}">${escapeHtml(pageSeo[locale][viewer.toolPath].linkText)}</a></li>`)
     .join('')
+  const convertLabel = escapeHtml(translate(locale, 'convert.menuHeading'))
+  const convertItems = landingPages
+    .filter((page) => page.convertTo)
+    .map((page) => `<li><a id="site-nav-link-${page.path.slice(1)}" href="${localizePath(locale, page.path)}" class="${n.convertLink}">${escapeHtml(pageSeo[locale][page.path].linkText)}</a></li>`)
+    .join('')
+  const convertMenu =
+    `<li><details id="site-nav-convert" class="${n.convertDetails}"><summary id="site-nav-convert-toggle" class="${n.convertSummary}">${convertLabel}` +
+    `<svg aria-hidden="true" viewBox="0 0 24 24" class="${n.convertChevron}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${CHEVRON_ICON_PATH}"></path></svg></summary>` +
+    `<ul id="site-nav-convert-list" class="${n.convertList}">${convertItems}</ul></details></li>`
   return (
     `<nav id="site-nav" aria-label="${label}" class="${n.nav}"><details id="site-nav-menu" class="${n.details}"><summary id="site-nav-toggle" class="${n.summary}">${label}` +
     `<svg aria-hidden="true" viewBox="0 0 24 24" class="${n.chevron}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${CHEVRON_ICON_PATH}"></path></svg></summary>` +
-    `<ul id="site-nav-list" class="${n.list}">${items}</ul></details></nav>`
+    `<ul id="site-nav-list" class="${n.list}">${items}${convertMenu}</ul></details></nav>`
   )
 }
 
@@ -64,7 +73,10 @@ function renderChangelogFooter(locale) {
     .map((viewer) => item(link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))))
     .join('')
   const moreItems =
-    landingPages.map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText)))).join('') +
+    landingPages
+      .filter((page) => !page.convertTo)
+      .map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))))
+      .join('') +
     item(link('footer-link-guides', '/guides', escapeHtml(pageSeo[locale]['/guides'].linkText))) +
     item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =

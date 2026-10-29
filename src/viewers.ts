@@ -7,7 +7,11 @@ export type Viewer = {
   // The address of this format's own page (a drop zone for just this format), without the language: /csv-viewer is served at
   // /en/csv-viewer and /ar/csv-viewer. Only for formats that work. The open file keeps it.
   toolPath?: string
+  // Set on a conversion page's viewer (findViewerByToolPath): the page converts the file instead of opening it.
+  convertTo?: ConversionTarget
 }
+
+export type ConversionTarget = 'csv' | 'xlsx' | 'json'
 
 export const viewers: Viewer[] = [
   { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], toolPath: '/csv-viewer' },
@@ -37,8 +41,9 @@ export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions
 
 // Pages for one job of a live viewer (/json-formatter is the JSON viewer's page with its own words in seo.ts and pageContent.ts),
 // served like a format page at /en/json-formatter and /ar/json-formatter. `extensions` narrows what their drop zone accepts.
-// Only jobs the viewer really does: no conversions.
-export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: string[] }
+// Only jobs the viewer really does. A page with `convertTo` is a converter: `viewerId` is the format it reads, and the file is
+// converted as it is chosen (src/formats/conversion.ts) and the result opens in the viewer of its new format.
+export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: string[]; convertTo?: ConversionTarget }
 
 export const landingPages: LandingPage[] = [
   { path: '/json-formatter', viewerId: 'json' },
@@ -46,7 +51,13 @@ export const landingPages: LandingPage[] = [
   { path: '/tsv-viewer', viewerId: 'csv', extensions: ['.tsv', '.tab'] },
   { path: '/large-csv-viewer', viewerId: 'csv' },
   { path: '/xls-viewer', viewerId: 'excel', extensions: ['.xls'] },
+  { path: '/excel-to-csv', viewerId: 'excel', convertTo: 'csv' },
+  { path: '/csv-to-excel', viewerId: 'csv', convertTo: 'xlsx' },
+  { path: '/excel-to-json', viewerId: 'excel', convertTo: 'json' },
+  { path: '/csv-to-json', viewerId: 'csv', convertTo: 'json' },
+  { path: '/json-to-csv', viewerId: 'json', convertTo: 'csv' },
 ]
+
 
 const LEGACY_FILE_VIEW_PATH = '/view'
 
@@ -69,7 +80,14 @@ export function findViewerByToolPath(pathname: string): Viewer | undefined {
   if (formatViewer) return formatViewer
   const landingPage = landingPages.find((page) => page.path === pathname)
   const landingViewer = landingPage && viewers.find((viewer) => viewer.id === landingPage.viewerId)
-  return landingViewer && { ...landingViewer, toolPath: landingPage.path, extensions: landingPage.extensions ?? landingViewer.extensions }
+  return (
+    landingViewer && {
+      ...landingViewer,
+      toolPath: landingPage.path,
+      extensions: landingPage.extensions ?? landingViewer.extensions,
+      convertTo: landingPage.convertTo,
+    }
+  )
 }
 
 export function findViewerForFileName(fileName: string) {

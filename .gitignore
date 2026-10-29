@@ -25,6 +25,7 @@ dist-ssr
 /.agents
 /test-files
 /.claude
+/.config
 CLAUDE.md
 DECISIONS.md
 DESIGN.md

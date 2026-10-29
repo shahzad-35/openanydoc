@@ -4,7 +4,7 @@
 
 How it keeps files private: the site's Content-Security-Policy is `default-src 'self'; connect-src 'self'`, so the browser refuses any request to another origin, and an automated test suite fails the build if any page makes a network request or writes browser storage beyond the theme choice. Anyone can confirm this in the browser's Network tab while opening a file.
 
-What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices. Files download back in their own format. Word, PDF and PowerPoint are not supported yet.
+What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices. Files download back in their own format, or convert between formats: Excel to CSV or JSON, CSV to Excel or JSON, and JSON to CSV with nested objects flattened into dot-notation columns. Word, PDF and PowerPoint are not supported yet.
 
 ## Pricing
 
@@ -21,6 +21,11 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Large CSV viewer](https://www.openanydoc.com/en/large-csv-viewer): files beyond Excel's row limit
 - [TSV viewer](https://www.openanydoc.com/en/tsv-viewer)
 - [XLS viewer](https://www.openanydoc.com/en/xls-viewer): legacy Excel 97-2003 files
+- [Excel to CSV converter](https://www.openanydoc.com/en/excel-to-csv): the first sheet opens as a UTF-8 CSV (with BOM for Arabic text) in the CSV viewer
+- [CSV to Excel converter](https://www.openanydoc.com/en/csv-to-excel): opens as .xlsx in the Excel viewer, with a bold header row and columns sized to fit
+- [Excel to JSON converter](https://www.openanydoc.com/en/excel-to-json): opens in the JSON viewer as an array of objects keyed by the header row, numbers kept as numbers
+- [CSV to JSON converter](https://www.openanydoc.com/en/csv-to-json): opens in the JSON viewer as an array of objects keyed by the header row
+- [JSON to CSV converter](https://www.openanydoc.com/en/json-to-csv): opens in the CSV viewer, nested objects flattened into dot-notation columns
 
 ## Guides
 
