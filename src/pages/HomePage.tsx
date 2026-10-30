@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import DropPanel from '../components/DropPanel'
 import FormatGuide from '../components/FormatGuide'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import ThemeToggle from '../components/ThemeToggle'
 import SiteFooter, { PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import WhatsNewBanner from '../components/WhatsNewBanner'
@@ -144,11 +145,9 @@ export default function HomePage({
         </p>
         <SiteNav currentPath={address} onNavigate={onNavigate} />
         <div className="flex items-center gap-1 sm:gap-2">
-          <PageLink id="header-link-privacy" path="/privacy" onNavigate={onNavigate} className="pill-link hidden sm:inline-flex">
-            {t('legal.privacyShort')}
-          </PageLink>
-          <LanguageSwitcher className="pill-link" />
-          <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary press ms-1">
+          <LanguageSwitcher className="pill-link text-[15px] md:px-3" />
+          <ThemeToggle />
+          <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--compact press ms-1">
             {t('nav.openFile')}
           </button>
         </div>

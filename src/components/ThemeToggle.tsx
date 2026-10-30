@@ -50,9 +50,14 @@ export default function ThemeToggle({ compact = false }: { compact?: boolean }) 
       type="button"
       onClick={toggleTheme}
       aria-label={isDark ? t('theme.toLight') : t('theme.toDark')}
-      className={`control-shape solid-box grid cursor-pointer place-items-center ${compact ? 'min-h-8 min-w-8 pointer-coarse:min-h-11 pointer-coarse:min-w-11' : 'min-h-11 min-w-11'} border-ink bg-paper text-ink transition-colors duration-200 hover:bg-paper-raised active:scale-[0.98]`}
+      className={
+        compact
+          ? 'control-shape solid-box grid min-h-8 min-w-8 cursor-pointer place-items-center border-ink bg-paper text-ink transition-colors duration-200 hover:bg-paper-raised active:scale-[0.98] pointer-coarse:min-h-11 pointer-coarse:min-w-11'
+          : // A round icon in the site header's quiet pill style, like the language link beside it.
+            'pill-link size-12 cursor-pointer justify-center px-0'
+      }
     >
-      <RoughIcon drawShapes={isDark ? drawSun : drawMoon} className={`${compact ? 'size-4 pointer-coarse:size-7' : 'size-7'} overflow-visible`} />
+      <RoughIcon drawShapes={isDark ? drawSun : drawMoon} className={`${compact ? 'size-4 pointer-coarse:size-7' : 'size-6'} overflow-visible`} />
     </button>
   )
 }

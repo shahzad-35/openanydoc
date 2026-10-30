@@ -67,7 +67,7 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
         </p>
         <SiteNav currentPath={address} onNavigate={onNavigate} />
         <div className="flex items-center gap-1 sm:gap-2">
-          <LanguageSwitcher className="pill-link" />
+          <LanguageSwitcher className="pill-link text-[15px] md:px-3" />
           <ThemeToggle />
         </div>
       </header>

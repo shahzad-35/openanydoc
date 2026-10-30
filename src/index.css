@@ -417,10 +417,25 @@ html[lang="ar"] .type-h2 {
   color: var(--paper-raised);
 }
 
+/* The light mode's dark block, inverted: a light block with dark text, so the main action stands out on the dark page. */
 .dark .btn--primary {
   --base: #9aa3b8;
-  background: var(--paper-raised);
-  color: var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* The header's "Open a file": a smaller block that does not outweigh the menu links beside it; 44 px tall on touch screens. */
+.btn--compact {
+  --lift: 4px;
+  min-height: 40px;
+  padding: 0 18px;
+  font-size: 15px;
+}
+
+@media (pointer: coarse) {
+  .btn--compact {
+    min-height: 44px;
+  }
 }
 
 .btn--quiet {
