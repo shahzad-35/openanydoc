@@ -21,8 +21,9 @@ export const changelogClasses = {
   page: 'toy-page min-h-dvh text-[17px] leading-normal text-ink',
   header: 'mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5',
   brandLink: 'rounded-full',
-  languageLink: 'pill-link',
-  main: 'mx-auto max-w-3xl px-4 pb-24',
+  // On a phone the link's padding is pulled out, so its text ends where the nav card below does.
+  languageLink: 'pill-link -me-4 text-[15px] md:me-0 md:px-3',
+  main: 'mx-auto max-w-3xl px-5 pb-24',
   intro: 'py-8 md:py-12',
   heading: 'type-h1 text-balance',
   introText: 'mt-4 max-w-2xl text-ink-soft',
@@ -53,14 +54,18 @@ export const SOCIAL_ICON_PATHS: Record<string, string> = {
 }
 
 // The header's links to the viewer pages (src/components/SiteNav.tsx), on every content page; the build script writes the same nav
-// into the changelog pages. On a phone the links fold into one disclosure on a row of their own; from md up the disclosure's
-// content is always shown (::details-content) and its summary hidden.
+// into the changelog pages. On a phone the links fold into one disclosure that opens as a card, on the header's second row (after
+// `headerRowBreak`); from md up the disclosure's content is always shown (::details-content) and its summary hidden.
+// On a phone the header has two rows: the logo and the language and theme controls, then the nav and the page's action. This
+// zero-height, full-width item (placed just before the nav) starts the second row; from md up everything is one row.
+export const headerRowBreak = 'order-last h-0 basis-full md:hidden'
+
 export const navClasses = {
-  nav: 'order-last w-full md:order-none md:w-auto',
+  nav: 'relative order-last md:order-none md:mx-auto',
   details: 'group md:[&::details-content]:[content-visibility:visible]',
   summary: 'pill-link cursor-pointer list-none gap-2 border-2 border-line text-sm md:hidden [&::-webkit-details-marker]:hidden',
   chevron: 'size-4 transition-transform duration-200 group-open:rotate-180',
-  list: 'mt-2 flex flex-col items-start md:mt-0 md:flex-row md:items-center md:gap-x-1',
+  list: 'absolute start-0 top-full z-30 mt-2 flex w-64 flex-col items-stretch rounded-2xl border-2 border-line bg-paper-raised p-2 shadow-lg md:static md:mt-0 md:w-auto md:flex-row md:items-center md:gap-x-1 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none',
   // 12 px sides on a wide screen (not the pill's 16 px), so the five header items fit beside the logo and the actions.
   link: 'pill-link text-[15px] md:px-3',
   // The Convert menu, the last item of the list: a dropdown card on a wide screen, an indented list inside the disclosure on a phone.
@@ -88,6 +93,8 @@ export const footerClasses = {
   list: 'mt-4 space-y-1',
   item: 'flex items-center gap-2',
   link: 'inline-flex min-h-8 items-center text-[15px] text-ink-soft underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline pointer-coarse:min-h-11',
+  // The viewers column takes the whole width on a phone, so a viewer's name and its New badge stay on one line.
+  viewersColumn: 'col-span-2 md:col-span-1',
   bottom: 'mt-10 border-t border-line pt-5',
   disclaimer: 'text-[13px] leading-relaxed text-ink-soft',
   socialList: 'mt-5 flex items-center gap-2',

@@ -4,6 +4,7 @@ import SiteFooter, { PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { usePageHead } from './HomePage'
+import { headerRowBreak } from './changelogMarkup'
 import { guidePages } from '../guides'
 import { useT } from '../i18n'
 import { CONTACT_EMAIL, infoPages, type InfoSection } from '../legalContent'
@@ -65,14 +66,15 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
             <Wordmark withMark />
           </PageLink>
         </p>
+        <span aria-hidden="true" className={headerRowBreak} />
         <SiteNav currentPath={address} onNavigate={onNavigate} />
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="-me-3 flex items-center gap-1 sm:gap-2 md:me-0">
           <LanguageSwitcher className="pill-link text-[15px] md:px-3" />
           <ThemeToggle />
         </div>
       </header>
 
-      <main id="main" className="mx-auto max-w-3xl px-4 pb-20">
+      <main id="main" className="mx-auto max-w-3xl px-5 pb-20">
         <div className="py-8 md:py-12">
           <h1 id="page-heading" className="type-h1 text-balance">{seo.heading}</h1>
           <p id="page-intro" className="mt-4 text-ink-soft">{seo.intro}</p>

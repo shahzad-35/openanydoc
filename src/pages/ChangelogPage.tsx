@@ -4,7 +4,7 @@ import { Wordmark } from '../components/KitIcon'
 import SiteNav from '../components/SiteNav'
 import changelog from '../data/changelog.json'
 import { localizePath, useT } from '../i18n'
-import { CHECK_ICON_PATH, changelogClasses, changelogIds } from './changelogMarkup'
+import { CHECK_ICON_PATH, changelogClasses, changelogIds, headerRowBreak } from './changelogMarkup'
 import { usePageHead } from './HomePage'
 import type { Locale, MessageKey } from '../i18n'
 import { viewers } from '../viewers'
@@ -47,6 +47,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
     <div id={changelogIds.page} className={changelogClasses.page}>
       <header id={changelogIds.header} className={changelogClasses.header}>
         <p>{pageLink(changelogIds.brandLink, localizePath(locale, '/'), changelogClasses.brandLink, <Wordmark withMark />)}</p>
+        <span aria-hidden="true" className={headerRowBreak} />
         <SiteNav currentPath="/changelog" onNavigate={onNavigate} />
         <p>{pageLink(changelogIds.languageLink, `/${otherLocale(locale)}/changelog`, changelogClasses.languageLink, t('changelog.otherLanguage'), otherLocale(locale))}</p>
       </header>

@@ -16,6 +16,7 @@ import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 import { Notice } from '../components/Messages'
+import { headerRowBreak } from './changelogMarkup'
 
 function setMetaTag(keyAttribute: 'name' | 'property', key: string, content: string) {
   let tag = document.head.querySelector(`meta[${keyAttribute}="${key}"]`)
@@ -143,14 +144,15 @@ export default function HomePage({
             <Wordmark withMark />
           )}
         </p>
+        <span aria-hidden="true" className={headerRowBreak} />
         <SiteNav currentPath={address} onNavigate={onNavigate} />
-        <div className="flex items-center gap-1 sm:gap-2">
+        <div className="-me-3 flex items-center gap-1 sm:gap-2 md:me-0">
           <LanguageSwitcher className="pill-link text-[15px] md:px-3" />
           <ThemeToggle />
-          <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--compact press ms-1">
-            {t('nav.openFile')}
-          </button>
         </div>
+        <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--compact press order-last md:order-none md:-ms-2">
+          {t('nav.openFile')}
+        </button>
       </header>
 
       {/* What's new is announced on the home page only, not on a format's own page. */}

@@ -15,7 +15,7 @@ import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
-import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, SOCIAL_ICON_PATHS, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
+import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, SOCIAL_ICON_PATHS, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
 import { AUTHOR_NAME, REPOSITORY_URL, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -89,12 +89,12 @@ function renderChangelogFooter(locale) {
   ).join('')
   // The wordmark with the brand mark, as src/components/KitIcon.tsx draws it.
   const wordmark = '<span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span>'
-  const column = (id, headingKey, items) => `<nav id="${id}" aria-label="${t(headingKey)}"><h2 class="${f.heading}">${t(headingKey)}</h2><ul class="${f.list}">${items}</ul></nav>`
+  const column = (id, headingKey, items, className) => `<nav id="${id}" aria-label="${t(headingKey)}"${className ? ` class="${className}"` : ''}><h2 class="${f.heading}">${t(headingKey)}</h2><ul class="${f.list}">${items}</ul></nav>`
   return (
     `<footer id="site-footer" class="${f.footer}"><div class="${f.inner}"><div class="${f.columns}">` +
     `<div class="${f.brand}"><p class="${f.brandMark}">${wordmark}</p><p class="${f.brandText}">${t('footer.text')}</p>` +
     `<nav id="footer-social" aria-label="${t('footer.follow')}"><ul class="${f.socialList}">${socialItems}</ul></nav></div>` +
-    column('footer-viewers', 'footer.viewers', viewerItems) +
+    column('footer-viewers', 'footer.viewers', viewerItems, f.viewersColumn) +
     column('footer-more', 'about.moreFileTools', moreItems) +
     column('footer-legal', 'footer.legal', legalItems) +
     `</div><div class="${f.bottom}"><p id="footer-disclaimer" class="${f.disclaimer}">${t('legal.disclaimer')}</p></div></div></footer>`
@@ -129,7 +129,7 @@ function renderChangelogBody(locale) {
   const other = otherLocale(locale)
   return (
     `<div id="${changelogIds.page}" class="${c.page}">` +
-    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p>${renderChangelogNav(locale)}` +
+    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p><span aria-hidden="true" class="${headerRowBreak}"></span>${renderChangelogNav(locale)}` +
     `<p><a id="${changelogIds.languageLink}" href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
     `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}"><h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
     `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`
@@ -228,7 +228,7 @@ function renderNotFoundPage(locale) {
     .join('')
   const body =
     `<div id="not-found-page" class="${c.page}">` +
-    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p>${renderChangelogNav(locale)}` +
+    `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p><span aria-hidden="true" class="${headerRowBreak}"></span>${renderChangelogNav(locale)}` +
     `<p><a id="${changelogIds.languageLink}" href="/${other}" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
     `<main id="main" class="${c.main}"><div class="${c.intro}"><h1 id="page-heading" class="${c.heading}">${t('notFound.heading')}</h1><p id="page-intro" class="${c.introText}">${t('notFound.text')}</p></div>` +
     `<ul id="not-found-links" class="mt-8 flex flex-wrap gap-3">${viewerLinks}</ul><a id="not-found-home-link" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`

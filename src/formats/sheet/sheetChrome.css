@@ -214,7 +214,7 @@
 @media (max-width:760px){
 #csv-workbench,#excel-workbench,#docs-workbench{
   & #top-bar{height:48px;gap:6px;padding-inline:8px}
-  & .brand-name,& .privacy-pill,& #undo-button,& #redo-button,& .desk-only{display:none!important}
+  & .brand-name,& .privacy-pill,& #undo-button,& #redo-button,& .desk-only,& .file-size{display:none!important}
   & .brand{padding:0}
   & .file-title{flex:1}
   & #file-name{font-size:14px}

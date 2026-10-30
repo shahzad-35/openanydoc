@@ -62,7 +62,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
               </ul>
             </nav>
           </div>
-          <nav id="footer-viewers" aria-label={t('footer.viewers')}>
+          <nav id="footer-viewers" aria-label={t('footer.viewers')} className={footerClasses.viewersColumn}>
             <h2 className={footerClasses.heading}>{t('footer.viewers')}</h2>
             <ul className={footerClasses.list}>
               {pagesWithOwnAddress
