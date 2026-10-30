@@ -41,4 +41,7 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Privacy](https://www.openanydoc.com/en/privacy)
 - [Terms](https://www.openanydoc.com/en/terms)
 - [Source code on GitHub](https://github.com/shahzad-35/openanydoc)
+- [OpenAnyDoc on X](https://x.com/openanydoc)
+- [OpenAnyDoc on LinkedIn](https://www.linkedin.com/company/145343043)
+- [OpenAnyDoc on YouTube](https://www.youtube.com/channel/UCS78NF7U939ypL0mcBgQKlg)
 - [Arabic site](https://www.openanydoc.com/ar)

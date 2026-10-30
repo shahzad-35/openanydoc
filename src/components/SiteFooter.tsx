@@ -1,8 +1,8 @@
 import type { ReactNode } from 'react'
 import { localizePath, useT } from '../i18n'
 import { CONTACT_EMAIL } from '../legalContent'
-import { footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
-import { pageSeo } from '../seo'
+import { SOCIAL_ICON_PATHS, footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
+import { SOCIAL_PROFILES, pageSeo } from '../seo'
 import { landingPages, viewers, type Viewer } from '../viewers'
 import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
@@ -48,6 +48,19 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
               <Wordmark withMark />
             </p>
             <p className={footerClasses.brandText}>{t('footer.text')}</p>
+            <nav id="footer-social" aria-label={t('footer.follow')}>
+              <ul className={footerClasses.socialList}>
+                {SOCIAL_PROFILES.map((profile) => (
+                  <li key={profile.id}>
+                    <a id={`footer-link-${profile.id}`} href={profile.url} rel="me noopener" aria-label={t('footer.socialProfile', { name: profile.name })} className={footerClasses.socialLink}>
+                      <svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true">
+                        <path d={SOCIAL_ICON_PATHS[profile.id]} />
+                      </svg>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
           </div>
           <nav id="footer-viewers" aria-label={t('footer.viewers')}>
             <h2 className={footerClasses.heading}>{t('footer.viewers')}</h2>

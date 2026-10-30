@@ -100,6 +100,8 @@
   "intake.largeFile": "حجم هذا الملف {size}. قد تكون الملفات الكبيرة بطيئة أو تستهلك الذاكرة بالكامل، لكننا سنحاول فتحه.",
   "intake.fileInputLabel": "اختر ملفًا: {extensions}",
   "footer.text": "OpenAnyDoc عارض ومحرر ملفات مجاني عبر الإنترنت. ملفاتك لا تغادر جهازك أبدًا.",
+  "footer.follow": "تابِع OpenAnyDoc",
+  "footer.socialProfile": "OpenAnyDoc على {name}",
   "file.openAnother": "فتح ملف آخر",
   "file.reading": "جارٍ قراءة الملف",
   "file.editingLoadFailed": "تعذّر تحميل أدوات التحرير. تحقق من اتصالك وأعد تحميل الصفحة؛ الملف ما زال مفتوحًا للعرض.",

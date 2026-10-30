@@ -96,6 +96,8 @@
   "intake.largeFile": "This file is {size}. Large files can be slow or run out of memory, but we'll still try to open it.",
   "intake.fileInputLabel": "Choose a file: {extensions}",
   "footer.text": "OpenAnyDoc is a free online file viewer and editor. Your files never leave your device.",
+  "footer.follow": "Follow OpenAnyDoc",
+  "footer.socialProfile": "OpenAnyDoc on {name}",
   "file.openAnother": "Open another file",
   "file.reading": "Reading file",
   "file.editingLoadFailed": "The editing tools could not be loaded. Check your connection and reload the page; the file is still open for viewing.",

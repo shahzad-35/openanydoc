@@ -10,6 +10,13 @@ export const SITE_ORIGIN = 'https://www.openanydoc.com'
 export const SITE_NAME = 'OpenAnyDoc'
 export const AUTHOR_NAME = 'Shahzad Ali'
 export const REPOSITORY_URL = 'https://github.com/shahzad-35/openanydoc'
+// The brand's own accounts: the footer links them and the Organization JSON-LD lists them in sameAs. Names are brands, the same in both languages.
+export const SOCIAL_PROFILES = [
+  { id: 'x', name: 'X', url: 'https://x.com/openanydoc' },
+  { id: 'linkedin', name: 'LinkedIn', url: 'https://www.linkedin.com/company/145343043' },
+  { id: 'youtube', name: 'YouTube', url: 'https://www.youtube.com/channel/UCS78NF7U939ypL0mcBgQKlg' },
+] as const
+export const X_HANDLE = '@openanydoc'
 
 type Locale = 'en' | 'ar'
 

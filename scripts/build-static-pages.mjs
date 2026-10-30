@@ -15,8 +15,8 @@ import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
-import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
-import { AUTHOR_NAME, REPOSITORY_URL, SITE_NAME, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, SOCIAL_ICON_PATHS, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
+import { AUTHOR_NAME, REPOSITORY_URL, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
@@ -82,12 +82,18 @@ function renderChangelogFooter(locale) {
   const legalItems =
     legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
     item(`<a id="footer-link-contact" href="mailto:${CONTACT_EMAIL}" class="${f.link}">${t('footer.contact')}</a>`)
+  const socialItems = SOCIAL_PROFILES.map(
+    (profile) =>
+      `<li><a id="footer-link-${profile.id}" href="${profile.url}" rel="me noopener" aria-label="${t('footer.socialProfile', { name: profile.name })}" class="${f.socialLink}">` +
+      `<svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><path d="${SOCIAL_ICON_PATHS[profile.id]}"></path></svg></a></li>`,
+  ).join('')
   // The wordmark with the brand mark, as src/components/KitIcon.tsx draws it.
   const wordmark = '<span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span>'
   const column = (id, headingKey, items) => `<nav id="${id}" aria-label="${t(headingKey)}"><h2 class="${f.heading}">${t(headingKey)}</h2><ul class="${f.list}">${items}</ul></nav>`
   return (
     `<footer id="site-footer" class="${f.footer}"><div class="${f.inner}"><div class="${f.columns}">` +
-    `<div class="${f.brand}"><p class="${f.brandMark}">${wordmark}</p><p class="${f.brandText}">${t('footer.text')}</p></div>` +
+    `<div class="${f.brand}"><p class="${f.brandMark}">${wordmark}</p><p class="${f.brandText}">${t('footer.text')}</p>` +
+    `<nav id="footer-social" aria-label="${t('footer.follow')}"><ul class="${f.socialList}">${socialItems}</ul></nav></div>` +
     column('footer-viewers', 'footer.viewers', viewerItems) +
     column('footer-more', 'about.moreFileTools', moreItems) +
     column('footer-legal', 'footer.legal', legalItems) +
@@ -158,6 +164,7 @@ function renderHeadTags(locale, address, title, description) {
     `<meta property="og:locale" content="${openGraphLocales[locale]}" />`,
     `<meta property="og:locale:alternate" content="${openGraphLocales[otherLocale(locale)]}" />`,
     `<meta name="twitter:card" content="summary_large_image" />`,
+    `<meta name="twitter:site" content="${X_HANDLE}" />`,
     `<meta name="twitter:title" content="${escapeHtml(title)}" />`,
     `<meta name="twitter:description" content="${escapeHtml(description)}" />`,
     `<meta name="twitter:image" content="${imageUrl}" />`,
@@ -280,7 +287,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: CONTACT_EMAIL, availableLanguage: ['en', 'ar'] },
         foundingDate: '2026-10',
         founder: { '@type': 'Person', name: AUTHOR_NAME },
-        sameAs: [REPOSITORY_URL],
+        sameAs: [REPOSITORY_URL, ...SOCIAL_PROFILES.map((profile) => profile.url)],
       },
     )
   }

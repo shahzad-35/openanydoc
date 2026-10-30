@@ -15,6 +15,9 @@ import { fileURLToPath } from 'node:url'
 import ExcelJS from 'exceljs'
 import * as XLSX from 'xlsx'
 
+// The brand's social profiles (SOCIAL_PROFILES in src/seo.ts): linked from the footer and listed in the Organization's sameAs.
+const socialProfileUrls = ['https://x.com/openanydoc', 'https://www.linkedin.com/company/145343043', 'https://www.youtube.com/channel/UCS78NF7U939ypL0mcBgQKlg']
+
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
 const chromePath = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
@@ -563,6 +566,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           expect(block.name === 'OpenAnyDoc' && block.url === 'https://www.openanydoc.com', problem('name or url is wrong'))
           expect(block.founder?.['@type'] === 'Person' && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
           expect(Array.isArray(block.sameAs) && block.sameAs.every((profile) => /^https:\/\//.test(profile)), problem('sameAs must list the public profiles as absolute URLs'))
+          expect(socialProfileUrls.every((profileUrl) => block.sameAs.includes(profileUrl)), problem('sameAs lacks a social profile'))
           expect(block.contactPoint?.email === 'support@openanydoc.com' && block.foundingDate === '2026-10', problem('contactPoint or foundingDate is wrong'))
           expect(isAbsoluteUrl(block.logo), problem('the logo is not an absolute URL'))
           const logoFile = path.join(distFolder, new URL(block.logo).pathname)
@@ -1169,11 +1173,13 @@ await test('the header nav, related tools, footer and home links point at built 
       if (formatPages.includes(page) || landingPages.includes(page)) expect(relatedLinks?.length >= 2, `${address}: no related tools`)
       else expect(relatedLinks === null, `${address}: related tools on a page that is not a tool page`)
       const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
+      // The social logos have no text, so linksIn skips them: each needs its address and a spoken name.
+      for (const profileUrl of socialProfileUrls) expect(new RegExp(`<a [^>]*href="${profileUrl}"[^>]*aria-label="OpenAnyDoc [^"]+"`).test(html), `${address}: the footer lacks the ${profileUrl} logo link`)
       expect(landingPages.every((landingPage) => landingPage === page || conversionPages.includes(landingPage) || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
       expect(!footerLinks.some((link) => conversionPages.some((conversionPage) => link.href === `/${locale}${conversionPage}`)), `${address}: the footer still links a conversion page (they are in the header's Convert menu)`)
       for (const link of [...navLinks, ...(relatedLinks ?? []), ...footerLinks]) {
-        // The footer's Contact link is a mailto: address, the only link that is not a page.
-        expect(link.href.startsWith('mailto:') || builtPage(link.href), `${address}: ${link.href} is not a built page`)
+        // The footer's Contact link (mailto:) and the brand's social profiles are the only links that are not pages.
+        expect(link.href.startsWith('mailto:') || socialProfileUrls.includes(link.href) || builtPage(link.href), `${address}: ${link.href} is not a built page`)
         expect(!/^(click here|here|tools|more|read more|اضغط هنا|هنا|أدوات|المزيد)$/i.test(link.text), `${address}: the link text "${link.text}" does not say where it goes`)
       }
       const selfLinks = [...(relatedLinks ?? []), ...linksIn(html, '<nav id="footer-viewers"', '</nav>')].filter((link) => link.href === address)
