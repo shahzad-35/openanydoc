@@ -1,0 +1,145 @@
+/* The Mask Data panel, in the viewers' workbench look (13 px text, 30 px controls, hairline borders). It is drawn inside a viewer
+   (a drawer over the file) and on the /mask-data page, so its colours come from the viewer it sits in (--panel, --line, --text ...)
+   and fall back to the site's own tokens on the page. Every rule is scoped to .mask-workbench; sides are logical, so it mirrors in
+   Arabic. */
+.mask-workbench {
+  --mw-panel: var(--panel, var(--paper-raised));
+  --mw-panel-2: var(--panel-2, var(--surface));
+  --mw-line: var(--line, var(--rule));
+  --mw-line-strong: var(--line-strong, var(--rule));
+  --mw-text: var(--text, var(--ink));
+  --mw-muted: var(--muted, var(--ink-soft));
+  --mw-hover: var(--hover, color-mix(in srgb, var(--ink) 6%, transparent));
+  --mw-accent: var(--accent);
+  --mw-accent-soft: var(--accent-soft, color-mix(in srgb, var(--accent) 12%, transparent));
+  --mw-on-accent: var(--on-accent);
+  --mw-warn-soft: var(--warn-soft, var(--warn-bg));
+  --mw-warn-line: var(--warn-base, #c27c00);
+  --mw-danger: var(--err, var(--danger));
+  display: flex;
+  flex-direction: column;
+  background: var(--mw-panel);
+  color: var(--mw-text);
+  font: 13px/1.45 var(--font-body, var(--font-sans, system-ui));
+  text-align: start;
+  -webkit-font-smoothing: antialiased;
+
+  & *, & *::before, & *::after { box-sizing: border-box; }
+  & :focus-visible { outline: 2px solid var(--mw-accent); outline-offset: 1px; }
+  & button, & input, & select { font: inherit; color: inherit; }
+  & button { cursor: pointer; }
+  & h2, & h3, & p { margin: 0; }
+
+  /* On the page: a framed panel under the drop zone. */
+  &.mask-page { margin: 40px auto 0; max-width: 760px; border: 1px solid var(--mw-line); border-radius: 14px; overflow: hidden; }
+
+  /* In a viewer: a drawer along the end edge, the whole height; the full screen on a phone. */
+  &.mask-drawer {
+    position: fixed; inset-block: 0; inset-inline-end: 0; z-index: 70;
+    width: min(560px, 100vw); border-inline-start: 1px solid var(--mw-line);
+    box-shadow: 0 18px 44px -12px rgba(16, 24, 40, 0.35);
+  }
+
+  & .mw-head { display: flex; align-items: center; gap: 8px; min-height: 48px; padding-inline: 14px 8px; border-bottom: 1px solid var(--mw-line); }
+  & .mw-title { font-size: 14px; font-weight: 600; white-space: nowrap; }
+  & .mw-file { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--mw-muted); font: 12px var(--mono, ui-monospace, Menlo, monospace); }
+  & .mw-spacer { flex: 1; }
+
+  & .mw-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; border-bottom: 1px solid var(--mw-line); background: var(--mw-panel-2); }
+  & .mw-body { padding: 14px; }
+  &.mask-drawer .mw-body { flex: 1; overflow: auto; }
+  & .mw-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 10px 14px; border-top: 1px solid var(--mw-line); background: var(--mw-panel); }
+
+  & .mw-warning { padding: 7px 10px; border-inline-start: 3px solid var(--mw-warn-line); border-radius: 6px; background: var(--mw-warn-soft); font-size: 12.5px; }
+  & .mw-muted { color: var(--mw-muted); }
+  & .mw-small { font-size: 12px; }
+  & .mw-danger { color: var(--mw-danger); }
+  & .mw-label { font-size: 12px; font-weight: 600; color: var(--mw-muted); }
+
+  /* Buttons and fields. */
+  & .mw-btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px; height: 32px; padding-inline: 12px;
+    border: 1px solid var(--mw-line-strong); border-radius: 8px; background: var(--mw-panel);
+    box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06); font-size: 12.5px; font-weight: 500; white-space: nowrap;
+    transition: background-color 120ms ease-out, border-color 120ms ease-out, box-shadow 120ms ease-out;
+  }
+  & .mw-btn:hover:not(:disabled) { border-color: var(--mw-muted); background: var(--mw-panel-2); }
+  & .mw-btn:active:not(:disabled) { transform: translateY(1px); }
+  & .mw-btn:disabled { opacity: 0.5; cursor: not-allowed; box-shadow: none; }
+  & .mw-btn.primary { border-color: transparent; background: var(--mw-accent); color: var(--mw-on-accent); box-shadow: 0 1px 2px rgba(16, 24, 40, 0.18), inset 0 1px 0 rgba(255, 255, 255, 0.14); }
+  & .mw-btn.primary:hover:not(:disabled) { border-color: transparent; background: var(--mw-accent); filter: brightness(1.08); }
+  & .mw-btn.ghost { border-color: transparent; background: transparent; box-shadow: none; color: var(--mw-muted); }
+  & .mw-btn.ghost:hover:not(:disabled) { border-color: transparent; background: var(--mw-hover); color: var(--mw-text); }
+  & .mw-btn.icon { width: 30px; height: 30px; padding: 0; }
+  & .mw-ico { width: 14px; height: 14px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  & .mw-flip { transform: scaleX(var(--mw-flip, 1)); }
+  &:dir(rtl) { --mw-flip: -1; }
+  & .mw-remove { color: var(--mw-muted); }
+  & .mw-remove:hover:not(:disabled) { background: color-mix(in srgb, var(--mw-danger) 10%, transparent); color: var(--mw-danger); }
+  & .mw-formats { display: flex; flex-wrap: wrap; gap: 8px; }
+
+  & .mw-file-input { width: 100%; padding: 6px; border: 1px dashed var(--mw-line-strong); border-radius: 7px; background: var(--mw-panel-2); font-size: 12.5px; }
+  & input[type="checkbox"] { width: 15px; height: 15px; margin: 0; accent-color: var(--mw-accent); flex: none; }
+
+  /* A row of small toggle buttons (Mask / Restore, the steps, After / Before). */
+  & .mw-segmented { display: inline-flex; gap: 2px; padding: 2px; border: 1px solid var(--mw-line); border-radius: 8px; background: var(--mw-panel-2); }
+  & .mw-segmented button { display: inline-flex; align-items: center; gap: 6px; height: 26px; padding-inline: 10px; border: 0; border-radius: 6px; background: transparent; color: var(--mw-muted); font-size: 12.5px; font-weight: 500; white-space: nowrap; }
+  & .mw-segmented button:hover { color: var(--mw-text); }
+  & .mw-segmented button[aria-selected="true"], & .mw-segmented button[aria-pressed="true"], & .mw-segmented button[aria-current="step"] { background: var(--mw-panel); color: var(--mw-text); box-shadow: 0 1px 2px rgba(16, 24, 40, 0.12); }
+  & .mw-step-number { display: grid; place-items: center; width: 16px; height: 16px; border-radius: 50%; background: var(--mw-accent-soft); color: var(--mw-accent); font-size: 10.5px; font-weight: 600; }
+
+  /* The column picker: a button that opens a list of every field with a check box. */
+  & .mw-picker { position: relative; }
+  & .mw-picker-list { position: absolute; inset-inline-start: 0; top: calc(100% + 4px); z-index: 5; width: min(360px, calc(100vw - 32px)); max-height: 320px; overflow: auto; padding: 4px; border: 1px solid var(--mw-line); border-radius: 9px; background: var(--mw-panel); box-shadow: 0 14px 34px -10px rgba(16, 24, 40, 0.3); }
+  & .mw-picker-search { width: 100%; height: 28px; margin-bottom: 4px; padding-inline: 8px; border: 1px solid var(--mw-line); border-radius: 6px; background: var(--mw-panel-2); font-size: 12.5px; }
+  & .mw-picker-sheet { padding: 6px 8px 2px; color: var(--mw-muted); font-size: 11px; font-weight: 600; }
+  & .mw-picker-item { display: flex; align-items: center; gap: 8px; min-height: 30px; padding-inline: 8px; border-radius: 6px; cursor: pointer; }
+  & .mw-picker-item:hover { background: var(--mw-hover); }
+  & .mw-picker-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+  & .mw-tag { display: inline-flex; align-items: center; gap: 4px; height: 18px; padding-inline: 6px; border-radius: 9px; background: var(--mw-accent-soft); color: var(--mw-accent); font-size: 11px; font-weight: 500; white-space: nowrap; }
+  & .mw-tag.low { background: var(--mw-panel-2); color: var(--mw-muted); }
+
+  /* The chosen fields: name, type, method, remove. */
+  & .mw-rows { border: 1px solid var(--mw-line); border-radius: 9px; overflow: hidden; }
+  & .mw-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px 190px 30px; align-items: center; gap: 8px; padding-block: 6px; padding-inline: 10px 6px; }
+  & .mw-row + .mw-row { border-top: 1px solid var(--mw-line); }
+  & .mw-row-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  & .mw-row-sheet { display: block; color: var(--mw-muted); font-size: 11px; font-weight: 400; }
+  & .mw-empty { padding: 18px 10px; text-align: center; color: var(--mw-muted); }
+
+  /* The preview table: data, so it stays left to right. */
+  & .mw-table-wrap { overflow: auto; max-height: 420px; border: 1px solid var(--mw-line); border-radius: 9px; }
+  & .mw-table { width: 100%; border-collapse: collapse; font: 12px/1.4 var(--mono, ui-monospace, Menlo, monospace); }
+  & .mw-table th { position: sticky; top: 0; padding: 6px 10px; border-bottom: 1px solid var(--mw-line); background: var(--mw-panel-2); font: 600 12px var(--font-body, var(--font-sans, system-ui)); text-align: start; white-space: nowrap; }
+  & .mw-table td { max-width: 16rem; overflow: hidden; padding: 5px 10px; border-top: 1px solid var(--mw-line); text-overflow: ellipsis; white-space: nowrap; }
+  & .mw-table td.changed { color: var(--mw-accent); font-weight: 600; }
+
+  & .mw-stack > * + * { margin-top: 12px; }
+}
+
+/* A phone: the drawer covers the screen and each chosen field takes two lines. */
+@media (max-width: 639px) {
+  .mask-workbench .mw-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 30px; }
+  .mask-workbench .mw-row-name { grid-column: 1 / -1; }
+  .mask-workbench.mask-page { margin-inline: -4px; }
+}
+
+/* A bordered button in a viewer's drawer, as the viewer's own bordered buttons look. Anchored on the panel's id, because the
+   viewer's "#csv-workbench .btn" (an id rule) sets a transparent border. */
+#mask-tool .btn.mw-outline { border-color: var(--mw-line-strong); background: var(--mw-panel); }
+#mask-tool .btn.mw-outline:hover:not(:disabled) { background: var(--mw-hover); }
+
+/* Selects with the panel's own arrow, the same as the Columns button's, set in from the end edge. Anchored on the panel's id so a
+   viewer's own select rules do not change them. */
+#mask-tool .mw-select-wrap { position: relative; display: inline-flex; min-width: 0; }
+#mask-tool .mw-select {
+  width: 100%; height: 30px; min-width: 0; padding-inline: 10px 30px; border: 1px solid var(--mw-line-strong); border-radius: 8px;
+  background: var(--mw-panel); color: var(--mw-text); font-family: inherit; font-size: 12.5px; font-weight: 500; appearance: none; cursor: pointer;
+  box-shadow: 0 1px 2px rgba(16, 24, 40, 0.06); transition: border-color 120ms ease-out;
+}
+#mask-tool .mw-select:hover:not(:disabled) { border-color: var(--mw-muted); }
+#mask-tool .mw-select:disabled { opacity: 0.55; cursor: not-allowed; }
+#mask-tool .mw-select-chevron { position: absolute; inset-inline-end: 10px; top: 50%; translate: 0 -50%; color: var(--mw-muted); pointer-events: none; }
+/* A disabled button reads as unavailable, not as faded text. */
+#mask-tool button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }

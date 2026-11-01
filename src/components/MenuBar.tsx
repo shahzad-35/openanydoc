@@ -27,6 +27,8 @@ export type MenuAction = {
   kind?: 'checkbox' | 'radio'
   isChecked?: boolean
   isDisabled?: boolean
+  // Why the item is disabled, shown when the pointer rests on it.
+  disabledReason?: string
   isDanger?: boolean
   // A colour shown as a small square in place of the icon (a colour picker's items), as a hex value such as "FF0000".
   swatch?: string
@@ -34,7 +36,7 @@ export type MenuAction = {
 }
 export type MenuLink = { id: string; label: string; href: string; icon?: string; external?: boolean }
 export type MenuNote = { id: string; note: string }
-export type MenuSubmenu = { id: string; label: string; icon?: string; isDisabled?: boolean; items: MenuEntry[] }
+export type MenuSubmenu = { id: string; label: string; icon?: string; isDisabled?: boolean; disabledReason?: string; items: MenuEntry[] }
 export type MenuEntry = MenuAction | MenuLink | MenuNote | MenuSubmenu | { heading: string } | 'separator'
 export type MenuDefinition = { id: string; label: string; items: MenuEntry[] }
 
@@ -195,6 +197,7 @@ export default function MenuBar({ menus, isCompact, label, tools }: { menus: Men
           aria-haspopup="menu"
           data-submenu={entry.id}
           disabled={entry.isDisabled}
+          title={entry.isDisabled ? entry.disabledReason : undefined}
           onClick={() => openSubmenuOf(menuId, entry.id)}
         >
           {entry.icon ? (
@@ -240,6 +243,7 @@ export default function MenuBar({ menus, isCompact, label, tools }: { menus: Men
         role={entry.kind === 'checkbox' ? 'menuitemcheckbox' : entry.kind === 'radio' ? 'menuitemradio' : 'menuitem'}
         aria-checked={isCheck ? Boolean(entry.isChecked) : undefined}
         disabled={entry.isDisabled}
+        title={entry.isDisabled ? entry.disabledReason : undefined}
         onClick={() => choose(entry.onSelect)}
       >
         {isCheck ? (

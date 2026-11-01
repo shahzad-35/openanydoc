@@ -35,7 +35,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v2.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V15"/></symbol>
 <symbol id="i-open" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
 <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol><symbol id="i-convert" viewBox="0 0 24 24"><path d="M4 8h13m0 0-3.5-3.5M17 8l-3.5 3.5"/><path d="M20 16H7m0 0 3.5-3.5M7 16l3.5 3.5"/></symbol><symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 9.5C3 7.6 4.4 6.5 6 6.5c2.2 0 3.6 1.2 6 1.2s3.8-1.2 6-1.2c1.6 0 3 1.1 3 3 0 4-2.6 7-5.2 7-1.8 0-2.6-1.6-3.8-1.6s-2 1.6-3.8 1.6C5.6 16.5 3 13.5 3 9.5Z"/><path d="M7.5 10.5h2.5M14 10.5h2.5"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
 <symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 4.2 2.9 17.5A2 2 0 0 0 4.6 20.5h14.8a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4"/><path d="M12 17h.01"/></symbol>
@@ -136,9 +136,12 @@ type TopBarProps = {
   onToggleTheme: () => void
   // The Convert button's choices for the open file (to CSV, to JSON); no button when there are none.
   convertItems?: MenuItem[]
+  // Opens the Mask data drawer; no button without it.
+  onMask?: () => void
+  isMaskOpen?: boolean
 }
 
-export function TopBar({ format, fileName, fileSize, isModified, canUndo, canRedo, onUndo, onRedo, canDownload, downloadLabel, downloadTip, onDownload, onHome, isDark, onToggleTheme, convertItems = [] }: TopBarProps) {
+export function TopBar({ format, fileName, fileSize, isModified, canUndo, canRedo, onUndo, onRedo, canDownload, downloadLabel, downloadTip, onDownload, onHome, isDark, onToggleTheme, convertItems = [], onMask, isMaskOpen = false }: TopBarProps) {
   const { t } = useT()
   const [convertMenuPosition, setConvertMenuPosition] = useState<{ left: number; top: number } | null>(null)
   return (
@@ -174,16 +177,22 @@ export function TopBar({ format, fileName, fileSize, isModified, canUndo, canRed
             setConvertMenuPosition({ left: document.documentElement.dir === 'rtl' ? buttonBox.right - 224 : buttonBox.left, top: buttonBox.bottom + 4 })
           }}
         >
-          <Icon name="replace" />
+          <Icon name="convert" />
           <span className="desk-only">{t('convert.menuHeading')}</span>
           <Icon name="down" size="xs" />
         </button>
       )}
       {convertMenuPosition && <ActionMenu id="convert-button-menu" ariaLabel={t('convert.menuHeading')} {...convertMenuPosition} items={convertItems} onClose={() => setConvertMenuPosition(null)} />}
-      <button className="btn icon" id="undo-button" type="button" aria-label={t('toolbar.undo')} data-tip={t('toolbar.undoTip')} disabled={!canUndo} onClick={onUndo}>
+      {onMask && (
+        <button className="btn" id="mask-button" type="button" aria-label={t('mask.button')} aria-haspopup="dialog" aria-expanded={isMaskOpen} data-tip={t('mask.buttonTip')} onClick={onMask}>
+          <Icon name="mask" />
+          <span className="desk-only">{t('mask.button')}</span>
+        </button>
+      )}
+      <button className="btn icon" id="undo-button" type="button" aria-label={t('toolbar.undo')} data-tip={t(canUndo ? 'toolbar.undoTip' : 'disabled.nothingToUndo')} disabled={!canUndo} onClick={onUndo}>
         <Icon name="undo" />
       </button>
-      <button className="btn icon" id="redo-button" type="button" aria-label={t('toolbar.redo')} data-tip={t('toolbar.redoTip')} disabled={!canRedo} onClick={onRedo}>
+      <button className="btn icon" id="redo-button" type="button" aria-label={t('toolbar.redo')} data-tip={t(canRedo ? 'toolbar.redoTip' : 'disabled.nothingToRedo')} disabled={!canRedo} onClick={onRedo}>
         <Icon name="redo" />
       </button>
       <span className="vsep desk-only" />

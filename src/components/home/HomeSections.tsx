@@ -105,6 +105,19 @@ export function FormatGrid({ onNavigate }: { onNavigate: (path: string) => void 
           </div>
         ))}
       </div>
+      {/* Cards for tool pages that work across formats (Mask data), under the format groups. */}
+      {toolCards[locale]
+        .filter((card) => !viewers.some((viewer) => viewer.toolPath === card.path))
+        .map((card) => (
+          <div key={card.path} id={`tool-card-${card.path.slice(1)}`} className="soft-card mt-5">
+            <p className="font-semibold">
+              <PageLink id={`tool-card-link-${card.path.slice(1)}`} path={card.path} onNavigate={onNavigate} className="underline-offset-4 hover:text-accent hover:underline">
+                {card.linkText}
+              </PageLink>
+            </p>
+            <p className="mt-0.5 text-sm text-ink-soft">{card.text}</p>
+          </div>
+        ))}
       <ul id="landing-links-list" aria-label={t('about.moreFileTools')} className="mt-6 flex flex-wrap gap-2">
         {landingPages.map((page) => (
           <li key={page.path}>

@@ -553,7 +553,7 @@ type OpenPopover = { kind: 'sort' | 'chain'; anchor: HTMLElement | null } | null
 type FindOptions = { matchCase: boolean; wholeWord: boolean; isRegex: boolean }
 type CompareSettings = { mode: 'inline' | 'side'; ignoreWhitespace: boolean; ignoreCase: boolean; index: number }
 type DownloadSettings = { fileName: string; encoding: TextDownloadEncoding; lineEnding: TextLineEnding }
-type ToolDescription = { label: string; hint: string; icon: string; keys?: string; isPressed?: boolean; isDisabled?: boolean; popup?: 'menu' | 'dialog'; run: (anchor: HTMLElement) => void }
+type ToolDescription = { label: string; hint: string; icon: string; keys?: string; isPressed?: boolean; isDisabled?: boolean; disabledReason?: string; popup?: 'menu' | 'dialog'; run: (anchor: HTMLElement) => void }
 
 // The TXT file page ("Compact ribbon"): a top bar, named ribbon tabs over icon tools in captioned groups, the text with its
 // gutter, current line, bookmarks, minimap and hidden characters, and a status line. It fills the whole screen (the format is
@@ -1078,11 +1078,11 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
       case 'bookmarkToggle':
         return plain(() => toggleBookmark(), { keys: shortcutLabel('F2') })
       case 'bookmarkNext':
-        return plain(() => jumpToBookmark(1), { keys: 'F2', isDisabled: bookmarks.size === 0 })
+        return plain(() => jumpToBookmark(1), { keys: 'F2', isDisabled: bookmarks.size === 0, disabledReason: t('disabled.noBookmarks') })
       case 'bookmarkPrevious':
-        return plain(() => jumpToBookmark(-1), { keys: 'Shift+F2', isDisabled: bookmarks.size === 0 })
+        return plain(() => jumpToBookmark(-1), { keys: 'Shift+F2', isDisabled: bookmarks.size === 0, disabledReason: t('disabled.noBookmarks') })
       case 'bookmarksClear':
-        return plain(() => setBookmarks(new Set()), { isDisabled: bookmarks.size === 0 })
+        return plain(() => setBookmarks(new Set()), { isDisabled: bookmarks.size === 0, disabledReason: t('disabled.noBookmarks') })
       case 'stats':
         return plain(() => togglePanel('stats'), { isPressed: panelView === 'stats' })
       case 'selectionStats':
@@ -1125,11 +1125,11 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
           { isPressed: compare.ignoreCase },
         )
       case 'changePrevious':
-        return plain(() => stepChange(-1), { isDisabled: !isEdited })
+        return plain(() => stepChange(-1), { isDisabled: !isEdited, disabledReason: t('disabled.noChanges') })
       case 'changeNext':
-        return plain(() => stepChange(1), { isDisabled: !isEdited })
+        return plain(() => stepChange(1), { isDisabled: !isEdited, disabledReason: t('disabled.noChanges') })
       case 'revertAll':
-        return plain(revertAll, { isDisabled: !isEdited })
+        return plain(revertAll, { isDisabled: !isEdited, disabledReason: t('disabled.noChanges') })
       case 'wrap':
         return plain(() => setWrapLines((current) => !current), { isPressed: wrapLines })
       case 'lineNumbers':
@@ -1145,7 +1145,7 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
       case 'reopen':
         return plain(() => void reopenWithEncoding(), { hint: t('text.tip.reopen') })
       case 'fixMixedEndings':
-        return plain(fixMixedEndings, { isDisabled: !hasMixedEndings })
+        return plain(fixMixedEndings, { isDisabled: !hasMixedEndings, disabledReason: t('disabled.noMixedEndings') })
       case 'downloadOptions':
         return plain(openDownloadDialog)
       case 'insertDateTime':
@@ -1424,7 +1424,7 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
         className={`ib tb${isBig && prefix === 'ribbon' ? ' big' : ''}`}
         id={id}
         aria-label={tool.label}
-        data-hint={tool.hint}
+        data-hint={tool.isDisabled && tool.disabledReason ? tool.disabledReason : tool.hint}
         data-keys={tool.keys}
         aria-pressed={tool.isPressed}
         aria-haspopup={tool.popup}
@@ -1558,6 +1558,7 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
             kind: tool.isPressed === undefined ? undefined : 'checkbox',
             isChecked: tool.isPressed,
             isDisabled: tool.isDisabled,
+            disabledReason: tool.disabledReason,
             onSelect: () => tool.run(document.getElementById(`ribbon-${toKebabCase(key)}-button`) ?? (document.getElementById(`menu-${tabKey}`) as HTMLElement)),
           }]
         })

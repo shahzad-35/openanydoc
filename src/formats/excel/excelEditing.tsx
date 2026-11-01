@@ -136,6 +136,22 @@ const COLOR_CHOICES: { hexColor: string; nameKey: MessageKey }[] = [
 
 const COLOR_MENU_WIDTH_PX = 176 // the menu's w-44
 
+type StylesUnavailable = NonNullable<NonNullable<ExcelSelection>['stylesUnavailable']>
+// Why the style tools are off, after the tool's name on a toolbar button ("Bold (cell styles are still loading)") ...
+const STYLES_UNAVAILABLE_HINTS: Record<StylesUnavailable, MessageKey> = {
+  notXlsx: 'excel.toolbar.stylesXlsxOnly',
+  loading: 'excel.toolbar.stylesLoading',
+  tooLarge: 'excel.toolbar.stylesTooLarge',
+  unreadable: 'excel.toolbar.stylesUnreadable',
+}
+// ... and as a sentence on a menu item and in the Format menu's note.
+const STYLES_UNAVAILABLE_REASONS: Record<StylesUnavailable, MessageKey> = {
+  notXlsx: 'excel.menu.stylesXlsxOnly',
+  loading: 'excel.menu.stylesLoading',
+  tooLarge: 'excel.menu.stylesTooLarge',
+  unreadable: 'excel.menu.stylesUnreadable',
+}
+
 // A button that opens a small grid of colours (and "None"), for text and fill colour.
 function ColorMenuButton({ id: buttonId, label, isDisabled, currentColor, onPick, children }: { id: string; label: string; isDisabled: boolean; currentColor: string; onPick: (hexColor: string | null) => void; children: ReactNode }) {
   const { t } = useT()
@@ -245,10 +261,11 @@ function AlignIcon({ alignment }: { alignment: 'left' | 'center' | 'right' }) {
 // number format, text style, colours, borders, alignment and merge.
 function MenuBarTools({ selection, commands }: { selection: unknown; commands: unknown }) {
   const { t, idFor } = useT()
-  const { hasCell, canStyle, isBold, isItalic, isUnderlined, isStruckThrough, alignment, isMerged } =
+  const { hasCell, canStyle, stylesUnavailable, isBold, isItalic, isUnderlined, isStruckThrough, alignment, isMerged } =
     (selection as NonNullable<ExcelSelection> | null) ?? {
       hasCell: false,
       canStyle: false,
+      stylesUnavailable: null,
       isBold: false,
       isItalic: false,
       isUnderlined: false,
@@ -260,7 +277,7 @@ function MenuBarTools({ selection, commands }: { selection: unknown; commands: u
   if (!getActions) return null
   const hasSelection = hasCell
   const styleDisabled = !hasSelection || !canStyle
-  const styleHint = canStyle ? '' : ` (${t('excel.toolbar.stylesXlsxOnly')})`
+  const styleHint = canStyle || !stylesUnavailable ? '' : ` (${t(STYLES_UNAVAILABLE_HINTS[stylesUnavailable])})`
   const styledLabel = (key: MessageKey) => `${t(key)}${styleHint}`
   const toolbarId = (key: MessageKey) => `toolbar-${idFor(key)}`
   const divider = <span aria-hidden="true" className="h-5 w-px shrink-0 bg-rule" />
@@ -575,6 +592,7 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
   const selectedRowCount = current?.selectedRowCount ?? 0
   const selectedColumnCount = current?.selectedColumnCount ?? 0
   const styleDisabled = !hasCell || !current?.canStyle
+  const styleDisabledReason = text(!hasCell ? 'disabled.selectCell' : STYLES_UNAVAILABLE_REASONS[current?.stylesUnavailable ?? 'notXlsx'])
   const run = (pick: (actions: ExcelActions) => void) => () => pick(viewerCommands.getActions())
   const colorItems = (setColor: (actions: ExcelActions, hexColor: string | null) => void): MenuEntry[] => [
     ...COLOR_CHOICES.map(({ hexColor, nameKey }) => ({ id: hexColor.toLowerCase(), label: text(nameKey), swatch: hexColor, onSelect: run((actions) => setColor(actions, hexColor)) })),
@@ -588,22 +606,22 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
       items: [
         { id: 'find', label: text('menu.findReplace'), icon: 'search', onSelect: viewerCommands.toggleFindReplace },
         'separator',
-        { id: 'clear-cells', label: text('excel.menu.clearCells'), isDisabled: !hasCell, onSelect: run((actions) => actions.clearCells()) },
-        { id: 'fill-down', label: text('excel.menu.fillDown'), isDisabled: !hasCell || selectedRowCount < 2, onSelect: run((actions) => actions.fillDown()) },
-        { id: 'fill-right', label: text('excel.menu.fillRight'), isDisabled: !hasCell || selectedColumnCount < 2, onSelect: run((actions) => actions.fillRight()) },
+        { id: 'clear-cells', label: text('excel.menu.clearCells'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.clearCells()) },
+        { id: 'fill-down', label: text('excel.menu.fillDown'), isDisabled: !hasCell || selectedRowCount < 2, disabledReason: text(hasCell ? 'disabled.selectTwoRows' : 'disabled.selectCell'), onSelect: run((actions) => actions.fillDown()) },
+        { id: 'fill-right', label: text('excel.menu.fillRight'), isDisabled: !hasCell || selectedColumnCount < 2, disabledReason: text(hasCell ? 'disabled.selectTwoColumns' : 'disabled.selectCell'), onSelect: run((actions) => actions.fillRight()) },
       ],
     },
     {
       id: 'insert',
       label: text('menu.insert'),
       items: [
-        { id: 'row-above', label: text('excel.menu.insertRowAbove'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertRows('above')) },
-        { id: 'row-below', label: text('excel.menu.insertRowBelow'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertRows('below')) },
-        { id: 'column-left', label: text('excel.menu.insertColumnLeft'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertColumns('left')) },
-        { id: 'column-right', label: text('excel.menu.insertColumnRight'), isDisabled: !hasCell, onSelect: run((actions) => actions.insertColumns('right')) },
+        { id: 'row-above', label: text('excel.menu.insertRowAbove'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.insertRows('above')) },
+        { id: 'row-below', label: text('excel.menu.insertRowBelow'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.insertRows('below')) },
+        { id: 'column-left', label: text('excel.menu.insertColumnLeft'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.insertColumns('left')) },
+        { id: 'column-right', label: text('excel.menu.insertColumnRight'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.insertColumns('right')) },
         'separator',
         { id: 'sheet', label: text('excel.menu.addSheet'), icon: 'plus', onSelect: run((actions) => actions.openAddSheet()) },
-        { id: 'link', label: text('excel.toolbar.insertOrEditLink'), isDisabled: !hasCell, onSelect: run((actions) => actions.openLink()) },
+        { id: 'link', label: text('excel.toolbar.insertOrEditLink'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.openLink()) },
       ],
     },
     {
@@ -613,54 +631,54 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
         {
           id: 'number-format',
           label: text('excel.menu.numberFormat'),
-          isDisabled: !hasCell,
+          isDisabled: !hasCell, disabledReason: text('disabled.selectCell'),
           items: NUMBER_FORMATS.map(({ labelKey, format }) => ({ id: idFromKey(labelKey, 'excel.menu.num'), label: text(labelKey), onSelect: run((actions) => actions.setNumberFormat(format)) })),
         },
         {
           id: 'currency',
           label: text('excel.toolbar.formatAsCurrency'),
-          isDisabled: !hasCell,
+          isDisabled: !hasCell, disabledReason: text('disabled.selectCell'),
           items: CURRENCIES.map((currency) => ({ id: idFromKey(currency.labelKey, 'excel.menu.currency'), label: text(currency.labelKey), onSelect: run((actions) => actions.setNumberFormat(currencyFormat(currency))) })),
         },
-        { id: 'percent', label: text('excel.toolbar.formatAsPercent'), isDisabled: !hasCell, onSelect: run((actions) => actions.setNumberFormat('0.00%')) },
-        { id: 'fewer-decimals', label: text('excel.toolbar.fewerDecimals'), isDisabled: !hasCell, onSelect: run((actions) => actions.changeDecimals(-1)) },
-        { id: 'more-decimals', label: text('excel.toolbar.moreDecimals'), isDisabled: !hasCell, onSelect: run((actions) => actions.changeDecimals(1)) },
+        { id: 'percent', label: text('excel.toolbar.formatAsPercent'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.setNumberFormat('0.00%')) },
+        { id: 'fewer-decimals', label: text('excel.toolbar.fewerDecimals'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.changeDecimals(-1)) },
+        { id: 'more-decimals', label: text('excel.toolbar.moreDecimals'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.changeDecimals(1)) },
         'separator',
-        { id: 'bold', label: text('excel.toolbar.bold'), kind: 'checkbox', isChecked: current?.isBold, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleBold()) },
-        { id: 'italic', label: text('excel.toolbar.italic'), kind: 'checkbox', isChecked: current?.isItalic, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleItalic()) },
-        { id: 'underline', label: text('excel.toolbar.underline'), kind: 'checkbox', isChecked: current?.isUnderlined, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleUnderline()) },
-        { id: 'strikethrough', label: text('excel.toolbar.strikethrough'), kind: 'checkbox', isChecked: current?.isStruckThrough, isDisabled: styleDisabled, onSelect: run((actions) => actions.toggleStrikethrough()) },
-        { id: 'font', label: text('excel.toolbar.font'), isDisabled: styleDisabled, items: FONT_FAMILIES.map((fontName) => ({ id: toElementId(fontName, true), label: fontName, onSelect: run((actions) => actions.setFontFamily(fontName)) })) },
-        { id: 'font-size', label: text('excel.toolbar.fontSize'), isDisabled: styleDisabled, items: FONT_SIZES.map((size) => ({ id: `size-${size}`, label: String(size), onSelect: run((actions) => actions.setFontSize(size)) })) },
-        { id: 'text-colour', label: text('excel.toolbar.textColour'), isDisabled: styleDisabled, items: colorItems((actions, hexColor) => actions.setTextColor(hexColor)) },
-        { id: 'fill-colour', label: text('excel.toolbar.fillColour'), isDisabled: styleDisabled, items: colorItems((actions, hexColor) => actions.setFillColor(hexColor)) },
+        { id: 'bold', label: text('excel.toolbar.bold'), kind: 'checkbox', isChecked: current?.isBold, isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.toggleBold()) },
+        { id: 'italic', label: text('excel.toolbar.italic'), kind: 'checkbox', isChecked: current?.isItalic, isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.toggleItalic()) },
+        { id: 'underline', label: text('excel.toolbar.underline'), kind: 'checkbox', isChecked: current?.isUnderlined, isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.toggleUnderline()) },
+        { id: 'strikethrough', label: text('excel.toolbar.strikethrough'), kind: 'checkbox', isChecked: current?.isStruckThrough, isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.toggleStrikethrough()) },
+        { id: 'font', label: text('excel.toolbar.font'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, items: FONT_FAMILIES.map((fontName) => ({ id: toElementId(fontName, true), label: fontName, onSelect: run((actions) => actions.setFontFamily(fontName)) })) },
+        { id: 'font-size', label: text('excel.toolbar.fontSize'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, items: FONT_SIZES.map((size) => ({ id: `size-${size}`, label: String(size), onSelect: run((actions) => actions.setFontSize(size)) })) },
+        { id: 'text-colour', label: text('excel.toolbar.textColour'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, items: colorItems((actions, hexColor) => actions.setTextColor(hexColor)) },
+        { id: 'fill-colour', label: text('excel.toolbar.fillColour'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, items: colorItems((actions, hexColor) => actions.setFillColor(hexColor)) },
         'separator',
-        { id: 'align-left', label: text('excel.toolbar.alignLeft'), kind: 'radio', isChecked: current?.alignment === 'left', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('left')) },
-        { id: 'align-center', label: text('excel.toolbar.alignCenter'), kind: 'radio', isChecked: current?.alignment === 'center', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('center')) },
-        { id: 'align-right', label: text('excel.toolbar.alignRight'), kind: 'radio', isChecked: current?.alignment === 'right', isDisabled: styleDisabled, onSelect: run((actions) => actions.setAlignment('right')) },
-        { id: 'decrease-indent', label: text('excel.toolbar.decreaseIndent'), isDisabled: styleDisabled, onSelect: run((actions) => actions.changeIndent(-1)) },
-        { id: 'increase-indent', label: text('excel.toolbar.increaseIndent'), isDisabled: styleDisabled, onSelect: run((actions) => actions.changeIndent(1)) },
-        { id: 'borders', label: text('excel.toolbar.borders'), isDisabled: styleDisabled, items: BORDER_CHOICES.map(({ side, labelKey }) => ({ id: side, label: text(labelKey), onSelect: run((actions) => actions.setBorders(side)) })) },
+        { id: 'align-left', label: text('excel.toolbar.alignLeft'), kind: 'radio', isChecked: current?.alignment === 'left', isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.setAlignment('left')) },
+        { id: 'align-center', label: text('excel.toolbar.alignCenter'), kind: 'radio', isChecked: current?.alignment === 'center', isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.setAlignment('center')) },
+        { id: 'align-right', label: text('excel.toolbar.alignRight'), kind: 'radio', isChecked: current?.alignment === 'right', isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.setAlignment('right')) },
+        { id: 'decrease-indent', label: text('excel.toolbar.decreaseIndent'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.changeIndent(-1)) },
+        { id: 'increase-indent', label: text('excel.toolbar.increaseIndent'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.changeIndent(1)) },
+        { id: 'borders', label: text('excel.toolbar.borders'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, items: BORDER_CHOICES.map(({ side, labelKey }) => ({ id: side, label: text(labelKey), onSelect: run((actions) => actions.setBorders(side)) })) },
         'separator',
-        { id: 'merge', label: text(current?.isMerged ? 'excel.toolbar.unmergeCells' : 'excel.toolbar.mergeCells'), isDisabled: !hasCell, onSelect: run((actions) => actions.toggleMerge()) },
-        { id: 'column-width', label: text('excel.menu.columnWidth'), isDisabled: !hasCell, onSelect: run((actions) => actions.openColumnWidth()) },
-        { id: 'clear-formatting', label: text('excel.toolbar.clearFormatting'), isDisabled: styleDisabled, onSelect: run((actions) => actions.clearFormatting()) },
-        ...(current && !current.canStyle ? [{ id: 'menu-styles-note', note: text('excel.menu.stylesXlsxOnly') }] : []),
+        { id: 'merge', label: text(current?.isMerged ? 'excel.toolbar.unmergeCells' : 'excel.toolbar.mergeCells'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.toggleMerge()) },
+        { id: 'column-width', label: text('excel.menu.columnWidth'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.openColumnWidth()) },
+        { id: 'clear-formatting', label: text('excel.toolbar.clearFormatting'), isDisabled: styleDisabled, disabledReason: styleDisabledReason, onSelect: run((actions) => actions.clearFormatting()) },
+        ...(current?.stylesUnavailable ? [{ id: 'menu-styles-note', note: text(STYLES_UNAVAILABLE_REASONS[current.stylesUnavailable]) }] : []),
       ],
     },
     {
       id: 'data',
       label: text('menu.data'),
       items: [
-        { id: 'upper', label: text('excel.menu.upperCase'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('upper')) },
-        { id: 'lower', label: text('excel.menu.lowerCase'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('lower')) },
-        { id: 'capitalize', label: text('excel.menu.capitalizeEachWord'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('capitalize')) },
-        { id: 'trim', label: text('excel.menu.trimExtraSpaces'), isDisabled: !hasCell, onSelect: run((actions) => actions.transformText('trim')) },
+        { id: 'upper', label: text('excel.menu.upperCase'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.transformText('upper')) },
+        { id: 'lower', label: text('excel.menu.lowerCase'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.transformText('lower')) },
+        { id: 'capitalize', label: text('excel.menu.capitalizeEachWord'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.transformText('capitalize')) },
+        { id: 'trim', label: text('excel.menu.trimExtraSpaces'), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.transformText('trim')) },
         'separator',
-        { id: 'clear-rows', label: translatePlural(locale, 'excel.menu.clearRows', selectedRowCount), isDisabled: !hasCell, onSelect: run((actions) => actions.clearRows()) },
-        { id: 'clear-columns', label: translatePlural(locale, 'excel.menu.clearColumns', selectedColumnCount), isDisabled: !hasCell, onSelect: run((actions) => actions.clearColumns()) },
-        { id: 'delete-rows', label: translatePlural(locale, 'excel.menu.deleteRows', selectedRowCount), isDanger: true, isDisabled: !selectedRowCount, onSelect: run((actions) => actions.deleteRows()) },
-        { id: 'delete-columns', label: translatePlural(locale, 'excel.menu.deleteColumns', selectedColumnCount), isDanger: true, isDisabled: !selectedColumnCount, onSelect: run((actions) => actions.deleteColumns()) },
+        { id: 'clear-rows', label: translatePlural(locale, 'excel.menu.clearRows', selectedRowCount), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.clearRows()) },
+        { id: 'clear-columns', label: translatePlural(locale, 'excel.menu.clearColumns', selectedColumnCount), isDisabled: !hasCell, disabledReason: text('disabled.selectCell'), onSelect: run((actions) => actions.clearColumns()) },
+        { id: 'delete-rows', label: translatePlural(locale, 'excel.menu.deleteRows', selectedRowCount), isDanger: true, isDisabled: !selectedRowCount, disabledReason: text('disabled.selectRows'), onSelect: run((actions) => actions.deleteRows()) },
+        { id: 'delete-columns', label: translatePlural(locale, 'excel.menu.deleteColumns', selectedColumnCount), isDanger: true, isDisabled: !selectedColumnCount, disabledReason: text('disabled.selectColumns'), onSelect: run((actions) => actions.deleteColumns()) },
       ],
     },
     {
@@ -672,7 +690,7 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
         { id: 'move-sheet-left', label: text('excel.menu.moveSheetLeft'), onSelect: run((actions) => actions.moveSheet(-1)) },
         { id: 'move-sheet-right', label: text('excel.menu.moveSheetRight'), onSelect: run((actions) => actions.moveSheet(1)) },
         'separator',
-        { id: 'delete-sheet', label: text('excel.menu.deleteSheet'), isDanger: true, isDisabled: !current?.canDeleteSheet, onSelect: run((actions) => actions.openDeleteSheet()) },
+        { id: 'delete-sheet', label: text('excel.menu.deleteSheet'), isDanger: true, isDisabled: !current?.canDeleteSheet, disabledReason: text('disabled.lastSheet'), onSelect: run((actions) => actions.openDeleteSheet()) },
       ],
     },
   ]

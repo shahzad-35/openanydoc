@@ -197,7 +197,9 @@ async function openPage(pathname) {
 
 const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer']
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
-const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages]
+// Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
+const toolPages = ['/mask-data']
+const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
@@ -380,7 +382,8 @@ await test('home, format and landing pages carry their own title, h1, intro, que
     const isLandingPage = landingPages.includes(address.slice(3))
     if (isLandingPage) {
       expect(faq.mainEntity.length >= 5 && faq.mainEntity.length <= 8, `${address}: a landing page needs 5 to 8 questions, it has ${faq.mainEntity.length}`)
-      expect(breadcrumb?.itemListElement.length === 3, `${address}: the breadcrumb is not Home › viewer › this page`)
+      const crumbCount = toolPages.includes(address.slice(3)) ? 2 : 3
+      expect(breadcrumb?.itemListElement.length === crumbCount, `${address}: the breadcrumb does not have ${crumbCount} steps`)
     }
     if (address.length > 3) {
       const isArabic = address.startsWith('/ar')
@@ -447,7 +450,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token', '/en/mask-data', '/ar/mask-data']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -456,7 +459,7 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/abou
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column', '/en/mask-data', '/ar/mask-data']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://www.openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
@@ -490,7 +493,7 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
   expect((await evaluate(`document.documentElement.style.getPropertyValue('--ext-pill-1')`)) !== '', 'the inline theme script did not run (blocked by the CSP?)')
 })
 
-const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json']
+const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
@@ -1170,10 +1173,10 @@ await test('the header nav, related tools, footer and home links point at built 
     for (const locale of ['en', 'ar']) {
       const address = `/${locale}${page}`
       const html = await (await fetch(`${siteOrigin}${address}`)).text()
-      // The header links the viewers, then the conversion pages in its Convert menu.
+      // The header links the viewers, then the conversion pages and the tool pages in its Convert menu.
       const navLinks = linksIn(html, '<nav id="site-nav"', '</nav>')
-      const navPages = [...formatPages, ...conversionPages]
-      expect(navLinks?.length === navPages.length, `${address}: the header nav does not link the ${formatPages.length} viewers and ${conversionPages.length} converters`)
+      const navPages = [...formatPages, ...toolPages, ...conversionPages]
+      expect(navLinks?.length === navPages.length, `${address}: the header nav does not link the ${formatPages.length} viewers, ${toolPages.length} tools and ${conversionPages.length} converters`)
       expect(JSON.stringify(navLinks.map((link) => link.href).sort()) === JSON.stringify(navPages.map((navPage) => `/${locale}${navPage}`).sort()), `${address}: the nav links are ${navLinks.map((link) => link.href).join(', ')}`)
       const currentLinks = navLinks.filter((link) => link.tag.includes('aria-current="page"'))
       const expectedCurrent = navPages.includes(page) ? [`/${locale}${page}`] : []
@@ -1210,7 +1213,7 @@ await test('the changelog writes the same nav as the browser draws, and the nav 
     expect(liveNav === staticNav, `/${locale}/changelog: the static nav differs from the React one:\n${staticNav}\n${liveNav}`)
   }
   const navState = () => evaluate(`({ toggle: document.querySelector('#site-nav-toggle').checkVisibility(), links: document.querySelector('#site-nav-link-csv').checkVisibility(), sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth })`)
-  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/fix-arabic-csv-in-excel', '/ar/changelog']) {
+  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/fix-arabic-csv-in-excel', '/ar/changelog', '/ar/mask-data']) {
     await openPage(address)
     const desktop = await navState()
     expect(!desktop.toggle && desktop.links, `${address} at 1280px: the links should show without the disclosure (${JSON.stringify(desktop)})`)
@@ -1499,6 +1502,222 @@ await test('the header has a Convert menu with every conversion page, and pickin
   await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'people.json'`, 'the converted file in the JSON viewer')
 })
 
+// A popover's default `inset: 0` used to win over the menu's `left` in right-to-left, pinning the menu to the far edge.
+await test('in Arabic the top-bar Convert menu opens under its button', async () => {
+  await openPage('/ar/excel-viewer')
+  await chooseFile(sampleWorkbook)
+  await waitFor(`document.querySelector('#excel-workbench #convert-button')`, 'the Excel viewer')
+  await evaluate(`document.querySelector('#convert-button').click()`)
+  await waitFor(`document.querySelector('#convert-button-menu')`, 'the Convert menu')
+  const boxes = JSON.parse(await evaluate(`JSON.stringify([document.querySelector('#convert-button').getBoundingClientRect(), document.querySelector('#convert-button-menu').getBoundingClientRect()])`))
+  expect(Math.abs(boxes[0].right - boxes[1].right) < 2, `the menu's end edge is at ${boxes[1].right}, the button's at ${boxes[0].right}`)
+})
+
+// Mask Data. Every value is made up: test card numbers, the published example IBAN, IDs with a computed check digit.
+function makeSyntheticId(firstDigits) {
+  const isLuhnValid = (digits) => [...digits].reverse().reduce((sum, digit, position) => sum + (position % 2 ? [0, 2, 4, 6, 8, 1, 3, 5, 7, 9][digit] : Number(digit)), 0) % 10 === 0
+  for (let checkDigit = 0; checkDigit <= 9; checkDigit++) if (isLuhnValid(`${firstDigits}${checkDigit}`)) return `${firstDigits}${checkDigit}`
+}
+const maskCsv = path.join(scratchFolder, 'customers.csv')
+const maskCsvText = [
+  'name,email,phone,national_id,iban,card,amount,notes',
+  `Sara Example,sara@example.com,+966500000001,${makeSyntheticId('100000001')},GB82WEST12345698765432,4111111111111111,10.50,Sara Example asked us to write to sara@example.com instead`,
+  `سارة مثال,omar@example.org,0500000002,${makeSyntheticId('200000002')},GB82WEST12345698765432,5555555555554444,20.00,Call back on 0500000009 about the late delivery please`,
+  `Omar Sample,lina@example.net,0500000003,${makeSyntheticId('100000003')},GB82WEST12345698765432,4111111111111111,30.25,Nothing to add for this customer at the moment really`,
+].join('\n')
+fs.writeFileSync(maskCsv, maskCsvText)
+const maskJson = path.join(scratchFolder, 'customers.json')
+fs.writeFileSync(maskJson, JSON.stringify({ customers: [{ profile: { fullName: 'Sara Example', email: 'sara@example.com' }, points: 12 }, { profile: { fullName: 'Omar Sample', email: 'omar@example.org' }, points: 7 }] }))
+const maskWorkbook = path.join(scratchFolder, 'people.xlsx')
+const maskSheets = XLSX.utils.book_new()
+XLSX.utils.book_append_sheet(maskSheets, XLSX.utils.aoa_to_sheet([['Name', 'Email'], ['Sara Example', 'sara@example.com'], ['Omar Sample', 'omar@example.org']]), 'Staff')
+XLSX.utils.book_append_sheet(maskSheets, XLSX.utils.aoa_to_sheet([['Client name', 'Mobile', 'Orders'], ['Lina Demo', '0500000004', 3]]), 'Clients')
+fs.writeFileSync(maskWorkbook, XLSX.write(maskSheets, { type: 'buffer', bookType: 'xlsx' }))
+
+async function chooseFileIn(selector, filePath) {
+  const { root } = await send('DOM.getDocument')
+  const { nodeId } = await send('DOM.querySelector', { nodeId: root.nodeId, selector })
+  await send('DOM.setFileInputFiles', { nodeId, files: [filePath] })
+}
+const lastBlobText = () => evaluate(`window.__blobs[window.__blobs.length - 1].text()`)
+const rowIdFor = (category) => evaluate(`document.querySelector('#mask-chosen-fields .mw-row[data-category="${category}"]')?.id ?? ''`)
+const chosenCategories = () => evaluate(`[...document.querySelectorAll('#mask-chosen-fields .mw-row')].map((row) => row.dataset.category).join(',')`)
+const goToMaskStep = async (step) => {
+  await evaluate(`document.querySelector('#mask-step-${step}-button').click()`)
+  await waitFor(`document.querySelector('#mask-step-${step}-button').getAttribute('aria-current') === 'step'`, `mask step ${step}`)
+}
+const maskText = path.join(scratchFolder, 'note.txt')
+fs.writeFileSync(maskText, 'Hello team,\nplease write to sara@example.com or call +966 50 000 0001 before Friday.\nThanks')
+
+await test('Mask Data lists every column, starts with the sensitive ones, masks them with tokens (inside free text too), and restores them with the private key', async () => {
+  await openPage('/en/mask-data')
+  await waitFor(`document.querySelector('#mask-warning')`, 'the Mask Data panel')
+  await expectCleanIds('/en/mask-data')
+  expect((await evaluate(`document.querySelector('#mask-warning')?.innerText.trim()`)) === "Masking lowers the risk but isn't a guarantee. Check the result before you share it.", 'the warning is not shown word for word')
+  await chooseFile(maskCsv)
+  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row').length > 0`, 'the chosen columns')
+  expect((await chosenCategories()) === 'name,email,phone,nationalId,iban,card,freeText', `the chosen columns were ${await chosenCategories()}`)
+  await evaluate(`document.querySelector('#mask-columns-button').click()`)
+  await waitFor(`document.querySelector('#mask-columns-list')`, 'the column list')
+  expect(await evaluate(`document.querySelectorAll('#mask-columns-list input[type=checkbox]').length === 8 && !document.querySelector('#mask-field-7-checkbox').checked`), 'the list does not offer all 8 columns with amount unticked')
+  await expectCleanIds('/en/mask-data with the column list open')
+  // A column the scan did not flag can be added, as Other.
+  await evaluate(`document.querySelector('#mask-field-7-checkbox').click()`)
+  await waitFor(`document.querySelector('#mask-field-7')?.dataset.category === 'other'`, 'amount added as Other')
+  await evaluate(`document.querySelector('#mask-field-7-remove').click()`)
+  await waitFor(`!document.querySelector('#mask-field-7')`, 'amount removed again')
+
+  await goToMaskStep(2)
+  await waitFor(`document.querySelector('#mask-preview-table[data-view="after"]')?.innerText.includes('EMAIL-000001')`, 'the masked preview')
+  await expectCleanIds('/en/mask-data on the preview step')
+  await evaluate(`document.querySelector('#mask-preview-before-button').click()`)
+  await waitFor(`document.querySelector('#mask-preview-table[data-view="before"]')?.innerText.includes('sara@example.com')`, 'the original rows')
+  expect(await evaluate(`document.querySelectorAll('#mask-preview-table tbody tr').length === 3`), 'the preview does not show the 3 rows')
+  await goToMaskStep(3)
+  await expectCleanIds('/en/mask-data on the download step')
+
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#mask-key-checkbox').click()`)
+  await waitFor(`document.querySelector('#mask-key-warning') && document.querySelector('#download-mask-key-button')?.disabled`, 'the key warning and the key button waiting for a masked file')
+  await evaluate(`document.querySelector('#download-masked-csv-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the masked CSV')
+  const maskedCsv = await lastBlobText()
+  for (const original of ['sara@example.com', 'Sara Example', '0500000009', '4111111111111111', 'GB82WEST']) expect(!maskedCsv.includes(original), `the masked CSV still has ${original}`)
+  expect(maskedCsv.includes('NAME-000001 asked us to write to EMAIL-000001 instead') && maskedCsv.includes('10.50'), `the masked CSV was: ${maskedCsv}`)
+  await waitFor(`!document.querySelector('#download-mask-key-button').disabled`, 'the key button')
+  await evaluate(`document.querySelector('#download-mask-key-button').click()`)
+  await waitFor(`window.__blobs.length === 2`, 'the private key')
+  const keyText = await lastBlobText()
+  expect(JSON.parse(keyText).tokens['EMAIL-000001'].value === 'sara@example.com', 'the key does not map EMAIL-000001 to its email')
+
+  const maskedFile = path.join(scratchFolder, 'customers-masked.csv')
+  const keyFile = path.join(scratchFolder, 'customers-private-key.json')
+  fs.writeFileSync(maskedFile, maskedCsv)
+  fs.writeFileSync(keyFile, keyText)
+  await evaluate(`document.querySelector('#restore-tab').click()`)
+  await waitFor(`document.querySelector('#restore-panel')`, 'the Restore tab')
+  await expectCleanIds('/en/mask-data on the Restore tab')
+  await chooseFileIn('#restore-file-input', maskedFile)
+  await chooseFileIn('#restore-key-input', keyFile)
+  await waitFor(`!document.querySelector('#restore-button').disabled`, 'the Restore button')
+  await evaluate(`document.querySelector('#restore-button').click()`)
+  await waitFor(`window.__blobs.length === 3`, 'the restored CSV')
+  const restoredCsv = (await lastBlobText()).replace(/^﻿/, '').replace(/\r\n/g, '\n').trim()
+  expect(restoredCsv === maskCsvText, `the restored CSV was: ${restoredCsv}`)
+  expect((await evaluate(`document.querySelector('#restore-message')?.innerText`)).includes('customers-restored.csv'), 'no message names the restored file')
+
+  // A wrong key is refused; a partial mask and a removed field change the download.
+  await chooseFileIn('#restore-key-input', maskCsv)
+  await evaluate(`document.querySelector('#restore-button').click()`)
+  await waitFor(`document.querySelector('#restore-message')?.innerText.includes('not a Mask Data key')`, 'the message about a wrong key')
+  await evaluate(`document.querySelector('#mask-tab').click()`)
+  await goToMaskStep(1)
+  await chooseOption(`#${await rowIdFor('card')}-strategy`, 'partial')
+  await chooseOption(`#${await rowIdFor('iban')}-strategy`, 'remove')
+  await goToMaskStep(2)
+  await evaluate(`document.querySelector('#mask-preview-after-button').click()`)
+  await waitFor(`document.querySelector('#mask-preview-table[data-view="after"]')?.innerText.includes('****1111') && !document.querySelector('#mask-preview-table').innerText.includes('iban')`, 'the preview with a partial card and no IBAN')
+  await goToMaskStep(3)
+  await evaluate(`document.querySelector('#download-masked-json-button').click()`)
+  await waitFor(`window.__blobs.length === 4`, 'the masked JSON')
+  const maskedRecords = JSON.parse(await lastBlobText())
+  expect(maskedRecords[0].card === '****1111' && !('iban' in maskedRecords[0]) && maskedRecords[0].amount === 10.5, `the first masked record was ${JSON.stringify(maskedRecords[0])}`)
+})
+
+await test('Mask Data masks every sheet of a workbook, nested JSON keeping numbers, and a text file', async () => {
+  await openPage('/ar/mask-data')
+  await chooseFile(maskWorkbook)
+  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row').length === 4`, 'the four sensitive columns of the two sheets')
+  await expectCleanIds('/ar/mask-data with chosen columns')
+  await goToMaskStep(2)
+  await waitFor(`document.querySelector('#mask-preview-table')`, 'the preview step')
+  expect(await evaluate(`document.querySelector('#mask-preview-sheet-select')?.options.length === 2`), 'no sheet picker for the two sheets')
+  await goToMaskStep(3)
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#download-masked-xlsx-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the masked workbook')
+  const workbookBase64 = await evaluate(`window.__blobs[0].arrayBuffer().then((buffer) => { let text = ''; for (const byte of new Uint8Array(buffer)) text += String.fromCharCode(byte); return btoa(text) })`)
+  const maskedWorkbook = new ExcelJS.Workbook()
+  await maskedWorkbook.xlsx.load(Buffer.from(workbookBase64, 'base64'))
+  const [staffSheet, clientsSheet] = maskedWorkbook.worksheets
+  expect(staffSheet.name === 'Staff' && staffSheet.getCell('B2').value === 'EMAIL-000001' && staffSheet.getCell('A3').value === 'NAME-000002', 'the Staff sheet is not masked')
+  expect(clientsSheet.name === 'Clients' && clientsSheet.getCell('B2').value === 'PHONE-000001' && clientsSheet.getCell('C2').value === 3, 'the Clients sheet is not masked, or lost its number')
+
+  await openPage('/en/mask-data')
+  await chooseFile(maskJson)
+  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row').length === 2`, 'the name and email of the JSON')
+  await goToMaskStep(2)
+  await waitFor(`document.querySelector('#mask-preview-table[data-view="after"]')?.innerText.includes('NAME-000001')`, 'the JSON preview')
+  await goToMaskStep(3)
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#download-masked-json-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the masked JSON')
+  const masked = JSON.parse(await lastBlobText())
+  expect(JSON.stringify(masked) === JSON.stringify({ customers: [{ profile: { fullName: 'NAME-000001', email: 'EMAIL-000001' }, points: 12 }, { profile: { fullName: 'NAME-000002', email: 'EMAIL-000002' }, points: 7 }] }), `the masked JSON was ${JSON.stringify(masked)}`)
+
+  await openPage('/en/mask-data')
+  await chooseFile(maskText)
+  await waitFor(`document.querySelector('#mask-chosen-fields .mw-row')?.dataset.category === 'freeText' && !document.querySelector('#mask-columns-button')`, 'the text file as one free-text field')
+  await goToMaskStep(3)
+  expect(await evaluate(`Boolean(document.querySelector('#download-masked-txt-button')) && !document.querySelector('#download-masked-csv-button')`), 'a text file is not offered as TXT only')
+  await evaluate(captureDownloads)
+  await evaluate(`document.querySelector('#download-masked-txt-button').click()`)
+  await waitFor(`window.__blobs.length === 1`, 'the masked text')
+  const maskedText = await lastBlobText()
+  expect(maskedText === 'Hello team,\nplease write to EMAIL-000001 or call PHONE-000001 before Friday.\nThanks', `the masked text was ${JSON.stringify(maskedText)}`)
+})
+
+await test('the CSV, JSON and Excel viewers open Mask data in a drawer over the file, from a top-bar button and their menus', async () => {
+  const drawerCases = [
+    ['/en/csv-viewer', maskCsv, `document.querySelector('#csv-workbench #data-table tbody td')`, 7],
+    ['/en/json-viewer', maskJson, `document.querySelector('#json-workbench .file-tab')?.innerText === 'customers.json'`, 2],
+    ['/ar/excel-viewer', maskWorkbook, `document.querySelector('#excel-workbench #data-table')`, 4],
+  ]
+  for (const [address, file, openedCheck, rowCount] of drawerCases) {
+    await openPage(address)
+    await chooseFile(file)
+    await waitFor(openedCheck, `${address}: the file`)
+    // The workbook is written with its edits (ExcelJS) before it is masked, which takes longer under a full run.
+    await waitFor(`document.querySelector('#mask-button') && !document.querySelector('#mask-button').disabled`, `${address}: the Mask button`, 20000)
+    await evaluate(`document.querySelector('#mask-button').click()`)
+    await waitFor(`document.querySelector('#mask-tool.mask-drawer') && document.querySelectorAll('#mask-chosen-fields .mw-row').length === ${rowCount}`, `${address}: the drawer with ${rowCount} chosen fields`, 20000)
+    expect((await evaluate('location.pathname')) === address, `${address}: opening the drawer left the page`)
+    await expectCleanIds(`${address} with the Mask drawer open`)
+    await pressKey('Escape', 'Escape', 27)
+    await waitFor(`!document.querySelector('#mask-tool') && document.activeElement?.id === 'mask-button'`, `${address}: the drawer to close on Escape, focus back on the button`)
+  }
+  await openPage('/en/txt-viewer')
+  await chooseFile(maskText)
+  await waitFor(`document.querySelector('#txt-workbench #file-name')`, 'the TXT viewer')
+  expect(await evaluate(`!document.querySelector('#mask-button')`), 'the TXT viewer has a Mask button')
+  // The CSV More menu opens the same drawer; the File menu no longer lists it (the top-bar button does).
+  await openPage('/en/csv-viewer')
+  await chooseFile(maskCsv)
+  await waitFor(`document.querySelector('#csv-workbench #data-table tbody td')`, 'the CSV viewer')
+  // On a wide screen the delimiter, header and encoding live in the status bar only, not in the More menu.
+  await evaluate(`document.querySelector('#more-menu-button').click()`)
+  await waitFor(`document.querySelector('#more-menu-download')`, 'the More menu')
+  expect(await evaluate(`!document.querySelector('#more-menu-reading') && Boolean(document.querySelector('#status-delimiter-button'))`), 'the More menu still has Delimiter, header, encoding')
+  await pressKey('Escape', 'Escape', 27)
+  // A disabled menu item says why on hover.
+  await evaluate(`document.querySelector('#menu-edit').click()`)
+  await waitFor(`document.querySelector('#menu-edit-undo')`, 'the Edit menu')
+  expect((await evaluate(`document.querySelector('#menu-edit-undo').title`)) === 'Nothing to undo', 'the disabled Undo does not say why')
+  await pressKey('Escape', 'Escape', 27)
+  await evaluate(`document.querySelector('#menu-file').click()`)
+  await waitFor(`document.querySelector('#menu-file-open')`, 'the File menu')
+  expect(await evaluate(`!document.querySelector('#menu-file-mask-data')`), 'the File menu still lists Mask data')
+  await pressKey('Escape', 'Escape', 27)
+  await evaluate(`document.querySelector('#more-menu-button').click()`)
+  await waitFor(`document.querySelector('#more-menu-mask-data')`, 'Mask sensitive data in the More menu')
+  await evaluate(`document.querySelector('#more-menu-mask-data').click()`)
+  await waitFor(`document.querySelectorAll('#mask-tool.mask-drawer #mask-chosen-fields .mw-row').length === 7`, 'the drawer from the More menu')
+  await onPhone(async () => {
+    const drawerBox = JSON.parse(await evaluate(`JSON.stringify(document.querySelector('#mask-tool').getBoundingClientRect())`))
+    expect(drawerBox.width <= 390 && drawerBox.left >= 0, `the drawer does not fit a phone: ${JSON.stringify(drawerBox)}`)
+  })
+})
+
 // The tool pages say the site works without a network once loaded: each page fetches its viewer while idle (App.tsx).
 const goOffline = (offline) => send('Network.emulateNetworkConditions', { offline, latency: 0, downloadThroughput: -1, uploadThroughput: -1 })
 await test('once a tool page is idle, its file opens with no network; code that cannot load shows a reload message, not a blank page', async () => {
@@ -1507,6 +1726,7 @@ await test('once a tool page is idle, its file opens with no network; code that 
     ['/en/json-viewer', sampleJson, `document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json' && !document.querySelector('#json-workbench [role="alert"]')`],
     ['/en/excel-viewer', sampleWorkbook, `document.querySelector('#excel-workbench #data-table')`],
     ['/en', sampleCsv, `document.querySelector('#csv-workbench #data-table tbody td')`],
+    ['/en/mask-data', maskWorkbook, `document.querySelectorAll('#mask-chosen-fields .mw-row').length === 4`],
   ]
   try {
     for (const [address, file, openedCheck] of offlineCases) {

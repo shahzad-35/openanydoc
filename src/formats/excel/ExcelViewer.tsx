@@ -83,6 +83,7 @@ export default function ExcelViewer({
   const editing = editingComponents as ExcelEditingComponents | null
   const isEditable = mode === 'edit' && editing !== null
   const [stylesVersion, setStylesVersion] = useState(0)
+  const [haveStylesFailed, setHaveStylesFailed] = useState(false)
   const [parseResult, setParseResult] = useState<ParseResult | null>(null)
   const [pickedSheetId, setPickedSheetId] = useState<number | null>(null)
   const [headerChoiceBySheetId, setHeaderChoiceBySheetId] = useState<Record<number, boolean>>({})
@@ -157,7 +158,9 @@ export default function ExcelViewer({
         parsed.styles = styles
         setStylesVersion((version) => version + 1)
       },
-      () => {},
+      () => {
+        if (!isCancelled) setHaveStylesFailed(true)
+      },
     )
     return () => {
       isCancelled = true
@@ -427,6 +430,8 @@ export default function ExcelViewer({
 
   // Styles are changed on every selected cell. Toggles follow the first selected cell: if it is bold, all become not bold.
   const canStyle = parsed !== null && parsed.bookType === 'xlsx' && parsed.styles !== null
+  const stylesUnavailable =
+    !parsed || canStyle ? null : parsed.bookType !== 'xlsx' ? 'notXlsx' : openedFile.file.size > MAX_STYLED_FILE_BYTES ? 'tooLarge' : haveStylesFailed ? 'unreadable' : 'loading'
   const focusStyle = sheet && selectedCell ? readStyle(sheet, selectedCell.rowId, selectedCell.columnId) : undefined
 
   function changeSelectionStyle(change: (style: CellStyle, position: CellPosition) => CellStyle, resetNumberFormat = false) {
@@ -705,6 +710,7 @@ export default function ExcelViewer({
       selectedColumnCount: selectedColumnIds.length,
       canDeleteSheet: sheetRecords.length > 1,
       canStyle,
+      stylesUnavailable,
       isBold: focusStyle?.font?.bold === true,
       isItalic: focusStyle?.font?.italic === true,
       isUnderlined: !!focusStyle?.font?.underline,
@@ -713,7 +719,7 @@ export default function ExcelViewer({
       isMerged: sheet && selectedCell ? findMergeAt(sheet, selectedCell) !== undefined : false,
     }
     onSelectionChange(selection)
-  }, [parsed, sheet, activeSheetName, sheetRecords.length, selectedCell, hasHeaderRow, selectedRowIds.length, selectedColumnIds.length, canStyle, focusStyle, onSelectionChange])
+  }, [parsed, sheet, activeSheetName, sheetRecords.length, selectedCell, hasHeaderRow, selectedRowIds.length, selectedColumnIds.length, canStyle, stylesUnavailable, focusStyle, onSelectionChange])
 
   useEffect(() => {
     onExportSourceChange(parsed ? ({ parsed } satisfies ExcelExportSource) : null)

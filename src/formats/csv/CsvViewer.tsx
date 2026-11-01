@@ -15,7 +15,8 @@ import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
 import type { ConversionTarget } from '../../viewers'
 import { columnLabel, measureColumnWidthsPx } from '../DataTable'
-import { buildDownloadName, downloadTextFile } from '../registry'
+import { buildDownloadName, downloadTextFile, findFormatForFileName } from '../registry'
+import { useMaskDrawer } from '../mask/useMaskDrawer'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import CsvGrid from './CsvGrid'
@@ -105,7 +106,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11"/><path d="M7.5 10.5 12 15l4.5-4.5"/><path d="M4 15v2.5A2.5 2.5 0 0 0 6.5 20h11a2.5 2.5 0 0 0 2.5-2.5V15"/></symbol>
 <symbol id="i-open" viewBox="0 0 24 24"><path d="M3.5 7.5a2 2 0 0 1 2-2h4l2 2h7a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-13a2 2 0 0 1-2-2z"/></symbol>
 <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7.5A2.5 2.5 0 0 0 5 5.5v13A2.5 2.5 0 0 0 7.5 21h9a2.5 2.5 0 0 0 2.5-2.5V8z"/><path d="M14 3v5h5"/></symbol>
-<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4.5" y="10.5" width="15" height="10" rx="3"/><path d="M8 10.5V8a4 4 0 0 1 8 0v2.5"/></symbol><symbol id="i-convert" viewBox="0 0 24 24"><path d="M4 8h13m0 0-3.5-3.5M17 8l-3.5 3.5"/><path d="M20 16H7m0 0 3.5-3.5M7 16l3.5 3.5"/></symbol><symbol id="i-mask" viewBox="0 0 24 24"><path d="M3 9.5C3 7.6 4.4 6.5 6 6.5c2.2 0 3.6 1.2 6 1.2s3.8-1.2 6-1.2c1.6 0 3 1.1 3 3 0 4-2.6 7-5.2 7-1.8 0-2.6-1.6-3.8-1.6s-2 1.6-3.8 1.6C5.6 16.5 3 13.5 3 9.5Z"/><path d="M7.5 10.5h2.5M14 10.5h2.5"/></symbol>
 <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M5.3 18.7l1.4-1.4M17.3 6.7l1.4-1.4"/></symbol>
 <symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
 <symbol id="i-warn" viewBox="0 0 24 24"><path d="M10.3 4.2 2.9 17.5A2 2 0 0 0 4.6 20.5h14.8a2 2 0 0 0 1.7-3L13.7 4.2a2 2 0 0 0-3.4 0z"/><path d="M12 9.5v4"/><path d="M12 17h.01"/></symbol>
@@ -764,6 +765,11 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     else onOpenConvertedFile(result.file)
   }
 
+  // Mask data masks the table as Download would save it, edits included.
+  const canMask = findFormatForFileName(fileName)?.canMask === true
+  const { openMaskDrawer, maskDrawer, isMaskDrawerOpen } = useMaskDrawer(() => new File([buildCsvFileText(rows, edits, buildCsvFileOptions(defaultDownloadSettings()))], fileName, { type: tableFormat.mimeType }))
+  const maskMenuItems = canMask ? [{ id: 'mask-data', label: t('mask.menuItem'), icon: 'mask', isDisabled: !readableCsv, disabledReason: t('disabled.noTable'), onSelect: () => void openMaskDrawer() }] : []
+
   // Excel shows Arabic letters as garbled text unless the file starts with the UTF-8 marker, so offer a copy that has it.
   const offersExcelCopy = readableCsv !== null && !readableCsv.hasUtf8Bom && rows.some((row) => row.some((cellText) => /[؀-ۿ]/.test(cellText)))
   function downloadExcelCopy() {
@@ -1142,7 +1148,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
 
   // ---------------------------------------------------------------- popovers
   type MenuItem =
-    | { id: string; label: string; icon?: string; hint?: string; isDanger?: boolean; isDisabled?: boolean; onSelect: () => void }
+    | { id: string; label: string; icon?: string; hint?: string; isDanger?: boolean; isDisabled?: boolean; disabledReason?: string; onSelect: () => void }
     | { id: string; label: string; icon: string; href: string }
     | { id: string; note: string }
     | 'separator'
@@ -1175,6 +1181,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               type="button"
               role="menuitem"
               disabled={item.isDisabled}
+              title={item.isDisabled ? item.disabledReason : undefined}
               onClick={() => {
                 setPopover(null)
                 item.onSelect()
@@ -1193,13 +1200,13 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   // The Clean up button's menu, also listed under Data in the menu bar.
   const cleanUpMenuItems: MenuItem[] = [
     { heading: selectedColumnId !== null ? t('csv.wb.columnHeading', { name: nameOf(selectedColumnId) }) : t('csv.wb.columnHeadingNone') },
-    { id: 'clean-menu-upper', label: t('csv.wb.upperCase'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('upper') },
-    { id: 'clean-menu-lower', label: t('csv.wb.lowerCase'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('lower') },
-    { id: 'clean-menu-capitalize', label: t('csv.wb.capitalize'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('capitalize') },
-    { id: 'clean-menu-trim', label: t('csv.wb.trimSpaces'), icon: 'edit', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('trim') },
-    { id: 'clean-menu-fill-down', label: t('csv.wb.fillDown'), icon: 'down', isDisabled: selectedColumnId === null, onSelect: () => transformSelectedColumn('fillDown') },
+    { id: 'clean-menu-upper', label: t('csv.wb.upperCase'), icon: 'edit', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => transformSelectedColumn('upper') },
+    { id: 'clean-menu-lower', label: t('csv.wb.lowerCase'), icon: 'edit', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => transformSelectedColumn('lower') },
+    { id: 'clean-menu-capitalize', label: t('csv.wb.capitalize'), icon: 'edit', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => transformSelectedColumn('capitalize') },
+    { id: 'clean-menu-trim', label: t('csv.wb.trimSpaces'), icon: 'edit', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => transformSelectedColumn('trim') },
+    { id: 'clean-menu-fill-down', label: t('csv.wb.fillDown'), icon: 'down', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => transformSelectedColumn('fillDown') },
     { id: 'clean-menu-split', label: t('csv.wb.splitColumn'), icon: 'columns', onSelect: () => openCleanTool('split') },
-    { id: 'clean-menu-merge', label: t('csv.wb.mergeColumns'), icon: 'columns', isDisabled: displayColumnIds.length < 2, onSelect: () => openCleanTool('merge') },
+    { id: 'clean-menu-merge', label: t('csv.wb.mergeColumns'), icon: 'columns', isDisabled: displayColumnIds.length < 2, disabledReason: t('disabled.twoColumns'), onSelect: () => openCleanTool('merge') },
     'separator',
     { heading: t('csv.wb.wholeFile') },
     {
@@ -1221,7 +1228,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     },
     { id: 'clean-menu-remove-duplicates', label: t('csv.wb.removeDuplicates'), icon: 'rows', onSelect: () => openCleanTool('dupes') },
     { id: 'clean-menu-transpose', label: t('csv.wb.transpose'), icon: 'grid-x', onSelect: () => openCleanTool('transpose') },
-    { id: 'clean-menu-apply-sort', label: t('csv.wb.applySort'), icon: 'sort', isDisabled: sortLevels.length === 0, onSelect: applySortToFile },
+    { id: 'clean-menu-apply-sort', label: t('csv.wb.applySort'), icon: 'sort', isDisabled: sortLevels.length === 0, disabledReason: t('disabled.noSort'), onSelect: applySortToFile },
   ]
 
   // The menu bar under the title row, like a spreadsheet application's. Every action is one the buttons and popovers already offer.
@@ -1234,7 +1241,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         { id: 'open', label: t('csv.wb.openFile'), icon: 'open', hint: shortcutLabel('O'), onSelect: onOpenAnotherFile },
         { id: 'paste', label: t('csv.wb.pasteCsv'), icon: 'paste', onSelect: () => { setPastedText(''); setOpenDialog('paste') } },
         'separator',
-        { id: 'download', label: t('csv.wb.downloadFormat', { format: tableFormat.label }), icon: 'download', isDisabled: hasNoTable, onSelect: () => downloadCsv(defaultDownloadSettings()) },
+        { id: 'download', label: t('csv.wb.downloadFormat', { format: tableFormat.label }), icon: 'download', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => downloadCsv(defaultDownloadSettings()) },
         ...(offersExcelCopy ? [{ id: 'excel-copy', label: t('csv.excelCopy.button'), icon: 'download', onSelect: downloadExcelCopy }] : []),
         'separator',
         { id: 'close', label: t('menu.close'), icon: 'x', onSelect: onClose },
@@ -1244,14 +1251,14 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       id: 'edit',
       label: t('menu.edit'),
       items: [
-        { id: 'undo', label: t('toolbar.undo'), icon: 'undo', hint: shortcutLabel('Z'), isDisabled: !session.canUndo, onSelect: session.undo },
-        { id: 'redo', label: t('toolbar.redo'), icon: 'redo', isDisabled: !session.canRedo, onSelect: session.redo },
+        { id: 'undo', label: t('toolbar.undo'), icon: 'undo', hint: shortcutLabel('Z'), isDisabled: !session.canUndo, disabledReason: t('disabled.nothingToUndo'), onSelect: session.undo },
+        { id: 'redo', label: t('toolbar.redo'), icon: 'redo', isDisabled: !session.canRedo, disabledReason: t('disabled.nothingToRedo'), onSelect: session.redo },
         'separator',
-        { id: 'copy', label: t('csv.wb.copy'), icon: 'copy', hint: shortcutLabel('C'), isDisabled: !selection, onSelect: () => copySelection(false) },
-        { id: 'find', label: t('csv.wb.findReplace'), icon: 'replace', isDisabled: hasNoTable, onSelect: () => openPopover('find', document.getElementById(isNarrow ? 'mobile-find-button' : 'find-replace-button')) },
-        { id: 'go-to', label: t('csv.wb.goToRow'), icon: 'goto', hint: shortcutLabel('G'), isDisabled: hasNoTable, onSelect: openGoToDialog },
+        { id: 'copy', label: t('csv.wb.copy'), icon: 'copy', hint: shortcutLabel('C'), isDisabled: !selection, disabledReason: t('disabled.selectCells'), onSelect: () => copySelection(false) },
+        { id: 'find', label: t('csv.wb.findReplace'), icon: 'replace', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => openPopover('find', document.getElementById(isNarrow ? 'mobile-find-button' : 'find-replace-button')) },
+        { id: 'go-to', label: t('csv.wb.goToRow'), icon: 'goto', hint: shortcutLabel('G'), isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: openGoToDialog },
         'separator',
-        { id: 'delete-rows', label: t('csv.wb.deleteSelectedRows'), icon: 'trash', isDanger: true, isDisabled: !selection, onSelect: deleteSelectedRows },
+        { id: 'delete-rows', label: t('csv.wb.deleteSelectedRows'), icon: 'trash', isDanger: true, isDisabled: !selection, disabledReason: t('disabled.selectCells'), onSelect: deleteSelectedRows },
       ],
     },
     {
@@ -1259,7 +1266,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       label: t('menu.view'),
       items: [
         { id: 'panel', label: t('csv.wb.panel'), kind: 'checkbox', isChecked: isDockOpen, onSelect: () => setIsDockOpen(!isDockOpen) },
-        { id: 'columns', label: t('csv.wb.columns'), icon: 'columns', isDisabled: hasNoTable, onSelect: () => openPopover('columns', document.getElementById('columns-button')) },
+        { id: 'columns', label: t('csv.wb.columns'), icon: 'columns', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => openPopover('columns', document.getElementById('columns-button')) },
         'separator',
         { id: 'issues', label: t('csv.wb.issues'), icon: 'warn', onSelect: () => showDockTab('issues') },
         { id: 'changes', label: t('csv.wb.reviewChanges'), icon: 'review', onSelect: () => showDockTab('changes') },
@@ -1269,17 +1276,17 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       id: 'insert',
       label: t('menu.insert'),
       items: [
-        { id: 'row', label: t('csv.wb.addRow'), icon: 'plus', isDisabled: hasNoTable, onSelect: addRow },
-        { id: 'column', label: t('csv.wb.insertColumn'), icon: 'plus', isDisabled: selectedColumnId === null, onSelect: () => selectedColumnId !== null && insertColumnAfter(selectedColumnId) },
+        { id: 'row', label: t('csv.wb.addRow'), icon: 'plus', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: addRow },
+        { id: 'column', label: t('csv.wb.insertColumn'), icon: 'plus', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => selectedColumnId !== null && insertColumnAfter(selectedColumnId) },
       ],
     },
     {
       id: 'data',
       label: t('menu.data'),
       items: [
-        { id: 'filter', label: t('csv.wb.filter'), icon: 'filter', isDisabled: hasNoTable, onSelect: () => openPopover('filterPick', document.getElementById(isNarrow ? 'mobile-filter-button' : 'filter-button')) },
-        { id: 'sort', label: t('csv.wb.sort'), icon: 'sort', isDisabled: hasNoTable, onSelect: () => openPopover('sort', document.getElementById('sort-button')) },
-        { id: 'group', label: t('csv.wb.groupBy'), icon: 'group', isDisabled: hasNoTable, onSelect: () => showDockTab('group') },
+        { id: 'filter', label: t('csv.wb.filter'), icon: 'filter', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => openPopover('filterPick', document.getElementById(isNarrow ? 'mobile-filter-button' : 'filter-button')) },
+        { id: 'sort', label: t('csv.wb.sort'), icon: 'sort', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => openPopover('sort', document.getElementById('sort-button')) },
+        { id: 'group', label: t('csv.wb.groupBy'), icon: 'group', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => showDockTab('group') },
         'separator',
         ...(hasNoTable ? [] : cleanUpMenuItems),
       ],
@@ -1385,31 +1392,33 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
                 ? [
                     { id: 'more-menu-group', label: t('csv.wb.groupBy'), icon: 'group', onSelect: () => showDockTab('group') },
                     { id: 'more-menu-find', label: t('find.label'), icon: 'replace', onSelect: () => openPopover('find', document.getElementById('mobile-find-button')) },
-                    { id: 'more-menu-undo', label: t('toolbar.undo'), icon: 'undo', isDisabled: !session.canUndo, onSelect: session.undo },
-                    { id: 'more-menu-redo', label: t('toolbar.redo'), icon: 'redo', isDisabled: !session.canRedo, onSelect: session.redo },
+                    { id: 'more-menu-undo', label: t('toolbar.undo'), icon: 'undo', isDisabled: !session.canUndo, disabledReason: t('disabled.nothingToUndo'), onSelect: session.undo },
+                    { id: 'more-menu-redo', label: t('toolbar.redo'), icon: 'redo', isDisabled: !session.canRedo, disabledReason: t('disabled.nothingToRedo'), onSelect: session.redo },
                     'separator' as const,
                   ]
                 : []),
               { heading: t('csv.wb.rows') },
               { id: 'more-menu-insert-row', label: t('csv.wb.addRow'), icon: 'plus', onSelect: addRow },
-              { id: 'more-menu-delete-rows', label: t('csv.wb.deleteSelectedRows'), icon: 'trash', isDanger: true, hint: isNarrow ? undefined : 'Del', isDisabled: !selection, onSelect: deleteSelectedRows },
+              { id: 'more-menu-delete-rows', label: t('csv.wb.deleteSelectedRows'), icon: 'trash', isDanger: true, hint: isNarrow ? undefined : 'Del', isDisabled: !selection, disabledReason: t('disabled.selectCells'), onSelect: deleteSelectedRows },
               { id: 'more-menu-go-to', label: t('csv.wb.goToRow'), icon: 'goto', hint: isNarrow ? undefined : shortcutLabel('G'), onSelect: openGoToDialog },
               { heading: t('csv.wb.columns') },
-              { id: 'more-menu-insert-column', label: t('csv.wb.insertColumn'), icon: 'plus', isDisabled: selectedColumnId === null, onSelect: () => selectedColumnId !== null && insertColumnAfter(selectedColumnId) },
+              { id: 'more-menu-insert-column', label: t('csv.wb.insertColumn'), icon: 'plus', isDisabled: selectedColumnId === null, disabledReason: t('disabled.selectColumn'), onSelect: () => selectedColumnId !== null && insertColumnAfter(selectedColumnId) },
               {
                 id: 'more-menu-rename-column',
                 label: t('csv.wb.renameColumn'),
                 icon: 'edit',
-                isDisabled: selectedColumnId === null || !hasHeaderRow,
+                isDisabled: selectedColumnId === null || !hasHeaderRow, disabledReason: t(selectedColumnId === null ? 'disabled.selectColumn' : 'disabled.headerRow'),
                 onSelect: () => selectedColumnId !== null && openColumnMenu(shownColumnIds.indexOf(selectedColumnId), document.getElementById(`column-menu-${shownColumnIds.indexOf(selectedColumnId)}`)),
               },
-              { id: 'more-menu-delete-column', label: t('csv.wb.deleteColumn'), icon: 'trash', isDanger: true, isDisabled: selectedColumnId === null || displayColumnIds.length <= 1, onSelect: () => selectedColumnId !== null && deleteColumn(selectedColumnId) },
+              { id: 'more-menu-delete-column', label: t('csv.wb.deleteColumn'), icon: 'trash', isDanger: true, isDisabled: selectedColumnId === null || displayColumnIds.length <= 1, disabledReason: t(selectedColumnId === null ? 'disabled.selectColumn' : 'disabled.lastColumn'), onSelect: () => selectedColumnId !== null && deleteColumn(selectedColumnId) },
               'separator',
               { id: 'more-menu-issues', label: t('csv.wb.issues'), icon: 'warn', onSelect: () => showDockTab('issues') },
               { id: 'more-menu-changes', label: t('csv.wb.reviewChanges'), icon: 'review', onSelect: () => showDockTab('changes') },
-              { id: 'more-menu-reading', label: t('csv.wb.readingMenu'), icon: 'settings', onSelect: () => openPopover('reading', document.getElementById(isNarrow ? 'mobile-more-button' : 'status-delimiter-button')) },
+              // On a wide screen the delimiter, header and encoding are in the status bar; a phone has no status bar, so it keeps them here.
+              ...(isNarrow ? [{ id: 'more-menu-reading', label: t('csv.wb.readingMenu'), icon: 'settings', onSelect: () => openPopover('reading', document.getElementById('mobile-more-button')) }] : []),
               { id: 'more-menu-download', label: t('csv.wb.downloadOptions'), icon: 'download', onSelect: openDownloadDialog },
               ...(offersExcelCopy ? [{ id: 'more-menu-excel-copy', label: t('csv.excelCopy.button'), icon: 'download', onSelect: downloadExcelCopy }] : []),
+              ...maskMenuItems.map((item) => ({ ...item, id: `more-menu-${item.id}` })),
               'separator',
               { id: 'menu-link-privacy', label: t('legal.privacy'), icon: 'lock', href: localizePath(locale, '/privacy') },
               { id: 'menu-link-terms', label: t('legal.terms'), icon: 'file', href: localizePath(locale, '/terms') },
@@ -1423,8 +1432,8 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               { id: 'context-excel-copy', label: t('csv.wb.excelCopy'), icon: 'copy', onSelect: () => copySelection(true) },
               { id: 'context-paste', label: t('csv.wb.paste'), icon: 'paste', hint: shortcutLabel('V'), onSelect: () => showToast(t('csv.wb.pasteHint', { shortcut: shortcutLabel('V') })) },
               'separator',
-              { id: 'context-filter-value', label: t('csv.wb.filterToValue'), icon: 'filter', isDisabled: !hasActiveCell, onSelect: () => hasActiveCell && filterToValue(activeColumnId, getText(activeRowId, activeColumnId)) },
-              { id: 'context-insert-row', label: t('csv.wb.insertRowBelow'), icon: 'plus', isDisabled: !hasActiveCell, onSelect: () => hasActiveCell && applyEdits(withInsertedLine(edits, 'row', activeRowId), t('csv.wb.rowAdded')) },
+              { id: 'context-filter-value', label: t('csv.wb.filterToValue'), icon: 'filter', isDisabled: !hasActiveCell, disabledReason: t('disabled.selectCell'), onSelect: () => hasActiveCell && filterToValue(activeColumnId, getText(activeRowId, activeColumnId)) },
+              { id: 'context-insert-row', label: t('csv.wb.insertRowBelow'), icon: 'plus', isDisabled: !hasActiveCell, disabledReason: t('disabled.selectCell'), onSelect: () => hasActiveCell && applyEdits(withInsertedLine(edits, 'row', activeRowId), t('csv.wb.rowAdded')) },
               { id: 'context-delete-rows', label: t('csv.wb.deleteSelectedRows'), icon: 'trash', isDanger: true, onSelect: deleteSelectedRows },
             ])
     }
@@ -2351,14 +2360,21 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         </span>
         <span className="spacer" />
         <button className="btn" id="convert-button" type="button" aria-haspopup="menu" aria-label={t('convert.menuHeading')} disabled={!readableCsv} onClick={(event) => openPopover('convert', event.currentTarget)}>
-          <Icon name="replace" />
+          <Icon name="convert" />
           <span className="desk-only">{t('convert.menuHeading')}</span>
           <Icon name="down" size="xs" />
         </button>
-        <button className="btn icon" id="undo-button" type="button" aria-label={t('toolbar.undo')} title={t('toolbar.undoTip')} disabled={!session.canUndo} onClick={session.undo}>
+        {canMask && (
+          <button className="btn" id="mask-button" type="button" aria-label={t('mask.button')} aria-haspopup="dialog" aria-expanded={isMaskDrawerOpen} title={t('mask.buttonTip')} disabled={!readableCsv} onClick={() => void openMaskDrawer()}>
+            <Icon name="mask" />
+            <span className="desk-only">{t('mask.button')}</span>
+          </button>
+        )}
+        {maskDrawer}
+        <button className="btn icon" id="undo-button" type="button" aria-label={t('toolbar.undo')} title={t(session.canUndo ? 'toolbar.undoTip' : 'disabled.nothingToUndo')} disabled={!session.canUndo} onClick={session.undo}>
           <Icon name="undo" />
         </button>
-        <button className="btn icon" id="redo-button" type="button" aria-label={t('toolbar.redo')} title={t('toolbar.redoTip')} disabled={!session.canRedo} onClick={session.redo}>
+        <button className="btn icon" id="redo-button" type="button" aria-label={t('toolbar.redo')} title={t(session.canRedo ? 'toolbar.redoTip' : 'disabled.nothingToRedo')} disabled={!session.canRedo} onClick={session.redo}>
           <Icon name="redo" />
         </button>
         <span className="vsep desk-only" />

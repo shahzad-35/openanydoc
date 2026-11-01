@@ -9,6 +9,8 @@ export type Viewer = {
   toolPath?: string
   // Set on a conversion page's viewer (findViewerByToolPath): the page converts the file instead of opening it.
   convertTo?: ConversionTarget
+  // Set on a tool page's viewer (findViewerByToolPath): the page is that tool, not a viewer of one format.
+  tool?: 'mask'
 }
 
 export type ConversionTarget = 'csv' | 'xlsx' | 'json'
@@ -42,8 +44,10 @@ export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions
 // Pages for one job of a live viewer (/json-formatter is the JSON viewer's page with its own words in seo.ts and pageContent.ts),
 // served like a format page at /en/json-formatter and /ar/json-formatter. `extensions` narrows what their drop zone accepts.
 // Only jobs the viewer really does. A page with `convertTo` is a converter: `viewerId` is the format it reads, and the file is
-// converted as it is chosen (src/formats/conversion.ts) and the result opens in the viewer of its new format.
-export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: string[]; convertTo?: ConversionTarget }
+// converted as it is chosen (src/formats/conversion.ts) and the result opens in the viewer of its new format. A page with `tool`
+// is a tool for several formats (/mask-data takes CSV, Excel and JSON): the file stays on the page; `viewerId` is the format of
+// its breadcrumb and guide only.
+export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: string[]; convertTo?: ConversionTarget; tool?: 'mask' }
 
 export const landingPages: LandingPage[] = [
   { path: '/json-formatter', viewerId: 'json' },
@@ -56,6 +60,7 @@ export const landingPages: LandingPage[] = [
   { path: '/excel-to-json', viewerId: 'excel', convertTo: 'json' },
   { path: '/csv-to-json', viewerId: 'csv', convertTo: 'json' },
   { path: '/json-to-csv', viewerId: 'json', convertTo: 'csv' },
+  { path: '/mask-data', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.json', '.xlsx', '.xls', '.xlsm', '.ods', '.txt'], tool: 'mask' },
 ]
 
 
@@ -86,6 +91,7 @@ export function findViewerByToolPath(pathname: string): Viewer | undefined {
       toolPath: landingPage.path,
       extensions: landingPage.extensions ?? landingViewer.extensions,
       convertTo: landingPage.convertTo,
+      tool: landingPage.tool,
     }
   )
 }

@@ -32,8 +32,12 @@ export function ToolCardsSection({ onNavigate }: { onNavigate: (path: string) =>
           const cardId = card.path.slice(1)
           return (
             <li key={card.path} id={`tool-card-${cardId}`} className="box-shape solid-box border-rule bg-paper-raised p-4">
-              <FileTypeChip viewer={viewer} />
-              <NewBadge viewerId={viewer.id} />
+              {!viewer.tool && (
+                <>
+                  <FileTypeChip viewer={viewer} />
+                  <NewBadge viewerId={viewer.id} />
+                </>
+              )}
               <h3 className="mt-2 font-semibold">
                 <PageLink id={`tool-card-link-${cardId}`} path={card.path} onNavigate={onNavigate}>{card.linkText}</PageLink>
               </h3>

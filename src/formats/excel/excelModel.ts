@@ -67,6 +67,9 @@ export type ExcelSelection = {
   canDeleteSheet: boolean
   // Styles can be changed and saved for .xlsx files whose styles were read; the focus cell's style shows on the buttons.
   canStyle: boolean
+  // Why styles cannot be changed (null when they can): not an .xlsx file, still being read, a file too large to read them, or
+  // styles the reader could not read.
+  stylesUnavailable: 'notXlsx' | 'loading' | 'tooLarge' | 'unreadable' | null
   isBold: boolean
   isItalic: boolean
   isUnderlined: boolean

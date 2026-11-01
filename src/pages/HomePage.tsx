@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import DropPanel from '../components/DropPanel'
 import FormatGuide from '../components/FormatGuide'
 import LanguageSwitcher from '../components/LanguageSwitcher'
@@ -9,6 +9,7 @@ import WhatsNewBanner from '../components/WhatsNewBanner'
 import DemoStage from '../components/home/DemoStage'
 import { ClosingCta, DemoNote, FaqSection, FormatGrid, PrivacyContrast, StatsRow } from '../components/home/HomeSections'
 import { Wordmark } from '../components/KitIcon'
+import { useHasMounted } from '../components/NewBadge'
 import ShortcutTabs, { useIsMacKeyboard } from '../components/home/ShortcutTabs'
 import { LOCALES, localizePath, useT } from '../i18n'
 import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
@@ -17,6 +18,12 @@ import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 import { Notice } from '../components/Messages'
 import { headerRowBreak } from './changelogMarkup'
+
+// oxlint-disable-next-line react/only-export-components
+export const loadMaskDataTool = () => import('../formats/mask/MaskWorkbench')
+const MaskWorkbench = lazy(loadMaskDataTool)
+// The formats the Mask Data page takes, for its list of extensions.
+const maskableViewers = viewers.filter((viewer) => ['csv', 'json', 'excel', 'text'].includes(viewer.id))
 
 function setMetaTag(keyAttribute: 'name' | 'property', key: string, content: string) {
   let tag = document.head.querySelector(`meta[${keyAttribute}="${key}"]`)
@@ -94,6 +101,11 @@ export default function HomePage({
   // What a conversion page shows while it converts, or why it could not; it belongs to that page (`address`).
   const [conversionState, setConversionState] = useState<{ address: string; errorMessage: string | null } | null>(null)
   const convertTo = toolViewer?.convertTo
+  const isMaskTool = toolViewer?.tool === 'mask'
+  // The file chosen on the Mask Data page, in React state only. App draws this page afresh on entering and leaving the Mask Data
+  // page, so the file is forgotten when the visitor leaves.
+  const [maskFile, setMaskFile] = useState<File | null>(null)
+  const hasMounted = useHasMounted()
 
   async function convertAndOpen(file: File) {
     if (!toolViewer || !convertTo) return
@@ -111,7 +123,7 @@ export default function HomePage({
 
   const intake = useFileIntake({
     acceptedExtensions: toolViewer?.extensions ?? supportedExtensions,
-    onFileLoaded: convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
+    onFileLoaded: isMaskTool ? (file) => setMaskFile(file) : convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
     handoffFile,
     onHandoffConsumed,
   })
@@ -135,14 +147,11 @@ export default function HomePage({
       </a>
 
       <header id="site-header" className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5">
+        {/* The brand always leads home; on the home page itself it goes back to the top. */}
         <p id="site-brand" className="flex items-center">
-          {toolViewer ? (
-            <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full">
-              <Wordmark withMark />
-            </PageLink>
-          ) : (
+          <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full" isCurrent={isHomePage}>
             <Wordmark withMark />
-          )}
+          </PageLink>
         </p>
         <span aria-hidden="true" className={headerRowBreak} />
         <SiteNav currentPath={address} onNavigate={onNavigate} />
@@ -167,8 +176,8 @@ export default function HomePage({
             <div className="hero-in mt-8">
               <DropPanel
                 intake={intake}
-                shownViewers={toolViewer ? [toolViewer] : viewers}
-                currentViewerId={toolViewer?.id}
+                shownViewers={isMaskTool ? maskableViewers : toolViewer ? [toolViewer] : viewers}
+                currentViewerId={isMaskTool ? undefined : toolViewer?.id}
                 onNavigate={onNavigate}
                 onOpenInViewer={onOpenInViewer}
                 showExtensions={!isHomePage}
@@ -186,6 +195,12 @@ export default function HomePage({
               )}
               <Notice id="conversion-error" kind="error" role="alert" className="font-medium text-danger" message={conversionState.errorMessage ?? ''} />
             </div>
+          )}
+          {/* The tool draws after the first render: it runs a worker and holds the file, nothing the static page can show. */}
+          {isMaskTool && hasMounted && (
+            <Suspense fallback={null}>
+              <MaskWorkbench file={maskFile} />
+            </Suspense>
           )}
           {isHomePage && (
             <div className="mt-12 md:mt-16">

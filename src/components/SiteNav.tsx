@@ -6,7 +6,7 @@ import { landingPages, viewers } from '../viewers'
 import { PageLink } from './SiteFooter'
 
 // The header's links to each viewer page on every content page (home, format and landing pages, About, Privacy, Terms, changelog),
-// then a Convert menu with the conversion pages. `currentPath` is the page's address without its language.
+// then a Convert menu with the conversion pages and, last, the tools for several formats (Mask data). `currentPath` is the page's address without its language.
 // scripts/build-static-pages.mjs writes the same markup into the changelog pages: keep the two identical.
 export default function SiteNav({ currentPath, onNavigate }: { currentPath: string; onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
@@ -56,7 +56,7 @@ export default function SiteNav({ currentPath, onNavigate }: { currentPath: stri
               </summary>
               <ul id="site-nav-convert-list" className={navClasses.convertList}>
                 {landingPages
-                  .filter((page) => page.convertTo)
+                  .filter((page) => page.convertTo || page.tool)
                   .map((page) => (
                     <li key={page.path}>
                       <PageLink

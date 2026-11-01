@@ -102,6 +102,8 @@ export type FormatDefinition = {
   maxFileBytes?: number
   // Absent while a format cannot be edited yet; the View / Edit toggle is then not shown.
   editing?: FormatEditing
+  // The viewer offers Mask data (a button in its top bar and its menus) for this format's files: src/formats/mask.
+  canMask?: boolean
 }
 
 const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
@@ -120,6 +122,7 @@ export const formatDefinitions: FormatDefinition[] = [
     ViewerComponent: lazy(loadCsvViewer),
     preloadViewer: loadCsvViewer,
     ownsWholePage: true,
+    canMask: true,
     editing: {
       createEmptyEdits: createEmptyCsvEdits,
       countChanges: (edits) => countCsvEdits(edits as CsvEdits),
@@ -152,6 +155,7 @@ export const formatDefinitions: FormatDefinition[] = [
     // Measured 2026-10-16: up to 10 MB every action takes a third of a second or less; at 50 MB a tree edit takes 1.6 s and the
     // page holds 1 GB of memory.
     maxFileBytes: 10 * 1024 * 1024,
+    canMask: true,
     editing: {
       createEmptyEdits: createEmptyJsonEdits,
       countChanges: countJsonChanges,
@@ -165,6 +169,7 @@ export const formatDefinitions: FormatDefinition[] = [
     highlights: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'],
     ViewerComponent: lazy(loadExcelViewer),
     preloadViewer: () => Promise.all([loadExcelViewer(), loadExcelEditing(), import('./excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]),
+    canMask: true,
     editing: {
       createEmptyEdits: createEmptyExcelEdits,
       countChanges: (edits) => countExcelEdits(edits as ExcelEdits),

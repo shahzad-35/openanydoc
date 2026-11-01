@@ -7,7 +7,7 @@ import type { ReactNode } from 'react'
 // `id` is the item's part of its element id and must not depend on the language: use `idFor('some.key', true)` from useT.
 const MENU_WIDTH_PX = 224 // the menu's w-56
 
-export type MenuItem = { id: string; label: string; onSelect: () => void; isDisabled?: boolean }
+export type MenuItem = { id: string; label: string; onSelect: () => void; isDisabled?: boolean; disabledReason?: string }
 
 type ActionMenuProps = {
   // The id of the menu; the button that opens it points at it with aria-controls, and each item gets "<id>-<item>".
@@ -57,7 +57,7 @@ export function ActionMenu({ id, ariaLabel, left, top, items, onClose }: ActionM
         buttons[(position + step + buttons.length) % buttons.length]?.focus()
       }}
       style={{ left: Math.min(left, window.innerWidth - MENU_WIDTH_PX - 8), top }}
-      className="box-shape solid-box fixed m-0 max-h-[70vh] w-56 overflow-y-auto border-rule bg-paper-raised p-1 text-ink"
+      className="box-shape solid-box fixed inset-auto m-0 max-h-[70vh] w-56 overflow-y-auto border-rule bg-paper-raised p-1 text-ink"
     >
       {items.map((item) => (
         <button
@@ -66,6 +66,7 @@ export function ActionMenu({ id, ariaLabel, left, top, items, onClose }: ActionM
           type="button"
           role="menuitem"
           disabled={item.isDisabled}
+          title={item.isDisabled ? item.disabledReason : undefined}
           onClick={() => {
             item.onSelect()
             onClose()

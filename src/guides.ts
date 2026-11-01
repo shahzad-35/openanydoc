@@ -231,7 +231,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/check-file-upload': {
       published: '2026-10-30',
-      updated: '2026-10-30',
+      updated: '2026-11-01',
       sections: [
         {
           heading: 'The short answer',
@@ -272,7 +272,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'What "processed in your browser" does not cover',
-          paragraphs: ['It keeps the file off the network, not safe on your computer. Anything with access to the device, such as a browser extension allowed to read every site, can still see the page. Use a browser profile without extensions for sensitive files, and close the tab when you are done: the file lives in the page\'s memory and is gone when the tab closes.'],
+          paragraphs: ['It keeps the file off the network, not safe on your computer. Anything with access to the device, such as a browser extension allowed to read every site, can still see the page. Use a browser profile without extensions for sensitive files, and close the tab when you are done: the file lives in the page\'s memory and is gone when the tab closes.', 'It also stops at your computer: once you send the file to someone, or paste it into an AI assistant, its contents travel with it. Before that, mask the personal data in it; the guide on how to anonymize a file before sharing it shows the steps.'],
+          links: [{ text: 'how to anonymize a file before sharing it', path: '/anonymize-data-before-sharing' }],
         },
         {
           heading: 'Questions?',
@@ -437,6 +438,66 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/anonymize-data-before-sharing': {
+      published: '2026-11-01',
+      updated: '2026-11-01',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['To anonymize a CSV, Excel or JSON file before you share it, replace or remove every value that points to a person: names, email addresses, phone numbers, ID numbers, bank account and card numbers, addresses and dates of birth. Keep only the columns the other person needs, then check the result before you send it.'],
+        },
+        {
+          heading: 'What counts as personal data in a spreadsheet',
+          paragraphs: ['Some columns identify a person on their own; others only do so together. Look for both:'],
+          list: [
+            'Direct identifiers: full names, email addresses, phone numbers, national ID and residence permit numbers, passport numbers, IBANs and card numbers.',
+            'Quasi-identifiers: date of birth, street address, postcode, job title, employer. One of them rarely names anyone, but three together often do.',
+            'Free text: notes, comments and descriptions that mention a customer by name or paste in their email or phone number. These are the values people miss most often.',
+          ],
+        },
+        {
+          heading: 'Masking, pseudonymization and anonymization',
+          paragraphs: [
+            'Masking is the general word for hiding real values. Replacing each value with a consistent token, such as EMAIL-000001 for the same address wherever it appears, is pseudonymization: rows can still be matched and counted, and whoever holds the key can turn the tokens back into the original values.',
+            'Removing a column, or hiding all but a few characters (****1234), cannot be undone, and it is closer to anonymization. Data protection laws often still treat pseudonymized data as personal data, so if your organization has a data protection or compliance contact, ask them which level a given file needs. This guide explains the techniques; it is not legal advice.',
+          ],
+        },
+        {
+          heading: 'How to mask a file in your browser, step by step',
+          paragraphs: ['The Mask data tool does this on your device: the file is not uploaded.'],
+          list: [
+            'Open the Mask data page and choose your CSV, Excel, JSON or TXT file, or press Mask in the CSV, Excel or JSON viewer while the file is open.',
+            'Check the columns it picked. Names, emails, phone numbers, IDs, IBANs, card numbers, addresses and dates of birth are ticked for you; open Columns to add anything it missed.',
+            'Choose a method for each column: tokens to keep rows matchable, a partial mask to keep the last digits, or removal.',
+            'Look at the preview of the first 20 rows, then download the masked copy as CSV, Excel or JSON.',
+            'If you will need the real values back, also download the private key and keep it apart from the masked file.',
+          ],
+          links: [{ text: 'Mask data', path: '/mask-data' }],
+        },
+        {
+          heading: 'Before you paste a file into an AI assistant',
+          paragraphs: ['Mask the file first and paste the masked copy into ChatGPT, Claude, Gemini or any other assistant. Consistent tokens keep the analysis useful: the assistant can still count orders per customer or spot duplicates, because the same customer always has the same token. When it answers with tokens, such as "the rows with EMAIL-000017 have three returns", open the Restore tab with the private key to turn a masked file back into real values on your own computer.'],
+        },
+        {
+          heading: 'Doing it by hand in Excel',
+          paragraphs: ['For a small file you can mask by hand: delete the columns nobody needs, replace a name column with a formula such as ="Customer "&ROW(), and use Find and Replace for known values. It works, but it is easy to miss a name inside a notes column, the same person gets different stand-ins in different sheets, and nothing records how to undo it.'],
+        },
+        {
+          heading: 'Check the result before you send it',
+          paragraphs: ['Open the masked copy and search it before it leaves your computer:'],
+          list: [
+            'Search for "@" to catch email addresses that remain.',
+            'Search for long runs of digits to catch phone, ID, account and card numbers.',
+            'Read a few rows of every free-text column.',
+            'Make sure the private key is not attached to the same email or uploaded with the file.',
+          ],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} if a column was not found that should have been (describe it; no real data).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
@@ -451,6 +512,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'How to open a JSON file',
             'How to open an XLSX file without Excel',
             'CSV vs Excel vs JSON: the differences and when to use each',
+            'How to anonymize a CSV or Excel file before sharing it',
           ],
           links: [
             { text: 'Why your CSV shows broken Arabic text in Excel', path: '/fix-arabic-csv-in-excel' },
@@ -461,6 +523,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'How to open a JSON file', path: '/open-json-file' },
             { text: 'How to open an XLSX file without Excel', path: '/open-xlsx-without-excel' },
             { text: 'CSV vs Excel vs JSON: the differences and when to use each', path: '/csv-vs-excel-vs-json' },
+            { text: 'How to anonymize a CSV or Excel file before sharing it', path: '/anonymize-data-before-sharing' },
           ],
         },
         {
@@ -698,7 +761,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/check-file-upload': {
       published: '2026-10-30',
-      updated: '2026-10-30',
+      updated: '2026-11-01',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -739,7 +802,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ما لا تغطيه «المعالجة في المتصفح»',
-          paragraphs: ['هي تُبعد الملف عن الشبكة، لكنها لا تحميه على جهازك. فكل ما له وصول إلى الجهاز، مثل إضافة متصفح مسموح لها بقراءة كل المواقع، يستطيع رؤية الصفحة. استخدم ملفًا شخصيًا في المتصفح بلا إضافات للملفات الحساسة، وأغلق التبويب عند الانتهاء: يبقى الملف في ذاكرة الصفحة ويختفي حين يُغلق التبويب.'],
+          paragraphs: ['هي تُبعد الملف عن الشبكة، لكنها لا تحميه على جهازك. فكل ما له وصول إلى الجهاز، مثل إضافة متصفح مسموح لها بقراءة كل المواقع، يستطيع رؤية الصفحة. استخدم ملفًا شخصيًا في المتصفح بلا إضافات للملفات الحساسة، وأغلق التبويب عند الانتهاء: يبقى الملف في ذاكرة الصفحة ويختفي حين يُغلق التبويب.', 'وهي تتوقف عند جهازك أيضًا: فحين ترسل الملف إلى أحد أو تلصقه في مساعد ذكاء اصطناعي ينتقل محتواه معه. قبل ذلك أخفِ البيانات الشخصية فيه، ويشرح دليل كيف تخفي البيانات الشخصية قبل مشاركة الملف الخطوات.'],
+          links: [{ text: 'كيف تخفي البيانات الشخصية قبل مشاركة الملف', path: '/anonymize-data-before-sharing' }],
         },
         {
           heading: 'أسئلة؟',
@@ -904,6 +968,66 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/anonymize-data-before-sharing': {
+      published: '2026-11-01',
+      updated: '2026-11-01',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['لإخفاء هوية الأشخاص في ملف CSV أو Excel أو JSON قبل مشاركته، استبدل أو احذف كل قيمة تدل على شخص: الأسماء والبريد الإلكتروني وأرقام الهواتف وأرقام الهوية وأرقام الحسابات البنكية والبطاقات والعناوين وتواريخ الميلاد. أبقِ فقط الأعمدة التي يحتاجها من ستشاركه، ثم راجع النتيجة قبل الإرسال.'],
+        },
+        {
+          heading: 'ما الذي يُعد بيانات شخصية في جدول البيانات',
+          paragraphs: ['بعض الأعمدة تكشف الشخص وحدها، وبعضها لا يكشفه إلا مع غيره. ابحث عن النوعين:'],
+          list: [
+            'معرّفات مباشرة: الأسماء الكاملة والبريد الإلكتروني وأرقام الهواتف وأرقام الهوية الوطنية والإقامة وجوازات السفر والآيبان وأرقام البطاقات.',
+            'معرّفات غير مباشرة: تاريخ الميلاد والعنوان والرمز البريدي والمسمى الوظيفي وجهة العمل. نادرًا ما يكشف أحدها شخصًا، لكن ثلاثة منها معًا كثيرًا ما تكشفه.',
+            'النص الحر: الملاحظات والتعليقات والأوصاف التي تذكر العميل باسمه أو تحتوي بريده أو رقم هاتفه. وهذه أكثر القيم التي يغفل عنها الناس.',
+          ],
+        },
+        {
+          heading: 'الإخفاء والترميز المستعار وإخفاء الهوية',
+          paragraphs: [
+            'الإخفاء كلمة عامة لحجب القيم الحقيقية. استبدال كل قيمة برمز ثابت، مثل EMAIL-000001 للعنوان نفسه أينما ظهر، هو ترميز مستعار: تبقى الصفوف قابلة للربط والعد، ويستطيع من يملك المفتاح إعادة الرموز إلى قيمها الأصلية.',
+            'أما حذف العمود أو إخفاء كل شيء عدا بضعة أحرف (****1234) فلا يمكن التراجع عنه، وهو أقرب إلى إخفاء الهوية. وكثيرًا ما تعدّ قوانين حماية البيانات البيانات ذات الترميز المستعار بيانات شخصية، فإن كان في جهتك مسؤول عن حماية البيانات أو الامتثال فاسأله عن المستوى الذي يحتاجه الملف. يشرح هذا الدليل الأساليب، وليس استشارة قانونية.',
+          ],
+        },
+        {
+          heading: 'كيف تخفي البيانات في متصفحك خطوة بخطوة',
+          paragraphs: ['تؤدي أداة إخفاء البيانات ذلك على جهازك، ولا يُرفع الملف.'],
+          list: [
+            'افتح صفحة إخفاء البيانات واختر ملف CSV أو Excel أو JSON أو TXT، أو اضغط إخفاء في عارض CSV أو Excel أو JSON والملف مفتوح.',
+            'راجع الأعمدة التي اختارتها الأداة. تُحدَّد لك الأسماء والبريد وأرقام الهواتف والهويات والآيبان والبطاقات والعناوين وتواريخ الميلاد، وافتح قائمة الأعمدة لإضافة ما فاتها.',
+            'اختر طريقة لكل عمود: الرموز لتبقى الصفوف قابلة للربط، أو الإخفاء الجزئي لإبقاء آخر الأرقام، أو الحذف.',
+            'راجع معاينة أول 20 صفًا، ثم نزّل النسخة المخفية بصيغة CSV أو Excel أو JSON.',
+            'إن احتجت القيم الحقيقية لاحقًا فنزّل المفتاح الخاص أيضًا واحفظه بعيدًا عن الملف المخفي.',
+          ],
+          links: [{ text: 'إخفاء البيانات', path: '/mask-data' }],
+        },
+        {
+          heading: 'قبل أن تلصق ملفًا في مساعد ذكاء اصطناعي',
+          paragraphs: ['أخفِ البيانات أولًا والصق النسخة المخفية في ChatGPT أو Claude أو Gemini أو أي مساعد آخر. تُبقي الرموز الثابتة التحليل مفيدًا: يستطيع المساعد عدّ الطلبات لكل عميل أو اكتشاف التكرار، لأن العميل نفسه يحمل الرمز نفسه دائمًا. وحين يجيب بالرموز، مثل "الصفوف ذات EMAIL-000017 فيها ثلاثة مرتجعات"، افتح تبويب الاستعادة مع المفتاح الخاص لتعيد الملف المخفي إلى قيمه الحقيقية على جهازك.'],
+        },
+        {
+          heading: 'الإخفاء يدويًا في Excel',
+          paragraphs: ['في الملف الصغير يمكنك الإخفاء يدويًا: احذف الأعمدة التي لا يحتاجها أحد، واستبدل عمود الأسماء بصيغة مثل ="Customer "&ROW()، واستخدم البحث والاستبدال للقيم المعروفة. ينجح ذلك، لكن من السهل أن يفوتك اسم داخل عمود ملاحظات، ويأخذ الشخص نفسه بدائل مختلفة في أوراق مختلفة، ولا شيء يسجّل كيف تتراجع عنه.'],
+        },
+        {
+          heading: 'راجع النتيجة قبل الإرسال',
+          paragraphs: ['افتح النسخة المخفية وابحث فيها قبل أن تغادر جهازك:'],
+          list: [
+            'ابحث عن "@" لتلتقط عناوين البريد المتبقية.',
+            'ابحث عن سلاسل الأرقام الطويلة لتلتقط أرقام الهواتف والهويات والحسابات والبطاقات.',
+            'اقرأ بضعة صفوف من كل عمود نص حر.',
+            'تأكد أن المفتاح الخاص ليس مرفقًا بالرسالة نفسها ولا مرفوعًا مع الملف.',
+          ],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} إن لم يُكتشف عمود كان يجب اكتشافه (صِفه دون بيانات حقيقية).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
@@ -918,6 +1042,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'كيف تفتح ملف JSON',
             'كيف تفتح ملف XLSX بدون Excel',
             'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها',
+            'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته',
           ],
           links: [
             { text: 'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel', path: '/fix-arabic-csv-in-excel' },
@@ -928,6 +1053,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'كيف تفتح ملف JSON', path: '/open-json-file' },
             { text: 'كيف تفتح ملف XLSX بدون Excel', path: '/open-xlsx-without-excel' },
             { text: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها', path: '/csv-vs-excel-vs-json' },
+            { text: 'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته', path: '/anonymize-data-before-sharing' },
           ],
         },
         {

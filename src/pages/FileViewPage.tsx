@@ -13,6 +13,7 @@ import { localizePath, useT } from '../i18n'
 import { formatFileSize, useFileIntake } from '../useFileIntake'
 import type { OpenedFile } from '../useFileIntake'
 import { findViewerForFileName, supportedExtensions } from '../viewers'
+import { useMaskDrawer } from '../formats/mask/useMaskDrawer'
 import type { ConversionTarget } from '../viewers'
 
 type FileViewPageProps = {
@@ -104,6 +105,13 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
     void convertedFile.arrayBuffer().then((convertedContents) => onReplaceFile(convertedFile, convertedContents))
   }
 
+  // Mask data masks the workbook as Download would save it, edits included.
+  const { openMaskDrawer, maskDrawer, isMaskDrawerOpen } = useMaskDrawer(async () => {
+    if (!editingModule) return null
+    const fileContents = await editingModule.downloadOption.createFile(session.edits, exportSource, { includeByteOrderMark: false })
+    return new File([fileContents], openedFile.file.name)
+  })
+
   const confirmBeforeClear = useCallback(async () => !hasUnsavedEdits || (await confirmDiscardEdits()), [hasUnsavedEdits, confirmDiscardEdits])
   const closeAfterConfirm = useCallback(async () => {
     if (await confirmBeforeClear()) onClose()
@@ -177,8 +185,9 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
       label: t('menu.file'),
       items: [
         { id: 'open', label: t('menu.openAnother'), icon: 'open', onSelect: anotherFileIntake.openFilePicker },
-        { id: 'download', label: t('menu.download'), icon: 'download', isDisabled: !editingModule || exportSource === null, onSelect: () => void downloadFile() },
-        { id: 'revert-all', label: t('toolbar.revertAll'), icon: 'undo', isDisabled: !hasUnsavedEdits, onSelect: session.revertAll },
+        { id: 'download', label: t('menu.download'), icon: 'download', isDisabled: !editingModule || exportSource === null, disabledReason: t('disabled.loading'), onSelect: () => void downloadFile() },
+        ...(format.canMask ? [{ id: 'mask-data', label: t('mask.menuItem'), icon: 'mask', isDisabled: !editingModule || exportSource === null, disabledReason: t('disabled.loading'), onSelect: () => void openMaskDrawer() }] : []),
+        { id: 'revert-all', label: t('toolbar.revertAll'), icon: 'undo', isDisabled: !hasUnsavedEdits, disabledReason: t('disabled.noChanges'), onSelect: session.revertAll },
         ...(changeDescription ? [{ id: 'menu-changes-note', note: changeDescription }] : []),
         'separator',
         { id: 'close', label: t('menu.close'), icon: 'x', onSelect: () => void closeAfterConfirm() },
@@ -233,6 +242,8 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         onHome={() => void closeAfterConfirm()}
         isDark={isDark}
         onToggleTheme={toggleTheme}
+        onMask={format.canMask && editingModule && exportSource !== null ? () => void openMaskDrawer() : undefined}
+        isMaskOpen={isMaskDrawerOpen}
         convertItems={
           canConvert
             ? [
@@ -262,6 +273,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         message={editingLoadFailed ? t('file.editingLoadFailed') : ''}
       />
       {viewerElement}
+      {maskDrawer}
       </div>
     </div>
   )

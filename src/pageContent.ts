@@ -26,12 +26,12 @@ export type FormatGuide = {
 // The "Related tools" links at the end of each format and landing page: other live pages a visitor of that page may want next.
 // Keyed by the page's address; the link text is each page's `linkText` in seo.ts, in the page's language.
 export const relatedPages: Record<string, string[]> = {
-  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-to-json', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/check-file-upload'],
+  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-to-json', '/mask-data', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/check-file-upload'],
   '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-opens-in-one-column'],
   '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer', '/csv-too-big-for-excel'],
-  '/excel-viewer': ['/xls-viewer', '/csv-viewer', '/excel-to-csv', '/excel-to-json', '/open-xlsx-without-excel'],
+  '/excel-viewer': ['/xls-viewer', '/csv-viewer', '/excel-to-csv', '/excel-to-json', '/mask-data', '/open-xlsx-without-excel', '/anonymize-data-before-sharing'],
   '/xls-viewer': ['/excel-viewer', '/csv-viewer', '/excel-to-csv', '/open-xlsx-without-excel'],
-  '/json-viewer': ['/json-formatter', '/json-validator', '/json-to-csv', '/csv-viewer', '/open-json-file'],
+  '/json-viewer': ['/json-formatter', '/json-validator', '/json-to-csv', '/mask-data', '/csv-viewer', '/open-json-file', '/anonymize-data-before-sharing'],
   '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token', '/open-json-file'],
   '/json-validator': ['/json-formatter', '/json-viewer', '/json-unexpected-token'],
   '/txt-viewer': ['/csv-viewer', '/json-viewer'],
@@ -40,6 +40,7 @@ export const relatedPages: Record<string, string[]> = {
   '/excel-to-json': ['/excel-to-csv', '/excel-viewer', '/json-viewer'],
   '/csv-to-json': ['/csv-to-excel', '/json-to-csv', '/csv-viewer', '/csv-vs-excel-vs-json'],
   '/json-to-csv': ['/csv-to-json', '/json-viewer', '/json-validator', '/csv-vs-excel-vs-json'],
+  '/mask-data': ['/anonymize-data-before-sharing', '/csv-viewer', '/excel-viewer', '/json-viewer', '/check-file-upload'],
 }
 
 // Keyed by language, then by the format or landing page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
@@ -128,6 +129,11 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'Can I open a TSV file online and edit it?',
           answer: 'Yes. .tsv and .tab files open tab-separated, with the header row detected, and you can edit and download them the same way as a CSV file.',
         },
+        {
+          question: 'How do I hide names, emails or IDs in a CSV before I share it?',
+          answer: 'Press Mask in the top bar. The columns that look personal are picked for you, and each can be replaced with tokens such as EMAIL-000001, partly hidden or removed; you download a masked copy. The same tool has its own page: Mask data.',
+          link: { text: 'Mask data', path: '/mask-data' },
+        },
       ],
     },
     '/excel-viewer': {
@@ -213,6 +219,11 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'Can I open a password-protected Excel file?',
           answer: 'No. Encrypted workbooks cannot be opened, because the file has to be read in your browser without sending it anywhere. Remove the password in Excel first, then open the file here.',
         },
+        {
+          question: 'Can I anonymize an Excel workbook before sending it?',
+          answer: 'Yes. Press Mask in the top bar: every sheet is scanned for names, emails, phone numbers, IDs, IBANs and card numbers, and you choose how to mask each column. The masked copy downloads as .xlsx, CSV or JSON; see Mask data for the details.',
+          link: { text: 'Mask data', path: '/mask-data' },
+        },
       ],
     },
     '/json-viewer': {
@@ -292,6 +303,11 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'Can I sort the keys of a JSON object alphabetically?',
           answer: 'Yes. Press Sort keys: the keys of every object, including the objects nested inside, are put in order from A to Z. Undo takes it back.',
+        },
+        {
+          question: 'Can I remove personal data from a JSON file?',
+          answer: 'Yes. Press the mask icon in the top bar: nested keys such as customers[].email are scanned, and each can be replaced with tokens, partly hidden or removed. The masked JSON keeps its structure and its numbers. More on the Mask data page.',
+          link: { text: 'Mask data', path: '/mask-data' },
         },
       ],
     },
@@ -827,6 +843,61 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
       ],
     },
+    '/mask-data': {
+      stepsTitle: 'How it works: mask sensitive data',
+      steps: [
+        { title: 'Choose your file', text: 'Drop or choose a CSV, Excel, JSON or TXT file, or press Mask in the CSV, Excel or JSON viewer to mask the file you have open. Your browser scans it for names, emails, phone numbers, ID numbers, IBANs, card numbers, addresses and dates of birth.' },
+        { title: 'Pick the columns', text: 'The columns that look sensitive are ticked for you, each with its type and how sure the scan is. Open Columns to add any other column, then choose tokens, a partial mask or removal for each.' },
+        { title: 'Check the preview', text: 'The first 20 rows are shown as they will be saved; switch to Before to compare with the original. Every change of choice updates the preview.' },
+        { title: 'Download', text: 'Save the masked copy as CSV, Excel or JSON (a text file stays .txt). If you ticked the key option, also save the private key and keep it apart from the file.' },
+      ],
+      handlesTitle: 'What the data masking tool handles',
+      handles: [
+        'Files: CSV and TSV, Excel workbooks with every sheet (.xlsx, .xls, .xlsm, .ods), JSON with nested objects and lists, and plain text (.txt).',
+        'Detection: names in English and Arabic, emails, phone numbers, Saudi national ID and Iqama numbers, IBANs and card numbers (checked with their checksums), addresses and dates of birth.',
+        'Masking: the same value always gets the same token, such as EMAIL-000001, in every field and inside free text such as notes.',
+        'Partial masks keep the last four characters (****1234), an email its first letter and domain, a date its year.',
+        'Restore: a masked file and its private key put the tokens back, including inside free text.',
+        'In the viewers: a Mask button in the CSV, Excel and JSON viewers masks the open file, edits included, without leaving it.',
+      ],
+      faqTitle: 'Masking data: questions and answers',
+      faq: [
+        {
+          question: 'What is data masking?',
+          answer: 'Data masking replaces sensitive values in a file, such as names, emails, phone numbers, ID numbers, IBANs and card numbers, with harmless stand-ins, so the file can be shared, tested or pasted into an AI assistant without exposing the people in it. The rows, columns and other values stay as they were.',
+        },
+        {
+          question: 'Can I mask a column the scan did not flag?',
+          answer: 'Yes. Open Columns: every column or JSON key of the file is listed, with the ones that look sensitive already ticked. Tick any other column, set its type (Other gives tokens such as VAL-000001) and choose how to mask it.',
+        },
+        {
+          question: 'What is the difference between tokens, a partial mask and removing a field?',
+          answer: 'A token replaces the value with a label such as NAME-000001, the same label wherever the value appears, so rows can still be matched. A partial mask hides all but a small part (****1234). Removing deletes the column or key from the file.',
+        },
+        {
+          question: 'What is the private key file, and who should have it?',
+          answer: 'It lists each token with the value it replaced, so the masked file can be turned back later. Keep it to yourself: never send it with the masked file, because anyone with both can undo the masking.',
+        },
+        {
+          question: 'Can a partly hidden or removed field be restored?',
+          answer: 'No. Only tokens can be put back, because only they are in the key. Choose tokens for any field you may need again.',
+        },
+        {
+          question: 'How does the scan decide a column is sensitive?',
+          answer: 'It reads the column or key name in English and Arabic and checks the values: emails by their shape, IBANs, card numbers and national IDs by their checksums, phone numbers by their length and prefix. Each finding shows its reason and how sure the scan is.',
+        },
+        {
+          question: 'Will the masked file be completely anonymous?',
+          answer: 'Not necessarily. The scan can miss values, and other columns together (a job title, a city, a date) can still point to a person. Check the preview and the downloaded file before you share it; the guide to anonymizing a file before sharing lists what to look for.',
+          link: { text: 'guide to anonymizing a file before sharing', path: '/anonymize-data-before-sharing' },
+        },
+        {
+          question: 'Is the file I mask sent anywhere?',
+          answer: 'No. The scan, the masking and the key are made by your browser on your device. Nothing is uploaded or stored, and the page keeps working offline once it has loaded.',
+          link: { text: 'uploaded', path: '/check-file-upload' },
+        },
+      ],
+    },
   },
   ar: {
     '/csv-viewer': {
@@ -911,6 +982,11 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل يمكنني فتح ملف TSV اون لاين وتعديله؟',
           answer: 'نعم. تُفتح ملفات .tsv و.tab مفصولة بعلامة جدولة مع اكتشاف صف العناوين، ويمكنك تحريرها وتنزيلها بالطريقة نفسها المتبعة مع ملف CSV.',
+        },
+        {
+          question: 'كيف أخفي الأسماء والبريد والهويات في ملف CSV قبل مشاركته؟',
+          answer: 'اضغط إخفاء في الشريط العلوي. تُحدَّد لك الأعمدة التي تبدو شخصية، ويمكن استبدال كل منها برموز مثل EMAIL-000001 أو إخفاؤه جزئيًا أو حذفه، ثم تنزّل نسخة مخفية. وللأداة صفحة خاصة: إخفاء البيانات.',
+          link: { text: 'إخفاء البيانات', path: '/mask-data' },
         },
       ],
     },
@@ -997,6 +1073,11 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
           question: 'هل يمكنني فتح ملف Excel محمي بكلمة مرور؟',
           answer: 'لا. لا يمكن فتح المصنفات المشفّرة، لأن الملف يجب أن يُقرأ في متصفحك دون إرساله إلى أي جهة. أزل كلمة المرور في Excel أولًا، ثم افتح الملف هنا.',
         },
+        {
+          question: 'هل يمكنني إخفاء البيانات الشخصية في مصنف Excel قبل إرساله؟',
+          answer: 'نعم. اضغط إخفاء في الشريط العلوي: تُفحص كل الأوراق بحثًا عن الأسماء والبريد وأرقام الهواتف والهويات والآيبان والبطاقات، وتختار طريقة إخفاء كل عمود. وتُنزَّل النسخة المخفية بصيغة .xlsx أو CSV أو JSON؛ التفاصيل في صفحة إخفاء البيانات.',
+          link: { text: 'إخفاء البيانات', path: '/mask-data' },
+        },
       ],
     },
     '/json-viewer': {
@@ -1076,6 +1157,11 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل يمكنني ترتيب مفاتيح كائن JSON أبجديًا؟',
           answer: 'نعم. اضغط «ترتيب المفاتيح»: تُرتَّب مفاتيح كل كائن، ومنها الكائنات المتداخلة، من A إلى Z. ويعيدها «تراجع» كما كانت.',
+        },
+        {
+          question: 'هل يمكنني حذف البيانات الشخصية من ملف JSON؟',
+          answer: 'نعم. اضغط أيقونة الإخفاء في الشريط العلوي: تُفحص المفاتيح المتداخلة مثل customers[].email، ويمكن استبدال كل منها برموز أو إخفاؤه جزئيًا أو حذفه. ويحتفظ ملف JSON المخفي ببنيته وأرقامه. المزيد في صفحة إخفاء البيانات.',
+          link: { text: 'إخفاء البيانات', path: '/mask-data' },
         },
       ],
     },
@@ -1608,6 +1694,61 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل يُرفع ملف JSON؟',
           answer: 'لا. يحلل متصفحك JSON ويحوّله على جهازك، ولا يُرسل شيء إلى أي خادم.',
+        },
+      ],
+    },
+    '/mask-data': {
+      stepsTitle: 'كيف يعمل: إخفاء البيانات الحساسة',
+      steps: [
+        { title: 'اختر ملفك', text: 'أفلت ملف CSV أو Excel أو JSON أو TXT أو اختره، أو اضغط إخفاء في عارض CSV أو Excel أو JSON لإخفاء الملف المفتوح. يفحصه متصفحك بحثًا عن الأسماء والبريد الإلكتروني وأرقام الهواتف والهويات والآيبان والبطاقات والعناوين وتواريخ الميلاد.' },
+        { title: 'اختر الأعمدة', text: 'تُحدَّد لك الأعمدة التي تبدو حساسة، ولكل منها نوعه ومدى ثقة الفحص. افتح قائمة الأعمدة لإضافة أي عمود آخر، ثم اختر لكل عمود الرموز أو الإخفاء الجزئي أو الحذف.' },
+        { title: 'راجع المعاينة', text: 'تظهر أول 20 صفًا كما ستُحفظ، وانتقل إلى «قبل» للمقارنة بالأصل. كل تغيير في الاختيارات يحدّث المعاينة.' },
+        { title: 'نزّل الملف', text: 'احفظ النسخة المخفية بصيغة CSV أو Excel أو JSON (ويبقى الملف النصي بصيغة .txt). وإن اخترت إنشاء المفتاح فاحفظ المفتاح الخاص أيضًا وأبقه بعيدًا عن الملف.' },
+      ],
+      handlesTitle: 'ما تتعامل معه أداة إخفاء البيانات',
+      handles: [
+        'الملفات: CSV وTSV، ومصنفات Excel بكل أوراقها (.xlsx و.xls و.xlsm و.ods)، وJSON بما فيه الكائنات والقوائم المتداخلة، والنص العادي (.txt).',
+        'الفحص: الأسماء بالعربية والإنجليزية، والبريد الإلكتروني، وأرقام الهواتف، وأرقام الهوية الوطنية والإقامة، والآيبان والبطاقات (مع التحقق من خانة التحقق)، والعناوين وتواريخ الميلاد.',
+        'الإخفاء: تأخذ القيمة نفسها دائمًا الرمز نفسه، مثل EMAIL-000001، في كل حقل وداخل النص الحر كالملاحظات.',
+        'الإخفاء الجزئي يُبقي آخر أربعة أحرف (****1234)، والبريد أول حرف والنطاق، والتاريخ سنته.',
+        'الاستعادة: يعيد الملف المخفي مع مفتاحه الخاص القيم الأصلية مكان الرموز، حتى داخل النص الحر.',
+        'داخل العارضات: زر إخفاء في عارض CSV وExcel وJSON يخفي الملف المفتوح بتعديلاته دون مغادرته.',
+      ],
+      faqTitle: 'إخفاء البيانات: أسئلة وأجوبة',
+      faq: [
+        {
+          question: 'ما إخفاء البيانات؟',
+          answer: 'إخفاء البيانات هو استبدال القيم الحساسة في الملف، مثل الأسماء والبريد الإلكتروني وأرقام الهواتف والهويات والآيبان والبطاقات، ببدائل لا تكشف أصحابها، حتى يمكن مشاركة الملف أو اختباره أو لصقه في مساعد ذكاء اصطناعي دون كشف الأشخاص فيه. تبقى الصفوف والأعمدة وبقية القيم كما هي.',
+        },
+        {
+          question: 'هل يمكنني إخفاء عمود لم يحدده الفحص؟',
+          answer: 'نعم. افتح قائمة الأعمدة: يظهر فيها كل عمود أو مفتاح JSON في الملف، والأعمدة التي تبدو حساسة محددة مسبقًا. حدد أي عمود آخر، واختر نوعه (النوع «أخرى» يعطي رموزًا مثل VAL-000001)، ثم اختر طريقة إخفائه.',
+        },
+        {
+          question: 'ما الفرق بين الرموز والإخفاء الجزئي وحذف الحقل؟',
+          answer: 'الرمز يستبدل القيمة بتسمية مثل NAME-000001، وهي التسمية نفسها أينما ظهرت القيمة، فتبقى الصفوف قابلة للربط. والإخفاء الجزئي يخفي كل شيء عدا جزء صغير (****1234). أما الحذف فيزيل العمود أو المفتاح من الملف.',
+        },
+        {
+          question: 'ما ملف المفتاح الخاص، ومن يجب أن يحتفظ به؟',
+          answer: 'يسرد كل رمز مع القيمة التي استبدلها، ليمكن إرجاع الملف المخفي لاحقًا. احتفظ به لنفسك ولا ترسله مع الملف المخفي أبدًا، فمن يملك الاثنين يستطيع إلغاء الإخفاء.',
+        },
+        {
+          question: 'هل يمكن استعادة حقل مخفي جزئيًا أو محذوف؟',
+          answer: 'لا. تُستعاد الرموز فقط لأنها وحدها موجودة في المفتاح. اختر الرموز لأي حقل قد تحتاجه لاحقًا.',
+        },
+        {
+          question: 'كيف يقرر الفحص أن العمود حساس؟',
+          answer: 'يقرأ اسم العمود أو المفتاح بالعربية والإنجليزية ويفحص القيم: البريد من شكله، والآيبان والبطاقات والهويات من خانة التحقق، وأرقام الهواتف من طولها وبدايتها. ويظهر لكل نتيجة سببها ومدى ثقة الفحص.',
+        },
+        {
+          question: 'هل سيصبح الملف المخفي مجهول الهوية تمامًا؟',
+          answer: 'ليس بالضرورة. قد يفوت الفحص بعض القيم، وقد تدل أعمدة أخرى مجتمعة (مسمى وظيفي ومدينة وتاريخ) على شخص بعينه. راجع المعاينة والملف المنزّل قبل مشاركته، ويسرد دليل إخفاء البيانات قبل المشاركة ما تبحث عنه.',
+          link: { text: 'دليل إخفاء البيانات قبل المشاركة', path: '/anonymize-data-before-sharing' },
+        },
+        {
+          question: 'هل يُرسل الملف الذي أخفيه إلى أي مكان؟',
+          answer: 'لا. يجري الفحص والإخفاء وإنشاء المفتاح في متصفحك على جهازك. لا يُرفع شيء ولا يُخزّن، وتبقى الصفحة تعمل دون اتصال بعد تحميلها.',
+          link: { text: 'لا يُرفع شيء', path: '/check-file-upload' },
         },
       ],
     },

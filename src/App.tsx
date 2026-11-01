@@ -4,7 +4,7 @@ import DiscardEditsDialog from './components/DiscardEditsDialog'
 import { LocaleContext, PagePathContext, SwitchLanguageContext, getBrowserLocale, getLocaleFromPath, loadLocale, localizePath, splitLocalePath, useT } from './i18n'
 import type { Locale } from './i18n'
 import { ToastProvider } from './components/Messages'
-import HomePage from './pages/HomePage'
+import HomePage, { loadMaskDataTool } from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
 import { formatDefinitions } from './formats/registry'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
@@ -20,6 +20,11 @@ const viewerIdForConversion: Record<ConversionTarget, Viewer['id']> = { csv: 'cs
 // format on a conversion page, CSV on the home page), so a file then opens with no network and no wait.
 function preloadFileOpening(path: string) {
   const toolViewer = findViewerByToolPath(path)
+  // The Mask Data page keeps the file on the page: it needs its tool and the Excel writer, not a viewer.
+  if (toolViewer?.tool === 'mask') {
+    void Promise.all([loadMaskDataTool(), import('./formats/excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]).catch(() => {})
+    return
+  }
   const viewerId = toolViewer?.convertTo ? viewerIdForConversion[toolViewer.convertTo] : (toolViewer?.id ?? (path === '/' ? 'csv' : undefined))
   const preloads = [loadFileViewPage(), formatDefinitions.find((definition) => definition.viewerId === viewerId)?.preloadViewer?.()]
   if (toolViewer?.convertTo) preloads.push(import('./formats/conversion'))
@@ -53,7 +58,7 @@ function LoadFailedMessage() {
   )
 }
 const InfoPage = lazy(() => import('./pages/InfoPage'))
-const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json']
+const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
 // language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still
@@ -227,6 +232,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
                 </Suspense>
               ) : (
                 <HomePage
+                  key={findViewerByToolPath(path)?.tool ?? 'page'}
                   onFileLoaded={openFile}
                   onNavigate={navigateTo}
                   toolViewer={findViewerByToolPath(path)}

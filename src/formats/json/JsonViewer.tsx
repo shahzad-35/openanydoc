@@ -6,7 +6,8 @@ import LanguageSwitcher from '../../components/LanguageSwitcher'
 import { isolateLeftToRight, localizePath, translatePlural, translateWithNodes, useT } from '../../i18n'
 import type { Locale, MessageKey } from '../../i18n'
 import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
-import { buildDownloadName, downloadTextFile } from '../registry'
+import { buildDownloadName, downloadTextFile, findFormatForFileName } from '../registry'
+import { useMaskDrawer } from '../mask/useMaskDrawer'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import JsonCodeEditor from './JsonCodeEditor'
@@ -212,6 +213,18 @@ const iconPaths: Record<string, ReactNode> = {
     <>
       <circle cx="10" cy="10" r="5.5" />
       <path d="m14 14 2.5 2.5M17 9h3M18.5 7.5v3M15 20h6" />
+    </>
+  ),
+  convert: (
+    <>
+      <path d="M4 8h13m0 0-3.5-3.5M17 8l-3.5 3.5" />
+      <path d="M20 16H7m0 0 3.5-3.5M7 16l3.5 3.5" />
+    </>
+  ),
+  mask: (
+    <>
+      <path d="M3 9.5C3 7.6 4.4 6.5 6 6.5c2.2 0 3.6 1.2 6 1.2s3.8-1.2 6-1.2c1.6 0 3 1.1 3 3 0 4-2.6 7-5.2 7-1.8 0-2.6-1.6-3.8-1.6s-2 1.6-3.8 1.6C5.6 16.5 3 13.5 3 9.5Z" />
+      <path d="M7.5 10.5h2.5M14 10.5h2.5" />
     </>
   ),
   lock: (
@@ -710,6 +723,13 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     else onOpenConvertedFile(result.file)
   }
 
+  // Mask data masks the JSON as Download would save it.
+  const canMask = findFormatForFileName(fileName)?.canMask === true
+  const { openMaskDrawer, maskDrawer, isMaskDrawerOpen } = useMaskDrawer(async () => {
+    const documentText = await buildDocumentText()
+    return documentText && new File([documentText.fileText], fileName, { type: 'application/json' })
+  })
+
   function replaceNextInText() {
     const textBox = textareaRef.current
     if (findText === '' || !textBox) return
@@ -959,10 +979,10 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           {t('json.pane.clear')}
         </button>
         <span className="vsep text-extra" />
-        <button className="btn sm icon text-extra" type="button" id="undo-button" aria-label={t('toolbar.undo')} title={t('toolbar.undoTip')} disabled={!session.canUndo && draftText === codeText} onClick={() => void undoLastChange()}>
+        <button className="btn sm icon text-extra" type="button" id="undo-button" aria-label={t('toolbar.undo')} title={t(session.canUndo || draftText !== codeText ? 'toolbar.undoTip' : 'disabled.nothingToUndo')} disabled={!session.canUndo && draftText === codeText} onClick={() => void undoLastChange()}>
           <SpriteIcon name="undo" isSmall />
         </button>
-        <button className="btn sm icon text-extra" type="button" id="redo-button" aria-label={t('toolbar.redo')} title={t('toolbar.redoTip')} disabled={!session.canRedo} onClick={() => void redoLastChange()}>
+        <button className="btn sm icon text-extra" type="button" id="redo-button" aria-label={t('toolbar.redo')} title={t(session.canRedo ? 'toolbar.redoTip' : 'disabled.nothingToRedo')} disabled={!session.canRedo} onClick={() => void redoLastChange()}>
           <SpriteIcon name="redo" isSmall />
         </button>
         <button
@@ -1394,16 +1414,16 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         <div className="cmds" role="toolbar" aria-label={t('json.wb.commands')} id="command-toolbar">
           <button className="btn" type="button" id="validate-button" title={t('json.wb.validateTip', { shortcut: shortcutLabel('Enter') })} disabled={isEmpty} onClick={() => void validateNow()}>
             <SpriteIcon name="check" />
-            {t('json.toolbar.validate')}
+            <span className="cmd-label">{t('json.toolbar.validate')}</span>
           </button>
           <button className="btn" type="button" id="repair-button" title={t('json.wb.repairTip')} disabled={isEmpty} onClick={() => void repairText()}>
             <SpriteIcon name="wrench" />
-            {t('json.wb.repair')}
+            <span className="cmd-label">{t('json.wb.repair')}</span>
           </button>
           <span className="split-btn">
             <button className="btn main" type="button" id="format-button" title={t('json.wb.formatTip')} disabled={!canChangeDocument} onClick={() => void formatDocument(chosenIndent)}>
               <SpriteIcon name="indent" />
-              {t('json.toolbar.format')}
+              <span className="cmd-label">{t('json.toolbar.format')}</span>
             </button>
             <button
               className="btn caret"
@@ -1441,11 +1461,11 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           </span>
           <button className="btn" type="button" id="minify-button" title={t('json.wb.minifyTip')} disabled={!canChangeDocument} onClick={() => void minifyDocument()}>
             <SpriteIcon name="minify" />
-            {t('json.toolbar.minifyShort')}
+            <span className="cmd-label">{t('json.toolbar.minifyShort')}</span>
           </button>
           <button className="btn" type="button" id="sort-keys-button" title={t('json.wb.sortTip')} disabled={!canChangeDocument} onClick={() => void sortDocumentKeys()}>
             <SpriteIcon name="sort" />
-            <span>
+            <span className="cmd-label">
               {t('json.wb.sort')}
               <span className="lbl-opt"> {t('json.wb.keys')}</span>
             </span>
@@ -1497,7 +1517,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
             aria-controls="convert-button-menu"
             onClick={() => setOpenMenu(openMenu === 'convert' ? null : 'convert')}
           >
-            <SpriteIcon name="replace" />
+            <SpriteIcon name="convert" />
             <span className="convert-label">{t('convert.menuHeading')}</span>
             <SpriteIcon name="chev-down" isSmall />
           </button>
@@ -1518,6 +1538,11 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
             </div>
           )}
         </span>
+        {canMask && (
+          <button className="btn icon" type="button" id="mask-button" aria-label={t('mask.buttonTip')} aria-haspopup="dialog" aria-expanded={isMaskDrawerOpen} title={t('mask.buttonTip')} onClick={() => void openMaskDrawer()}>
+            <SpriteIcon name="mask" />
+          </button>
+        )}
         <LanguageSwitcher className="btn" />
         <span className="split-btn">
           <button
@@ -1568,6 +1593,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         ))}
       </div>
 
+      {maskDrawer}
       <main id="workbench" ref={workbenchRef} style={{ '--left': `${textPanePercent}%` } as CSSProperties}>
         {textPane}
         <div

@@ -136,6 +136,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Convert JSON to CSV in your browser: drop or paste a JSON array of objects and it opens in the CSV viewer with one row per object. Nested objects become columns such as address.city, and lists become items.0, items.1. Edit, filter and download it there. Nothing is uploaded.',
       linkText: 'JSON to CSV',
     },
+    '/mask-data': {
+      title: 'Mask Sensitive Data in CSV, Excel and JSON – Free, Private',
+      description: 'Mask sensitive data online: find names, emails, phone numbers, IDs, IBANs and card numbers in CSV, Excel, JSON or TXT files and replace them. No upload.',
+      heading: 'Mask Sensitive Data in CSV, Excel and JSON Files',
+      intro: 'Find personal data in a CSV, Excel, JSON or text file and mask it in your browser before you share it: replace values with consistent tokens, hide all but the last characters, or remove the field. A private key file can put the values back later. Your file never leaves your device.',
+      linkText: 'Mask sensitive data',
+    },
     '/about': {
       title: 'About OpenAnyDoc – Private Online File Viewer',
       description: 'About OpenAnyDoc, built and run by Shahzad Ali: a free file viewer and editor that runs in your browser and never uploads files. CSV, Excel, JSON and TXT today.',
@@ -209,6 +216,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'CSV vs Excel vs JSON: the differences and when to use each',
       intro: 'What each format can hold, where each one breaks, and a simple rule for picking the right one.',
       linkText: 'CSV vs Excel vs JSON',
+    },
+    '/anonymize-data-before-sharing': {
+      title: 'How to Anonymize a CSV or Excel File Before Sharing It',
+      description: 'Anonymize a CSV, Excel or JSON file before sharing it: what counts as personal data, masking vs anonymization, the steps in your browser, and what to check.',
+      heading: 'How to anonymize a CSV or Excel file before sharing it',
+      intro: 'What to hide, the difference between masking and anonymizing, and how to do it without uploading the file anywhere.',
+      linkText: 'Anonymize data before sharing',
     },
     '/guides': {
       title: 'Guides: Fix CSV, Excel and JSON File Problems',
@@ -323,6 +337,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'حوّل JSON إلى CSV في متصفحك: أفلت أو الصق مصفوفة كائنات JSON فتُفتح في عارض CSV بصف لكل كائن. تصبح الكائنات المتداخلة أعمدة مثل address.city، والقوائم أعمدة مثل items.0 وitems.1. عدّله وصفِّه ونزّله هناك. لا يُرفع شيء.',
       linkText: 'تحويل JSON إلى CSV',
     },
+    '/mask-data': {
+      title: 'إخفاء البيانات الحساسة في CSV وExcel وJSON – مجاني وخاص',
+      description: 'أخفِ البيانات الحساسة اون لاين: اعثر على الأسماء والبريد الإلكتروني وأرقام الجوال والهويات والآيبان والبطاقات في ملفات CSV وExcel وJSON ثم استبدلها، دون رفع.',
+      heading: 'إخفاء البيانات الحساسة في ملفات CSV وExcel وJSON',
+      intro: 'اعثر على البيانات الشخصية في ملف CSV أو Excel أو JSON أو ملف نصي وأخفِها في متصفحك قبل مشاركته: استبدل القيم برموز ثابتة، أو أخفِ كل شيء عدا آخر الأحرف، أو احذف الحقل. ويمكن لملف مفتاح خاص أن يعيد القيم لاحقًا. لا يغادر ملفك جهازك.',
+      linkText: 'إخفاء البيانات الحساسة',
+    },
     '/about': {
       title: 'عن OpenAnyDoc – عارض ملفات خاص اون لاين',
       description: 'عن OpenAnyDoc الذي يبنيه ويديره شهزاد علي: عارض ومحرر ملفات مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT، وقريبًا Word وPDF.',
@@ -397,6 +418,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'ما تتسع له كل صيغة، وأين تتعثر، وقاعدة بسيطة لاختيار المناسبة.',
       linkText: 'CSV أم Excel أم JSON',
     },
+    '/anonymize-data-before-sharing': {
+      title: 'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته',
+      description: 'أخفِ البيانات الشخصية في ملف CSV أو Excel أو JSON قبل مشاركته: ما الذي يُعد بيانات شخصية، والفرق بين الإخفاء وإخفاء الهوية، والخطوات في متصفحك، وما تراجعه.',
+      heading: 'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته',
+      intro: 'ما الذي تخفيه، والفرق بين الإخفاء وإخفاء الهوية، وكيف تفعل ذلك دون رفع الملف إلى أي مكان.',
+      linkText: 'إخفاء البيانات قبل المشاركة',
+    },
     '/guides': {
       title: 'أدلة: حل مشكلات ملفات CSV وExcel وJSON',
       description: 'أدلة عملية لملفات CSV وExcel وJSON: افتحها دون Excel، وأصلح العربية المشوّهة وملف CSV في عمود واحد، وتحقق من أن الموقع لا يرفع ملفك، وقارن بين الصيغ الثلاث.',
@@ -412,7 +440,7 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 
 export function getShareImage(locale: Locale, address: string) {
   const imageAddress = pagesWithShareImage.includes(address) ? address : '/'

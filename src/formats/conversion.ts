@@ -15,24 +15,24 @@ import type { JsonValue } from './json/jsonModel'
 import { isBigNumber } from './json/jsonTools'
 import { buildDownloadName } from './registry'
 
-type CellValue = string | number | boolean | Date | null
+export type CellValue = string | number | boolean | Date | null
 // One sheet of the input (a CSV or JSON file is one table), header row first.
 type InputTable = { sheetName: string; rows: CellValue[][] }
 type ReadResult = { status: 'error'; message: string } | { status: 'ok'; tables: InputTable[] }
 
 // Only plain decimals become numbers; "007", phone numbers and long IDs stay text so nothing is lost.
 const PLAIN_NUMBER_PATTERN = /^-?(0|[1-9]\d{0,14})(\.\d+)?$/
-const OUTPUT_FORMATS = {
+export const OUTPUT_FORMATS = {
   csv: { extension: '.csv', mimeType: 'text/csv' },
   xlsx: { extension: '.xlsx', mimeType: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' },
   json: { extension: '.json', mimeType: 'application/json' },
 }
 
-function readNumberOrText(text: string): CellValue {
+export function readNumberOrText(text: string): CellValue {
   return PLAIN_NUMBER_PATTERN.test(text) ? Number(text) : text
 }
 
-function getCellText(value: CellValue) {
+export function getCellText(value: CellValue) {
   if (value === null) return ''
   if (value instanceof Date) return value.toISOString()
   return String(value)
@@ -49,7 +49,7 @@ function flattenToDotKeys(value: JsonValue, keyPrefix: string, flatRecord: Map<s
 }
 
 // A list of objects (or one object) as a table whose columns are the dot-notation keys, in the order they first appear.
-function readJsonRecordsAsTable(value: JsonValue): CellValue[][] | null {
+export function readJsonRecordsAsTable(value: JsonValue): CellValue[][] | null {
   const records = Array.isArray(value) ? value : [value]
   if (records.length === 0 || !records.every(isPlainObject)) return null
   const flatRecords = records.map((record) => {
@@ -62,7 +62,7 @@ function readJsonRecordsAsTable(value: JsonValue): CellValue[][] | null {
 }
 
 // For JSON output, cells keep their type (numbers stay numbers); for CSV and Excel output they are the text the sheet shows.
-async function readInputTables(file: File, contents: ArrayBuffer, inputViewerId: Viewer['id'], convertTo: ConversionTarget, locale: Locale): Promise<ReadResult> {
+export async function readInputTables(file: File, contents: ArrayBuffer, inputViewerId: Viewer['id'], convertTo: ConversionTarget, locale: Locale): Promise<ReadResult> {
   if (inputViewerId === 'excel') {
     try {
       // UTC: a date cell is a calendar day, not a moment, so it must not move by the visitor's time zone in the ISO text.
@@ -100,28 +100,30 @@ function buildRecordKeys(headerRow: CellValue[], columnCount: number) {
   })
 }
 
-function buildRecords(rows: CellValue[][]) {
+export function buildRecords(rows: CellValue[][]) {
   const columnCount = Math.max(0, ...rows.map((row) => row.length))
   const recordKeys = buildRecordKeys(rows[0] ?? [], columnCount)
   return rows.slice(1).map((row) => Object.fromEntries(recordKeys.map((key, columnPosition) => [key, row[columnPosition] ?? null])))
 }
 
-function buildCsvText(rows: CellValue[][], delimiter: string, includeByteOrderMark: boolean) {
+export function buildCsvText(rows: CellValue[][], delimiter: string, includeByteOrderMark: boolean) {
   const csvText = Papa.unparse(rows.map((row) => row.map(getCellText)), { delimiter, newline: '\r\n' })
   return `${includeByteOrderMark ? '﻿' : ''}${csvText}\r\n`
 }
 
-// One sheet with a bold header row and each column as wide as its longest cell (up to 60 characters).
-async function buildXlsxBlob(rows: CellValue[][], sheetName: string) {
+// One worksheet per table, each with a bold header row and each column as wide as its longest cell (up to 60 characters).
+export async function buildXlsxBlob(tables: InputTable[]) {
   const ExcelJS = await loadExcelJs()
   const workbook = new ExcelJS.Workbook()
-  const worksheet = workbook.addWorksheet(sheetName.replace(/[[\]:*?/\\]/g, '').slice(0, 31) || 'Sheet1')
-  worksheet.addRows(rows)
-  worksheet.getRow(1).font = { bold: true }
-  const columnCount = Math.max(0, ...rows.map((row) => row.length))
-  for (let columnPosition = 0; columnPosition < columnCount; columnPosition++) {
-    const longestTextLength = Math.max(...rows.map((row) => getCellText(row[columnPosition] ?? null).length))
-    worksheet.getColumn(columnPosition + 1).width = Math.min(60, Math.max(8, longestTextLength + 2))
+  for (const { rows, sheetName } of tables) {
+    const worksheet = workbook.addWorksheet(sheetName.replace(/[[\]:*?/\\]/g, '').slice(0, 31) || 'Sheet1')
+    worksheet.addRows(rows)
+    worksheet.getRow(1).font = { bold: true }
+    const columnCount = Math.max(0, ...rows.map((row) => row.length))
+    for (let columnPosition = 0; columnPosition < columnCount; columnPosition++) {
+      const longestTextLength = Math.max(...rows.map((row) => getCellText(row[columnPosition] ?? null).length))
+      worksheet.getColumn(columnPosition + 1).width = Math.min(60, Math.max(8, longestTextLength + 2))
+    }
   }
   return new Blob([await workbook.xlsx.writeBuffer()])
 }
@@ -135,7 +137,7 @@ function buildConvertedFileName(fileName: string, sheetName: string, hasSeveralS
 }
 
 // Excel opens a UTF-8 CSV without a byte order mark as Windows text, which garbles Arabic and other non-Latin letters.
-function hasNonAsciiText(tables: InputTable[]) {
+export function hasNonAsciiText(tables: InputTable[]) {
   return tables.some((table) => table.rows.some((row) => row.some((cell) => /[^\p{ASCII}]/u.test(getCellText(cell)))))
 }
 
@@ -147,7 +149,7 @@ async function buildConvertedFile(table: InputTable, convertTo: ConversionTarget
     convertTo === 'csv'
       ? buildCsvText(table.rows, ',', hasNonAsciiText([table]))
       : convertTo === 'xlsx'
-        ? await buildXlsxBlob(table.rows, table.sheetName || fileName.replace(/\.[^.]+$/, ''))
+        ? await buildXlsxBlob([{ rows: table.rows, sheetName: table.sheetName || fileName.replace(/\.[^.]+$/, '') }])
         : JSON.stringify(buildRecords(table.rows), null, 2)
   return new File([contents], fileName, { type: mimeType })
 }

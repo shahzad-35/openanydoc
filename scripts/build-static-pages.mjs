@@ -47,7 +47,7 @@ function renderChangelogNav(locale) {
     .join('')
   const convertLabel = escapeHtml(translate(locale, 'convert.menuHeading'))
   const convertItems = landingPages
-    .filter((page) => page.convertTo)
+    .filter((page) => page.convertTo || page.tool)
     .map((page) => `<li><a id="site-nav-link-${page.path.slice(1)}" href="${localizePath(locale, page.path)}" class="${n.convertLink}">${escapeHtml(pageSeo[locale][page.path].linkText)}</a></li>`)
     .join('')
   const convertMenu =
@@ -284,9 +284,10 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const seo = pageSeo[locale][address]
   const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
   const viewer = findViewerByToolPath(address)
-  // A landing page (/json-formatter) sits under its viewer's page in the breadcrumb: Home › JSON viewer › JSON formatter.
+  // A landing page (/json-formatter) sits under its viewer's page in the breadcrumb: Home › JSON viewer › JSON formatter. A tool
+  // for several formats (/mask-data) sits under Home only.
   const landingPage = landingPages.find((page) => page.path === address)
-  const parentAddress = landingPage && viewers.find((candidate) => candidate.id === landingPage.viewerId).toolPath
+  const parentAddress = landingPage && !landingPage.tool && viewers.find((candidate) => candidate.id === landingPage.viewerId).toolPath
   // A format or landing page's "What it handles" lines are its application's feature list: true features only.
   const guide = formatGuides[locale][address]
   const structuredData = []
