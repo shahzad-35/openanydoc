@@ -1,6 +1,6 @@
 # OpenAnyDoc
 
-**Free online viewer and editor for CSV, Excel, JSON and TXT files. Files stay in your browser: nothing is uploaded.**
+**Free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files. Files stay in your browser: nothing is uploaded.**
 
 Live site: **https://www.openanydoc.com** (English) · https://www.openanydoc.com/ar (Arabic)
 

@@ -1,10 +1,20 @@
 # OpenAnyDoc
 
-> Free online viewer and editor for CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files. The file is read in the browser and never uploaded: no server sees it, no account, no cookies, no analytics. English and Arabic. Open source (MIT).
+> OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files that runs in your browser: files are never uploaded. No account, no cookies, no analytics. English and Arabic. MIT licence.
 
 How it keeps files private: the site's Content-Security-Policy is `default-src 'self'; connect-src 'self'`, so the browser refuses any request to another origin, and an automated test suite fails the build if any page makes a network request or writes browser storage beyond the theme choice. Anyone can confirm this in the browser's Network tab while opening a file.
 
 What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices. Files download back in their own format, or convert between formats: Excel to CSV or JSON, CSV to Excel or JSON, and JSON to CSV with nested objects flattened into dot-notation columns. Word, PDF and PowerPoint are not supported yet.
+
+## Answers
+
+- Is my file uploaded? No. The browser reads it; the page's Content-Security-Policy (`connect-src 'self'`) blocks requests to any other site. How to verify: https://www.openanydoc.com/en/check-file-upload
+- Which formats? .csv, .tsv, .tab, .xlsx, .xls, .xlsm, .ods, .json and .txt. Not Word (.docx), PDF or PowerPoint (.pptx) yet.
+- How big a file? CSV has no fixed limit (a 120,000-row file opens in under a second; a warning above 50 MB). JSON up to 10 MB. Excel cell styles are read for files up to 8 MB.
+- Arabic? The whole interface is in Arabic too (https://www.openanydoc.com/ar). CSV files in Windows-1256 are detected, and downloads add a UTF-8 byte order mark so Excel shows Arabic correctly.
+- Offline? Once a tool page has loaded, files of its type open and edit with no network. It is not an installable app.
+- Does it change my original file? No. Edits stay in the page's memory until you download a copy.
+- Price? Free, with no account, plans or ads.
 
 ## Pricing
 
@@ -33,7 +43,22 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [CSV opens in one column in Excel: how to fix the delimiter](https://www.openanydoc.com/en/csv-opens-in-one-column)
 - [CSV too big for Excel: the 1,048,576-row limit and what to do](https://www.openanydoc.com/en/csv-too-big-for-excel)
 - [JSON "unexpected token" errors: find the line and fix it](https://www.openanydoc.com/en/json-unexpected-token)
+- [How to check that a website does not upload your file](https://www.openanydoc.com/en/check-file-upload)
+- [How to open a JSON file](https://www.openanydoc.com/en/open-json-file)
+- [How to open an XLSX file without Excel](https://www.openanydoc.com/en/open-xlsx-without-excel)
+- [CSV vs Excel vs JSON: the differences and when to use each](https://www.openanydoc.com/en/csv-vs-excel-vs-json)
 - [All guides](https://www.openanydoc.com/en/guides)
+
+## Arabic pages
+
+Every page has an Arabic version under /ar with the same address, for example:
+
+- [OpenAnyDoc بالعربية](https://www.openanydoc.com/ar)
+- [عارض CSV](https://www.openanydoc.com/ar/csv-viewer)
+- [عارض Excel](https://www.openanydoc.com/ar/excel-viewer)
+- [عارض JSON](https://www.openanydoc.com/ar/json-viewer)
+- [لماذا تظهر العربية في ملف CSV برموز غريبة في Excel](https://www.openanydoc.com/ar/fix-arabic-csv-in-excel)
+- [الأدلة](https://www.openanydoc.com/ar/guides)
 
 ## About
 
@@ -44,4 +69,3 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [OpenAnyDoc on X](https://x.com/openanydoc)
 - [OpenAnyDoc on LinkedIn](https://www.linkedin.com/company/145343043)
 - [OpenAnyDoc on YouTube](https://www.youtube.com/channel/UCS78NF7U939ypL0mcBgQKlg)
-- [Arabic site](https://www.openanydoc.com/ar)

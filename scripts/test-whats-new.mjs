@@ -490,7 +490,7 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
   expect((await evaluate(`document.documentElement.style.getPropertyValue('--ext-pill-1')`)) !== '', 'the inline theme script did not run (blocked by the CSP?)')
 })
 
-const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
+const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json']
 const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
@@ -553,8 +553,13 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
       const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
       const types = blocks.flatMap((block) => [block['@type']].flat())
-      const expectedTypes = { '': ['WebSite', 'Organization', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['BreadcrumbList'], '/changelog': [], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
+      const expectedTypes = { '': ['WebSite', 'Organization', 'SoftwareApplication', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['CollectionPage', 'BreadcrumbList'], '/changelog': ['BreadcrumbList'], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
       expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
+      // Every reference to the organisation or website points at the one id the home page defines.
+      const entityIds = ['https://www.openanydoc.com/#organization', 'https://www.openanydoc.com/#website']
+      const references = [...JSON.stringify(blocks).matchAll(/"@id":"([^"]+)"/g)].map((match) => match[1])
+      expect(references.every((reference) => entityIds.includes(reference)), `${address}: an @id points somewhere unknown: ${references.join(', ')}`)
+      if (page === '') expect(blocks.some((block) => block['@type'] === 'Organization' && block['@id'] === entityIds[0]) && blocks.some((block) => block['@type'] === 'WebSite' && block['@id'] === entityIds[1] && block.publisher?.['@id'] === entityIds[0]), `${address}: the Organization and WebSite are not linked by @id`)
       for (const block of blocks) {
         const type = [block['@type']].flat()[0]
         const problem = (message) => `${address} ${type}: ${message}`
@@ -589,6 +594,10 @@ await test('every JSON-LD block is valid data with the fields search engines nee
         } else if (type === 'Article') {
           expect(block.headline?.length > 0 && isAbsoluteUrl(block.image) && /^\d{4}-\d{2}-\d{2}T00:00:00\+00:00$/.test(block.datePublished) && /^\d{4}-\d{2}-\d{2}T/.test(block.dateModified), problem('headline, image or dates are wrong'))
           expect(block.author?.['@type'] === 'Person' && block.author.name?.length > 0 && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
+        } else if (type === 'CollectionPage') {
+          const items = block.mainEntity?.itemListElement ?? []
+          expect(block.url === canonical && block.mainEntity?.['@type'] === 'ItemList' && items.length === guidePagesList.length, problem(`url is wrong or the list does not hold the ${guidePagesList.length} guides`))
+          items.forEach((item, index) => expect(item.position === index + 1 && item.name?.length > 0 && item.url === `https://www.openanydoc.com/${locale}${guidePagesList[index]}`, problem(`item ${index + 1} is not ${guidePagesList[index]}`)))
         } else if (type === 'ProfilePage') {
           expect(block.mainEntity?.['@type'] === 'Person' && block.mainEntity.name === 'Shahzad Ali' && block.url === canonical, problem('mainEntity or url is wrong'))
         } else if (type === 'BreadcrumbList') {
@@ -1488,6 +1497,36 @@ await test('the header has a Convert menu with every conversion page, and pickin
   await waitFor(`location.pathname === '/en/csv-to-json' && !document.querySelector('#site-nav-convert').open`, 'the CSV to JSON page, with the menu closed')
   await chooseFile(peopleCsv)
   await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'people.json'`, 'the converted file in the JSON viewer')
+})
+
+// The tool pages say the site works without a network once loaded: each page fetches its viewer while idle (App.tsx).
+const goOffline = (offline) => send('Network.emulateNetworkConditions', { offline, latency: 0, downloadThroughput: -1, uploadThroughput: -1 })
+await test('once a tool page is idle, its file opens with no network; code that cannot load shows a reload message, not a blank page', async () => {
+  const offlineCases = [
+    ['/en/csv-viewer', sampleCsv, `document.querySelector('#csv-workbench #data-table tbody td')`],
+    ['/en/json-viewer', sampleJson, `document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json' && !document.querySelector('#json-workbench [role="alert"]')`],
+    ['/en/excel-viewer', sampleWorkbook, `document.querySelector('#excel-workbench #data-table')`],
+    ['/en', sampleCsv, `document.querySelector('#csv-workbench #data-table tbody td')`],
+  ]
+  try {
+    for (const [address, file, openedCheck] of offlineCases) {
+      await send('Network.clearBrowserCache')
+      await openPage(address)
+      await sleep(3000)
+      await goOffline(true)
+      await chooseFile(file)
+      await waitFor(openedCheck, `${address}: the file to open offline`)
+      await goOffline(false)
+    }
+    // Offline before the page has fetched anything: the file page cannot load.
+    await send('Network.clearBrowserCache')
+    await openPage('/en/txt-viewer')
+    await goOffline(true)
+    await chooseFile(sampleText)
+    await waitFor(`document.querySelector('#load-failed-message') && document.querySelector('#reload-page-button')`, 'the reload message')
+  } finally {
+    await goOffline(false)
+  }
 })
 
 // ---------------------------------------------------------------- report

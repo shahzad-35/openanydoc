@@ -17,6 +17,11 @@ export const SOCIAL_PROFILES = [
   { id: 'youtube', name: 'YouTube', url: 'https://www.youtube.com/channel/UCS78NF7U939ypL0mcBgQKlg' },
 ] as const
 export const X_HANDLE = '@openanydoc'
+// The one sentence that says what OpenAnyDoc is, wherever the brand is described as data (Organization, WebSite, llms.txt, README).
+export const SITE_DESCRIPTION: Record<'en' | 'ar', string> = {
+  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files that runs in your browser: files are never uploaded.',
+  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
+}
 
 type Locale = 'en' | 'ar'
 
@@ -177,9 +182,37 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'The parser stopped at a character JSON does not allow. Here is what each token means, how to find the exact line, and how to fix it.',
       linkText: 'JSON unexpected token',
     },
+    '/check-file-upload': {
+      title: 'Does a Website Upload Your File? How to Check in 2 Minutes',
+      description: 'How to see whether an online file viewer or converter uploads your file: the browser Network tab, the offline test and the security policy, step by step.',
+      heading: 'How to check that a website does not upload your file',
+      intro: 'Four checks anyone can run in a desktop browser, with what each one proves and what it does not.',
+      linkText: 'Check a site does not upload your file',
+    },
+    '/open-json-file': {
+      title: 'How to Open a JSON File: Browser, Phone, Editor, Online',
+      description: 'How to open a JSON file on Windows, Mac or a phone: in your browser, a text or code editor, or a free online viewer, and what to do when the file will not open.',
+      heading: 'How to open a JSON file',
+      intro: 'Every way to open and read a .json file, from the quickest to the most powerful, and how to fix one that will not open.',
+      linkText: 'How to open a JSON file',
+    },
+    '/open-xlsx-without-excel': {
+      title: 'How to Open an XLSX File Without Excel: Free Options',
+      description: 'Free ways to open an .xlsx file without Excel: in your browser with no upload, LibreOffice, Google Sheets, Apple Numbers or a phone, and what each keeps.',
+      heading: 'How to open an XLSX file without Excel',
+      intro: 'The free options, which of them upload your workbook, and how much of its formulas and formatting each one keeps.',
+      linkText: 'Open XLSX without Excel',
+    },
+    '/csv-vs-excel-vs-json': {
+      title: 'CSV vs Excel vs JSON: Differences and When to Use Each',
+      description: 'CSV, Excel (XLSX) and JSON compared: structure, data types, formulas, size limits and encoding, which to use for what, and how to convert between them for free.',
+      heading: 'CSV vs Excel vs JSON: the differences and when to use each',
+      intro: 'What each format can hold, where each one breaks, and a simple rule for picking the right one.',
+      linkText: 'CSV vs Excel vs JSON',
+    },
     '/guides': {
       title: 'Guides: Fix CSV, Excel and JSON File Problems',
-      description: 'Short, practical guides to the problems people hit with CSV, Excel and JSON files: broken Arabic, one-column CSVs, files too big for Excel, JSON syntax errors.',
+      description: 'Practical guides to CSV, Excel and JSON files: open them without Excel, fix broken Arabic and one-column CSVs, check a site does not upload your file, and more.',
       heading: 'Guides',
       intro: 'Practical answers to common file problems, each with the free tool that fixes it in your browser.',
       linkText: 'Guides',
@@ -336,9 +369,37 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'توقف المحلل عند حرف لا يسمح به JSON. إليك ما يعنيه كل رمز، وكيف تعثر على السطر بالضبط، وكيف تصلحه.',
       linkText: 'خطأ JSON unexpected token',
     },
+    '/check-file-upload': {
+      title: 'هل يرفع الموقع ملفك؟ كيف تتحقق بنفسك في دقيقتين',
+      description: 'كيف تعرف إن كان عارض أو محوّل ملفات على الإنترنت يرفع ملفك: تبويب Network في المتصفح، واختبار قطع الاتصال، وسياسة أمان الموقع، خطوة بخطوة وبلا أي برنامج.',
+      heading: 'كيف تتحقق من أن الموقع لا يرفع ملفك',
+      intro: 'أربعة اختبارات يجريها أي شخص في متصفح الحاسوب، مع ما يثبته كل منها وما لا يثبته.',
+      linkText: 'تحقق أن الموقع لا يرفع ملفك',
+    },
+    '/open-json-file': {
+      title: 'كيف تفتح ملف JSON: في المتصفح والهاتف والمحرر مجانًا',
+      description: 'كيف تفتح ملف JSON على ويندوز أو ماك أو الهاتف: في المتصفح، أو في محرر نصوص أو شيفرة، أو في عارض مجاني على الإنترنت، وماذا تفعل حين يرفض الملف أن يُفتح.',
+      heading: 'كيف تفتح ملف JSON',
+      intro: 'كل طرق فتح ملف json وقراءته، من الأسرع إلى الأقوى، وكيف تصلح ملفًا لا يُفتح.',
+      linkText: 'كيف تفتح ملف JSON',
+    },
+    '/open-xlsx-without-excel': {
+      title: 'كيف تفتح ملف XLSX بدون Excel: خيارات مجانية بلا رفع',
+      description: 'طرق مجانية لفتح ملف xlsx دون Microsoft Excel: في متصفحك دون رفع، وفي LibreOffice وGoogle Sheets وApple Numbers وعلى الهاتف، مع ما يحتفظ به كل خيار من الملف.',
+      heading: 'كيف تفتح ملف XLSX بدون Excel',
+      intro: 'الخيارات المجانية، وأيها يرفع مصنفك، وكم يحتفظ كل منها بالصيغ والتنسيق.',
+      linkText: 'فتح XLSX بدون Excel',
+    },
+    '/csv-vs-excel-vs-json': {
+      title: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كل صيغة',
+      description: 'مقارنة بين CSV وExcel (XLSX) وJSON: البنية وأنواع البيانات والصيغ وحدود الحجم وترميز النص، وأي صيغة تناسب كل استخدام، وكيف تحوّل بينها مجانًا في متصفحك.',
+      heading: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها',
+      intro: 'ما تتسع له كل صيغة، وأين تتعثر، وقاعدة بسيطة لاختيار المناسبة.',
+      linkText: 'CSV أم Excel أم JSON',
+    },
     '/guides': {
       title: 'أدلة: حل مشكلات ملفات CSV وExcel وJSON',
-      description: 'أدلة قصيرة وعملية للمشكلات التي يصطدم بها الناس مع ملفات CSV وExcel وJSON: العربية المشوّهة، وملف CSV في عمود واحد، وملف أكبر من Excel، وأخطاء صياغة JSON.',
+      description: 'أدلة عملية لملفات CSV وExcel وJSON: افتحها دون Excel، وأصلح العربية المشوّهة وملف CSV في عمود واحد، وتحقق من أن الموقع لا يرفع ملفك، وقارن بين الصيغ الثلاث.',
       heading: 'الأدلة',
       intro: 'إجابات عملية لمشكلات الملفات الشائعة، مع الأداة المجانية التي تحلها في متصفحك.',
       linkText: 'الأدلة',
@@ -351,7 +412,7 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json']
 
 export function getShareImage(locale: Locale, address: string) {
   const imageAddress = pagesWithShareImage.includes(address) ? address : '/'

@@ -229,6 +229,214 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/check-file-upload': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Open your browser\'s developer tools, watch the Network tab while you open a file, and look for a request that sends data out (a POST or PUT) or one whose size is close to your file\'s. If none appears, and the file still opens with the network switched off, the site read it on your own computer.'],
+        },
+        {
+          heading: 'Step 1: open the Network tab',
+          paragraphs: ['The steps work in any desktop browser:'],
+          list: [
+            'Chrome and Edge: press F12, or Ctrl+Shift+I on Windows and Cmd+Option+I on a Mac, then open Network.',
+            'Firefox: the same keys, then Network.',
+            'Safari: in Settings, Advanced, turn on "Show features for web developers", then choose Develop, Show Web Inspector, and open Network.',
+            'Tick Preserve log in Chrome (Persist Logs in Firefox) so the list survives page changes, and press the clear button to start with an empty list.',
+          ],
+        },
+        {
+          heading: 'Step 2: open a file and read the list',
+          paragraphs: ['Choose or drop a file; a harmless test file is best. Every line in the Network tab is one request. Look at the Method, Size and Type columns, then click the Fetch/XHR filter, which shows only the requests the page\'s code sends on its own, the usual way files are uploaded:'],
+          list: [
+            'A POST or PUT request right after you choose the file, especially one close to the file\'s size, is an upload. Click it and open Payload (Chrome) or Request (Firefox) to see what was sent.',
+            'Requests to another domain at that moment, such as an analytics, storage or API address, mean something left the page. Check what they carry.',
+            'GET requests for .js, .css or font files are the site loading its own code. They download to you and do not carry your file.',
+            'WebSocket (WS) entries can carry data too. Open them and look at the Messages tab.',
+          ],
+        },
+        {
+          heading: 'Step 3: the offline test',
+          paragraphs: ['Load the site, then disconnect: turn off Wi-Fi, or change "No throttling" to "Offline" in the Network tab. Now open a file. If it opens and you can work with it, the reading happens in your browser; a site that needs its server shows an error or keeps spinning. Reconnect afterwards and watch the Network tab for a minute, because a page could in principle keep a copy and send it later.'],
+        },
+        {
+          heading: 'Step 4: read the site\'s security policy',
+          paragraphs: ['Click the first request in the list (the page itself), open Headers and find content-security-policy under Response Headers. Its connect-src part lists the addresses the page\'s code may contact: connect-src \'self\' means only the site\'s own address, and the browser itself blocks everything else. A policy is a strong signal but not proof on its own, so combine it with steps 2 and 3.'],
+        },
+        {
+          heading: 'What these checks show on OpenAnyDoc',
+          paragraphs: ['Try them on the CSV viewer, the Excel viewer or the JSON viewer: opening, editing and downloading a file sends no Fetch/XHR request, no POST and no request to another site. The page\'s policy is connect-src \'self\', and once a tool page has finished loading, its files open with the network off. The privacy policy names the one thing the host, Cloudflare, does see: ordinary page requests, never file contents.'],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }, { text: 'Excel viewer', path: '/excel-viewer' }, { text: 'JSON viewer', path: '/json-viewer' }, { text: 'privacy policy', path: '/privacy' }],
+        },
+        {
+          heading: 'What "processed in your browser" does not cover',
+          paragraphs: ['It keeps the file off the network, not safe on your computer. Anything with access to the device, such as a browser extension allowed to read every site, can still see the page. Use a browser profile without extensions for sensitive files, and close the tab when you are done: the file lives in the page\'s memory and is gone when the tab closes.'],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL}. If a check on OpenAnyDoc shows a request you did not expect, tell us what you saw.`],
+        },
+      ],
+    },
+    '/open-json-file': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'What a JSON file is',
+          paragraphs: ['JSON (JavaScript Object Notation) is plain text that stores data as objects of "key": value pairs and as lists in square brackets. APIs, configuration files and data exports use it. Any program that opens text can open a .json file; the hard part is reading it when it is one long line or nested many levels deep.'],
+        },
+        {
+          heading: 'The quickest way: open it in your browser',
+          paragraphs: ['Drop the file on the JSON viewer, or paste JSON with Ctrl+V (Cmd+V on a Mac). It shows a tree you can fold, a table when the file is a list of objects, and the text with line numbers. Nothing is uploaded, and it works on a phone too: tap Choose a file and pick the .json from Files or your downloads. Files up to 10 MB open.'],
+          links: [{ text: 'JSON viewer', path: '/json-viewer' }],
+        },
+        {
+          heading: 'On Windows or a Mac with no extra software',
+          paragraphs: ['Every browser opens JSON: drag the file onto a Chrome, Edge or Firefox window. Firefox shows a built-in viewer with a collapsible tree; the others show the text. Notepad on Windows and TextEdit on a Mac open it as text too: right-click the file, choose Open with, and pick the editor. They are fine for small files, but long lines and deep nesting are hard to follow.'],
+        },
+        {
+          heading: 'In a code editor',
+          paragraphs: ['If you work with JSON often, a code editor such as the free Visual Studio Code colours the syntax, folds objects and marks errors. Format Document (Shift+Alt+F on Windows, Shift+Option+F on a Mac) indents a file saved on one line.'],
+        },
+        {
+          heading: 'Make a one-line file readable',
+          paragraphs: ['A file saved on a single line is valid but unreadable. The JSON formatter indents it with 2 or 4 spaces (anything from 1 to 8, or a tab), can sort the keys, and minifies it again when you need a small file.'],
+          links: [{ text: 'JSON formatter', path: '/json-formatter' }],
+        },
+        {
+          heading: 'If the file will not open',
+          paragraphs: ['The message usually says why:'],
+          list: [
+            '"Unexpected token" or "Unexpected end of JSON input" means the text breaks a JSON rule: a trailing comma, single quotes or a comment. The JSON validator shows the line and column and repairs the common mistakes, and the guide to unexpected token errors explains each message.',
+            'A file that starts with < is an HTML page saved with a .json name, often an error page from a server.',
+            'A file with one JSON object per line (.jsonl or .ndjson) is JSON Lines: each line is a separate document, so an ordinary JSON parser rejects the file as a whole, and OpenAnyDoc does not open it yet.',
+            'Above 10 MB OpenAnyDoc refuses the file to keep the page responsive; a code editor or a command-line tool such as jq handles larger ones.',
+          ],
+          links: [{ text: 'JSON validator', path: '/json-validator' }, { text: 'guide to unexpected token errors', path: '/json-unexpected-token' }],
+        },
+        {
+          heading: 'Turn JSON into a spreadsheet',
+          paragraphs: ['If the file is a list of records, the JSON to CSV converter flattens it into columns (nested fields become headers such as address.city) and opens the result as a table you can download and open in Excel.'],
+          links: [{ text: 'JSON to CSV converter', path: '/json-to-csv' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and say what you see when you open the file (no personal data).`],
+        },
+      ],
+    },
+    '/open-xlsx-without-excel': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['An .xlsx file is an Excel workbook, but you do not need Excel to open it. A browser-based viewer, LibreOffice, Google Sheets and Apple Numbers all read it for free. They differ in two ways: whether the file is uploaded, and how much of the formatting and formulas they keep.'],
+        },
+        {
+          heading: 'In your browser, with nothing uploaded',
+          paragraphs: ['Drop the file on the Excel viewer. Every sheet opens with its values, formulas, number formats and merged cells, and fonts, colours and fills show for .xlsx and .xlsm files up to 8 MB. You can edit cells and formulas, which recalculate, and download the workbook as .xlsx again. It also opens .xls, .xlsm and .ods files. Password-protected workbooks cannot be opened.'],
+          links: [{ text: 'Excel viewer', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'Free desktop apps',
+          paragraphs: ['Both work offline and keep the file on your computer:'],
+          list: [
+            'LibreOffice Calc (Windows, Mac and Linux) opens and saves .xlsx and keeps formulas and most formatting. It is the closest free equivalent to desktop Excel.',
+            'Apple Numbers (Mac, iPhone and iPad) opens .xlsx and can export back to the Excel format; some Excel-only features are converted or dropped.',
+          ],
+        },
+        {
+          heading: 'Online suites (the file is uploaded)',
+          paragraphs: ['Google Sheets opens an .xlsx after you upload it to Google Drive, and Excel for the web does the same with OneDrive. Both need an account, and the workbook is stored on their servers. That is fine for most files, but not for payroll, customer lists or anything you are not allowed to share.'],
+        },
+        {
+          heading: 'On a phone',
+          paragraphs: ['Mobile browsers open OpenAnyDoc the same way: tap Choose a file and pick the workbook from Files or your downloads. Microsoft\'s Excel app and Google Sheets also have phone apps; both work with your account.'],
+        },
+        {
+          heading: 'Only need the data?',
+          paragraphs: ['If you only need the numbers in another program, convert the sheet. Excel to CSV turns the first sheet into a UTF-8 CSV that any program reads, and Excel to JSON turns it into a list of objects for code.'],
+          links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }, { text: 'Excel to JSON', path: '/excel-to-json' }],
+        },
+        {
+          heading: 'Older and related formats',
+          paragraphs: ['Three other extensions turn up next to .xlsx:'],
+          list: [
+            '.xls is the Excel 97 to 2003 format. The XLS viewer opens it with values, formulas and number formats, without cell styles.',
+            '.xlsm is a workbook with macros. Viewers open the data; the macros never run outside Excel, and OpenAnyDoc does not keep them when it saves.',
+            '.ods is the OpenDocument spreadsheet that LibreOffice saves by default. Excel and OpenAnyDoc both open it.',
+          ],
+          links: [{ text: 'XLS viewer', path: '/xls-viewer' }],
+        },
+        {
+          heading: 'What may look different',
+          paragraphs: ['Only Excel draws everything. When OpenAnyDoc saves a workbook it keeps values, formulas, number formats, merged cells and column widths, but not charts, images, pivot tables or conditional formats. If a workbook depends on those, keep the original file.'],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe the workbook (no personal data).`],
+        },
+      ],
+    },
+    '/csv-vs-excel-vs-json': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Use CSV for one table of plain data that many programs must read, Excel (.xlsx) for workbooks people open and edit with formulas and formatting, and JSON for structured or nested data that programs read and write.'],
+        },
+        {
+          heading: 'CSV: one plain table',
+          paragraphs: ['A CSV file is plain text: one line per row, with values separated by commas, or by semicolons in many countries. It has no types, sheets, formulas or formatting, so every program can read it and files stay small. The cost is ambiguity: neither the separator nor the text encoding is stored in the file, which is why CSV files sometimes open in one column or show broken Arabic in Excel.'],
+          links: [{ text: 'open in one column', path: '/csv-opens-in-one-column' }, { text: 'show broken Arabic', path: '/fix-arabic-csv-in-excel' }],
+        },
+        {
+          heading: 'Excel (.xlsx): a workbook',
+          paragraphs: ['An .xlsx file is a zip archive of XML files in the Office Open XML format. It holds several sheets, typed cells (numbers, dates, text), formulas, number formats, styles, charts and more. A sheet holds at most 1,048,576 rows and 16,384 columns. It is the right format when people will open the file, but it is harder for scripts to write and read than CSV.'],
+          links: [{ text: '1,048,576 rows', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'JSON: structured data',
+          paragraphs: ['JSON is text too, but it stores objects and lists that can nest: an order can contain a customer and a list of items. Values are typed as strings, numbers, true or false, and null; there is no date type, so dates are written as text. Almost every programming language reads it, which is why APIs use it, but a spreadsheet cannot show the nesting without flattening it.'],
+        },
+        {
+          heading: 'Side by side',
+          paragraphs: ['The differences that matter in practice:'],
+          list: [
+            'Structure: CSV is one table; Excel has several sheets; JSON has nested objects and lists.',
+            'Types: CSV has none, everything is text; Excel has numbers, dates, text and true/false; JSON has strings, numbers, true/false and null.',
+            'Formulas and formatting: only Excel.',
+            'Size: the CSV and JSON formats have no limit; Excel stops at about a million rows per sheet.',
+            'Who reads it: CSV, almost everything; Excel, spreadsheet apps and libraries; JSON, programs, APIs and dedicated viewers.',
+            'Text encoding: not recorded in a CSV file; Excel and JSON handle Unicode by design, and JSON exchanged between systems must be UTF-8.',
+          ],
+        },
+        {
+          heading: 'Which one to pick',
+          paragraphs: ['A rule of thumb for the common cases:'],
+          list: [
+            'Sending a table to someone who will open it in Excel: .xlsx, so nothing about separators or encoding can go wrong.',
+            'Importing into a database or another program: CSV in UTF-8.',
+            'Data for an app, an API or a configuration file: JSON.',
+            'Data with more than about a million rows: CSV or JSON, because Excel cannot hold it in one sheet.',
+          ],
+        },
+        {
+          heading: 'Converting between them',
+          paragraphs: ['Each conversion runs in your browser, uploads nothing, and opens the result in its own viewer: Excel to CSV, CSV to Excel, Excel to JSON, CSV to JSON and JSON to CSV. Turning JSON into a table flattens nested fields into columns such as address.city, and converting a CSV makes its header row the JSON keys.'],
+          links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }, { text: 'CSV to Excel', path: '/csv-to-excel' }, { text: 'Excel to JSON', path: '/excel-to-json' }, { text: 'CSV to JSON', path: '/csv-to-json' }, { text: 'JSON to CSV', path: '/json-to-csv' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} if a conversion does not give you what you expected (no personal data).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
@@ -239,12 +447,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'CSV opens in one column in Excel: how to fix the delimiter',
             'CSV too big for Excel: the 1,048,576-row limit and what to do',
             'JSON "unexpected token" errors: find the line and fix it',
+            'How to check that a website does not upload your file',
+            'How to open a JSON file',
+            'How to open an XLSX file without Excel',
+            'CSV vs Excel vs JSON: the differences and when to use each',
           ],
           links: [
             { text: 'Why your CSV shows broken Arabic text in Excel', path: '/fix-arabic-csv-in-excel' },
             { text: 'CSV opens in one column in Excel: how to fix the delimiter', path: '/csv-opens-in-one-column' },
             { text: 'CSV too big for Excel: the 1,048,576-row limit and what to do', path: '/csv-too-big-for-excel' },
             { text: 'JSON "unexpected token" errors: find the line and fix it', path: '/json-unexpected-token' },
+            { text: 'How to check that a website does not upload your file', path: '/check-file-upload' },
+            { text: 'How to open a JSON file', path: '/open-json-file' },
+            { text: 'How to open an XLSX file without Excel', path: '/open-xlsx-without-excel' },
+            { text: 'CSV vs Excel vs JSON: the differences and when to use each', path: '/csv-vs-excel-vs-json' },
           ],
         },
         {
@@ -480,6 +696,214 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/check-file-upload': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'الجواب المختصر',
+          paragraphs: ['افتح أدوات المطوّر في متصفحك، وراقب تبويب Network وأنت تفتح ملفًا، وابحث عن طلب يرسل بيانات إلى الخارج (POST أو PUT) أو طلب يقترب حجمه من حجم ملفك. إن لم يظهر شيء من ذلك، وفُتح الملف والشبكة مفصولة، فالموقع قرأه على جهازك أنت.'],
+        },
+        {
+          heading: 'الخطوة 1: افتح تبويب Network',
+          paragraphs: ['تعمل الخطوات في أي متصفح على الحاسوب:'],
+          list: [
+            'Chrome وEdge: اضغط F12، أو Ctrl+Shift+I على ويندوز وCmd+Option+I على ماك، ثم افتح Network.',
+            'Firefox: الاختصارات نفسها، ثم Network.',
+            'Safari: من الإعدادات ثم «متقدم» فعّل «إظهار ميزات مطوري الويب»، ثم اختر Develop ثم Show Web Inspector وافتح Network.',
+            'فعّل Preserve log في Chrome (أو Persist Logs في Firefox) كي تبقى القائمة عند تغيّر الصفحة، واضغط زر المسح لتبدأ بقائمة فارغة.',
+          ],
+        },
+        {
+          heading: 'الخطوة 2: افتح ملفًا واقرأ القائمة',
+          paragraphs: ['اختر ملفًا أو أفلته، ويُفضَّل ملف تجربة لا ضرر منه. كل سطر في تبويب Network طلب واحد. انظر إلى أعمدة Method وSize وType، ثم اضغط مرشّح Fetch/XHR الذي يعرض الطلبات التي ترسلها شيفرة الصفحة من تلقاء نفسها، وهي الطريقة المعتادة لرفع الملفات:'],
+          list: [
+            'طلب POST أو PUT بعد اختيار الملف مباشرة، خاصة إن اقترب حجمه من حجم الملف، هو رفع. اضغط عليه وافتح Payload في Chrome أو Request في Firefox لترى ما أُرسل.',
+            'طلبات إلى نطاق آخر في تلك اللحظة، مثل عنوان تحليلات أو تخزين أو API، تعني أن شيئًا غادر الصفحة. افحص ما تحمله.',
+            'طلبات GET لملفات js وcss والخطوط هي الموقع يحمّل شيفرته. تنزل إليك ولا تحمل ملفك.',
+            'مدخلات WebSocket (WS) قد تحمل بيانات أيضًا. افتحها وانظر في تبويب Messages.',
+          ],
+        },
+        {
+          heading: 'الخطوة 3: اختبار قطع الاتصال',
+          paragraphs: ['حمّل الموقع ثم افصل الشبكة: أطفئ الواي فاي، أو غيّر «No throttling» إلى «Offline» في تبويب Network. افتح الآن ملفًا. إن فُتح وأمكنك العمل عليه، فالقراءة تحدث في متصفحك؛ أما الموقع الذي يحتاج خادمه فيعرض خطأ أو يبقى في انتظار. أعد الاتصال بعدها وراقب تبويب Network دقيقة، لأن الصفحة قادرة نظريًا على الاحتفاظ بنسخة وإرسالها لاحقًا.'],
+        },
+        {
+          heading: 'الخطوة 4: اقرأ سياسة أمان الموقع',
+          paragraphs: ['اضغط أول طلب في القائمة (الصفحة نفسها)، وافتح Headers، وابحث عن content-security-policy تحت Response Headers. يذكر جزء connect-src العناوين التي يُسمح لشيفرة الصفحة بالاتصال بها: connect-src \'self\' تعني عنوان الموقع وحده، ويمنع المتصفح نفسه كل ما عداه. السياسة دليل قوي لكنها وحدها ليست برهانًا، فاجمعها مع الخطوتين 2 و3.'],
+        },
+        {
+          heading: 'ماذا تُظهر هذه الاختبارات على OpenAnyDoc',
+          paragraphs: ['جرّبها على عارض CSV أو عارض Excel أو عارض JSON: فتح الملف وتعديله وتنزيله لا يرسل أي طلب Fetch/XHR، ولا طلب POST، ولا طلبًا إلى موقع آخر. سياسة الصفحة هي connect-src \'self\'، وبعد أن تكتمل صفحة الأداة تُفتح ملفاتها والشبكة مفصولة. وتذكر سياسة الخصوصية الشيء الوحيد الذي يراه المستضيف Cloudflare: طلبات الصفحات العادية، لا محتوى الملفات أبدًا.'],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }, { text: 'عارض Excel', path: '/excel-viewer' }, { text: 'عارض JSON', path: '/json-viewer' }, { text: 'سياسة الخصوصية', path: '/privacy' }],
+        },
+        {
+          heading: 'ما لا تغطيه «المعالجة في المتصفح»',
+          paragraphs: ['هي تُبعد الملف عن الشبكة، لكنها لا تحميه على جهازك. فكل ما له وصول إلى الجهاز، مثل إضافة متصفح مسموح لها بقراءة كل المواقع، يستطيع رؤية الصفحة. استخدم ملفًا شخصيًا في المتصفح بلا إضافات للملفات الحساسة، وأغلق التبويب عند الانتهاء: يبقى الملف في ذاكرة الصفحة ويختفي حين يُغلق التبويب.'],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL}. وإن أظهر اختبار على OpenAnyDoc طلبًا لم تتوقعه، فأخبرنا بما رأيت.`],
+        },
+      ],
+    },
+    '/open-json-file': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'ما هو ملف JSON',
+          paragraphs: ['JSON نص عادي يخزّن البيانات في كائنات من أزواج "مفتاح": قيمة، وفي قوائم بين أقواس مربعة. تستخدمه واجهات API وملفات الإعدادات وتصدير البيانات. كل برنامج يفتح النصوص يفتح ملف json؛ الصعوبة في قراءته حين يكون سطرًا واحدًا طويلًا أو متداخلًا على مستويات كثيرة.'],
+        },
+        {
+          heading: 'الطريقة الأسرع: افتحه في متصفحك',
+          paragraphs: ['أفلت الملف على عارض JSON، أو الصق JSON بضغط Ctrl+V (أو Cmd+V على ماك). يعرض شجرة قابلة للطي، وجدولًا حين يكون الملف قائمة كائنات، والنص بأرقام الأسطر. لا يُرفع شيء، ويعمل على الهاتف أيضًا: اضغط «اختر ملفًا» وحدد ملف json من «الملفات» أو مجلد التنزيلات. تُفتح الملفات حتى 10 ميغابايت.'],
+          links: [{ text: 'عارض JSON', path: '/json-viewer' }],
+        },
+        {
+          heading: 'على ويندوز أو ماك دون برامج إضافية',
+          paragraphs: ['كل متصفح يفتح JSON: اسحب الملف إلى نافذة Chrome أو Edge أو Firefox. يعرض Firefox عارضًا مدمجًا بشجرة قابلة للطي، وتعرض المتصفحات الأخرى النص. ويفتحه «المفكرة» على ويندوز وTextEdit على ماك نصًا أيضًا: اضغط بزر الفأرة الأيمن على الملف، واختر «فتح باستخدام»، ثم المحرر. يكفيان للملفات الصغيرة، لكن الأسطر الطويلة والتداخل العميق يصعب تتبعهما.'],
+        },
+        {
+          heading: 'في محرر شيفرة',
+          paragraphs: ['إن كنت تتعامل مع JSON كثيرًا، فمحرر شيفرة مثل Visual Studio Code المجاني يلوّن الصياغة ويطوي الكائنات ويُعلّم الأخطاء. ويرتّب أمر Format Document (Shift+Alt+F على ويندوز، وShift+Option+F على ماك) ملفًا محفوظًا في سطر واحد.'],
+        },
+        {
+          heading: 'اجعل الملف المحفوظ في سطر واحد مقروءًا',
+          paragraphs: ['الملف المحفوظ في سطر واحد صالح لكنه غير مقروء. يضيف منسّق JSON المسافات البادئة بمسافتين أو أربع (أي عدد من 1 إلى 8، أو علامة جدولة)، ويرتّب المفاتيح، ويضغط الملف من جديد حين تحتاج ملفًا صغيرًا.'],
+          links: [{ text: 'منسّق JSON', path: '/json-formatter' }],
+        },
+        {
+          heading: 'إن لم يُفتح الملف',
+          paragraphs: ['الرسالة تقول السبب في الغالب:'],
+          list: [
+            '"Unexpected token" أو "Unexpected end of JSON input" تعني أن النص يخالف قاعدة من قواعد JSON: فاصلة زائدة، أو علامات اقتباس مفردة، أو تعليق. يعرض مدقق JSON السطر والعمود ويصلح الأخطاء الشائعة، ويشرح دليل أخطاء unexpected token كل رسالة.',
+            'الملف الذي يبدأ بالعلامة < صفحة HTML حُفظت باسم json، وغالبًا صفحة خطأ من خادم.',
+            'الملف الذي فيه كائن JSON في كل سطر (jsonl أو ndjson) هو JSON Lines: كل سطر مستند مستقل، فيرفض محلل JSON العادي الملف كله، ولا يفتحه OpenAnyDoc بعد.',
+            'فوق 10 ميغابايت يرفض OpenAnyDoc الملف كي تبقى الصفحة سريعة الاستجابة؛ ويتعامل محرر شيفرة أو أداة سطر أوامر مثل jq مع الملفات الأكبر.',
+          ],
+          links: [{ text: 'مدقق JSON', path: '/json-validator' }, { text: 'دليل أخطاء unexpected token', path: '/json-unexpected-token' }],
+        },
+        {
+          heading: 'حوّل JSON إلى جدول',
+          paragraphs: ['إن كان الملف قائمة سجلات، فإن محوّل JSON إلى CSV يسطّح الحقول المتداخلة في أعمدة (تصبح عناوينها مثل address.city)، ويفتح النتيجة جدولًا يمكنك تنزيله وفتحه في Excel.'],
+          links: [{ text: 'محوّل JSON إلى CSV', path: '/json-to-csv' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} واذكر ما يظهر حين تفتح الملف (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/open-xlsx-without-excel': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'الجواب المختصر',
+          paragraphs: ['ملف xlsx مصنف Excel، لكنك لا تحتاج إلى Excel لفتحه. يقرؤه مجانًا عارضٌ في المتصفح، وLibreOffice، وGoogle Sheets، وApple Numbers. ويختلفون في أمرين: هل يُرفع الملف، وكم يحفظون من التنسيق والصيغ.'],
+        },
+        {
+          heading: 'في متصفحك، دون رفع أي شيء',
+          paragraphs: ['أفلت الملف على عارض Excel. تُفتح كل الأوراق بقيمها وصيغها وتنسيقات أرقامها وخلاياها المدمجة، وتظهر الخطوط والألوان والتعبئة في ملفات xlsx وxlsm حتى 8 ميغابايت. يمكنك تعديل الخلايا والصيغ التي يُعاد حسابها، وتنزيل المصنف بصيغة xlsx من جديد. ويفتح أيضًا ملفات xls وxlsm وods. أما المصنفات المحمية بكلمة مرور فلا تُفتح.'],
+          links: [{ text: 'عارض Excel', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'برامج مجانية للحاسوب',
+          paragraphs: ['كلاهما يعمل دون إنترنت ويُبقي الملف على حاسوبك:'],
+          list: [
+            'LibreOffice Calc (ويندوز وماك ولينكس) يفتح xlsx ويحفظه، ويحتفظ بالصيغ ومعظم التنسيق. هو أقرب بديل مجاني لبرنامج Excel على الحاسوب.',
+            'Apple Numbers (ماك وآيفون وآيباد) يفتح xlsx ويمكنه التصدير بصيغة Excel من جديد؛ وبعض الميزات الخاصة بـ Excel تُحوَّل أو تُحذف.',
+          ],
+        },
+        {
+          heading: 'الحزم على الإنترنت (يُرفع الملف)',
+          paragraphs: ['يفتح Google Sheets ملف xlsx بعد رفعه إلى Google Drive، ويفعل Excel للويب الشيء نفسه مع OneDrive. كلاهما يحتاج حسابًا، ويُخزَّن المصنف على خوادمهما. هذا مقبول لمعظم الملفات، لكن ليس لكشوف الرواتب أو قوائم العملاء أو أي ملف لا يُسمح لك بمشاركته.'],
+        },
+        {
+          heading: 'على الهاتف',
+          paragraphs: ['تفتح متصفحات الهاتف OpenAnyDoc بالطريقة نفسها: اضغط «اختر ملفًا» وحدد المصنف من «الملفات» أو التنزيلات. ولتطبيق Excel من مايكروسوفت ولـ Google Sheets تطبيقات للهاتف أيضًا، ويعمل كلاهما بحسابك.'],
+        },
+        {
+          heading: 'تحتاج البيانات فقط؟',
+          paragraphs: ['إن كنت تحتاج الأرقام في برنامج آخر فقط، فحوّل الورقة: تحويل Excel إلى CSV يجعل الورقة الأولى ملف CSV بترميز UTF-8 يقرؤه كل برنامج، وتحويل Excel إلى JSON يجعلها قائمة كائنات للبرمجة.'],
+          links: [{ text: 'تحويل Excel إلى CSV', path: '/excel-to-csv' }, { text: 'تحويل Excel إلى JSON', path: '/excel-to-json' }],
+        },
+        {
+          heading: 'الصيغ الأقدم والقريبة',
+          paragraphs: ['ثلاث امتدادات أخرى تظهر إلى جانب xlsx:'],
+          list: [
+            'xls صيغة Excel من 97 إلى 2003. يفتحها عارض XLS بالقيم والصيغ وتنسيقات الأرقام، دون أنماط الخلايا.',
+            'xlsm مصنف فيه وحدات ماكرو. تفتح العارضات البيانات؛ ولا تعمل وحدات الماكرو خارج Excel، ولا يحتفظ بها OpenAnyDoc عند الحفظ.',
+            'ods صيغة جداول OpenDocument التي يحفظ بها LibreOffice افتراضيًا. ويفتحها Excel وOpenAnyDoc كلاهما.',
+          ],
+          links: [{ text: 'عارض XLS', path: '/xls-viewer' }],
+        },
+        {
+          heading: 'ما قد يبدو مختلفًا',
+          paragraphs: ['لا يرسم كل شيء إلا Excel. حين يحفظ OpenAnyDoc المصنف يحتفظ بالقيم والصيغ وتنسيقات الأرقام والخلايا المدمجة وعرض الأعمدة، لكن لا يحتفظ بالمخططات والصور والجداول المحورية والتنسيق الشرطي. إن كان المصنف يعتمد على هذه العناصر، فاحتفظ بالملف الأصلي.'],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصِف المصنف (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/csv-vs-excel-vs-json': {
+      published: '2026-10-30',
+      updated: '2026-10-30',
+      sections: [
+        {
+          heading: 'الجواب المختصر',
+          paragraphs: ['استخدم CSV لجدول واحد من بيانات بسيطة يجب أن تقرأه برامج كثيرة، وExcel (xlsx) لمصنفات يفتحها الناس ويعدّلونها بالصيغ والتنسيق، وJSON للبيانات المنظمة أو المتداخلة التي تقرؤها البرامج وتكتبها.'],
+        },
+        {
+          heading: 'CSV: جدول نصي واحد',
+          paragraphs: ['ملف CSV نص عادي: سطر لكل صف، والقيم مفصولة بفواصل، أو بفواصل منقوطة في بلدان كثيرة. لا أنواع فيه ولا أوراق ولا صيغ ولا تنسيق، فيقرؤه كل برنامج ويبقى صغيرًا. والثمن هو الغموض: لا يُخزَّن الفاصل ولا ترميز النص داخل الملف، ولهذا يُفتح ملف CSV أحيانًا في عمود واحد أو تظهر العربية فيه مشوّهة في Excel.'],
+          links: [{ text: 'في عمود واحد', path: '/csv-opens-in-one-column' }, { text: 'تظهر العربية فيه مشوّهة', path: '/fix-arabic-csv-in-excel' }],
+        },
+        {
+          heading: 'Excel (xlsx): مصنف',
+          paragraphs: ['ملف xlsx أرشيف zip لملفات XML بصيغة Office Open XML. يحمل أوراقًا عدة، وخلايا لها أنواع (أرقام وتواريخ ونصوص)، وصيغًا، وتنسيقات أرقام، وأنماطًا، ومخططات وغيرها. تتسع الورقة الواحدة لـ 1,048,576 صفًا و16,384 عمودًا على الأكثر. هي الصيغة المناسبة حين يفتح الناس الملف، لكنها أصعب على البرامج كتابةً وقراءةً من CSV.'],
+          links: [{ text: '1,048,576 صفًا', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'JSON: بيانات منظمة',
+          paragraphs: ['JSON نص أيضًا، لكنه يخزّن كائنات وقوائم يمكن أن تتداخل: قد يحوي الطلب عميلًا وقائمة أصناف. والقيم لها أنواع: نصوص وأرقام وtrue أو false وnull؛ ولا يوجد نوع للتاريخ، فتُكتب التواريخ نصًا. تقرؤه كل لغات البرمجة تقريبًا، ولهذا تستخدمه واجهات API، لكن جدول البيانات لا يعرض التداخل إلا بعد تسطيحه.'],
+        },
+        {
+          heading: 'مقارنة سريعة',
+          paragraphs: ['الفروق التي تهم في العمل اليومي:'],
+          list: [
+            'البنية: CSV جدول واحد؛ وExcel أوراق عدة؛ وJSON كائنات وقوائم متداخلة.',
+            'الأنواع: لا أنواع في CSV، فكل القيم نص؛ وفي Excel أرقام وتواريخ ونصوص وصح/خطأ؛ وفي JSON نصوص وأرقام وtrue/false وnull.',
+            'الصيغ والتنسيق: في Excel وحده.',
+            'الحجم: لا حد في صيغتي CSV وJSON؛ ويتوقف Excel عند نحو مليون صف في الورقة.',
+            'من يقرؤه: CSV يقرؤه كل شيء تقريبًا؛ وExcel تقرؤه برامج الجداول ومكتباتها؛ وJSON تقرؤه البرامج وواجهات API والعارضات المخصصة.',
+            'ترميز النص: لا يُسجَّل في ملف CSV؛ ويتعامل Excel وJSON مع Unicode بطبيعتهما، ويجب أن يكون JSON المتبادل بين الأنظمة بترميز UTF-8.',
+          ],
+        },
+        {
+          heading: 'أيها تختار',
+          paragraphs: ['قاعدة عامة للحالات الشائعة:'],
+          list: [
+            'ترسل جدولًا لشخص سيفتحه في Excel: xlsx، فلا يمكن أن يخطئ الفاصل أو الترميز.',
+            'تستورد إلى قاعدة بيانات أو برنامج آخر: CSV بترميز UTF-8.',
+            'بيانات لتطبيق أو API أو ملف إعدادات: JSON.',
+            'بيانات تتجاوز نحو مليون صف: CSV أو JSON، لأن Excel لا يتسع لها في ورقة واحدة.',
+          ],
+        },
+        {
+          heading: 'التحويل بينها',
+          paragraphs: ['كل تحويل يعمل في متصفحك ولا يرفع شيئًا، ويفتح النتيجة في عارضها: Excel إلى CSV، وCSV إلى Excel، وExcel إلى JSON، وCSV إلى JSON، وJSON إلى CSV. تحويل JSON إلى جدول يسطّح الحقول المتداخلة في أعمدة مثل address.city، وتحويل ملف CSV يجعل صف العناوين مفاتيح JSON.'],
+          links: [{ text: 'Excel إلى CSV', path: '/excel-to-csv' }, { text: 'CSV إلى Excel', path: '/csv-to-excel' }, { text: 'Excel إلى JSON', path: '/excel-to-json' }, { text: 'CSV إلى JSON', path: '/csv-to-json' }, { text: 'JSON إلى CSV', path: '/json-to-csv' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} إن لم يعطك تحويل ما توقعته (دون بيانات شخصية).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
@@ -490,12 +914,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'ملف CSV يُفتح في عمود واحد في Excel: كيف تصلح الفاصل',
             'ملف CSV أكبر من أن يفتحه Excel: حد 1,048,576 صفًا وما تفعله',
             'أخطاء JSON "unexpected token": اعثر على السطر وأصلحه',
+            'كيف تتحقق من أن الموقع لا يرفع ملفك',
+            'كيف تفتح ملف JSON',
+            'كيف تفتح ملف XLSX بدون Excel',
+            'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها',
           ],
           links: [
             { text: 'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel', path: '/fix-arabic-csv-in-excel' },
             { text: 'ملف CSV يُفتح في عمود واحد في Excel: كيف تصلح الفاصل', path: '/csv-opens-in-one-column' },
             { text: 'ملف CSV أكبر من أن يفتحه Excel: حد 1,048,576 صفًا وما تفعله', path: '/csv-too-big-for-excel' },
             { text: 'أخطاء JSON "unexpected token": اعثر على السطر وأصلحه', path: '/json-unexpected-token' },
+            { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
+            { text: 'كيف تفتح ملف JSON', path: '/open-json-file' },
+            { text: 'كيف تفتح ملف XLSX بدون Excel', path: '/open-xlsx-without-excel' },
+            { text: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها', path: '/csv-vs-excel-vs-json' },
           ],
         },
         {

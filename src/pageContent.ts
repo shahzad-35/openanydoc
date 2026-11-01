@@ -26,20 +26,20 @@ export type FormatGuide = {
 // The "Related tools" links at the end of each format and landing page: other live pages a visitor of that page may want next.
 // Keyed by the page's address; the link text is each page's `linkText` in seo.ts, in the page's language.
 export const relatedPages: Record<string, string[]> = {
-  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-to-json', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column'],
+  '/csv-viewer': ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-to-json', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/check-file-upload'],
   '/tsv-viewer': ['/csv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-opens-in-one-column'],
   '/large-csv-viewer': ['/csv-viewer', '/tsv-viewer', '/excel-viewer', '/csv-too-big-for-excel'],
-  '/excel-viewer': ['/xls-viewer', '/csv-viewer', '/excel-to-csv', '/excel-to-json'],
-  '/xls-viewer': ['/excel-viewer', '/csv-viewer', '/excel-to-csv'],
-  '/json-viewer': ['/json-formatter', '/json-validator', '/json-to-csv', '/csv-viewer'],
-  '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token'],
+  '/excel-viewer': ['/xls-viewer', '/csv-viewer', '/excel-to-csv', '/excel-to-json', '/open-xlsx-without-excel'],
+  '/xls-viewer': ['/excel-viewer', '/csv-viewer', '/excel-to-csv', '/open-xlsx-without-excel'],
+  '/json-viewer': ['/json-formatter', '/json-validator', '/json-to-csv', '/csv-viewer', '/open-json-file'],
+  '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token', '/open-json-file'],
   '/json-validator': ['/json-formatter', '/json-viewer', '/json-unexpected-token'],
   '/txt-viewer': ['/csv-viewer', '/json-viewer'],
-  '/excel-to-csv': ['/excel-to-json', '/excel-viewer', '/fix-arabic-csv-in-excel'],
+  '/excel-to-csv': ['/excel-to-json', '/excel-viewer', '/fix-arabic-csv-in-excel', '/csv-vs-excel-vs-json'],
   '/csv-to-excel': ['/csv-to-json', '/csv-viewer', '/csv-too-big-for-excel'],
   '/excel-to-json': ['/excel-to-csv', '/excel-viewer', '/json-viewer'],
-  '/csv-to-json': ['/csv-to-excel', '/json-to-csv', '/csv-viewer'],
-  '/json-to-csv': ['/csv-to-json', '/json-viewer', '/json-validator'],
+  '/csv-to-json': ['/csv-to-excel', '/json-to-csv', '/csv-viewer', '/csv-vs-excel-vs-json'],
+  '/json-to-csv': ['/csv-to-json', '/json-viewer', '/json-validator', '/csv-vs-excel-vs-json'],
 }
 
 // Keyed by language, then by the format or landing page's address, like pageSeo in seo.ts. Both languages have the same steps and questions in the same order.
@@ -79,7 +79,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'Is my file uploaded?',
-          answer: 'No. Your browser reads the CSV file itself and draws the table on your screen. Nothing is sent to a server, so the file never leaves your device.',
+          answer: 'No. Your browser reads the CSV file itself and draws the table on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.',
+          link: { text: 'how to check that a website does not upload your file', path: '/check-file-upload' },
         },
         {
           question: 'Can I edit and save it?',
@@ -103,7 +104,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
+          answer: 'Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com.',
         },
         {
           question: 'Why does my CSV file open in a single column?',
@@ -164,7 +165,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'Is my file uploaded?',
-          answer: 'No. Your browser reads the workbook itself and draws the sheets on your screen. Nothing is sent to a server, so the file never leaves your device.',
+          answer: 'No. Your browser reads the workbook itself and draws the sheets on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.',
+          link: { text: 'how to check that a website does not upload your file', path: '/check-file-upload' },
         },
         {
           question: 'Can I edit and save it?',
@@ -188,11 +190,12 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
+          answer: 'Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com.',
         },
         {
           question: 'How do I open an XLSX file online without Excel?',
-          answer: 'Drop the .xlsx file on this page. It opens in your browser with its sheets, formatting and merged cells, and you can edit it and save it again, with no Excel, no account and no upload.',
+          answer: 'Drop the .xlsx file on this page. It opens in your browser with its sheets, formatting and merged cells, and you can edit it and save it again, with no Excel, no account and no upload. For the other free ways, and what each keeps, read how to open an XLSX file without Excel.',
+          link: { text: 'how to open an XLSX file without Excel', path: '/open-xlsx-without-excel' },
         },
         {
           question: 'Do formulas recalculate when I edit a cell?',
@@ -247,7 +250,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'Is my file uploaded?',
-          answer: 'No. Your browser reads and checks the JSON itself, and pasted JSON stays in the page too. Nothing is sent to a server, which makes it suitable for API responses, tokens and internal configuration.',
+          answer: 'No. Your browser reads and checks the JSON itself, and pasted JSON stays in the page too. Nothing is sent to a server, which makes it suitable for API responses, tokens and internal configuration. To check it yourself, see how to check that a website does not upload your file.',
+          link: { text: 'how to check that a website does not upload your file', path: '/check-file-upload' },
         },
         {
           question: 'Can I edit and save it?',
@@ -271,7 +275,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
+          answer: 'Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com.',
         },
         {
           question: 'How do I format, beautify or pretty print JSON online?',
@@ -325,7 +329,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'Is my file uploaded?',
-          answer: 'No. Your browser reads the text file itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device.',
+          answer: 'No. Your browser reads the text file itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.',
+          link: { text: 'how to check that a website does not upload your file', path: '/check-file-upload' },
         },
         {
           question: 'Can I edit and save it?',
@@ -349,7 +354,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'Can my company host its own copy?',
-          answer: 'Not at the moment: OpenAnyDoc is only offered at openanydoc.com, and no licence for running your own copy is available yet. If your company needs this, write to support@openanydoc.com.',
+          answer: 'Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com.',
         },
         {
           question: 'How do I change line endings (LF to CRLF) in a text file?',
@@ -858,7 +863,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'هل يُرفع ملفي؟',
-          answer: 'لا. يقرأ متصفحك ملف CSV بنفسه ويرسم الجدول على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك.',
+          answer: 'لا. يقرأ متصفحك ملف CSV بنفسه ويرسم الجدول على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك. ولتتحقق بنفسك، اقرأ كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          link: { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
         },
         {
           question: 'هل يمكنني تعديله وحفظه؟',
@@ -882,7 +888,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
+          answer: 'نعم. الكود المصدري متاح للجميع على GitHub بترخيص MIT. ابنِه وقدّم المجلد الناتج من أي خادم ويب في شبكتكم، وستبقى الملفات التي يفتحها الموظفون على أجهزتهم دون أن تغادرها. للأسئلة: support@openanydoc.com.',
         },
         {
           question: 'لماذا يُفتح ملف CSV في عمود واحد؟',
@@ -943,7 +949,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'هل يُرفع ملفي؟',
-          answer: 'لا. يقرأ متصفحك المصنف بنفسه ويرسم الأوراق على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك.',
+          answer: 'لا. يقرأ متصفحك المصنف بنفسه ويرسم الأوراق على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك. ولتتحقق بنفسك، اقرأ كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          link: { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
         },
         {
           question: 'هل يمكنني تعديله وحفظه؟',
@@ -967,11 +974,12 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
+          answer: 'نعم. الكود المصدري متاح للجميع على GitHub بترخيص MIT. ابنِه وقدّم المجلد الناتج من أي خادم ويب في شبكتكم، وستبقى الملفات التي يفتحها الموظفون على أجهزتهم دون أن تغادرها. للأسئلة: support@openanydoc.com.',
         },
         {
           question: 'كيف أفتح ملف اكسل بدون برنامج Excel؟',
-          answer: 'أفلت ملف .xlsx على هذه الصفحة. يُفتح في متصفحك مع أوراقه وتنسيقه وخلاياه المدمجة، ويمكنك تعديله وحفظه من جديد، بدون Excel وبدون حساب وبدون رفع.',
+          answer: 'أفلت ملف .xlsx على هذه الصفحة. يُفتح في متصفحك مع أوراقه وتنسيقه وخلاياه المدمجة، ويمكنك تعديله وحفظه من جديد، بدون Excel وبدون حساب وبدون رفع. ولمعرفة الطرق المجانية الأخرى وما يحتفظ به كل منها، اقرأ كيف تفتح ملف XLSX بدون Excel.',
+          link: { text: 'كيف تفتح ملف XLSX بدون Excel', path: '/open-xlsx-without-excel' },
         },
         {
           question: 'هل تُعاد حساب الصيغ عند تعديل خلية؟',
@@ -1026,7 +1034,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'هل يُرفع ملفي؟',
-          answer: 'لا. يقرأ متصفحك JSON ويتحقق منه بنفسه، ويبقى JSON الملصوق في الصفحة أيضًا. لا يُرسل شيء إلى أي خادم، ما يجعله مناسبًا لاستجابات API والرموز المميزة وإعدادات الأنظمة الداخلية.',
+          answer: 'لا. يقرأ متصفحك JSON ويتحقق منه بنفسه، ويبقى JSON الملصوق في الصفحة أيضًا. لا يُرسل شيء إلى أي خادم، ما يجعله مناسبًا لاستجابات API والرموز المميزة وإعدادات الأنظمة الداخلية. ولتتحقق بنفسك، اقرأ كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          link: { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
         },
         {
           question: 'هل يمكنني تعديله وحفظه؟',
@@ -1050,7 +1059,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
+          answer: 'نعم. الكود المصدري متاح للجميع على GitHub بترخيص MIT. ابنِه وقدّم المجلد الناتج من أي خادم ويب في شبكتكم، وستبقى الملفات التي يفتحها الموظفون على أجهزتهم دون أن تغادرها. للأسئلة: support@openanydoc.com.',
         },
         {
           question: 'كيف أنسّق JSON اون لاين (Pretty Print)؟',
@@ -1104,7 +1113,8 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
       faq: [
         {
           question: 'هل يُرفع ملفي؟',
-          answer: 'لا. يقرأ متصفحك الملف النصي بنفسه ويعرضه على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك.',
+          answer: 'لا. يقرأ متصفحك الملف النصي بنفسه ويعرضه على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك. ولتتحقق بنفسك، اقرأ كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          link: { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
         },
         {
           question: 'هل يمكنني تعديله وحفظه؟',
@@ -1128,7 +1138,7 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         },
         {
           question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
-          answer: 'ليس حاليًا: يُقدَّم OpenAnyDoc على openanydoc.com فقط، ولا يوجد بعدُ ترخيص لتشغيل نسخة خاصة بك. إذا كانت شركتك تحتاج إلى ذلك، فراسلنا على support@openanydoc.com.',
+          answer: 'نعم. الكود المصدري متاح للجميع على GitHub بترخيص MIT. ابنِه وقدّم المجلد الناتج من أي خادم ويب في شبكتكم، وستبقى الملفات التي يفتحها الموظفون على أجهزتهم دون أن تغادرها. للأسئلة: support@openanydoc.com.',
         },
         {
           question: 'كيف أغيّر نهايات الأسطر (من LF إلى CRLF) في ملف نصي؟',

@@ -9,7 +9,7 @@ import { countExcelEdits, createEmptyExcelEdits, describeExcelChanges } from './
 import type { ExcelEdits } from './excel/excelEdits'
 import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
 import type { CsvEdits } from './csv/csvCells'
-import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges } from './json/jsonModel'
+import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, parseJsonText } from './json/jsonModel'
 import { countTextChanges, createEmptyTextEdits, describeTextChanges } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
@@ -93,6 +93,9 @@ export type FormatDefinition = {
   // Two or three short feature keys (translated in src/i18n/en.json and ar.json), used in the changelog.
   highlights?: string[]
   ViewerComponent: LazyExoticComponent<ComponentType<FormatViewerProps>>
+  // Fetches everything opening a file of this format needs (the viewer and what it loads on open), so a page can do it while idle
+  // and the file then opens with no network.
+  preloadViewer?: () => Promise<unknown>
   // The viewer draws the whole screen itself (JSON): no shared header, edit toolbar or save tip around it.
   ownsWholePage?: boolean
   // Larger files are refused before they are read, because the page would become slow with them.
@@ -102,6 +105,11 @@ export type FormatDefinition = {
 }
 
 const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
+const loadCsvViewer = () => import('./csv/CsvViewer')
+const loadTextViewer = () => import('./text/TextViewer')
+const loadJsonViewer = () => import('./json/JsonViewer')
+const loadExcelViewer = () => import('./excel/ExcelViewer')
+const loadExcelEditing = () => import('./excel/excelEditing')
 
 // To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now.
 export const formatDefinitions: FormatDefinition[] = [
@@ -109,7 +117,8 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'csv',
     addedOn: '2026-10-05',
     highlights: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'],
-    ViewerComponent: lazy(() => import('./csv/CsvViewer')),
+    ViewerComponent: lazy(loadCsvViewer),
+    preloadViewer: loadCsvViewer,
     ownsWholePage: true,
     editing: {
       createEmptyEdits: createEmptyCsvEdits,
@@ -122,7 +131,8 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'text',
     addedOn: '2026-10-14',
     highlights: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'],
-    ViewerComponent: lazy(() => import('./text/TextViewer')),
+    ViewerComponent: lazy(loadTextViewer),
+    preloadViewer: loadTextViewer,
     ownsWholePage: true,
     editing: {
       createEmptyEdits: createEmptyTextEdits,
@@ -135,7 +145,9 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'json',
     addedOn: '2026-10-14',
     highlights: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'],
-    ViewerComponent: lazy(() => import('./json/JsonViewer')),
+    ViewerComponent: lazy(loadJsonViewer),
+    // Parsing a tiny document starts the parse worker once, so its file is cached too.
+    preloadViewer: () => Promise.all([loadJsonViewer(), parseJsonText('null', 'en')]),
     ownsWholePage: true,
     // Measured 2026-10-16: up to 10 MB every action takes a third of a second or less; at 50 MB a tree edit takes 1.6 s and the
     // page holds 1 GB of memory.
@@ -151,12 +163,13 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'excel',
     addedOn: '2026-10-15',
     highlights: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'],
-    ViewerComponent: lazy(() => import('./excel/ExcelViewer')),
+    ViewerComponent: lazy(loadExcelViewer),
+    preloadViewer: () => Promise.all([loadExcelViewer(), loadExcelEditing(), import('./excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]),
     editing: {
       createEmptyEdits: createEmptyExcelEdits,
       countChanges: (edits) => countExcelEdits(edits as ExcelEdits),
       describeChanges: (edits, locale) => describeExcelChanges(edits as ExcelEdits, locale),
-      loadEditingModule: () => import('./excel/excelEditing').then((editingFile) => editingFile.excelEditingModule),
+      loadEditingModule: () => loadExcelEditing().then((editingFile) => editingFile.excelEditingModule),
       alwaysEditable: true,
     },
   },

@@ -16,7 +16,7 @@ import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, SOCIAL_ICON_PATHS, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
-import { AUTHOR_NAME, REPOSITORY_URL, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
@@ -243,6 +243,23 @@ fs.writeFileSync(path.join(distFolder, '404.html'), renderNotFoundPage('en'))
 fs.mkdirSync(path.join(distFolder, 'ar'), { recursive: true })
 fs.writeFileSync(path.join(distFolder, 'ar', '404.html'), renderNotFoundPage('ar'))
 
+// The site's entities, named once by @id so every page's data points at the same organisation and website.
+const organizationId = `${SITE_ORIGIN}/#organization`
+const websiteId = `${SITE_ORIGIN}/#website`
+
+const jsonLdScript = (data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
+
+function changelogBreadcrumb(locale) {
+  return jsonLdScript({
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
+      { '@type': 'ListItem', position: 2, name: translate(locale, 'changelog.heading'), item: `${SITE_ORIGIN}${localizePath(locale, '/changelog')}` },
+    ],
+  })
+}
+
 for (const locale of locales) {
   checkSearchSnippet(`${locale} changelog`, translate(locale, 'changelog.title'), translate(locale, 'changelog.description'))
   const title = translate(locale, 'changelog.title')
@@ -250,7 +267,7 @@ for (const locale of locales) {
   const page = pageShell(locale)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(title)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(description)}$2`)
-    .replace('</head>', `  ${renderHeadTags(locale, '/changelog', title, description)}\n  </head>`)
+    .replace('</head>', `  ${renderHeadTags(locale, '/changelog', title, description)}\n    ${changelogBreadcrumb(locale)}\n  </head>`)
     .replace('<div id="root"></div>', `<div id="root">${renderChangelogBody(locale)}</div>`)
   if (!page.includes('id="main"')) throw new Error(`Could not write the ${locale} changelog: dist/index.html has a different shape than expected.`)
   const pageFolder = path.join(distFolder, locale, 'changelog')
@@ -260,7 +277,6 @@ for (const locale of locales) {
 
 // ---------------------------------------------------------------- home and format pages: real <head> for search and sharing
 
-const jsonLdScript = (data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
 
 // `address` is the page without its language ('/' or '/csv-viewer'); the page is written once per language. `rootMarkup` is React's
 // render of the page, or empty for an address the browser draws by itself.
@@ -276,11 +292,13 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const structuredData = []
   if (address === '/') {
     structuredData.push(
-      { '@context': 'https://schema.org', '@type': 'WebSite', name: SITE_NAME, alternateName: ['Open Any Doc', 'OpenAnyDoc.com'], url: pageUrl, inLanguage: locale },
+      { '@context': 'https://schema.org', '@type': 'WebSite', '@id': websiteId, name: SITE_NAME, alternateName: ['Open Any Doc', 'OpenAnyDoc.com'], url: pageUrl, inLanguage: locale, description: SITE_DESCRIPTION[locale], publisher: { '@id': organizationId } },
       {
         '@context': 'https://schema.org',
         '@type': 'Organization',
+        '@id': organizationId,
         name: SITE_NAME,
+        description: SITE_DESCRIPTION[locale],
         url: SITE_ORIGIN,
         logo: `${SITE_ORIGIN}/logo.png`,
         email: CONTACT_EMAIL,
@@ -289,7 +307,39 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         founder: { '@type': 'Person', name: AUTHOR_NAME },
         sameAs: [REPOSITORY_URL, ...SOCIAL_PROFILES.map((profile) => profile.url)],
       },
+      // The product as a whole; its features are the tools it links to, by their page names.
+      {
+        '@context': 'https://schema.org',
+        '@type': ['SoftwareApplication', 'WebApplication'],
+        name: SITE_NAME,
+        url: pageUrl,
+        inLanguage: locale,
+        description: SITE_DESCRIPTION[locale],
+        applicationCategory: 'UtilitiesApplication',
+        operatingSystem: 'Any (web browser)',
+        isAccessibleForFree: true,
+        offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+        featureList: [...viewers.filter((tool) => tool.toolPath).map((tool) => tool.toolPath), ...landingPages.map((page) => page.path)].map((toolAddress) => pageSeo[locale][toolAddress].linkText),
+        publisher: { '@id': organizationId },
+      },
     )
+  }
+  // The guides index lists every published guide, in the order it shows them.
+  if (address === '/guides') {
+    const publishedGuides = Object.entries(guidePages[locale]).filter(([, guide]) => guide.published)
+    structuredData.push({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: seo.heading,
+      url: pageUrl,
+      inLanguage: locale,
+      description: seo.description,
+      isPartOf: { '@id': websiteId },
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: publishedGuides.map(([guideAddress], index) => ({ '@type': 'ListItem', position: index + 1, name: pageSeo[locale][guideAddress].heading, url: `${SITE_ORIGIN}${localizePath(locale, guideAddress)}` })),
+      },
+    })
   }
   // The About page is the author's page; a guide is an article with its author and dates (the byline InfoPage draws).
   if (address === '/about') {
@@ -313,7 +363,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       datePublished: `${guidePage.published}T00:00:00+00:00`,
       dateModified: `${guidePage.updated ?? guidePage.published}T00:00:00+00:00`,
       author: { '@type': 'Person', name: AUTHOR_NAME, url: `${SITE_ORIGIN}${localizePath(locale, '/about')}` },
-      publisher: { '@type': 'Organization', name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/logo.png` } },
+      publisher: { '@type': 'Organization', '@id': organizationId, name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/logo.png` } },
       mainEntityOfPage: pageUrl,
       inLanguage: locale,
     })
@@ -330,6 +380,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       operatingSystem: 'Any (web browser)',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: guide.handles,
+      publisher: { '@id': organizationId },
     })
   }
   // The questions published as data are exactly the ones the page shows: the home page's, or this format's own.

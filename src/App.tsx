@@ -1,16 +1,59 @@
-import { Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
+import type { ReactNode } from 'react'
 import DiscardEditsDialog from './components/DiscardEditsDialog'
-import { LocaleContext, PagePathContext, SwitchLanguageContext, getBrowserLocale, getLocaleFromPath, loadLocale, localizePath, splitLocalePath } from './i18n'
+import { LocaleContext, PagePathContext, SwitchLanguageContext, getBrowserLocale, getLocaleFromPath, loadLocale, localizePath, splitLocalePath, useT } from './i18n'
 import type { Locale } from './i18n'
 import { ToastProvider } from './components/Messages'
-import FileViewPage from './pages/FileViewPage'
 import HomePage from './pages/HomePage'
 import type { OpenedFile } from './useFileIntake'
+import { formatDefinitions } from './formats/registry'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
+import type { ConversionTarget, Viewer } from './viewers'
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
+// The file page (viewers, editing, menus) is its own chunk, so content pages load only what they show.
+const loadFileViewPage = () => import('./pages/FileViewPage')
+const FileViewPage = lazy(loadFileViewPage)
+const viewerIdForConversion: Record<ConversionTarget, Viewer['id']> = { csv: 'csv', xlsx: 'excel', json: 'json' }
+
+// Once a page is idle it fetches the file page and the viewer its visitors are about to need (the page's own format, the result's
+// format on a conversion page, CSV on the home page), so a file then opens with no network and no wait.
+function preloadFileOpening(path: string) {
+  const toolViewer = findViewerByToolPath(path)
+  const viewerId = toolViewer?.convertTo ? viewerIdForConversion[toolViewer.convertTo] : (toolViewer?.id ?? (path === '/' ? 'csv' : undefined))
+  const preloads = [loadFileViewPage(), formatDefinitions.find((definition) => definition.viewerId === viewerId)?.preloadViewer?.()]
+  if (toolViewer?.convertTo) preloads.push(import('./formats/conversion'))
+  // Offline or after a new release the fetch fails; the file then fails to open with LoadFailedMessage, not here.
+  void Promise.all(preloads).catch(() => {})
+}
+
+// A part of the app that throws while drawing (most often code that could not be fetched: offline, or the page is older than the
+// latest release) shows a message with a reload button instead of a blank page.
+class LoadFailedBoundary extends Component<{ children: ReactNode }, { hasFailed: boolean }> {
+  state = { hasFailed: false }
+  static getDerivedStateFromError() {
+    return { hasFailed: true }
+  }
+  render() {
+    return this.state.hasFailed ? <LoadFailedMessage /> : this.props.children
+  }
+}
+
+function LoadFailedMessage() {
+  const { t } = useT()
+  return (
+    <main id="main" className="toy-page mx-auto flex min-h-dvh max-w-md flex-col items-center justify-center gap-5 px-5 text-center">
+      <p id="load-failed-message" role="alert" className="text-lg text-ink">
+        {t('app.loadFailed')}
+      </p>
+      <button id="reload-page-button" type="button" onClick={() => window.location.reload()} className="btn btn--primary press">
+        {t('app.reload')}
+      </button>
+    </main>
+  )
+}
 const InfoPage = lazy(() => import('./pages/InfoPage'))
-const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token']
+const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json']
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
 // language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still
@@ -126,6 +169,12 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
     }
   }
 
+  useEffect(() => {
+    if (openedFile) return
+    const preloadTimer = window.setTimeout(() => preloadFileOpening(path), 1500)
+    return () => window.clearTimeout(preloadTimer)
+  }, [path, openedFile])
+
   // The page language follows the address (/ar/... is right-to-left Arabic).
   useEffect(() => {
     document.documentElement.lang = locale
@@ -156,35 +205,39 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
       <SwitchLanguageContext.Provider value={switchLanguage}>
         <PagePathContext.Provider value={path}>
           <ToastProvider>
-            {openedFile ? (
-              <FileViewPage
-                key={fileKey}
-                openedFile={openedFile}
-                onClose={closeFile}
-                onReplaceFile={replaceFile}
-                confirmDiscardEdits={confirmDiscardEdits}
-                onUnsavedEditsChange={reportUnsavedEdits}
-              />
-            ) : path === '/changelog' ? (
-              <Suspense fallback={null}>
-                <ChangelogPage onNavigate={navigateTo} />
-              </Suspense>
-            ) : infoPageAddresses.includes(path) ? (
-              <Suspense fallback={null}>
-                <InfoPage address={path} onNavigate={navigateTo} />
-              </Suspense>
-            ) : (
-              <HomePage
-                onFileLoaded={openFile}
-                onNavigate={navigateTo}
-                toolViewer={findViewerByToolPath(path)}
-                isBannerDismissed={isBannerDismissed}
-                onDismissBanner={() => setIsBannerDismissed(true)}
-                handoffFile={handoffFile}
-                onHandoffConsumed={() => setHandoffFile(null)}
-                onOpenInViewer={openInViewer}
-              />
-            )}
+            <LoadFailedBoundary key={openedFile ? `file-${fileKey}` : 'page'}>
+              {openedFile ? (
+                <Suspense fallback={null}>
+                  <FileViewPage
+                    key={fileKey}
+                    openedFile={openedFile}
+                    onClose={closeFile}
+                    onReplaceFile={replaceFile}
+                    confirmDiscardEdits={confirmDiscardEdits}
+                    onUnsavedEditsChange={reportUnsavedEdits}
+                  />
+                </Suspense>
+              ) : path === '/changelog' ? (
+                <Suspense fallback={null}>
+                  <ChangelogPage onNavigate={navigateTo} />
+                </Suspense>
+              ) : infoPageAddresses.includes(path) ? (
+                <Suspense fallback={null}>
+                  <InfoPage address={path} onNavigate={navigateTo} />
+                </Suspense>
+              ) : (
+                <HomePage
+                  onFileLoaded={openFile}
+                  onNavigate={navigateTo}
+                  toolViewer={findViewerByToolPath(path)}
+                  isBannerDismissed={isBannerDismissed}
+                  onDismissBanner={() => setIsBannerDismissed(true)}
+                  handoffFile={handoffFile}
+                  onHandoffConsumed={() => setHandoffFile(null)}
+                  onOpenInViewer={openInViewer}
+                />
+              )}
+            </LoadFailedBoundary>
             {discardRequest && (
               <DiscardEditsDialog onKeepEditing={() => answerDiscardRequest(false)} onDiscard={() => answerDiscardRequest(true)} />
             )}
