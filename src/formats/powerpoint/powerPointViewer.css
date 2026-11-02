@@ -1,0 +1,30 @@
+/* The PowerPoint page: a thumbnail sidebar beside one slide on the docs canvas (sheetChrome.css), and full screen.
+   The renderer sizes the slide itself through inline CSSOM styles; these rules only place it. */
+#docs-workbench{
+  & #toolbar .beta-tag{margin-inline-end:6px;padding:3px 8px;border-radius:999px;background:color-mix(in srgb,var(--pptx) 18%,transparent);color:var(--text);font-size:11.5px;font-weight:600}
+  & #toolbar .slide-counter{min-width:56px;text-align:center;font:500 12px/1 var(--mono);color:var(--text)}
+  &:dir(rtl) #previous-slide-button .ico,&:dir(rtl) #next-slide-button .ico{transform:scaleX(-1)}
+  & .powerpoint-fidelity-note{margin:0;padding:6px 16px;border-bottom:1px solid var(--line);background:var(--panel);color:var(--muted);font-size:12.5px}
+  & .slides-layout{flex:1 1 auto;min-height:0;display:flex}
+  & #slide-thumbnails{flex:none;width:204px;overflow:hidden;border-inline-end:1px solid var(--line);background:var(--panel)}
+  & #slide-thumbnails ol{height:100%;margin:0;padding:10px 8px;overflow:auto;list-style:none}
+  & .slide-thumbnail{display:flex;gap:8px;align-items:flex-start;width:100%;margin-bottom:6px;padding:6px;border:0;border-radius:6px;background:transparent;color:var(--muted);font:inherit;cursor:pointer}
+  & .slide-thumbnail:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  & .slide-thumbnail[aria-current="true"]{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
+  & .slide-thumbnail[aria-current="true"] .slide-thumbnail-frame{outline:2px solid var(--accent);outline-offset:1px}
+  & .slide-thumbnail-number{width:16px;flex:none;text-align:end;font:500 11px/1.2 var(--mono)}
+  & .slide-thumbnail-frame{display:block;width:160px;min-height:60px;overflow:hidden;border-radius:2px;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.18)}
+  & .slide-thumbnail-picture{display:block}
+  & .slide-thumbnail-placeholder{display:flex;align-items:center;justify-content:center;height:90px;padding:6px;color:#5b6170;font-size:11px;font-weight:500;line-height:1.3;text-align:center}
+  & .slides-canvas{display:flex;flex-direction:column}
+  & .powerpoint-loading{margin:48px auto;text-align:center;color:var(--muted)}
+  & #slide-stage{position:relative;flex:1 1 auto;min-height:0;display:flex;align-items:center;justify-content:center}
+  & #slide-view{flex:none}
+  & #slide-view.is-covered{visibility:hidden}
+  & #slide-placeholder{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;padding:24px;text-align:center}
+  & .slide-placeholder-title{margin:0;max-width:34rem;font-size:17px;font-weight:600;color:var(--text)}
+  & .slide-placeholder-hint{margin:0;max-width:34rem;font-size:14px;color:var(--muted)}
+  & #slide-stage:fullscreen{background:#000}
+  & #slide-stage:fullscreen #slide-placeholder{background:var(--panel)}
+  & .fullscreen-slide-counter{position:absolute;inset-block-end:12px;inset-inline-end:16px;padding:3px 8px;border-radius:6px;background:rgba(0,0,0,.55);color:#fff;font:500 12px/1.2 var(--mono)}
+}

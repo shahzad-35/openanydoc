@@ -53,32 +53,27 @@ export const SOCIAL_ICON_PATHS: Record<string, string> = {
   youtube: 'M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z',
 }
 
-// The header's links to the viewer pages (src/components/SiteNav.tsx), on every content page; the build script writes the same nav
-// into the changelog pages. On a phone the links fold into one disclosure that opens as a card, on the header's second row (after
-// `headerRowBreak`); from xl (1280 px) up the disclosure's content is always shown (::details-content) and its summary hidden.
-// Below xl (phones and tablets) the header has two rows: the logo and the language and theme controls, then the nav and the
-// page's action; the one-row header needs about 1,060 px for the six nav items. This zero-height, full-width item (placed just
-// before the nav) starts the second row; from xl up everything is one row.
+// The header's search box (src/components/SiteNav.tsx), on every content page; the build script writes the same closed box into
+// the changelog pages, and React adds the results panel once the box is used. Below xl (phones and tablets) the header has two
+// rows: the logo and the language and theme controls, then the search box and the page's action. This zero-height, full-width
+// item (placed just before the nav) starts the second row; from xl (1280 px) up everything is one row. The pages are found by
+// search rather than listed since PowerPoint made the viewers seven links (about 1,230 px, more than the header's 1,080).
 export const headerRowBreak = 'order-last h-0 basis-full xl:hidden'
 
 export const navClasses = {
-  nav: 'relative order-last xl:order-none xl:mx-auto',
-  details: 'group xl:[&::details-content]:[content-visibility:visible]',
-  summary: 'pill-link cursor-pointer list-none gap-2 border-2 border-line text-sm xl:hidden [&::-webkit-details-marker]:hidden',
-  chevron: 'size-4 transition-transform duration-200 group-open:rotate-180',
-  list: 'absolute start-0 top-full z-30 mt-2 flex w-64 flex-col items-stretch rounded-2xl border-2 border-line bg-paper-raised p-2 shadow-lg xl:static xl:mt-0 xl:w-auto xl:flex-row xl:items-center xl:gap-x-1 xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none',
-  // 8 px sides on a wide screen (not the pill's 16 px), so the six header items fit beside the logo and the actions.
-  link: 'pill-link text-[15px] xl:px-2',
-  // The Convert menu, the last item of the list: a dropdown card on a wide screen, an indented list inside the disclosure on a phone.
-  convertDetails: 'group/convert relative',
-  convertSummary: 'pill-link cursor-pointer list-none gap-1.5 text-[15px] xl:px-2 [&::-webkit-details-marker]:hidden',
-  convertChevron: 'size-4 transition-transform duration-200 group-open/convert:rotate-180',
-  convertList: 'mt-1 flex flex-col items-start ps-4 xl:absolute xl:end-0 xl:top-full xl:z-30 xl:mt-2 xl:w-56 xl:rounded-2xl xl:border-2 xl:border-line xl:bg-paper-raised xl:p-2 xl:shadow-lg',
-  convertLink: 'pill-link w-full text-[15px]',
+  nav: 'relative order-last min-w-0 flex-1 xl:order-none xl:mx-auto xl:flex-none',
+  searchButton: 'flex h-12 w-full cursor-text items-center gap-2.5 rounded-full border-2 border-line bg-paper-raised ps-4 pe-2 text-[15px] font-semibold text-ink-soft transition-colors hover:border-accent xl:w-[440px]',
+  searchIcon: 'size-[18px] flex-none',
+  searchLabel: 'truncate',
+  // The format blocks inside the box: what the site opens, at a glance.
+  searchFormats: 'ms-auto hidden gap-1 pe-2 xl:flex',
 } as const
 
-// A downward chevron, drawn inside a 24 x 24 box.
-export const CHEVRON_ICON_PATH = 'm6 9 6 6 6-6'
+// The formats drawn inside the search box, in this order (`.nav-icon-*` in index.css).
+export const searchBoxFormats = ['csv', 'xlsx', 'json', 'txt', 'docx', 'pptx'] as const
+
+// A magnifying glass, drawn inside a 24 x 24 box.
+export const SEARCH_ICON_PATH = 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zm5-1.5 4.5 4.5'
 
 // The site footer (src/components/SiteFooter.tsx). The build script writes the same footer as HTML into the changelog pages.
 // A soft band with a four-column grid (brand, File viewers, More file tools, About and legal) and a bottom bar for the disclaimer.

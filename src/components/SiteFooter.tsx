@@ -8,7 +8,7 @@ import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
 
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
-const viewerGlyphs: Partial<Record<Viewer['id'], MiniFormat>> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx', word: 'docx' }
+const viewerGlyphs: Partial<Record<Viewer['id'], MiniFormat>> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx', word: 'docx', powerpoint: 'pptx' }
 
 // A link that changes the page without reloading (the app has no router package); modified clicks open a new tab as usual.
 // `path` is the address without its language ('/csv-viewer'); the link goes to the page in the current language.
@@ -84,9 +84,9 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
           <nav id="footer-more" aria-label={t('about.moreFileTools')}>
             <h2 className={footerClasses.heading}>{t('about.moreFileTools')}</h2>
             <ul className={footerClasses.list}>
-              {/* The conversion pages are in the header's Convert menu, not here. */}
+              {/* Every landing page, the converters too: the header has a search box, not links, so this is their site-wide link. */}
               {landingPages
-                .filter((page) => page.path !== currentPath && !page.convertTo)
+                .filter((page) => page.path !== currentPath)
                 .map((page) => (
                   <li key={page.path} className={footerClasses.item}>
                     <PageLink id={`footer-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className={footerClasses.link}>

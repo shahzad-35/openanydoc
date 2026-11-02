@@ -196,7 +196,7 @@ async function openPage(pathname) {
 
 // ---------------------------------------------------------------- the tests
 
-const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer']
+const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer']
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
@@ -204,10 +204,14 @@ const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/lar
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
-const comingSoonFile = path.join(scratchFolder, 'slides.pptx')
-fs.writeFileSync(comingSoonFile, 'not a real presentation')
-const unknownFile = path.join(scratchFolder, 'notes.doc')
-fs.writeFileSync(unknownFile, 'not a real document')
+const comingSoonFile = path.join(scratchFolder, 'report.pdf')
+fs.writeFileSync(comingSoonFile, 'not a real PDF')
+const unknownFile = path.join(scratchFolder, 'notes.xyz')
+fs.writeFileSync(unknownFile, 'not a file type anyone opens')
+const legacyDocument = path.join(scratchFolder, 'notes.doc')
+fs.writeFileSync(legacyDocument, 'not a real document')
+const legacyPresentation = path.join(scratchFolder, 'slides.ppt')
+fs.writeFileSync(legacyPresentation, 'not a real presentation')
 
 const results = []
 async function test(name, run) {
@@ -240,7 +244,7 @@ const bannerText = () => evaluate(`document.querySelector('[role=region]')?.inne
 await test('home page shows the banner, the badges and takes no focus', async () => {
   await openPage('/en')
   const text = await bannerText()
-  expect(text?.includes('New') && text.includes('You can now open CSV, TXT, JSON, Excel, and Word files'), `banner text was: ${text}`)
+  expect(text?.includes('New') && text.includes('You can now open CSV, TXT, JSON, Excel, Word, and PowerPoint files'), `banner text was: ${text}`)
   expect(await evaluate(`document.activeElement === document.body`), 'the banner took focus')
   expect(await evaluate(`document.querySelectorAll('footer nav [data-file-type]').length >= 4`), 'footer badges are missing')
   expect(await evaluate(`[...document.querySelectorAll('footer nav li')].some((item) => item.innerText.includes('JSON viewer') && item.innerText.includes('New'))`), 'the JSON nav link has no New badge')
@@ -434,6 +438,23 @@ documentZip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"?><
 documentZip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>')
 documentZip.file('word/document.xml', '<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Sample document</w:t></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>Name</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Qty</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>')
 fs.writeFileSync(sampleDocument, await documentZip.generateAsync({ type: 'nodebuffer' }))
+// The smallest real .pptx: one slide with one text box, on a blank layout and master.
+const samplePresentation = path.join(scratchFolder, 'sample.pptx')
+const presentationZip = new JSZip()
+const presentationNamespaces = 'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"'
+const presentationRelationships = (relationships) => `<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${relationships.map(([id, type, target]) => `<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/${type}" Target="${target}"/>`).join('')}</Relationships>`
+const emptyShapeTree = '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr><p:grpSpPr/>'
+presentationZip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/ppt/presentation.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml"/><Override PartName="/ppt/slideMasters/slideMaster1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideMaster+xml"/><Override PartName="/ppt/slideLayouts/slideLayout1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slideLayout+xml"/><Override PartName="/ppt/slides/slide1.xml" ContentType="application/vnd.openxmlformats-officedocument.presentationml.slide+xml"/></Types>')
+presentationZip.file('_rels/.rels', presentationRelationships([['rId1', 'officeDocument', 'ppt/presentation.xml']]))
+presentationZip.file('ppt/presentation.xml', `<?xml version="1.0" encoding="UTF-8"?><p:presentation ${presentationNamespaces}><p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rId1"/></p:sldMasterIdLst><p:sldIdLst><p:sldId id="256" r:id="rId2"/></p:sldIdLst><p:sldSz cx="12192000" cy="6858000"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>`)
+presentationZip.file('ppt/_rels/presentation.xml.rels', presentationRelationships([['rId1', 'slideMaster', 'slideMasters/slideMaster1.xml'], ['rId2', 'slide', 'slides/slide1.xml']]))
+presentationZip.file('ppt/slideMasters/slideMaster1.xml', `<?xml version="1.0" encoding="UTF-8"?><p:sldMaster ${presentationNamespaces}><p:cSld><p:spTree>${emptyShapeTree}</p:spTree></p:cSld><p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/><p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rId1"/></p:sldLayoutIdLst></p:sldMaster>`)
+presentationZip.file('ppt/slideMasters/_rels/slideMaster1.xml.rels', presentationRelationships([['rId1', 'slideLayout', '../slideLayouts/slideLayout1.xml']]))
+presentationZip.file('ppt/slideLayouts/slideLayout1.xml', `<?xml version="1.0" encoding="UTF-8"?><p:sldLayout ${presentationNamespaces}><p:cSld><p:spTree>${emptyShapeTree}</p:spTree></p:cSld></p:sldLayout>`)
+presentationZip.file('ppt/slideLayouts/_rels/slideLayout1.xml.rels', presentationRelationships([['rId1', 'slideMaster', '../slideMasters/slideMaster1.xml']]))
+presentationZip.file('ppt/slides/slide1.xml', `<?xml version="1.0" encoding="UTF-8"?><p:sld ${presentationNamespaces}><p:cSld><p:spTree>${emptyShapeTree}<p:sp><p:nvSpPr><p:cNvPr id="2" name="Title"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr><p:spPr><a:xfrm><a:off x="914400" y="914400"/><a:ext cx="6096000" cy="914400"/></a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr><p:txBody><a:bodyPr/><a:lstStyle/><a:p><a:r><a:rPr lang="en-US" sz="2800"/><a:t>Sample slide</a:t></a:r></a:p></p:txBody></p:sp></p:spTree></p:cSld></p:sld>`)
+presentationZip.file('ppt/slides/_rels/slide1.xml.rels', presentationRelationships([['rId1', 'slideLayout', '../slideLayouts/slideLayout1.xml']]))
+fs.writeFileSync(samplePresentation, await presentationZip.generateAsync({ type: 'nodebuffer' }))
 
 for (const [name, address, file, readyElement] of [
   ['CSV', '/en/csv-viewer', sampleCsv, '#data-table'],
@@ -441,18 +462,20 @@ for (const [name, address, file, readyElement] of [
   ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row'],
   ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table'],
   ['Word', '/en/word-viewer', sampleDocument, '#word-document section.docx'],
+  ['PowerPoint', '/en/powerpoint-viewer', samplePresentation, '#slide-thumbnail-1'],
 ]) {
-  for (const locale of ['en', 'ar']) await test(`${name} (${locale}): every field has an id and no id repeats (page, view mode, edit mode, an open menu)`, async () => {
+  for (const locale of ['en', 'ar']) await test(`${name} (${locale}): every field has an id and no id repeats (page, view mode, edit mode if editable, an open menu)`, async () => {
     await openPage(address.replace('/en/', `/${locale}/`))
     await expectCleanIds(`${name} drop page`)
     await chooseFile(file)
     await waitFor(`document.querySelector('${readyElement}')`, `the ${name} file to show`)
     await expectCleanIds(`${name} view mode`)
-    // Every editable format opens ready to edit, with its own menus.
-    const menuButton = name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : name === 'TXT' ? '#ribbon-sort-menu-button' : '#menu-bar #menu-format'
+    // Every editable format opens ready to edit, with its own menus; the view-only formats (Word, PowerPoint) have the Help menu.
+    const isViewOnly = name === 'Word' || name === 'PowerPoint'
+    const menuButton = isViewOnly ? '#menu-bar #menu-help' : name === 'JSON' ? '#indent-button:not(:disabled)' : name === 'CSV' ? '#more-menu-button:not(:disabled)' : name === 'TXT' ? '#ribbon-sort-menu-button' : '#menu-bar #menu-format'
     if (name === 'TXT') await evaluate(`document.querySelector('#ribbon-tab-lines').click()`)
-    await waitFor(`document.querySelector('${menuButton}')`, 'the editing tools')
-    await expectCleanIds(`${name} edit mode`)
+    await waitFor(`document.querySelector('${menuButton}')`, isViewOnly ? 'the menu bar' : 'the editing tools')
+    if (!isViewOnly) await expectCleanIds(`${name} edit mode`)
     await evaluate(`document.querySelector('${menuButton}').click()`)
     await waitFor(`document.querySelector('[role=menu]')`, 'a menu to open')
     await expectCleanIds(`${name} with a menu open`)
@@ -543,14 +566,14 @@ await test('every sitemap address has a lastmod date and is a built page without
 
 // The upper bound was 900 before the home page gained its stats row, shortcut keycaps, privacy comparison and the note on how
 // the demo works (2026-10-19), and 1000 before the five conversion pages joined the home page's tool links (2026-10-29), and 1050 before the Word viewer
-// added its nav and footer links, home card and format group (2026-11-02).
-await test('the home page has 600 to 1100 words in its server HTML, eight questions and a card linking to each tool page', async () => {
+// added its nav and footer links, home card and format group (2026-11-02), and 1100 before the PowerPoint viewer did the same (2026-11-02).
+await test('the home page has 600 to 1150 words in its server HTML, eight questions and a card linking to each tool page', async () => {
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
     const wordCount = prerenderedText(html).split(/\s+/).filter(Boolean).length
-    expect(wordCount >= 600 && wordCount <= 1100, `/${locale}: ${wordCount} words`)
+    expect(wordCount >= 600 && wordCount <= 1150, `/${locale}: ${wordCount} words`)
     expect((html.match(/id="faq-item-\d+"/g) ?? []).length === 8, `/${locale}: the FAQ does not have eight questions`)
-    for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer']) {
+    for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer', 'powerpoint-viewer']) {
       expect(new RegExp(`id="tool-card-link-${page}" href="/${locale}/${page}"`).test(html), `/${locale}: no card links to /${locale}/${page}`)
     }
   }
@@ -655,7 +678,7 @@ await test('About, Privacy, Terms and guide pages: one h1, their own title and d
 
 await test('format pages show a real screenshot and a comparison table in both languages', async () => {
   for (const locale of ['en', 'ar']) {
-    for (const [page, viewerId] of [['/csv-viewer', 'csv'], ['/excel-viewer', 'excel'], ['/json-viewer', 'json'], ['/txt-viewer', 'text'], ['/word-viewer', 'word']]) {
+    for (const [page, viewerId] of [['/csv-viewer', 'csv'], ['/excel-viewer', 'excel'], ['/json-viewer', 'json'], ['/txt-viewer', 'text'], ['/word-viewer', 'word'], ['/powerpoint-viewer', 'powerpoint']]) {
       const html = await (await fetch(`${siteOrigin}/${locale}${page}`)).text()
       const image = /<img src="(\/screenshots\/[\w-]+\.webp)" width="1200" height="750" loading="lazy" decoding="async" alt="([^"]+)"/.exec(html)
       expect(image !== null && image[1] === `/screenshots/${locale}-${viewerId}.webp` && image[2].length > 20, `/${locale}${page}: the screenshot is missing its size, lazy loading or alt text`)
@@ -699,7 +722,7 @@ await test('the footer has About, Privacy and Terms links and the Microsoft disc
     expect(html.includes('id="footer-disclaimer"') && html.includes(`id="footer-link-privacy" href="/${locale}/privacy"`), `${locale}: the static changelog has no footer`)
   }
   await openPage('/en')
-  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === 5 && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
+  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === 6 && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
   await openPage('/ar')
   const arabicFooterFits = await evaluate(`(() => {
     const width = document.documentElement.clientWidth
@@ -718,6 +741,7 @@ for (const [name, address, file, readyElement, menuButton] of [
   ['TXT', '/en/txt-viewer', sampleText, '#text-editor', '#ribbon-tab-file'],
   ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table', '#menu-help'],
   ['Word', '/en/word-viewer', sampleDocument, '#word-document section.docx', '#menu-help'],
+  ['PowerPoint', '/en/powerpoint-viewer', samplePresentation, '#slide-thumbnail-1', '#menu-help'],
 ]) {
   for (const locale of ['en', 'ar']) await test(`${name} (${locale}): Privacy, Terms and the disclaimer in the menu, and the status bar links, open in a new tab`, async () => {
     await openPage(address.replace('/en/', `/${locale}/`))
@@ -725,7 +749,7 @@ for (const [name, address, file, readyElement, menuButton] of [
     await waitFor(`document.querySelector('${readyElement}') && document.querySelector('${menuButton}')`, `the ${name} file to show`)
     await evaluate(`document.querySelector('${menuButton}').click()`)
     await waitFor(`document.querySelector('#menu-link-privacy')?.checkVisibility()`, 'the menu with the legal links')
-    const links = name === 'Excel' ? ['menu-link-privacy', 'menu-link-terms'] : ['menu-link-privacy', 'menu-link-terms', 'status-link-privacy', 'status-link-terms']
+    const links = ['Excel', 'Word', 'PowerPoint'].includes(name) ? ['menu-link-privacy', 'menu-link-terms'] : ['menu-link-privacy', 'menu-link-terms', 'status-link-privacy', 'status-link-terms']
     for (const id of links) {
       const link = await evaluate(`(() => { const link = document.querySelector('#${id}'); return link && { href: link.getAttribute('href'), target: link.target, rel: link.rel } })()`)
       expect(link?.href === `/${locale}/${id.endsWith('privacy') ? 'privacy' : 'terms'}` && link.target === '_blank' && link.rel.includes('noopener'), `#${id} is ${JSON.stringify(link)}`)
@@ -745,21 +769,23 @@ await test('the format list is read from the registry: View and edit, View, or C
     for (const id of ['csv', 'text', 'json', 'excel']) {
       expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.edit, `${locale}: ${id} does not say "${words.edit}"`)
     }
-    expect((await evaluate(`document.querySelector('#extension-row-word #extension-capabilities-word')?.innerText`)) === words.view, `${locale}: word does not say "${words.view}"`)
-    for (const id of ['pdf', 'powerpoint']) {
+    for (const id of ['word', 'powerpoint']) {
+      expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.view, `${locale}: ${id} does not say "${words.view}"`)
+    }
+    for (const id of ['pdf']) {
       expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.soon, `${locale}: ${id} does not say "${words.soon}"`)
     }
   }
 })
 
 await test('one drop zone opens every live format with its tools; Coming soon stays on the page', async () => {
-  const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook], ['Word', sampleDocument]]
+  const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook], ['Word', sampleDocument], ['PowerPoint', samplePresentation]]
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
     await chooseFile(file)
-    await waitFor(`(${name === 'Excel'} && document.querySelector('#excel-workbench')) || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench')) || (${name === 'Word'} && document.querySelector('#word-document section.docx'))`, `the ${name} file page`)
+    await waitFor(`(${name === 'Excel'} && document.querySelector('#excel-workbench')) || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench')) || (${name === 'Word'} && document.querySelector('#word-document section.docx')) || (${name === 'PowerPoint'} && document.querySelector('#slide-thumbnail-1'))`, `the ${name} file page`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
-    await waitFor(`document.querySelector('#menu-bar #menu-format, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button, #toolbar #fit-width-button')`, `the ${name} tools`)
+    await waitFor(`document.querySelector('#menu-bar #menu-format, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button, #toolbar #fit-width-button, #toolbar #next-slide-button')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
@@ -789,7 +815,7 @@ await test('/ goes to /ar for an Arabic browser and to /en otherwise; old addres
   await openPage('/')
   expect((await evaluate('location.pathname')) === '/en', `an English browser landed on ${await evaluate('location.pathname')}`)
   expect(await evaluate(`document.documentElement.lang === 'en' && document.documentElement.dir === 'ltr'`), 'lang and dir are not en and ltr')
-  for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer']) {
+  for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer', 'powerpoint-viewer']) {
     await openPage(`/${page}`)
     expect((await evaluate('location.pathname')) === `/en/${page}`, `/${page} landed on ${await evaluate('location.pathname')}`)
   }
@@ -798,10 +824,21 @@ await test('/ goes to /ar for an Arabic browser and to /en otherwise; old addres
 await test('an old .doc file gets the "only .docx" message, on the Word page and the home page', async () => {
   for (const address of ['/en/word-viewer', '/ar/word-viewer', '/en']) {
     await openPage(address)
-    await chooseFile(unknownFile)
+    await chooseFile(legacyDocument)
     await waitFor(`document.querySelector('#toast-region:popover-open')`, `${address}: the .doc message`)
     expect((await evaluate(`document.querySelector('#toast-region').innerText`)).includes('.docx'), `${address}: the .doc message does not mention .docx`)
     expect((await evaluate('location.pathname')) === address, `${address}: the page changed for a .doc file`)
+    await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
+  }
+})
+
+await test('an old .ppt file gets the "only .pptx" message, on the PowerPoint page and the home page', async () => {
+  for (const address of ['/en/powerpoint-viewer', '/ar/powerpoint-viewer', '/en']) {
+    await openPage(address)
+    await chooseFile(legacyPresentation)
+    await waitFor(`document.querySelector('#toast-region:popover-open')`, `${address}: the .ppt message`)
+    expect((await evaluate(`document.querySelector('#toast-region').innerText`)).includes('.pptx'), `${address}: the .ppt message does not mention .pptx`)
+    expect((await evaluate('location.pathname')) === address, `${address}: the page changed for a .ppt file`)
     await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
   }
 })
@@ -1196,23 +1233,17 @@ await test('the header nav, related tools, footer and home links point at built 
     for (const locale of ['en', 'ar']) {
       const address = `/${locale}${page}`
       const html = await (await fetch(`${siteOrigin}${address}`)).text()
-      // The header links the viewers, then the conversion pages and the tool pages in its Convert menu.
+      // The header is a search box: no links in the served page (the footer links every page instead).
       const navLinks = linksIn(html, '<nav id="site-nav"', '</nav>')
-      const navPages = [...formatPages, ...toolPages, ...conversionPages]
-      expect(navLinks?.length === navPages.length, `${address}: the header nav does not link the ${formatPages.length} viewers, ${toolPages.length} tools and ${conversionPages.length} converters`)
-      expect(JSON.stringify(navLinks.map((link) => link.href).sort()) === JSON.stringify(navPages.map((navPage) => `/${locale}${navPage}`).sort()), `${address}: the nav links are ${navLinks.map((link) => link.href).join(', ')}`)
-      const currentLinks = navLinks.filter((link) => link.tag.includes('aria-current="page"'))
-      const expectedCurrent = navPages.includes(page) ? [`/${locale}${page}`] : []
-      expect(JSON.stringify(currentLinks.map((link) => link.href)) === JSON.stringify(expectedCurrent), `${address}: aria-current is on ${currentLinks.map((link) => link.href).join(', ') || 'no link'}`)
+      expect(navLinks?.length === 0 && html.includes('id="site-search-button"'), `${address}: the header should hold the search box and no links`)
       const relatedLinks = linksIn(html, '<section id="related-tools"', '</section>')
       if (formatPages.includes(page) || landingPages.includes(page)) expect(relatedLinks?.length >= 2, `${address}: no related tools`)
       else expect(relatedLinks === null, `${address}: related tools on a page that is not a tool page`)
       const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
       // The social logos have no text, so linksIn skips them: each needs its address and a spoken name.
       for (const profileUrl of socialProfileUrls) expect(new RegExp(`<a [^>]*href="${profileUrl}"[^>]*aria-label="OpenAnyDoc [^"]+"`).test(html), `${address}: the footer lacks the ${profileUrl} logo link`)
-      expect(landingPages.every((landingPage) => landingPage === page || conversionPages.includes(landingPage) || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
-      expect(!footerLinks.some((link) => conversionPages.some((conversionPage) => link.href === `/${locale}${conversionPage}`)), `${address}: the footer still links a conversion page (they are in the header's Convert menu)`)
-      for (const link of [...navLinks, ...(relatedLinks ?? []), ...footerLinks]) {
+      expect(landingPages.every((landingPage) => landingPage === page || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
+      for (const link of [...(relatedLinks ?? []), ...footerLinks]) {
         // The footer's Contact link (mailto:) and the brand's social profiles are the only links that are not pages.
         expect(link.href.startsWith('mailto:') || socialProfileUrls.includes(link.href) || builtPage(link.href), `${address}: ${link.href} is not a built page`)
         expect(!/^(click here|here|tools|more|read more|اضغط هنا|هنا|أدوات|المزيد)$/i.test(link.text), `${address}: the link text "${link.text}" does not say where it goes`)
@@ -1227,7 +1258,7 @@ await test('the header nav, related tools, footer and home links point at built 
   }
 })
 
-await test('the changelog writes the same nav as the browser draws, and the nav folds into one disclosure on a phone', async () => {
+await test('the changelog writes the same search box as the browser draws, and it fits a phone', async () => {
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}/changelog`)).text()
     const staticNav = html.slice(html.indexOf('<nav id="site-nav"'), html.indexOf('</nav>', html.indexOf('<nav id="site-nav"')) + 6)
@@ -1235,18 +1266,18 @@ await test('the changelog writes the same nav as the browser draws, and the nav 
     const liveNav = await evaluate(`document.querySelector('#site-nav').outerHTML`)
     expect(liveNav === staticNav, `/${locale}/changelog: the static nav differs from the React one:\n${staticNav}\n${liveNav}`)
   }
-  const navState = () => evaluate(`({ toggle: document.querySelector('#site-nav-toggle').checkVisibility(), links: document.querySelector('#site-nav-link-csv').checkVisibility(), sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth })`)
+  const navState = () => evaluate(`({ box: document.querySelector('#site-search-button').checkVisibility(), sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth })`)
   for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/fix-arabic-csv-in-excel', '/ar/changelog', '/ar/mask-data']) {
     await openPage(address)
     const desktop = await navState()
-    expect(!desktop.toggle && desktop.links, `${address} at 1280px: the links should show without the disclosure (${JSON.stringify(desktop)})`)
+    expect(desktop.box && !desktop.sideways, `${address} at 1280px: the search box should show (${JSON.stringify(desktop)})`)
     await onPhone(async () => {
       await openPage(address)
       const closed = await navState()
-      expect(closed.toggle && !closed.links && !closed.sideways, `${address} at 390px: the disclosure should be closed (${JSON.stringify(closed)})`)
-      await evaluate(`document.querySelector('#site-nav-toggle').click()`)
-      const opened = await navState()
-      expect(opened.links && !opened.sideways, `${address} at 390px: the disclosure does not open (${JSON.stringify(opened)})`)
+      expect(closed.box && !closed.sideways, `${address} at 390px: the search box should fit (${JSON.stringify(closed)})`)
+      await evaluate(`document.querySelector('#site-search-button').click()`)
+      await waitFor(`document.querySelector('#site-search-input') === document.activeElement`, `${address} at 390px: the search to open`)
+      expect(!(await navState()).sideways, `${address} at 390px: the open search scrolls sideways`)
     })
   }
 })
@@ -1503,24 +1534,26 @@ await test('Convert in the top bar of the CSV, JSON and Excel viewers opens the 
   await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'two-sheets-Second.json'`, 'the sheet on screen, opened as JSON')
 })
 
-await test('the header has a Convert menu with every conversion page, and picking one then a file opens the result in its viewer', async () => {
+await test('the header search finds a converter by name, and choosing one then a file opens the result in its viewer', async () => {
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
     expect(await evaluate(`document.querySelector('#site-header').getBoundingClientRect().height < 100`), `/${locale}: the header no longer fits on one line at 1280 px`)
-    await evaluate(`document.querySelector('#site-nav-convert-toggle').click()`)
-    await waitFor(`document.querySelector('#site-nav-convert[open] #site-nav-link-csv-to-excel')?.checkVisibility()`, `/${locale}: the Convert menu`)
-    const menuBox = await evaluate(`JSON.stringify(document.querySelector('#site-nav-convert-list').getBoundingClientRect())`)
-    const { left, right } = JSON.parse(menuBox)
-    expect(left >= 0 && right <= 1280, `/${locale}: the Convert menu is cut off at the edge (${menuBox})`)
+    await evaluate(`document.querySelector('#site-search-button').click()`)
+    await waitFor(`document.querySelector('#site-search-option-csv-to-excel')?.checkVisibility()`, `/${locale}: the search with its starting list`)
+    const panelBox = await evaluate(`JSON.stringify(document.querySelector('#site-search-panel').getBoundingClientRect())`)
+    const { left, right } = JSON.parse(panelBox)
+    expect(left >= 0 && right <= 1280, `/${locale}: the search panel is cut off at the edge (${panelBox})`)
     await pressKey('Escape', 'Escape', 27)
-    await waitFor(`!document.querySelector('#site-nav-convert').open`, `/${locale}: Escape to close the Convert menu`)
+    await waitFor(`!document.querySelector('#site-search-panel') && document.activeElement?.id === 'site-search-button'`, `/${locale}: Escape to close the search`)
   }
-  // Picking a converter from the menu, then a file, lands in the viewer of the converted format.
+  // Typing a converter's name, then Enter, then a file, lands in the viewer of the converted format.
   await openPage('/en')
-  await evaluate(`document.querySelector('#site-nav-convert-toggle').click()`)
-  await waitFor(`document.querySelector('#site-nav-link-csv-to-json')?.checkVisibility()`, 'the Convert menu')
-  await evaluate(`document.querySelector('#site-nav-link-csv-to-json').click()`)
-  await waitFor(`location.pathname === '/en/csv-to-json' && !document.querySelector('#site-nav-convert').open`, 'the CSV to JSON page, with the menu closed')
+  for (const type of ['rawKeyDown', 'keyUp']) await send('Input.dispatchKeyEvent', { type, key: 'k', code: 'KeyK', windowsVirtualKeyCode: 75, modifiers: 4 })
+  await waitFor(`document.activeElement?.id === 'site-search-input'`, '⌘K to open the search')
+  await send('Input.insertText', { text: 'csv to json' })
+  await waitFor(`document.querySelector('#site-search-option-csv-to-json')?.getAttribute('aria-selected') === 'true'`, 'CSV to JSON as the first result')
+  await pressKey('Enter', 'Enter', 13)
+  await waitFor(`location.pathname === '/en/csv-to-json' && !document.querySelector('#site-search-panel')`, 'the CSV to JSON page, with the search closed')
   await chooseFile(peopleCsv)
   await waitFor(`location.pathname === '/en/json-viewer' && document.querySelector('#json-workbench .file-tab')?.innerText === 'people.json'`, 'the converted file in the JSON viewer')
 })

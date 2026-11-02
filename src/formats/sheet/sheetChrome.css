@@ -260,8 +260,10 @@
 }
 #excel-workbench [role="columnheader"],#excel-workbench [role="rowheader"]{background:var(--head)}
 
-/* The word-processor frame of the formats not built yet: a white page on a grey canvas. */
+/* The document frame (Word, PowerPoint, and the formats not built yet): labelled toolbar buttons, and a white page on a grey canvas. */
 #docs-workbench{
+  & #toolbar .tbtn.labelled{width:auto;gap:6px;padding-inline:8px;font-size:13px}
+  & #toolbar .spacer{flex:1}
   & .docs-canvas{flex:1 1 auto;min-height:0;overflow:auto;padding:28px 24px;background:color-mix(in srgb,var(--ink) 6%,var(--surface-2))}
   & .docs-page{max-width:816px;min-height:60vh;margin-inline:auto;padding:56px 64px;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:0 1px 3px rgba(16,24,40,.08),0 6px 18px -8px rgba(16,24,40,.16);font-size:15px;line-height:1.6}
 }

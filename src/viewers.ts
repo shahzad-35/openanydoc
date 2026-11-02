@@ -22,7 +22,7 @@ export const viewers: Viewer[] = [
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer' },
   { id: 'word', label: 'Word', extensions: ['.docx'], toolPath: '/word-viewer' },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'] },
-  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'] },
+  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], toolPath: '/powerpoint-viewer' },
 ]
 
 // How the table viewer treats each kind of table file: .csv starts on auto-detect (real CSVs are often semicolon separated),
@@ -67,7 +67,7 @@ export const landingPages: LandingPage[] = [
 const LEGACY_FILE_VIEW_PATH = '/view'
 
 // A file keeps the address of its format's own page (/csv-viewer, /txt-viewer, /json-viewer), so the address and a reload
-// both make sense. Formats without a page of their own use /view-pdf, /view-powerpoint while open.
+// both make sense. Formats without a page of their own use /view-pdf while open.
 export function getFileViewPath(fileName: string) {
   const viewer = findViewerForFileName(fileName)
   return viewer?.toolPath ?? `/view-${viewer?.id ?? 'file'}`

@@ -1,8 +1,6 @@
-/* The Word page: docx-preview's pages on the docs canvas (sheetChrome.css), the labelled toolbar buttons, and printing.
+/* The Word page: docx-preview's pages on the docs canvas (sheetChrome.css), and printing.
    docx-preview's own stylesheet arrives as adopted sheets; the id selectors here win over its class rules. */
 #docs-workbench{
-  & #toolbar .tbtn.labelled{width:auto;gap:6px;padding-inline:8px;font-size:13px}
-  & #toolbar .spacer{flex:1}
   & #toolbar .zoom-value{min-width:44px;text-align:center;font:500 12px/1 var(--mono);color:var(--text)}
   & .word-loading{margin:48px auto;text-align:center;color:var(--muted)}
   & #word-document{width:max-content;min-width:100%}

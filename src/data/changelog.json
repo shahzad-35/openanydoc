@@ -1,6 +1,20 @@
 [
   {
     "date": "2026-11-02",
+    "version": "1.7.0",
+    "formats": [
+      "powerpoint"
+    ],
+    "items": [
+      "changelog.v1_7.view",
+      "changelog.v1_7.navigate",
+      "changelog.v1_7.fullscreen",
+      "changelog.v1_7.fallback"
+    ],
+    "title": "changelog.v1_7.title"
+  },
+  {
+    "date": "2026-11-02",
     "version": "1.6.0",
     "formats": [
       "word"

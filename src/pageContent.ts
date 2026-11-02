@@ -35,7 +35,8 @@ export const relatedPages: Record<string, string[]> = {
   '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token', '/open-json-file'],
   '/json-validator': ['/json-formatter', '/json-viewer', '/json-unexpected-token'],
   '/txt-viewer': ['/csv-viewer', '/json-viewer', '/word-viewer'],
-  '/word-viewer': ['/open-docx-without-word', '/txt-viewer', '/csv-viewer', '/check-file-upload'],
+  '/word-viewer': ['/open-docx-without-word', '/powerpoint-viewer', '/txt-viewer', '/csv-viewer', '/check-file-upload'],
+  '/powerpoint-viewer': ['/word-viewer', '/excel-viewer', '/check-file-upload'],
   '/excel-to-csv': ['/excel-to-json', '/excel-viewer', '/fix-arabic-csv-in-excel', '/csv-vs-excel-vs-json'],
   '/csv-to-excel': ['/csv-to-json', '/csv-viewer', '/csv-too-big-for-excel'],
   '/excel-to-json': ['/excel-to-csv', '/excel-viewer', '/json-viewer'],
@@ -475,6 +476,92 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'Why does my document look a little different from Word?',
           answer: 'The pages are drawn by your browser, not by Word. Fonts that are not installed on your device are replaced by similar ones, so lines can break in other places, and charts, text boxes and some drawing shapes may be simplified.',
+        },
+      ],
+    },
+    '/powerpoint-viewer': {
+      screenshot: { alt: 'The PowerPoint viewer showing a title slide with a picture, with slide thumbnails on the side and the previous, next and full screen buttons above it', caption: 'A PowerPoint presentation open one slide at a time: thumbnails on the side, the slide counter, and Full screen in the toolbar.' },
+      comparison: {
+        title: 'PowerPoint viewer compared with PowerPoint Online, Google Slides and upload-based viewers',
+        columns: ['OpenAnyDoc', 'PowerPoint Online or Google Slides', 'Upload-based online viewers'],
+        rows: [
+          { label: 'Your file is uploaded', cells: ['No. It is read in your browser.', 'Yes, to Microsoft or Google servers.', 'Yes, to the service\'s server.'] },
+          { label: 'Account or sign-in', cells: ['None.', 'A Microsoft or Google account.', 'Often none; sometimes an email address.'] },
+          { label: 'Edit and save', cells: ['View only for now (beta); editing is coming.', 'Yes, in the cloud copy.', 'Often view only.'] },
+          { label: 'Animations and transitions', cells: ['Not played; each slide is shown in its final state.', 'Played.', 'Varies by service.'] },
+          { label: 'Works without a network once loaded', cells: ['Yes.', 'No.', 'No.'] },
+          { label: 'Cost', cells: ['Free, no ads.', 'Free with an account; paid plans for more.', 'Free with ads, or paid.'] },
+        ],
+      },
+      stepsTitle: 'How it works: open a PowerPoint presentation online',
+      steps: [
+        { title: 'Drop your .pptx file on the page', text: 'Choose or drop a PowerPoint presentation. It is read in your browser, never uploaded, and opens on its first slide.' },
+        { title: 'Move between slides', text: 'Click a thumbnail on the side, use the previous and next buttons, or press the arrow keys, Page Up and Page Down. The counter shows which slide you are on, such as 3 / 24.' },
+        { title: 'Present full screen', text: 'Click Full screen to show only the slide, as large as your screen allows. The arrow keys still move between slides, and Esc leaves full screen.' },
+        { title: 'Download or report a slide', text: 'Download saves the original .pptx again. If a slide looks wrong, Report a slide that looks wrong opens an email to us; no file is sent with it.' },
+      ],
+      handlesTitle: 'What the PowerPoint viewer handles: PPTX files (beta)',
+      handles: [
+        'Files: PowerPoint presentations in the .pptx format, made by PowerPoint, Google Slides, Keynote or LibreOffice. Older .ppt files are not supported: save them as .pptx first.',
+        'Content: text with its fonts and formatting, pictures, tables with merged cells, basic shapes, lines and arrows, and slide backgrounds.',
+        'Simplified: SmartArt is shown as last drawn by PowerPoint, and charts are drawn approximately. Animations and transitions are not played, and embedded video may not play.',
+        'Slides that cannot be drawn: a slide with features the viewer cannot show yet displays a note instead of a broken layout, and the other slides are not affected.',
+        'Navigation: thumbnails, previous and next buttons, arrow keys, a slide counter and full screen.',
+      ],
+      faqTitle: 'PowerPoint viewer online: common questions',
+      faq: [
+        {
+          question: 'Is my file uploaded?',
+          answer: 'No. Your browser reads the presentation itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.',
+          link: { text: 'how to check that a website does not upload your file', path: '/check-file-upload' },
+        },
+        {
+          question: 'Can I edit and save it?',
+          answer: 'Not yet: the PowerPoint viewer shows presentations, and editing is coming. Today you can view the slides, present them full screen, or download the original .pptx again.',
+        },
+        {
+          question: 'Is the original changed?',
+          answer: 'No. The presentation is only read, and the file on your device is never touched.',
+        },
+        {
+          question: 'Is there a file size limit?',
+          answer: 'There is no fixed limit: the limit is your browser\'s memory, and files over 50 MB show a warning first. Presentations with many large pictures take longer to open.',
+        },
+        {
+          question: 'Does it work on mobile?',
+          answer: 'Yes. On a phone the slide fills the width of the screen and the previous and next buttons move between slides; the thumbnail sidebar is shown on wider screens.',
+        },
+        {
+          question: 'Does it work offline?',
+          answer: 'Once the page and its PowerPoint viewer have loaded, opening presentations needs no network. It is not an installable offline app, though: the page has to be loaded online first.',
+        },
+        {
+          question: 'Can my company host its own copy?',
+          answer: 'Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com.',
+        },
+        {
+          question: 'Why is it called beta?',
+          answer: 'Because PowerPoint files can hold many kinds of content, and not all of them are drawn yet. Text, pictures, tables and basic shapes are shown as in PowerPoint; animations, transitions, some effects and embedded video may be simplified or skipped.',
+        },
+        {
+          question: 'Are animations and transitions played?',
+          answer: 'No. Each slide is shown as it looks once all its animations have finished, and slides change without a transition.',
+        },
+        {
+          question: 'What happens if a slide looks wrong?',
+          answer: 'A slide with features the viewer cannot draw yet shows a note instead of a broken layout. If a slide is shown but looks wrong, use Report a slide that looks wrong next to the viewer: it opens an email to us. No file is sent, so describe what you see and please do not attach confidential slides.',
+        },
+        {
+          question: 'Can I present full screen?',
+          answer: 'Yes. Click Full screen: only the slide is shown, as large as your screen allows. Move with the arrow keys, Page Up and Page Down, and press Esc to leave. Some phones, such as iPhones, do not allow full screen in the browser, so the button is hidden there.',
+        },
+        {
+          question: 'Can I open an old .ppt file?',
+          answer: 'No. Only .pptx is supported; a .ppt file shows a message instead. Open it in PowerPoint, Keynote or LibreOffice, save it as a PowerPoint presentation (.pptx), then open the new file here.',
+        },
+        {
+          question: 'Does it show Arabic slides correctly?',
+          answer: 'Arabic text in a slide is shown right to left, as PowerPoint saved it. Fonts that are not installed on your device are replaced by similar ones, so lines can break in other places.',
         },
       ],
     },
@@ -1412,6 +1499,92 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'لماذا يبدو مستندي مختلفًا قليلًا عنه في Word؟',
           answer: 'يرسم متصفحك الصفحات وليس Word. الخطوط غير المثبتة على جهازك تُستبدل بخطوط قريبة منها، فقد تنكسر الأسطر في أماكن أخرى، وقد تُبسَّط المخططات ومربعات النص وبعض الأشكال.',
+        },
+      ],
+    },
+    '/powerpoint-viewer': {
+      screenshot: { alt: 'عارض PowerPoint يعرض شريحة عنوان فيها صورة، وبجانبها الصور المصغّرة للشرائح، وفوقها أزرار السابق والتالي وملء الشاشة', caption: 'عرض PowerPoint مفتوح شريحةً شريحة: الصور المصغّرة بجانبه، وعدّاد الشرائح، و«ملء الشاشة» في شريط الأدوات.' },
+      comparison: {
+        title: 'عارض PowerPoint مقارنةً بـ PowerPoint Online وGoogle Slides والعارضات التي ترفع الملف',
+        columns: ['OpenAnyDoc', 'PowerPoint Online أو Google Slides', 'العارضات التي ترفع الملف'],
+        rows: [
+          { label: 'هل يُرفع ملفك؟', cells: ['لا، يُقرأ في متصفحك.', 'نعم، إلى خوادم Microsoft أو Google.', 'نعم، إلى خادم الخدمة.'] },
+          { label: 'حساب أو تسجيل دخول', cells: ['لا شيء.', 'حساب Microsoft أو Google.', 'غالبًا لا شيء، وأحيانًا بريد إلكتروني.'] },
+          { label: 'التحرير والحفظ', cells: ['للعرض فقط حاليًا (نسخة تجريبية)، والتحرير قادم.', 'نعم، في النسخة السحابية.', 'غالبًا للعرض فقط.'] },
+          { label: 'الحركات والانتقالات', cells: ['لا تُشغَّل؛ تظهر كل شريحة بحالتها النهائية.', 'تُشغَّل.', 'يختلف حسب الخدمة.'] },
+          { label: 'يعمل دون شبكة بعد التحميل', cells: ['نعم.', 'لا.', 'لا.'] },
+          { label: 'التكلفة', cells: ['مجاني وبلا إعلانات.', 'مجاني مع حساب، وخطط مدفوعة للمزيد.', 'مجاني مع إعلانات، أو مدفوع.'] },
+        ],
+      },
+      stepsTitle: 'كيف يعمل: فتح عرض PowerPoint اون لاين',
+      steps: [
+        { title: 'أفلِت ملف .pptx في الصفحة', text: 'اختر عرض PowerPoint أو أفلِته. يُقرأ في متصفحك ولا يُرفع أبدًا، ويُفتح على شريحته الأولى.' },
+        { title: 'تنقّل بين الشرائح', text: 'اضغط صورة مصغّرة في الجانب، أو استخدم زرّي السابق والتالي، أو مفاتيح الأسهم وPage Up وPage Down. ويعرض العدّاد رقم الشريحة الحالية، مثل 3 / 24.' },
+        { title: 'اعرض بملء الشاشة', text: 'اضغط «ملء الشاشة» لتظهر الشريحة وحدها بأكبر حجم تسمح به شاشتك. تبقى مفاتيح الأسهم تنقلك بين الشرائح، ويخرجك Esc من ملء الشاشة.' },
+        { title: 'نزّل الملف أو أبلغ عن شريحة', text: 'يحفظ «تنزيل» ملف .pptx الأصلي من جديد. وإن بدت شريحة خاطئة، فإن «أبلغ عن شريحة تبدو خاطئة» يفتح رسالة بريد إلينا، ولا يُرسل معها أي ملف.' },
+      ],
+      handlesTitle: 'ما يدعمه عارض PowerPoint: ملفات PPTX (نسخة تجريبية)',
+      handles: [
+        'الملفات: عروض PowerPoint بصيغة .pptx، من PowerPoint أو Google Slides أو Keynote أو LibreOffice. ملفات .ppt القديمة غير مدعومة: احفظها بصيغة .pptx أولًا.',
+        'المحتوى: النصوص بخطوطها وتنسيقها، والصور، والجداول بخلاياها المدمجة، والأشكال الأساسية والخطوط والأسهم، وخلفيات الشرائح.',
+        'ما يُبسَّط: يظهر SmartArt كما رسمه PowerPoint آخر مرة، وتُرسم المخططات بشكل تقريبي. لا تُشغَّل الحركات والانتقالات، وقد لا يعمل الفيديو المضمّن.',
+        'الشرائح التي يتعذّر رسمها: تظهر مكانها ملاحظة بدل تخطيط مكسور، ولا تتأثر الشرائح الأخرى.',
+        'التنقّل: صور مصغّرة، وزرّا السابق والتالي، ومفاتيح الأسهم، وعدّاد الشرائح، وملء الشاشة.',
+      ],
+      faqTitle: 'عارض PowerPoint اون لاين: أسئلة شائعة',
+      faq: [
+        {
+          question: 'هل يُرفع ملفي؟',
+          answer: 'لا. يقرأ متصفحك العرض بنفسه ويعرضه على شاشتك، ولا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك. وللتحقق بنفسك، اطّلع على كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          link: { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
+        },
+        {
+          question: 'هل يمكنني تعديله وحفظه؟',
+          answer: 'ليس بعد: عارض PowerPoint يعرض العروض، والتحرير قادم. يمكنك اليوم مشاهدة الشرائح وعرضها بملء الشاشة أو تنزيل ملف .pptx الأصلي من جديد.',
+        },
+        {
+          question: 'هل يتغير الملف الأصلي؟',
+          answer: 'لا. العرض يُقرأ فقط، ولا يُمس الملف الموجود على جهازك أبدًا.',
+        },
+        {
+          question: 'هل هناك حد لحجم الملف؟',
+          answer: 'لا يوجد حد ثابت: الحد هو ذاكرة متصفحك، وتظهر رسالة تحذير أولًا للملفات الأكبر من 50 ميغابايت. وتستغرق العروض التي فيها صور كبيرة كثيرة وقتًا أطول لتُفتح.',
+        },
+        {
+          question: 'هل يعمل على الجوال؟',
+          answer: 'نعم. على الجوال تملأ الشريحة عرض الشاشة، وينقلك زرّا السابق والتالي بين الشرائح؛ ويظهر الشريط الجانبي للصور المصغّرة على الشاشات الأعرض.',
+        },
+        {
+          question: 'هل يعمل بدون إنترنت؟',
+          answer: 'بعد تحميل الصفحة وعارض PowerPoint فيها، لا يحتاج فتح العروض إلى أي شبكة. لكنه ليس تطبيقًا قابلًا للتثبيت: يجب تحميل الصفحة متصلًا أولًا.',
+        },
+        {
+          question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
+          answer: 'نعم. الكود المصدري متاح للجميع على GitHub بترخيص MIT. ابنِه وقدّم المجلد الناتج من أي خادم ويب في شبكتكم، وستبقى الملفات التي يفتحها الموظفون على أجهزتهم دون أن تغادرها. للأسئلة: support@openanydoc.com.',
+        },
+        {
+          question: 'لماذا هو نسخة تجريبية؟',
+          answer: 'لأن ملفات PowerPoint قد تحمل أنواعًا كثيرة من المحتوى، ولا يُرسم كلها بعد. تظهر النصوص والصور والجداول والأشكال الأساسية كما في PowerPoint، أما الحركات والانتقالات وبعض المؤثرات والفيديو المضمّن فقد تُبسَّط أو تُتخطّى.',
+        },
+        {
+          question: 'هل تُشغَّل الحركات والانتقالات؟',
+          answer: 'لا. تظهر كل شريحة كما تبدو بعد انتهاء كل حركاتها، وتتغير الشرائح دون انتقال.',
+        },
+        {
+          question: 'ماذا يحدث إن بدت شريحة خاطئة؟',
+          answer: 'الشريحة التي فيها عناصر لا يستطيع العارض رسمها بعد تظهر مكانها ملاحظة بدل تخطيط مكسور. وإن ظهرت شريحة لكنها تبدو خاطئة، فاستخدم «أبلغ عن شريحة تبدو خاطئة» بجانب العارض: يفتح رسالة بريد إلينا. لا يُرسل أي ملف، فصِف ما تراه، ورجاءً لا ترفق شرائح سرية.',
+        },
+        {
+          question: 'هل يمكنني العرض بملء الشاشة؟',
+          answer: 'نعم. اضغط «ملء الشاشة» لتظهر الشريحة وحدها بأكبر حجم تسمح به شاشتك. تنقّل بمفاتيح الأسهم وPage Up وPage Down، واضغط Esc للخروج. بعض الهواتف، مثل iPhone، لا تسمح بملء الشاشة في المتصفح، فيُخفى الزر فيها.',
+        },
+        {
+          question: 'هل يمكنني فتح ملف .ppt قديم؟',
+          answer: 'لا. الصيغة المدعومة هي .pptx فقط، وملف .ppt تظهر له رسالة بدلًا من ذلك. افتحه في PowerPoint أو Keynote أو LibreOffice واحفظه بصيغة عرض PowerPoint (.pptx)، ثم افتح الملف الجديد هنا.',
+        },
+        {
+          question: 'هل تظهر الشرائح العربية بشكل صحيح؟',
+          answer: 'يظهر النص العربي في الشريحة من اليمين إلى اليسار كما حفظه PowerPoint. والخطوط غير المثبتة على جهازك تُستبدل بخطوط قريبة منها، فقد تنكسر الأسطر في أماكن أخرى.',
         },
       ],
     },

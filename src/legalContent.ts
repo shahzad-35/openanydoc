@@ -55,11 +55,11 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'View only',
-          paragraphs: ['Word documents (.docx) open as pages that you can zoom, print or save as PDF; editing them is coming. Older .doc files are not supported.'],
+          paragraphs: ['Word documents (.docx) open as pages that you can zoom, print or save as PDF; editing them is coming. Older .doc files are not supported.', 'PowerPoint presentations (.pptx) open one slide at a time, with thumbnails and full screen, in beta: animations are not played, and older .ppt files are not supported.'],
         },
         {
           heading: 'Coming later',
-          paragraphs: ['PDF and PowerPoint (.pptx) files are coming. They cannot be opened yet.'],
+          paragraphs: ['PDF files are coming. They cannot be opened yet.'],
         },
         {
           heading: 'Languages',
@@ -181,11 +181,11 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'للعرض فقط',
-          paragraphs: ['تُفتح مستندات وورد (.docx) صفحاتٍ يمكنك تكبيرها وطباعتها أو حفظها PDF، وتحريرها قادم. ملفات .doc القديمة غير مدعومة.'],
+          paragraphs: ['تُفتح مستندات وورد (.docx) صفحاتٍ يمكنك تكبيرها وطباعتها أو حفظها PDF، وتحريرها قادم. ملفات .doc القديمة غير مدعومة.', 'تُفتح عروض باوربوينت (.pptx) شريحةً شريحة، مع صور مصغّرة وملء الشاشة، في نسخة تجريبية: لا تُشغَّل الحركات، وملفات .ppt القديمة غير مدعومة.'],
         },
         {
           heading: 'قريبًا',
-          paragraphs: ['ملفات PDF وباوربوينت (.pptx) قادمة، ولا يمكن فتحها بعد.'],
+          paragraphs: ['ملفات PDF قادمة، ولا يمكن فتحها بعد.'],
         },
         {
           heading: 'اللغات',

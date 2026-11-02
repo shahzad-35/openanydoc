@@ -15,7 +15,7 @@ import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
-import { CHECK_ICON_PATH, CHEVRON_ICON_PATH, SOCIAL_ICON_PATHS, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses } from '../src/pages/changelogMarkup.ts'
+import { CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
 import { AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -36,28 +36,16 @@ const otherLocale = (locale) => (locale === 'en' ? 'ar' : 'en')
 const localizePath = (locale, address) => (address === '/' ? `/${locale}` : `/${locale}${address}`)
 const viewerById = new Map(viewers.map((viewer) => [viewer.id, viewer]))
 
-// The header nav as src/components/SiteNav.tsx draws it on the changelog page (no link is the current page there).
+// The header's closed search box as src/components/SiteNav.tsx draws it on the changelog page; React adds the results panel.
 function renderChangelogNav(locale) {
-  const label = escapeHtml(translate(locale, 'footer.viewers'))
+  const label = escapeHtml(translate(locale, 'search.label'))
   // The classes hold "&" (arbitrary variants), which React writes as &amp;.
   const n = Object.fromEntries(Object.entries(navClasses).map(([part, classes]) => [part, escapeHtml(classes)]))
-  const items = viewers
-    .filter((viewer) => viewer.toolPath)
-    .map((viewer) => `<li><a id="site-nav-link-${viewer.id}" href="${localizePath(locale, viewer.toolPath)}" class="${n.link}">${escapeHtml(pageSeo[locale][viewer.toolPath].linkText)}</a></li>`)
-    .join('')
-  const convertLabel = escapeHtml(translate(locale, 'convert.menuHeading'))
-  const convertItems = landingPages
-    .filter((page) => page.convertTo || page.tool)
-    .map((page) => `<li><a id="site-nav-link-${page.path.slice(1)}" href="${localizePath(locale, page.path)}" class="${n.convertLink}">${escapeHtml(pageSeo[locale][page.path].linkText)}</a></li>`)
-    .join('')
-  const convertMenu =
-    `<li><details id="site-nav-convert" class="${n.convertDetails}"><summary id="site-nav-convert-toggle" class="${n.convertSummary}">${convertLabel}` +
-    `<svg aria-hidden="true" viewBox="0 0 24 24" class="${n.convertChevron}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${CHEVRON_ICON_PATH}"></path></svg></summary>` +
-    `<ul id="site-nav-convert-list" class="${n.convertList}">${convertItems}</ul></details></li>`
+  const formatBlocks = searchBoxFormats.map((format) => `<span class="nav-icon nav-icon-${format}"></span>`).join('')
   return (
-    `<nav id="site-nav" aria-label="${label}" class="${n.nav}"><details id="site-nav-menu" class="${n.details}"><summary id="site-nav-toggle" class="${n.summary}">${label}` +
-    `<svg aria-hidden="true" viewBox="0 0 24 24" class="${n.chevron}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${CHEVRON_ICON_PATH}"></path></svg></summary>` +
-    `<ul id="site-nav-list" class="${n.list}">${items}${convertMenu}</ul></details></nav>`
+    `<nav id="site-nav" aria-label="${label}" class="${n.nav}"><button id="site-search-button" type="button" class="${n.searchButton}" aria-haspopup="dialog" aria-expanded="false">` +
+    `<svg aria-hidden="true" viewBox="0 0 24 24" class="${n.searchIcon}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="${SEARCH_ICON_PATH}"></path></svg>` +
+    `<span class="${n.searchLabel}">${escapeHtml(translate(locale, 'search.button'))}</span><span class="${n.searchFormats}" aria-hidden="true">${formatBlocks}</span></button></nav>`
   )
 }
 
@@ -74,7 +62,6 @@ function renderChangelogFooter(locale) {
     .join('')
   const moreItems =
     landingPages
-      .filter((page) => !page.convertTo)
       .map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))))
       .join('') +
     item(link('footer-link-guides', '/guides', escapeHtml(pageSeo[locale]['/guides'].linkText))) +

@@ -7,7 +7,7 @@ import type { FormatViewerProps } from './registry'
 import { DropOverlay, SheetIconSprite, TopBar, useIsNarrowScreen, useThemeToggle } from './sheet/SheetChrome'
 import './sheet/sheetChrome.css'
 
-// Stands in for formats whose preview is not built yet (PDF, PowerPoint), in the word-processor frame of the other file
+// Stands in for formats whose preview is not built yet (PDF), in the word-processor frame of the other file
 // pages: title row, menu bar, and the message on a page. Only File and Help have items; nothing pretends to edit.
 export default function ComingSoonViewer({ openedFile, onOpenAnotherFile, onClose }: FormatViewerProps) {
   const { locale, t } = useT()
