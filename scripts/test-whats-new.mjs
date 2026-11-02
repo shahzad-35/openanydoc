@@ -13,6 +13,7 @@ import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import ExcelJS from 'exceljs'
+import JSZip from 'jszip'
 import * as XLSX from 'xlsx'
 
 // The brand's social profiles (SOCIAL_PROFILES in src/seo.ts): linked from the footer and listed in the Organization's sameAs.
@@ -195,7 +196,7 @@ async function openPage(pathname) {
 
 // ---------------------------------------------------------------- the tests
 
-const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer']
+const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer']
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
@@ -203,8 +204,8 @@ const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/lar
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
-const comingSoonFile = path.join(scratchFolder, 'letter.docx')
-fs.writeFileSync(comingSoonFile, 'not a real document')
+const comingSoonFile = path.join(scratchFolder, 'slides.pptx')
+fs.writeFileSync(comingSoonFile, 'not a real presentation')
 const unknownFile = path.join(scratchFolder, 'notes.doc')
 fs.writeFileSync(unknownFile, 'not a real document')
 
@@ -239,7 +240,7 @@ const bannerText = () => evaluate(`document.querySelector('[role=region]')?.inne
 await test('home page shows the banner, the badges and takes no focus', async () => {
   await openPage('/en')
   const text = await bannerText()
-  expect(text?.includes('New') && text.includes('You can now open and edit CSV, TXT, JSON, and Excel files'), `banner text was: ${text}`)
+  expect(text?.includes('New') && text.includes('You can now open CSV, TXT, JSON, Excel, and Word files'), `banner text was: ${text}`)
   expect(await evaluate(`document.activeElement === document.body`), 'the banner took focus')
   expect(await evaluate(`document.querySelectorAll('footer nav [data-file-type]').length >= 4`), 'footer badges are missing')
   expect(await evaluate(`[...document.querySelectorAll('footer nav li')].some((item) => item.innerText.includes('JSON viewer') && item.innerText.includes('New'))`), 'the JSON nav link has no New badge')
@@ -426,12 +427,20 @@ XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet([['Name', 'Qty'],
 fs.writeFileSync(sampleWorkbook, XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }))
 const sampleLegacyWorkbook = path.join(scratchFolder, 'legacy.xls')
 fs.writeFileSync(sampleLegacyWorkbook, XLSX.write(workbook, { type: 'buffer', bookType: 'biff8' }))
+// The smallest real .docx: one paragraph and one table.
+const sampleDocument = path.join(scratchFolder, 'sample.docx')
+const documentZip = new JSZip()
+documentZip.file('[Content_Types].xml', '<?xml version="1.0" encoding="UTF-8"?><Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>')
+documentZip.file('_rels/.rels', '<?xml version="1.0" encoding="UTF-8"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>')
+documentZip.file('word/document.xml', '<?xml version="1.0" encoding="UTF-8"?><w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:body><w:p><w:r><w:t>Sample document</w:t></w:r></w:p><w:tbl><w:tr><w:tc><w:p><w:r><w:t>Name</w:t></w:r></w:p></w:tc><w:tc><w:p><w:r><w:t>Qty</w:t></w:r></w:p></w:tc></w:tr></w:tbl><w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440"/></w:sectPr></w:body></w:document>')
+fs.writeFileSync(sampleDocument, await documentZip.generateAsync({ type: 'nodebuffer' }))
 
 for (const [name, address, file, readyElement] of [
   ['CSV', '/en/csv-viewer', sampleCsv, '#data-table'],
   ['TXT', '/en/txt-viewer', sampleText, '#text-editor'],
   ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row'],
   ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table'],
+  ['Word', '/en/word-viewer', sampleDocument, '#word-document section.docx'],
 ]) {
   for (const locale of ['en', 'ar']) await test(`${name} (${locale}): every field has an id and no id repeats (page, view mode, edit mode, an open menu)`, async () => {
     await openPage(address.replace('/en/', `/${locale}/`))
@@ -493,7 +502,7 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
   expect((await evaluate(`document.documentElement.style.getPropertyValue('--ext-pill-1')`)) !== '', 'the inline theme script did not run (blocked by the CSP?)')
 })
 
-const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
+const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
@@ -533,14 +542,15 @@ await test('every sitemap address has a lastmod date and is a built page without
 })
 
 // The upper bound was 900 before the home page gained its stats row, shortcut keycaps, privacy comparison and the note on how
-// the demo works (2026-10-19), and 1000 before the five conversion pages joined the home page's tool links (2026-10-29).
-await test('the home page has 600 to 1050 words in its server HTML, eight questions and a card linking to each tool page', async () => {
+// the demo works (2026-10-19), and 1000 before the five conversion pages joined the home page's tool links (2026-10-29), and 1050 before the Word viewer
+// added its nav and footer links, home card and format group (2026-11-02).
+await test('the home page has 600 to 1100 words in its server HTML, eight questions and a card linking to each tool page', async () => {
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
     const wordCount = prerenderedText(html).split(/\s+/).filter(Boolean).length
-    expect(wordCount >= 600 && wordCount <= 1050, `/${locale}: ${wordCount} words`)
+    expect(wordCount >= 600 && wordCount <= 1100, `/${locale}: ${wordCount} words`)
     expect((html.match(/id="faq-item-\d+"/g) ?? []).length === 8, `/${locale}: the FAQ does not have eight questions`)
-    for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer']) {
+    for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer']) {
       expect(new RegExp(`id="tool-card-link-${page}" href="/${locale}/${page}"`).test(html), `/${locale}: no card links to /${locale}/${page}`)
     }
   }
@@ -645,7 +655,7 @@ await test('About, Privacy, Terms and guide pages: one h1, their own title and d
 
 await test('format pages show a real screenshot and a comparison table in both languages', async () => {
   for (const locale of ['en', 'ar']) {
-    for (const [page, viewerId] of [['/csv-viewer', 'csv'], ['/excel-viewer', 'excel'], ['/json-viewer', 'json'], ['/txt-viewer', 'text']]) {
+    for (const [page, viewerId] of [['/csv-viewer', 'csv'], ['/excel-viewer', 'excel'], ['/json-viewer', 'json'], ['/txt-viewer', 'text'], ['/word-viewer', 'word']]) {
       const html = await (await fetch(`${siteOrigin}/${locale}${page}`)).text()
       const image = /<img src="(\/screenshots\/[\w-]+\.webp)" width="1200" height="750" loading="lazy" decoding="async" alt="([^"]+)"/.exec(html)
       expect(image !== null && image[1] === `/screenshots/${locale}-${viewerId}.webp` && image[2].length > 20, `/${locale}${page}: the screenshot is missing its size, lazy loading or alt text`)
@@ -689,7 +699,7 @@ await test('the footer has About, Privacy and Terms links and the Microsoft disc
     expect(html.includes('id="footer-disclaimer"') && html.includes(`id="footer-link-privacy" href="/${locale}/privacy"`), `${locale}: the static changelog has no footer`)
   }
   await openPage('/en')
-  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === 4 && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
+  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === 5 && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
   await openPage('/ar')
   const arabicFooterFits = await evaluate(`(() => {
     const width = document.documentElement.clientWidth
@@ -707,6 +717,7 @@ for (const [name, address, file, readyElement, menuButton] of [
   ['JSON', '/en/json-viewer', sampleJson, '#tree-view .row', '#more-button'],
   ['TXT', '/en/txt-viewer', sampleText, '#text-editor', '#ribbon-tab-file'],
   ['Excel', '/en/excel-viewer', sampleWorkbook, '#data-table', '#menu-help'],
+  ['Word', '/en/word-viewer', sampleDocument, '#word-document section.docx', '#menu-help'],
 ]) {
   for (const locale of ['en', 'ar']) await test(`${name} (${locale}): Privacy, Terms and the disclaimer in the menu, and the status bar links, open in a new tab`, async () => {
     await openPage(address.replace('/en/', `/${locale}/`))
@@ -728,26 +739,27 @@ for (const [name, address, file, readyElement, menuButton] of [
 
 // ---------------------------------------------------------------- one drop zone for every format
 
-await test('the format list is read from the registry: View and edit, or Coming soon', async () => {
-  for (const [locale, words] of [['en', { edit: 'View and edit', soon: 'Coming soon' }], ['ar', { edit: 'عرض وتحرير', soon: 'قريبًا' }]]) {
+await test('the format list is read from the registry: View and edit, View, or Coming soon', async () => {
+  for (const [locale, words] of [['en', { edit: 'View and edit', view: 'View', soon: 'Coming soon' }], ['ar', { edit: 'عرض وتحرير', view: 'عرض', soon: 'قريبًا' }]]) {
     await openPage(`/${locale}`)
     for (const id of ['csv', 'text', 'json', 'excel']) {
       expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.edit, `${locale}: ${id} does not say "${words.edit}"`)
     }
-    for (const id of ['word', 'pdf', 'powerpoint']) {
+    expect((await evaluate(`document.querySelector('#extension-row-word #extension-capabilities-word')?.innerText`)) === words.view, `${locale}: word does not say "${words.view}"`)
+    for (const id of ['pdf', 'powerpoint']) {
       expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.soon, `${locale}: ${id} does not say "${words.soon}"`)
     }
   }
 })
 
 await test('one drop zone opens every live format with its tools; Coming soon stays on the page', async () => {
-  const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook]]
+  const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook], ['Word', sampleDocument]]
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
     await chooseFile(file)
-    await waitFor(`(${name === 'Excel'} && document.querySelector('#excel-workbench')) || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench'))`, `the ${name} file page`)
+    await waitFor(`(${name === 'Excel'} && document.querySelector('#excel-workbench')) || (${name === 'JSON'} && document.querySelector('#json-workbench')) || (${name === 'CSV'} && document.querySelector('#csv-workbench')) || (${name === 'TXT'} && document.querySelector('#txt-workbench')) || (${name === 'Word'} && document.querySelector('#word-document section.docx'))`, `the ${name} file page`)
     expect(!(await evaluate('location.href')).includes('sample'), `${name}: the file name reached the URL`)
-    await waitFor(`document.querySelector('#menu-bar #menu-format, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button')`, `the ${name} tools`)
+    await waitFor(`document.querySelector('#menu-bar #menu-format, #command-toolbar #validate-button, #command-bar #filter-button:not(:disabled), #ribbon-panel #ribbon-find-replace-button, #toolbar #fit-width-button')`, `the ${name} tools`)
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
@@ -777,9 +789,20 @@ await test('/ goes to /ar for an Arabic browser and to /en otherwise; old addres
   await openPage('/')
   expect((await evaluate('location.pathname')) === '/en', `an English browser landed on ${await evaluate('location.pathname')}`)
   expect(await evaluate(`document.documentElement.lang === 'en' && document.documentElement.dir === 'ltr'`), 'lang and dir are not en and ltr')
-  for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer']) {
+  for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer']) {
     await openPage(`/${page}`)
     expect((await evaluate('location.pathname')) === `/en/${page}`, `/${page} landed on ${await evaluate('location.pathname')}`)
+  }
+})
+
+await test('an old .doc file gets the "only .docx" message, on the Word page and the home page', async () => {
+  for (const address of ['/en/word-viewer', '/ar/word-viewer', '/en']) {
+    await openPage(address)
+    await chooseFile(unknownFile)
+    await waitFor(`document.querySelector('#toast-region:popover-open')`, `${address}: the .doc message`)
+    expect((await evaluate(`document.querySelector('#toast-region').innerText`)).includes('.docx'), `${address}: the .doc message does not mention .docx`)
+    expect((await evaluate('location.pathname')) === address, `${address}: the page changed for a .doc file`)
+    await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
   }
 })
 

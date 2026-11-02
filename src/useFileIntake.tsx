@@ -72,10 +72,17 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     setComingSoonViewer(null)
     setLargeFileWarning(null)
 
-    // A registered format whose viewer is not built yet (Word, PDF, PowerPoint): say so instead of opening a page or an error.
+    // A registered format whose viewer is not built yet (PDF, PowerPoint): say so instead of opening a page or an error.
     const droppedViewer = findViewerForFileName(file.name)
     if (droppedViewer && getFormatCapabilities(droppedViewer.id)?.isComingSoon) {
       setComingSoonViewer(droppedViewer)
+      return
+    }
+
+    // Old binary Word files cannot be read in the browser; say how to get a .docx instead of the generic "cannot open".
+    if (file.name.toLowerCase().endsWith('.doc')) {
+      setErrorMessage(t('intake.legacyWord'))
+      setErrorDetail(t('intake.legacyWordDetail'))
       return
     }
 
@@ -177,7 +184,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       id="file-input"
       ref={fileInputRef}
       type="file"
-      accept={choosableExtensions.join(',')}
+      // .doc stays choosable wherever .docx is, so an old Word file gets its own message.
+      accept={[...choosableExtensions, ...(choosableExtensions.includes('.docx') ? ['.doc'] : [])].join(',')}
       aria-label={t('intake.fileInputLabel', { extensions: isolateLeftToRight(choosableExtensions.join(', ')) })}
       className="hidden"
       onChange={(event) => {

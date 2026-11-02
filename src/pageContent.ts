@@ -34,7 +34,8 @@ export const relatedPages: Record<string, string[]> = {
   '/json-viewer': ['/json-formatter', '/json-validator', '/json-to-csv', '/mask-data', '/csv-viewer', '/open-json-file', '/anonymize-data-before-sharing'],
   '/json-formatter': ['/json-validator', '/json-viewer', '/json-unexpected-token', '/open-json-file'],
   '/json-validator': ['/json-formatter', '/json-viewer', '/json-unexpected-token'],
-  '/txt-viewer': ['/csv-viewer', '/json-viewer'],
+  '/txt-viewer': ['/csv-viewer', '/json-viewer', '/word-viewer'],
+  '/word-viewer': ['/open-docx-without-word', '/txt-viewer', '/csv-viewer', '/check-file-upload'],
   '/excel-to-csv': ['/excel-to-json', '/excel-viewer', '/fix-arabic-csv-in-excel', '/csv-vs-excel-vs-json'],
   '/csv-to-excel': ['/csv-to-json', '/csv-viewer', '/csv-too-big-for-excel'],
   '/excel-to-json': ['/excel-to-csv', '/excel-viewer', '/json-viewer'],
@@ -391,6 +392,89 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'Can I open text files with Arabic or other non-English characters?',
           answer: 'Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it.',
+        },
+      ],
+    },
+    '/word-viewer': {
+      screenshot: { alt: 'The Word viewer showing a document as a page with a table, a list and a picture, and the zoom and print buttons above it', caption: 'A Word document open as pages: its table, lists and picture, with zoom, fit to width and Print / Save as PDF in the toolbar.' },
+      comparison: {
+        title: 'Word viewer compared with Word Online, Google Docs and upload-based viewers',
+        columns: ['OpenAnyDoc', 'Word Online or Google Docs', 'Upload-based online viewers'],
+        rows: [
+          { label: 'Your file is uploaded', cells: ['No. It is read in your browser.', 'Yes, to Microsoft or Google servers.', 'Yes, to the service\'s server.'] },
+          { label: 'Account or sign-in', cells: ['None.', 'A Microsoft or Google account.', 'Often none; sometimes an email address.'] },
+          { label: 'Edit and save', cells: ['View only for now; editing is coming. Print or save as PDF works today.', 'Yes, in the cloud copy.', 'Often view only.'] },
+          { label: 'Works without a network once loaded', cells: ['Yes.', 'No.', 'No.'] },
+          { label: 'Size', cells: ['No fixed limit; it depends on your browser\'s memory.', 'Set by the service.', 'Set by the service.'] },
+          { label: 'Cost', cells: ['Free, no ads.', 'Free with an account; paid plans for more.', 'Free with ads, or paid.'] },
+        ],
+      },
+      stepsTitle: 'How it works: open a Word document online',
+      steps: [
+        { title: 'Drop your .docx file on the page', text: 'Choose or drop a Word document. It is read in your browser, never uploaded, and laid out as pages with its own page size and margins.' },
+        { title: 'Read it as Word shows it', text: 'Fonts, bold and colours, tables with shading and merged cells, pictures, bullet and numbered lists, and each page\'s header and footer with its page number are drawn as in the document.' },
+        { title: 'Zoom or fit the page', text: 'Use the zoom buttons to read small print, or Fit to width to fit the page to your screen. On a phone the page starts fitted.' },
+        { title: 'Print or save as PDF', text: 'Click Print / Save as PDF. Your browser\'s print dialog opens with the document\'s pages only; choose your printer, or Save as PDF to make a PDF copy.' },
+      ],
+      handlesTitle: 'What the Word viewer handles: DOCX files',
+      handles: [
+        'Files: Word documents in the .docx format, made by Word, Google Docs, Pages or LibreOffice. Older .doc files are not supported: save them as .docx first.',
+        'Layout: page size and margins, page breaks, headers and footers with page numbers, footnotes and endnotes.',
+        'Content: fonts and text formatting, tables with borders, shading and merged cells, pictures, and bullet and numbered lists.',
+        'Arabic: right-to-left paragraphs and tables, with Arabic and English mixed in one line.',
+        'Output: zoom from 50% to 200% or fit to width, print, save as PDF, or download the original file.',
+      ],
+      faqTitle: 'Word viewer online: common questions',
+      faq: [
+        {
+          question: 'Is my file uploaded?',
+          answer: 'No. Your browser reads the Word document itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.',
+          link: { text: 'how to check that a website does not upload your file', path: '/check-file-upload' },
+        },
+        {
+          question: 'Can I edit and save it?',
+          answer: 'Not yet: the Word viewer shows documents, and editing is coming. Today you can zoom, print the document, save it as PDF with Print / Save as PDF, or download the original .docx again.',
+        },
+        {
+          question: 'Is the original changed?',
+          answer: 'No. The document is only read, and the file on your device is never touched.',
+        },
+        {
+          question: 'Is there a file size limit?',
+          answer: 'There is no fixed limit: the limit is your browser\'s memory, and files over 50 MB show a warning first. Long documents with many pictures take longer to lay out.',
+        },
+        {
+          question: 'Does it work on mobile?',
+          answer: 'Yes. On a phone the page is fitted to the screen width, and you can zoom in to read small print or print to PDF from the phone\'s share or print menu.',
+        },
+        {
+          question: 'Does it work offline?',
+          answer: 'Once the page and its Word viewer have loaded, opening documents needs no network. It is not an installable offline app, though: the page has to be loaded online first.',
+        },
+        {
+          question: 'Can my company host its own copy?',
+          answer: 'Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com.',
+        },
+        {
+          question: 'How do I open a DOCX file without Microsoft Word?',
+          answer: 'Drop the .docx file on this page. It opens in your browser as pages, with its formatting, on Windows, macOS, Linux, ChromeOS, Android or iPhone, with no Word licence, no Office install and no account. For the other free options, see how to open a DOCX file without Word.',
+          link: { text: 'how to open a DOCX file without Word', path: '/open-docx-without-word' },
+        },
+        {
+          question: 'Can I open an old .doc file?',
+          answer: 'No. Only .docx is supported; a .doc file shows a message instead. Open it in Word, Pages or LibreOffice, choose Save As and pick Word Document (.docx), then open the new file here.',
+        },
+        {
+          question: 'How do I convert a Word document to PDF?',
+          answer: 'Open the .docx here and click Print / Save as PDF. In the print dialog, choose Save as PDF (or Microsoft Print to PDF on Windows) as the printer. Only the document\'s pages are printed, without the page around them.',
+        },
+        {
+          question: 'Does it show Arabic Word documents correctly?',
+          answer: 'Yes. Right-to-left paragraphs read from right to left, right-to-left tables keep their columns in order from the right, and English words and numbers inside Arabic sentences stay in place.',
+        },
+        {
+          question: 'Why does my document look a little different from Word?',
+          answer: 'The pages are drawn by your browser, not by Word. Fonts that are not installed on your device are replaced by similar ones, so lines can break in other places, and charts, text boxes and some drawing shapes may be simplified.',
         },
       ],
     },
@@ -1245,6 +1329,89 @@ export const formatGuides: Record<Locale, Record<string, FormatGuide>> = {
         {
           question: 'هل يمكنني فتح ملفات نصية فيها حروف عربية أو بلغات أخرى؟',
           answer: 'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، وهو الترميز العربي القديم. ويُعرض كل سطر باتجاه القراءة الخاص به. وإذا ظهر النص بشكل خاطئ، فاختر ترميزًا آخر في تبويب «ملف» وأعد فتحه.',
+        },
+      ],
+    },
+    '/word-viewer': {
+      screenshot: { alt: 'عارض Word يعرض مستندًا صفحةً فيها جدول وقائمة وصورة، وفوقها أزرار التكبير والطباعة', caption: 'مستند Word مفتوح صفحاتٍ: جدوله وقوائمه وصورته، مع التكبير وملاءمة العرض و«طباعة / حفظ PDF» في شريط الأدوات.' },
+      comparison: {
+        title: 'عارض Word مقارنةً بـ Word Online وGoogle Docs والعارضات التي ترفع الملف',
+        columns: ['OpenAnyDoc', 'Word Online أو Google Docs', 'عارضات اون لاين ترفع الملف'],
+        rows: [
+          { label: 'هل يُرفع ملفك؟', cells: ['لا. يُقرأ في متصفحك.', 'نعم، إلى خوادم Microsoft أو Google.', 'نعم، إلى خادم الخدمة.'] },
+          { label: 'حساب أو تسجيل دخول', cells: ['لا شيء.', 'حساب Microsoft أو Google.', 'غالبًا لا؛ وأحيانًا بريد إلكتروني.'] },
+          { label: 'التحرير والحفظ', cells: ['للعرض فقط حاليًا، والتحرير قادم. الطباعة والحفظ PDF متاحان اليوم.', 'نعم، في النسخة السحابية.', 'غالبًا عرض فقط.'] },
+          { label: 'يعمل بلا شبكة بعد تحميل الصفحة', cells: ['نعم.', 'لا.', 'لا.'] },
+          { label: 'الحجم', cells: ['لا يوجد حد ثابت؛ يعتمد على ذاكرة متصفحك.', 'تحدده الخدمة.', 'تحدده الخدمة.'] },
+          { label: 'التكلفة', cells: ['مجاني بلا إعلانات.', 'مجاني مع حساب، وخطط مدفوعة للمزيد.', 'مجاني مع إعلانات، أو مدفوع.'] },
+        ],
+      },
+      stepsTitle: 'كيف يعمل: فتح ملف وورد اون لاين',
+      steps: [
+        { title: 'أفلت ملف .docx على الصفحة', text: 'اختر مستند Word أو أفلته. يُقرأ داخل متصفحك ولا يُرفع أبدًا، ويُرتَّب صفحاتٍ بمقاس الصفحة وهوامشها كما في المستند.' },
+        { title: 'اقرأه كما يعرضه Word', text: 'تُرسم الخطوط والخط العريض والألوان، والجداول بتظليلها وخلاياها المدمجة، والصور، والقوائم النقطية والمرقمة، وترويسة كل صفحة وتذييلها برقم الصفحة، كما في المستند.' },
+        { title: 'كبّر أو لائم الصفحة', text: 'استخدم أزرار التكبير والتصغير لقراءة الخط الصغير، أو «ملاءمة العرض» لتناسب الصفحة شاشتك. وعلى الجوال تبدأ الصفحة ملائمةً للشاشة.' },
+        { title: 'اطبع أو احفظ PDF', text: 'انقر «طباعة / حفظ PDF». تُفتح نافذة الطباعة في متصفحك بصفحات المستند وحدها؛ اختر طابعتك، أو الحفظ بصيغة PDF لإنشاء نسخة PDF.' },
+      ],
+      handlesTitle: 'ما يدعمه عارض Word: ملفات DOCX',
+      handles: [
+        'الملفات: مستندات Word بصيغة .docx، المنشأة في Word أو Google Docs أو Pages أو LibreOffice. ملفات .doc القديمة غير مدعومة: احفظها بصيغة .docx أولًا.',
+        'التخطيط: مقاس الصفحة وهوامشها، وفواصل الصفحات، والترويسات والتذييلات بأرقام الصفحات، والحواشي السفلية والختامية.',
+        'المحتوى: الخطوط وتنسيق النص، والجداول بحدودها وتظليلها وخلاياها المدمجة، والصور، والقوائم النقطية والمرقمة.',
+        'العربية: الفقرات والجداول من اليمين إلى اليسار، مع العربية والإنجليزية معًا في سطر واحد.',
+        'الإخراج: تكبير من 50% إلى 200% أو ملاءمة العرض، والطباعة، والحفظ PDF، وتنزيل الملف الأصلي.',
+      ],
+      faqTitle: 'عارض وورد اون لاين: أسئلة شائعة',
+      faq: [
+        {
+          question: 'هل يُرفع ملفي؟',
+          answer: 'لا. يقرأ متصفحك مستند Word بنفسه ويعرضه على شاشتك. لا يُرسل شيء إلى أي خادم، فلا يغادر الملف جهازك. ولتتحقق بنفسك، اقرأ كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          link: { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
+        },
+        {
+          question: 'هل يمكنني تعديله وحفظه؟',
+          answer: 'ليس بعد: يعرض عارض Word المستندات، والتحرير قادم. يمكنك اليوم تكبير المستند وطباعته وحفظه PDF من «طباعة / حفظ PDF»، أو تنزيل ملف .docx الأصلي مرة أخرى.',
+        },
+        {
+          question: 'هل يتغير الملف الأصلي؟',
+          answer: 'لا. المستند يُقرأ فقط، ولا يُمس الملف الموجود على جهازك أبدًا.',
+        },
+        {
+          question: 'هل هناك حد لحجم الملف؟',
+          answer: 'لا يوجد حد ثابت: الحد هو ذاكرة متصفحك، وتظهر رسالة تحذير أولًا للملفات التي تزيد على 50 ميغابايت. والمستندات الطويلة التي فيها صور كثيرة تستغرق وقتًا أطول في ترتيب صفحاتها.',
+        },
+        {
+          question: 'هل يعمل على الجوال؟',
+          answer: 'نعم. على الجوال تُلاءم الصفحة عرض الشاشة، ويمكنك التكبير لقراءة الخط الصغير أو الطباعة إلى PDF من قائمة المشاركة أو الطباعة في الجوال.',
+        },
+        {
+          question: 'هل يعمل بدون إنترنت؟',
+          answer: 'بعد تحميل الصفحة وعارض Word، لا يحتاج فتح المستندات إلى أي اتصال بالإنترنت. لكنه ليس تطبيقًا يُثبَّت للعمل دون اتصال: يجب تحميل الصفحة وأنت متصل أولًا.',
+        },
+        {
+          question: 'هل يمكن لشركتي استضافة نسخة خاصة بها؟',
+          answer: 'نعم. الكود المصدري متاح للجميع على GitHub بترخيص MIT. ابنِه وقدّم المجلد الناتج من أي خادم ويب في شبكتكم، وستبقى الملفات التي يفتحها الموظفون على أجهزتهم دون أن تغادرها. للأسئلة: support@openanydoc.com.',
+        },
+        {
+          question: 'كيف أفتح ملف DOCX بدون برنامج وورد؟',
+          answer: 'أفلِت ملف .docx على هذه الصفحة، فيُفتح في متصفحك صفحاتٍ بتنسيقه، على Windows أو macOS أو Linux أو ChromeOS أو Android أو iPhone، بدون ترخيص Word وبدون تثبيت Office وبدون حساب. وللخيارات المجانية الأخرى، اقرأ كيف تفتح ملف DOCX بدون وورد.',
+          link: { text: 'كيف تفتح ملف DOCX بدون وورد', path: '/open-docx-without-word' },
+        },
+        {
+          question: 'هل يمكنني فتح ملف .doc قديم؟',
+          answer: 'لا. الصيغة المدعومة هي .docx فقط، ويظهر لملف .doc رسالة بدلًا منه. افتحه في Word أو Pages أو LibreOffice، واختر «حفظ باسم» ثم «مستند Word (.docx)»، ثم افتح الملف الجديد هنا.',
+        },
+        {
+          question: 'كيف أحوّل ملف وورد إلى PDF؟',
+          answer: 'افتح ملف .docx هنا وانقر «طباعة / حفظ PDF». في نافذة الطباعة اختر «حفظ بصيغة PDF» (أو Microsoft Print to PDF في Windows) طابعةً. تُطبع صفحات المستند وحدها، بدون الصفحة التي حولها.',
+        },
+        {
+          question: 'هل يعرض مستندات Word العربية بشكل صحيح؟',
+          answer: 'نعم. تُقرأ الفقرات العربية من اليمين إلى اليسار، وتبقى أعمدة الجداول العربية مرتبة من اليمين، وتبقى الكلمات الإنجليزية والأرقام داخل الجمل العربية في مكانها.',
+        },
+        {
+          question: 'لماذا يبدو مستندي مختلفًا قليلًا عنه في Word؟',
+          answer: 'يرسم متصفحك الصفحات وليس Word. الخطوط غير المثبتة على جهازك تُستبدل بخطوط قريبة منها، فقد تنكسر الأسطر في أماكن أخرى، وقد تُبسَّط المخططات ومربعات النص وبعض الأشكال.',
         },
       ],
     },

@@ -45,6 +45,7 @@
   --xlsx: #2ead60; --xlsx-base: #19733d; --xlsx-glow: rgba(25, 115, 61, 0.5); --xlsx-ink: #0b3a1e;
   --json: #7a5cff; --json-base: #4a31c4; --json-glow: rgba(74, 49, 196, 0.5); --json-ink: #ffffff;
   --txt: #ff8a3d; --txt-base: #c25a16; --txt-glow: rgba(194, 90, 22, 0.5); --txt-ink: #2a1300;
+  --docx: #3d7cf2; --docx-base: #1f4fae; --docx-ink: #ffffff;
   --yellow: #ffd84d; --yellow-base: #d9a900; --yellow-glow: rgba(217, 169, 0, 0.55); --yellow-ink: #2a2100;
   --warn: #ffb020; --warn-base: #c27c00; --warn-ink: #2a1d00; --warn-bg: #fff8ec;
   --ok: #2ead60; --ok-base: #19733d;

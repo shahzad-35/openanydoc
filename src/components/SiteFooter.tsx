@@ -8,7 +8,7 @@ import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
 
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
-const viewerGlyphs: Partial<Record<Viewer['id'], MiniFormat>> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx' }
+const viewerGlyphs: Partial<Record<Viewer['id'], MiniFormat>> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx', word: 'docx' }
 
 // A link that changes the page without reloading (the app has no router package); modified clicks open a new tab as usual.
 // `path` is the address without its language ('/csv-viewer'); the link goes to the page in the current language.

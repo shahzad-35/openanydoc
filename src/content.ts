@@ -7,7 +7,7 @@ export type Locale = 'en' | 'ar'
 
 export const features: Record<Locale, string[]> = {
   en: [
-    'CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files open in your browser today; Word, PDF and PowerPoint are coming.',
+    'CSV, Excel (XLSX, XLS, XLSM, ODS), JSON, TXT and Word (DOCX) files open in your browser today; PDF and PowerPoint are coming.',
     'Edit as well as view, with undo and redo, then download the file in its own format.',
     'Large files: a 120,000-row CSV opens in under a second, and files over 50 MB show a warning.',
     'Arabic and right-to-left text is shown correctly (UTF-8, UTF-16 and Windows-1256), and the whole site is in English and Arabic.',
@@ -15,7 +15,7 @@ export const features: Record<Locale, string[]> = {
     'Mask sensitive data (names, emails, phone numbers, IDs, IBANs, card numbers) before you share a file, with an optional private key to restore it.',
   ],
   ar: [
-    'تُفتح ملفات CSV وExcel (XLSX وXLS وXLSM وODS) وJSON وTXT في متصفحك اليوم، وملفات Word وPDF وPowerPoint قادمة.',
+    'تُفتح ملفات CSV وExcel (XLSX وXLS وXLSM وODS) وJSON وTXT وWord (DOCX) في متصفحك اليوم، وملفات PDF وPowerPoint قادمة.',
     'عرض وتعديل معًا، مع التراجع والإعادة، ثم تنزيل الملف بصيغته نفسها.',
     'الملفات الكبيرة: يُفتح ملف CSV من 120,000 صف في أقل من ثانية، وتظهر رسالة تحذير للملفات الأكبر من 50 ميغابايت.',
     'يُعرض النص العربي من اليمين إلى اليسار بشكل صحيح (UTF-8 وUTF-16 وWindows-1256)، والموقع كله بالعربية والإنجليزية.',
@@ -31,6 +31,7 @@ export const toolCards: Record<Locale, { path: string; linkText: string; text: s
     { path: '/excel-viewer', linkText: 'Open Excel files online', text: 'View XLSX, XLS, XLSM and ODS workbooks with every sheet, edit cells and formulas, and save.' },
     { path: '/json-viewer', linkText: 'View and format JSON online', text: 'Explore JSON as a tree, validate it, fix errors, then pretty print or minify it.' },
     { path: '/txt-viewer', linkText: 'Open TXT files online', text: 'Read and edit plain text with find and replace, line tools and word counts.' },
+    { path: '/word-viewer', linkText: 'Open Word documents online', text: 'View DOCX files as pages, zoom in, and print or save as PDF.' },
     { path: '/mask-data', linkText: 'Mask sensitive data', text: 'Find names, emails, phone numbers, IDs and card numbers in CSV, Excel and JSON files and mask them before you share.' },
   ],
   ar: [
@@ -38,6 +39,7 @@ export const toolCards: Record<Locale, { path: string; linkText: string; text: s
     { path: '/excel-viewer', linkText: 'فتح ملف اكسل اون لاين', text: 'اعرض مصنفات XLSX وXLS وXLSM وODS بكل أوراقها، وعدّل الخلايا والصيغ ثم احفظ المصنف.' },
     { path: '/json-viewer', linkText: 'عارض JSON وتنسيقه اون لاين', text: 'استعرض JSON كشجرة، وتحقق منه وأصلح أخطاءه، ثم نسّقه أو صغّره.' },
     { path: '/txt-viewer', linkText: 'فتح ملف TXT اون لاين', text: 'اقرأ النص العادي وعدّله مع البحث والاستبدال وأدوات الأسطر وعدّ الكلمات.' },
+    { path: '/word-viewer', linkText: 'فتح ملف وورد اون لاين', text: 'اعرض ملفات DOCX صفحاتٍ، وكبّرها، واطبعها أو احفظها PDF.' },
     { path: '/mask-data', linkText: 'إخفاء البيانات الحساسة', text: 'اعثر على الأسماء والبريد وأرقام الهواتف والهويات والبطاقات في ملفات CSV وExcel وJSON وأخفِها قبل المشاركة.' },
   ],
 }
@@ -54,7 +56,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     },
     {
       question: 'Which file types can I open?',
-      answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json) and Excel (.xlsx, .xls, .xlsm, .ods). Word (.docx), PDF (.pdf) and PowerPoint (.pptx) are on the way.',
+      answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json), Excel (.xlsx, .xls, .xlsm, .ods) and Word documents (.docx) to view. PDF (.pdf) and PowerPoint (.pptx) are on the way.',
     },
     {
       question: 'Can I edit my file and save the changes?',
@@ -88,7 +90,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     },
     {
       question: 'ما أنواع الملفات التي يمكنني فتحها؟',
-      answer: 'جداول CSV والجداول المفصولة بعلامة جدولة (.csv و.tsv و.tab)، والنصوص العادية (.txt)، وJSON (.json)، وExcel (.xlsx و.xls و.xlsm و.ods). أما Word (.docx) وPDF (.pdf) وPowerPoint (.pptx) فهي قادمة قريبًا.',
+      answer: 'جداول CSV والجداول المفصولة بعلامة جدولة (.csv و.tsv و.tab)، والنصوص العادية (.txt)، وJSON (.json)، وExcel (.xlsx و.xls و.xlsm و.ods)، ومستندات Word (.docx) للعرض. أما PDF (.pdf) وPowerPoint (.pptx) فهي قادمة قريبًا.',
     },
     {
       question: 'هل يمكنني تحرير ملفي وحفظ التغييرات؟',

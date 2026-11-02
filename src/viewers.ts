@@ -20,7 +20,7 @@ export const viewers: Viewer[] = [
   { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer' },
   { id: 'json', label: 'JSON', extensions: ['.json'], toolPath: '/json-viewer' },
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer' },
-  { id: 'word', label: 'Word', extensions: ['.docx'] },
+  { id: 'word', label: 'Word', extensions: ['.docx'], toolPath: '/word-viewer' },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'] },
   { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'] },
 ]
@@ -67,7 +67,7 @@ export const landingPages: LandingPage[] = [
 const LEGACY_FILE_VIEW_PATH = '/view'
 
 // A file keeps the address of its format's own page (/csv-viewer, /txt-viewer, /json-viewer), so the address and a reload
-// both make sense. Formats without a page of their own use /view-excel, /view-word, /view-pdf, /view-powerpoint while open.
+// both make sense. Formats without a page of their own use /view-pdf, /view-powerpoint while open.
 export function getFileViewPath(fileName: string) {
   const viewer = findViewerForFileName(fileName)
   return viewer?.toolPath ?? `/view-${viewer?.id ?? 'file'}`

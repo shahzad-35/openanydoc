@@ -383,6 +383,61 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/open-docx-without-word': {
+      published: '2026-11-02',
+      updated: '2026-11-02',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['A .docx file is a Word document, but you do not need Microsoft Word to open it. A browser-based viewer, LibreOffice Writer, Google Docs and Apple Pages all read it for free. They differ in two ways: whether the file is uploaded, and how much of the layout and formatting they keep.'],
+        },
+        {
+          heading: 'In your browser, with nothing uploaded',
+          paragraphs: ['Drop the file on the Word viewer. The document opens as pages with its page size and margins, fonts, tables, pictures, lists, headers and footers with page numbers, and Arabic paragraphs and tables run right to left. You can zoom in, fit the page to your screen and download the original file again. The viewer reads documents but does not edit them yet. Password-protected documents cannot be opened.'],
+          links: [{ text: 'Word viewer', path: '/word-viewer' }],
+        },
+        {
+          heading: 'Save it as a PDF',
+          paragraphs: ['To send or print the document, open it in the Word viewer and click Print / Save as PDF. Your browser\'s print dialog opens with only the document\'s pages; choose Save as PDF (Microsoft Print to PDF on Windows) as the printer. The PDF is made on your computer, so the document is not uploaded for this either.'],
+          links: [{ text: 'Print / Save as PDF', path: '/word-viewer' }],
+        },
+        {
+          heading: 'Free desktop apps',
+          paragraphs: ['These work offline and keep the file on your computer:'],
+          list: [
+            'LibreOffice Writer (Windows, Mac and Linux) opens, edits and saves .docx and keeps most formatting. It is the closest free equivalent to desktop Word.',
+            'Apple Pages (Mac, iPhone and iPad) opens .docx and can export back to the Word format; some Word-only features are converted or dropped.',
+            'On a Mac, selecting the file in Finder and pressing the Space bar shows a quick preview, and TextEdit opens it with simpler formatting.',
+          ],
+        },
+        {
+          heading: 'Online suites (the file is uploaded)',
+          paragraphs: ['Google Docs opens a .docx after you upload it to Google Drive, and Word for the web does the same with OneDrive. Both need an account, and the document is stored on their servers. That is fine for most files, but not for contracts, HR letters or anything you are not allowed to share. If you are unsure whether a site uploads your file, you can check it yourself.'],
+          links: [{ text: 'check it yourself', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'On a phone',
+          paragraphs: ['Mobile browsers open OpenAnyDoc the same way: tap Choose a file and pick the document from Files or your downloads; the page fits the screen width. Microsoft\'s Word app and Google Docs also have phone apps; both work with your account.'],
+        },
+        {
+          heading: 'Older and related formats',
+          paragraphs: ['A few other extensions turn up next to .docx:'],
+          list: [
+            '.doc is the Word 97 to 2003 format. OpenAnyDoc does not open it; LibreOffice, Pages and Word do, and can save it as .docx, which then opens here.',
+            '.docm is a document with macros and .dotx a template. Save either as a .docx first; the macros never run outside Word.',
+            '.odt is the OpenDocument text format that LibreOffice saves by default, and .rtf an older rich text format. Word, LibreOffice and Pages open both.',
+          ],
+        },
+        {
+          heading: 'What may look different',
+          paragraphs: ['Only Word draws everything exactly. Other apps, OpenAnyDoc included, replace fonts that are not installed on your device with similar ones, so lines and pages can break in other places, and charts, text boxes and some drawing shapes may be simplified. If the exact layout matters, keep the original file or ask the sender for a PDF.'],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe the document (no personal data).`],
+        },
+      ],
+    },
     '/csv-vs-excel-vs-json': {
       published: '2026-10-30',
       updated: '2026-10-30',
@@ -502,7 +557,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'Guides',
-          paragraphs: ['Short, practical answers to the problems people hit with CSV, Excel and JSON files, each with the free tool that fixes it in your browser:'],
+          paragraphs: ['Short, practical answers to the problems people hit with CSV, Excel and JSON files and Word documents, each with the free tool that fixes it in your browser:'],
           list: [
             'Why your CSV shows broken Arabic text in Excel',
             'CSV opens in one column in Excel: how to fix the delimiter',
@@ -511,6 +566,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'How to check that a website does not upload your file',
             'How to open a JSON file',
             'How to open an XLSX file without Excel',
+            'How to open a DOCX file without Word',
             'CSV vs Excel vs JSON: the differences and when to use each',
             'How to anonymize a CSV or Excel file before sharing it',
           ],
@@ -522,6 +578,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'How to check that a website does not upload your file', path: '/check-file-upload' },
             { text: 'How to open a JSON file', path: '/open-json-file' },
             { text: 'How to open an XLSX file without Excel', path: '/open-xlsx-without-excel' },
+            { text: 'How to open a DOCX file without Word', path: '/open-docx-without-word' },
             { text: 'CSV vs Excel vs JSON: the differences and when to use each', path: '/csv-vs-excel-vs-json' },
             { text: 'How to anonymize a CSV or Excel file before sharing it', path: '/anonymize-data-before-sharing' },
           ],
@@ -913,6 +970,61 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/open-docx-without-word': {
+      published: '2026-11-02',
+      updated: '2026-11-02',
+      sections: [
+        {
+          heading: 'الجواب المختصر',
+          paragraphs: ['ملف docx مستند وورد، لكنك لا تحتاج إلى برنامج Microsoft Word لفتحه. يقرؤه مجانًا عارضٌ في المتصفح، وLibreOffice Writer، وGoogle Docs، وApple Pages. ويختلفون في أمرين: هل يُرفع الملف، وكم يحفظون من تخطيطه وتنسيقه.'],
+        },
+        {
+          heading: 'في متصفحك، دون رفع أي شيء',
+          paragraphs: ['أفلت الملف على عارض وورد. يُفتح المستند صفحاتٍ بمقاس الصفحة وهوامشها، وبخطوطه وجداوله وصوره وقوائمه وترويساته وتذييلاته وأرقام صفحاته، وتظهر الفقرات والجداول العربية من اليمين إلى اليسار. يمكنك التكبير وملاءمة الصفحة مع شاشتك وتنزيل الملف الأصلي من جديد. يعرض العارض المستندات ولا يحررها بعد. أما المستندات المحمية بكلمة مرور فلا تُفتح.'],
+          links: [{ text: 'عارض وورد', path: '/word-viewer' }],
+        },
+        {
+          heading: 'احفظه ملف PDF',
+          paragraphs: ['لإرسال المستند أو طباعته، افتحه في عارض وورد وانقر «طباعة / حفظ PDF». تُفتح نافذة الطباعة في متصفحك بصفحات المستند وحدها؛ اختر «حفظ بصيغة PDF» (أو Microsoft Print to PDF في ويندوز) طابعةً. يُنشأ ملف PDF على حاسوبك، فلا يُرفع المستند لهذا أيضًا.'],
+          links: [{ text: 'طباعة / حفظ PDF', path: '/word-viewer' }],
+        },
+        {
+          heading: 'برامج مجانية للحاسوب',
+          paragraphs: ['تعمل دون إنترنت وتُبقي الملف على حاسوبك:'],
+          list: [
+            'LibreOffice Writer (ويندوز وماك ولينكس) يفتح docx ويحرره ويحفظه، ويحتفظ بمعظم التنسيق. هو أقرب بديل مجاني لبرنامج وورد على الحاسوب.',
+            'Apple Pages (ماك وآيفون وآيباد) يفتح docx ويمكنه التصدير بصيغة وورد من جديد؛ وبعض الميزات الخاصة بوورد تُحوَّل أو تُحذف.',
+            'على الماك، حدد الملف في Finder واضغط مفتاح المسافة لمعاينة سريعة، ويفتحه TextEdit بتنسيق أبسط.',
+          ],
+        },
+        {
+          heading: 'الحزم على الإنترنت (يُرفع الملف)',
+          paragraphs: ['يفتح Google Docs ملف docx بعد رفعه إلى Google Drive، ويفعل Word للويب الشيء نفسه مع OneDrive. كلاهما يحتاج حسابًا، ويُخزَّن المستند على خوادمهما. هذا مقبول لمعظم الملفات، لكن ليس للعقود أو خطابات الموارد البشرية أو أي ملف لا يُسمح لك بمشاركته. وإن لم تكن متأكدًا أن موقعًا ما لا يرفع ملفك، يمكنك أن تتحقق بنفسك.'],
+          links: [{ text: 'تتحقق بنفسك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'على الهاتف',
+          paragraphs: ['تفتح متصفحات الهاتف OpenAnyDoc بالطريقة نفسها: اضغط «اختر ملفًا» وحدد المستند من «الملفات» أو التنزيلات، فتُلاءم الصفحة عرض الشاشة. ولتطبيق Word من مايكروسوفت ولـ Google Docs تطبيقات للهاتف أيضًا، ويعمل كلاهما بحسابك.'],
+        },
+        {
+          heading: 'الصيغ الأقدم والقريبة',
+          paragraphs: ['امتدادات أخرى تظهر إلى جانب docx:'],
+          list: [
+            'doc صيغة وورد من 97 إلى 2003. لا يفتحها OpenAnyDoc؛ ويفتحها LibreOffice وPages ووورد، ويمكنها حفظها بصيغة docx التي تُفتح هنا بعد ذلك.',
+            'docm مستند فيه وحدات ماكرو، وdotx قالب. احفظ أيًّا منهما بصيغة docx أولًا؛ ولا تعمل وحدات الماكرو خارج وورد.',
+            'odt صيغة النصوص المفتوحة التي يحفظ بها LibreOffice افتراضيًا، وrtf صيغة نص منسق أقدم. يفتحهما وورد وLibreOffice وPages.',
+          ],
+        },
+        {
+          heading: 'ما قد يبدو مختلفًا',
+          paragraphs: ['وورد وحده يرسم كل شيء كما هو تمامًا. البرامج الأخرى، ومنها OpenAnyDoc، تستبدل الخطوط غير المثبتة على جهازك بخطوط قريبة منها، فقد تنكسر الأسطر والصفحات في أماكن أخرى، وقد تُبسَّط المخططات ومربعات النص وبعض الأشكال. إن كان التخطيط الدقيق مهمًا، فاحتفظ بالملف الأصلي أو اطلب من المرسل نسخة PDF.'],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصِف المستند (دون بيانات شخصية).`],
+        },
+      ],
+    },
     '/csv-vs-excel-vs-json': {
       published: '2026-10-30',
       updated: '2026-10-30',
@@ -1032,7 +1144,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'الأدلة',
-          paragraphs: ['إجابات قصيرة وعملية للمشكلات التي يصطدم بها الناس مع ملفات CSV وExcel وJSON، مع الأداة المجانية التي تحلها في متصفحك:'],
+          paragraphs: ['إجابات قصيرة وعملية للمشكلات التي يصطدم بها الناس مع ملفات CSV وExcel وJSON ومستندات وورد، مع الأداة المجانية التي تحلها في متصفحك:'],
           list: [
             'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel',
             'ملف CSV يُفتح في عمود واحد في Excel: كيف تصلح الفاصل',
@@ -1041,6 +1153,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'كيف تتحقق من أن الموقع لا يرفع ملفك',
             'كيف تفتح ملف JSON',
             'كيف تفتح ملف XLSX بدون Excel',
+            'كيف تفتح ملف DOCX بدون وورد',
             'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها',
             'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته',
           ],
@@ -1052,6 +1165,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' },
             { text: 'كيف تفتح ملف JSON', path: '/open-json-file' },
             { text: 'كيف تفتح ملف XLSX بدون Excel', path: '/open-xlsx-without-excel' },
+            { text: 'كيف تفتح ملف DOCX بدون وورد', path: '/open-docx-without-word' },
             { text: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها', path: '/csv-vs-excel-vs-json' },
             { text: 'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته', path: '/anonymize-data-before-sharing' },
           ],

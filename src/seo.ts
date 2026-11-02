@@ -19,8 +19,8 @@ export const SOCIAL_PROFILES = [
 export const X_HANDLE = '@openanydoc'
 // The one sentence that says what OpenAnyDoc is, wherever the brand is described as data (Organization, WebSite, llms.txt, README).
 export const SITE_DESCRIPTION: Record<'en' | 'ar', string> = {
-  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files that runs in your browser: files are never uploaded.',
-  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
+  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, and a viewer for Word documents, that runs in your browser: files are never uploaded.',
+  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT، وعارض لمستندات Word، يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
 }
 
 type Locale = 'en' | 'ar'
@@ -34,9 +34,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
   en: {
     '/': {
       title: 'Free Online File Viewer and Editor, No Upload – OpenAnyDoc',
-      description: 'Free online file viewer and editor: open CSV, Excel (XLSX), JSON and TXT files without software and edit them in your browser. Private: no upload, no sign-up.',
+      description: 'Free online file viewer and editor: open CSV, Excel (XLSX), JSON, TXT and Word files without software, edit in your browser. Private: no upload, no sign-up.',
       heading: 'Free online file viewer and editor: open any file, upload nothing',
-      intro: 'Drop a CSV, Excel, JSON or text file and it opens right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
+      intro: 'Drop a CSV, Excel, JSON or text file to edit it, or view Word documents, right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
     },
     '/csv-viewer': {
       title: 'CSV Viewer Online – Free CSV File Editor, No Upload',
@@ -65,6 +65,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'Open TXT File Online: Free Text Viewer and Editor',
       intro: 'Open TXT file online in your browser and read or edit it like a notepad online: search, line numbers, and tools for lines, whitespace and case, with Arabic text shown right to left. Your file never leaves your device.',
       linkText: 'TXT editor',
+    },
+    '/word-viewer': {
+      title: 'Open Word Document Online – Free DOCX Viewer, No Upload',
+      description: 'Open a Word document online free: view DOCX files as pages with fonts, tables, images, headers and footers, zoom in, and print or save as PDF. No upload.',
+      heading: 'Open Word Document Online: Free DOCX Viewer',
+      intro: 'Open a Word document online in your browser: a free DOCX viewer that shows your .docx as pages, with its fonts, tables, images, lists, headers and footers, and Arabic documents right to left. Zoom in, fit the page to your screen, and print it or save it as PDF. Your file never leaves your device.',
+      linkText: 'Word viewer',
     },
     '/json-formatter': {
       title: 'JSON Formatter Online – Beautify and Pretty Print JSON',
@@ -145,7 +152,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/about': {
       title: 'About OpenAnyDoc – Private Online File Viewer',
-      description: 'About OpenAnyDoc, built and run by Shahzad Ali: a free file viewer and editor that runs in your browser and never uploads files. CSV, Excel, JSON and TXT today.',
+      description: 'About OpenAnyDoc, built and run by Shahzad Ali: a free file viewer and editor that runs in your browser and never uploads files. CSV, Excel, JSON, TXT and Word.',
       heading: 'About OpenAnyDoc',
       intro: 'A free, privacy-first file viewer and editor that runs in your browser.',
     },
@@ -210,6 +217,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'The free options, which of them upload your workbook, and how much of its formulas and formatting each one keeps.',
       linkText: 'Open XLSX without Excel',
     },
+    '/open-docx-without-word': {
+      title: 'How to Open a DOCX File Without Word: Free Options',
+      description: 'Free ways to open a .docx file without Microsoft Word: in your browser with no upload, LibreOffice, Google Docs, Apple Pages or a phone, and what each keeps.',
+      heading: 'How to open a DOCX file without Word',
+      intro: 'The free options, which of them upload your document, and how much of its layout and formatting each one keeps.',
+      linkText: 'Open DOCX without Word',
+    },
     '/csv-vs-excel-vs-json': {
       title: 'CSV vs Excel vs JSON: Differences and When to Use Each',
       description: 'CSV, Excel (XLSX) and JSON compared: structure, data types, formulas, size limits and encoding, which to use for what, and how to convert between them for free.',
@@ -225,8 +239,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'Anonymize data before sharing',
     },
     '/guides': {
-      title: 'Guides: Fix CSV, Excel and JSON File Problems',
-      description: 'Practical guides to CSV, Excel and JSON files: open them without Excel, fix broken Arabic and one-column CSVs, check a site does not upload your file, and more.',
+      title: 'Guides: Fix CSV, Excel, JSON and Word File Problems',
+      description: 'Practical guides to CSV, Excel, JSON and Word files: open them without Excel or Word, fix broken Arabic and one-column CSVs, and check a site does not upload.',
       heading: 'Guides',
       intro: 'Practical answers to common file problems, each with the free tool that fixes it in your browser.',
       linkText: 'Guides',
@@ -235,9 +249,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
   ar: {
     '/': {
       title: 'عارض ملفات اون لاين مجاني – فتح الملفات بدون برامج',
-      description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV وExcel وJSON وTXT وعدّلها في متصفحك. فتح الملفات بدون برامج وبدون تسجيل، وملفاتك لا تُرفع ولا تغادر جهازك أبدًا.',
+      description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV وExcel وJSON وTXT وWord في متصفحك وعدّلها. فتح الملفات بدون برامج وبدون تسجيل، وملفاتك لا تُرفع ولا تغادر جهازك.',
       heading: 'عارض ومحرر ملفات اون لاين مجاني: افتح أي ملف بدون رفع',
-      intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا وسيُفتح هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
+      intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا لتعدّله، أو اعرض مستندات Word، هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
     },
     '/csv-viewer': {
       title: 'عارض CSV اون لاين – فتح ملف CSV وتعديله مجانًا بدون رفع',
@@ -266,6 +280,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'فتح ملف TXT اون لاين: عارض ومحرر نصوص مجاني',
       intro: 'فتح ملف TXT اون لاين وقراءته وتعديله في متصفحك: محرر نصوص اون لاين مع البحث وأرقام الأسطر وأدوات للأسطر والمسافات وحالة الأحرف، ويعرض النص العربي من اليمين إلى اليسار. ملفك لا يغادر جهازك.',
       linkText: 'محرر TXT',
+    },
+    '/word-viewer': {
+      title: 'فتح ملف وورد اون لاين – عارض Word وDOCX مجاني بدون رفع',
+      description: 'فتح ملف وورد اون لاين مجانًا: اعرض مستندات Word وDOCX صفحاتٍ بخطوطها وجداولها وصورها وترويساتها، مع التكبير والطباعة أو الحفظ PDF. ملفك لا يُرفع أبدًا.',
+      heading: 'فتح ملف وورد اون لاين: عارض Word وDOCX مجاني',
+      intro: 'فتح ملف وورد اون لاين في متصفحك: عارض DOCX مجاني يعرض ملف .docx صفحاتٍ كما هو، بخطوطه وجداوله وصوره وقوائمه وترويساته وتذييلاته، ويعرض المستندات العربية من اليمين إلى اليسار. كبّر وصغّر ولائم الصفحة مع شاشتك، ثم اطبعها أو احفظها PDF. ملفك لا يغادر جهازك.',
+      linkText: 'عارض Word',
     },
     '/json-formatter': {
       title: 'تنسيق JSON اون لاين – تجميل JSON وتصغيره مجانًا بدون رفع',
@@ -346,7 +367,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/about': {
       title: 'عن OpenAnyDoc – عارض ملفات خاص اون لاين',
-      description: 'عن OpenAnyDoc الذي يبنيه ويديره شهزاد علي: عارض ومحرر ملفات مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT، وقريبًا Word وPDF.',
+      description: 'عن OpenAnyDoc الذي يبنيه ويديره شهزاد علي: عارض ومحرر ملفات مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT وWord، وقريبًا PDF.',
       heading: 'عن OpenAnyDoc',
       intro: 'عارض ومحرر ملفات مجاني يضع الخصوصية أولًا ويعمل داخل متصفحك.',
     },
@@ -411,6 +432,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'الخيارات المجانية، وأيها يرفع مصنفك، وكم يحتفظ كل منها بالصيغ والتنسيق.',
       linkText: 'فتح XLSX بدون Excel',
     },
+    '/open-docx-without-word': {
+      title: 'كيف تفتح ملف DOCX بدون وورد: طرق مجانية بلا رفع',
+      description: 'طرق مجانية لفتح ملف وورد docx دون برنامج Microsoft Word: في متصفحك دون رفع، وفي LibreOffice وGoogle Docs وApple Pages وعلى الهاتف، مع ما يحفظه كل خيار.',
+      heading: 'كيف تفتح ملف DOCX بدون وورد',
+      intro: 'الخيارات المجانية، وأيها يرفع مستندك، وكم يحفظ كل منها من تخطيطه وتنسيقه.',
+      linkText: 'فتح DOCX بدون وورد',
+    },
     '/csv-vs-excel-vs-json': {
       title: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كل صيغة',
       description: 'مقارنة بين CSV وExcel (XLSX) وJSON: البنية وأنواع البيانات والصيغ وحدود الحجم وترميز النص، وأي صيغة تناسب كل استخدام، وكيف تحوّل بينها مجانًا في متصفحك.',
@@ -426,8 +454,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'إخفاء البيانات قبل المشاركة',
     },
     '/guides': {
-      title: 'أدلة: حل مشكلات ملفات CSV وExcel وJSON',
-      description: 'أدلة عملية لملفات CSV وExcel وJSON: افتحها دون Excel، وأصلح العربية المشوّهة وملف CSV في عمود واحد، وتحقق من أن الموقع لا يرفع ملفك، وقارن بين الصيغ الثلاث.',
+      title: 'أدلة: حل مشكلات ملفات CSV وExcel وJSON ووورد',
+      description: 'أدلة عملية لملفات CSV وExcel وJSON ووورد: افتحها دون Excel أو Word، وأصلح العربية المشوّهة وملف CSV في عمود واحد، وتحقق من أن الموقع لا يرفع ملفك أبدًا.',
       heading: 'الأدلة',
       intro: 'إجابات عملية لمشكلات الملفات الشائعة، مع الأداة المجانية التي تحلها في متصفحك.',
       linkText: 'الأدلة',
@@ -440,7 +468,7 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 
 export function getShareImage(locale: Locale, address: string) {
   const imageAddress = pagesWithShareImage.includes(address) ? address : '/'

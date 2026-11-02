@@ -155,11 +155,11 @@ export default function HomePage({
         </p>
         <span aria-hidden="true" className={headerRowBreak} />
         <SiteNav currentPath={address} onNavigate={onNavigate} />
-        <div className="-me-3 flex items-center gap-1 sm:gap-2 md:me-0">
-          <LanguageSwitcher className="pill-link text-[15px] md:px-3" />
+        <div className="-me-3 flex items-center gap-1 sm:gap-2 xl:me-0">
+          <LanguageSwitcher className="pill-link text-[15px] xl:px-3" />
           <ThemeToggle />
         </div>
-        <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--compact press order-last md:order-none md:-ms-2">
+        <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--compact press order-last xl:order-none xl:-ms-2">
           {t('nav.openFile')}
         </button>
       </header>

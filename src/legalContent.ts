@@ -54,8 +54,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           ],
         },
         {
+          heading: 'View only',
+          paragraphs: ['Word documents (.docx) open as pages that you can zoom, print or save as PDF; editing them is coming. Older .doc files are not supported.'],
+        },
+        {
           heading: 'Coming later',
-          paragraphs: ['Word (.docx), PDF and PowerPoint (.pptx) files are coming. They cannot be opened yet.'],
+          paragraphs: ['PDF and PowerPoint (.pptx) files are coming. They cannot be opened yet.'],
         },
         {
           heading: 'Languages',
@@ -176,8 +180,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           ],
         },
         {
+          heading: 'للعرض فقط',
+          paragraphs: ['تُفتح مستندات وورد (.docx) صفحاتٍ يمكنك تكبيرها وطباعتها أو حفظها PDF، وتحريرها قادم. ملفات .doc القديمة غير مدعومة.'],
+        },
+        {
           heading: 'قريبًا',
-          paragraphs: ['ملفات وورد (.docx) وPDF وباوربوينت (.pptx) قادمة، ولا يمكن فتحها بعد.'],
+          paragraphs: ['ملفات PDF وباوربوينت (.pptx) قادمة، ولا يمكن فتحها بعد.'],
         },
         {
           heading: 'اللغات',

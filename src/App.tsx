@@ -58,7 +58,7 @@ function LoadFailedMessage() {
   )
 }
 const InfoPage = lazy(() => import('./pages/InfoPage'))
-const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
+const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
 // language, and an old link such as /csv-viewer goes to /en/csv-viewer, so links that existed before the Arabic version still

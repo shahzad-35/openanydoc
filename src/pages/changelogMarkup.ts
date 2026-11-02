@@ -22,7 +22,7 @@ export const changelogClasses = {
   header: 'mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5',
   brandLink: 'rounded-full',
   // On a phone the link's padding is pulled out, so its text ends where the nav card below does.
-  languageLink: 'pill-link -me-4 text-[15px] md:me-0 md:px-3',
+  languageLink: 'pill-link -me-4 text-[15px] xl:me-0 xl:px-3',
   main: 'mx-auto max-w-3xl px-5 pb-24',
   intro: 'py-8 md:py-12',
   heading: 'type-h1 text-balance',
@@ -55,24 +55,25 @@ export const SOCIAL_ICON_PATHS: Record<string, string> = {
 
 // The header's links to the viewer pages (src/components/SiteNav.tsx), on every content page; the build script writes the same nav
 // into the changelog pages. On a phone the links fold into one disclosure that opens as a card, on the header's second row (after
-// `headerRowBreak`); from md up the disclosure's content is always shown (::details-content) and its summary hidden.
-// On a phone the header has two rows: the logo and the language and theme controls, then the nav and the page's action. This
-// zero-height, full-width item (placed just before the nav) starts the second row; from md up everything is one row.
-export const headerRowBreak = 'order-last h-0 basis-full md:hidden'
+// `headerRowBreak`); from xl (1280 px) up the disclosure's content is always shown (::details-content) and its summary hidden.
+// Below xl (phones and tablets) the header has two rows: the logo and the language and theme controls, then the nav and the
+// page's action; the one-row header needs about 1,060 px for the six nav items. This zero-height, full-width item (placed just
+// before the nav) starts the second row; from xl up everything is one row.
+export const headerRowBreak = 'order-last h-0 basis-full xl:hidden'
 
 export const navClasses = {
-  nav: 'relative order-last md:order-none md:mx-auto',
-  details: 'group md:[&::details-content]:[content-visibility:visible]',
-  summary: 'pill-link cursor-pointer list-none gap-2 border-2 border-line text-sm md:hidden [&::-webkit-details-marker]:hidden',
+  nav: 'relative order-last xl:order-none xl:mx-auto',
+  details: 'group xl:[&::details-content]:[content-visibility:visible]',
+  summary: 'pill-link cursor-pointer list-none gap-2 border-2 border-line text-sm xl:hidden [&::-webkit-details-marker]:hidden',
   chevron: 'size-4 transition-transform duration-200 group-open:rotate-180',
-  list: 'absolute start-0 top-full z-30 mt-2 flex w-64 flex-col items-stretch rounded-2xl border-2 border-line bg-paper-raised p-2 shadow-lg md:static md:mt-0 md:w-auto md:flex-row md:items-center md:gap-x-1 md:rounded-none md:border-0 md:bg-transparent md:p-0 md:shadow-none',
-  // 12 px sides on a wide screen (not the pill's 16 px), so the five header items fit beside the logo and the actions.
-  link: 'pill-link text-[15px] md:px-3',
+  list: 'absolute start-0 top-full z-30 mt-2 flex w-64 flex-col items-stretch rounded-2xl border-2 border-line bg-paper-raised p-2 shadow-lg xl:static xl:mt-0 xl:w-auto xl:flex-row xl:items-center xl:gap-x-1 xl:rounded-none xl:border-0 xl:bg-transparent xl:p-0 xl:shadow-none',
+  // 8 px sides on a wide screen (not the pill's 16 px), so the six header items fit beside the logo and the actions.
+  link: 'pill-link text-[15px] xl:px-2',
   // The Convert menu, the last item of the list: a dropdown card on a wide screen, an indented list inside the disclosure on a phone.
   convertDetails: 'group/convert relative',
-  convertSummary: 'pill-link cursor-pointer list-none gap-1.5 text-[15px] md:px-3 [&::-webkit-details-marker]:hidden',
+  convertSummary: 'pill-link cursor-pointer list-none gap-1.5 text-[15px] xl:px-2 [&::-webkit-details-marker]:hidden',
   convertChevron: 'size-4 transition-transform duration-200 group-open/convert:rotate-180',
-  convertList: 'mt-1 flex flex-col items-start ps-4 md:absolute md:end-0 md:top-full md:z-30 md:mt-2 md:w-56 md:rounded-2xl md:border-2 md:border-line md:bg-paper-raised md:p-2 md:shadow-lg',
+  convertList: 'mt-1 flex flex-col items-start ps-4 xl:absolute xl:end-0 xl:top-full xl:z-30 xl:mt-2 xl:w-56 xl:rounded-2xl xl:border-2 xl:border-line xl:bg-paper-raised xl:p-2 xl:shadow-lg',
   convertLink: 'pill-link w-full text-[15px]',
 } as const
 

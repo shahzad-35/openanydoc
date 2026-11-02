@@ -68,8 +68,8 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
         </p>
         <span aria-hidden="true" className={headerRowBreak} />
         <SiteNav currentPath={address} onNavigate={onNavigate} />
-        <div className="-me-3 flex items-center gap-1 sm:gap-2 md:me-0">
-          <LanguageSwitcher className="pill-link text-[15px] md:px-3" />
+        <div className="-me-3 flex items-center gap-1 sm:gap-2 xl:me-0">
+          <LanguageSwitcher className="pill-link text-[15px] xl:px-3" />
           <ThemeToggle />
         </div>
       </header>

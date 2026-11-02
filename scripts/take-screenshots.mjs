@@ -25,17 +25,20 @@ const sampleFiles = {
     csv: ['orders.csv', 'order_id,customer,city,amount,status\n1001,Northwind Ltd,Riyadh,1250.00,paid\n1002,Acme Trading,Jeddah,310.50,pending\n1003,Globex,Dammam,980.00,paid\n1004,Initech,Riyadh,45.90,refunded\n1005,Umbrella Co,Mecca,2210.00,paid\n'],
     json: ['products.json', JSON.stringify({ store: 'Northwind', updated: '2026-10-22', products: [{ id: 1, name: 'Notebook', price: 12.5, tags: ['paper', 'office'], inStock: true }, { id: 2, name: 'Pen set', price: 7.25, tags: ['office'], inStock: false }, { id: 3, name: 'Desk lamp', price: 39.9, tags: ['light'], inStock: true }] }, null, 2)],
     text: ['notes.txt', 'Release notes\n\n- Opened the quarterly export without Excel.\n- Fixed the Arabic encoding in the customer list.\n- Shared the filtered rows with the finance team.\n\nNext: compare the two exports and keep the diff.\n'],
+    // Word samples are the synthetic documents scripts/generate-test-files.mjs writes into test-files/ (run it first).
+    word: ['report.docx', 'test-files/word-rich.docx'],
     excel: ['budget.xlsx', [['Item', 'Qty', 'Unit price', 'Total'], ['Desks', 4, 320, { t: 'n', f: 'B2*C2', v: 1280 }], ['Chairs', 8, 95, { t: 'n', f: 'B3*C3', v: 760 }], ['Monitors', 6, 210, { t: 'n', f: 'B4*C4', v: 1260 }], ['Total', '', '', { t: 'n', f: 'SUM(D2:D4)', v: 3300 }]]],
   },
   ar: {
     csv: ['الطلبات.csv', 'رقم الطلب,العميل,المدينة,المبلغ,الحالة\n1001,شركة الشمال,الرياض,1250.00,مدفوع\n1002,أكمي للتجارة,جدة,310.50,قيد الانتظار\n1003,جلوبكس,الدمام,980.00,مدفوع\n1004,إنيتك,الرياض,45.90,مسترد\n1005,شركة المظلة,مكة,2210.00,مدفوع\n'],
     json: ['المنتجات.json', JSON.stringify({ store: 'الشمال', updated: '2026-10-22', products: [{ id: 1, name: 'دفتر', price: 12.5, tags: ['ورق', 'مكتب'], inStock: true }, { id: 2, name: 'طقم أقلام', price: 7.25, tags: ['مكتب'], inStock: false }, { id: 3, name: 'مصباح مكتب', price: 39.9, tags: ['إضاءة'], inStock: true }] }, null, 2)],
     text: ['ملاحظات.txt', 'ملاحظات الإصدار\n\n- فتحنا التصدير الربعي بدون Excel.\n- أصلحنا ترميز العربية في قائمة العملاء.\n- شاركنا الصفوف المصفّاة مع فريق المالية.\n\nالتالي: مقارنة التصديرين والاحتفاظ بالفرق.\n'],
+    word: ['تقرير.docx', 'test-files/word-arabic.docx'],
     excel: ['الميزانية.xlsx', [['البند', 'الكمية', 'سعر الوحدة', 'الإجمالي'], ['مكاتب', 4, 320, { t: 'n', f: 'B2*C2', v: 1280 }], ['كراسي', 8, 95, { t: 'n', f: 'B3*C3', v: 760 }], ['شاشات', 6, 210, { t: 'n', f: 'B4*C4', v: 1260 }], ['الإجمالي', '', '', { t: 'n', f: 'SUM(D2:D4)', v: 3300 }]]],
   },
 }
-const pagePath = { csv: '/csv-viewer', json: '/json-viewer', text: '/txt-viewer', excel: '/excel-viewer' }
-const readySelector = { csv: '#data-table [id^="cell-"]', json: '#tree-view .row', text: '#text-editor', excel: '#data-table [id^="cell-"]' }
+const pagePath = { csv: '/csv-viewer', json: '/json-viewer', text: '/txt-viewer', excel: '/excel-viewer', word: '/word-viewer' }
+const readySelector = { csv: '#data-table [id^="cell-"]', json: '#tree-view .row', text: '#text-editor', excel: '#data-table [id^="cell-"]', word: '#word-document section.docx' }
 
 function writeSampleFile(locale, viewerId) {
   const [name, content] = sampleFiles[locale][viewerId]
@@ -45,6 +48,8 @@ function writeSampleFile(locale, viewerId) {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(content), locale === 'ar' ? 'الميزانية' : 'Budget')
     fs.writeFileSync(filePath, XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }))
+  } else if (viewerId === 'word') {
+    fs.copyFileSync(path.join(projectRoot, content), filePath)
   } else {
     fs.writeFileSync(filePath, '﻿' + content)
   }

@@ -1,5 +1,20 @@
 [
   {
+    "date": "2026-11-02",
+    "version": "1.6.0",
+    "formats": [
+      "word"
+    ],
+    "items": [
+      "changelog.v1_6.view",
+      "changelog.v1_6.rtl",
+      "changelog.v1_6.zoom",
+      "changelog.v1_6.print",
+      "changelog.v1_6.legacy"
+    ],
+    "title": "changelog.v1_6.title"
+  },
+  {
     "date": "2026-10-17",
     "version": "1.5.0",
     "formats": [

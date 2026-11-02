@@ -112,8 +112,10 @@ const loadTextViewer = () => import('./text/TextViewer')
 const loadJsonViewer = () => import('./json/JsonViewer')
 const loadExcelViewer = () => import('./excel/ExcelViewer')
 const loadExcelEditing = () => import('./excel/excelEditing')
+const loadWordViewer = () => import('./word/WordViewer')
 
-// To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now.
+// To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now; Word is
+// view only, and its Edit toggle turns on by itself once its entry has `editing`.
 export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'csv',
@@ -178,7 +180,14 @@ export const formatDefinitions: FormatDefinition[] = [
       alwaysEditable: true,
     },
   },
-  { viewerId: 'word', ViewerComponent: comingSoonViewer, ownsWholePage: true },
+  {
+    viewerId: 'word',
+    addedOn: '2026-11-02',
+    highlights: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'],
+    ViewerComponent: lazy(loadWordViewer),
+    preloadViewer: loadWordViewer,
+    ownsWholePage: true,
+  },
   { viewerId: 'pdf', ViewerComponent: comingSoonViewer, ownsWholePage: true },
   { viewerId: 'powerpoint', ViewerComponent: comingSoonViewer, ownsWholePage: true },
 ]
