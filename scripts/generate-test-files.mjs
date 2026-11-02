@@ -1,4 +1,4 @@
-// Generates synthetic CSV and Word test files into test-files/. Run: node scripts/generate-test-files.mjs
+// Generates synthetic CSV, Word and PowerPoint test files into test-files/. Run: node scripts/generate-test-files.mjs
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
@@ -128,6 +128,10 @@ writeTestFile(
 // ---- Word (.docx built by hand, .doc through macOS textutil) ----
 
 const escapeXml = (text) => text.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;')
+
+const xmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+const relationship = (id, type, target) =>
+  `<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/${type}" Target="${target}"/>`
 
 const WORD_NAMESPACES =
   'xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" ' +
@@ -264,9 +268,6 @@ function buildDocx(wordText, rightToLeft) {
     '<w:sectPr><w:headerReference w:type="default" r:id="rIdHeader"/><w:footerReference w:type="default" r:id="rIdFooter"/>' +
     '<w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1440" w:right="1440" w:bottom="1440" w:left="1440" w:header="708" w:footer="708" w:gutter="0"/>' +
     `${rightToLeft ? '<w:bidi/>' : ''}</w:sectPr>`
-  const xmlDeclaration = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
-  const relationship = (id, type, target) =>
-    `<Relationship Id="${id}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/${type}" Target="${target}"/>`
   const contentTypeOverride = (partName, type) =>
     `<Override PartName="${partName}" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.${type}+xml"/>`
 
@@ -403,5 +404,382 @@ try {
   console.log('Skipped word-legacy.doc: macOS textutil is not available.')
 }
 rmSync(legacyHtmlPath)
+
+// ---- PowerPoint (.pptx built by hand) ----
+
+const PRESENTATION_NAMESPACES =
+  'xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ' +
+  'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" ' +
+  'xmlns:p="http://schemas.openxmlformats.org/presentationml/2006/main"'
+const SMARTART_NAMESPACE = 'http://schemas.openxmlformats.org/drawingml/2006/diagram'
+const SMARTART_DRAWING_NAMESPACE = 'http://schemas.microsoft.com/office/drawing/2008/diagram'
+const presentationContentType = (type) => `application/vnd.openxmlformats-officedocument.${type}+xml`
+const inchesToEmu = (inches) => Math.round(inches * 914400)
+const shapePosition = ([x, y, width, height]) =>
+  `<a:off x="${inchesToEmu(x)}" y="${inchesToEmu(y)}"/><a:ext cx="${inchesToEmu(width)}" cy="${inchesToEmu(height)}"/>`
+const solidFill = (color) => `<a:solidFill><a:srgbClr val="${color}"/></a:solidFill>`
+
+const SHAPE_TREE_HEADER =
+  '<p:nvGrpSpPr><p:cNvPr id="1" name=""/><p:cNvGrpSpPr/><p:nvPr/></p:nvGrpSpPr>' +
+  '<p:grpSpPr><a:xfrm><a:off x="0" y="0"/><a:ext cx="0" cy="0"/><a:chOff x="0" y="0"/><a:chExt cx="0" cy="0"/></a:xfrm></p:grpSpPr>'
+
+function slideTextParagraph(text, { fontSize, bold, textColor, align }) {
+  return (
+    `<a:p><a:pPr algn="${align}"/><a:r><a:rPr lang="en-US" sz="${fontSize}"${bold ? ' b="1"' : ''}>${solidFill(textColor)}</a:rPr>` +
+    `<a:t>${escapeXml(text)}</a:t></a:r></a:p>`
+  )
+}
+
+// A preset shape (rect, ellipse, star5, ...); without a fill it is a plain text box.
+function slideShape(id, geometry, box, { fill, text = '', fontSize = 1800, bold = false, textColor = 'FFFFFF', align = 'ctr' }) {
+  const fillAndLine = fill ? `${solidFill(fill)}<a:ln w="12700">${solidFill('404040')}</a:ln>` : '<a:noFill/>'
+  const paragraph = text ? slideTextParagraph(text, { fontSize, bold, textColor, align }) : '<a:p><a:endParaRPr lang="en-US"/></a:p>'
+  return (
+    `<p:sp><p:nvSpPr><p:cNvPr id="${id}" name="${geometry} ${id}"/><p:cNvSpPr/><p:nvPr/></p:nvSpPr>` +
+    `<p:spPr><a:xfrm>${shapePosition(box)}</a:xfrm><a:prstGeom prst="${geometry}"><a:avLst/></a:prstGeom>${fillAndLine}</p:spPr>` +
+    `<p:txBody><a:bodyPr wrap="square" anchor="ctr"/><a:lstStyle/>${paragraph}</p:txBody></p:sp>`
+  )
+}
+
+const slideTitle = (id, text) => slideShape(id, 'rect', [0.6, 0.4, 12.1, 1], { text, fontSize: 3200, bold: true, textColor: '1F3864', align: 'l' })
+
+function slideArrowLine(id, box) {
+  return (
+    `<p:cxnSp><p:nvCxnSpPr><p:cNvPr id="${id}" name="Arrow line ${id}"/><p:cNvCxnSpPr/><p:nvPr/></p:nvCxnSpPr>` +
+    `<p:spPr><a:xfrm>${shapePosition(box)}</a:xfrm><a:prstGeom prst="straightConnector1"><a:avLst/></a:prstGeom>` +
+    `<a:ln w="28575">${solidFill('404040')}<a:tailEnd type="triangle"/></a:ln></p:spPr></p:cxnSp>`
+  )
+}
+
+// cropPercent trims each edge; rotation is in degrees.
+function slidePicture(id, box, { rotation = 0, cropPercent = 0 } = {}) {
+  const crop = cropPercent ? `<a:srcRect l="${cropPercent * 1000}" t="${cropPercent * 1000}" r="${cropPercent * 1000}" b="${cropPercent * 1000}"/>` : ''
+  return (
+    `<p:pic><p:nvPicPr><p:cNvPr id="${id}" name="Picture ${id}" descr="OpenAnyDoc logo"/><p:cNvPicPr><a:picLocks noChangeAspect="1"/></p:cNvPicPr><p:nvPr/></p:nvPicPr>` +
+    `<p:blipFill><a:blip r:embed="rIdImage"/>${crop}<a:stretch><a:fillRect/></a:stretch></p:blipFill>` +
+    `<p:spPr><a:xfrm${rotation ? ` rot="${rotation * 60000}"` : ''}>${shapePosition(box)}</a:xfrm><a:prstGeom prst="rect"><a:avLst/></a:prstGeom></p:spPr></p:pic>`
+  )
+}
+
+function slideTableCell(text, { bold, fill, textColor = '1F1F1F', columnSpan, mergedIntoPrevious }) {
+  const paragraph = text
+    ? `<a:p><a:r><a:rPr lang="en-US" sz="1400"${bold ? ' b="1"' : ''}>${solidFill(textColor)}</a:rPr><a:t>${escapeXml(text)}</a:t></a:r></a:p>`
+    : '<a:p><a:endParaRPr lang="en-US"/></a:p>'
+  const borders = ['lnL', 'lnR', 'lnT', 'lnB'].map((side) => `<a:${side} w="12700">${solidFill('808080')}</a:${side}>`).join('')
+  return (
+    `<a:tc${columnSpan ? ` gridSpan="${columnSpan}"` : ''}${mergedIntoPrevious ? ' hMerge="1"' : ''}>` +
+    `<a:txBody><a:bodyPr/><a:lstStyle/>${paragraph}</a:txBody><a:tcPr>${borders}${fill ? solidFill(fill) : '<a:noFill/>'}</a:tcPr></a:tc>`
+  )
+}
+
+function slideTable(id, box) {
+  const headerCells = ['Name', 'City', 'Amount', 'Date'].map((label) => slideTableCell(label, { bold: true, fill: '2F5496', textColor: 'FFFFFF' }))
+  const amounts = []
+  const dataRows = [1, 2, 3, 4, 5].map((rowNumber) => {
+    const amount = Number((nextRandom() * 5000).toFixed(2))
+    amounts.push(amount)
+    const fill = rowNumber % 2 === 0 ? 'F2F2F2' : undefined
+    return [pickFrom(firstNames), pickFrom(cities), amount.toFixed(2), formatDate(Math.floor(nextRandom() * 700))].map((cellText) =>
+      slideTableCell(cellText, { fill }),
+    )
+  })
+  const totalCells = [
+    slideTableCell('Total (merged across three columns)', { bold: true, fill: 'D9E2F3', columnSpan: 3 }),
+    slideTableCell('', { fill: 'D9E2F3', mergedIntoPrevious: true }),
+    slideTableCell('', { fill: 'D9E2F3', mergedIntoPrevious: true }),
+    slideTableCell(amounts.reduce((sum, amount) => sum + amount, 0).toFixed(2), { bold: true, fill: 'D9E2F3' }),
+  ]
+  const columnWidth = inchesToEmu(box[2] / 4)
+  const rows = [headerCells, ...dataRows, totalCells].map((cells) => `<a:tr h="${inchesToEmu(0.45)}">${cells.join('')}</a:tr>`).join('')
+  return (
+    `<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id="${id}" name="Table ${id}"/><p:cNvGraphicFramePr><a:graphicFrameLocks noGrp="1"/></p:cNvGraphicFramePr><p:nvPr/></p:nvGraphicFramePr>` +
+    `<p:xfrm>${shapePosition(box)}</p:xfrm><a:graphic><a:graphicData uri="http://schemas.openxmlformats.org/drawingml/2006/table">` +
+    `<a:tbl><a:tblPr firstRow="1" bandRow="1"/><a:tblGrid>${`<a:gridCol w="${columnWidth}"/>`.repeat(4)}</a:tblGrid>${rows}</a:tbl>` +
+    '</a:graphicData></a:graphic></p:graphicFrame>'
+  )
+}
+
+// Shows the shape on click; with fade it also fades in over half a second.
+function clickEntranceAnimation(firstTimeNodeId, shapeId, fade) {
+  const [groupId, stepId, effectId, showId, fadeId] = [0, 1, 2, 3, 4].map((offset) => firstTimeNodeId + offset)
+  const target = `<p:tgtEl><p:spTgt spid="${shapeId}"/></p:tgtEl>`
+  const showShape =
+    `<p:set><p:cBhvr><p:cTn id="${showId}" dur="1" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst></p:cTn>${target}` +
+    '<p:attrNameLst><p:attrName>style.visibility</p:attrName></p:attrNameLst></p:cBhvr><p:to><p:strVal val="visible"/></p:to></p:set>'
+  const fadeIn = fade ? `<p:animEffect transition="in" filter="fade"><p:cBhvr><p:cTn id="${fadeId}" dur="500"/>${target}</p:cBhvr></p:animEffect>` : ''
+  return (
+    `<p:par><p:cTn id="${groupId}" fill="hold"><p:stCondLst><p:cond delay="indefinite"/></p:stCondLst><p:childTnLst>` +
+    `<p:par><p:cTn id="${stepId}" fill="hold"><p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>` +
+    `<p:par><p:cTn id="${effectId}" presetID="${fade ? 10 : 1}" presetClass="entr" presetSubtype="0" fill="hold" grpId="0" nodeType="clickEffect">` +
+    `<p:stCondLst><p:cond delay="0"/></p:stCondLst><p:childTnLst>${showShape}${fadeIn}</p:childTnLst></p:cTn></p:par>` +
+    '</p:childTnLst></p:cTn></p:par></p:childTnLst></p:cTn></p:par>'
+  )
+}
+
+function slideAnimationTiming(animations) {
+  const effects = animations.map(({ shapeId, fade }, index) => clickEntranceAnimation(3 + index * 5, shapeId, fade)).join('')
+  const builds = animations.map(({ shapeId }) => `<p:bldP spid="${shapeId}" grpId="0" animBg="1"/>`).join('')
+  return (
+    '<p:timing><p:tnLst><p:par><p:cTn id="1" dur="indefinite" restart="never" nodeType="tmRoot"><p:childTnLst>' +
+    `<p:seq concurrent="1" nextAc="seek"><p:cTn id="2" dur="indefinite" nodeType="mainSeq"><p:childTnLst>${effects}</p:childTnLst></p:cTn>` +
+    '<p:prevCondLst><p:cond evt="onPrev" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:prevCondLst>' +
+    '<p:nextCondLst><p:cond evt="onNext" delay="0"><p:tgtEl><p:sldTgt/></p:tgtEl></p:cond></p:nextCondLst></p:seq>' +
+    `</p:childTnLst></p:cTn></p:par></p:tnLst><p:bldLst>${builds}</p:bldLst></p:timing>`
+  )
+}
+
+// SmartArt: the data model holds the text; drawing1.xml holds the shapes PowerPoint last drew, which most viewers render.
+const smartArtModelId = (number) => `{6F1A2B3C-0000-4000-8000-${String(number).padStart(12, '0')}}`
+const SMARTART_STEPS = ['Choose a file', 'Read it in the browser', 'Edit and save']
+
+function smartArtFrame(id, box) {
+  return (
+    `<p:graphicFrame><p:nvGraphicFramePr><p:cNvPr id="${id}" name="SmartArt process ${id}"/><p:cNvGraphicFramePr/><p:nvPr/></p:nvGraphicFramePr>` +
+    `<p:xfrm>${shapePosition(box)}</p:xfrm><a:graphic><a:graphicData uri="${SMARTART_NAMESPACE}">` +
+    `<dgm:relIds xmlns:dgm="${SMARTART_NAMESPACE}" r:dm="rIdDiagramData" r:lo="rIdDiagramLayout" r:qs="rIdDiagramStyle" r:cs="rIdDiagramColors"/>` +
+    '</a:graphicData></a:graphic></p:graphicFrame>'
+  )
+}
+
+function buildSmartArtData() {
+  const textBody = (text) =>
+    `<dgm:t><a:bodyPr/><a:lstStyle/><a:p>${text ? `<a:r><a:rPr lang="en-US"/><a:t>${escapeXml(text)}</a:t></a:r>` : '<a:endParaRPr lang="en-US"/>'}</a:p></dgm:t>`
+  const documentPoint =
+    `<dgm:pt modelId="${smartArtModelId(0)}" type="doc"><dgm:prSet loTypeId="urn:microsoft.com/office/officeart/2005/8/layout/process1" loCatId="process" ` +
+    'qsTypeId="urn:microsoft.com/office/officeart/2005/8/quickstyle/simple1" qsCatId="simple" ' +
+    `csTypeId="urn:microsoft.com/office/officeart/2005/8/colors/accent1_2" csCatId="accent1"/><dgm:spPr/>${textBody('')}</dgm:pt>`
+  const stepPoints = SMARTART_STEPS.map((step, index) => {
+    const connectionId = smartArtModelId(31 + index)
+    return (
+      `<dgm:pt modelId="${smartArtModelId(1 + index)}"><dgm:prSet phldrT="[Text]"/><dgm:spPr/>${textBody(step)}</dgm:pt>` +
+      `<dgm:pt modelId="${smartArtModelId(11 + index)}" type="parTrans" cxnId="${connectionId}"><dgm:prSet/><dgm:spPr/>${textBody('')}</dgm:pt>` +
+      `<dgm:pt modelId="${smartArtModelId(21 + index)}" type="sibTrans" cxnId="${connectionId}"><dgm:prSet/><dgm:spPr/>${textBody('')}</dgm:pt>`
+    )
+  })
+  const connections = SMARTART_STEPS.map(
+    (step, index) =>
+      `<dgm:cxn modelId="${smartArtModelId(31 + index)}" srcId="${smartArtModelId(0)}" destId="${smartArtModelId(1 + index)}" ` +
+      `srcOrd="${index}" destOrd="0" parTransId="${smartArtModelId(11 + index)}" sibTransId="${smartArtModelId(21 + index)}"/>`,
+  )
+  return (
+    `${xmlDeclaration}<dgm:dataModel xmlns:dgm="${SMARTART_NAMESPACE}" ${PRESENTATION_NAMESPACES}>` +
+    `<dgm:ptLst>${documentPoint}${stepPoints.join('')}</dgm:ptLst><dgm:cxnLst>${connections.join('')}</dgm:cxnLst><dgm:bg/><dgm:whole/>` +
+    `<dgm:extLst><a:ext uri="http://schemas.microsoft.com/office/drawing/2008/diagram"><dsp:dataModelExt xmlns:dsp="${SMARTART_DRAWING_NAMESPACE}" ` +
+    `relId="rIdDiagramDrawing" minVer="${SMARTART_NAMESPACE}"/></a:ext></dgm:extLst></dgm:dataModel>`
+  )
+}
+
+function buildSmartArtDrawing() {
+  const drawingShape = (modelId, geometry, box, text) =>
+    `<dsp:sp modelId="${modelId}"><dsp:nvSpPr><dsp:cNvPr id="0" name=""/><dsp:cNvSpPr/></dsp:nvSpPr>` +
+    `<dsp:spPr><a:xfrm>${shapePosition(box)}</a:xfrm><a:prstGeom prst="${geometry}"><a:avLst/></a:prstGeom>` +
+    `<a:solidFill><a:schemeClr val="accent1"/></a:solidFill><a:ln w="12700"><a:solidFill><a:schemeClr val="lt1"/></a:solidFill></a:ln></dsp:spPr>` +
+    `<dsp:txBody><a:bodyPr anchor="ctr"/><a:lstStyle/><a:p><a:pPr algn="ctr"/>` +
+    (text ? `<a:r><a:rPr lang="en-US" sz="2000"><a:solidFill><a:schemeClr val="lt1"/></a:solidFill></a:rPr><a:t>${escapeXml(text)}</a:t></a:r>` : '<a:endParaRPr lang="en-US"/>') +
+    `</a:p></dsp:txBody><dsp:txXfrm>${shapePosition(box)}</dsp:txXfrm></dsp:sp>`
+  const shapes = SMARTART_STEPS.flatMap((step, index) => {
+    const stepShape = drawingShape(smartArtModelId(1 + index), 'roundRect', [index * 3.7, 0.7, 2.6, 1.6], step)
+    const isLastStep = index === SMARTART_STEPS.length - 1
+    return isLastStep ? [stepShape] : [stepShape, drawingShape(smartArtModelId(21 + index), 'rightArrow', [index * 3.7 + 2.85, 1.2, 0.6, 0.6], '')]
+  })
+  return (
+    `${xmlDeclaration}<dsp:drawing xmlns:dgm="${SMARTART_NAMESPACE}" xmlns:dsp="${SMARTART_DRAWING_NAMESPACE}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">` +
+    `<dsp:spTree><dsp:nvGrpSpPr><dsp:cNvPr id="0" name=""/><dsp:cNvGrpSpPr/></dsp:nvGrpSpPr><dsp:grpSpPr/>${shapes.join('')}</dsp:spTree></dsp:drawing>`
+  )
+}
+
+const SMARTART_LAYOUT_XML =
+  `${xmlDeclaration}<dgm:layoutDef xmlns:dgm="${SMARTART_NAMESPACE}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ` +
+  'uniqueId="urn:microsoft.com/office/officeart/2005/8/layout/process1"><dgm:title val=""/><dgm:desc val=""/>' +
+  '<dgm:catLst><dgm:cat type="process" pri="1000"/></dgm:catLst><dgm:layoutNode name="Name0"/></dgm:layoutDef>'
+
+const SMARTART_STYLE_XML =
+  `${xmlDeclaration}<dgm:styleDef xmlns:dgm="${SMARTART_NAMESPACE}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ` +
+  'uniqueId="urn:microsoft.com/office/officeart/2005/8/quickstyle/simple1"><dgm:title val=""/><dgm:desc val=""/>' +
+  '<dgm:catLst><dgm:cat type="simple" pri="10100"/></dgm:catLst>' +
+  '<dgm:scene3d><a:camera prst="orthographicFront"/><a:lightRig rig="threePt" dir="t"/></dgm:scene3d>' +
+  '<dgm:styleLbl name="node1"><dgm:scene3d><a:camera prst="orthographicFront"/><a:lightRig rig="threePt" dir="t"/></dgm:scene3d><dgm:sp3d/><dgm:txPr/>' +
+  '<dgm:style><a:lnRef idx="2"><a:scrgbClr r="0" g="0" b="0"/></a:lnRef><a:fillRef idx="1"><a:scrgbClr r="0" g="0" b="0"/></a:fillRef>' +
+  '<a:effectRef idx="0"><a:scrgbClr r="0" g="0" b="0"/></a:effectRef><a:fontRef idx="minor"><a:schemeClr val="lt1"/></a:fontRef></dgm:style></dgm:styleLbl></dgm:styleDef>'
+
+const SMARTART_COLORS_XML =
+  `${xmlDeclaration}<dgm:colorsDef xmlns:dgm="${SMARTART_NAMESPACE}" xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" ` +
+  'uniqueId="urn:microsoft.com/office/officeart/2005/8/colors/accent1_2"><dgm:title val=""/><dgm:desc val=""/>' +
+  '<dgm:catLst><dgm:cat type="accent1" pri="11200"/></dgm:catLst><dgm:styleLbl name="node1">' +
+  '<dgm:fillClrLst meth="repeat"><a:schemeClr val="accent1"/></dgm:fillClrLst><dgm:linClrLst meth="repeat"><a:schemeClr val="lt1"/></dgm:linClrLst>' +
+  '<dgm:effectClrLst/><dgm:txLinClrLst/><dgm:txFillClrLst meth="repeat"><a:schemeClr val="lt1"/></dgm:txFillClrLst><dgm:txEffectClrLst/></dgm:styleLbl></dgm:colorsDef>'
+
+const themeColor = (name, color) => `<a:${name}><a:srgbClr val="${color}"/></a:${name}>`
+const PRESENTATION_THEME_XML =
+  `${xmlDeclaration}<a:theme xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main" name="Office Theme"><a:themeElements>` +
+  '<a:clrScheme name="Office"><a:dk1><a:sysClr val="windowText" lastClr="000000"/></a:dk1><a:lt1><a:sysClr val="window" lastClr="FFFFFF"/></a:lt1>' +
+  [
+    ['dk2', '44546A'],
+    ['lt2', 'E7E6E6'],
+    ['accent1', '4472C4'],
+    ['accent2', 'ED7D31'],
+    ['accent3', 'A5A5A5'],
+    ['accent4', 'FFC000'],
+    ['accent5', '5B9BD5'],
+    ['accent6', '70AD47'],
+    ['hlink', '0563C1'],
+    ['folHlink', '954F72'],
+  ]
+    .map(([name, color]) => themeColor(name, color))
+    .join('') +
+  '</a:clrScheme><a:fontScheme name="Office">' +
+  '<a:majorFont><a:latin typeface="Calibri Light"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont>' +
+  '<a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>' +
+  '<a:fmtScheme name="Office">' +
+  `<a:fillStyleLst>${'<a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'.repeat(3)}</a:fillStyleLst>` +
+  `<a:lnStyleLst>${'<a:ln w="6350"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln>'.repeat(3)}</a:lnStyleLst>` +
+  `<a:effectStyleLst>${'<a:effectStyle><a:effectLst/></a:effectStyle>'.repeat(3)}</a:effectStyleLst>` +
+  `<a:bgFillStyleLst>${'<a:solidFill><a:schemeClr val="phClr"/></a:solidFill>'.repeat(3)}</a:bgFillStyleLst>` +
+  '</a:fmtScheme></a:themeElements><a:objectDefaults/><a:extraClrSchemeLst/></a:theme>'
+
+const SLIDE_MASTER_XML =
+  `${xmlDeclaration}<p:sldMaster ${PRESENTATION_NAMESPACES}><p:cSld><p:bg><p:bgRef idx="1001"><a:schemeClr val="bg1"/></p:bgRef></p:bg>` +
+  `<p:spTree>${SHAPE_TREE_HEADER}</p:spTree></p:cSld>` +
+  '<p:clrMap bg1="lt1" tx1="dk1" bg2="lt2" tx2="dk2" accent1="accent1" accent2="accent2" accent3="accent3" accent4="accent4" accent5="accent5" accent6="accent6" hlink="hlink" folHlink="folHlink"/>' +
+  '<p:sldLayoutIdLst><p:sldLayoutId id="2147483649" r:id="rIdLayout"/></p:sldLayoutIdLst></p:sldMaster>'
+
+const SLIDE_LAYOUT_XML =
+  `${xmlDeclaration}<p:sldLayout ${PRESENTATION_NAMESPACES} type="blank" preserve="1"><p:cSld name="Blank">` +
+  `<p:spTree>${SHAPE_TREE_HEADER}</p:spTree></p:cSld><p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr></p:sldLayout>`
+
+// slides: [{ shapes, transition, timing, relationships }]; extraParts: [{ path, contents, contentType }].
+function buildPptx(slides, extraParts) {
+  const relationshipsXml = (relationshipsXmlInside) =>
+    `${xmlDeclaration}<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${relationshipsXmlInside}</Relationships>`
+  const slideNumbers = slides.map((slide, index) => index + 1)
+  const contentTypeOverride = (partName, type) => `<Override PartName="${partName}" ContentType="${type}"/>`
+
+  const zip = new JSZip()
+  zip.file(
+    '[Content_Types].xml',
+    `${xmlDeclaration}<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">` +
+      '<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+      '<Default Extension="xml" ContentType="application/xml"/><Default Extension="png" ContentType="image/png"/>' +
+      contentTypeOverride('/ppt/presentation.xml', presentationContentType('presentationml.presentation.main')) +
+      contentTypeOverride('/ppt/slideMasters/slideMaster1.xml', presentationContentType('presentationml.slideMaster')) +
+      contentTypeOverride('/ppt/slideLayouts/slideLayout1.xml', presentationContentType('presentationml.slideLayout')) +
+      contentTypeOverride('/ppt/theme/theme1.xml', presentationContentType('theme')) +
+      slideNumbers.map((number) => contentTypeOverride(`/ppt/slides/slide${number}.xml`, presentationContentType('presentationml.slide'))).join('') +
+      extraParts
+        .filter((part) => part.contentType)
+        .map((part) => contentTypeOverride(`/${part.path}`, part.contentType))
+        .join('') +
+      '</Types>',
+  )
+  zip.file('_rels/.rels', relationshipsXml(relationship('rIdPresentation', 'officeDocument', 'ppt/presentation.xml')))
+  zip.file(
+    'ppt/presentation.xml',
+    `${xmlDeclaration}<p:presentation ${PRESENTATION_NAMESPACES}>` +
+      '<p:sldMasterIdLst><p:sldMasterId id="2147483648" r:id="rIdMaster"/></p:sldMasterIdLst>' +
+      `<p:sldIdLst>${slideNumbers.map((number) => `<p:sldId id="${255 + number}" r:id="rIdSlide${number}"/>`).join('')}</p:sldIdLst>` +
+      `<p:sldSz cx="${inchesToEmu(13.333)}" cy="${inchesToEmu(7.5)}"/><p:notesSz cx="6858000" cy="9144000"/></p:presentation>`,
+  )
+  zip.file(
+    'ppt/_rels/presentation.xml.rels',
+    relationshipsXml(
+      relationship('rIdMaster', 'slideMaster', 'slideMasters/slideMaster1.xml') +
+        relationship('rIdTheme', 'theme', 'theme/theme1.xml') +
+        slideNumbers.map((number) => relationship(`rIdSlide${number}`, 'slide', `slides/slide${number}.xml`)).join(''),
+    ),
+  )
+  zip.file('ppt/theme/theme1.xml', PRESENTATION_THEME_XML)
+  zip.file('ppt/slideMasters/slideMaster1.xml', SLIDE_MASTER_XML)
+  zip.file(
+    'ppt/slideMasters/_rels/slideMaster1.xml.rels',
+    relationshipsXml(relationship('rIdLayout', 'slideLayout', '../slideLayouts/slideLayout1.xml') + relationship('rIdTheme', 'theme', '../theme/theme1.xml')),
+  )
+  zip.file('ppt/slideLayouts/slideLayout1.xml', SLIDE_LAYOUT_XML)
+  zip.file('ppt/slideLayouts/_rels/slideLayout1.xml.rels', relationshipsXml(relationship('rIdMaster', 'slideMaster', '../slideMasters/slideMaster1.xml')))
+  slides.forEach((slide, index) => {
+    zip.file(
+      `ppt/slides/slide${index + 1}.xml`,
+      `${xmlDeclaration}<p:sld ${PRESENTATION_NAMESPACES}><p:cSld><p:spTree>${SHAPE_TREE_HEADER}${slide.shapes}</p:spTree></p:cSld>` +
+        `<p:clrMapOvr><a:masterClrMapping/></p:clrMapOvr>${slide.transition ?? ''}${slide.timing ?? ''}</p:sld>`,
+    )
+    zip.file(
+      `ppt/slides/_rels/slide${index + 1}.xml.rels`,
+      relationshipsXml(relationship('rIdLayout', 'slideLayout', '../slideLayouts/slideLayout1.xml') + (slide.relationships ?? '')),
+    )
+  })
+  extraParts.forEach((part) => zip.file(part.path, part.contents))
+  return zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' })
+}
+
+const logoPart = { path: 'ppt/media/image1.png', contents: readFileSync(new URL('../public/logo.png', import.meta.url)) }
+const imageRelationship = relationship('rIdImage', 'image', '../media/image1.png')
+
+const richSlides = [
+  {
+    shapes:
+      slideShape(2, 'rect', [0.8, 2.2, 8, 1.4], { text: 'Quarterly review (synthetic sample)', fontSize: 4400, bold: true, textColor: '1F3864', align: 'l' }) +
+      slideShape(3, 'rect', [0.8, 3.6, 8, 0.8], { text: 'A test deck with images, a table and basic shapes', fontSize: 2000, textColor: '595959', align: 'l' }) +
+      slidePicture(4, [9.6, 1.9, 2.8, 2.8]),
+    relationships: imageRelationship,
+  },
+  {
+    shapes:
+      slideTitle(2, 'Basic shapes') +
+      slideShape(3, 'rect', [0.8, 1.8, 2.4, 1.4], { fill: '4472C4', text: 'Rectangle' }) +
+      slideShape(4, 'roundRect', [3.8, 1.8, 2.4, 1.4], { fill: 'ED7D31', text: 'Rounded' }) +
+      slideShape(5, 'ellipse', [6.8, 1.8, 2.4, 1.4], { fill: '70AD47', text: 'Ellipse' }) +
+      slideShape(6, 'triangle', [9.8, 1.6, 2.4, 1.8], { fill: 'FFC000', text: 'Triangle', textColor: '1F1F1F' }) +
+      slideShape(7, 'rightArrow', [0.8, 4.4, 2.8, 1.2], { fill: '5B9BD5', text: 'Arrow' }) +
+      slideShape(8, 'star5', [4.2, 4.0, 2.0, 2.0], { fill: 'FFD966', text: 'Star', textColor: '1F1F1F' }) +
+      slideShape(9, 'hexagon', [6.8, 4.2, 2.4, 1.6], { fill: 'A5A5A5', text: 'Hexagon' }) +
+      slideArrowLine(10, [9.8, 4.4, 2.4, 1.2]),
+  },
+  {
+    shapes: slideTitle(2, 'Table with a merged total row') + slideTable(3, [0.8, 1.6, 11.7, 3.15]),
+  },
+  {
+    shapes:
+      slideTitle(2, 'Images: plain, scaled, rotated and cropped') +
+      slidePicture(3, [0.8, 2.0, 2.6, 2.6]) +
+      slidePicture(4, [3.9, 2.6, 1.4, 1.4]) +
+      slidePicture(5, [6.0, 2.0, 2.6, 2.6], { rotation: 20 }) +
+      slidePicture(6, [9.4, 2.0, 2.6, 2.6], { cropPercent: 20 }),
+    relationships: imageRelationship,
+  },
+]
+
+const animatedSlides = [
+  {
+    shapes:
+      slideTitle(2, 'Animations and transitions') +
+      slideShape(3, 'roundRect', [1.5, 2.4, 4.5, 2], { fill: '4472C4', text: 'Click 1: appears', fontSize: 2400 }) +
+      slideShape(4, 'roundRect', [7.3, 2.4, 4.5, 2], { fill: 'ED7D31', text: 'Click 2: fades in', fontSize: 2400 }),
+    transition: '<p:transition spd="med"><p:fade/></p:transition>',
+    timing: slideAnimationTiming([
+      { shapeId: 3, fade: false },
+      { shapeId: 4, fade: true },
+    ]),
+  },
+  {
+    shapes: slideTitle(2, 'SmartArt: a three-step process') + smartArtFrame(3, [1.65, 2.0, 10, 3]),
+    transition: '<p:transition spd="med"><p:push dir="u"/></p:transition>',
+    relationships:
+      relationship('rIdDiagramData', 'diagramData', '../diagrams/data1.xml') +
+      relationship('rIdDiagramLayout', 'diagramLayout', '../diagrams/layout1.xml') +
+      relationship('rIdDiagramStyle', 'diagramQuickStyle', '../diagrams/quickStyle1.xml') +
+      relationship('rIdDiagramColors', 'diagramColors', '../diagrams/colors1.xml') +
+      '<Relationship Id="rIdDiagramDrawing" Type="http://schemas.microsoft.com/office/2007/relationships/diagramDrawing" Target="../diagrams/drawing1.xml"/>',
+  },
+]
+
+const smartArtParts = [
+  { path: 'ppt/diagrams/data1.xml', contents: buildSmartArtData(), contentType: presentationContentType('drawingml.diagramData') },
+  { path: 'ppt/diagrams/layout1.xml', contents: SMARTART_LAYOUT_XML, contentType: presentationContentType('drawingml.diagramLayout') },
+  { path: 'ppt/diagrams/quickStyle1.xml', contents: SMARTART_STYLE_XML, contentType: presentationContentType('drawingml.diagramStyle') },
+  { path: 'ppt/diagrams/colors1.xml', contents: SMARTART_COLORS_XML, contentType: presentationContentType('drawingml.diagramColors') },
+  { path: 'ppt/diagrams/drawing1.xml', contents: buildSmartArtDrawing(), contentType: 'application/vnd.ms-office.drawingml.diagramDrawing+xml' },
+]
+
+writeTestFile('powerpoint-rich.pptx', await buildPptx(richSlides, [logoPart]))
+writeTestFile('powerpoint-animated.pptx', await buildPptx(animatedSlides, smartArtParts))
 
 console.log(`Wrote test files to ${outputDirectory.pathname}`)

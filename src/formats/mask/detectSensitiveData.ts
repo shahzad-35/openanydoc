@@ -8,7 +8,7 @@ export type FindingCategory = SensitiveCategory | 'freeText'
 export type MaskCategory = FindingCategory | 'other'
 export type Confidence = 'high' | 'medium' | 'low'
 // Why a field was flagged: the column name, its values, a passed checksum, or matches inside long text.
-export type FindingReason = 'headerAndValues' | 'values' | 'checksum' | 'header' | 'textMatches' | 'longText'
+export type FindingReason = 'headerAndValues' | 'headerAndShape' | 'values' | 'checksum' | 'header' | 'textMatches' | 'longText'
 
 export type CellValue = string | number | boolean | Date | null
 export type MaskTable = { sheetName: string; header: string[]; rows: CellValue[][] }
@@ -278,6 +278,21 @@ function findDistinctExamples(values: unknown[], isMatch: (value: unknown) => bo
   return [...examples]
 }
 
+// The form of an ID, IBAN, card, phone or email without its checksum: test data and made-up examples often fail the check, but a
+// column named "IBAN" whose values look like IBANs is still one.
+const VALUE_SHAPES: Partial<Record<SensitiveCategory, RegExp>> = {
+  nationalId: /^\d{8,15}$/,
+  iban: /^[A-Z]{2}\d{2}[A-Z0-9]{8,30}$/,
+  card: /^\d{13,19}$/,
+  phone: /^\+?\d{7,15}$/,
+  email: /@/,
+}
+
+function hasShapeOf(value: unknown, category: SensitiveCategory) {
+  const shape = VALUE_SHAPES[category]
+  return shape !== undefined && shape.test(getValueText(value).trim().toUpperCase().replace(/[\s().-]/g, ''))
+}
+
 function classifyField(field: SampledField): Finding | null {
   const { values } = field
   if (values.length === 0) return null
@@ -295,6 +310,9 @@ function classifyField(field: SampledField): Finding | null {
       const passesChecksum = CHECKSUM_CATEGORIES.has(category) && matchShare >= CHECKSUM_SHARE
       confidence = passesChecksum ? 'high' : 'medium'
       reason = passesChecksum ? 'checksum' : 'values'
+    } else if (hasHeaderHint && values.filter((value) => hasShapeOf(value, category)).length / values.length >= MATCH_SHARE) {
+      confidence = 'medium'
+      reason = 'headerAndShape'
     } else if (category === 'name' && values.filter((value) => looksLikePersonName(getValueText(value).trim(), true)).length / values.length >= CHECKSUM_SHARE) {
       // Names found by their shape alone are often products or places, so they are offered but not selected.
       confidence = 'low'
@@ -303,8 +321,10 @@ function classifyField(field: SampledField): Finding | null {
       reason = 'header'
     }
     if (!confidence) continue
-    const examples = findDistinctExamples(values, reason === 'header' ? () => true : category === 'name' && reason === 'values' ? (value) => looksLikePersonName(getValueText(value).trim(), true) : isMatch)
-    const finding: Finding = { fieldId: field.fieldId, label: field.label, sheetName: field.sheetName, category, reason, confidence, matchPercent: Math.round(matchShare * 100), examples }
+    const isExample = reason === 'header' ? () => true : reason === 'headerAndShape' ? (value: unknown) => hasShapeOf(value, category) : category === 'name' && reason === 'values' ? (value: unknown) => looksLikePersonName(getValueText(value).trim(), true) : isMatch
+    const examples = findDistinctExamples(values, isExample)
+    const shownShare = reason === 'headerAndShape' ? values.filter(isExample).length / values.length : matchShare
+    const finding: Finding = { fieldId: field.fieldId, label: field.label, sheetName: field.sheetName, category, reason, confidence, matchPercent: Math.round(shownShare * 100), examples }
     if (!bestFinding || CONFIDENCE_RANK[confidence] > CONFIDENCE_RANK[bestFinding.confidence] || (confidence === bestFinding.confidence && finding.matchPercent > bestFinding.matchPercent)) bestFinding = finding
   }
   return bestFinding ?? classifyFreeText(field)

@@ -110,12 +110,11 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
   const [errorMessage, setErrorMessage] = useState('')
   const [createsKey, setCreatesKey] = useState(false)
   // The tokens of the last masked download, for its key; cleared when the choices change, since the key would no longer match.
-  const [lastTokens, setLastTokens] = useState<Record<string, TokenKeyEntry> | null>(null)
+  const [lastTokens, setLastTokens] = useState<{ tokens: Record<string, TokenKeyEntry>; maskedFileName: string } | null>(null)
   const [maskedFile, setMaskedFile] = useState<File | null>(null)
   const [keyFile, setKeyFile] = useState<File | null>(null)
   const [restoreMessage, setRestoreMessage] = useState<{ kind: 'error' | 'success'; text: string } | null>(null)
   const workerRef = useRef<ReturnType<typeof startMaskWorker> | null>(null)
-  const pickerRef = useRef<HTMLDivElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -134,7 +133,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
         if (event.key !== 'Escape') return
         if (isPickerOpen) setIsPickerOpen(false)
         else onClose?.()
-      } else if (isPickerOpen && !pickerRef.current?.contains(event.target as Node)) {
+      } else if (isPickerOpen && !(event.target instanceof Element && event.target.closest('#mask-columns-button, #mask-columns-list'))) {
         setIsPickerOpen(false)
       }
     }
@@ -149,6 +148,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
   const fields = scanState.status === 'ready' ? scanState.fields : []
   const findingsById = new Map((scanState.status === 'ready' ? scanState.findings : []).map((finding) => [finding.fieldId, finding]))
   const isTextFile = fields.length === 1 && fields[0].fieldId === TEXT_FIELD_ID
+  const isMultiSheet = scanState.status === 'ready' && scanState.sheetNames.length > 1
   const selectedFields = fields.filter((field) => fieldChoices[field.fieldId]?.isSelected)
   const choices: MaskChoice[] = selectedFields.map((field) => ({ fieldId: field.fieldId, category: fieldChoices[field.fieldId].category, strategy: fieldChoices[field.fieldId].strategy }))
   const choicesText = JSON.stringify(choices)
@@ -165,6 +165,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
     setActiveTab('mask')
     setStep(1)
     setScanState({ status: 'scanning', percent: 0 })
+    if (!isDrawer) panelRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     setPreview(null)
     setLastTokens(null)
     setErrorMessage('')
@@ -238,7 +239,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
         return
       }
       downloadTextFile(fileName, outputFile, outputFile.type)
-      setLastTokens(response.tokens)
+      setLastTokens({ tokens: response.tokens, maskedFileName: fileName })
       showToast({ message: t('mask.saved', { name: isolateText(fileName) }), kind: 'success' })
     } catch {
       setErrorMessage(t('mask.error.failed'))
@@ -247,10 +248,11 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
     }
   }
 
+  // The key is named after the masked file it restores ("people-masked.csv" -> "people-masked-key.json"), so the two stay a pair.
   function downloadKey() {
     if (!file || !lastTokens) return
-    const keyFileName = buildOutputFileName(file.name, 'private-key', 'json')
-    downloadTextFile(keyFileName, JSON.stringify(buildTokenKey(lastTokens, file.name), null, 2), 'application/json')
+    const keyFileName = lastTokens.maskedFileName.replace(/\.[^.]+$/, '-key.json')
+    downloadTextFile(keyFileName, JSON.stringify(buildTokenKey(lastTokens.tokens, lastTokens.maskedFileName), null, 2), 'application/json')
     showToast({ message: t('mask.keySaved', { name: isolateText(keyFileName) }), kind: 'success' })
   }
 
@@ -299,7 +301,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
 
   const normalizedQuery = pickerQuery.trim().toLowerCase()
   const columnPicker = (
-    <div className="mw-picker" ref={pickerRef}>
+    <div className="mw-picker">
       <button id="mask-columns-button" type="button" className={buttonClasses.outline} title={t('mask.columnsTip')} aria-haspopup="true" aria-expanded={isPickerOpen} aria-controls="mask-columns-list" onClick={() => setIsPickerOpen(!isPickerOpen)}>
         {t('mask.columnsButton', { count: selectedFields.length, total: fields.length })}
         <svg viewBox="0 0 24 24" aria-hidden="true" className="mw-ico"><path d={CHEVRON_ICON_PATH} /></svg>
@@ -309,18 +311,26 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
           {fields.length > SEARCHABLE_FIELD_COUNT && (
             <input id="mask-columns-search" type="search" className="mw-picker-search" placeholder={t('mask.searchColumns')} aria-label={t('mask.searchColumns')} value={pickerQuery} onChange={(event) => setPickerQuery(event.target.value)} />
           )}
-          {fields.map((field, fieldIndex) => {
-            if (normalizedQuery && !field.label.toLowerCase().includes(normalizedQuery)) return null
-            const finding = findingsById.get(field.fieldId)
-            const startsSheet = field.sheetName && field.sheetName !== fields[fieldIndex - 1]?.sheetName
+          {[true, false].map((isLikelySensitive) => {
+            const groupFields = fields
+              .map((field, fieldIndex) => ({ field, fieldIndex }))
+              .filter(({ field }) => (findingsById.get(field.fieldId) ? isSelectedByDefault(findingsById.get(field.fieldId) as Finding) : false) === isLikelySensitive)
+              .filter(({ field }) => !normalizedQuery || field.label.toLowerCase().includes(normalizedQuery))
+            if (groupFields.length === 0) return null
             return (
-              <div key={field.fieldId}>
-                {startsSheet && <p className="mw-picker-sheet">{field.sheetName}</p>}
-                <label htmlFor={`mask-field-${fieldIndex + 1}-checkbox`} className="mw-picker-item">
-                  <input id={`mask-field-${fieldIndex + 1}-checkbox`} type="checkbox" checked={fieldChoices[field.fieldId]?.isSelected ?? false} onChange={(event) => updateFieldChoice(field.fieldId, { isSelected: event.target.checked })} />
-                  <bdi className="mw-picker-name">{fieldLabel(field)}</bdi>
-                  {finding && renderFindingTag(finding)}
-                </label>
+              <div key={String(isLikelySensitive)} role="group" aria-labelledby={`mask-columns-group-${isLikelySensitive ? 'sensitive' : 'other'}`}>
+                <p id={`mask-columns-group-${isLikelySensitive ? 'sensitive' : 'other'}`} className="mw-picker-group">{t(isLikelySensitive ? 'mask.columnsSensitive' : 'mask.columnsOther')}</p>
+                {groupFields.map(({ field, fieldIndex }) => {
+                  const finding = findingsById.get(field.fieldId)
+                  return (
+                    <label key={field.fieldId} htmlFor={`mask-field-${fieldIndex + 1}-checkbox`} className="mw-picker-item">
+                      <input id={`mask-field-${fieldIndex + 1}-checkbox`} type="checkbox" checked={fieldChoices[field.fieldId]?.isSelected ?? false} onChange={(event) => updateFieldChoice(field.fieldId, { isSelected: event.target.checked })} />
+                      <bdi className="mw-picker-name">{fieldLabel(field)}</bdi>
+                      {isMultiSheet && <span className="mw-picker-sheet">{field.sheetName}</span>}
+                      {finding && renderFindingTag(finding)}
+                    </label>
+                  )
+                })}
               </div>
             )
           })}
@@ -332,6 +342,14 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
   const chosenFieldRows = (
     <div id="mask-chosen-fields" className="mw-rows">
       {selectedFields.length === 0 && <p className="mw-empty">{fields.length === 0 ? t('mask.noFields') : t('mask.noColumns')}</p>}
+      {selectedFields.length > 0 && (
+        <div id="mask-rows-head" className="mw-row mw-row-head">
+          <span title={t('mask.header.columnTip')}>{t('mask.header.column')}</span>
+          <span title={t('mask.header.typeTip')}>{t('mask.header.type')}</span>
+          <span title={t('mask.header.methodTip')}>{t('mask.header.method')}</span>
+          <span />
+        </div>
+      )}
       {fields.map((field, fieldIndex) => {
         const choice = fieldChoices[field.fieldId]
         if (!choice?.isSelected) return null
@@ -346,12 +364,12 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
                 <span className="mw-row-sheet">
                   {field.sheetName}
                   {field.sheetName && finding && ' · '}
-                  {finding && t(`mask.level.${finding.confidence}`)}
+                  {finding && <span title={t('mask.rowConfidenceTip')}>{t('mask.rowConfidence', { level: t(`mask.level.${finding.confidence}`) })}</span>}
                 </span>
               )}
             </span>
             <span className="mw-select-wrap">
-              <select id={`${rowId}-type`} className="mw-select" aria-label={t('mask.typeLabel', { field: label })} title={t('mask.typeLabel', { field: fieldLabel(field) })} value={choice.category} disabled={isTextFile} onChange={(event) => updateFieldChoice(field.fieldId, { category: event.target.value as MaskCategory })}>
+              <select id={`${rowId}-type`} className="mw-select" aria-describedby="mask-rows-help" aria-label={t('mask.typeLabel', { field: label })} title={t('mask.typeLabel', { field: fieldLabel(field) })} value={choice.category} disabled={isTextFile} onChange={(event) => updateFieldChoice(field.fieldId, { category: event.target.value as MaskCategory })}>
                 {CATEGORIES.map((category) => (
                   <option key={category} value={category}>{t(`mask.category.${category}`)}</option>
                 ))}
@@ -359,7 +377,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
               {SELECT_CHEVRON}
             </span>
             <span className="mw-select-wrap">
-              <select id={`${rowId}-strategy`} className="mw-select" aria-label={t('mask.strategyLabel', { field: label })} title={t('mask.strategyLabel', { field: fieldLabel(field) })} value={choice.strategy} onChange={(event) => updateFieldChoice(field.fieldId, { strategy: event.target.value as MaskStrategy })}>
+              <select id={`${rowId}-strategy`} className="mw-select" aria-describedby="mask-rows-help" aria-label={t('mask.strategyLabel', { field: label })} title={t('mask.strategyLabel', { field: fieldLabel(field) })} value={choice.strategy} onChange={(event) => updateFieldChoice(field.fieldId, { strategy: event.target.value as MaskStrategy })}>
                 {STRATEGIES.filter((strategy) => !(isTextFile && strategy === 'remove')).map((strategy) => (
                   <option key={strategy} value={strategy}>{t(strategyLabelKey(choice.category, strategy))}</option>
                 ))}
@@ -380,6 +398,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
       <div className="mw-stack">
         {!isTextFile && columnPicker}
         {findingsById.size === 0 && fields.length > 0 && !isTextFile && <p className="mw-muted mw-small">{t('mask.noFindings')}</p>}
+        {fields.length > 0 && <p id="mask-rows-help" className="mw-muted mw-small">{t(isTextFile ? 'mask.rowsHelpText' : 'mask.rowsHelp')}</p>}
         {chosenFieldRows}
       </div>
     ) : step === 2 ? (
@@ -426,7 +445,7 @@ export default function MaskWorkbench({ file, onClose }: { file: File | null; on
             <div className="flex flex-wrap items-center gap-2">
               <button id="download-mask-key-button" type="button" disabled={isWorking || !lastTokens} title={lastTokens ? t('mask.keyTip') : t('mask.keyHint')} onClick={downloadKey} className={buttonClasses.outline}>
                 <svg viewBox="0 0 24 24" aria-hidden="true" className="mw-ico"><path d={DOWNLOAD_ICON_PATH} /></svg>
-                {t('mask.downloadKey')}
+                {lastTokens ? t('mask.downloadKeyFor', { name: isolateText(lastTokens.maskedFileName) }) : t('mask.downloadKey')}
               </button>
               {!lastTokens && <span id="mask-key-hint" className="mw-muted mw-small">{t('mask.keyHint')}</span>}
             </div>

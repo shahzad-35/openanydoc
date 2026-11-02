@@ -90,9 +90,11 @@
 
   /* The column picker: a button that opens a list of every field with a check box. */
   & .mw-picker { position: relative; }
-  & .mw-picker-list { position: absolute; inset-inline-start: 0; top: calc(100% + 4px); z-index: 5; width: min(360px, calc(100vw - 32px)); max-height: 320px; overflow: auto; padding: 4px; border: 1px solid var(--mw-line); border-radius: 9px; background: var(--mw-panel); box-shadow: 0 14px 34px -10px rgba(16, 24, 40, 0.3); }
+  /* In the flow, under its button: nothing around it can clip it, and it scrolls on its own when the file has many columns. */
+  & .mw-picker-list { margin-top: 6px; max-width: 460px; max-height: 300px; overflow-y: auto; overscroll-behavior: contain; padding: 4px; border: 1px solid var(--mw-line); border-radius: 9px; background: var(--mw-panel); box-shadow: 0 8px 22px -12px rgba(16, 24, 40, 0.3); }
+  & .mw-picker-group { position: sticky; top: -4px; z-index: 1; margin: 0 -4px; padding: 8px 12px 4px; background: var(--mw-panel); color: var(--mw-muted); font-size: 11px; font-weight: 600; text-transform: none; }
   & .mw-picker-search { width: 100%; height: 28px; margin-bottom: 4px; padding-inline: 8px; border: 1px solid var(--mw-line); border-radius: 6px; background: var(--mw-panel-2); font-size: 12.5px; }
-  & .mw-picker-sheet { padding: 6px 8px 2px; color: var(--mw-muted); font-size: 11px; font-weight: 600; }
+  & .mw-picker-sheet { color: var(--mw-muted); font-size: 11px; white-space: nowrap; }
   & .mw-picker-item { display: flex; align-items: center; gap: 8px; min-height: 30px; padding-inline: 8px; border-radius: 6px; cursor: pointer; }
   & .mw-picker-item:hover { background: var(--mw-hover); }
   & .mw-picker-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -105,6 +107,8 @@
   & .mw-row { display: grid; grid-template-columns: minmax(0, 1fr) 150px 190px 30px; align-items: center; gap: 8px; padding-block: 6px; padding-inline: 10px 6px; }
   & .mw-row + .mw-row { border-top: 1px solid var(--mw-line); }
   & .mw-row-name { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 500; }
+  & .mw-row-head { padding-block: 7px; background: var(--mw-panel-2); color: var(--mw-muted); font-size: 11.5px; font-weight: 600; }
+  & .mw-row-head span[title] { width: fit-content; cursor: help; text-decoration: underline dotted; text-underline-offset: 3px; }
   & .mw-row-sheet { display: block; color: var(--mw-muted); font-size: 11px; font-weight: 400; }
   & .mw-empty { padding: 18px 10px; text-align: center; color: var(--mw-muted); }
 
@@ -122,6 +126,7 @@
 @media (max-width: 639px) {
   .mask-workbench .mw-row { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 30px; }
   .mask-workbench .mw-row-name { grid-column: 1 / -1; }
+  .mask-workbench .mw-row-head span:first-child { grid-column: 1 / -1; }
   .mask-workbench.mask-page { margin-inline: -4px; }
 }
 

@@ -185,3 +185,11 @@ test('a text file is masked as free text and restored', () => {
   assert.equal(masked.text, 'Hello,\nplease write to EMAIL-000001 or call PHONE-000001.\nThanks')
   assert.equal(restoreDocument(masked, buildTokenKey(tokens, 'note.txt')).document.text, text)
 })
+
+test('a column named like an ID or IBAN whose values have the right form is selected, even when the checksum fails', () => {
+  const { findings } = detectSensitiveFields(tablesDocument(['National ID', 'IBAN', 'City'], [['9100007919', 'SA00 0000 0000 0000 0000 0001', 'Riyadh'], ['9100015838', 'SA00 0000 0000 0000 0000 0002', 'Jeddah']]))
+  assert.equal(findingFor(findings, 'National ID').reason, 'headerAndShape')
+  assert.equal(findingFor(findings, 'IBAN').category, 'iban')
+  assert.ok(findings.filter((finding) => finding.label !== 'City').every(isSelectedByDefault))
+  assert.equal(findingFor(findings, 'City'), undefined)
+})
