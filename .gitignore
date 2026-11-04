@@ -36,3 +36,4 @@ LOG.md
 # Wrangler local state
 .wrangler
 MARKETING_PLAN.md
+/scripts/k9.mjs

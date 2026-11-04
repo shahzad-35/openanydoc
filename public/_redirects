@@ -7,6 +7,22 @@
 /word-viewer /en/word-viewer 301
 /powerpoint-viewer /en/powerpoint-viewer 301
 
+# Other spellings of a page: a permanent 301 to the address without a trailing slash, so Google keeps one URL (html_handling alone answers 307).
+/index.html / 301
+/en/ /en 301
+/ar/ /ar 301
+/en/index.html /en 301
+/ar/index.html /ar 301
+/en/:page/ /en/:page 301
+/ar/:page/ /ar/:page 301
+/en/:page/index.html /en/:page 301
+/ar/:page/index.html /ar/:page 301
+
+# Links shared with a full stop stuck to the end (Search Console found these).
+/csv-viewer. /en/csv-viewer 301
+/en/csv-viewer. /en/csv-viewer 301
+/ar/csv-viewer. /ar/csv-viewer 301
+
 # Addresses that exist only while a file is open (/en/view-csv ...): the file lives in memory, so after a reload there is nothing to show. Go to that format's page (302).
 /en/view-csv /en/csv-viewer 302
 /en/view-text /en/txt-viewer 302

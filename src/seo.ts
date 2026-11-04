@@ -164,13 +164,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'A free, privacy-first file viewer and editor that runs in your browser.',
     },
     '/privacy': {
-      title: 'Privacy Policy – OpenAnyDoc',
+      title: 'Privacy Policy: No Uploads, No Tracking – OpenAnyDoc',
       description: 'OpenAnyDoc privacy policy: files open in your browser and are never uploaded. No analytics, no cookies, no tracking. What your browser keeps and who hosts us.',
       heading: 'Privacy Policy',
       intro: 'In short: your files stay on your device, and we do not track you.',
     },
     '/terms': {
-      title: 'Terms of Use – OpenAnyDoc',
+      title: 'Terms of Use for the Free File Viewer – OpenAnyDoc',
       description: 'OpenAnyDoc terms of use: the file viewer and editor is free and provided as is, without warranty. Keep your original files: you are responsible for your edits.',
       heading: 'Terms of Use',
       intro: 'The short rules for using OpenAnyDoc.',
@@ -386,13 +386,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'عارض ومحرر ملفات مجاني يضع الخصوصية أولًا ويعمل داخل متصفحك.',
     },
     '/privacy': {
-      title: 'سياسة الخصوصية – OpenAnyDoc',
+      title: 'سياسة الخصوصية: لا رفع للملفات ولا تتبع – OpenAnyDoc',
       description: 'سياسة الخصوصية في OpenAnyDoc: تُفتح الملفات في متصفحك ولا تُرفع أبدًا. لا تحليلات ولا ملفات تعريف ارتباط ولا تتبع. ما يحفظه المتصفح ومن يستضيف الموقع.',
       heading: 'سياسة الخصوصية',
       intro: 'باختصار: ملفاتك تبقى على جهازك، ونحن لا نتتبعك.',
     },
     '/terms': {
-      title: 'شروط الاستخدام – OpenAnyDoc',
+      title: 'شروط استخدام عارض الملفات المجاني – OpenAnyDoc',
       description: 'شروط استخدام OpenAnyDoc: عارض ومحرر الملفات مجاني ويُقدَّم كما هو دون أي ضمان. احتفظ دائمًا بملفاتك الأصلية، فأنت مسؤول عن الملفات التي تفتحها وتعدّلها.',
       heading: 'شروط الاستخدام',
       intro: 'القواعد المختصرة لاستخدام OpenAnyDoc.',
