@@ -344,3 +344,5 @@ html[lang="ar"] #csv-workbench{--ui:"IBM Plex Sans Arabic",system-ui,"Segoe UI",
 #csv-workbench .grid-spacer td{height:auto;padding:0;border:0;background:transparent}
 #csv-workbench #grid-empty.shown{display:block}
 #csv-workbench .fatal{padding:24px}
+/* Touch screens: the search field reaches 44 px tall for taps; the negative margins keep the box around it (.search) as drawn. */
+@media (pointer: coarse){#csv-workbench .search input{height:44px;margin-block:-13px}}

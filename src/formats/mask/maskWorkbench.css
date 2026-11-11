@@ -148,3 +148,7 @@
 #mask-tool .mw-select-chevron { position: absolute; inset-inline-end: 10px; top: 50%; translate: 0 -50%; color: var(--mw-muted); pointer-events: none; }
 /* A disabled button reads as unavailable, not as faded text. */
 #mask-tool button:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+/* Touch screens: a select draws its own border, so it cannot get a bigger invisible touch area; it grows to 44 px instead. */
+@media (pointer: coarse) {
+  #mask-tool .mw-select { height: 44px; }
+}

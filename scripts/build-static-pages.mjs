@@ -15,9 +15,9 @@ import { faqItems } from '../src/content.ts'
 import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
-import { CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
+import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
 import { AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
-import { findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
+import { findBreadcrumbParent, findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
 const serverBuildFolder = path.join(projectRoot, 'dist-ssr')
@@ -118,7 +118,9 @@ function renderChangelogBody(locale) {
     `<div id="${changelogIds.page}" class="${c.page}">` +
     `<header id="${changelogIds.header}" class="${c.header}"><p><a id="${changelogIds.brandLink}" href="/${locale}" class="${c.brandLink}"><span dir="ltr" class="wordmark"><img src="/favicon.svg" alt="" width="34" height="34" class="wordmark-mark">open<span class="text-accent">any</span>doc</span></a></p><span aria-hidden="true" class="${headerRowBreak}"></span>${renderChangelogNav(locale)}` +
     `<p><a id="${changelogIds.languageLink}" href="/${other}/changelog" hreflang="${other}" lang="${other}" class="${c.languageLink}">${t('changelog.otherLanguage')}</a></p></header>` +
-    `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}"><h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
+    `<main id="${changelogIds.main}" class="${c.main}"><div class="${c.intro}">` +
+    `<nav id="breadcrumb" aria-label="${t('breadcrumb.label')}" class="${breadcrumbClasses.nav}"><ol class="${breadcrumbClasses.list}"><li class="${breadcrumbClasses.item}"><a id="breadcrumb-link-home" href="/${locale}" class="${breadcrumbClasses.link}">${t('breadcrumb.home')}</a><svg aria-hidden="true" viewBox="0 0 24 24" class="${breadcrumbClasses.separator}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${BREADCRUMB_CHEVRON_PATH}"></path></svg></li><li class="${breadcrumbClasses.item}"><span aria-current="page" class="${breadcrumbClasses.current}">${t('breadcrumb.changelog')}</span></li></ol></nav>` +
+    `<h1 id="${changelogIds.heading}" class="${c.heading}">${t('changelog.heading')}</h1><p id="${changelogIds.intro}" class="${c.introText}">${t('changelog.intro')}</p></div>` +
     `<ol id="${changelogIds.timeline}" class="${c.timeline}">${entries}</ol><a id="${changelogIds.backLink}" href="/${locale}" class="${c.backLink}">${t('changelog.home')}</a></main>${renderChangelogFooter(locale)}</div>`
   )
 }
@@ -241,8 +243,8 @@ function changelogBreadcrumb(locale) {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: SITE_NAME, item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
-      { '@type': 'ListItem', position: 2, name: translate(locale, 'changelog.heading'), item: `${SITE_ORIGIN}${localizePath(locale, '/changelog')}` },
+      { '@type': 'ListItem', position: 1, name: translate(locale, 'breadcrumb.home'), item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
+      { '@type': 'ListItem', position: 2, name: translate(locale, 'breadcrumb.changelog'), item: `${SITE_ORIGIN}${localizePath(locale, '/changelog')}` },
     ],
   })
 }
@@ -271,10 +273,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const seo = pageSeo[locale][address]
   const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
   const viewer = findViewerByToolPath(address)
-  // A landing page (/json-formatter) sits under its viewer's page in the breadcrumb: Home › JSON viewer › JSON formatter. A tool
-  // for several formats (/mask-data) sits under Home only.
-  const landingPage = landingPages.find((page) => page.path === address)
-  const parentAddress = landingPage && !landingPage.tool && viewers.find((candidate) => candidate.id === landingPage.viewerId).toolPath
+  const parentAddress = findBreadcrumbParent(address, Boolean(guidePages.en[address]))
   // A format or landing page's "What it handles" lines are its application's feature list: true features only.
   const guide = formatGuides[locale][address]
   const structuredData = []
@@ -385,9 +384,10 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       '@context': 'https://schema.org',
       '@type': 'BreadcrumbList',
       itemListElement: [
-        { name: SITE_NAME, item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
-        ...(parentAddress ? [{ name: pageSeo[locale][parentAddress].linkText, item: `${SITE_ORIGIN}${localizePath(locale, parentAddress)}` }] : []),
-        { name: seo.heading, item: pageUrl },
+        // The same trail and names as the breadcrumb on the page (PageBreadcrumb in src/components/SiteFooter.tsx).
+        { name: translate(locale, 'breadcrumb.home'), item: `${SITE_ORIGIN}${localizePath(locale, '/')}` },
+        ...(parentAddress ? [{ name: pageSeo[locale][parentAddress].linkText ?? pageSeo[locale][parentAddress].heading, item: `${SITE_ORIGIN}${localizePath(locale, parentAddress)}` }] : []),
+        { name: seo.linkText ?? seo.heading, item: pageUrl },
       ].map((crumb, index) => ({ '@type': 'ListItem', position: index + 1, ...crumb })),
     })
   }
@@ -404,11 +404,22 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
 const seoAddresses = Object.keys(pageSeo.en)
 const seoTitles = locales.flatMap((locale) => seoAddresses.map((address) => pageSeo[locale][address].title))
 if (new Set(seoTitles).size !== seoTitles.length) throw new Error('Two pages have the same title: every page needs its own.')
+// What a reader sees of a page: its title, description and the text of its <main> without the breadcrumb. Tags and attributes are
+// left out, so a new class or asset name is not a content change, and neither is shared chrome (a new tool page adds a footer link
+// everywhere; renaming a viewer changes its landing pages' breadcrumbs).
+function hashPageContent(seo, rootMarkup) {
+  const mainMarkup = (rootMarkup.match(/<main[\s\S]*<\/main>/)?.[0] ?? rootMarkup).replace(/<nav id="breadcrumb"[\s\S]*?<\/nav>/, '')
+  const mainText = mainMarkup.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim()
+  return createHash('sha1').update(`${seo.title}\n${seo.description}\n${mainText}`).digest('hex')
+}
+const pageContentHashes = new Map()
 for (const locale of locales) {
   for (const address of seoAddresses) {
     const pageFolder = path.join(distFolder, localizePath(locale, address))
     fs.mkdirSync(pageFolder, { recursive: true })
-    fs.writeFileSync(path.join(pageFolder, 'index.html'), renderSeoPage(locale, address, await renderPage(locale, address)))
+    const rootMarkup = await renderPage(locale, address)
+    pageContentHashes.set(localizePath(locale, address), hashPageContent(pageSeo[locale][address], rootMarkup))
+    fs.writeFileSync(path.join(pageFolder, 'index.html'), renderSeoPage(locale, address, rootMarkup))
   }
 }
 // "/" has no language of its own: /locale-redirect.js sends the visitor to /en or /ar. Its HTML is the English home page's head
@@ -416,7 +427,8 @@ for (const locale of locales) {
 // for unknown addresses, which the browser draws by itself.
 fs.writeFileSync(path.join(distFolder, 'index.html'), renderSeoPage('en', '/', '', { keepLocaleRedirect: true }))
 
-// The day a page last changed, for the sitemap's <lastmod>: the date of the last commit that touched the page's source files.
+// The date of the last commit that touched a page's source files: the starting <lastmod> of a page new to src/data/pageDates.json,
+// and the changelog's.
 // The Cloudflare build may clone only the newest commit (a shallow clone, where every file looks changed that day) or have no
 // git at all; then every page gets the newest release date from the changelog instead.
 const newestChangeDate = changelog[0].date
@@ -440,6 +452,32 @@ function pageSourceFiles(address) {
 }
 const changelogLastChange = lastChangeDate(['src/data/changelog.json', 'src/pages/ChangelogPage.tsx'])
 
+// The day each page's content last changed, kept with its content hash in src/data/pageDates.json; commit that file with the
+// change. A page whose hash differs from the stored one gets today's date; a page new to the file starts from its git date. So a
+// copy edit in a shared file (src/seo.ts) moves only the pages whose words changed, and a shallow clone keeps the real dates.
+const pageDatesFile = path.join(projectRoot, 'src', 'data', 'pageDates.json')
+const storedPageDates = fs.existsSync(pageDatesFile) ? JSON.parse(fs.readFileSync(pageDatesFile, 'utf8')) : {}
+const today = new Date().toISOString().slice(0, 10)
+const pageDates = {}
+const pagesWithNewDate = []
+for (const locale of locales) {
+  for (const address of seoAddresses) {
+    const localizedAddress = localizePath(locale, address)
+    const hash = pageContentHashes.get(localizedAddress)
+    const stored = storedPageDates[localizedAddress]
+    if (stored?.hash === hash) {
+      pageDates[localizedAddress] = stored
+      continue
+    }
+    pageDates[localizedAddress] = { hash, date: stored ? today : lastChangeDate(pageSourceFiles(address)) }
+    pagesWithNewDate.push(localizedAddress)
+  }
+}
+if (pagesWithNewDate.length > 0) {
+  fs.writeFileSync(pageDatesFile, `${JSON.stringify(pageDates, null, 2)}\n`)
+  console.log(`New lastmod for ${pagesWithNewDate.length} page(s), saved in src/data/pageDates.json (commit it): ${pagesWithNewDate.join(', ')}`)
+}
+
 // Only pages that work as a page: no /view-* addresses (they exist only for a file open in one visitor's browser).
 const changelogAlternates = [
   ...locales.map((locale) => `<xhtml:link rel="alternate" hreflang="${locale}" href="${SITE_ORIGIN}/${locale}/changelog"/>`),
@@ -449,7 +487,7 @@ const pageAlternates = (address) =>
   [...locales.map((locale) => `<xhtml:link rel="alternate" hreflang="${locale}" href="${SITE_ORIGIN}${localizePath(locale, address)}"/>`), `<xhtml:link rel="alternate" hreflang="x-default" href="${SITE_ORIGIN}${localizePath('en', address)}"/>`].join('')
 const sitemapEntries = [
   ...locales.flatMap((locale) =>
-    seoAddresses.map((address) => `<url><loc>${SITE_ORIGIN}${localizePath(locale, address)}</loc><lastmod>${lastChangeDate(pageSourceFiles(address))}</lastmod>${pageAlternates(address)}</url>`),
+    seoAddresses.map((address) => `<url><loc>${SITE_ORIGIN}${localizePath(locale, address)}</loc><lastmod>${pageDates[localizePath(locale, address)].date}</lastmod>${pageAlternates(address)}</url>`),
   ),
   ...locales.map((locale) => `<url><loc>${SITE_ORIGIN}/${locale}/changelog</loc><lastmod>${changelogLastChange}</lastmod>${changelogAlternates}</url>`),
 ]
@@ -459,4 +497,4 @@ fs.writeFileSync(
 )
 fs.writeFileSync(path.join(distFolder, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`)
 fs.rmSync(serverBuildFolder, { recursive: true, force: true })
-console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml (lastmod from ${hasFullGitHistory ? 'git' : `the newest release, ${newestChangeDate}: no full git history`}) and robots.txt into dist/`)
+console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml (lastmod from src/data/pageDates.json) and robots.txt into dist/`)

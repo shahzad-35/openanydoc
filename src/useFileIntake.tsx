@@ -8,6 +8,23 @@ import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
 import { findReleasedFormat, getFormatCapabilities, getReleasedFormats } from './whatsNew'
 
+// The file chooser lists each extension's media types as well: iOS Safari and Android Chrome match files by type, and leave
+// some greyed out when given only an extension they cannot map (.tsv, .json on older iOS). Android labels CSV either way.
+const PICKER_MIME_TYPES: Record<string, string[]> = {
+  '.csv': ['text/csv', 'text/comma-separated-values'],
+  '.tsv': ['text/tab-separated-values'],
+  '.txt': ['text/plain'],
+  '.json': ['application/json'],
+  '.xlsx': ['application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'],
+  '.xls': ['application/vnd.ms-excel'],
+  '.xlsm': ['application/vnd.ms-excel.sheet.macroEnabled.12'],
+  '.ods': ['application/vnd.oasis.opendocument.spreadsheet'],
+  '.docx': ['application/vnd.openxmlformats-officedocument.wordprocessingml.document'],
+  '.doc': ['application/msword'],
+  '.pptx': ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
+  '.ppt': ['application/vnd.ms-powerpoint'],
+}
+
 export const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
 
 // `openedFrom`: the page the file was opened on, without its language ('/json-validator'); a landing page opens its viewer in its own mode.
@@ -184,13 +201,14 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   // The file chooser offers only the formats that open today; a dropped coming-soon file still gets its "coming soon" message.
   const releasedExtensions = new Set(getReleasedFormats().flatMap(({ viewer }) => viewer.extensions))
   const choosableExtensions = acceptedExtensions.filter((extension) => releasedExtensions.has(extension))
+  // .doc and .ppt stay choosable wherever .docx and .pptx are, so an old Office file gets its own message.
+  const pickerExtensions = [...choosableExtensions, ...(choosableExtensions.includes('.docx') ? ['.doc'] : []), ...(choosableExtensions.includes('.pptx') ? ['.ppt'] : [])]
   const fileInput = (
     <input
       id="file-input"
       ref={fileInputRef}
       type="file"
-      // .doc and .ppt stay choosable wherever .docx and .pptx are, so an old Office file gets its own message.
-      accept={[...choosableExtensions, ...(choosableExtensions.includes('.docx') ? ['.doc'] : []), ...(choosableExtensions.includes('.pptx') ? ['.ppt'] : [])].join(',')}
+      accept={[...pickerExtensions, ...pickerExtensions.flatMap((extension) => PICKER_MIME_TYPES[extension] ?? [])].join(',')}
       aria-label={t('intake.fileInputLabel', { extensions: isolateLeftToRight(choosableExtensions.join(', ')) })}
       className="hidden"
       onChange={(event) => {

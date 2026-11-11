@@ -20,6 +20,7 @@ import { useMaskDrawer } from '../mask/useMaskDrawer'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import CsvGrid from './CsvGrid'
+import type { CsvParseMessage, CsvParseRequest } from './csvParse.worker'
 import type { CsvGridHandle, GridColumn, GridSelection } from './CsvGrid'
 import {
   COLUMN_TYPE_LABEL_KEYS,
@@ -86,6 +87,30 @@ function measureHeaderWidthPx(name: string, typeLabel: string) {
 }
 
 const ENCODING_CHOICES: EncodingChoice[] = ['auto', 'utf-8', 'utf-16le', 'utf-16be', 'windows-1256', 'iso-8859-1']
+
+// Parsing runs in a Web Worker, so clicks still answer while a large file is read (the file stays here: the worker gets a copy).
+// It lives here, not in parseCsv.ts, because the worker imports parseCsv.ts. If the worker cannot start, the page parses it itself.
+export function parseCsvInWorker(contents: ArrayBuffer, delimiterChoice: DelimiterChoice, encodingChoice: EncodingChoice): Promise<ParsedCsv> {
+  return new Promise((resolve) => {
+    const worker = new Worker(new URL('./csvParse.worker.ts', import.meta.url), { type: 'module' })
+    const receivedRows: string[][] = []
+    worker.onmessage = (event: MessageEvent<CsvParseMessage>) => {
+      const message = event.data
+      if (message.kind === 'rows') {
+        for (const row of message.rows) receivedRows.push(row)
+        return
+      }
+      worker.terminate()
+      resolve(message.parsedCsv.status === 'ok' ? { ...message.parsedCsv, rows: receivedRows } : message.parsedCsv)
+    }
+    worker.onerror = () => {
+      worker.terminate()
+      resolve(parseCsv(contents, delimiterChoice, encodingChoice))
+    }
+    const request: CsvParseRequest = { contents, delimiterChoice, encodingChoice }
+    worker.postMessage(request)
+  })
+}
 
 // The icons, drawn once and used by name (as in the design file). Static markup, no file content.
 const ICON_SPRITE = `<defs>
@@ -342,7 +367,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     }
   }, [pageTitle])
 
-  // Parse after the "Reading file" state has painted, so the page never looks frozen.
+  // Parse in the worker; a newer file, delimiter or encoding makes an older answer stale.
   useEffect(() => {
     // A new file, delimiter or encoding starts from a clean state; this is the reset, not a value derived from other state.
     // oxlint-disable-next-line react/set-state-in-effect
@@ -353,12 +378,15 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     setActive(null)
     setEditingCell(null)
     resetEditSession()
-    const parseTimerId = setTimeout(() => {
-      const newParsedCsv = parseCsv(openedFile.contents, delimiterChoice, encodingChoice)
+    let isCurrentParse = true
+    void parseCsvInWorker(openedFile.contents, delimiterChoice, encodingChoice).then((newParsedCsv) => {
+      if (!isCurrentParse) return
       if (newParsedCsv.status === 'ok' && tableFormat.headerRow !== 'always') setHasHeaderRow(firstRowLooksLikeHeader(newParsedCsv.rows))
       setParsedCsv(newParsedCsv)
-    }, 0)
-    return () => clearTimeout(parseTimerId)
+    })
+    return () => {
+      isCurrentParse = false
+    }
   }, [openedFile, delimiterChoice, encodingChoice, tableFormat.headerRow, resetEditSession])
 
   const readableCsv = parsedCsv?.status === 'ok' ? parsedCsv : null

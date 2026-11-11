@@ -168,19 +168,28 @@ function readWithoutConsoleNoise(contents: ArrayBuffer) {
   }
 }
 
+// Reads the file into sheets; throws when SheetJS cannot read it. Runs in excelParse.worker.ts (and here when the worker cannot start).
+export function readWorkbookFile(contents: ArrayBuffer, fileName: string): ParsedWorkbook {
+  const workbook = readWithoutConsoleNoise(contents)
+  const sheets = workbook.SheetNames.map((name): OriginalSheet => {
+    const worksheet = workbook.Sheets[name]
+    const merges = (worksheet['!merges'] ?? []).flatMap((range) => rangeToMerge(range) ?? [])
+    return { name, worksheet, ...measureSheet(worksheet), merges, coveredKeys: findCoveredKeys(merges) }
+  })
+  const extension = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase()
+  return { workbook, sheets, bookType: BOOK_TYPE_BY_EXTENSION[extension] ?? 'xlsx', styles: null }
+}
+
+// `reason` is SheetJS's own message; empty when it gave none.
+export function describeUnreadableWorkbook(reason: string, locale: Locale) {
+  return translate(locale, 'excel.msg.cannotReadWorkbook', { reason: isolateText(reason || translate(locale, 'excel.msg.unknownError')) })
+}
+
 export function parseWorkbook(contents: ArrayBuffer, fileName: string, locale: Locale = 'en'): ParseResult {
   try {
-    const workbook = readWithoutConsoleNoise(contents)
-    const sheets = workbook.SheetNames.map((name): OriginalSheet => {
-      const worksheet = workbook.Sheets[name]
-      const merges = (worksheet['!merges'] ?? []).flatMap((range) => rangeToMerge(range) ?? [])
-      return { name, worksheet, ...measureSheet(worksheet), merges, coveredKeys: findCoveredKeys(merges) }
-    })
-    const extension = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase()
-    return { status: 'ok', parsed: { workbook, sheets, bookType: BOOK_TYPE_BY_EXTENSION[extension] ?? 'xlsx', styles: null } }
+    return { status: 'ok', parsed: readWorkbookFile(contents, fileName) }
   } catch (error) {
-    const reason = error instanceof Error ? error.message : translate(locale, 'excel.msg.unknownError')
-    return { status: 'error', message: translate(locale, 'excel.msg.cannotReadWorkbook', { reason: isolateText(reason) }) }
+    return { status: 'error', message: describeUnreadableWorkbook(error instanceof Error ? error.message : '', locale) }
   }
 }
 

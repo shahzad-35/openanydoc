@@ -1,6 +1,6 @@
 import { Wordmark } from '../components/KitIcon'
 import LanguageSwitcher from '../components/LanguageSwitcher'
-import SiteFooter, { PageLink } from '../components/SiteFooter'
+import SiteFooter, { PageBreadcrumb, PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { usePageHead } from './HomePage'
@@ -76,6 +76,7 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
 
       <main id="main" className="mx-auto max-w-3xl px-5 pb-20">
         <div className="py-8 md:py-12">
+          <PageBreadcrumb address={address} onNavigate={onNavigate} />
           <h1 id="page-heading" className="type-h1 text-balance">{seo.heading}</h1>
           <p id="page-intro" className="mt-4 text-ink-soft">{seo.intro}</p>
           {content.lastUpdated && <p id="last-updated" className="mt-2 text-sm text-ink-soft">{content.lastUpdated}</p>}

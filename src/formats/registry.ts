@@ -123,7 +123,8 @@ export const formatDefinitions: FormatDefinition[] = [
     addedOn: '2026-10-05',
     highlights: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'],
     ViewerComponent: lazy(loadCsvViewer),
-    preloadViewer: loadCsvViewer,
+    // The parse worker is fetched too (an empty parse), so a file opens with no network.
+    preloadViewer: () => loadCsvViewer().then((csvViewer) => csvViewer.parseCsvInWorker(new ArrayBuffer(0), 'auto', 'auto')),
     ownsWholePage: true,
     canMask: true,
     editing: {
@@ -171,7 +172,8 @@ export const formatDefinitions: FormatDefinition[] = [
     addedOn: '2026-10-15',
     highlights: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'],
     ViewerComponent: lazy(loadExcelViewer),
-    preloadViewer: () => Promise.all([loadExcelViewer(), loadExcelEditing(), import('./excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]),
+    // The read worker is fetched too (an empty file, which it refuses), so a workbook opens with no network.
+    preloadViewer: () => Promise.all([loadExcelViewer().then((excelViewer) => excelViewer.readWorkbookInWorker(new ArrayBuffer(0), 'empty.xlsx', 'en')), loadExcelEditing(), import('./excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]),
     canMask: true,
     editing: {
       createEmptyEdits: createEmptyExcelEdits,

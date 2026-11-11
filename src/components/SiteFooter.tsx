@@ -1,9 +1,9 @@
 import type { ReactNode } from 'react'
 import { localizePath, useT } from '../i18n'
 import { CONTACT_EMAIL } from '../legalContent'
-import { SOCIAL_ICON_PATHS, footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
-import { SOCIAL_PROFILES, pageSeo } from '../seo'
-import { landingPages, viewers, type Viewer } from '../viewers'
+import { BREADCRUMB_CHEVRON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
+import { SOCIAL_PROFILES, guideAddresses, pageSeo } from '../seo'
+import { findBreadcrumbParent, landingPages, viewers, type Viewer } from '../viewers'
 import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
 
@@ -30,6 +30,36 @@ export function PageLink({ id, path, onNavigate, children, className = 'underlin
     >
       {children}
     </a>
+  )
+}
+
+// Home › [parent] › this page, above the heading of every page but home; the same trail as the page's BreadcrumbList data
+// (scripts/build-static-pages.mjs). `address` is the page's address without its language.
+export function PageBreadcrumb({ address, onNavigate, className = '' }: { address: string; onNavigate: (path: string) => void; className?: string }) {
+  const { locale, t } = useT()
+  const pageName = (path: string) => (path === '/changelog' ? t('breadcrumb.changelog') : (pageSeo[locale][path].linkText ?? pageSeo[locale][path].heading))
+  const parentAddress = findBreadcrumbParent(address, guideAddresses.includes(address))
+  const linkedAddresses = parentAddress ? ['/', parentAddress] : ['/']
+  return (
+    <nav id="breadcrumb" aria-label={t('breadcrumb.label')} className={className ? `${breadcrumbClasses.nav} ${className}` : breadcrumbClasses.nav}>
+      <ol className={breadcrumbClasses.list}>
+        {linkedAddresses.map((path) => (
+          <li key={path} className={breadcrumbClasses.item}>
+            <PageLink id={`breadcrumb-link-${path === '/' ? 'home' : path.slice(1)}`} path={path} onNavigate={onNavigate} className={breadcrumbClasses.link}>
+              {path === '/' ? t('breadcrumb.home') : pageName(path)}
+            </PageLink>
+            <svg aria-hidden="true" viewBox="0 0 24 24" className={breadcrumbClasses.separator} fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d={BREADCRUMB_CHEVRON_PATH} />
+            </svg>
+          </li>
+        ))}
+        <li className={breadcrumbClasses.item}>
+          <span aria-current="page" className={breadcrumbClasses.current}>
+            {pageName(address)}
+          </span>
+        </li>
+      </ol>
+    </nav>
   )
 }
 

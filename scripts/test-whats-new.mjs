@@ -244,7 +244,10 @@ const bannerText = () => evaluate(`document.querySelector('[role=region]')?.inne
 await test('home page shows the banner, the badges and takes no focus', async () => {
   await openPage('/en')
   const text = await bannerText()
-  expect(text?.includes('New') && text.includes('You can now open CSV, TXT, JSON, Excel, Word, and PowerPoint files'), `banner text was: ${text}`)
+  // The formats named are the ones still inside their 30 days (NEW_WINDOW_DAYS), so the list changes with the date; the message
+  // is read from the DOM because it is hidden below 640 px.
+  const message = await evaluate(`document.querySelector('#banner-message')?.textContent ?? ''`)
+  expect(text?.includes('New') && /^You can now open (and edit )?.+ files\.$/.test(message), `banner text was: ${text} / ${message}`)
   expect(await evaluate(`document.activeElement === document.body`), 'the banner took focus')
   expect(await evaluate(`document.querySelectorAll('footer nav [data-file-type]').length >= 4`), 'footer badges are missing')
   expect(await evaluate(`[...document.querySelectorAll('footer nav li')].some((item) => item.innerText.includes('JSON viewer') && item.innerText.includes('New'))`), 'the JSON nav link has no New badge')
@@ -358,7 +361,7 @@ await test('home, format and landing pages carry their own title, h1, intro, que
     headings.add(heading)
     intros.add(intro)
     const breadcrumb = structuredData.find((item) => item['@type'] === 'BreadcrumbList')
-    if (breadcrumb) expect(serverText.includes(breadcrumb.itemListElement.at(-1).name), `${address}: the server's h1 is not the page heading`)
+    if (breadcrumb) expect(serverText.includes(breadcrumb.itemListElement.at(-1).name), `${address}: the breadcrumb data's last step is not the breadcrumb shown in the server's HTML`)
     if (address.length > 3) expect(html.includes('id="how-to-section"') && html.includes('id="handles-section"'), `${address}: "How it works" or "What it handles" is not in the server's HTML`)
     const expectedType = address.length > 3 ? 'SoftwareApplication' : 'WebSite'
     expect(structuredData.some((item) => [item['@type']].flat().includes(expectedType)), `${address}: ${expectedType} data is missing`)
@@ -1360,14 +1363,14 @@ await test('landing pages accept their own file types, offer another type its vi
   const sampleTsv = path.join(scratchFolder, 'sample.tsv')
   fs.writeFileSync(sampleTsv, 'id\tname\n1\tAlpha\n2\tBeta\n')
   await openPage('/en/tsv-viewer')
-  expect((await evaluate(`document.querySelector('#file-input').accept`)) === '.tsv,.tab', 'the TSV page accepts other types')
+  expect((await evaluate(`document.querySelector('#file-input').accept`)) === '.tsv,.tab,text/tab-separated-values', 'the TSV page accepts other types (the media types follow the extensions)')
   await chooseFile(sampleCsv)
   await waitFor(`document.querySelector('#open-in-viewer-button')`, 'the CSV viewer to be offered for a .csv file')
   await chooseFile(sampleTsv)
   await waitFor(`[...document.querySelectorAll('#data-table [id^="cell-"]')].some((cell) => cell.textContent.trim() === 'Alpha')`, 'the TSV file to open with tabs as columns')
   expect((await evaluate('location.pathname')) === '/en/csv-viewer', 'the open TSV file does not have the CSV viewer address')
   await openPage('/en/xls-viewer')
-  expect((await evaluate(`document.querySelector('#file-input').accept`)) === '.xls', 'the XLS page accepts other types')
+  expect((await evaluate(`document.querySelector('#file-input').accept`)) === '.xls,application/vnd.ms-excel', 'the XLS page accepts other types (the media types follow the extensions)')
   for (const address of ['/en/json-formatter', '/ar/json-validator']) {
     await openPage(address)
     await chooseFile(sampleJson)
@@ -1597,7 +1600,7 @@ async function chooseFileIn(selector, filePath) {
 }
 const lastBlobText = () => evaluate(`window.__blobs[window.__blobs.length - 1].text()`)
 const rowIdFor = (category) => evaluate(`document.querySelector('#mask-chosen-fields .mw-row[data-category="${category}"]')?.id ?? ''`)
-const chosenCategories = () => evaluate(`[...document.querySelectorAll('#mask-chosen-fields .mw-row')].map((row) => row.dataset.category).join(',')`)
+const chosenCategories = () => evaluate(`[...document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]')].map((row) => row.dataset.category).join(',')`)
 const goToMaskStep = async (step) => {
   await evaluate(`document.querySelector('#mask-step-${step}-button').click()`)
   await waitFor(`document.querySelector('#mask-step-${step}-button').getAttribute('aria-current') === 'step'`, `mask step ${step}`)
@@ -1611,7 +1614,7 @@ await test('Mask Data lists every column, starts with the sensitive ones, masks 
   await expectCleanIds('/en/mask-data')
   expect((await evaluate(`document.querySelector('#mask-warning')?.innerText.trim()`)) === "Masking lowers the risk but isn't a guarantee. Check the result before you share it.", 'the warning is not shown word for word')
   await chooseFile(maskCsv)
-  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row').length > 0`, 'the chosen columns')
+  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length > 0`, 'the chosen columns')
   expect((await chosenCategories()) === 'name,email,phone,nationalId,iban,card,freeText', `the chosen columns were ${await chosenCategories()}`)
   await evaluate(`document.querySelector('#mask-columns-button').click()`)
   await waitFor(`document.querySelector('#mask-columns-list')`, 'the column list')
@@ -1683,7 +1686,7 @@ await test('Mask Data lists every column, starts with the sensitive ones, masks 
 await test('Mask Data masks every sheet of a workbook, nested JSON keeping numbers, and a text file', async () => {
   await openPage('/ar/mask-data')
   await chooseFile(maskWorkbook)
-  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row').length === 4`, 'the four sensitive columns of the two sheets')
+  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length === 4`, 'the four sensitive columns of the two sheets')
   await expectCleanIds('/ar/mask-data with chosen columns')
   await goToMaskStep(2)
   await waitFor(`document.querySelector('#mask-preview-table')`, 'the preview step')
@@ -1701,7 +1704,7 @@ await test('Mask Data masks every sheet of a workbook, nested JSON keeping numbe
 
   await openPage('/en/mask-data')
   await chooseFile(maskJson)
-  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row').length === 2`, 'the name and email of the JSON')
+  await waitFor(`document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length === 2`, 'the name and email of the JSON')
   await goToMaskStep(2)
   await waitFor(`document.querySelector('#mask-preview-table[data-view="after"]')?.innerText.includes('NAME-000001')`, 'the JSON preview')
   await goToMaskStep(3)
@@ -1713,7 +1716,7 @@ await test('Mask Data masks every sheet of a workbook, nested JSON keeping numbe
 
   await openPage('/en/mask-data')
   await chooseFile(maskText)
-  await waitFor(`document.querySelector('#mask-chosen-fields .mw-row')?.dataset.category === 'freeText' && !document.querySelector('#mask-columns-button')`, 'the text file as one free-text field')
+  await waitFor(`document.querySelector('#mask-chosen-fields .mw-row[data-category]')?.dataset.category === 'freeText' && !document.querySelector('#mask-columns-button')`, 'the text file as one free-text field')
   await goToMaskStep(3)
   expect(await evaluate(`Boolean(document.querySelector('#download-masked-txt-button')) && !document.querySelector('#download-masked-csv-button')`), 'a text file is not offered as TXT only')
   await evaluate(captureDownloads)
@@ -1736,7 +1739,7 @@ await test('the CSV, JSON and Excel viewers open Mask data in a drawer over the 
     // The workbook is written with its edits (ExcelJS) before it is masked, which takes longer under a full run.
     await waitFor(`document.querySelector('#mask-button') && !document.querySelector('#mask-button').disabled`, `${address}: the Mask button`, 20000)
     await evaluate(`document.querySelector('#mask-button').click()`)
-    await waitFor(`document.querySelector('#mask-tool.mask-drawer') && document.querySelectorAll('#mask-chosen-fields .mw-row').length === ${rowCount}`, `${address}: the drawer with ${rowCount} chosen fields`, 20000)
+    await waitFor(`document.querySelector('#mask-tool.mask-drawer') && document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length === ${rowCount}`, `${address}: the drawer with ${rowCount} chosen fields`, 20000)
     expect((await evaluate('location.pathname')) === address, `${address}: opening the drawer left the page`)
     await expectCleanIds(`${address} with the Mask drawer open`)
     await pressKey('Escape', 'Escape', 27)
@@ -1767,7 +1770,7 @@ await test('the CSV, JSON and Excel viewers open Mask data in a drawer over the 
   await evaluate(`document.querySelector('#more-menu-button').click()`)
   await waitFor(`document.querySelector('#more-menu-mask-data')`, 'Mask sensitive data in the More menu')
   await evaluate(`document.querySelector('#more-menu-mask-data').click()`)
-  await waitFor(`document.querySelectorAll('#mask-tool.mask-drawer #mask-chosen-fields .mw-row').length === 7`, 'the drawer from the More menu')
+  await waitFor(`document.querySelectorAll('#mask-tool.mask-drawer #mask-chosen-fields .mw-row[data-category]').length === 7`, 'the drawer from the More menu')
   await onPhone(async () => {
     const drawerBox = JSON.parse(await evaluate(`JSON.stringify(document.querySelector('#mask-tool').getBoundingClientRect())`))
     expect(drawerBox.width <= 390 && drawerBox.left >= 0, `the drawer does not fit a phone: ${JSON.stringify(drawerBox)}`)
@@ -1782,7 +1785,7 @@ await test('once a tool page is idle, its file opens with no network; code that 
     ['/en/json-viewer', sampleJson, `document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json' && !document.querySelector('#json-workbench [role="alert"]')`],
     ['/en/excel-viewer', sampleWorkbook, `document.querySelector('#excel-workbench #data-table')`],
     ['/en', sampleCsv, `document.querySelector('#csv-workbench #data-table tbody td')`],
-    ['/en/mask-data', maskWorkbook, `document.querySelectorAll('#mask-chosen-fields .mw-row').length === 4`],
+    ['/en/mask-data', maskWorkbook, `document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length === 4`],
   ]
   try {
     for (const [address, file, openedCheck] of offlineCases) {

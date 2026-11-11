@@ -63,6 +63,9 @@ export function getOriginalCellText(rows: string[][], rowId: number, columnId: n
 }
 
 export function getCellText(rows: string[][], edits: CsvEdits, rowId: number, columnId: number) {
+  // Called for every cell when a large file opens (the column overview, sorting, filters): with no edited cell, building the
+  // map key for each one was most of the 190 ms that opening 120,000 rows held the page.
+  if (edits.cells.size === 0) return getOriginalCellText(rows, rowId, columnId)
   return edits.cells.get(cellKey(rowId, columnId)) ?? getOriginalCellText(rows, rowId, columnId)
 }
 

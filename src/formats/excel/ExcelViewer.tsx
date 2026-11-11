@@ -4,6 +4,7 @@ import { textControlClassName } from '../../buttonStyles'
 import { FatalFileError, Notice } from '../../components/Messages'
 import { getLargeFileWarning } from '../../useFileIntake'
 import { isolateText, useT } from '../../i18n'
+import type { Locale } from '../../i18n'
 import type { FormatViewerProps } from '../registry'
 import DataTable, { SearchIcon, columnLabel, getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
 import type { DataTableHandle, SortState } from '../DataTable'
@@ -22,6 +23,7 @@ import {
   getSheetRecords,
   getSheetView,
   parseCellInput,
+  describeUnreadableWorkbook,
   parseWorkbook,
   readCell,
   readOriginalCell,
@@ -51,6 +53,7 @@ import type { ExcelActions, ExcelEditingComponents, SheetDialog } from './excelE
 import { createFormulaCalculator, translateFormulaRefs } from './excelFormulas'
 import { MAX_STYLED_FILE_BYTES, readWorkbookStyles } from './excelStyles'
 import SheetTabs from './SheetTabs'
+import type { ExcelParseMessage, ExcelParseRequest } from './excelParse.worker'
 import type * as XLSX from 'xlsx'
 
 type EditingCell = CellPosition & { draft: string; source: 'cell' | 'bar' | 'header'; startedByTyping: boolean }
@@ -58,6 +61,25 @@ type CellRange = { anchor: CellPosition; focus: CellPosition }
 
 const noIds: number[] = []
 const MAX_CLIPBOARD_CELLS = 200_000
+
+// SheetJS reads the file in a Web Worker (a 20,000-row workbook held the page for about 300 ms). It lives here, not in
+// excelModel.ts, because the worker imports excelModel.ts. If the worker cannot start, the page reads the file itself.
+export function readWorkbookInWorker(contents: ArrayBuffer, fileName: string, locale: Locale): Promise<ParseResult> {
+  return new Promise((resolve) => {
+    const worker = new Worker(new URL('./excelParse.worker.ts', import.meta.url), { type: 'module' })
+    worker.onmessage = (event: MessageEvent<ExcelParseMessage>) => {
+      worker.terminate()
+      const message = event.data
+      resolve(message.status === 'ok' ? message : { status: 'error', message: describeUnreadableWorkbook(message.reason, locale) })
+    }
+    worker.onerror = () => {
+      worker.terminate()
+      resolve(parseWorkbook(contents, fileName, locale))
+    }
+    const request: ExcelParseRequest = { contents, fileName }
+    worker.postMessage(request)
+  })
+}
 
 // A first row of text-only cells, one in every column, reads as a header, like in most spreadsheets.
 function firstRowLooksLikeHeader(rowCount: number, columnCount: number, readFirstRowCell: (columnId: number) => XLSX.CellObject | undefined) {
@@ -109,7 +131,7 @@ export default function ExcelViewer({
   const { reset: resetEditSession } = session
   const edits = session.edits
 
-  // Parse after the "Reading file" state has painted, so the page never looks frozen.
+  // Read in the worker; a newer file makes an older answer stale.
   useEffect(() => {
     // A new file starts from a clean state; this is the reset, not a value derived from other state.
     // oxlint-disable-next-line react/set-state-in-effect
@@ -120,8 +142,13 @@ export default function ExcelViewer({
     setRange(null)
     setEditingCell(null)
     resetEditSession()
-    const parseTimerId = setTimeout(() => setParseResult(parseWorkbook(openedFile.contents, openedFile.file.name, locale)), 0)
-    return () => clearTimeout(parseTimerId)
+    let isCurrentRead = true
+    void readWorkbookInWorker(openedFile.contents, openedFile.file.name, locale).then((newParseResult) => {
+      if (isCurrentRead) setParseResult(newParseResult)
+    })
+    return () => {
+      isCurrentRead = false
+    }
     // A language change must not re-read the file and drop the visitor's edits.
   }, [openedFile, resetEditSession]) // oxlint-disable-line react-hooks/exhaustive-deps
 

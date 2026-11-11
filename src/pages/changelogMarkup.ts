@@ -43,6 +43,19 @@ export const changelogClasses = {
   backLink: 'mt-12 inline-block text-sm underline underline-offset-2 hover:text-accent pointer-coarse:py-3',
 } as const
 
+// The breadcrumb above the heading of every page but home (PageBreadcrumb in src/components/SiteFooter.tsx; the build script writes
+// the same markup into the changelog pages). The separator is a drawn chevron, flipped in Arabic: the › character kept pointing
+// right in the Arabic font.
+export const BREADCRUMB_CHEVRON_PATH = 'm9 6 6 6-6 6'
+export const breadcrumbClasses = {
+  nav: 'mb-5 text-sm text-ink-soft',
+  list: 'flex flex-wrap items-center gap-x-2 gap-y-1',
+  item: 'inline-flex items-center gap-2',
+  link: 'underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline',
+  current: 'text-ink',
+  separator: 'size-3 shrink-0 rtl:-scale-x-100',
+} as const
+
 // A check mark, drawn inside a 24 x 24 box.
 export const CHECK_ICON_PATH = 'm5 13 4 4L19 7'
 

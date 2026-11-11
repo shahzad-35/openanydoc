@@ -1,0 +1,258 @@
+{
+  "/en": {
+    "hash": "026cf1c7ce5afb62975cf6d49cd6410e8d79f72f",
+    "date": "2026-11-04"
+  },
+  "/en/csv-viewer": {
+    "hash": "0c9d661c9fed7bc3a1348b17e3cfb268e45e608e",
+    "date": "2026-11-04"
+  },
+  "/en/excel-viewer": {
+    "hash": "63b2787b0862c1225c8de5d937439bed44eb3de7",
+    "date": "2026-11-04"
+  },
+  "/en/json-viewer": {
+    "hash": "0a9ff2cadab3c2b417505fea76fdc23ab88f2e79",
+    "date": "2026-11-04"
+  },
+  "/en/txt-viewer": {
+    "hash": "5d4ceea606f92f4ea78088e9fb6c9af23793e002",
+    "date": "2026-11-04"
+  },
+  "/en/word-viewer": {
+    "hash": "949d08974e114c796ec5bde04402981b7639ec6b",
+    "date": "2026-11-04"
+  },
+  "/en/powerpoint-viewer": {
+    "hash": "4d4249de2f16314af9ee08e98fea192f7e56859e",
+    "date": "2026-11-04"
+  },
+  "/en/json-formatter": {
+    "hash": "bfe56088f5309462326eadea095898ee1035ac9c",
+    "date": "2026-11-04"
+  },
+  "/en/json-validator": {
+    "hash": "106825d0c740b397e102a635f749c5e0f03ae565",
+    "date": "2026-11-04"
+  },
+  "/en/tsv-viewer": {
+    "hash": "d30ad4181586c1057efd2c8c08a4c29c08765c74",
+    "date": "2026-11-04"
+  },
+  "/en/large-csv-viewer": {
+    "hash": "b86911ea7cc7b3840c18b6d13aae25673e33f2de",
+    "date": "2026-11-04"
+  },
+  "/en/xls-viewer": {
+    "hash": "700df62706c168848bf6ab9f3763de40b4f6bf35",
+    "date": "2026-11-04"
+  },
+  "/en/excel-to-csv": {
+    "hash": "ed2bbf0273bf6ba80c91cdc8ace729cd0af87b51",
+    "date": "2026-11-04"
+  },
+  "/en/csv-to-excel": {
+    "hash": "83fb64e01a17377d1676e9b80c24bf35c5b7f603",
+    "date": "2026-11-04"
+  },
+  "/en/excel-to-json": {
+    "hash": "3c2a912efe71acf81a863d4325d42e6b877c6a23",
+    "date": "2026-11-04"
+  },
+  "/en/csv-to-json": {
+    "hash": "3b37794849e8cec7656ef7845c45ba88e1c720fc",
+    "date": "2026-11-04"
+  },
+  "/en/json-to-csv": {
+    "hash": "0a9e986daeb43a841f1c53b8f13592b1a3c59d47",
+    "date": "2026-11-04"
+  },
+  "/en/mask-data": {
+    "hash": "aae0d043834d46f3a3e8e073305c3490f5828dd5",
+    "date": "2026-11-04"
+  },
+  "/en/about": {
+    "hash": "1282b075be7e9dde5b46634c8ec49195dec215a6",
+    "date": "2026-11-04"
+  },
+  "/en/privacy": {
+    "hash": "a14042fbda4711723534726287fd482da08718ba",
+    "date": "2026-11-04"
+  },
+  "/en/terms": {
+    "hash": "be664fa0bcd86c2c594b602808dc34f1d5977421",
+    "date": "2026-11-04"
+  },
+  "/en/fix-arabic-csv-in-excel": {
+    "hash": "3a6be743d2cd51528ac2d95eb0dbdaf0c6dddf8d",
+    "date": "2026-11-04"
+  },
+  "/en/csv-opens-in-one-column": {
+    "hash": "4d2c3bd2d265b4043afa5a55b60b0127f81c6288",
+    "date": "2026-11-04"
+  },
+  "/en/csv-too-big-for-excel": {
+    "hash": "e9ba66c9b426cea8d20686076006bd7be95c6dce",
+    "date": "2026-11-04"
+  },
+  "/en/json-unexpected-token": {
+    "hash": "4c899b676b61647db1c098c052a00cc420e5d668",
+    "date": "2026-11-04"
+  },
+  "/en/check-file-upload": {
+    "hash": "7e7767a60bba95f36128208c4df37233263c6e3d",
+    "date": "2026-11-04"
+  },
+  "/en/open-json-file": {
+    "hash": "0d7416af70257d63977a1789d303cef9df456d3f",
+    "date": "2026-11-04"
+  },
+  "/en/open-xlsx-without-excel": {
+    "hash": "8d5c7994ae8978a02602e4492b3ac20f223b1661",
+    "date": "2026-11-04"
+  },
+  "/en/open-docx-without-word": {
+    "hash": "49dc2d444f5c6f0fd582610b41382b0b9ba34f78",
+    "date": "2026-11-04"
+  },
+  "/en/csv-vs-excel-vs-json": {
+    "hash": "e10a2f2340a2bf1131acf959ee90df7407fe30bb",
+    "date": "2026-11-04"
+  },
+  "/en/anonymize-data-before-sharing": {
+    "hash": "020d186534741db6ee688a2bf1f1ea6fc635d19e",
+    "date": "2026-11-04"
+  },
+  "/en/guides": {
+    "hash": "f520f0e3f68aab2702fc5bc7be13b7127ea7301a",
+    "date": "2026-11-04"
+  },
+  "/ar": {
+    "hash": "f69e585db80cfb10009109dbb57dd22e4183a6de",
+    "date": "2026-11-04"
+  },
+  "/ar/csv-viewer": {
+    "hash": "566da497fdeab6bb4694d2e39383456ecb14039f",
+    "date": "2026-11-04"
+  },
+  "/ar/excel-viewer": {
+    "hash": "2b822b6f4a179b97d243198e9fbb84fd28827143",
+    "date": "2026-11-04"
+  },
+  "/ar/json-viewer": {
+    "hash": "b836277fc40bfbc2f5a5acdd26637b437adba8b3",
+    "date": "2026-11-04"
+  },
+  "/ar/txt-viewer": {
+    "hash": "66cda174bf4cf5914e02c0ecc3ed7b9a50bfe168",
+    "date": "2026-11-04"
+  },
+  "/ar/word-viewer": {
+    "hash": "fa620ac6b25fea32bf3566999a1050afba6f7d52",
+    "date": "2026-11-04"
+  },
+  "/ar/powerpoint-viewer": {
+    "hash": "821c64dd1e682392ce1aea0d169ddf4b1238034a",
+    "date": "2026-11-04"
+  },
+  "/ar/json-formatter": {
+    "hash": "c8bd8fb90e6a401950c5edae505f582c5d5a69b2",
+    "date": "2026-11-04"
+  },
+  "/ar/json-validator": {
+    "hash": "0980efb7a9177ae1661741f03eeb45c55d5c4ca7",
+    "date": "2026-11-04"
+  },
+  "/ar/tsv-viewer": {
+    "hash": "ba1a8ef3ca29303a722f796fa19143cb1711ca26",
+    "date": "2026-11-04"
+  },
+  "/ar/large-csv-viewer": {
+    "hash": "1b724e41e4b1621e0ed9d7175b7489956db4ca3d",
+    "date": "2026-11-04"
+  },
+  "/ar/xls-viewer": {
+    "hash": "afc7cdfe475b677ca127e598440d4684ec5bbb3c",
+    "date": "2026-11-04"
+  },
+  "/ar/excel-to-csv": {
+    "hash": "d161051a76369bc7afa2728a64be1187345bd67c",
+    "date": "2026-11-04"
+  },
+  "/ar/csv-to-excel": {
+    "hash": "8486a9fde7521f07527b16471fc9cfc28dc15131",
+    "date": "2026-11-04"
+  },
+  "/ar/excel-to-json": {
+    "hash": "8ad49bf41ffcb8e4dc460370e995aef852354ef1",
+    "date": "2026-11-04"
+  },
+  "/ar/csv-to-json": {
+    "hash": "e2b38ca929a4449f9430bfbfe6ec271e8622a982",
+    "date": "2026-11-04"
+  },
+  "/ar/json-to-csv": {
+    "hash": "6a613d536dbd300e4f9bf835480cd41a09a4f9b5",
+    "date": "2026-11-04"
+  },
+  "/ar/mask-data": {
+    "hash": "698c204841149f01b70e144e24c6906da36cf0f1",
+    "date": "2026-11-04"
+  },
+  "/ar/about": {
+    "hash": "1a832438b5e4ee8833fe4fc993d552900c1a8c27",
+    "date": "2026-11-04"
+  },
+  "/ar/privacy": {
+    "hash": "aee008864ba18e7876608c43c927bf74a8909003",
+    "date": "2026-11-04"
+  },
+  "/ar/terms": {
+    "hash": "43556c2e8e197f4d9346ebf683e4c0c6e912e809",
+    "date": "2026-11-04"
+  },
+  "/ar/fix-arabic-csv-in-excel": {
+    "hash": "974dbd36e18e48dcd429348a69b87a0e5118acbc",
+    "date": "2026-11-04"
+  },
+  "/ar/csv-opens-in-one-column": {
+    "hash": "2fc2d68a77e546aba6aa29b629149d5cc9b9f2f4",
+    "date": "2026-11-04"
+  },
+  "/ar/csv-too-big-for-excel": {
+    "hash": "9d982beefe3a44512ec9d90f2b08476f468c38fa",
+    "date": "2026-11-04"
+  },
+  "/ar/json-unexpected-token": {
+    "hash": "2d4dcefd90920fb2a251f25edd1ed95b7c04e742",
+    "date": "2026-11-04"
+  },
+  "/ar/check-file-upload": {
+    "hash": "6343bcb29b57c1dfed57ed38b6e4f93ea388ca27",
+    "date": "2026-11-04"
+  },
+  "/ar/open-json-file": {
+    "hash": "d04c162e4b900ef6276b8ab42db111ddda33ab65",
+    "date": "2026-11-04"
+  },
+  "/ar/open-xlsx-without-excel": {
+    "hash": "f9f98ee94db1e913d27a616b4ec2195bdc3676ec",
+    "date": "2026-11-04"
+  },
+  "/ar/open-docx-without-word": {
+    "hash": "0642d092d1e74abf8db0236fcf5eea0851b7d86b",
+    "date": "2026-11-04"
+  },
+  "/ar/csv-vs-excel-vs-json": {
+    "hash": "ccc3f2a9c09133ffa5b0ae2bb19be952e6c41a5c",
+    "date": "2026-11-04"
+  },
+  "/ar/anonymize-data-before-sharing": {
+    "hash": "f225ea2f40cdac7110ef56bb33485a19aa8b3436",
+    "date": "2026-11-04"
+  },
+  "/ar/guides": {
+    "hash": "834f20571b127335fda473a3faad694e04565467",
+    "date": "2026-11-04"
+  }
+}

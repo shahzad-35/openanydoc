@@ -1,5 +1,5 @@
 import NewBadge from '../components/NewBadge'
-import SiteFooter from '../components/SiteFooter'
+import SiteFooter, { PageBreadcrumb } from '../components/SiteFooter'
 import { Wordmark } from '../components/KitIcon'
 import SiteNav from '../components/SiteNav'
 import changelog from '../data/changelog.json'
@@ -53,6 +53,7 @@ export default function ChangelogPage({ onNavigate }: { onNavigate: (path: strin
       </header>
       <main id={changelogIds.main} className={changelogClasses.main}>
         <div className={changelogClasses.intro}>
+          <PageBreadcrumb address="/changelog" onNavigate={onNavigate} />
           <h1 id={changelogIds.heading} className={changelogClasses.heading}>{t('changelog.heading')}</h1>
           <p id={changelogIds.intro} className={changelogClasses.introText}>{t('changelog.intro')}</p>
         </div>

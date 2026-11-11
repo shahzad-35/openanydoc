@@ -3,7 +3,7 @@ import DropPanel from '../components/DropPanel'
 import FormatGuide from '../components/FormatGuide'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeToggle from '../components/ThemeToggle'
-import SiteFooter, { PageLink } from '../components/SiteFooter'
+import SiteFooter, { PageBreadcrumb, PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import WhatsNewBanner from '../components/WhatsNewBanner'
 import DemoStage from '../components/home/DemoStage'
@@ -169,6 +169,7 @@ export default function HomePage({
 
       <main id="main" className="mx-auto max-w-[1120px] px-5 pb-24">
         <section id="hero" className="pt-10 md:pt-16">
+          {!isHomePage && <PageBreadcrumb address={address} onNavigate={onNavigate} className="mx-auto flex max-w-[640px] justify-center" />}
           <div className="mx-auto max-w-[640px] text-center">
             <h1 id="page-heading" className="type-display hero-in text-balance">{seo.heading}</h1>
             <p id="page-intro" className="type-lead hero-in mt-5 text-ink-soft">{seo.intro}</p>

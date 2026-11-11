@@ -365,3 +365,7 @@
 @media (prefers-reduced-motion: reduce) {
   #json-workbench * { transition: none !important; animation: none !important }
 }
+/* Touch screens: the path field reaches 44 px tall for taps; the negative margins keep the box around it (#path-query) as drawn. */
+@media (pointer: coarse) {
+  #json-workbench #path-query-input { height: 44px; margin-block: -14px }
+}
