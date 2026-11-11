@@ -498,3 +498,5 @@ html[lang="ar"] #txt-workbench{--ui:"IBM Plex Sans Arabic",system-ui,"Segoe UI",
   #txt-workbench #view-text{padding:20px 24px 0;background:color-mix(in srgb,var(--ink) 6%,var(--surface))}
   #txt-workbench #editor-scroll{max-width:860px;margin-inline:auto;border:1px solid var(--rule);border-bottom:0;border-radius:4px 4px 0 0;box-shadow:0 1px 3px rgba(16,24,40,.08),0 6px 18px -8px rgba(16,24,40,.16)}
 }
+/* With the "Next" strip under the top bar, the grid gets one more auto row. */
+#txt-workbench:has(> #next-steps){grid-template-rows:auto auto auto auto minmax(0,1fr) auto auto}

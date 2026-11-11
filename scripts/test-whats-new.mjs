@@ -349,7 +349,9 @@ await test('home, format and landing pages carry their own title, h1, intro, que
     const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
     const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
     expect(title.length >= 50 && title.length <= 60, `${address}: title is ${title.length} characters (50 to 60 for home, format and landing pages): ${title}`)
-    expect(description.length >= 150 && description.length <= 160, `${address}: description is ${description.length} characters`)
+    // Tool pages follow Step 17C (120 to 155, one concrete benefit); the home page keeps 150 to 160.
+    const [minDescription, maxDescription] = address.length > 3 ? [120, 155] : [150, 160]
+    expect(description.length >= minDescription && description.length <= maxDescription, `${address}: description is ${description.length} characters (${minDescription} to ${maxDescription})`)
     expect(html.includes(`<link rel="canonical" href="https://www.openanydoc.com${address}"`), `${address}: canonical is missing`)
     expect(html.includes('property="og:title"') && html.includes('property="og:description"'), `${address}: Open Graph tags are missing`)
     const structuredData = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
@@ -595,7 +597,9 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       const expectedTypes = { '': ['WebSite', 'Organization', 'SoftwareApplication', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['CollectionPage', 'BreadcrumbList'], '/changelog': ['BreadcrumbList'], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
       expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
       // Every reference to the organisation or website points at the one id the home page defines.
-      const entityIds = ['https://www.openanydoc.com/#organization', 'https://www.openanydoc.com/#website']
+      const entityIds = ['https://www.openanydoc.com/#organization', 'https://www.openanydoc.com/#website', 'https://www.openanydoc.com/#founder']
+      // No rating or review markup: there are no real reviews on the page.
+      expect(!/"(aggregateRating|review)"/.test(JSON.stringify(blocks)), `${address}: rating or review markup must not be published`)
       const references = [...JSON.stringify(blocks).matchAll(/"@id":"([^"]+)"/g)].map((match) => match[1])
       expect(references.every((reference) => entityIds.includes(reference)), `${address}: an @id points somewhere unknown: ${references.join(', ')}`)
       if (page === '') expect(blocks.some((block) => block['@type'] === 'Organization' && block['@id'] === entityIds[0]) && blocks.some((block) => block['@type'] === 'WebSite' && block['@id'] === entityIds[1] && block.publisher?.['@id'] === entityIds[0]), `${address}: the Organization and WebSite are not linked by @id`)
@@ -608,7 +612,8 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           expect(JSON.stringify(block.alternateName) === JSON.stringify(['Open Any Doc', 'OpenAnyDoc.com']), problem('alternateName is wrong'))
         } else if (type === 'Organization') {
           expect(block.name === 'OpenAnyDoc' && block.url === 'https://www.openanydoc.com', problem('name or url is wrong'))
-          expect(block.founder?.['@type'] === 'Person' && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
+          expect(block.founder?.['@type'] === 'Person' && block.founder['@id'] === entityIds[2] && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
+          expect(block.sameAs.includes('https://www.saashub.com/openanydoc'), problem('sameAs lacks the SaaSHub listing'))
           expect(Array.isArray(block.sameAs) && block.sameAs.every((profile) => /^https:\/\//.test(profile)), problem('sameAs must list the public profiles as absolute URLs'))
           expect(socialProfileUrls.every((profileUrl) => block.sameAs.includes(profileUrl)), problem('sameAs lacks a social profile'))
           expect(block.contactPoint?.email === 'support@openanydoc.com' && block.foundingDate === '2026-10', problem('contactPoint or foundingDate is wrong'))
@@ -622,6 +627,8 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           expect(block.offers?.['@type'] === 'Offer' && block.offers.price === '0' && block.offers.priceCurrency === 'USD', problem('offers is not a free Offer in USD'))
           expect(block.applicationCategory === 'UtilitiesApplication' && block.operatingSystem === 'Any (web browser)', problem('applicationCategory or operatingSystem is wrong'))
           expect(Array.isArray(block.featureList) && block.featureList.length > 0, problem('featureList is empty'))
+          // A format or landing page lists its format's features from src/viewers.ts (three, plus the landing page's own name).
+          if (page !== '' && page !== '/mask-data') expect([3, 4].includes(block.featureList.length), problem(`featureList has ${block.featureList.length} items, not the format's features`))
           expect(block.url === canonical && block.inLanguage === locale, problem('url or inLanguage is wrong'))
           expect(!('aggregateRating' in block) && !('review' in block), problem('ratings or reviews must not be published'))
         } else if (type === 'FAQPage') {
@@ -632,13 +639,13 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           }
         } else if (type === 'Article') {
           expect(block.headline?.length > 0 && isAbsoluteUrl(block.image) && /^\d{4}-\d{2}-\d{2}T00:00:00\+00:00$/.test(block.datePublished) && /^\d{4}-\d{2}-\d{2}T/.test(block.dateModified), problem('headline, image or dates are wrong'))
-          expect(block.author?.['@type'] === 'Person' && block.author.name?.length > 0 && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
+          expect(block.author?.['@type'] === 'Person' && block.author['@id'] === entityIds[2] && block.author.name?.length > 0 && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
         } else if (type === 'CollectionPage') {
           const items = block.mainEntity?.itemListElement ?? []
           expect(block.url === canonical && block.mainEntity?.['@type'] === 'ItemList' && items.length === guidePagesList.length, problem(`url is wrong or the list does not hold the ${guidePagesList.length} guides`))
           items.forEach((item, index) => expect(item.position === index + 1 && item.name?.length > 0 && item.url === `https://www.openanydoc.com/${locale}${guidePagesList[index]}`, problem(`item ${index + 1} is not ${guidePagesList[index]}`)))
         } else if (type === 'ProfilePage') {
-          expect(block.mainEntity?.['@type'] === 'Person' && block.mainEntity.name === 'Shahzad Ali' && block.url === canonical, problem('mainEntity or url is wrong'))
+          expect(block.mainEntity?.['@type'] === 'Person' && block.mainEntity['@id'] === entityIds[2] && block.mainEntity.name === 'Shahzad Ali' && block.url === canonical, problem('mainEntity or url is wrong'))
         } else if (type === 'BreadcrumbList') {
           const items = block.itemListElement ?? []
           expect(items.length >= 2, problem('fewer than two items'))
@@ -1039,7 +1046,7 @@ await test('the same unsupported file twice shows the toast both times', async (
 
 await test('JSON: sample, split panes, validate, path query, big numbers kept exactly, and the logo goes home', async () => {
   await openPage('/en/json-viewer')
-  await evaluate(`document.querySelector('#open-sample-json-button').click()`)
+  await evaluate(`document.querySelector('#sample-button-nested-json').click()`)
   await waitFor(`document.querySelector('#text-pane #json-text-input') && document.querySelector('#tree-pane #tree-view .row')`, 'the text and the tree side by side')
   expect(await evaluate(`document.querySelector('#tree-view').innerText.includes('9007199254740993') && document.querySelector('#tree-view .badge.big') !== null`), 'the big number was rounded or not marked in the tree')
   expect(await evaluate(`document.querySelector('#file-page header') === document.querySelector('#command-bar') && document.querySelector('#edit-toolbar') === null`), 'the shared header or edit toolbar is still on the JSON page')
@@ -1198,7 +1205,7 @@ await test('JSON over 10 MB is refused with a toast before it is read; 10 MB exa
 
 await test('JSON in Arabic: the bars mirror, the code and tree stay left to right', async () => {
   await openPage('/ar/json-viewer')
-  await evaluate(`document.querySelector('#open-sample-json-button').click()`)
+  await evaluate(`document.querySelector('#sample-button-nested-json').click()`)
   await waitFor(`document.querySelector('#tree-view .row')`, 'the tree')
   const layout = await evaluate(`({ home: document.querySelector('#home-button').getBoundingClientRect().right, download: document.querySelector('#download-button').getBoundingClientRect().left, width: innerWidth, tree: getComputedStyle(document.querySelector('#tree-view')).direction, code: getComputedStyle(document.querySelector('#json-text-input')).direction })`)
   expect(layout.home > layout.width - 60 && layout.download < 60, 'the command bar is not mirrored')
@@ -1209,7 +1216,7 @@ await test('JSON in Arabic: the bars mirror, the code and tree stay left to righ
 await test('JSON on a phone: Text, Tree and Inspector tabs instead of side by side', async () => {
   await onPhone(async () => {
     await openPage('/en/json-viewer')
-    await evaluate(`document.querySelector('#open-sample-json-button').click()`)
+    await evaluate(`document.querySelector('#sample-button-nested-json').click()`)
     await waitFor(`document.querySelector('#tree-view .row')`, 'the tree')
     const shown = (id) => `getComputedStyle(document.querySelector('${id}')).display !== 'none'`
     expect(await evaluate(`${shown('#mobile-pane-tabs')} && ${shown('#tree-pane')} && !(${shown('#text-pane')})`), 'both panes show on a phone')
@@ -1806,6 +1813,62 @@ await test('once a tool page is idle, its file opens with no network; code that 
   } finally {
     await goOffline(false)
   }
+})
+
+// ---------------------------------------------------------------- first screen of the tool pages (Step 17C)
+
+const formatPagesWithSamples = ['/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', ...landingPages]
+
+await test('every tool page shows its choose button and two sample files on the first screen of a 375 x 667 phone, in both languages', async () => {
+  await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true })
+  try {
+    for (const locale of ['en', 'ar']) {
+      for (const page of formatPagesWithSamples) {
+        await openPage(`/${locale}${page}`)
+        const firstScreen = await evaluate(`({ samples: document.querySelectorAll('#sample-files [id^="sample-button-"]').length, chooseBottom: document.querySelector('#choose-file-button').getBoundingClientRect().bottom, samplesBottom: document.querySelector('#sample-files')?.getBoundingClientRect().bottom ?? 9999, answer: document.querySelector('#page-answer')?.innerText ?? '', proofLink: document.querySelector('#page-proof-link')?.getAttribute('href') })`)
+        expect(firstScreen.samples === 2, `/${locale}${page}: ${firstScreen.samples} sample buttons, not 2`)
+        expect(firstScreen.chooseBottom <= 667 && firstScreen.samplesBottom <= 667, `/${locale}${page}: the choose button or the samples end at ${Math.round(firstScreen.samplesBottom)} px, below the 667 px first screen`)
+        expect(firstScreen.answer.length > 30 && firstScreen.proofLink === `/${locale}/check-file-upload`, `/${locale}${page}: the answer sentence or the proof link is missing`)
+      }
+    }
+  } finally {
+    await send('Emulation.clearDeviceMetricsOverride')
+  }
+})
+
+await test('a sample file opens with no network once its page is idle, with the Next strip of its format', async () => {
+  const sampleCases = [
+    ['/en/csv-viewer', 'arabic-csv', `document.querySelector('#csv-workbench #data-table tbody td')`, 'to-excel,to-json,mask'],
+    ['/en/json-viewer', 'records-json', `document.querySelector('#json-workbench .file-tab')?.innerText === 'customers.json' && !document.querySelector('#json-workbench [role="alert"]')`, 'format,to-csv,mask'],
+    ['/en/txt-viewer', 'release-notes-txt', `document.querySelector('#txt-workbench #file-name')`, 'find,sort-lines,remove-duplicates'],
+    ['/en/excel-viewer', 'sales-xlsx', `document.querySelector('#excel-workbench #data-table') && document.querySelectorAll('#sheet-tabs [role="tab"], [id^="sheet-tab-"]').length >= 3`, 'to-csv,to-json,mask'],
+    ['/en/word-viewer', 'quarterly-docx', `document.querySelector('#word-document section, #word-document .docx')`, 'print,fit-width'],
+    ['/en/powerpoint-viewer', 'review-pptx', `document.querySelector('#slide-stage svg, #slide-stage div')`, ''],
+    ['/en/mask-data', 'people-xlsx', `document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length > 0`, null],
+  ]
+  try {
+    for (const [address, sampleId, openedCheck, nextSteps] of sampleCases) {
+      await send('Network.clearBrowserCache')
+      await openPage(address)
+      await sleep(3000)
+      await goOffline(true)
+      await evaluate(`document.querySelector('#sample-button-${sampleId}').click()`)
+      await waitFor(openedCheck, `${address}: the ${sampleId} sample to open offline`)
+      if (nextSteps === null) continue
+      const strip = await evaluate(`[...document.querySelectorAll('#next-steps .next-step-button')].map((button) => button.id.replace('next-step-', '')).join(',')`)
+      // PowerPoint offers full screen only where the browser allows it, so only its last step is fixed.
+      expect(nextSteps ? strip === nextSteps : strip.endsWith('open-another'), `${address}: the Next strip was "${strip}"`)
+      await goOffline(false)
+    }
+  } finally {
+    await goOffline(false)
+  }
+  await openPage('/en/csv-viewer')
+  await evaluate(`document.querySelector('#sample-button-customers-csv').click()`)
+  await waitFor(`document.querySelector('#next-step-to-excel') && !document.querySelector('#next-step-to-excel').disabled`, 'the Next strip ready')
+  await expectCleanIds('/en/csv-viewer with a sample and the Next strip')
+  await evaluate(`document.querySelector('#next-step-to-excel').click()`)
+  await waitFor(`location.pathname === '/en/excel-viewer' && document.querySelector('#excel-workbench #data-table')`, 'Convert to Excel from the Next strip')
 })
 
 // ---------------------------------------------------------------- report

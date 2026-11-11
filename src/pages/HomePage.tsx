@@ -16,6 +16,7 @@ import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
+import { samplesByPage } from '../samples/toolSamples'
 import { Notice } from '../components/Messages'
 import { headerRowBreak } from './changelogMarkup'
 
@@ -168,13 +169,27 @@ export default function HomePage({
       {isHomePage && !isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} />}
 
       <main id="main" className="mx-auto max-w-[1120px] px-5 pb-24">
-        <section id="hero" className="pt-10 md:pt-16">
+        <section id="hero" className={isHomePage ? 'pt-10 md:pt-16' : 'pt-4 sm:pt-10 md:pt-16'}>
           {!isHomePage && <PageBreadcrumb address={address} onNavigate={onNavigate} className="mx-auto flex max-w-[640px] justify-center" />}
           <div className="mx-auto max-w-[640px] text-center">
             <h1 id="page-heading" className="type-display hero-in text-balance">{seo.heading}</h1>
-            <p id="page-intro" className="type-lead hero-in mt-5 text-ink-soft">{seo.intro}</p>
+            {isHomePage ? (
+              <p id="page-intro" className="type-lead hero-in mt-5 text-ink-soft">{seo.intro}</p>
+            ) : (
+              <>
+                {/* A tool page answers the search in one sentence and keeps the tool on a phone's first screen; its longer intro
+                    moves under the tool. */}
+                <p id="page-answer" className="type-lead hero-in mt-3 text-ink-soft sm:mt-5">{seo.answer}</p>
+                <p id="page-proof" className="hero-in mt-2 text-sm text-ink-soft">
+                  {t('hero.proof')}{' '}
+                  <PageLink id="page-proof-link" path="/check-file-upload" onNavigate={onNavigate}>
+                    {t('hero.proofLink')}
+                  </PageLink>
+                </p>
+              </>
+            )}
             {isHomePage && <p id="hero-fine-print" className="hero-in mt-3 text-sm font-semibold text-ink-soft">{t('hero.finePrint')}</p>}
-            <div className="hero-in mt-8">
+            <div className={isHomePage ? 'hero-in mt-8' : 'hero-in mt-5 sm:mt-8'}>
               <DropPanel
                 intake={intake}
                 shownViewers={isMaskTool ? maskableViewers : toolViewer ? [toolViewer] : viewers}
@@ -184,6 +199,7 @@ export default function HomePage({
                 showExtensions={!isHomePage}
                 showOtherFormats={!convertTo}
                 pasteHint={isHomePage ? t('hero.pasteHint', { shortcut: isMac ? '⌘' : 'Ctrl' }) : undefined}
+                samples={samplesByPage[address]}
               />
             </div>
           </div>
@@ -212,6 +228,7 @@ export default function HomePage({
 
         {toolViewer ? (
           <div id="about-content" className="section-gap">
+            <p id="page-intro" className="type-lead mx-auto mb-12 max-w-3xl text-ink-soft">{seo.intro}</p>
             <FormatGuide address={address} viewerId={toolViewer.id} onNavigate={onNavigate} />
           </div>
         ) : (

@@ -11,18 +11,21 @@ export type Viewer = {
   convertTo?: ConversionTarget
   // Set on a tool page's viewer (findViewerByToolPath): the page is that tool, not a viewer of one format.
   tool?: 'mask'
+  // The format's main features, as keys translated in src/i18n/en.json and ar.json: the featureList of its pages' WebApplication
+  // structured data (scripts/build-static-pages.mjs).
+  featureKeys?: string[]
 }
 
 export type ConversionTarget = 'csv' | 'xlsx' | 'json'
 
 export const viewers: Viewer[] = [
-  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], toolPath: '/csv-viewer' },
-  { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer' },
-  { id: 'json', label: 'JSON', extensions: ['.json'], toolPath: '/json-viewer' },
-  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer' },
-  { id: 'word', label: 'Word', extensions: ['.docx'], toolPath: '/word-viewer' },
+  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], toolPath: '/csv-viewer', featureKeys: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'] },
+  { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer', featureKeys: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'] },
+  { id: 'json', label: 'JSON', extensions: ['.json'], toolPath: '/json-viewer', featureKeys: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'] },
+  { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer', featureKeys: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'] },
+  { id: 'word', label: 'Word', extensions: ['.docx'], toolPath: '/word-viewer', featureKeys: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'] },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'] },
-  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], toolPath: '/powerpoint-viewer' },
+  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], toolPath: '/powerpoint-viewer', featureKeys: ['highlights.powerpoint.view', 'highlights.powerpoint.thumbnails', 'highlights.powerpoint.fullscreen'] },
 ]
 
 // How the table viewer treats each kind of table file: .csv starts on auto-detect (real CSVs are often semicolon separated),

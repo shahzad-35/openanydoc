@@ -3,6 +3,7 @@ import { ChangeCounter, downloadEditedFile } from '../components/EditControls'
 import MenuBar from '../components/MenuBar'
 import type { MenuDefinition } from '../components/MenuBar'
 import { Notice, REJECTED_FILE_TOAST_SECONDS, useToast } from '../components/Messages'
+import NextSteps from '../components/NextSteps'
 import { findFormatForFileName } from '../formats/registry'
 import type { EditingModule } from '../formats/registry'
 import type { ExcelSelection } from '../formats/excel/excelModel'
@@ -253,6 +254,16 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
             : []
         }
       />
+      {viewer?.id === 'excel' && (
+        <NextSteps
+          isReady={canConvert}
+          steps={[
+            { id: 'to-csv', label: t('convert.toCsv'), onSelect: () => void convertFile('csv') },
+            { id: 'to-json', label: t('convert.toJson'), onSelect: () => void convertFile('json') },
+            ...(format.canMask ? [{ id: 'mask', label: t('nextSteps.mask'), onSelect: () => void openMaskDrawer() }] : []),
+          ]}
+        />
+      )}
       <MenuBar
         menus={menus}
         isCompact={isNarrow}

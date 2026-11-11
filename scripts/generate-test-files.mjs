@@ -1,9 +1,11 @@
-// Generates synthetic CSV, Word and PowerPoint test files into test-files/. Run: node scripts/generate-test-files.mjs
+// Generates synthetic CSV, Word and PowerPoint test files into test-files/, and the binary sample files the tool pages bundle
+// ("Try a sample file") into src/samples/ (commit those). Run: node scripts/generate-test-files.mjs
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import JSZip from 'jszip'
+import * as XLSX from 'xlsx'
 
 const HUGE_FILE_ROW_COUNT = 120_000
 const outputDirectory = new URL('../test-files/', import.meta.url)
@@ -782,4 +784,84 @@ const smartArtParts = [
 writeTestFile('powerpoint-rich.pptx', await buildPptx(richSlides, [logoPart]))
 writeTestFile('powerpoint-animated.pptx', await buildPptx(animatedSlides, smartArtParts))
 
-console.log(`Wrote test files to ${outputDirectory.pathname}`)
+// ---- Sample files for the tool pages (src/samples/, bundled with the site; synthetic data only) ----
+// Written after every test file so the seeded random numbers above, and so the test files, stay the same.
+
+const sampleDirectory = new URL('../src/samples/', import.meta.url)
+mkdirSync(sampleDirectory, { recursive: true })
+const writeSampleFile = (fileName, contents) => writeFileSync(new URL(fileName, sampleDirectory), contents)
+
+function buildWorkbookBuffer(sheets, { rightToLeft = false, bookType = 'xlsx' } = {}) {
+  const workbook = XLSX.utils.book_new()
+  for (const { name, rows, formulas = {} } of sheets) {
+    const worksheet = XLSX.utils.aoa_to_sheet(rows)
+    // Each formula keeps its result too, as Excel saves it, so converters and viewers that don't calculate still show the number.
+    for (const [address, [formula, value]] of Object.entries(formulas)) worksheet[address] = { t: 'n', f: formula, v: value }
+    XLSX.utils.book_append_sheet(workbook, worksheet, name)
+  }
+  if (rightToLeft) workbook.Workbook = { Views: [{ RTL: true }] }
+  return XLSX.write(workbook, { type: 'buffer', bookType, compression: true })
+}
+
+const salesRows = [['Month', 'Product', 'Units', 'Price', 'Revenue']]
+const salesFormulas = {}
+const products = ['Notebook', 'Desk lamp', 'Backpack', 'Water bottle']
+for (let row = 2; row <= 13; row++) {
+  const units = 20 + Math.floor(nextRandom() * 80)
+  const price = Number((5 + nextRandom() * 45).toFixed(2))
+  salesRows.push([`2026-${String(row - 1).padStart(2, '0')}`, pickFrom(products), units, price])
+  salesFormulas[`E${row}`] = [`C${row}*D${row}`, Number((units * price).toFixed(2))]
+}
+const salesColumn = (columnIndex) => salesRows.slice(1).map((row) => row[columnIndex])
+const sumOf = (numbers) => Number(numbers.reduce((total, number) => total + number, 0).toFixed(2))
+writeSampleFile(
+  'sales-three-sheets.xlsx',
+  buildWorkbookBuffer([
+    { name: 'Sales', rows: salesRows, formulas: salesFormulas },
+    { name: 'Customers', rows: [['Name', 'City', 'Email'], ...firstNames.slice(0, 8).map((name, index) => [`${name} ${lastNames[index]}`, cities[index], `${name}.${lastNames[index]}@example.com`.toLowerCase()])] },
+    { name: 'Summary', rows: [['Measure', 'Value'], ['Total units'], ['Total revenue'], ['Average price']], formulas: { B2: ['SUM(Sales!C2:C13)', sumOf(salesColumn(2))], B3: ['SUM(Sales!E2:E13)', sumOf(Object.values(salesFormulas).map(([, value]) => value))], B4: ['AVERAGE(Sales!D2:D13)', Number((sumOf(salesColumn(3)) / 12).toFixed(2))] } },
+  ]),
+)
+writeSampleFile('arabic-branches.xlsx', buildWorkbookBuffer([{ name: 'الفروع', rows: buildArabicRows(15) }], { rightToLeft: true }))
+writeSampleFile('budget-1997.xls', buildWorkbookBuffer([{ name: 'Budget', rows: [['Item', 'Q1', 'Q2', 'Q3', 'Q4'], ['Rent', 1200, 1200, 1200, 1200], ['Travel', 300, 450, 200, 600], ['Supplies', 150, 120, 180, 90]] }], { bookType: 'biff8' }))
+writeSampleFile(
+  'stock-two-sheets.xls',
+  buildWorkbookBuffer(
+    [
+      { name: 'Stock', rows: [['Product', 'In stock', 'Reorder at'], ...products.map((product) => [product, Math.floor(nextRandom() * 200), 25])] },
+      { name: 'Suppliers', rows: [['Supplier', 'Country'], ['Northwind Paper (sample)', 'Portugal'], ['Bright Lamps (sample)', 'Austria']] },
+    ],
+    { bookType: 'biff8' },
+  ),
+)
+
+// Synthetic people for Mask data: example.com addresses, a published example IBAN, test card numbers, IDs made of a pattern.
+function makePatternId(firstDigits) {
+  const isLuhnValid = (digits) => [...digits].reverse().reduce((sum, digit, position) => sum + (position % 2 ? [0, 2, 4, 6, 8, 1, 3, 5, 7, 9][digit] : Number(digit)), 0) % 10 === 0
+  for (let checkDigit = 0; checkDigit <= 9; checkDigit++) if (isLuhnValid(`${firstDigits}${checkDigit}`)) return `${firstDigits}${checkDigit}`
+}
+writeSampleFile(
+  'people-two-sheets.xlsx',
+  buildWorkbookBuffer([
+    { name: 'Customers', rows: [['Full name', 'Email', 'Mobile', 'National ID', 'IBAN'], ['Sara Example', 'sara@example.com', '+966500000001', makePatternId('100000000'), 'GB82WEST12345698765432'], ['Omar Sample', 'omar@example.org', '+966500000002', makePatternId('200000000'), 'GB82WEST12345698765432'], ['Lina Demo', 'lina@example.net', '+966500000003', makePatternId('100000001'), 'GB82WEST12345698765432']] },
+    { name: 'Staff', rows: [['Employee name', 'Work email', 'Phone', 'Team'], ['Hugo Test', 'hugo@example.com', '+966500000004', 'Sales'], ['Ines Placeholder', 'ines@example.com', '+966500000005', 'Support']] },
+  ]),
+)
+
+writeSampleFile('quarterly-summary.docx', await buildDocx(englishWordText, false))
+writeSampleFile('arabic-summary.docx', await buildDocx(arabicWordText, true))
+writeSampleFile('quarterly-review-3-slides.pptx', await buildPptx(richSlides.slice(0, 3), [logoPart]))
+const arabicSlideText = (id, box, text, options) => slideShape(id, 'rect', box, { textColor: '1F1F1F', align: 'r', ...options, text })
+writeSampleFile(
+  'arabic-review-3-slides.pptx',
+  await buildPptx(
+    [
+      { shapes: arabicSlideText(2, [4.5, 2.2, 8, 1.4], 'مراجعة ربع سنوية (عينة اصطناعية)', { fontSize: 4400, bold: true, textColor: '1F3864' }) + arabicSlideText(3, [4.5, 3.6, 8, 0.8], 'عرض تجريبي من ثلاث شرائح', { fontSize: 2000, textColor: '595959' }) },
+      { shapes: arabicSlideText(2, [0.8, 0.5, 11.7, 1], 'أبرز النتائج', { fontSize: 3200, bold: true }) + slideShape(3, 'roundRect', [7.8, 2, 4.7, 1.4], { fill: '4472C4', text: 'نمو المبيعات ١٢٪', fontSize: 2400 }) + slideShape(4, 'roundRect', [0.8, 2, 4.7, 1.4], { fill: '70AD47', text: 'عملاء جدد: ٣٤٠', fontSize: 2400 }) },
+      { shapes: arabicSlideText(2, [0.8, 0.5, 11.7, 1], 'الخطوات التالية', { fontSize: 3200, bold: true }) + arabicSlideText(3, [0.8, 1.8, 11.7, 3], 'مراجعة الأرقام، ثم مشاركة الملخص مع الفريق', { fontSize: 2400 }) },
+    ],
+    [],
+  ),
+)
+
+console.log(`Wrote test files to ${outputDirectory.pathname} and sample files to ${sampleDirectory.pathname}`)

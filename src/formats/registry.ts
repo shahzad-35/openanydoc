@@ -90,8 +90,6 @@ export type FormatDefinition = {
   viewerId: Viewer['id']
   // The day the format went live (YYYY-MM-DD). A format without it is not released yet: it is never announced, linked or suggested.
   addedOn?: string
-  // Two or three short feature keys (translated in src/i18n/en.json and ar.json), used in the changelog.
-  highlights?: string[]
   ViewerComponent: LazyExoticComponent<ComponentType<FormatViewerProps>>
   // Fetches everything opening a file of this format needs (the viewer and what it loads on open), so a page can do it while idle
   // and the file then opens with no network.
@@ -121,7 +119,6 @@ export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'csv',
     addedOn: '2026-10-05',
-    highlights: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'],
     ViewerComponent: lazy(loadCsvViewer),
     // The parse worker is fetched too (an empty parse), so a file opens with no network.
     preloadViewer: () => loadCsvViewer().then((csvViewer) => csvViewer.parseCsvInWorker(new ArrayBuffer(0), 'auto', 'auto')),
@@ -137,7 +134,6 @@ export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'text',
     addedOn: '2026-10-14',
-    highlights: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'],
     ViewerComponent: lazy(loadTextViewer),
     preloadViewer: loadTextViewer,
     ownsWholePage: true,
@@ -151,7 +147,6 @@ export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'json',
     addedOn: '2026-10-14',
-    highlights: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'],
     ViewerComponent: lazy(loadJsonViewer),
     // Parsing a tiny document starts the parse worker once, so its file is cached too.
     preloadViewer: () => Promise.all([loadJsonViewer(), parseJsonText('null', 'en')]),
@@ -170,7 +165,6 @@ export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'excel',
     addedOn: '2026-10-15',
-    highlights: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'],
     ViewerComponent: lazy(loadExcelViewer),
     // The read worker is fetched too (an empty file, which it refuses), so a workbook opens with no network.
     preloadViewer: () => Promise.all([loadExcelViewer().then((excelViewer) => excelViewer.readWorkbookInWorker(new ArrayBuffer(0), 'empty.xlsx', 'en')), loadExcelEditing(), import('./excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]),
@@ -186,7 +180,6 @@ export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'word',
     addedOn: '2026-11-02',
-    highlights: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'],
     ViewerComponent: lazy(loadWordViewer),
     preloadViewer: loadWordViewer,
     ownsWholePage: true,
@@ -195,7 +188,6 @@ export const formatDefinitions: FormatDefinition[] = [
   {
     viewerId: 'powerpoint',
     addedOn: '2026-11-02',
-    highlights: ['highlights.powerpoint.view', 'highlights.powerpoint.thumbnails', 'highlights.powerpoint.fullscreen'],
     ViewerComponent: lazy(loadPowerPointViewer),
     preloadViewer: loadPowerPointViewer,
     ownsWholePage: true,

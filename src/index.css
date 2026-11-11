@@ -292,6 +292,46 @@ html {
   opacity: 1;
 }
 
+/* The "Next" strip under a viewer's top bar (src/components/NextSteps.tsx). Ids, so the viewers' own button rules don't apply.
+   One line; on a phone the actions scroll sideways instead of wrapping. */
+#next-steps {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-block-end: 1px solid var(--rule);
+  background: var(--paper);
+  color: var(--ink);
+  font-size: 13px;
+  white-space: nowrap;
+}
+#next-steps #next-steps-list { display: flex; flex: 1; align-items: center; gap: 8px; min-width: 0; overflow-x: auto; }
+#next-steps #next-steps-title { font-weight: 600; color: var(--ink-soft); }
+#next-steps .next-step-button {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: var(--paper-raised);
+  color: var(--ink);
+  font: inherit;
+  cursor: pointer;
+}
+#next-steps .next-step-button:hover:not(:disabled) { border-color: var(--accent); color: var(--accent); }
+#next-steps .next-step-button:disabled { opacity: 0.55; cursor: default; }
+#next-steps .next-steps-close {
+  display: grid;
+  flex-shrink: 0;
+  place-items: center;
+  padding: 4px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+}
+#next-steps .next-steps-close:hover { color: var(--ink); }
+
 /* On touch screens every control can be tapped across at least 44 x 44 px while it keeps its drawn size: an invisible ::before
    (::after is the tooltip) grows the hit area. Where controls sit closer than that, the later one takes the shared edge, so a
    tap on any control's middle still lands on it. inset, not transform: the reduced-motion rule turns transforms off. */

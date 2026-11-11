@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react'
 import type { DragEvent } from 'react'
 import { isolateLeftToRight, translate, useT } from './i18n'
 import type { Locale } from './i18n'
-import { SAMPLE_JSON_TEXT } from './formats/json/jsonTools'
 import { findFormatForFileName } from './formats/registry'
 import { findViewerForFileName } from './viewers'
 import type { Viewer } from './viewers'
@@ -232,7 +231,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     largeFileWarning,
     openFilePicker: () => fileInputRef.current?.click(),
     openFiles: openChosenFiles,
-    openSampleJson: () => loadFile(new File([SAMPLE_JSON_TEXT], 'sample.json', { type: 'application/json' })),
+    // A sample file ("Try a sample file"), made in memory: it opens like a chosen file.
+    openSampleFile: (file: File) => loadFile(file),
     redirectSuggestion,
   }
 }

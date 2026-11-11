@@ -1,9 +1,17 @@
 // The text of the About, Privacy Policy and Terms of Use pages, in English and Arabic. Each page's title, description, h1 and intro
-// live in seo.ts like every other page; this holds the sections under them. Plain data with no imports, so the build script can
-// read it too. The privacy and terms text are plain-language templates that have not had a legal review yet (DECISIONS.md,
+// live in seo.ts like every other page; this holds the sections under them. Plain data that imports only seo.ts (plain data too),
+// so the build script can read it. The privacy and terms text are plain-language templates that have not had a legal review yet (DECISIONS.md,
 // 2026-10-17): keep every sentence true to what the site does, and change them only together with the code they describe.
 
+import { LISTING_PROFILES, REPOSITORY_URL, SOCIAL_PROFILES } from './seo.ts'
+
 type Locale = 'en' | 'ar'
+
+// The brand's profiles as section links, by their names in the text (one list in seo.ts feeds this page and the structured data).
+function profileLinks(names: string[]) {
+  const profiles = [{ name: 'GitHub', url: REPOSITORY_URL }, ...SOCIAL_PROFILES, ...LISTING_PROFILES]
+  return names.map((name) => ({ text: name, path: profiles.find((profile) => profile.name === name)?.url ?? REPOSITORY_URL }))
+}
 
 export const CONTACT_EMAIL = 'support@openanydoc.com'
 
@@ -27,9 +35,8 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Who makes it',
           paragraphs: [
             'OpenAnyDoc is built and run by Shahzad Ali, a software developer. It started with a simple observation: people at work keep pasting customer files into online tools that upload them, because opening a CSV or a workbook without the right software is harder than it should be.',
-            'Every viewer here is tested against synthetic files before it ships: a 120,000-row CSV, Arabic text saved as Windows-1256, a 100,000-row workbook, JSON files at the 10 MB limit. The privacy rule is not a promise but a test: the build fails if any page makes a network request, sets a cookie or stores anything beyond the theme choice. The source code is public on GitHub.',
+            'Every viewer here is tested against synthetic files before it ships: a 120,000-row CSV, Arabic text saved as Windows-1256, a 100,000-row workbook, JSON files at the 10 MB limit.',
           ],
-          links: [{ text: 'public on GitHub', path: 'https://github.com/shahzad-35/openanydoc' }],
         },
         {
           heading: 'Why it exists',
@@ -42,6 +49,19 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: [
             'Most online viewers upload your file to a server. OpenAnyDoc does not: your browser reads the file and draws it on your screen, and your edits stay in the page until you download them. There is nothing for us to store, see or lose.',
           ],
+        },
+        {
+          heading: 'How you can check that nothing is uploaded',
+          paragraphs: [
+            "Three things back the promise. The site's security policy lets your browser send requests only to openanydoc.com itself, so not even a mistake in the code could send your file anywhere else. An automated test opens every page and fails the build if any of them makes a network request, sets a cookie or stores anything beyond the theme choice. And the source code is public, so anyone can read it.",
+            'You can check it yourself in a minute: open your browser\'s network panel, open a file here and see that no request carries it. The steps are in how to check that a website does not upload your file.',
+          ],
+          links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'Find OpenAnyDoc elsewhere',
+          paragraphs: ['The source code is on GitHub. OpenAnyDoc is also on LinkedIn, X and YouTube, and listed on SaaSHub.'],
+          links: profileLinks(['GitHub', 'LinkedIn', 'X', 'YouTube', 'SaaSHub']),
         },
         {
           heading: 'File types',
@@ -153,9 +173,8 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'من يقف وراءه',
           paragraphs: [
             'يبني OpenAnyDoc ويديره شهزاد علي، وهو مطوّر برمجيات. بدأت الفكرة من ملاحظة بسيطة: كثيرون في العمل يلصقون ملفات العملاء في أدوات على الإنترنت ترفعها إلى خوادمها، لأن فتح ملف CSV أو مصنف من دون البرنامج المناسب أصعب مما ينبغي.',
-            'كل عارض هنا يُختبر على ملفات اصطناعية قبل نشره: ملف CSV من 120,000 صف، ونص عربي محفوظ بترميز Windows-1256، ومصنف من 100,000 صف، وملفات JSON عند حد 10 ميغابايت. وقاعدة الخصوصية ليست وعدًا بل اختبار: يفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر. الكود المصدري متاح للجميع على GitHub.',
+            'كل عارض هنا يُختبر على ملفات اصطناعية قبل نشره: ملف CSV من 120,000 صف، ونص عربي محفوظ بترميز Windows-1256، ومصنف من 100,000 صف، وملفات JSON عند حد 10 ميغابايت.',
           ],
-          links: [{ text: 'متاح للجميع على GitHub', path: 'https://github.com/shahzad-35/openanydoc' }],
         },
         {
           heading: 'لماذا وُجد',
@@ -168,6 +187,19 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: [
             'معظم العارضات على الإنترنت ترفع ملفك إلى خادم. أما OpenAnyDoc فلا يفعل ذلك: يقرأ متصفحك الملف ويرسمه على شاشتك، وتبقى تعديلاتك في الصفحة حتى تنزّلها. لا يوجد ما نخزّنه أو نراه أو نفقده.',
           ],
+        },
+        {
+          heading: 'كيف تتحقق بنفسك من أن شيئًا لا يُرفع',
+          paragraphs: [
+            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لمتصفحك بإرسال الطلبات إلا إلى openanydoc.com نفسه، فحتى خطأ في الكود لا يستطيع إرسال ملفك إلى أي مكان آخر. واختبار آلي يفتح كل صفحة ويُفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
+            'ويمكنك التحقق بنفسك خلال دقيقة: افتح لوحة الشبكة في متصفحك، وافتح ملفًا هنا، وتأكد أن أي طلب لا يحمله. الخطوات في دليل كيف تتحقق من أن الموقع لا يرفع ملفك.',
+          ],
+          links: [{ text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'OpenAnyDoc في أماكن أخرى',
+          paragraphs: ['الكود المصدري على GitHub. وتجد OpenAnyDoc أيضًا على LinkedIn وX وYouTube، ومُدرجًا في SaaSHub.'],
+          links: profileLinks(['GitHub', 'LinkedIn', 'X', 'YouTube', 'SaaSHub']),
         },
         {
           heading: 'أنواع الملفات',

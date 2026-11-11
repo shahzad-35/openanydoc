@@ -16,6 +16,7 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - Offline? Once a tool page has loaded, files of its type open and edit with no network. It is not an installable app.
 - Does it change my original file? No. Edits stay in the page's memory until you download a copy.
 - Price? Free, with no account, plans or ads.
+- Can I try it without a file? Yes. Every tool page has two "Try a sample file" buttons with small made-up files (Arabic text, a workbook with three sheets, a 150,000-row CSV, a short Word document, three slides), opened in the browser like any other file.
 - Can I hide personal data before sharing a file or pasting it into an AI assistant? Yes. The Mask data tool finds names, emails, phone numbers, Saudi national ID and Iqama numbers, IBANs and card numbers in CSV, Excel, JSON and TXT files and replaces them with consistent tokens (EMAIL-000001), partial masks (****1234) or removes the field, in the browser. An optional private key file restores the tokens later. https://www.openanydoc.com/en/mask-data
 
 ## Pricing

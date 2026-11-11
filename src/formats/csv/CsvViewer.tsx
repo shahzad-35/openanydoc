@@ -20,6 +20,7 @@ import { useMaskDrawer } from '../mask/useMaskDrawer'
 import type { FormatViewerProps } from '../registry'
 import type { EditSession } from '../useEditSession'
 import CsvGrid from './CsvGrid'
+import NextSteps from '../../components/NextSteps'
 import type { CsvParseMessage, CsvParseRequest } from './csvParse.worker'
 import type { CsvGridHandle, GridColumn, GridSelection } from './CsvGrid'
 import {
@@ -2415,6 +2416,16 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
           <Icon name="moon" className="i-moon" />
         </button>
       </header>
+      {parsedCsv?.status !== 'error' && (
+        <NextSteps
+          isReady={readableCsv !== null}
+          steps={[
+            { id: 'to-excel', label: t('convert.toExcel'), onSelect: () => void convertCsv('xlsx') },
+            { id: 'to-json', label: t('convert.toJson'), onSelect: () => void convertCsv('json') },
+            { id: 'mask', label: t('nextSteps.mask'), onSelect: () => void openMaskDrawer() },
+          ]}
+        />
+      )}
 
       <MenuBar menus={menus} isCompact={isNarrow} label={t('menu.bar')} />
 

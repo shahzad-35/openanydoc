@@ -40,6 +40,7 @@ import type { EncodingChoice, TextChainStep, TextDiffRow, TextDownloadEncoding, 
 import { TEXT_TOOL_DEFAULT_OPTIONS, computeTextStats, countSelection, findHiddenCharacters, transformLines } from './textTools'
 import type { HiddenCharacterName, TextToolId, TextToolOptions, TextTransformId } from './textTools'
 import './txtWorkbench.css'
+import NextSteps from '../../components/NextSteps'
 
 // Above this many characters the text box would make typing slow: the file opens in the read view (only the visible lines are
 // drawn) with an "Edit anyway" step, and an edited text this long is a plain text box without line numbers or highlights.
@@ -2730,6 +2731,14 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
           </button>
         </div>
       </header>
+      <NextSteps
+        isReady={exportSource !== null}
+        steps={[
+          { id: 'find', label: t('nextSteps.findReplace'), onSelect: () => openFind(true) },
+          { id: 'sort-lines', label: t('nextSteps.sortLines'), onSelect: () => runTransform('sortAscending') },
+          { id: 'remove-duplicates', label: t('nextSteps.removeDuplicates'), onSelect: () => runTransform('removeDuplicateLines') },
+        ]}
+      />
 
       <MenuBar menus={buildMenus()} isCompact={isPhone} label={t('menu.bar')} />
 

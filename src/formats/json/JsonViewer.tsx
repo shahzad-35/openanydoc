@@ -52,6 +52,7 @@ import {
 } from './jsonModel'
 import type { JsonEdits, JsonIndent, JsonParseResult, JsonPath, JsonValue, TreeRow } from './jsonModel'
 import './jsonWorkbench.css'
+import NextSteps from '../../components/NextSteps'
 
 const COMMIT_DELAY_MS = 600
 const LINE_HEIGHT_PX = 20
@@ -1583,6 +1584,14 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           <SpriteIcon name="download" />
         </button>
       </header>
+      <NextSteps
+        isReady={hasDocument}
+        steps={[
+          { id: 'format', label: t('nextSteps.formatJson'), onSelect: () => void formatDocument(chosenIndent) },
+          { id: 'to-csv', label: t('convert.toCsv'), onSelect: () => void convertToCsv() },
+          { id: 'mask', label: t('nextSteps.mask'), onSelect: () => void openMaskDrawer() },
+        ]}
+      />
 
       <div id="mobile-pane-tabs" role="tablist" aria-label={t('json.pane.tabs')}>
         {(['text', 'tree', 'inspector'] as const).map((tab) => (

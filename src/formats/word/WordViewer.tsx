@@ -5,6 +5,7 @@ import JSZip from 'jszip'
 import MenuBar from '../../components/MenuBar'
 import type { MenuDefinition } from '../../components/MenuBar'
 import { FatalFileError } from '../../components/Messages'
+import NextSteps from '../../components/NextSteps'
 import { localizePath, useT } from '../../i18n'
 import { formatFileSize } from '../../useFileIntake'
 import { getFormatCapabilities } from '../../whatsNew'
@@ -128,6 +129,14 @@ export default function WordViewer({ openedFile, onOpenAnotherFile, onClose }: F
         })
         document.adoptedStyleSheets = [...document.adoptedStyleSheets, ...adoptedSheets]
         finishRenderedPages(pagesHolder, isTableRightToLeft)
+        // Pages wider than the screen (any page on a phone) start fitted to the width. The zoom is measured while the pages are
+        // still hidden and set together with 'ready', so they appear at their final size: shown first and fitted after, they
+        // moved (a layout shift of about 0.6 on a phone).
+        const fitZoom = measureFitZoom()
+        if (fitZoom < 1) {
+          setZoom(fitZoom)
+          setIsFitToWidth(true)
+        }
         setRenderState('ready')
       })
       .catch(() => {
@@ -158,14 +167,6 @@ export default function WordViewer({ openedFile, onOpenAnotherFile, onClose }: F
     const availableWidth = canvas.clientWidth - parseFloat(canvasStyle.paddingInlineStart) - parseFloat(canvasStyle.paddingInlineEnd)
     return Math.min(ZOOM_STEPS[ZOOM_STEPS.length - 1], Math.max(SMALLEST_FIT_ZOOM, availableWidth / widestPage))
   }
-
-  // Pages wider than the screen (any page on a phone) start fitted to the width.
-  useEffect(() => {
-    if (renderState !== 'ready') return
-    if (measureFitZoom() < 1) setIsFitToWidth(true)
-    // Measured once per rendered file.
-    // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [renderState])
 
   useEffect(() => {
     const canvas = canvasRef.current
@@ -247,6 +248,15 @@ export default function WordViewer({ openedFile, onOpenAnotherFile, onClose }: F
           <span className="desk-only">{t(canEdit ? 'word.edit' : 'word.editComingSoon')}</span>
         </button>
       </Toolbar>
+      {renderState !== 'failed' && (
+        <NextSteps
+          isReady={isReady}
+          steps={[
+            { id: 'print', label: t('nextSteps.printPdf'), onSelect: printDocument },
+            { id: 'fit-width', label: t('word.fitWidth'), onSelect: () => setIsFitToWidth(true) },
+          ]}
+        />
+      )}
       <main id="main" className="docs-canvas" ref={canvasRef}>
         {renderState === 'loading' && (
           <p id="word-loading" className="word-loading">
@@ -255,7 +265,7 @@ export default function WordViewer({ openedFile, onOpenAnotherFile, onClose }: F
         )}
         {renderState === 'failed' && <FatalFileError title={t('word.error.title')} reason={t('word.error.reason')} hint={t('word.error.hint')} onOpenAnotherFile={onOpenAnotherFile} />}
         {/* The pages keep the document's own direction; Arabic paragraphs and tables are right to left inside it. */}
-        <div id="word-document" ref={documentRef} dir="ltr" hidden={renderState === 'failed'} style={{ zoom }} />
+        <div id="word-document" ref={documentRef} dir="ltr" hidden={renderState === 'failed'} className={renderState === 'ready' ? undefined : 'is-sizing'} style={{ zoom }} />
       </main>
       <DropOverlay />
     </div>

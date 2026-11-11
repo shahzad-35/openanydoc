@@ -4,6 +4,7 @@ import type { SlideHandle } from '@aiden0z/pptx-renderer'
 import MenuBar from '../../components/MenuBar'
 import type { MenuDefinition } from '../../components/MenuBar'
 import { FatalFileError, Notice } from '../../components/Messages'
+import NextSteps from '../../components/NextSteps'
 import { localizePath, useT } from '../../i18n'
 import { CONTACT_EMAIL } from '../../legalContent'
 import { formatFileSize } from '../../useFileIntake'
@@ -41,6 +42,9 @@ export default function PowerPointViewer({ openedFile, onOpenAnotherFile, onClos
   const [isDark, toggleTheme] = useThemeToggle()
   const isNarrow = useIsNarrowScreen()
   const [renderState, setRenderState] = useState<'loading' | 'ready' | 'failed'>('loading')
+  // The stage stays hidden until the slide has been sized to it: drawn at the renderer's size and resized after, the slide moved
+  // (a layout shift of about 0.65 on a phone).
+  const [isSlideSized, setIsSlideSized] = useState(false)
   const [slideCount, setSlideCount] = useState(0)
   const [currentSlideIndex, setCurrentSlideIndex] = useState(0)
   const [failedSlideIndexes, setFailedSlideIndexes] = useState<ReadonlySet<number>>(new Set())
@@ -69,6 +73,7 @@ export default function PowerPointViewer({ openedFile, onOpenAnotherFile, onClos
     })
     fallbackObserver.observe(slideView, { childList: true, subtree: true })
     setRenderState('loading')
+    setIsSlideSized(false)
     setFailedSlideIndexes(new Set())
     setCurrentSlideIndex(0)
 
@@ -116,6 +121,7 @@ export default function PowerPointViewer({ openedFile, onOpenAnotherFile, onClos
     const slideAspectRatio = viewer.slideWidth / viewer.slideHeight
     const resizeObserver = new ResizeObserver(() => {
       slideView.style.width = `${Math.floor(Math.min(stage.clientWidth, stage.clientHeight * slideAspectRatio))}px`
+      setIsSlideSized(true)
     })
     resizeObserver.observe(stage)
     return () => resizeObserver.disconnect()
@@ -286,9 +292,20 @@ export default function PowerPointViewer({ openedFile, onOpenAnotherFile, onClos
           <span className="desk-only">{t(canEdit ? 'powerpoint.edit' : 'powerpoint.editComingSoon')}</span>
         </button>
       </Toolbar>
-      {isReady && <Notice id="powerpoint-fidelity-note" kind="info" role="status" className="powerpoint-fidelity-note" message={t('powerpoint.fidelityNote')} />}
+      {renderState !== 'failed' && (
+        <NextSteps
+          isReady={isReady}
+          steps={[
+            ...(canGoFullscreen ? [{ id: 'fullscreen', label: t('nextSteps.presentFullscreen'), onSelect: () => void toggleFullscreen() }] : []),
+            { id: 'open-another', label: t('nextSteps.openAnother'), onSelect: onOpenAnotherFile },
+          ]}
+        />
+      )}
+      {/* Shown from the start, not once the slides are ready: appearing then pushed the slides down (a layout shift on desktop). */}
+      {renderState !== 'failed' && <Notice id="powerpoint-fidelity-note" kind="info" role="status" className="powerpoint-fidelity-note" message={t('powerpoint.fidelityNote')} />}
       <div className="slides-layout">
-        {isReady && !isNarrow && (
+        {/* Drawn (empty) while the slides load, so its fixed width does not push the slide sideways when they arrive. */}
+        {renderState !== 'failed' && !isNarrow && (
           <nav id="slide-thumbnails" aria-label={t('powerpoint.thumbnails')}>
             <ol ref={thumbnailListRef} dir="ltr">
               {Array.from({ length: slideCount }, (_, slideIndex) => (
@@ -320,7 +337,7 @@ export default function PowerPointViewer({ openedFile, onOpenAnotherFile, onClos
           )}
           {renderState === 'failed' && <FatalFileError title={t('powerpoint.error.title')} reason={t('powerpoint.error.reason')} hint={t('powerpoint.error.hint')} onOpenAnotherFile={onOpenAnotherFile} />}
           {/* Slides keep their own layout; Arabic text inside them is right to left on its own. */}
-          <div id="slide-stage" ref={stageRef} dir="ltr" hidden={renderState === 'failed'}>
+          <div id="slide-stage" ref={stageRef} dir="ltr" hidden={renderState === 'failed'} className={isSlideSized ? undefined : 'is-sizing'}>
             <div id="slide-view" ref={slideViewRef} className={isCurrentSlideFailed ? 'is-covered' : undefined} />
             {isReady && isCurrentSlideFailed && (
               <div id="slide-placeholder" role="status" dir={locale === 'ar' ? 'rtl' : 'ltr'}>

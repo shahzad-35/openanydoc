@@ -16,7 +16,7 @@ import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
-import { AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findBreadcrumbParent, findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
@@ -126,9 +126,14 @@ function renderChangelogBody(locale) {
 }
 
 // What a search result shows: a title of at most 60 characters (65 is the hard stop) and a description of 150 to 160.
-function checkSearchSnippet(label, title, description) {
-  if (title.length > 65) throw new Error(`${label}: the title is ${title.length} characters (keep it at 60 or fewer).`)
-  if (description.length < 150 || description.length > 160) throw new Error(`${label}: the description is ${description.length} characters (it must be 150 to 160).`)
+// Tool pages (viewers, landing pages, converters) follow Step 17C: main phrase first, title up to 60, description 120 to 155, and an
+// answer sentence under the H1. Other pages keep the earlier rule (title up to 65, description 150 to 160).
+function checkSearchSnippet(label, title, description, toolPageAnswer) {
+  const isToolPage = toolPageAnswer !== undefined
+  const [maxTitle, minDescription, maxDescription] = isToolPage ? [60, 120, 155] : [65, 150, 160]
+  if (title.length > maxTitle) throw new Error(`${label}: the title is ${title.length} characters (keep it at ${maxTitle} or fewer).`)
+  if (description.length < minDescription || description.length > maxDescription) throw new Error(`${label}: the description is ${description.length} characters (it must be ${minDescription} to ${maxDescription}).`)
+  if (isToolPage && !toolPageAnswer) throw new Error(`${label}: a tool page needs its answer sentence (answer in src/seo.ts).`)
 }
 
 // Canonical, language alternates and the share tags (Open Graph, X/Twitter) of a page; `address` is the page without its language.
@@ -235,6 +240,14 @@ fs.writeFileSync(path.join(distFolder, 'ar', '404.html'), renderNotFoundPage('ar
 // The site's entities, named once by @id so every page's data points at the same organisation and website.
 const organizationId = `${SITE_ORIGIN}/#organization`
 const websiteId = `${SITE_ORIGIN}/#website`
+// The founder, named once: the Organization's founder, the About page's person and every guide's author share this @id.
+const founderPerson = {
+  '@type': 'Person',
+  '@id': `${SITE_ORIGIN}/#founder`,
+  name: AUTHOR_NAME,
+  url: `${SITE_ORIGIN}/en/about`,
+  sameAs: [REPOSITORY_URL, SOCIAL_PROFILES.find((profile) => profile.id === 'linkedin').url],
+}
 
 const jsonLdScript = (data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
 
@@ -291,8 +304,8 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         email: CONTACT_EMAIL,
         contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: CONTACT_EMAIL, availableLanguage: ['en', 'ar'] },
         foundingDate: '2026-10',
-        founder: { '@type': 'Person', name: AUTHOR_NAME },
-        sameAs: [REPOSITORY_URL, ...SOCIAL_PROFILES.map((profile) => profile.url)],
+        founder: founderPerson,
+        sameAs: ALL_PROFILE_URLS,
       },
       // The product as a whole; its features are the tools it links to, by their page names.
       {
@@ -335,7 +348,9 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       '@type': 'ProfilePage',
       url: pageUrl,
       inLanguage: locale,
-      mainEntity: { '@type': 'Person', name: AUTHOR_NAME, url: pageUrl, email: CONTACT_EMAIL, sameAs: [REPOSITORY_URL], knowsAbout: ['CSV files', 'Excel workbooks', 'JSON', 'text encodings', 'Arabic and right-to-left text'] },
+      mainEntity: { ...founderPerson, email: CONTACT_EMAIL, knowsAbout: ['CSV files', 'Excel workbooks', 'JSON', 'text encodings', 'Arabic and right-to-left text'] },
+      about: { '@id': organizationId },
+      isPartOf: { '@id': websiteId },
     })
   }
   const guidePage = guidePages[locale][address]
@@ -349,9 +364,10 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       image: `${SITE_ORIGIN}${shareImage.path}`,
       datePublished: `${guidePage.published}T00:00:00+00:00`,
       dateModified: `${guidePage.updated ?? guidePage.published}T00:00:00+00:00`,
-      author: { '@type': 'Person', name: AUTHOR_NAME, url: `${SITE_ORIGIN}${localizePath(locale, '/about')}` },
+      author: founderPerson,
       publisher: { '@type': 'Organization', '@id': organizationId, name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/logo.png` } },
       mainEntityOfPage: pageUrl,
+      isPartOf: { '@id': websiteId },
       inLanguage: locale,
     })
   }
@@ -366,7 +382,10 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       applicationCategory: 'UtilitiesApplication',
       operatingSystem: 'Any (web browser)',
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      featureList: guide.handles,
+      // The format's features from src/viewers.ts (a landing page adds its own name first); Mask data is a tool for several
+      // formats, so it lists its own "What it handles" lines.
+      featureList: viewer.featureKeys && !viewer.tool ? [...(landingPages.some((page) => page.path === address) ? [seo.linkText] : []), ...viewer.featureKeys.map((key) => translate(locale, key))] : guide.handles,
+      isPartOf: { '@id': websiteId },
       publisher: { '@id': organizationId },
     })
   }
@@ -392,7 +411,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
     })
   }
   const head = [renderHeadTags(locale, address, seo.title, seo.description), ...structuredData.map(jsonLdScript)].join('\n    ')
-  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description)
+  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description, viewer ? (seo.answer ?? '') : undefined)
   return pageShell(locale, shellOptions)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(seo.title)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(seo.description)}$2`)

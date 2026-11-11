@@ -7,6 +7,7 @@ import NewBadge from './NewBadge'
 import type { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
+import type { ToolSample } from '../samples/toolSamples'
 
 // One class per pill position (written out in full so Tailwind finds them). Each --ext-pill-N is pointed at a hue in the session's
 // shuffled order by public/theme-init.js before the first paint, so the server markup, the first browser render and the colours
@@ -71,9 +72,11 @@ type DropPanelProps = {
   pasteHint?: string
   // Off on a conversion page, which takes only its own format: the other viewers are not things it can do.
   showOtherFormats?: boolean
+  // A tool page's two sample files ("Try a sample file"), shown right under the choose button so they fit a phone's first screen.
+  samples?: ToolSample[]
 }
 
-export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer, showExtensions = true, pasteHint, showOtherFormats = true }: DropPanelProps) {
+export default function DropPanel({ intake, shownViewers = viewers, currentViewerId, onNavigate, onOpenInViewer, showExtensions = true, pasteHint, showOtherFormats = true, samples }: DropPanelProps) {
   const { locale, t } = useT()
   const otherFormats = currentViewerId && showOtherFormats ? getOtherReleasedFormats(currentViewerId) : []
   const suggestion = intake.redirectSuggestion
@@ -83,21 +86,32 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
   return (
     <>
       <div id="drop-panel" className="text-center">
-        {showExtensions && <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mb-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />}
-
         {intake.fileInput}
         <div className="flex flex-wrap justify-center gap-3">
           <button id="choose-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--hero press">
             {t('drop.chooseFile')}
           </button>
-          {currentViewerId === 'json' && (
-            <button id="open-sample-json-button" type="button" disabled={intake.isReading} onClick={intake.openSampleJson} className="btn btn--quiet btn--hero press">
-              {t('drop.trySampleJson')}
-            </button>
-          )}
         </div>
+        {samples && (
+          <div id="sample-files" className="mt-4 flex flex-wrap items-center justify-center gap-2 text-sm">
+            <span id="sample-files-label" className="text-ink-soft">{t('drop.trySample')}</span>
+            {samples.map((sample) => (
+              <button
+                key={sample.id}
+                id={`sample-button-${sample.id}`}
+                type="button"
+                disabled={intake.isReading}
+                onClick={() => void sample.buildFile().then(intake.openSampleFile)}
+                className="btn btn--quiet btn--compact press"
+              >
+                {t(`sample.${sample.id}` as MessageKey)}
+              </button>
+            ))}
+          </div>
+        )}
         {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{pasteHint ?? t(currentViewerId === 'json' ? 'drop.pasteHintJson' : 'drop.pasteHint')}</p>}
         {showExtensions && <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>}
+        {showExtensions && <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />}
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
           <Notice id="large-file-warning" kind="warning" message={intake.largeFileWarning ?? ''} />

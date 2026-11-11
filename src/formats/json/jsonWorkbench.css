@@ -369,3 +369,8 @@
 @media (pointer: coarse) {
   #json-workbench #path-query-input { height: 44px; margin-block: -14px }
 }
+/* With the "Next" strip under the command bar, the grid gets one more auto row. */
+#json-workbench:has(> #next-steps) { grid-template-rows: auto auto 1fr auto }
+@media (max-width: 760px) {
+  #json-workbench:has(> #next-steps) { grid-template-rows: auto auto auto 1fr auto auto }
+}

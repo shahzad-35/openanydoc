@@ -48,7 +48,7 @@ export const changelogClasses = {
 // right in the Arabic font.
 export const BREADCRUMB_CHEVRON_PATH = 'm9 6 6 6-6 6'
 export const breadcrumbClasses = {
-  nav: 'mb-5 text-sm text-ink-soft',
+  nav: 'mb-3 text-sm text-ink-soft sm:mb-5',
   list: 'flex flex-wrap items-center gap-x-2 gap-y-1',
   item: 'inline-flex items-center gap-2',
   link: 'underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline',

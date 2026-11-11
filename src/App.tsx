@@ -10,6 +10,7 @@ import { formatDefinitions } from './formats/registry'
 import { guideAddresses } from './seo'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
 import type { ConversionTarget, Viewer } from './viewers'
+import { preloadPageSamples } from './samples/toolSamples'
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 // The file page (viewers, editing, menus) is its own chunk, so content pages load only what they show.
@@ -20,6 +21,8 @@ const viewerIdForConversion: Record<ConversionTarget, Viewer['id']> = { csv: 'cs
 // Once a page is idle it fetches the file page and the viewer its visitors are about to need (the page's own format, the result's
 // format on a conversion page, CSV on the home page), so a file then opens with no network and no wait.
 function preloadFileOpening(path: string) {
+  // The page's bundled sample files ("Try a sample file"), so they also open offline.
+  void preloadPageSamples(path).catch(() => {})
   const toolViewer = findViewerByToolPath(path)
   // The Mask Data page keeps the file on the page: it needs its tool and the Excel writer, not a viewer.
   if (toolViewer?.tool === 'mask') {
