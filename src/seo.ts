@@ -1,10 +1,12 @@
 // The words search engines and visitors see first for each page: title, description, main heading and the sentence under it.
 // Keyed by language ('en', 'ar'), then by page address.
-// Plain data with no imports, because scripts/build-static-pages.mjs also reads it to write each page's <head> at build time.
+// Plain data whose only import is the tool registry (JSON and types), because scripts/build-static-pages.mjs also reads it to write
+// each page's <head> at build time.
 //
 // Rules for anything added here (see CLAUDE.md, "Writing for search"): the main phrase a person would type comes first in the
 // title and the heading; a title is at most 60 characters and a description 150 to 160; every page has its own; say only what
 // the page really does (no format that is not built); the heading is the only h1 of the page.
+import { liveHubs, liveToolPages, toolContent, toolPath, ALL_TOOLS_PATH } from './tools/registry.ts'
 
 export const SITE_ORIGIN = 'https://www.openanydoc.com'
 export const SITE_NAME = 'OpenAnyDoc'
@@ -276,6 +278,34 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Practical answers to common file problems, each with the free tool that fixes it in your browser.',
       linkText: 'Guides',
     },
+    '/pdf-tools': {
+      title: 'PDF Tools Online – Merge and Number PDF Files, No Upload',
+      description: 'Free PDF tools that run in your browser: merge PDF files into one and add page numbers, with nothing uploaded. No sign-up, no watermark, and they work offline.',
+      heading: 'PDF tools',
+      intro: 'Free PDF tools that work on your own device: combine PDF files into one and number their pages, without uploading them anywhere.',
+      linkText: 'PDF tools',
+    },
+    '/data-tools': {
+      title: 'Data Tools Online – CSV, JSON and Excel Converters, No Upload',
+      description: 'Free data tools for CSV, TSV, JSON and Excel files: view large tables, convert between formats, format and validate JSON, and mask personal data. No upload.',
+      heading: 'Data tools',
+      intro: 'Free tools for tables and data files: open CSV and JSON, convert between CSV, Excel and JSON, check JSON and hide personal data, all in your browser.',
+      linkText: 'Data tools',
+    },
+    '/office-tools': {
+      title: 'Office Tools Online – Open Word, Excel and PowerPoint Files',
+      description: 'Free office file tools: open Word documents, Excel workbooks, old XLS files, PowerPoint slides and text files in your browser, no Office needed. No upload.',
+      heading: 'Office tools',
+      intro: 'Open Word, Excel, PowerPoint and text files without installing Office: free viewers that run in your browser and never upload your files.',
+      linkText: 'Office tools',
+    },
+    '/all-tools': {
+      title: 'All Free File Tools: PDF, Data and Office – OpenAnyDoc',
+      description: 'Every free OpenAnyDoc tool in one place: PDF tools, CSV and JSON converters, data masking, and viewers for Word, Excel and PowerPoint files. Nothing uploaded.',
+      heading: 'All tools',
+      intro: 'Every tool on OpenAnyDoc, grouped by the kind of file it works on. Each one runs in your browser, and none of them uploads your files.',
+      linkText: 'All tools',
+    },
   },
   ar: {
     '/': {
@@ -515,7 +545,44 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'إجابات عملية لمشكلات الملفات الشائعة، مع الأداة المجانية التي تحلها في متصفحك.',
       linkText: 'الأدلة',
     },
+    '/pdf-tools': {
+      title: 'أدوات PDF على الإنترنت – دمج ملفات PDF وترقيمها دون رفع',
+      description: 'أدوات PDF مجانية تعمل في متصفحك: ادمج ملفات PDF في ملف واحد وأضف أرقام الصفحات دون رفع أي شيء. دون تسجيل ودون علامة مائية، وتعمل أيضًا دون اتصال بالإنترنت.',
+      heading: 'أدوات PDF',
+      intro: 'أدوات PDF مجانية تعمل على جهازك: اجمع ملفات PDF في ملف واحد ورقّم صفحاتها، دون رفعها إلى أي مكان.',
+      linkText: 'أدوات PDF',
+    },
+    '/data-tools': {
+      title: 'أدوات البيانات – تحويل CSV وJSON وExcel دون رفع الملفات',
+      description: 'أدوات مجانية لملفات CSV وTSV وJSON وExcel: اعرض الجداول الكبيرة، وحوّل بين الصيغ، ونسّق JSON وتحقق منه، وأخفِ البيانات الشخصية. كل ذلك في متصفحك دون رفع أي ملف.',
+      heading: 'أدوات البيانات',
+      intro: 'أدوات مجانية للجداول وملفات البيانات: افتح CSV وJSON، وحوّل بين CSV وExcel وJSON، وتحقق من JSON، وأخفِ البيانات الشخصية، كل ذلك في متصفحك.',
+      linkText: 'أدوات البيانات',
+    },
+    '/office-tools': {
+      title: 'أدوات المكتب – افتح ملفات Word وExcel وPowerPoint دون Office',
+      description: 'أدوات مجانية لملفات المكتب: افتح مستندات Word ومصنفات Excel وملفات XLS القديمة وشرائح PowerPoint والملفات النصية في متصفحك دون Office. لا يُرفع أي ملف أبدًا.',
+      heading: 'أدوات المكتب',
+      intro: 'افتح ملفات Word وExcel وPowerPoint والملفات النصية دون تثبيت Office: عارضات مجانية تعمل في متصفحك ولا ترفع ملفاتك أبدًا.',
+      linkText: 'أدوات المكتب',
+    },
+    '/all-tools': {
+      title: 'كل أدوات الملفات المجانية: PDF والبيانات والمكتب – OpenAnyDoc',
+      description: 'كل أدوات OpenAnyDoc المجانية في مكان واحد: أدوات PDF، ومحوّلات CSV وJSON، وإخفاء البيانات، وعارضات ملفات Word وExcel وPowerPoint. لا يُرفع أي ملف إلى أي خادم.',
+      heading: 'كل الأدوات',
+      intro: 'كل أدوات OpenAnyDoc مرتبة حسب نوع الملف الذي تعمل عليه. كلها تعمل في متصفحك، ولا ترفع أي منها ملفاتك.',
+      linkText: 'كل الأدوات',
+    },
   },
+}
+
+// The tool pages drawn by src/pages/ToolPage.tsx take their words from src/content/tools/<slug>.<locale>.json (through the
+// registry); they join pageSeo here so the build, the breadcrumb, the search and the share images treat them like any page.
+for (const locale of ['en', 'ar'] as const) {
+  for (const tool of liveToolPages) {
+    const content = toolContent[locale][tool.slug]
+    pageSeo[locale][toolPath(tool)] = { title: content.title, description: content.description, heading: content.heading, intro: content.subtitle, answer: content.subtitle, linkText: content.linkText }
+  }
 }
 
 // The Open Graph name of each language (og:locale and og:locale:alternate).
@@ -528,8 +595,11 @@ export const guideAddresses = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-co
 
 export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
 
+// The live tool and hub pages have one each too, drawn from the registry.
+export const registryPagesWithShareImage = [...liveToolPages.map(toolPath), ...liveHubs.map((hub) => hub.path), ALL_TOOLS_PATH]
+
 export function getShareImage(locale: Locale, address: string) {
-  const imageAddress = pagesWithShareImage.includes(address) ? address : '/'
+  const imageAddress = pagesWithShareImage.includes(address) || registryPagesWithShareImage.includes(address) ? address : '/'
   return {
     path: `/og/${locale}-${imageAddress === '/' ? 'home' : imageAddress.slice(1)}.png`,
     alt: `${SITE_NAME}: ${pageSeo[locale][imageAddress].heading}`,

@@ -4,10 +4,11 @@ import { localizePath, useT } from '../i18n'
 import type { Locale, MessageKey } from '../i18n'
 import { SEARCH_ICON_PATH, navClasses, searchBoxFormats } from '../pages/changelogMarkup'
 import { guideAddresses, pageSeo } from '../seo'
+import { ALL_TOOLS_PATH, findToolIcon, liveToolPages, toolPath } from '../tools/registry'
 import { landingPages, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 
-type SearchGroup = 'viewers' | 'tools' | 'convert' | 'guides'
+type SearchGroup = 'pdf' | 'viewers' | 'tools' | 'convert' | 'guides'
 // A page the search can open. `searchText` holds the words a query is matched against: the page's name and heading in the page's
 // language, the words of its address and the extensions it opens.
 type SearchEntry = { path: string; name: string; note: string; icon: string; group: SearchGroup; searchText: string }
@@ -15,7 +16,7 @@ type SearchEntry = { path: string; name: string; note: string; icon: string; gro
 type UnsupportedEntry = { id: string; icon: string; nameKey: MessageKey; noteKey: MessageKey }
 
 const viewerIcons: Record<Viewer['id'], string> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx', word: 'docx', pdf: 'pdf', powerpoint: 'pptx' }
-const searchGroups: SearchGroup[] = ['viewers', 'tools', 'convert', 'guides']
+const searchGroups: SearchGroup[] = ['pdf', 'viewers', 'tools', 'convert', 'guides']
 const unsupportedEntries: UnsupportedEntry[] = [
   { id: 'ppt', icon: 'pptx', nameKey: 'search.unsupported.ppt', noteKey: 'search.unsupported.pptNote' },
   { id: 'doc', icon: 'docx', nameKey: 'search.unsupported.doc', noteKey: 'search.unsupported.docNote' },
@@ -35,18 +36,21 @@ function buildSearchEntries(locale: Locale, translate: (key: MessageKey) => stri
     const icon = page.tool ? 'mask' : page.convertTo ? 'convert' : viewerIcons[page.viewerId]
     return entry(page.path, icon, isConversionOrTool ? 'convert' : 'tools', page.extensions ?? viewer.extensions)
   })
+  // The tools drawn by ToolPage (src/tools/registry.ts), in their category's group: today the PDF tools.
+  const toolPageEntries = liveToolPages.filter((tool) => tool.category === 'pdf').map((tool) => entry(toolPath(tool), findToolIcon(tool), 'pdf', tool.inputFormats))
   const guideEntries = guideAddresses.map((path) => entry(path, 'guide', 'guides', []))
-  return [...viewerEntries, ...landingEntries, ...guideEntries]
+  return [...viewerEntries, ...landingEntries, ...toolPageEntries, ...guideEntries]
 }
 
 // The words of a text, for matching: letters and digits in any script, lower case.
 const wordsOf = (text: string) => text.toLocaleLowerCase().split(/[^\p{L}\p{N}]+/u).filter(Boolean)
 
 // Every typed word must start a word of the entry (a word of one or two letters, such as "to", must be a whole word); entries
-// whose name starts with the first typed word come first. With nothing typed: the viewers and the converters.
+// whose name starts with the first typed word come first. With nothing typed: the PDF tools, the viewers and the converters.
 function findMatchingEntries(entries: SearchEntry[], query: string) {
   const typedWords = wordsOf(query)
-  if (typedWords.length === 0) return entries.filter((entry) => entry.group === 'viewers' || entry.group === 'convert')
+  const byGroup = (first: SearchEntry, second: SearchEntry) => searchGroups.indexOf(first.group) - searchGroups.indexOf(second.group)
+  if (typedWords.length === 0) return entries.filter((entry) => entry.group === 'pdf' || entry.group === 'viewers' || entry.group === 'convert').sort(byGroup)
   const matchesTypedWords = (text: string) => {
     const words = wordsOf(text)
     return typedWords.every((typedWord) => words.some((word) => (typedWord.length <= 2 ? word === typedWord : word.startsWith(typedWord))))
@@ -54,7 +58,7 @@ function findMatchingEntries(entries: SearchEntry[], query: string) {
   const startsWithFirstWord = (entry: SearchEntry) => (entry.name.toLocaleLowerCase().startsWith(typedWords[0]) ? 0 : 1)
   return entries
     .filter((entry) => matchesTypedWords(entry.searchText))
-    .sort((first, second) => searchGroups.indexOf(first.group) - searchGroups.indexOf(second.group) || startsWithFirstWord(first) - startsWithFirstWord(second))
+    .sort((first, second) => byGroup(first, second) || startsWithFirstWord(first) - startsWithFirstWord(second))
 }
 
 // The header's search box, on every content page (home, format and landing pages, About, Privacy, Terms, guides, changelog). It
@@ -213,7 +217,22 @@ export default function SiteNav({ currentPath, onNavigate }: { currentPath: stri
               </li>
             ))}
           </ul>
-          <p className="mt-1.5 hidden flex-none border-t border-line px-3 pt-2 text-xs text-ink-soft xl:block">{t('search.hint')}</p>
+          <p className="mt-1.5 flex flex-none items-center justify-between gap-3 border-t border-line px-3 pt-1.5">
+            <a
+              id="site-search-all-tools-link"
+              href={localizePath(locale, ALL_TOOLS_PATH)}
+              onClick={(event) => {
+                if (event.metaKey || event.ctrlKey || event.shiftKey || event.button !== 0) return
+                event.preventDefault()
+                setIsOpen(false)
+                onNavigate(localizePath(locale, ALL_TOOLS_PATH))
+              }}
+              className="inline-flex min-h-11 shrink-0 items-center text-sm font-semibold whitespace-nowrap text-accent underline-offset-2 hover:underline"
+            >
+              {t('tools.menu.seeAll')}
+            </a>
+            <span className="hidden text-xs text-ink-soft xl:inline">{t('search.hint')}</span>
+          </p>
         </div>
       )}
     </nav>

@@ -22,6 +22,7 @@ const PICKER_MIME_TYPES: Record<string, string[]> = {
   '.doc': ['application/msword'],
   '.pptx': ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
   '.ppt': ['application/vnd.ms-powerpoint'],
+  '.pdf': ['application/pdf'],
 }
 
 export const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024
@@ -42,6 +43,10 @@ type FileIntakeOptions = {
   // dropped file, and `onHandoffConsumed` then tells the owner to forget it. It is kept in React state only.
   handoffFile?: File | null
   onHandoffConsumed?: () => void
+  // A tool page (src/pages/ToolPage.tsx): takes several files at once (each goes to onFileLoaded), and takes its formats even when
+  // no viewer opens them yet (Merge PDF takes .pdf although the PDF viewer is "coming soon").
+  allowsSeveralFiles?: boolean
+  acceptsComingSoonFormats?: boolean
 }
 
 // A file whose type another viewer opens: shown as an offer to open it there instead of as an error.
@@ -59,7 +64,7 @@ export function getLargeFileWarning(file: File, locale: Locale) {
 }
 
 // Everything a drop zone needs, with no markup of its own, so each layout can build its own UI.
-export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed }: FileIntakeOptions) {
+export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed, allowsSeveralFiles = false, acceptsComingSoonFormats = false }: FileIntakeOptions) {
   const { locale, t } = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   // The grey line under an error toast, for the rejection that can say what to do instead.
@@ -90,7 +95,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
     // A registered format whose viewer is not built yet (PDF): say so instead of opening a page or an error.
     const droppedViewer = findViewerForFileName(file.name)
-    if (droppedViewer && getFormatCapabilities(droppedViewer.id)?.isComingSoon) {
+    if (droppedViewer && getFormatCapabilities(droppedViewer.id)?.isComingSoon && !acceptsComingSoonFormats) {
       setComingSoonViewer(droppedViewer)
       return
     }
@@ -142,6 +147,10 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   function openChosenFiles(files: File[]) {
     if (files.length === 0) return
+    if (allowsSeveralFiles) {
+      for (const file of files) void loadFile(file)
+      return
+    }
     if (files.length > 1) {
       setErrorMessage(t('intake.oneFile'))
       return
@@ -199,7 +208,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
 
   // The file chooser offers only the formats that open today; a dropped coming-soon file still gets its "coming soon" message.
   const releasedExtensions = new Set(getReleasedFormats().flatMap(({ viewer }) => viewer.extensions))
-  const choosableExtensions = acceptedExtensions.filter((extension) => releasedExtensions.has(extension))
+  const choosableExtensions = acceptsComingSoonFormats ? acceptedExtensions : acceptedExtensions.filter((extension) => releasedExtensions.has(extension))
   // .doc and .ppt stay choosable wherever .docx and .pptx are, so an old Office file gets its own message.
   const pickerExtensions = [...choosableExtensions, ...(choosableExtensions.includes('.docx') ? ['.doc'] : []), ...(choosableExtensions.includes('.pptx') ? ['.ppt'] : [])]
   const fileInput = (
@@ -207,6 +216,7 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       id="file-input"
       ref={fileInputRef}
       type="file"
+      multiple={allowsSeveralFiles}
       accept={[...pickerExtensions, ...pickerExtensions.flatMap((extension) => PICKER_MIME_TYPES[extension] ?? [])].join(',')}
       aria-label={t('intake.fileInputLabel', { extensions: isolateLeftToRight(choosableExtensions.join(', ')) })}
       className="hidden"

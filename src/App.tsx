@@ -11,6 +11,7 @@ import { guideAddresses } from './seo'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
 import type { ConversionTarget, Viewer } from './viewers'
 import { preloadPageSamples } from './samples/toolSamples'
+import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage } from './tools/registry'
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 // The file page (viewers, editing, menus) is its own chunk, so content pages load only what they show.
@@ -23,6 +24,14 @@ const viewerIdForConversion: Record<ConversionTarget, Viewer['id']> = { csv: 'cs
 function preloadFileOpening(path: string) {
   // The page's bundled sample files ("Try a sample file"), so they also open offline.
   void preloadPageSamples(path).catch(() => {})
+  // A tool page: its component and, for the PDF tools, the worker with pdf-lib (an empty task fetches it).
+  const toolPage = findLiveToolPage(path)
+  if (toolPage) {
+    const preloads: Promise<unknown>[] = [toolPage.loadComponent?.() ?? Promise.resolve()]
+    if (toolPage.category === 'pdf') preloads.push(import('./tools/pdf/pdfTasks').then(({ runPdfTask }) => runPdfTask({ type: 'warm-up' })))
+    void Promise.all(preloads).catch(() => {})
+    return
+  }
   const toolViewer = findViewerByToolPath(path)
   // The Mask Data page keeps the file on the page: it needs its tool and the Excel writer, not a viewer.
   if (toolViewer?.tool === 'mask') {
@@ -62,6 +71,8 @@ function LoadFailedMessage() {
   )
 }
 const InfoPage = lazy(() => import('./pages/InfoPage'))
+const ToolPage = lazy(() => import('./pages/ToolPage'))
+const HubPage = lazy(() => import('./pages/HubPage'))
 const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', ...guideAddresses]
 
 // What to show for the address in the browser. An address with no language gets one: the home page follows the browser's
@@ -94,6 +105,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   const [handoffFile, setHandoffFile] = useState<File | null>(null)
   const { locale: addressLocale, path } = splitLocalePath(pathname)
   const locale: Locale = addressLocale ?? 'en'
+  const toolPage = findLiveToolPage(path)
   const hasUnsavedEditsRef = useRef(false)
   const openedFilePathRef = useRef('/en')
 
@@ -229,6 +241,21 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
               ) : path === '/changelog' ? (
                 <Suspense fallback={null}>
                   <ChangelogPage onNavigate={navigateTo} />
+                </Suspense>
+              ) : toolPage ? (
+                <Suspense fallback={null}>
+                  <ToolPage
+                    key={toolPage.slug}
+                    tool={toolPage}
+                    onNavigate={navigateTo}
+                    handoffFile={handoffFile}
+                    onHandoffConsumed={() => setHandoffFile(null)}
+                    onOpenInViewer={openInViewer}
+                  />
+                </Suspense>
+              ) : findLiveHub(path) || path === ALL_TOOLS_PATH ? (
+                <Suspense fallback={null}>
+                  <HubPage key={path} hub={findLiveHub(path)} onNavigate={navigateTo} />
                 </Suspense>
               ) : infoPageAddresses.includes(path) ? (
                 <Suspense fallback={null}>

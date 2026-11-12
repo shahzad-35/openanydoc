@@ -18,6 +18,7 @@ import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
 import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findBreadcrumbParent, findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
+import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage, hubs, liveHubs, liveToolPages, liveTools, toolContent, toolPath } from '../src/tools/registry.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
 const serverBuildFolder = path.join(projectRoot, 'dist-ssr')
@@ -64,7 +65,7 @@ function renderChangelogFooter(locale) {
     landingPages
       .map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))))
       .join('') +
-    item(link('footer-link-guides', '/guides', escapeHtml(pageSeo[locale]['/guides'].linkText))) +
+    [ALL_TOOLS_PATH, '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
     item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =
     legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
@@ -319,7 +320,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         operatingSystem: 'Any (web browser)',
         isAccessibleForFree: true,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        featureList: [...viewers.filter((tool) => tool.toolPath).map((tool) => tool.toolPath), ...landingPages.map((page) => page.path)].map((toolAddress) => pageSeo[locale][toolAddress].linkText),
+        featureList: [...viewers.filter((tool) => tool.toolPath).map((tool) => tool.toolPath), ...landingPages.map((page) => page.path), ...liveToolPages.map(toolPath)].map((toolAddress) => pageSeo[locale][toolAddress].linkText),
         publisher: { '@id': organizationId },
       },
     )
@@ -389,8 +390,46 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       publisher: { '@id': organizationId },
     })
   }
-  // The questions published as data are exactly the ones the page shows: the home page's, or this format's own.
-  const questions = address === '/' ? faqItems[locale] : (guide?.faq ?? [])
+  // A tool page drawn by ToolPage (Merge PDF ...): its application, with its features as the feature list. No ratings.
+  const toolPage = findLiveToolPage(address)
+  const content = toolPage && toolContent[locale][toolPage.slug]
+  if (toolPage) {
+    structuredData.push({
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: `${SITE_NAME} ${seo.linkText}`,
+      url: pageUrl,
+      inLanguage: locale,
+      description: seo.description,
+      applicationCategory: 'UtilitiesApplication',
+      operatingSystem: 'Any (web browser)',
+      isAccessibleForFree: true,
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      featureList: content.features.map((feature) => feature.title),
+      isPartOf: { '@id': websiteId },
+      publisher: { '@id': organizationId },
+    })
+  }
+  // A hub page lists its live tools (/all-tools lists every live tool), in the order the page shows them.
+  const hub = findLiveHub(address)
+  if (hub || address === ALL_TOOLS_PATH) {
+    const listedTools = (hub ? [hub] : liveHubs).flatMap((listedHub) => listedHub.groups.flatMap((group) => liveTools.filter((tool) => tool.category === listedHub.category && tool.group === group)))
+    structuredData.push({
+      '@context': 'https://schema.org',
+      '@type': 'CollectionPage',
+      name: seo.heading,
+      url: pageUrl,
+      inLanguage: locale,
+      description: seo.description,
+      isPartOf: { '@id': websiteId },
+      mainEntity: {
+        '@type': 'ItemList',
+        itemListElement: listedTools.map((tool, index) => ({ '@type': 'ListItem', position: index + 1, name: pageSeo[locale][toolPath(tool)].linkText, url: `${SITE_ORIGIN}${localizePath(locale, toolPath(tool))}` })),
+      },
+    })
+  }
+  // The questions published as data are exactly the ones the page shows: the home page's, this format's own, or this tool's.
+  const questions = address === '/' ? faqItems[locale] : (guide?.faq ?? content?.faq ?? [])
   if (questions.length > 0) {
     structuredData.push({
       '@context': 'https://schema.org',
@@ -411,7 +450,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
     })
   }
   const head = [renderHeadTags(locale, address, seo.title, seo.description), ...structuredData.map(jsonLdScript)].join('\n    ')
-  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description, viewer ? (seo.answer ?? '') : undefined)
+  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description, viewer || toolPage ? (seo.answer ?? '') : undefined)
   return pageShell(locale, shellOptions)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(seo.title)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(seo.description)}$2`)
@@ -420,7 +459,9 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
     .replace('<div id="root"></div>', () => (rootMarkup ? `<div id="root" data-prerendered>${rootMarkup}</div>` : '<div id="root"></div>'))
 }
 
-const seoAddresses = Object.keys(pageSeo.en)
+// A hub with no live tool yet is not a page (its words may already be written).
+const seoAddresses = Object.keys(pageSeo.en).filter((address) => !hubs.some((hub) => hub.path === address) || findLiveHub(address))
+for (const hub of liveHubs) if (!pageSeo.en[hub.path]) throw new Error(`The hub ${hub.path} has live tools but no words in src/seo.ts.`)
 const seoTitles = locales.flatMap((locale) => seoAddresses.map((address) => pageSeo[locale][address].title))
 if (new Set(seoTitles).size !== seoTitles.length) throw new Error('Two pages have the same title: every page needs its own.')
 // What a reader sees of a page: its title, description and the text of its <main> without the breadcrumb. Tags and attributes are
@@ -467,6 +508,9 @@ function pageSourceFiles(address) {
   if (address === '/') return ['src/seo.ts', 'src/content.ts', 'src/pages/HomePage.tsx', 'src/components/AboutSections.tsx']
   if (infoPages.en[address]) return ['src/seo.ts', 'src/legalContent.ts', 'src/pages/InfoPage.tsx']
   if (guidePages.en[address]) return ['src/seo.ts', 'src/guides.ts', 'src/pages/InfoPage.tsx']
+  const toolPage = findLiveToolPage(address)
+  if (toolPage) return [`src/content/tools/${toolPage.slug}.en.json`, `src/content/tools/${toolPage.slug}.ar.json`, 'src/pages/ToolPage.tsx', 'src/tools/registry.ts']
+  if (findLiveHub(address) || address === ALL_TOOLS_PATH) return ['src/seo.ts', 'src/pages/HubPage.tsx', 'src/tools/registry.ts']
   return ['src/seo.ts', 'src/pageContent.ts', 'src/pages/HomePage.tsx', 'src/components/FormatGuide.tsx']
 }
 const changelogLastChange = lastChangeDate(['src/data/changelog.json', 'src/pages/ChangelogPage.tsx'])

@@ -1,4 +1,5 @@
 import type { DelimiterChoice } from './parseCsv'
+import { findHubOfTool, findLiveToolPage } from './tools/registry.ts'
 
 export type Viewer = {
   id: 'csv' | 'text' | 'json' | 'excel' | 'word' | 'pdf' | 'powerpoint'
@@ -84,10 +85,12 @@ export function isFileViewPath(pathname: string) {
 // The viewer of a format page or a landing page, as that page uses it: `toolPath` is the page's own address and `extensions` the
 // ones its drop zone accepts.
 // The page between Home and this page in its breadcrumb (shown on the page and in its BreadcrumbList data): a guide sits under the
-// guides index, a landing page under its viewer's page (Home › JSON viewer › JSON formatter). A tool for several formats
-// (/mask-data) and every other page sit under Home only.
+// guides index, a landing page under its viewer's page (Home › JSON viewer › JSON formatter), a tool page under its hub
+// (Home › PDF tools › Merge PDF). A tool for several formats (/mask-data) and every other page sit under Home only.
 export function findBreadcrumbParent(address: string, isGuide: boolean): string | undefined {
   if (isGuide) return '/guides'
+  const toolPage = findLiveToolPage(address)
+  if (toolPage) return findHubOfTool(toolPage).path
   const landingPage = landingPages.find((page) => page.path === address)
   if (!landingPage || landingPage.tool) return undefined
   return viewers.find((viewer) => viewer.id === landingPage.viewerId)?.toolPath

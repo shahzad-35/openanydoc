@@ -8,8 +8,9 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { getShareImage, pageSeo, pagesWithShareImage } from '../src/seo.ts'
+import { getShareImage, pageSeo, pagesWithShareImage, registryPagesWithShareImage } from '../src/seo.ts'
 import { findViewerByToolPath, viewers } from '../src/viewers.ts'
+import { findLiveHub, findLiveToolPage, findToolIcon, liveTools } from '../src/tools/registry.ts'
 
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const outputFolder = path.join(projectRoot, 'public/og')
@@ -17,6 +18,9 @@ const chromePath = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/C
 const scratchFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'og-images-'))
 const locales = ['en', 'ar']
 const taglines = { en: 'Free · No upload · Runs in your browser', ar: 'مجاني · بدون رفع · يعمل في متصفحك' }
+const noUploadLabels = { en: 'No upload', ar: 'بدون رفع' }
+// The tools' small icons (.nav-icon-<name> in src/index.css), drawn large on a tool or hub page's card.
+const iconImages = Object.fromEntries([...fs.readFileSync(path.join(projectRoot, 'src/index.css'), 'utf8').matchAll(/\.nav-icon-([\w-]+) \{ ?background-image: ?url\("([^"]+)"\)/g)].map((match) => [match[1], match[2]]))
 
 // The light palette: the variables of the first :root block in src/index.css.
 const rootBlock = /:root\s*{([^}]*)}/.exec(fs.readFileSync(path.join(projectRoot, 'src/index.css'), 'utf8'))[1]
@@ -42,9 +46,16 @@ const brandRow = `<div class="brand">${markSvg}<span>open<b>any</b>doc</span></d
 function renderCard(locale, address) {
   const viewer = findViewerByToolPath(address)
   const shownViewers = viewer ? [viewer] : viewers.filter((candidate) => candidate.toolPath)
-  const chips = shownViewers
-    .flatMap((shown) => shown.extensions.map((extension) => `<span class="chip" style="background:${palette[`type-${shown.id}`]}">${extension}</span>`))
-    .join('')
+  // A tool page (Merge PDF ...) or a hub shows its tool's icon and a "No upload" chip with the extensions it takes.
+  const hub = findLiveHub(address)
+  const iconTool = findLiveToolPage(address) ?? (hub && liveTools.find((tool) => tool.category === hub.category))
+  const iconImage = iconTool && iconImages[findToolIcon(iconTool)]
+  const extensionChips = iconTool
+    ? [...new Set(liveTools.filter((tool) => (hub ? tool.category === hub.category : tool === iconTool)).flatMap((tool) => tool.inputFormats))].slice(0, 4).map((extension) => `<span class="chip" style="background:${palette.ink}">${extension}</span>`)
+    : shownViewers.flatMap((shown) => shown.extensions.map((extension) => `<span class="chip" style="background:${palette[`type-${shown.id}`]}">${extension}</span>`))
+  // The chip row is left to right, so in Arabic the label goes last to be read first.
+  const labelChips = iconTool ? [`<span class="chip chip--label" style="background:${palette.accent}">${noUploadLabels[locale]}</span>`] : []
+  const chips = (locale === 'ar' ? [...extensionChips, ...labelChips] : [...labelChips, ...extensionChips]).join('')
   // A band along the bottom in the format's colour; the home page gets one stripe per live format.
   const band = shownViewers.map((shown) => `<span style="background:${palette[`type-${shown.id}`]}"></span>`).join('')
   return `<!doctype html>
@@ -62,13 +73,15 @@ function renderCard(locale, address) {
   .tagline { margin-top: 22px; font-size: 28px; font-weight: 400; color: ${palette['ink-soft']}; }
   .chips { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; direction: ltr; justify-content: ${locale === 'ar' ? 'flex-end' : 'flex-start'}; }
   .chip { font-family: 'Plex Mono'; font-size: 24px; font-weight: 500; color: ${palette['on-accent']}; padding: 4px 16px; border-radius: 10px; }
+  .chip--label { font-family: 'Nunito Sans', 'Plex Arabic', sans-serif; font-weight: 400; }
+  .big-mark img { width: 100%; height: 100%; }
   .big-mark { position: absolute; top: 150px; inset-inline-end: 96px; width: 260px; height: 260px; transform: rotate(${locale === 'ar' ? '6deg' : '-6deg'}); filter: drop-shadow(0 34px 30px rgba(217, 169, 0, 0.35)); }
   .band { position: absolute; inset-inline: 0; bottom: 0; height: 16px; display: flex; }
   .band span { flex: 1; }
 </style>
 </head>
 <body>
-  <div class="big-mark">${markSvg}</div>
+  <div class="big-mark">${iconImage ? `<img src="${iconImage}" alt="" />` : markSvg}</div>
   <div class="content">
     ${brandRow}
     <h1>${escapeHtml(pageSeo[locale][address].heading)}</h1>
@@ -121,7 +134,7 @@ try {
   await send('Emulation.setDeviceMetricsOverride', { width: 1200, height: 630, deviceScaleFactor: 1, mobile: false })
   fs.mkdirSync(outputFolder, { recursive: true })
   for (const locale of locales) {
-    for (const address of pagesWithShareImage) {
+    for (const address of [...pagesWithShareImage, ...registryPagesWithShareImage]) {
       const cardFile = path.join(scratchFolder, `${locale}-${address.slice(1) || 'home'}.html`)
       fs.writeFileSync(cardFile, renderCard(locale, address))
       await send('Page.navigate', { url: pathToFileURL(cardFile).href })

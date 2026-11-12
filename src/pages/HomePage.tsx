@@ -17,6 +17,8 @@ import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 import { samplesByPage } from '../samples/toolSamples'
+import { ALL_TOOLS_PATH, findLiveTool, findToolIcon, popularToolSlugs, toolPath } from '../tools/registry'
+import type { MessageKey } from '../i18n'
 import { Notice } from '../components/Messages'
 import { headerRowBreak } from './changelogMarkup'
 
@@ -225,6 +227,34 @@ export default function HomePage({
             </div>
           )}
         </section>
+
+        {isHomePage && (
+          <section id="popular-tools" className="section-gap">
+            <h2 id="popular-tools-heading" className="type-h2 text-center">{t('home.popularTools')}</h2>
+            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+              {popularToolSlugs.flatMap((slug) => {
+                const tool = findLiveTool(slug)
+                if (!tool) return []
+                return [
+                  <li key={slug}>
+                    <PageLink id={`popular-tool-link-${slug}`} path={toolPath(tool)} onNavigate={onNavigate} className="flex h-full min-h-11 items-center gap-3 rounded-[18px] border-2 border-rule bg-paper-raised p-4 transition-colors duration-200 hover:border-accent">
+                      <span aria-hidden="true" className={`nav-icon nav-icon-${findToolIcon(tool)} shrink-0`} />
+                      <span className="flex min-w-0 flex-col leading-tight">
+                        <span className="font-semibold text-ink">{pageSeo[locale][toolPath(tool)].linkText}</span>
+                        <span className="mt-1 text-sm text-ink-soft">{t(`nav.note.${slug}` as MessageKey)}</span>
+                      </span>
+                    </PageLink>
+                  </li>,
+                ]
+              })}
+            </ul>
+            <p className="mt-6 text-center">
+              <PageLink id="popular-tools-all-link" path={ALL_TOOLS_PATH} onNavigate={onNavigate} className="inline-flex min-h-11 items-center font-semibold text-accent underline underline-offset-2">
+                {t('tools.menu.seeAll')}
+              </PageLink>
+            </p>
+          </section>
+        )}
 
         {toolViewer ? (
           <div id="about-content" className="section-gap">

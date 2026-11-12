@@ -201,6 +201,9 @@ const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/c
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
 const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
+// Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
+const registryToolPages = ['/merge-pdf', '/add-page-numbers']
+const hubPages = ['/pdf-tools', '/data-tools', '/office-tools', '/all-tools']
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
@@ -487,7 +490,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token', '/en/mask-data', '/ar/mask-data']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token', '/en/mask-data', '/ar/mask-data', '/en/merge-pdf', '/ar/add-page-numbers', '/en/pdf-tools', '/ar/all-tools']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -496,7 +499,7 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/abou
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column', '/en/mask-data', '/ar/mask-data']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column', '/en/mask-data', '/ar/mask-data', '/en/merge-pdf', '/ar/add-page-numbers', '/en/pdf-tools', '/ar/data-tools', '/en/office-tools', '/ar/all-tools']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://www.openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
@@ -531,7 +534,7 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
 })
 
 const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
-const contentPages = ['', ...formatPages, ...landingPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
+const contentPages = ['', ...formatPages, ...landingPages, ...registryToolPages, ...hubPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
   const alternatesOf = (html) =>
@@ -594,7 +597,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
       const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
       const types = blocks.flatMap((block) => [block['@type']].flat())
-      const expectedTypes = { '': ['WebSite', 'Organization', 'SoftwareApplication', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['CollectionPage', 'BreadcrumbList'], '/changelog': ['BreadcrumbList'], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
+      const expectedTypes = { '': ['WebSite', 'Organization', 'SoftwareApplication', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['CollectionPage', 'BreadcrumbList'], '/changelog': ['BreadcrumbList'], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])), ...Object.fromEntries(registryToolPages.map((tool) => [tool, ['WebApplication', 'FAQPage', 'BreadcrumbList']])), ...Object.fromEntries(hubPages.map((hub) => [hub, ['CollectionPage', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
       expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
       // Every reference to the organisation or website points at the one id the home page defines.
       const entityIds = ['https://www.openanydoc.com/#organization', 'https://www.openanydoc.com/#website', 'https://www.openanydoc.com/#founder']
@@ -657,6 +660,44 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       }
     }
   }
+})
+
+// ---------------------------------------------------------------- the tool engine: tool pages, hubs, Tools menu
+
+await test('tool pages and hubs: their own title and description, h1, the no-upload badge, the PDF tools in the search', async () => {
+  for (const address of ['en', 'ar'].flatMap((locale) => [...registryToolPages, ...hubPages].map((page) => `/${locale}${page}`))) {
+    const html = await (await fetch(`${siteOrigin}${address}`)).text()
+    const title = /<title>([^<]+)<\/title>/.exec(html)?.[1].replace(/&amp;/g, '&') ?? ''
+    const description = /name="description"\s+content="([^"]+)"/.exec(html)?.[1] ?? ''
+    const isToolPage = registryToolPages.some((page) => address.endsWith(page))
+    const [maxTitle, minDescription, maxDescription] = isToolPage ? [60, 120, 155] : [65, 150, 160]
+    expect(title.length <= maxTitle && description.length >= minDescription && description.length <= maxDescription, `${address}: title ${title.length}, description ${description.length}`)
+    expect(/<h1 id="page-heading"/.test(html), `${address}: the h1 is not in the server's HTML`)
+    if (isToolPage) expect(html.includes('id="tool-privacy-badge"') && html.includes('id="format-faq-list"') && html.includes('id="tool-limits-list"'), `${address}: the badge, questions or limits are not in the server's HTML`)
+  }
+  for (const locale of ['en', 'ar']) {
+    await openPage(`/${locale}/csv-viewer`)
+    await evaluate(`document.querySelector('#site-search-button').click()`)
+    await waitFor(`document.querySelector('#site-search-option-merge-pdf')`, 'the PDF tools in the search')
+    expect(await evaluate(`document.querySelector('#site-search-option-merge-pdf').getAttribute('href') === '/${locale}/merge-pdf' && !document.querySelector('#site-search-option-split-pdf') && document.querySelector('#site-search-all-tools-link')?.getAttribute('href') === '/${locale}/all-tools'`), `/${locale}: the search lists a tool that is not live, or misses Merge PDF or the All tools link`)
+  }
+})
+
+await test('Merge PDF merges the two samples, and Add page numbers takes the result in memory', async () => {
+  await openPage('/en/merge-pdf')
+  await evaluate(`document.querySelector('#sample-button-report-pdf').click()`)
+  await waitFor(`document.querySelector('#pdf-file-1')?.innerText.includes('3 pages')`, 'the first sample to be read')
+  await evaluate(`document.querySelector('#sample-button-letter-pdf').click()`)
+  await waitFor(`document.querySelector('#pdf-file-2')?.innerText.includes('2 pages') && !document.querySelector('#merge-pdf-button').disabled`, 'the second sample to be read')
+  await evaluate(`document.querySelector('#merge-pdf-button').click()`)
+  await waitFor(`document.querySelector('#tool-download-button')`, 'the merged file')
+  await evaluate(`window.__blobs = []; const make = URL.createObjectURL; URL.createObjectURL = (blob) => { window.__blobs.push(blob); return make(blob) }`)
+  await evaluate(`document.querySelector('#tool-download-button').click()`)
+  await waitFor(`window.__blobs.length === 1 && document.querySelector('#next-step-add-page-numbers')`, 'the download and the next steps')
+  expect(!(await evaluate(`Boolean(document.querySelector('#next-step-compress-pdf'))`)), 'a next step that is not live is shown')
+  await evaluate(`document.querySelector('#next-step-add-page-numbers').click()`)
+  await waitFor(`location.pathname === '/en/add-page-numbers' && document.querySelector('#pdf-file-1')?.innerText.includes('5 pages')`, 'Add page numbers to receive the merged PDF')
+  expect(await evaluate(`location.search === '' && location.hash === ''`), 'the file must not travel in the address')
 })
 
 // ---------------------------------------------------------------- About, Privacy and Terms; footer and workbench links
@@ -1277,7 +1318,7 @@ await test('the changelog writes the same search box as the browser draws, and i
     expect(liveNav === staticNav, `/${locale}/changelog: the static nav differs from the React one:\n${staticNav}\n${liveNav}`)
   }
   const navState = () => evaluate(`({ box: document.querySelector('#site-search-button').checkVisibility(), sideways: document.documentElement.scrollWidth > document.documentElement.clientWidth })`)
-  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/fix-arabic-csv-in-excel', '/ar/changelog', '/ar/mask-data']) {
+  for (const address of ['/en', '/ar/json-formatter', '/en/about', '/ar/fix-arabic-csv-in-excel', '/ar/changelog', '/ar/mask-data', '/en/merge-pdf', '/ar/pdf-tools']) {
     await openPage(address)
     const desktop = await navState()
     expect(desktop.box && !desktop.sideways, `${address} at 1280px: the search box should show (${JSON.stringify(desktop)})`)

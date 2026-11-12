@@ -1,5 +1,5 @@
 // The "Try a sample file" buttons of the tool pages: two small synthetic files per page (made-up names, example.com addresses, a
-// published example IBAN, test card numbers). Text samples are written here; the binary ones (xlsx, xls, docx, pptx) are files in
+// published example IBAN, test card numbers). Text samples are written here; the binary ones (xlsx, xls, docx, pptx, pdf) are files in
 // this folder made by scripts/generate-test-files.mjs and bundled as data, so a sample opens with no network request.
 // This module is loaded on demand (and while the page is idle, so samples also open offline).
 import { SAMPLE_JSON_TEXT } from '../formats/json/jsonTools'
@@ -131,6 +131,8 @@ const samples = {
   arabicPptx: bundledSample('arabic-pptx', 'arabic-review-3-slides.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', () => import('./arabic-review-3-slides.pptx?inline')),
   peopleCsv: { id: 'people-csv', buildFile: textFile('people.csv', PEOPLE_CSV, CSV) },
   peopleXlsx: bundledSample('people-xlsx', 'people-two-sheets.xlsx', XLSX_TYPE, () => import('./people-two-sheets.xlsx?inline')),
+  reportPdf: bundledSample('report-pdf', 'report-3-pages.pdf', 'application/pdf', () => import('./report-3-pages.pdf?inline')),
+  letterPdf: bundledSample('letter-pdf', 'letter-2-pages.pdf', 'application/pdf', () => import('./letter-2-pages.pdf?inline')),
 } satisfies Record<string, ToolSample>
 
 // The two samples of each tool page, by its address without the language. Each file has an extension the page accepts.
@@ -152,6 +154,8 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/word-viewer': [samples.quarterlyDocx, samples.arabicDocx],
   '/powerpoint-viewer': [samples.reviewPptx, samples.arabicPptx],
   '/mask-data': [samples.peopleCsv, samples.peopleXlsx],
+  '/merge-pdf': [samples.reportPdf, samples.letterPdf],
+  '/add-page-numbers': [samples.reportPdf, samples.letterPdf],
 }
 
 // Fetches a page's bundled samples while the page is idle, so they open with no network later.

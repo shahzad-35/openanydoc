@@ -1,7 +1,7 @@
 {
   "/en": {
-    "hash": "026cf1c7ce5afb62975cf6d49cd6410e8d79f72f",
-    "date": "2026-11-04"
+    "hash": "e3b0336c07a9840fe156e2cb9f3927a060165970",
+    "date": "2026-11-11"
   },
   "/en/csv-viewer": {
     "hash": "9896f54176172ef3d47390cd3cdd12ef0b756035",
@@ -127,9 +127,33 @@
     "hash": "f520f0e3f68aab2702fc5bc7be13b7127ea7301a",
     "date": "2026-11-04"
   },
+  "/en/pdf-tools": {
+    "hash": "a4677430e553cb3dfadc28dda5d61ecd7fcaa455",
+    "date": "2026-11-11"
+  },
+  "/en/data-tools": {
+    "hash": "9feb83010d28c3d7c508a48264829250181f1132",
+    "date": "2026-11-11"
+  },
+  "/en/office-tools": {
+    "hash": "1e652c2987fdcc804bde2b5b71f0283784a35881",
+    "date": "2026-11-11"
+  },
+  "/en/all-tools": {
+    "hash": "9f91be56cc38b401a98942e44b062793ff3208e1",
+    "date": "2026-11-11"
+  },
+  "/en/merge-pdf": {
+    "hash": "1a37ee74dfea4feda61251b6a3c149db1d289ea4",
+    "date": "2026-11-02"
+  },
+  "/en/add-page-numbers": {
+    "hash": "b238a2dc46a1322b249d08e95e616421541f2f8f",
+    "date": "2026-11-02"
+  },
   "/ar": {
-    "hash": "f69e585db80cfb10009109dbb57dd22e4183a6de",
-    "date": "2026-11-04"
+    "hash": "639cf731303312672e7f5efacdcda30101f424fa",
+    "date": "2026-11-11"
   },
   "/ar/csv-viewer": {
     "hash": "86d233a25be5651355c6164382bbc5cc13c94a67",
@@ -254,5 +278,29 @@
   "/ar/guides": {
     "hash": "834f20571b127335fda473a3faad694e04565467",
     "date": "2026-11-04"
+  },
+  "/ar/pdf-tools": {
+    "hash": "ab5c44f4c56c1223d4ec70d941a5f6ec2aefa9c0",
+    "date": "2026-11-11"
+  },
+  "/ar/data-tools": {
+    "hash": "bd73a490a41041a28a4d181b8a8b203528b68b79",
+    "date": "2026-11-11"
+  },
+  "/ar/office-tools": {
+    "hash": "20dc3bf2b26d7b827eaa09e53a48eeb9ef38f3ae",
+    "date": "2026-11-11"
+  },
+  "/ar/all-tools": {
+    "hash": "3ca2ae1a00cbf21fd55ff90fc9039348a557a0ec",
+    "date": "2026-11-11"
+  },
+  "/ar/merge-pdf": {
+    "hash": "9eaa5ac3361f459bced3098151b7462547332856",
+    "date": "2026-11-02"
+  },
+  "/ar/add-page-numbers": {
+    "hash": "41fb634e6357edfdeb8408125533df241a39cc06",
+    "date": "2026-11-02"
   }
 }

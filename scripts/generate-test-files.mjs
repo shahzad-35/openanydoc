@@ -5,6 +5,7 @@ import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import JSZip from 'jszip'
+import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import * as XLSX from 'xlsx'
 
 const HUGE_FILE_ROW_COUNT = 120_000
@@ -865,3 +866,35 @@ writeSampleFile(
 )
 
 console.log(`Wrote test files to ${outputDirectory.pathname} and sample files to ${sampleDirectory.pathname}`)
+
+// The PDF tools' samples (Merge PDF, Add page numbers): plain A4 pages of made-up text, with fixed dates so every run writes the
+// same bytes.
+async function buildSamplePdf(title, pageTexts) {
+  const pdf = await PDFDocument.create()
+  pdf.setTitle(title)
+  pdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+  pdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+  const headingFont = await pdf.embedFont(StandardFonts.HelveticaBold)
+  const bodyFont = await pdf.embedFont(StandardFonts.Helvetica)
+  pageTexts.forEach(([heading, ...lines]) => {
+    const page = pdf.addPage([595, 842])
+    page.drawText(heading, { x: 60, y: 760, size: 22, font: headingFont, color: rgb(0.1, 0.1, 0.15) })
+    lines.forEach((line, index) => page.drawText(line, { x: 60, y: 720 - index * 22, size: 12, font: bodyFont, color: rgb(0.2, 0.2, 0.25) }))
+  })
+  return pdf.save()
+}
+writeSampleFile(
+  'report-3-pages.pdf',
+  await buildSamplePdf('Quarterly report (synthetic sample)', [
+    ['Quarterly report', 'A synthetic sample for OpenAnyDoc.', 'Sales grew in every region this quarter.', 'Page 1 of the report: summary.'],
+    ['Sales by region', 'North: 1,240 units', 'South: 980 units', 'West: 1,105 units'],
+    ['Next steps', 'Open two more shops in the spring.', 'Review the price list in March.', 'Contact: team@example.com'],
+  ]),
+)
+writeSampleFile(
+  'letter-2-pages.pdf',
+  await buildSamplePdf('Letter (synthetic sample)', [
+    ['Dear customer,', 'Thank you for your order of 12 notebooks.', 'Your parcel leaves our warehouse on Monday.', 'The invoice is on the next page.'],
+    ['Invoice 2026-118', '12 x Notebook, A5     58.80', 'Shipping               4.90', 'Total                 63.70'],
+  ]),
+)

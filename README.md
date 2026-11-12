@@ -35,7 +35,7 @@ Behind that:
 
 Encodings on every text format: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic files. Arabic text is shown right to left; the "Excel copy" button writes a UTF-8 BOM so Excel stops showing Arabic as symbols.
 
-PDF is planned and not built yet.
+PDF tools: [Merge PDF](https://www.openanydoc.com/en/merge-pdf) combines PDF files in the order you choose, and [Add page numbers](https://www.openanydoc.com/en/add-page-numbers) numbers every page from any start number, both with [pdf-lib](https://github.com/Hopding/pdf-lib) (MIT) in a Web Worker. Password-protected PDFs are not supported. A PDF viewer is planned and not built yet.
 
 ![The Excel viewer with sheet tabs, formulas and the formatting toolbar](public/screenshots/en-excel.webp)
 ![The JSON viewer with the text pane and the tree view](public/screenshots/en-json.webp)

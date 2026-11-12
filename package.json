@@ -26,6 +26,7 @@
     "fast-formula-parser": "^1.0.19",
     "jszip": "^3.10.2",
     "papaparse": "^5.7.0",
+    "pdf-lib": "^1.17.1",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "roughjs": "^4.6.6",

@@ -3,6 +3,7 @@ import { localizePath, useT } from '../i18n'
 import { CONTACT_EMAIL } from '../legalContent'
 import { BREADCRUMB_CHEVRON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
 import { SOCIAL_PROFILES, guideAddresses, pageSeo } from '../seo'
+import { ALL_TOOLS_PATH } from '../tools/registry'
 import { findBreadcrumbParent, landingPages, viewers, type Viewer } from '../viewers'
 import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
@@ -124,7 +125,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
                     </PageLink>
                   </li>
                 ))}
-              {['/guides']
+              {[ALL_TOOLS_PATH, '/guides']
                 .filter((address) => address !== currentPath)
                 .map((address) => (
                   <li key={address} className={footerClasses.item}>
