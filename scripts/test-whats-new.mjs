@@ -525,7 +525,8 @@ await test('unknown addresses get a real 404 page with noindex, and open-file ad
 await test('security headers: HSTS, the inline theme script allowed by its hash only, Early Hints and font preloads', async () => {
   const headers = fs.readFileSync(path.join(distFolder, '_headers'), 'utf8')
   expect(headers.includes('Strict-Transport-Security: max-age=31536000; includeSubDomains'), 'HSTS is missing from _headers')
-  expect(/script-src 'self' 'sha256-[A-Za-z0-9+/=]+';/.test(headers) && !headers.includes('unsafe-inline'), 'the CSP does not allow the theme script by hash alone')
+  // 'wasm-unsafe-eval' lets the CSV page's query mode compile SQLite's WebAssembly; it does not allow JavaScript eval.
+  expect(/script-src 'self' 'sha256-[A-Za-z0-9+/=]+' 'wasm-unsafe-eval';/.test(headers) && !headers.includes('unsafe-inline') && !/'unsafe-eval'/.test(headers), 'the CSP does not allow the theme script by hash alone')
   expect(/^\/en\n  Link: <\/assets\/fredoka-latin-700[^>]+>; rel=preload; as=font; crossorigin/m.test(headers) && /^\/ar\/\*\n  Link: <\/assets\/ibm-plex-sans-arabic/m.test(headers), 'the Early Hints Link headers for the fonts are missing')
   const html = await (await fetch(`${siteOrigin}/en`)).text()
   expect(/<link rel="preload" as="font" type="font\/woff2" crossorigin href="\/assets\/fredoka-latin-700/.test(html) && !html.includes('theme-init.js'), 'English pages should preload the display font and have no theme-init.js request')

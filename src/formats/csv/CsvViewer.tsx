@@ -1,4 +1,5 @@
-import { useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import Papa from 'papaparse'
+import { Suspense, lazy, useCallback, useDeferredValue, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, KeyboardEvent as ReactKeyboardEvent, ReactNode } from 'react'
 import { MiniFormatIcon, Wordmark } from '../../components/KitIcon'
 import LanguageSwitcher from '../../components/LanguageSwitcher'
@@ -30,7 +31,9 @@ import {
   buildHistogram,
   countRowsPerWeek,
   detectColumnInfo,
+  formatFilterRowText,
   groupRows,
+  parseFilterRowText,
   parseNumber,
   passesFilter,
   sortRowIds,
@@ -65,7 +68,14 @@ import {
   withoutEmptyRows,
 } from './csvCells'
 import type { CellTextTransform, CsvEdits } from './csvCells'
+import { appendTables } from './csvCombine'
+import { buildHtmlTable, buildMarkdownTable, buildSqlInserts, splitIntoParts, toSqlTableName } from './csvExport'
+import { findHealthIssues } from './csvHealth'
 import './csvWorkbench.css'
+
+// The chart (Chart.js) and query (SQLite) panels are fetched when their tab opens.
+const CsvChartPanel = lazy(() => import('./CsvChartPanel'))
+const CsvQueryPanel = lazy(() => import('./CsvQueryPanel'))
 
 const MAX_LISTED_CHANGES = 200
 const MAX_FILTER_VALUES = 200
@@ -91,7 +101,8 @@ const ENCODING_CHOICES: EncodingChoice[] = ['auto', 'utf-8', 'utf-16le', 'utf-16
 
 // Parsing runs in a Web Worker, so clicks still answer while a large file is read (the file stays here: the worker gets a copy).
 // It lives here, not in parseCsv.ts, because the worker imports parseCsv.ts. If the worker cannot start, the page parses it itself.
-export function parseCsvInWorker(contents: ArrayBuffer, delimiterChoice: DelimiterChoice, encodingChoice: EncodingChoice): Promise<ParsedCsv> {
+// A Parquet file goes through the same worker, which then reads it with hyparquet (parquetTable.ts) instead of the CSV parser.
+export function parseCsvInWorker(contents: ArrayBuffer, delimiterChoice: DelimiterChoice, encodingChoice: EncodingChoice, isParquet = false): Promise<ParsedCsv> {
   return new Promise((resolve) => {
     const worker = new Worker(new URL('./csvParse.worker.ts', import.meta.url), { type: 'module' })
     const receivedRows: string[][] = []
@@ -106,9 +117,9 @@ export function parseCsvInWorker(contents: ArrayBuffer, delimiterChoice: Delimit
     }
     worker.onerror = () => {
       worker.terminate()
-      resolve(parseCsv(contents, delimiterChoice, encodingChoice))
+      resolve(isParquet ? { status: 'error', reason: 'binary' } : parseCsv(contents, delimiterChoice, encodingChoice))
     }
-    const request: CsvParseRequest = { contents, delimiterChoice, encodingChoice }
+    const request: CsvParseRequest = { contents, delimiterChoice, encodingChoice, isParquet }
     worker.postMessage(request)
   })
 }
@@ -145,6 +156,7 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
 <symbol id="i-more" viewBox="0 0 24 24"><circle cx="5.5" cy="12" r="1.3"/><circle cx="12" cy="12" r="1.3"/><circle cx="18.5" cy="12" r="1.3"/></symbol>
 <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 19.5h16"/><rect x="5.5" y="11" width="3" height="6" rx=".6"/><rect x="10.5" y="6" width="3" height="11" rx=".6"/><rect x="15.5" y="13" width="3" height="4" rx=".6"/></symbol>
+<symbol id="i-query" viewBox="0 0 24 24"><path d="M5 6h14M5 12h8M5 18h5"/><circle cx="16.5" cy="15.5" r="3"/><path d="m18.7 17.7 2 2"/></symbol>
 <symbol id="i-pin" viewBox="0 0 24 24"><path d="M9 4h6l-1 5 3 3H7l3-3zM12 12v8"/></symbol>
 <symbol id="i-eye-off" viewBox="0 0 24 24"><path d="M3 3l18 18M10.6 6.1A9 9 0 0 1 12 6c5 0 8.5 6 8.5 6a15 15 0 0 1-3 3.5M6.6 7.7A15 15 0 0 0 3.5 12S7 18 12 18a8 8 0 0 0 3.4-.8"/></symbol>
 <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="m13.5 6.5 4 4"/></symbol>
@@ -152,13 +164,18 @@ const ICON_SPRITE = `<defs>
 <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4.5 7h15M9.5 7V4.5h5V7M6.5 7l1 13h9l1-13"/></symbol>
 </defs>`
 
-type DockTab = 'profile' | 'group' | 'issues' | 'changes'
+type DockTab = 'profile' | 'group' | 'issues' | 'changes' | 'chart' | 'query'
 type CleanTool = 'split' | 'merge' | 'dupes' | 'transpose'
 type PopoverKind = 'column' | 'filterPick' | 'sort' | 'columns' | 'clean' | 'file' | 'reading' | 'more' | 'find' | 'context' | 'convert'
 type Popover = { kind: PopoverKind; anchor: HTMLElement | null; point?: { x: number; y: number }; columnPosition?: number }
 type Toast = { id: number; message: string; canUndo: boolean }
 type FindState = { text: string; replacement: string; matchCase: boolean; wholeCell: boolean; isRegularExpression: boolean; columnId: number | null }
-type DownloadSettings = { fileName: string; onlyShownRows: boolean; delimiter: string; lineEnding: '\n' | '\r\n'; includeHeaderRow: boolean; quoteAllFields: boolean; byteOrderMark: boolean }
+// `format`: the file type saved (csv uses the CSV options; the others read the same rows and columns). `splitRowsPerPart`: a CSV
+// saved as a zip of parts of that many rows each, or null for one file. `tableName`: the SQL statements' table.
+type ExportFormat = 'csv' | 'xlsx' | 'markdown' | 'html' | 'sql'
+type DownloadSettings = { fileName: string; onlyShownRows: boolean; delimiter: string; lineEnding: '\n' | '\r\n'; includeHeaderRow: boolean; quoteAllFields: boolean; byteOrderMark: boolean; format: ExportFormat; splitRowsPerPart: number | null; tableName: string }
+const EXPORT_EXTENSIONS: Record<ExportFormat, string> = { csv: '', xlsx: '.xlsx', markdown: '.md', html: '.html', sql: '.sql' }
+const EXPORT_MIME_TYPES: Record<ExportFormat, string> = { csv: 'text/csv;charset=utf-8', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', markdown: 'text/markdown;charset=utf-8', html: 'text/html;charset=utf-8', sql: 'application/sql;charset=utf-8' }
 type ColumnDraft = {
   columnId: number
   nameDraft: string
@@ -171,7 +188,8 @@ type ColumnDraft = {
   toDate: string
   boolValue: '' | 'true' | 'false'
 }
-type Issue = { kind: 'warn' | 'info'; title: string; detail: string; goTo?: { rowId: number; columnId: number }; showBlanksOf?: number }
+// `action`: a fix the issue offers instead of Go to (trim a column, remove duplicate rows).
+type Issue = { kind: 'warn' | 'info'; title: string; detail: string; goTo?: { rowId: number; columnId: number }; showBlanksOf?: number; action?: { id: string; label: string; run: () => void } }
 
 function Icon({ name, size = '', className = '', flipped = false }: { name: string; size?: '' | 'sm' | 'xs'; className?: string; flipped?: boolean }) {
   return (
@@ -311,6 +329,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   const { reset: resetEditSession } = session
   const fileName = openedFile.file.name
   const tableFormat = findTableFormat(fileName)
+  const isParquetFile = fileName.toLowerCase().endsWith('.parquet')
   const isNarrow = useIsNarrowScreen()
   const isPhone = useIsPhone()
   const { showToast: showSiteToast, dismissToast: dismissSiteToast } = useToast()
@@ -346,6 +365,12 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   const [find, setFind] = useState<FindState>({ text: '', replacement: '', matchCase: false, wholeCell: false, isRegularExpression: false, columnId: null })
   const [groupSettings, setGroupSettings] = useState<{ byColumnId: number | null; aggregate: GroupAggregate; ofColumnId: number | null }>({ byColumnId: null, aggregate: 'sum', ofColumnId: null })
   const [toast, setToast] = useState<Toast | null>(null)
+  // The filter row under the headers: shown on wide screens to start with (a phone filters from the column menu). While a box is
+  // being typed in, its own text is kept here, so ">100" is not rewritten as ">=100" under the cursor.
+  const [isFilterRowShown, setIsFilterRowShown] = useState(() => !window.matchMedia(PHONE_QUERY).matches)
+  const [filterRowDrafts, setFilterRowDrafts] = useState<ReadonlyMap<number, string>>(new Map())
+  const [isMonospaced, setIsMonospaced] = useState(false)
+  const combineInputRef = useRef<HTMLInputElement>(null)
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'))
   const deferredSearchText = useDeferredValue(searchText.trim())
   const gridRef = useRef<CsvGridHandle>(null)
@@ -380,7 +405,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     setEditingCell(null)
     resetEditSession()
     let isCurrentParse = true
-    void parseCsvInWorker(openedFile.contents, delimiterChoice, encodingChoice).then((newParsedCsv) => {
+    void parseCsvInWorker(openedFile.contents, delimiterChoice, encodingChoice, isParquetFile).then((newParsedCsv) => {
       if (!isCurrentParse) return
       if (newParsedCsv.status === 'ok' && tableFormat.headerRow !== 'always') setHasHeaderRow(firstRowLooksLikeHeader(newParsedCsv.rows))
       setParsedCsv(newParsedCsv)
@@ -388,7 +413,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     return () => {
       isCurrentParse = false
     }
-  }, [openedFile, delimiterChoice, encodingChoice, tableFormat.headerRow, resetEditSession])
+  }, [openedFile, delimiterChoice, encodingChoice, tableFormat.headerRow, resetEditSession, isParquetFile])
 
   const readableCsv = parsedCsv?.status === 'ok' ? parsedCsv : null
   const parsedRows = readableCsv?.rows
@@ -458,6 +483,12 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     // typesKey stands for the column types.
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [displayRowIds, filters, matchAllFilters, deferredSearchText, sortLevels, rows, shownColumnIds, typesKey])
+
+  // The chart reads cells through one function that changes only with the table, so it redraws only then.
+  const readTextForPanels = useCallback((rowId: number, columnId: number) => getCellText(rows, edits, rowId, columnId), [rows, edits])
+  // A new value whenever the table the query mode reads changes (rows, edits, header, types), so its panel loads the table again.
+  // oxlint-disable-next-line react-hooks/exhaustive-deps
+  const queryTableKey = useMemo(() => ({}), [rows, edits, hasHeaderRow, displayColumnIds, typesKey])
 
   const gridColumns: GridColumn[] = shownColumnIds.map((columnId, position) => ({
     id: columnId,
@@ -638,6 +669,11 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     if (!applyEdits(newEdits, t('csv.wb.columnChanged', { name }))) showToast(t('csv.wb.nothingToChange', { name }))
   }
 
+  function trimColumn(columnId: number) {
+    const name = nameOf(columnId)
+    if (!applyEdits(withMappedCells(edits, rows, displayRowIds, [columnId], cellTextTransforms.trim).edits, t('csv.wb.columnChanged', { name }))) showToast(t('csv.wb.nothingToChange', { name }))
+  }
+
   function rebuildTable(newTable: string[][], message: string) {
     applyEdits(withRebuiltTable(newTable), message)
     setFilters([])
@@ -719,6 +755,32 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     )
   }
 
+  // The filter row: a box's text becomes that column's filter at once; a filter set elsewhere shows as text (or as a label when
+  // it has no text form, such as a pick list).
+  const filterRow = {
+    getText: (columnId: number) => {
+      const draft = filterRowDrafts.get(columnId)
+      if (draft !== undefined) return draft
+      const filter = filters.find((existing) => existing.columnId === columnId)
+      return filter ? (formatFilterRowText(filter) ?? '') : ''
+    },
+    readOnlyText: (columnId: number) => {
+      const filter = filters.find((existing) => existing.columnId === columnId)
+      if (!filter || filterRowDrafts.has(columnId) || formatFilterRowText(filter) !== null) return null
+      return describeFilter(filter).join(' ')
+    },
+    onChange: (columnId: number, text: string) => {
+      setFilterRowDrafts((drafts) => new Map(drafts).set(columnId, text))
+      setFilter(columnId, parseFilterRowText(text, columnId))
+    },
+    onBlur: (columnId: number) =>
+      setFilterRowDrafts((drafts) => {
+        const remaining = new Map(drafts)
+        remaining.delete(columnId)
+        return remaining
+      }),
+  }
+
   // ---------------------------------------------------------------- find and replace
   const findPattern = buildFindPattern(find.text, find)
   const isFindInvalid = find.isRegularExpression && find.text !== '' && findPattern === null
@@ -758,13 +820,17 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
 
   // ---------------------------------------------------------------- download
   const defaultDownloadSettings = (): DownloadSettings => ({
-    fileName: buildDownloadName(fileName, session.changeCount > 0, null),
+    // A Parquet file is saved as CSV (Parquet is read, not written).
+    fileName: buildDownloadName(fileName, session.changeCount > 0, isParquetFile ? '.csv' : null),
     onlyShownRows: false,
     delimiter: readableCsv?.detectedDelimiter ?? ',',
     lineEnding: readableCsv?.usesCrlf ? '\r\n' : '\n',
     includeHeaderRow: hasHeaderRow,
     quoteAllFields: false,
     byteOrderMark: (readableCsv?.hasUtf8Bom ?? false) || rows.some((row) => row.some((cellText) => /[^\p{ASCII}]/u.test(cellText))),
+    format: 'csv',
+    splitRowsPerPart: null,
+    tableName: toSqlTableName(fileName),
   })
 
   function buildCsvFileOptions(settings: DownloadSettings): CsvFileOptions {
@@ -783,6 +849,83 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     const options = buildCsvFileOptions(settings)
     downloadTextFile(settings.fileName, buildCsvFileText(rows, edits, options), `${tableFormat.mimeType};charset=utf-8`)
     showToast(tp('csv.wb.saved', options.rowIds.length, { name: settings.fileName }))
+  }
+
+  // Every format but plain CSV: the same rows and columns as the CSV would have, with the column names as the first row (Excel,
+  // Markdown, HTML and SQL need one, so a table without a header row gets "Column 1" ...). A split CSV is a zip of parts.
+  async function downloadTable(settings: DownloadSettings) {
+    if (settings.format === 'csv' && settings.splitRowsPerPart === null) {
+      downloadCsv(settings)
+      return
+    }
+    const options = buildCsvFileOptions(settings)
+    const table = [options.columnIds.map((columnId) => nameOf(columnId)), ...readTable(rows, edits, options.rowIds, options.columnIds)]
+    const baseName = settings.fileName.replace(/\.[^.]+$/, '')
+    if (settings.format === 'csv' && settings.splitRowsPerPart !== null) {
+      const JSZip = (await import('jszip')).default
+      const zip = new JSZip()
+      const parts = splitIntoParts(table, settings.splitRowsPerPart)
+      const extension = settings.fileName.match(/\.[^.]+$/)?.[0] ?? '.csv'
+      parts.forEach((part, position) => {
+        const partRows = options.includeHeaderRow ? part : part.slice(1)
+        const partText = Papa.unparse(partRows, { delimiter: options.delimiter, newline: options.lineEnding, quotes: options.quoteAllFields })
+        zip.file(`${baseName}-part-${position + 1}${extension}`, `${options.byteOrderMark ? '\ufeff' : ''}${partText}${options.lineEnding}`)
+      })
+      downloadTextFile(`${baseName}-parts.zip`, await zip.generateAsync({ type: 'blob' }), 'application/zip')
+      showToast(tp('csv.export.savedParts', parts.length, { name: `${baseName}-parts.zip` }))
+      return
+    }
+    const savedName = `${baseName}${EXPORT_EXTENSIONS[settings.format]}`
+    if (settings.format === 'xlsx') {
+      const { buildXlsxBlob, readNumberOrText } = await import('../conversion')
+      const typedTable = table.map((row, position) => (position === 0 ? row : row.map(readNumberOrText)))
+      downloadTextFile(savedName, await buildXlsxBlob([{ rows: typedTable, sheetName: baseName }]), EXPORT_MIME_TYPES.xlsx)
+    } else {
+      const text = settings.format === 'markdown' ? buildMarkdownTable(table) : settings.format === 'html' ? buildHtmlTable(table, baseName) : buildSqlInserts(table, settings.tableName.trim() || toSqlTableName(fileName))
+      downloadTextFile(savedName, text, EXPORT_MIME_TYPES[settings.format])
+    }
+    showToast(tp('csv.wb.saved', options.rowIds.length, { name: savedName }))
+  }
+
+  // The group-by totals of the rows on screen as a CSV: the group, its row count, and the sum and average of the chosen number column.
+  function downloadGroupTotals() {
+    if (groupByColumnId === null) return
+    const readGroup = (rowId: number) => getCellText(rows, edits, rowId, groupByColumnId)
+    const readValue = (rowId: number) => (groupOfColumnId === null ? null : parseNumber(getCellText(rows, edits, rowId, groupOfColumnId)))
+    const counts = groupRows(visibleRowIds, readGroup, readValue, 'count')
+    const sums = new Map(groupRows(visibleRowIds, readGroup, readValue, 'sum').map((total) => [total.group, total.value]))
+    const averages = new Map(groupRows(visibleRowIds, readGroup, readValue, 'avg').map((total) => [total.group, total.value]))
+    const ofName = groupOfColumnId === null ? '' : nameOf(groupOfColumnId)
+    const header = [nameOf(groupByColumnId), t('csv.wb.countOfRows'), ...(groupOfColumnId === null ? [] : [t('csv.group.sumColumn', { of: ofName }), t('csv.group.averageColumn', { of: ofName })])]
+    const totalRows = counts.map((total) => [total.group, String(total.value), ...(groupOfColumnId === null ? [] : [String(sums.get(total.group) ?? 0), String(Math.round((averages.get(total.group) ?? 0) * 1e6) / 1e6)])])
+    const savedName = `${fileName.replace(/\.[^.]+$/, '')}-by-${toSqlTableName(nameOf(groupByColumnId))}.csv`
+    downloadTextFile(savedName, `\ufeff${Papa.unparse([header, ...totalRows], { newline: '\r\n' })}\r\n`, 'text/csv;charset=utf-8')
+    showToast(tp('csv.wb.saved', totalRows.length, { name: savedName }))
+  }
+
+  // "Add rows from other CSV files": each chosen file's rows go under this table when its header matches; one undo step.
+  async function addRowsFromFiles(files: File[]) {
+    if (files.length === 0) return
+    if (!hasHeaderRow) {
+      showToast(t('csv.combine.needsHeader'))
+      return
+    }
+    const others: { fileName: string; rows: string[][] }[] = []
+    for (const file of files) {
+      const parsed = await parseCsvInWorker(await file.arrayBuffer(), 'auto', 'auto')
+      if (parsed.status !== 'ok') {
+        showToast(t('csv.combine.unreadable', { name: file.name }))
+        return
+      }
+      others.push({ fileName: file.name, rows: parsed.rows })
+    }
+    const combined = appendTables(currentTable(displayRowIds), others)
+    if ('differingFileName' in combined) {
+      showToast(t('csv.combine.headersDiffer', { name: combined.differingFileName }))
+      return
+    }
+    const addedCount = others.reduce((count, table) => count + table.rows.length - 1, 0)
+    rebuildTable(combined.rows, tp('csv.combine.added', addedCount, { files: files.length }))
   }
 
   // The table as Download would save it, edits included, converted and opened in the viewer of its new format.
@@ -1107,14 +1250,23 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         for (const rowId of blankRowIds) found.push({ kind: 'warn', title: t('csv.wb.blankCellTitle', { name: nameOf(columnId), row: rowId - firstDataRowId + 1 }), detail: typeOf(columnId) === 'number' ? t('csv.wb.blankNumberDetail') : t('csv.wb.blankCellDetail'), goTo: { rowId, columnId } })
       } else found.push({ kind: 'info', title: tp('csv.wb.blankCellsTitle', blankRowIds.length, { name: nameOf(columnId) }), detail: t('csv.wb.blankCellsDetail'), showBlanksOf: columnId })
     }
-    const seenRows = new Set<string>()
-    let duplicateCount = 0
-    for (const rowId of displayRowIds) {
-      const rowText = displayColumnIds.map((columnId) => getCellText(rows, deferredEdits, rowId, columnId)).join('\u0000')
-      if (seenRows.has(rowText)) duplicateCount++
-      else seenRows.add(rowText)
+    // Mixed types, spaces at either end and repeated rows (csvHealth.ts); each lists the rows it is about, up to five here.
+    const rowNumber = (rowId: number) => rowId - firstDataRowId + 1
+    const healthIssues = findHealthIssues({ readText: (rowId, columnId) => getCellText(rows, deferredEdits, rowId, columnId), rowIds: displayRowIds, columnIds: displayColumnIds })
+    for (const issue of healthIssues) {
+      if (issue.kind === 'mixedTypes') {
+        found.push({ kind: 'warn', title: tp(issue.expected === 'number' ? 'csv.health.notNumbers' : 'csv.health.notDates', issue.oddCount, { name: nameOf(issue.columnId) }), detail: t(issue.expected === 'number' ? 'csv.health.notNumbersDetail' : 'csv.health.notDatesDetail') })
+        for (const rowId of issue.oddRowIds.slice(0, 5)) found.push({ kind: 'warn', title: t('csv.health.oddCell', { name: nameOf(issue.columnId), row: rowNumber(rowId), value: getCellText(rows, deferredEdits, rowId, issue.columnId) }), detail: '', goTo: { rowId, columnId: issue.columnId } })
+      }
+      if (issue.kind === 'outerSpaces') {
+        found.push({ kind: 'info', title: tp('csv.health.outerSpaces', issue.count, { name: nameOf(issue.columnId) }), detail: t('csv.health.outerSpacesDetail', { row: rowNumber(issue.rowIds[0]) }), action: { id: `trim-${issue.columnId}`, label: t('csv.health.trim'), run: () => trimColumn(issue.columnId) } })
+      }
+      if (issue.kind === 'duplicateRows') {
+        found.push({ kind: 'info', title: tp('csv.wb.duplicateRows', issue.count), detail: t('csv.wb.duplicateRowsDetail'), action: { id: 'remove-duplicates', label: t('csv.health.removeDuplicates'), run: () => openCleanTool('dupes') } })
+        for (const repeat of issue.repeats.slice(0, 5)) found.push({ kind: 'info', title: t('csv.health.repeatsRow', { row: rowNumber(repeat.rowId), first: rowNumber(repeat.firstRowId) }), detail: '', goTo: { rowId: repeat.rowId, columnId: displayColumnIds[0] } })
+      }
     }
-    found.push({ kind: 'info', title: duplicateCount ? tp('csv.wb.duplicateRows', duplicateCount) : t('csv.wb.noDuplicateRows'), detail: duplicateCount ? t('csv.wb.duplicateRowsDetail') : tp('csv.wb.noDuplicateRowsDetail', displayColumnIds.length) })
+    if (!healthIssues.some((issue) => issue.kind === 'duplicateRows')) found.push({ kind: 'info', title: t('csv.wb.noDuplicateRows'), detail: tp('csv.wb.noDuplicateRowsDetail', displayColumnIds.length) })
     return found
     // Worked out while the Issues panel is open, from the table as it is.
     // oxlint-disable-next-line react-hooks/exhaustive-deps
@@ -1271,7 +1423,10 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
         { id: 'paste', label: t('csv.wb.pasteCsv'), icon: 'paste', onSelect: () => { setPastedText(''); setOpenDialog('paste') } },
         'separator',
         { id: 'download', label: t('csv.wb.downloadFormat', { format: tableFormat.label }), icon: 'download', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => downloadCsv(defaultDownloadSettings()) },
+        { id: 'download-as', label: t('csv.wb.downloadOptions'), icon: 'download', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: openDownloadDialog },
         ...(offersExcelCopy ? [{ id: 'excel-copy', label: t('csv.excelCopy.button'), icon: 'download', onSelect: downloadExcelCopy }] : []),
+        'separator',
+        { id: 'add-rows', label: t('csv.combine.menu'), icon: 'plus', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => combineInputRef.current?.click() },
         'separator',
         { id: 'close', label: t('menu.close'), icon: 'x', onSelect: onClose },
       ],
@@ -1295,8 +1450,14 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       label: t('menu.view'),
       items: [
         { id: 'panel', label: t('csv.wb.panel'), kind: 'checkbox', isChecked: isDockOpen, onSelect: () => setIsDockOpen(!isDockOpen) },
+        { id: 'filter-row', label: t('csv.filterRow.menu'), kind: 'checkbox', isChecked: isFilterRowShown, onSelect: () => setIsFilterRowShown(!isFilterRowShown) },
         { id: 'columns', label: t('csv.wb.columns'), icon: 'columns', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => openPopover('columns', document.getElementById('columns-button')) },
         'separator',
+        { id: 'font-regular', label: t('csv.font.regular'), kind: 'radio', isChecked: !isMonospaced, onSelect: () => setIsMonospaced(false) },
+        { id: 'font-mono', label: t('csv.font.monospaced'), kind: 'radio', isChecked: isMonospaced, onSelect: () => setIsMonospaced(true) },
+        'separator',
+        { id: 'chart', label: t('csv.chart.menu'), icon: 'chart', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => showDockTab('chart') },
+        { id: 'query', label: t('csv.query.menu'), icon: 'query', isDisabled: hasNoTable, disabledReason: t('disabled.noTable'), onSelect: () => showDockTab('query') },
         { id: 'issues', label: t('csv.wb.issues'), icon: 'warn', onSelect: () => showDockTab('issues') },
         { id: 'changes', label: t('csv.wb.reviewChanges'), icon: 'review', onSelect: () => showDockTab('changes') },
       ],
@@ -1441,6 +1602,8 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               },
               { id: 'more-menu-delete-column', label: t('csv.wb.deleteColumn'), icon: 'trash', isDanger: true, isDisabled: selectedColumnId === null || displayColumnIds.length <= 1, disabledReason: t(selectedColumnId === null ? 'disabled.selectColumn' : 'disabled.lastColumn'), onSelect: () => selectedColumnId !== null && deleteColumn(selectedColumnId) },
               'separator',
+              { id: 'more-menu-chart', label: t('csv.chart.menu'), icon: 'chart', onSelect: () => showDockTab('chart') },
+              { id: 'more-menu-query', label: t('csv.query.menu'), icon: 'query', onSelect: () => showDockTab('query') },
               { id: 'more-menu-issues', label: t('csv.wb.issues'), icon: 'warn', onSelect: () => showDockTab('issues') },
               { id: 'more-menu-changes', label: t('csv.wb.reviewChanges'), icon: 'review', onSelect: () => showDockTab('changes') },
               // On a wide screen the delimiter, header and encoding are in the status bar; a phone has no status bar, so it keeps them here.
@@ -2024,15 +2187,17 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   const previewRowIds = displayRowIds.slice(0, 3)
 
   // ---------------------------------------------------------------- the page
-  const dockTitle = dockTab === 'profile' ? (profileColumnId !== null ? nameOf(profileColumnId) : t('csv.wb.overview')) : t(({ group: 'csv.wb.groupBy', issues: 'csv.wb.issues', changes: 'csv.wb.changes' } as Record<string, MessageKey>)[dockTab])
+  const dockTitle = dockTab === 'profile' ? (profileColumnId !== null ? nameOf(profileColumnId) : t('csv.wb.overview')) : t(({ group: 'csv.wb.groupBy', issues: 'csv.wb.issues', changes: 'csv.wb.changes', chart: 'csv.chart.menu', query: 'csv.query.menu' } as Record<string, MessageKey>)[dockTab])
   const dockSubtitle =
     dockTab === 'profile'
       ? profileColumnId !== null
         ? `${t(COLUMN_TYPE_LABEL_KEYS[typeOf(profileColumnId)])} · ${shownRowCount < totalRowCount ? tp('csv.wb.shownRows', shownRowCount) : tp('csv.wb.allRows', totalRowCount)}`
         : fileName
-      : dockTab === 'group'
+      : dockTab === 'group' || dockTab === 'chart'
         ? t('csv.wb.shownRowsOnly')
-        : ''
+        : dockTab === 'query'
+          ? t('csv.query.subtitle')
+          : ''
 
   function renderProfileBody() {
     if (profileColumnId === null) {
@@ -2232,6 +2397,10 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               )
             })}
           </svg>
+          <button className="btn sm outline" id="group-download-button" type="button" style={{ marginTop: 10 }} onClick={downloadGroupTotals}>
+            <Icon name="download" size="sm" />
+            {t('csv.group.download')}
+          </button>
           <div className="small-note" style={{ marginTop: 8 }}>
             {groupAggregate === 'avg' ? tp('csv.wb.groupsNoteAverage', groupTotals.length, { rows: shownRowCount }) : tp('csv.wb.groupsNote', groupTotals.length, { total: formatNumber(total, decimals), rows: shownRowCount })}
           </div>
@@ -2266,6 +2435,10 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             }}
           >
             {t('csv.wb.show')}
+          </button>
+        ) : issue.action ? (
+          <button className="btn sm outline" id={`issue-action-${issue.action.id}`} type="button" onClick={() => issue.action?.run()}>
+            {issue.action.label}
           </button>
         ) : (
           <span />
@@ -2360,7 +2533,20 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   )
 
   return (
-    <div id="csv-workbench" data-opened-from={openedFile.openedFrom?.slice(1)} className={isDockOpen ? undefined : 'dock-closed'} style={{ '--dock-w': `${dockWidthPx}px` } as CSSProperties}>
+    <div id="csv-workbench" data-opened-from={openedFile.openedFrom?.slice(1)} className={[isDockOpen ? '' : 'dock-closed', isFilterRowShown && readableCsv ? 'filter-row-on' : '', isMonospaced ? 'cells-mono' : ''].filter(Boolean).join(' ') || undefined} style={{ '--dock-w': `${dockWidthPx}px` } as CSSProperties}>
+      <input
+        id="combine-files-input"
+        ref={combineInputRef}
+        type="file"
+        multiple
+        accept=".csv,.tsv,.tab,text/csv,text/tab-separated-values"
+        aria-label={t('csv.combine.menu')}
+        hidden
+        onChange={(event) => {
+          void addRowsFromFiles(Array.from(event.target.files ?? []))
+          event.target.value = ''
+        }}
+      />
       <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true" dangerouslySetInnerHTML={{ __html: ICON_SPRITE }} />
 
       <header id="top-bar">
@@ -2658,6 +2844,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
           {readableCsv && (
             <CsvGrid
               gridRef={gridRef}
+              filterRow={isFilterRowShown ? filterRow : null}
               label={fileName}
               columns={gridColumns}
               rowIds={visibleRowIds}
@@ -2774,6 +2961,22 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               {dockTab === 'group' && renderGroupBody()}
               {dockTab === 'issues' && renderIssuesBody()}
               {dockTab === 'changes' && renderChangesBody()}
+              {dockTab === 'chart' && readableCsv && (
+                <Suspense fallback={<div className="empty-note">{t('csv.panel.loading')}</div>}>
+                  <CsvChartPanel columns={shownColumnIds.map((columnId) => ({ id: columnId, name: nameOf(columnId), type: typeOf(columnId) }))} rowIds={visibleRowIds} readText={readTextForPanels} />
+                </Suspense>
+              )}
+              {dockTab === 'query' && readableCsv && (
+                <Suspense fallback={<div className="empty-note">{t('csv.panel.loading')}</div>}>
+                  <CsvQueryPanel
+                    tableKey={queryTableKey}
+                    readTable={() => [displayColumnIds.map((columnId) => nameOf(columnId)), ...readTable(rows, edits, displayRowIds, displayColumnIds)]}
+                    isNumberColumn={displayColumnIds.map((columnId) => typeOf(columnId) === 'number')}
+                    defaultTableName="data"
+                    fileName={fileName}
+                  />
+                </Suspense>
+              )}
             </div>
           </div>
         </aside>
@@ -3115,17 +3318,44 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     return (
       <>
         <div className="dlg-head">
-          <h2 id="download-dialog-title">{t('csv.wb.downloadFormat', { format: tableFormat.label })}</h2>
+          <h2 id="download-dialog-title">{t('csv.wb.downloadOptions')}</h2>
           <span className="spacer" />
           <button className="btn icon" id="download-dialog-close-button" type="button" aria-label={t('find.close')} onClick={() => setOpenDialog(null)}>
             <Icon name="x" />
           </button>
         </div>
         <div className="dlg-body">
-          <div className="field">
-            <label htmlFor="download-name-input">{t('csv.wb.fileName')}</label>
-            <input id="download-name-input" dir="auto" value={settings.fileName} onChange={(event) => setSettings({ ...settings, fileName: event.target.value })} />
+          <div className="two">
+            <div className="field">
+              <label htmlFor="download-format-select">{t('csv.export.format')}</label>
+              <select
+                id="download-format-select"
+                value={settings.format}
+                onChange={(event) => {
+                  const format = event.target.value as ExportFormat
+                  const baseName = settings.fileName.replace(/\.[^.]+$/, '')
+                  const csvExtension = defaultDownloadSettings().fileName.match(/\.[^.]+$/)?.[0] ?? '.csv'
+                  setSettings({ ...settings, format, fileName: `${baseName}${format === 'csv' ? csvExtension : EXPORT_EXTENSIONS[format]}`, splitRowsPerPart: format === 'csv' ? settings.splitRowsPerPart : null })
+                }}
+              >
+                <option value="csv">{tableFormat.label}</option>
+                <option value="xlsx">{t('csv.export.xlsx')}</option>
+                <option value="markdown">{t('csv.export.markdown')}</option>
+                <option value="html">{t('csv.export.html')}</option>
+                <option value="sql">{t('csv.export.sql')}</option>
+              </select>
+            </div>
+            <div className="field">
+              <label htmlFor="download-name-input">{t('csv.wb.fileName')}</label>
+              <input id="download-name-input" dir="auto" value={settings.fileName} onChange={(event) => setSettings({ ...settings, fileName: event.target.value })} />
+            </div>
           </div>
+          {settings.format === 'sql' && (
+            <div className="field">
+              <label htmlFor="download-table-name-input">{t('csv.export.tableName')}</label>
+              <input id="download-table-name-input" dir="ltr" value={settings.tableName} onChange={(event) => setSettings({ ...settings, tableName: event.target.value })} />
+            </div>
+          )}
           <div>
             <div className="opt-label">{t('csv.wb.rows')}</div>
             <div className="seg" id="download-rows-seg">
@@ -3140,6 +3370,8 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
               {t('csv.wb.shownRowsNote')}
             </div>
           </div>
+          {settings.format === 'csv' && (
+          <>
           <div className="two">
             <div className="field">
               <label htmlFor="download-delimiter-select">{t('csv.delimiter.label')}</label>
@@ -3175,9 +3407,22 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             <input type="checkbox" id="download-bom-checkbox" checked={settings.byteOrderMark} onChange={(event) => setSettings({ ...settings, byteOrderMark: event.target.checked })} />
             {t('csv.wb.byteOrderMark')}
           </label>
+          <label className="toggle-row">
+            <input type="checkbox" id="download-split-checkbox" checked={settings.splitRowsPerPart !== null} onChange={(event) => setSettings({ ...settings, splitRowsPerPart: event.target.checked ? 10000 : null })} />
+            {t('csv.export.split')}
+          </label>
+          {settings.splitRowsPerPart !== null && (
+            <div className="field">
+              <label htmlFor="download-split-rows-input">{t('csv.export.rowsPerPart')}</label>
+              <input id="download-split-rows-input" type="number" min="1" dir="ltr" value={settings.splitRowsPerPart} onChange={(event) => setSettings({ ...settings, splitRowsPerPart: Math.max(1, Math.floor(Number(event.target.value) || 1)) })} />
+              <span className="small-note">{tp('csv.export.partsNote', Math.ceil((settings.onlyShownRows ? shownRowCount : totalRowCount) / settings.splitRowsPerPart), { rows: settings.splitRowsPerPart })}</span>
+            </div>
+          )}
+          </>
+          )}
         </div>
         <div className="dlg-foot">
-          <span className="small-note">{t('csv.wb.alwaysFormat', { format: tableFormat.label })}</span>
+          <span className="small-note">{settings.format === 'csv' ? t('csv.wb.alwaysFormat', { format: tableFormat.label }) : t('csv.export.columnsNote')}</span>
           <span className="spacer" />
           <button className="btn outline" id="download-cancel-button" type="button" onClick={() => setOpenDialog(null)}>
             {t('csv.wb.cancel')}
@@ -3188,7 +3433,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             type="button"
             onClick={() => {
               setOpenDialog(null)
-              downloadCsv(settings)
+              void downloadTable(settings)
             }}
           >
             <Icon name="download" />

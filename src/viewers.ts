@@ -20,7 +20,7 @@ export type Viewer = {
 export type ConversionTarget = 'csv' | 'xlsx' | 'json'
 
 export const viewers: Viewer[] = [
-  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab'], toolPath: '/csv-viewer', featureKeys: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'] },
+  { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab', '.parquet'], toolPath: '/csv-viewer', featureKeys: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'] },
   { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer', featureKeys: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'] },
   { id: 'json', label: 'JSON', extensions: ['.json'], toolPath: '/json-viewer', featureKeys: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'] },
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer', featureKeys: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'] },

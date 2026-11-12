@@ -82,6 +82,53 @@ export function passesFilter(text: string, filter: ColumnFilter) {
   }
 }
 
+// The filter row under the headers: what a person types becomes one of the filters above. "empty" / "!empty"; "=x" is equals;
+// "10..50", ">5", ">=5", "<5", "<=5" with numbers is a number range, the same with ISO dates ("2025-01-01..2025-06-30") a date
+// range; any other text is "contains"; empty text is no filter. It reads the text, not the column's type, so ">=50" still works on
+// a column that one stray "n/a" made a text column.
+const RANGE_PATTERN = /^(.*?)\.\.(.*)$/
+const COMPARISON_PATTERN = /^([<>]=?)\s*(.+)$/
+
+export function parseFilterRowText(text: string, columnId: number): ColumnFilter | null {
+  const trimmed = text.trim()
+  if (trimmed === '') return null
+  if (trimmed.toLowerCase() === 'empty') return { columnId, kind: 'empty' }
+  if (trimmed.toLowerCase() === '!empty') return { columnId, kind: 'notEmpty' }
+  if (trimmed.startsWith('=')) return { columnId, kind: 'equals', value: trimmed.slice(1) }
+  const range = RANGE_PATTERN.exec(trimmed)
+  const comparison = COMPARISON_PATTERN.exec(trimmed)
+  // The two ends of the range ("" for an open end), or the one bound of a comparison on the side it limits.
+  const [low, high] = range ? [range[1].trim(), range[2].trim()] : comparison ? (comparison[1].startsWith('>') ? [comparison[2].trim(), ''] : ['', comparison[2].trim()]) : [null, null]
+  if (low === null || high === null || (low === '' && high === '')) return { columnId, kind: 'contains', value: trimmed }
+  const isNumberOrOpen = (bound: string) => bound === '' || parseNumber(bound) !== null
+  const isDateOrOpen = (bound: string) => bound === '' || DATE_PATTERN.test(bound)
+  // "Greater than" and "at least" both keep the bound itself: the range filters have inclusive ends.
+  if (isNumberOrOpen(low) && isNumberOrOpen(high)) return { columnId, kind: 'range', min: low === '' ? null : parseNumber(low), max: high === '' ? null : parseNumber(high) }
+  if (isDateOrOpen(low) && isDateOrOpen(high)) return { columnId, kind: 'dateRange', from: low, to: high }
+  return { columnId, kind: 'contains', value: trimmed }
+}
+
+// The text the filter row shows for a filter, so a filter set from a column's menu appears in the row too. A pick list or a
+// true/false filter has no text form: null.
+export function formatFilterRowText(filter: ColumnFilter): string | null {
+  switch (filter.kind) {
+    case 'contains':
+      return filter.value
+    case 'equals':
+      return `=${filter.value}`
+    case 'empty':
+      return 'empty'
+    case 'notEmpty':
+      return '!empty'
+    case 'range':
+      return filter.max === null ? `>=${filter.min ?? ''}` : filter.min === null ? `<=${filter.max}` : `${filter.min}..${filter.max}`
+    case 'dateRange':
+      return filter.to === '' ? `>=${filter.from}` : filter.from === '' ? `<=${filter.to}` : `${filter.from}..${filter.to}`
+    default:
+      return null
+  }
+}
+
 // Empty cells always go last; numbers compare as numbers, everything else as text.
 export function compareCellTexts(firstText: string, secondText: string, type: ColumnType) {
   if (firstText === '' || secondText === '') return firstText === secondText ? 0 : firstText === '' ? 1 : -1

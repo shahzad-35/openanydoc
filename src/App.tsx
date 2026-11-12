@@ -134,9 +134,15 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   // The file only lives in memory, so an address that exists only for an open file (/en/view-pdf ...) never shows without one: a
   // reload or Forward lands on home instead. A format's own address (/en/json-viewer ...) shows its page with the drop zone.
   useEffect(() => {
-    function sendHomeIfOnFileViewPath() {
+    // The page is drawn only once its words are there: a file opened from home sits at its viewer's address (/en/csv-viewer), so
+    // closing it must not draw that tool page before its words have loaded (it would have none). `closesFile`: Back or Forward
+    // left the file page, so the file goes in the same step as the address changes.
+    function sendHomeIfOnFileViewPath(closesFile = false) {
       const address = showResolvedAddress()
-      void loadAddressWords(address).then(() => setPathname(address))
+      void loadAddressWords(address).then(() => {
+        if (closesFile) setOpenedFile(null)
+        setPathname(address)
+      })
     }
 
     function handleBrowserNavigation() {
@@ -150,8 +156,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
         })
         return
       }
-      setOpenedFile(null)
-      sendHomeIfOnFileViewPath()
+      sendHomeIfOnFileViewPath(true)
     }
 
     sendHomeIfOnFileViewPath()

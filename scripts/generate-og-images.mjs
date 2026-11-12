@@ -8,9 +8,9 @@ import fs from 'node:fs'
 import os from 'node:os'
 import path from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
-import { getShareImage, loadToolPageWords, pageSeo, pagesWithShareImage, registryPagesWithShareImage } from '../src/seo.ts'
+import { getShareImage, setToolPageWords, pageSeo, pagesWithShareImage, registryPagesWithShareImage } from '../src/seo.ts'
 import { findViewerByToolPath, viewers } from '../src/viewers.ts'
-import { findLiveHub, findLiveToolPage, findToolIcon, liveTools, toolPath } from '../src/tools/registry.ts'
+import { findLiveHub, findLiveToolPage, findToolIcon, liveTools } from '../src/tools/registry.ts'
 
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const outputFolder = path.join(projectRoot, 'public/og')
@@ -19,7 +19,7 @@ const scratchFolder = fs.mkdtempSync(path.join(os.tmpdir(), 'og-images-'))
 const locales = ['en', 'ar']
 const taglines = { en: 'Free · No upload · Runs in your browser', ar: 'مجاني · بدون رفع · يعمل في متصفحك' }
 // Every tool page's words, for its heading on the card.
-await Promise.all(locales.flatMap((locale) => liveTools.map((tool) => loadToolPageWords(locale, toolPath(tool)))))
+for (const locale of locales) for (const tool of liveTools) setToolPageWords(locale, tool.slug, JSON.parse(fs.readFileSync(path.join(projectRoot, 'src/content/tools', `${tool.slug}.${locale}.json`), 'utf8')))
 const noUploadLabels = { en: 'No upload', ar: 'بدون رفع' }
 // The tools' small icons (.nav-icon-<name> in src/index.css), drawn large on a tool or hub page's card.
 const iconImages = Object.fromEntries([...fs.readFileSync(path.join(projectRoot, 'src/index.css'), 'utf8').matchAll(/\.nav-icon-([\w-]+) \{ ?background-image: ?url\("([^"]+)"\)/g)].map((match) => [match[1], match[2]]))

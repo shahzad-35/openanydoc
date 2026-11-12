@@ -308,7 +308,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
 // The tool pages (viewers, converters, Mask data, the PDF tools) join pageSeo here so the breadcrumb, the search, the menus and the
 // share images treat them like any page. Their words are in src/content/tools/<slug>.<locale>.json, fetched only for the page shown
 // (about 50 KB for every tool in both languages): until then a tool's entry holds just its name. loadToolPageWords fills it in;
-// main.tsx and App call it before drawing a tool page, entry-server.tsx before rendering one, the build for every page.
+// main.tsx and App call it before drawing a tool page, entry-server.tsx before rendering one; the build scripts read every file
+// themselves and call setToolPageWords.
 for (const locale of ['en', 'ar'] as const) {
   for (const tool of liveTools) {
     const name = tool.name?.[locale] ?? tool.slug
@@ -316,12 +317,17 @@ for (const locale of ['en', 'ar'] as const) {
   }
 }
 
+// A tool page's words, once read: they fill its pageSeo entry. The build scripts call this with the files read from disk.
+export function setToolPageWords(locale: Locale, slug: string, content: ToolContent) {
+  const path = `/${slug}`
+  toolContent[locale][slug] = content
+  pageSeo[locale][path] = { title: content.title, description: content.description, heading: content.heading, intro: content.intro ?? content.subtitle, answer: content.subtitle, linkText: pageSeo[locale][path].linkText }
+}
+
 export async function loadToolPageWords(locale: Locale, path: string) {
   const tool = liveTools.find((candidate) => toolPath(candidate) === path)
   if (!tool || toolContent[locale][tool.slug]) return
-  const content = (await toolContentLoaders[locale][tool.slug]()).default as ToolContent
-  toolContent[locale][tool.slug] = content
-  pageSeo[locale][path] = { title: content.title, description: content.description, heading: content.heading, intro: content.intro ?? content.subtitle, answer: content.subtitle, linkText: pageSeo[locale][path].linkText }
+  setToolPageWords(locale, tool.slug, (await toolContentLoaders[locale][tool.slug]()).default as ToolContent)
 }
 
 // The Open Graph name of each language (og:locale and og:locale:alternate).
