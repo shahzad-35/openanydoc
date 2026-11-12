@@ -45,7 +45,7 @@ export function findTableFormat(fileName: string): TableFormat {
 
 export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions)
 
-// Pages for one job of a live viewer (/json-formatter is the JSON viewer's page with its own words in seo.ts and pageContent.ts),
+// Pages for one job of a live viewer (/json-formatter is the JSON viewer's page with its own words in src/content/tools/json-formatter.<locale>.json),
 // served like a format page at /en/json-formatter and /ar/json-formatter. `extensions` narrows what their drop zone accepts.
 // Only jobs the viewer really does. A page with `convertTo` is a converter: `viewerId` is the format it reads, and the file is
 // converted as it is chosen (src/formats/conversion.ts) and the result opens in the viewer of its new format. A page with `tool`
@@ -89,11 +89,12 @@ export function isFileViewPath(pathname: string) {
 // (Home › PDF tools › Merge PDF). A tool for several formats (/mask-data) and every other page sit under Home only.
 export function findBreadcrumbParent(address: string, isGuide: boolean): string | undefined {
   if (isGuide) return '/guides'
-  const toolPage = findLiveToolPage(address)
-  if (toolPage) return findHubOfTool(toolPage).path
   const landingPage = landingPages.find((page) => page.path === address)
-  if (!landingPage || landingPage.tool) return undefined
-  return viewers.find((viewer) => viewer.id === landingPage.viewerId)?.toolPath
+  if (landingPage) return landingPage.tool ? undefined : viewers.find((viewer) => viewer.id === landingPage.viewerId)?.toolPath
+  // A tool with no viewer page of its own (Merge PDF) sits under its hub; a format's page under Home.
+  const toolPage = findLiveToolPage(address)
+  if (toolPage && !viewers.some((viewer) => viewer.toolPath === address)) return findHubOfTool(toolPage).path
+  return undefined
 }
 
 export function findViewerByToolPath(pathname: string): Viewer | undefined {

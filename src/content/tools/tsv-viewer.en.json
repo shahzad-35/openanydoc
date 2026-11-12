@@ -1,0 +1,79 @@
+{
+  "title": "TSV Viewer Online – Open TSV Files as a Table, No Upload",
+  "description": "TSV viewer online: open a TSV or .tab file as a table with the header row detected, then search, sort, edit and save it as TSV again. No upload.",
+  "heading": "TSV Viewer Online: Open Tab-Separated Files",
+  "subtitle": "Drop a TSV file to see it as a table, then sort, search and edit it instantly; nothing is uploaded.",
+  "intro": "A free TSV viewer online: open a TSV file online and read its tab-separated values as a table, with the header row detected for you. Search, filter, sort and edit the cells, then download it as TSV again. The file is read in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: open a TSV file online",
+  "steps": [
+    {
+      "title": "Drop a .tsv or .tab file",
+      "text": "Choose the file or drop it anywhere on the page. It opens with tab as the separator, read in your browser and never uploaded."
+    },
+    {
+      "title": "Check the header row",
+      "text": "Whether the first row holds column names is worked out from how the rows look. If that is wrong, click the delimiter in the status bar at the bottom and turn \"First row is header\" on or off."
+    },
+    {
+      "title": "Search, filter and sort",
+      "text": "Search every column, add filters, and Shift+click column headers to sort by more than one column."
+    },
+    {
+      "title": "Edit and download",
+      "text": "Edit cells, rows and columns, then press Download: the file is saved with tabs again, with its own line endings."
+    }
+  ],
+  "handlesTitle": "What the TSV file viewer handles",
+  "handles": [
+    "Files: .tsv and .tab, read with tab as the separator.",
+    "Header row: worked out from the data, and you can switch it.",
+    "Quoted values: read the way Excel and Google Sheets write them, so a tab or line break inside quotes stays in one cell.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 for older Arabic files.",
+    "Saving: tab-separated again with the file's line endings; Download options set quotes and line endings or keep only the filtered rows."
+  ],
+  "limits": [
+    "Only tab-separated files (.tsv, .tab) open on this page; use the CSV viewer for comma or semicolon files.",
+    "Very large files are limited by your device's memory."
+  ],
+  "faqTitle": "TSV files: questions and answers",
+  "faq": [
+    {
+      "question": "What is a TSV file?",
+      "answer": "A TSV (tab-separated values) file is a plain text table: one row per line, with a tab between the columns. Databases, spreadsheets and many data tools export it, because tabs rarely appear inside values."
+    },
+    {
+      "question": "How do I open a TSV file online?",
+      "answer": "Drop the .tsv file on this page or choose it with the button. It opens as a table in your browser, without Excel and without uploading it."
+    },
+    {
+      "question": "What is the difference between TSV and CSV?",
+      "answer": "Both are plain text tables. CSV separates columns with commas (or semicolons in many countries), TSV with tabs. TSV needs quotes less often, because values rarely contain tabs."
+    },
+    {
+      "question": "Can I edit a TSV file and keep it as TSV?",
+      "answer": "Yes. Edit cells, add or delete rows and columns, then press Download: the file is written with tabs, as it came."
+    },
+    {
+      "question": "My .txt file is tab-separated. Can I open it here?",
+      "answer": "This page opens .tsv and .tab files. A .txt file opens in the TXT editor as text; rename it to .tsv to see it as a table."
+    },
+    {
+      "question": "Does the TSV viewer handle large files?",
+      "answer": "Yes. It uses the same table as the CSV viewer, where a 120,000-row file opened in under a second in our tests. Files over 50 MB show a warning first."
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "title": "JSON Formatter Online – Beautify and Pretty Print JSON",
+  "description": "JSON formatter online: pretty print JSON with 2 or 4 spaces or a tab, minify it to one line or sort its keys, keeping long numbers exact. Free, no upload.",
+  "heading": "JSON Formatter Online: Beautify and Minify JSON",
+  "subtitle": "Paste or drop JSON and press Format to make it readable instantly; nothing is uploaded.",
+  "intro": "A free JSON formatter online: paste JSON or open a .json file, press Format to pretty print it with the indentation you choose, or Minify to put it on one line. The JSON beautifier keeps long numbers exactly and runs in your browser, so nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: format JSON in a few steps",
+  "steps": [
+    {
+      "title": "Paste or open your JSON",
+      "text": "Press Ctrl+V anywhere on this page to paste JSON, or drop a .json file. Try a sample JSON if you just want to see it work."
+    },
+    {
+      "title": "Pick the indentation",
+      "text": "Open the menu next to Format and choose 1, 2, 3, 4 or 8 spaces or a tab. Format pretty prints the whole document with it."
+    },
+    {
+      "title": "Minify or sort keys if you need to",
+      "text": "Minify removes every space and line break outside strings and shows how much smaller the file became. Sort keys puts the keys of every object in order from A to Z."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy formatted or Copy minified puts the result on your clipboard; Download saves a .json file in the layout you chose."
+    }
+  ],
+  "handlesTitle": "What the JSON beautifier handles",
+  "handles": [
+    "Indentation: 1, 2, 3, 4 or 8 spaces, or a tab.",
+    "Minify: one line, with the size before and after.",
+    "Sort keys: A to Z in every object, nested ones included, as one undo step.",
+    "Long numbers: integers beyond 2^53 are written back exactly as they were, not rounded.",
+    "Input: pasted JSON or a .json file up to 10 MB."
+  ],
+  "limits": [
+    "Files up to 10 MB.",
+    "Invalid JSON must be fixed before it can be formatted; the validator shows where the error is."
+  ],
+  "faqTitle": "JSON formatter: questions and answers",
+  "faq": [
+    {
+      "question": "What is the difference between formatting and minifying JSON?",
+      "answer": "Formatting, or pretty printing, puts each key and value on its own indented line so people can read it. Minifying removes all spaces and line breaks outside strings, so the file is as small as possible. The data is the same either way."
+    },
+    {
+      "question": "Which indentation should I use to pretty print JSON?",
+      "answer": "Two spaces is the most common choice and the default here. Four spaces is common in some code styles, and a tab lets each reader's editor choose the width. The formatter offers 1, 2, 3, 4 and 8 spaces and tab."
+    },
+    {
+      "question": "Will formatting change my numbers or the order of keys?",
+      "answer": "No. Format and Minify only change spaces and line breaks. Keys keep their order unless you press Sort keys, and integers too long for JavaScript are kept digit for digit."
+    },
+    {
+      "question": "Can I format JSON that has an error in it?",
+      "answer": "Not until the error is fixed, because formatting needs valid JSON. The page shows the line and column of the problem, and Repair fixes common mistakes such as trailing commas, comments and single quotes; then Format works."
+    },
+    {
+      "question": "Is it safe to format JSON with API keys or tokens in it?",
+      "answer": "The JSON is formatted inside your browser and is not uploaded or stored anywhere, so tokens and internal settings stay on your device."
+    },
+    {
+      "question": "How large a JSON file can I format?",
+      "answer": "Up to 10 MB. Larger files are refused before they are read, because every action on them would be slow."
+    }
+  ]
+}

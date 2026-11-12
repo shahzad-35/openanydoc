@@ -1,0 +1,174 @@
+{
+  "title": "PowerPoint Viewer Online – Open PPTX Free, No Upload (Beta)",
+  "description": "PowerPoint viewer online: open PPTX slides with their text, images and tables, flip through thumbnails and present them full screen. No upload.",
+  "heading": "PowerPoint Viewer Online (Beta)",
+  "subtitle": "Drop a PowerPoint file to flip through its slides and present them full screen; nothing is uploaded.",
+  "intro": "Open a PowerPoint presentation in your browser: a free PPTX viewer, in beta, that shows your slides with their text, images, tables and shapes. Move between them with thumbnails, buttons or the arrow keys, and present them full screen. Animations and some effects are simplified. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: open a PowerPoint presentation online",
+  "steps": [
+    {
+      "title": "Drop your .pptx file on the page",
+      "text": "Choose or drop a PowerPoint presentation. It is read in your browser, never uploaded, and opens on its first slide."
+    },
+    {
+      "title": "Move between slides",
+      "text": "Click a thumbnail on the side, use the previous and next buttons, or press the arrow keys, Page Up and Page Down. The counter shows which slide you are on, such as 3 / 24."
+    },
+    {
+      "title": "Present full screen",
+      "text": "Click Full screen to show only the slide, as large as your screen allows. The arrow keys still move between slides, and Esc leaves full screen."
+    },
+    {
+      "title": "Download or report a slide",
+      "text": "Download saves the original .pptx again. If a slide looks wrong, Report a slide that looks wrong opens an email to us; no file is sent with it."
+    }
+  ],
+  "handlesTitle": "What the PowerPoint viewer handles: PPTX files (beta)",
+  "handles": [
+    "Files: PowerPoint presentations in the .pptx format, made by PowerPoint, Google Slides, Keynote or LibreOffice. Older .ppt files are not supported: save them as .pptx first.",
+    "Content: text with its fonts and formatting, pictures, tables with merged cells, basic shapes, lines and arrows, and slide backgrounds.",
+    "Simplified: SmartArt is shown as last drawn by PowerPoint, and charts are drawn approximately. Animations and transitions are not played, and embedded video may not play.",
+    "Slides that cannot be drawn: a slide with features the viewer cannot show yet displays a note instead of a broken layout, and the other slides are not affected.",
+    "Navigation: thumbnails, previous and next buttons, arrow keys, a slide counter and full screen."
+  ],
+  "screenshot": {
+    "alt": "The PowerPoint viewer showing a title slide with a picture, with slide thumbnails on the side and the previous, next and full screen buttons above it",
+    "caption": "A PowerPoint presentation open one slide at a time: thumbnails on the side, the slide counter, and Full screen in the toolbar."
+  },
+  "comparison": {
+    "title": "PowerPoint viewer compared with PowerPoint Online, Google Slides and upload-based viewers",
+    "columns": [
+      "OpenAnyDoc",
+      "PowerPoint Online or Google Slides",
+      "Upload-based online viewers"
+    ],
+    "rows": [
+      {
+        "label": "Your file is uploaded",
+        "cells": [
+          "No. It is read in your browser.",
+          "Yes, to Microsoft or Google servers.",
+          "Yes, to the service's server."
+        ]
+      },
+      {
+        "label": "Account or sign-in",
+        "cells": [
+          "None.",
+          "A Microsoft or Google account.",
+          "Often none; sometimes an email address."
+        ]
+      },
+      {
+        "label": "Edit and save",
+        "cells": [
+          "View only for now (beta); editing is coming.",
+          "Yes, in the cloud copy.",
+          "Often view only."
+        ]
+      },
+      {
+        "label": "Animations and transitions",
+        "cells": [
+          "Not played; each slide is shown in its final state.",
+          "Played.",
+          "Varies by service."
+        ]
+      },
+      {
+        "label": "Works without a network once loaded",
+        "cells": [
+          "Yes.",
+          "No.",
+          "No."
+        ]
+      },
+      {
+        "label": "Cost",
+        "cells": [
+          "Free, no ads.",
+          "Free with an account; paid plans for more.",
+          "Free with ads, or paid."
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "View only: slides can't be edited.",
+    "Animations and transitions are not played.",
+    "Old .ppt files are not supported; save them as .pptx first."
+  ],
+  "faqTitle": "PowerPoint viewer online: common questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the presentation itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.",
+      "link": {
+        "text": "how to check that a website does not upload your file",
+        "path": "/check-file-upload"
+      }
+    },
+    {
+      "question": "Can I edit and save it?",
+      "answer": "Not yet: the PowerPoint viewer shows presentations, and editing is coming. Today you can view the slides, present them full screen, or download the original .pptx again."
+    },
+    {
+      "question": "Is the original changed?",
+      "answer": "No. The presentation is only read, and the file on your device is never touched."
+    },
+    {
+      "question": "Is there a file size limit?",
+      "answer": "There is no fixed limit: the limit is your browser's memory, and files over 50 MB show a warning first. Presentations with many large pictures take longer to open."
+    },
+    {
+      "question": "Does it work on mobile?",
+      "answer": "Yes. On a phone the slide fills the width of the screen and the previous and next buttons move between slides; the thumbnail sidebar is shown on wider screens."
+    },
+    {
+      "question": "Does it work offline?",
+      "answer": "Once the page and its PowerPoint viewer have loaded, opening presentations needs no network. It is not an installable offline app, though: the page has to be loaded online first."
+    },
+    {
+      "question": "Can my company host its own copy?",
+      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+    },
+    {
+      "question": "Why is it called beta?",
+      "answer": "Because PowerPoint files can hold many kinds of content, and not all of them are drawn yet. Text, pictures, tables and basic shapes are shown as in PowerPoint; animations, transitions, some effects and embedded video may be simplified or skipped."
+    },
+    {
+      "question": "Are animations and transitions played?",
+      "answer": "No. Each slide is shown as it looks once all its animations have finished, and slides change without a transition."
+    },
+    {
+      "question": "What happens if a slide looks wrong?",
+      "answer": "A slide with features the viewer cannot draw yet shows a note instead of a broken layout. If a slide is shown but looks wrong, use Report a slide that looks wrong next to the viewer: it opens an email to us. No file is sent, so describe what you see and please do not attach confidential slides."
+    },
+    {
+      "question": "Can I present full screen?",
+      "answer": "Yes. Click Full screen: only the slide is shown, as large as your screen allows. Move with the arrow keys, Page Up and Page Down, and press Esc to leave. Some phones, such as iPhones, do not allow full screen in the browser, so the button is hidden there."
+    },
+    {
+      "question": "Can I open an old .ppt file?",
+      "answer": "No. Only .pptx is supported; a .ppt file shows a message instead. Open it in PowerPoint, Keynote or LibreOffice, save it as a PowerPoint presentation (.pptx), then open the new file here."
+    },
+    {
+      "question": "Does it show Arabic slides correctly?",
+      "answer": "Arabic text in a slide is shown right to left, as PowerPoint saved it. Fonts that are not installed on your device are replaced by similar ones, so lines can break in other places."
+    }
+  ]
+}

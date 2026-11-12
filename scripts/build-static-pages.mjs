@@ -12,13 +12,12 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { faqItems } from '../src/content.ts'
-import { formatGuides } from '../src/pageContent.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
-import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, loadToolPageWords, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findBreadcrumbParent, findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
-import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage, hubs, liveHubs, liveToolPages, liveTools, toolContent, toolPath } from '../src/tools/registry.ts'
+import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage, hubs, liveHubs, liveTools, toolContent, toolPath } from '../src/tools/registry.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
 const serverBuildFolder = path.join(projectRoot, 'dist-ssr')
@@ -28,6 +27,8 @@ const readJson = (relativePath) => JSON.parse(fs.readFileSync(path.join(projectR
 const messages = { en: readJson('src/i18n/en.json'), ar: readJson('src/i18n/ar.json') }
 const changelog = readJson('src/data/changelog.json')
 const locales = ['en', 'ar']
+// Every tool page's words (the browser fetches only the page shown).
+await Promise.all(locales.flatMap((locale) => liveTools.map((tool) => loadToolPageWords(locale, toolPath(tool)))))
 
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 const translate = (locale, key, values = {}) => messages[locale][key].replace(/\{(\w+)\}/g, (placeholder, name) => values[name] ?? placeholder)
@@ -288,8 +289,8 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   const pageUrl = `${SITE_ORIGIN}${localizePath(locale, address)}`
   const viewer = findViewerByToolPath(address)
   const parentAddress = findBreadcrumbParent(address, Boolean(guidePages.en[address]))
-  // A format or landing page's "What it handles" lines are its application's feature list: true features only.
-  const guide = formatGuides[locale][address]
+  const toolPage = findLiveToolPage(address)
+  const content = toolPage && toolContent[locale][toolPage.slug]
   const structuredData = []
   if (address === '/') {
     structuredData.push(
@@ -320,7 +321,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         operatingSystem: 'Any (web browser)',
         isAccessibleForFree: true,
         offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-        featureList: [...viewers.filter((tool) => tool.toolPath).map((tool) => tool.toolPath), ...landingPages.map((page) => page.path), ...liveToolPages.map(toolPath)].map((toolAddress) => pageSeo[locale][toolAddress].linkText),
+        featureList: [...new Set([...viewers.filter((tool) => tool.toolPath).map((tool) => tool.toolPath), ...landingPages.map((page) => page.path), ...liveTools.map(toolPath)])].map((toolAddress) => pageSeo[locale][toolAddress].linkText),
         publisher: { '@id': organizationId },
       },
     )
@@ -372,7 +373,11 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       inLanguage: locale,
     })
   }
-  if (viewer) {
+  // Every tool page (src/pages/ToolPage.tsx): its application. The feature list holds true features only: a format's features from
+  // src/viewers.ts (a landing page adds its own name first); a tool for several formats (Mask data) or without a viewer lists its
+  // "What it handles" lines, or else its feature block titles. No ratings.
+  if (toolPage) {
+    const viewerFeatures = viewer?.featureKeys && !viewer.tool ? [...(landingPages.some((page) => page.path === address) ? [seo.linkText] : []), ...viewer.featureKeys.map((key) => translate(locale, key))] : undefined
     structuredData.push({
       '@context': 'https://schema.org',
       '@type': ['SoftwareApplication', 'WebApplication'],
@@ -382,30 +387,9 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       description: seo.description,
       applicationCategory: 'UtilitiesApplication',
       operatingSystem: 'Any (web browser)',
-      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      // The format's features from src/viewers.ts (a landing page adds its own name first); Mask data is a tool for several
-      // formats, so it lists its own "What it handles" lines.
-      featureList: viewer.featureKeys && !viewer.tool ? [...(landingPages.some((page) => page.path === address) ? [seo.linkText] : []), ...viewer.featureKeys.map((key) => translate(locale, key))] : guide.handles,
-      isPartOf: { '@id': websiteId },
-      publisher: { '@id': organizationId },
-    })
-  }
-  // A tool page drawn by ToolPage (Merge PDF ...): its application, with its features as the feature list. No ratings.
-  const toolPage = findLiveToolPage(address)
-  const content = toolPage && toolContent[locale][toolPage.slug]
-  if (toolPage) {
-    structuredData.push({
-      '@context': 'https://schema.org',
-      '@type': 'WebApplication',
-      name: `${SITE_NAME} ${seo.linkText}`,
-      url: pageUrl,
-      inLanguage: locale,
-      description: seo.description,
-      applicationCategory: 'UtilitiesApplication',
-      operatingSystem: 'Any (web browser)',
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
-      featureList: content.features.map((feature) => feature.title),
+      featureList: viewerFeatures ?? content.handles ?? content.features.map((feature) => feature.title),
       isPartOf: { '@id': websiteId },
       publisher: { '@id': organizationId },
     })
@@ -429,7 +413,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
     })
   }
   // The questions published as data are exactly the ones the page shows: the home page's, this format's own, or this tool's.
-  const questions = address === '/' ? faqItems[locale] : (guide?.faq ?? content?.faq ?? [])
+  const questions = address === '/' ? faqItems[locale] : (content?.faq ?? [])
   if (questions.length > 0) {
     structuredData.push({
       '@context': 'https://schema.org',
@@ -450,7 +434,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
     })
   }
   const head = [renderHeadTags(locale, address, seo.title, seo.description), ...structuredData.map(jsonLdScript)].join('\n    ')
-  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description, viewer || toolPage ? (seo.answer ?? '') : undefined)
+  checkSearchSnippet(`${locale} ${address}`, seo.title, seo.description, toolPage ? (seo.answer ?? '') : undefined)
   return pageShell(locale, shellOptions)
     .replace(/<title>[\s\S]*?<\/title>/, `<title>${escapeHtml(seo.title)}</title>`)
     .replace(/(<meta\s+name="description"\s+content=")[^"]*(")/, `$1${escapeHtml(seo.description)}$2`)
@@ -510,8 +494,7 @@ function pageSourceFiles(address) {
   if (guidePages.en[address]) return ['src/seo.ts', 'src/guides.ts', 'src/pages/InfoPage.tsx']
   const toolPage = findLiveToolPage(address)
   if (toolPage) return [`src/content/tools/${toolPage.slug}.en.json`, `src/content/tools/${toolPage.slug}.ar.json`, 'src/pages/ToolPage.tsx', 'src/tools/registry.ts']
-  if (findLiveHub(address) || address === ALL_TOOLS_PATH) return ['src/seo.ts', 'src/pages/HubPage.tsx', 'src/tools/registry.ts']
-  return ['src/seo.ts', 'src/pageContent.ts', 'src/pages/HomePage.tsx', 'src/components/FormatGuide.tsx']
+  return ['src/seo.ts', 'src/pages/HubPage.tsx', 'src/tools/registry.ts']
 }
 const changelogLastChange = lastChangeDate(['src/data/changelog.json', 'src/pages/ChangelogPage.tsx'])
 

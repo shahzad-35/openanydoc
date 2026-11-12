@@ -1,0 +1,91 @@
+{
+  "title": "Excel to CSV Converter Online – Free XLSX to CSV, No Upload",
+  "description": "Excel to CSV converter online: turn the first sheet of an XLSX, XLS or ODS file into a UTF-8 CSV that keeps Arabic text intact. No upload.",
+  "heading": "Excel to CSV Converter Online",
+  "subtitle": "Drop an Excel file and it opens as a CSV, ready to edit and download; nothing is uploaded.",
+  "intro": "Convert Excel to CSV in your browser: drop an XLSX, XLS or ODS file and its first sheet opens as a CSV in the CSV viewer, where you can edit it, pick another delimiter and download it. Arabic text gets the UTF-8 marker Excel needs. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to CSV",
+  "steps": [
+    {
+      "title": "Drop your Excel file",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page or choose it. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "It opens as a CSV",
+      "text": "The first sheet is converted at once and opens in the CSV viewer, with commas between the columns and Arabic text kept intact."
+    },
+    {
+      "title": "Check and edit it",
+      "text": "Search, sort, filter and edit the rows in the CSV viewer, so the CSV holds exactly what you need."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves the CSV. For a semicolon, tab or pipe instead of a comma, choose Download options in the More menu."
+    }
+  ],
+  "handlesTitle": "What the Excel to CSV converter handles",
+  "handles": [
+    "Files: .xlsx, .xls, .xlsm and .ods workbooks.",
+    "Values: each cell as Excel shows it, so dates, percentages and currencies keep their format, and formulas give their saved result.",
+    "Sheets: the first sheet; for another, open the workbook in the Excel viewer, pick the sheet and use Convert.",
+    "Encoding: UTF-8, with the byte order mark Excel needs for Arabic and other non-Latin text whenever the sheet has any.",
+    "Delimiters: a comma, or a semicolon, tab or pipe from the CSV viewer's Download options."
+  ],
+  "limits": [
+    "CSV holds values only: formulas, formatting, charts and images are not kept.",
+    "Each sheet becomes its own CSV file."
+  ],
+  "faqTitle": "Excel to CSV: questions and answers",
+  "faq": [
+    {
+      "question": "How do I convert an Excel file with several sheets to CSV?",
+      "answer": "This page converts the first sheet. For another sheet, open the workbook in the Excel viewer, click the sheet's tab, then click Convert at the top and choose Convert to CSV: the sheet on screen opens as a CSV.",
+      "link": {
+        "text": "Excel viewer",
+        "path": "/excel-viewer"
+      }
+    },
+    {
+      "question": "Why does Arabic text look broken when I open the CSV in Excel?",
+      "answer": "Excel reads a UTF-8 file without a byte order mark as an older Windows encoding. The CSV made here gets that mark whenever the sheet has Arabic or other non-Latin text, so Excel shows it correctly.",
+      "link": {
+        "text": "Fix broken Arabic in a CSV",
+        "path": "/fix-arabic-csv-in-excel"
+      }
+    },
+    {
+      "question": "Can I use a semicolon instead of a comma?",
+      "answer": "Yes. The CSV opens in the CSV viewer: choose Download options in the More menu and pick a semicolon, tab or pipe. A semicolon suits Excel in regions that write decimals with a comma, where a comma-separated file lands in one column.",
+      "link": {
+        "text": "CSV opens in one column",
+        "path": "/csv-opens-in-one-column"
+      }
+    },
+    {
+      "question": "Are formulas kept in the CSV?",
+      "answer": "No. CSV holds text only, so each formula is written as the result saved in the workbook. Keep the Excel file if you still need the formulas."
+    },
+    {
+      "question": "Are dates and numbers written the way Excel shows them?",
+      "answer": "Yes. Each cell is written as the text Excel shows, so a date stays 05/01/2026 and a price keeps its currency sign, instead of becoming the number Excel stores behind it."
+    },
+    {
+      "question": "Is my workbook uploaded to convert it?",
+      "answer": "No. The workbook is read and converted by your browser on your device; nothing is sent to a server."
+    }
+  ]
+}

@@ -1,10 +1,11 @@
 import { Component, Suspense, lazy, useCallback, useEffect, useRef, useState } from 'react'
 import type { ReactNode } from 'react'
 import DiscardEditsDialog from './components/DiscardEditsDialog'
-import { LocaleContext, PagePathContext, SwitchLanguageContext, getBrowserLocale, getLocaleFromPath, loadLocale, localizePath, splitLocalePath, useT } from './i18n'
+import { LocaleContext, PagePathContext, SwitchLanguageContext, getBrowserLocale, loadLocale, localizePath, splitLocalePath, useT } from './i18n'
 import type { Locale } from './i18n'
 import { ToastProvider } from './components/Messages'
-import HomePage, { loadMaskDataTool } from './pages/HomePage'
+import HomePage from './pages/HomePage'
+import ToolPage from './pages/ToolPage'
 import type { OpenedFile } from './useFileIntake'
 import { formatDefinitions } from './formats/registry'
 import { guideAddresses } from './seo'
@@ -12,6 +13,7 @@ import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers
 import type { ConversionTarget, Viewer } from './viewers'
 import { preloadPageSamples } from './samples/toolSamples'
 import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage } from './tools/registry'
+import { loadToolPageWords } from './seo'
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 // The file page (viewers, editing, menus) is its own chunk, so content pages load only what they show.
@@ -26,7 +28,7 @@ function preloadFileOpening(path: string) {
   void preloadPageSamples(path).catch(() => {})
   // A tool page: its component and, for the PDF tools, the worker with pdf-lib (an empty task fetches it).
   const toolPage = findLiveToolPage(path)
-  if (toolPage) {
+  if (toolPage?.loadComponent) {
     const preloads: Promise<unknown>[] = [toolPage.loadComponent?.() ?? Promise.resolve()]
     if (toolPage.category === 'pdf') preloads.push(import('./tools/pdf/pdfTasks').then(({ runPdfTask }) => runPdfTask({ type: 'warm-up' })))
     void Promise.all(preloads).catch(() => {})
@@ -35,7 +37,7 @@ function preloadFileOpening(path: string) {
   const toolViewer = findViewerByToolPath(path)
   // The Mask Data page keeps the file on the page: it needs its tool and the Excel writer, not a viewer.
   if (toolViewer?.tool === 'mask') {
-    void Promise.all([loadMaskDataTool(), import('./formats/excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]).catch(() => {})
+    void Promise.all([import('./formats/mask/MaskWorkbench'), import('./formats/excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]).catch(() => {})
     return
   }
   const viewerId = toolViewer?.convertTo ? viewerIdForConversion[toolViewer.convertTo] : (toolViewer?.id ?? (path === '/' ? 'csv' : undefined))
@@ -71,7 +73,6 @@ function LoadFailedMessage() {
   )
 }
 const InfoPage = lazy(() => import('./pages/InfoPage'))
-const ToolPage = lazy(() => import('./pages/ToolPage'))
 const HubPage = lazy(() => import('./pages/HubPage'))
 const infoPageAddresses = ['/about', '/privacy', '/terms', '/guides', ...guideAddresses]
 
@@ -83,6 +84,12 @@ function resolveAddress(pathname: string) {
   if (isFileViewPath(path)) return localizePath(locale ?? getBrowserLocale(), '/')
   if (locale) return pathname
   return localizePath(path === '/' ? getBrowserLocale() : 'en', path)
+}
+
+// What a page needs before it is drawn: its language file and, on a tool page, that tool's words (fetched per page, src/seo.ts).
+function loadAddressWords(address: string) {
+  const { locale, path } = splitLocalePath(address)
+  return Promise.all([loadLocale(locale ?? 'en'), loadToolPageWords(locale ?? 'en', path)])
 }
 
 // Shows the resolved address in the browser's address bar (replacing the entry, so Back never lands on the old address).
@@ -129,7 +136,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   useEffect(() => {
     function sendHomeIfOnFileViewPath() {
       const address = showResolvedAddress()
-      void loadLocale(getLocaleFromPath(address)).then(() => setPathname(address))
+      void loadAddressWords(address).then(() => setPathname(address))
     }
 
     function handleBrowserNavigation() {
@@ -170,7 +177,8 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
     setPathname(openedFilePathRef.current)
   }
 
-  function navigateTo(path: string) {
+  async function navigateTo(path: string) {
+    await loadAddressWords(path)
     window.history.pushState(null, '', path)
     setPathname(path)
     window.scrollTo(0, 0)
@@ -179,8 +187,8 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   // The same page in the other language. With a file open the entry is replaced (not added) so Back still closes the file and
   // the edits stay where they are; otherwise it is a normal visit.
   async function switchLanguage(newLocale: Locale) {
-    await loadLocale(newLocale)
     const newAddress = localizePath(newLocale, path)
+    await loadAddressWords(newAddress)
     if (openedFile) {
       window.history.replaceState(window.history.state, '', newAddress)
       openedFilePathRef.current = newAddress
@@ -205,7 +213,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   // Hands a file to another format's page. Leaving a page with unsaved edits asks first, as everywhere else.
   async function openInViewer(file: File, toolPath: string) {
     if (hasUnsavedEditsRef.current && !(await confirmDiscardEdits())) return
-    navigateTo(toolPath)
+    await navigateTo(toolPath)
     setHandoffFile(file)
   }
 
@@ -243,16 +251,15 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
                   <ChangelogPage onNavigate={navigateTo} />
                 </Suspense>
               ) : toolPage ? (
-                <Suspense fallback={null}>
-                  <ToolPage
-                    key={toolPage.slug}
-                    tool={toolPage}
-                    onNavigate={navigateTo}
-                    handoffFile={handoffFile}
-                    onHandoffConsumed={() => setHandoffFile(null)}
-                    onOpenInViewer={openInViewer}
-                  />
-                </Suspense>
+                <ToolPage
+                  key={toolPage.slug}
+                  tool={toolPage}
+                  onFileLoaded={openFile}
+                  onNavigate={navigateTo}
+                  handoffFile={handoffFile}
+                  onHandoffConsumed={() => setHandoffFile(null)}
+                  onOpenInViewer={openInViewer}
+                />
               ) : findLiveHub(path) || path === ALL_TOOLS_PATH ? (
                 <Suspense fallback={null}>
                   <HubPage key={path} hub={findLiveHub(path)} onNavigate={navigateTo} />
@@ -263,10 +270,8 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
                 </Suspense>
               ) : (
                 <HomePage
-                  key={findViewerByToolPath(path)?.tool ?? 'page'}
                   onFileLoaded={openFile}
                   onNavigate={navigateTo}
-                  toolViewer={findViewerByToolPath(path)}
                   isBannerDismissed={isBannerDismissed}
                   onDismissBanner={() => setIsBannerDismissed(true)}
                   handoffFile={handoffFile}

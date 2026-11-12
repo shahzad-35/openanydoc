@@ -1,32 +1,21 @@
-import { Suspense, lazy, useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import DropPanel from '../components/DropPanel'
-import FormatGuide from '../components/FormatGuide'
 import LanguageSwitcher from '../components/LanguageSwitcher'
 import ThemeToggle from '../components/ThemeToggle'
-import SiteFooter, { PageBreadcrumb, PageLink } from '../components/SiteFooter'
+import SiteFooter, { PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import WhatsNewBanner from '../components/WhatsNewBanner'
 import DemoStage from '../components/home/DemoStage'
 import { ClosingCta, DemoNote, FaqSection, FormatGrid, PrivacyContrast, StatsRow } from '../components/home/HomeSections'
 import { Wordmark } from '../components/KitIcon'
-import { useHasMounted } from '../components/NewBadge'
 import ShortcutTabs, { useIsMacKeyboard } from '../components/home/ShortcutTabs'
 import { LOCALES, localizePath, useT } from '../i18n'
 import { SITE_ORIGIN, getShareImage, openGraphLocales, pageSeo } from '../seo'
 import { useFileIntake } from '../useFileIntake'
 import { supportedExtensions, viewers } from '../viewers'
-import type { Viewer } from '../viewers'
-import { samplesByPage } from '../samples/toolSamples'
 import { ALL_TOOLS_PATH, findLiveTool, findToolIcon, popularToolSlugs, toolPath } from '../tools/registry'
 import type { MessageKey } from '../i18n'
-import { Notice } from '../components/Messages'
 import { headerRowBreak } from './changelogMarkup'
-
-// oxlint-disable-next-line react/only-export-components
-export const loadMaskDataTool = () => import('../formats/mask/MaskWorkbench')
-const MaskWorkbench = lazy(loadMaskDataTool)
-// The formats the Mask Data page takes, for its list of extensions.
-const maskableViewers = viewers.filter((viewer) => ['csv', 'json', 'excel', 'text'].includes(viewer.id))
 
 function setMetaTag(keyAttribute: 'name' | 'property', key: string, content: string) {
   let tag = document.head.querySelector(`meta[${keyAttribute}="${key}"]`)
@@ -76,14 +65,12 @@ export function usePageHead(address: string, title: string, description: string)
   }, [locale, address, title, description])
 }
 
-// The whole screen is the drop target: a file dropped anywhere on the page opens in its viewer. The home page is the Toy Blocks
-// landing page (hero with the simulated demo, stats, shortcuts, formats, privacy, questions, closing call); with `toolViewer` it
-// is that format's own page (/json-viewer ...): the same hero for one format, with that page's guide under it. On a conversion page
-// (/csv-to-excel ...) the chosen file is converted at once and the result opens in the viewer of its new format.
+// The home page, the Toy Blocks landing page: hero with the simulated demo, the most-used tools, stats, shortcuts, formats, privacy,
+// questions and a closing call. The whole screen is the drop target: a file dropped anywhere opens in its viewer. Every tool's own
+// page (/csv-viewer, /merge-pdf ...) is src/pages/ToolPage.tsx.
 export default function HomePage({
   onFileLoaded,
   onNavigate,
-  toolViewer,
   isBannerDismissed,
   onDismissBanner,
   handoffFile,
@@ -92,7 +79,6 @@ export default function HomePage({
 }: {
   onFileLoaded: (file: File, fileContents: ArrayBuffer) => void
   onNavigate: (path: string) => void
-  toolViewer?: Viewer
   isBannerDismissed: boolean
   onDismissBanner: () => void
   handoffFile: File | null
@@ -101,41 +87,9 @@ export default function HomePage({
 }) {
   const { locale, t } = useT()
   const isMac = useIsMacKeyboard()
-  // What a conversion page shows while it converts, or why it could not; it belongs to that page (`address`).
-  const [conversionState, setConversionState] = useState<{ address: string; errorMessage: string | null } | null>(null)
-  const convertTo = toolViewer?.convertTo
-  const isMaskTool = toolViewer?.tool === 'mask'
-  // The file chosen on the Mask Data page, in React state only. App draws this page afresh on entering and leaving the Mask Data
-  // page, so the file is forgotten when the visitor leaves.
-  const [maskFile, setMaskFile] = useState<File | null>(null)
-  const hasMounted = useHasMounted()
-
-  async function convertAndOpen(file: File) {
-    if (!toolViewer || !convertTo) return
-    const conversionAddress = toolViewer.toolPath as string
-    setConversionState({ address: conversionAddress, errorMessage: null })
-    const { convertForViewer } = await import('../formats/conversion')
-    const result = await convertForViewer(file, toolViewer.id, convertTo, locale)
-    if ('error' in result) {
-      setConversionState({ address: conversionAddress, errorMessage: result.error })
-      return
-    }
-    setConversionState(null)
-    onFileLoaded(result.file, await result.file.arrayBuffer())
-  }
-
-  const intake = useFileIntake({
-    acceptedExtensions: toolViewer?.extensions ?? supportedExtensions,
-    onFileLoaded: isMaskTool ? (file) => setMaskFile(file) : convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
-    handoffFile,
-    onHandoffConsumed,
-  })
-
-  // Each page gets its own title and description, in the page's language, for search results and browser tabs.
-  const address = toolViewer?.toolPath ?? '/'
-  const seo = pageSeo[locale][address]
-  usePageHead(address, seo.title, seo.description)
-  const isHomePage = !toolViewer
+  const intake = useFileIntake({ acceptedExtensions: supportedExtensions, onFileLoaded, handoffFile, onHandoffConsumed })
+  const seo = pageSeo[locale]['/']
+  usePageHead('/', seo.title, seo.description)
 
   return (
     <div id="home-page" {...intake.dropTargetProps} className="toy-page relative min-h-dvh text-[17px] leading-normal text-ink">
@@ -152,12 +106,12 @@ export default function HomePage({
       <header id="site-header" className="mx-auto flex max-w-[1120px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-5">
         {/* The brand always leads home; on the home page itself it goes back to the top. */}
         <p id="site-brand" className="flex items-center">
-          <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full" isCurrent={isHomePage}>
+          <PageLink id="brand-home-link" path="/" onNavigate={onNavigate} className="rounded-full" isCurrent>
             <Wordmark withMark />
           </PageLink>
         </p>
         <span aria-hidden="true" className={headerRowBreak} />
-        <SiteNav currentPath={address} onNavigate={onNavigate} />
+        <SiteNav currentPath="/" onNavigate={onNavigate} />
         <div className="-me-3 flex items-center gap-1 sm:gap-2 xl:me-0">
           <LanguageSwitcher className="pill-link text-[15px] xl:px-3" />
           <ThemeToggle />
@@ -167,114 +121,66 @@ export default function HomePage({
         </button>
       </header>
 
-      {/* What's new is announced on the home page only, not on a format's own page. */}
-      {isHomePage && !isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} />}
+      {!isBannerDismissed && <WhatsNewBanner onNavigate={onNavigate} onDismiss={onDismissBanner} />}
 
       <main id="main" className="mx-auto max-w-[1120px] px-5 pb-24">
-        <section id="hero" className={isHomePage ? 'pt-10 md:pt-16' : 'pt-4 sm:pt-10 md:pt-16'}>
-          {!isHomePage && <PageBreadcrumb address={address} onNavigate={onNavigate} className="mx-auto flex max-w-[640px] justify-center" />}
+        <section id="hero" className="pt-10 md:pt-16">
           <div className="mx-auto max-w-[640px] text-center">
             <h1 id="page-heading" className="type-display hero-in text-balance">{seo.heading}</h1>
-            {isHomePage ? (
-              <p id="page-intro" className="type-lead hero-in mt-5 text-ink-soft">{seo.intro}</p>
-            ) : (
-              <>
-                {/* A tool page answers the search in one sentence and keeps the tool on a phone's first screen; its longer intro
-                    moves under the tool. */}
-                <p id="page-answer" className="type-lead hero-in mt-3 text-ink-soft sm:mt-5">{seo.answer}</p>
-                <p id="page-proof" className="hero-in mt-2 text-sm text-ink-soft">
-                  {t('hero.proof')}{' '}
-                  <PageLink id="page-proof-link" path="/check-file-upload" onNavigate={onNavigate}>
-                    {t('hero.proofLink')}
-                  </PageLink>
-                </p>
-              </>
-            )}
-            {isHomePage && <p id="hero-fine-print" className="hero-in mt-3 text-sm font-semibold text-ink-soft">{t('hero.finePrint')}</p>}
-            <div className={isHomePage ? 'hero-in mt-8' : 'hero-in mt-5 sm:mt-8'}>
+            <p id="page-intro" className="type-lead hero-in mt-5 text-ink-soft">{seo.intro}</p>
+            <p id="hero-fine-print" className="hero-in mt-3 text-sm font-semibold text-ink-soft">{t('hero.finePrint')}</p>
+            <div className="hero-in mt-8">
               <DropPanel
                 intake={intake}
-                shownViewers={isMaskTool ? maskableViewers : toolViewer ? [toolViewer] : viewers}
-                currentViewerId={isMaskTool ? undefined : toolViewer?.id}
+                shownViewers={viewers}
                 onNavigate={onNavigate}
                 onOpenInViewer={onOpenInViewer}
-                showExtensions={!isHomePage}
-                showOtherFormats={!convertTo}
-                pasteHint={isHomePage ? t('hero.pasteHint', { shortcut: isMac ? '⌘' : 'Ctrl' }) : undefined}
-                samples={samplesByPage[address]}
+                showExtensions={false}
+                pasteHint={t('hero.pasteHint', { shortcut: isMac ? '⌘' : 'Ctrl' })}
               />
             </div>
           </div>
-          {conversionState?.address === address && (
-            <div id="conversion-messages" aria-live="polite" className="mx-auto mt-6 max-w-[640px] text-center">
-              {conversionState.errorMessage === null && (
-                <p id="conversion-status" role="status" className="font-medium text-ink-soft">
-                  {t('convert.converting')}
-                </p>
-              )}
-              <Notice id="conversion-error" kind="error" role="alert" className="font-medium text-danger" message={conversionState.errorMessage ?? ''} />
-            </div>
-          )}
-          {/* The tool draws after the first render: it runs a worker and holds the file, nothing the static page can show. */}
-          {isMaskTool && hasMounted && (
-            <Suspense fallback={null}>
-              <MaskWorkbench file={maskFile} />
-            </Suspense>
-          )}
-          {isHomePage && (
-            <div className="mt-12 md:mt-16">
-              <DemoStage />
-            </div>
-          )}
+          <div className="mt-12 md:mt-16">
+            <DemoStage />
+          </div>
         </section>
 
-        {isHomePage && (
-          <section id="popular-tools" className="section-gap">
-            <h2 id="popular-tools-heading" className="type-h2 text-center">{t('home.popularTools')}</h2>
-            <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-              {popularToolSlugs.flatMap((slug) => {
-                const tool = findLiveTool(slug)
-                if (!tool) return []
-                return [
-                  <li key={slug}>
-                    <PageLink id={`popular-tool-link-${slug}`} path={toolPath(tool)} onNavigate={onNavigate} className="flex h-full min-h-11 items-center gap-3 rounded-[18px] border-2 border-rule bg-paper-raised p-4 transition-colors duration-200 hover:border-accent">
-                      <span aria-hidden="true" className={`nav-icon nav-icon-${findToolIcon(tool)} shrink-0`} />
-                      <span className="flex min-w-0 flex-col leading-tight">
-                        <span className="font-semibold text-ink">{pageSeo[locale][toolPath(tool)].linkText}</span>
-                        <span className="mt-1 text-sm text-ink-soft">{t(`nav.note.${slug}` as MessageKey)}</span>
-                      </span>
-                    </PageLink>
-                  </li>,
-                ]
-              })}
-            </ul>
-            <p className="mt-6 text-center">
-              <PageLink id="popular-tools-all-link" path={ALL_TOOLS_PATH} onNavigate={onNavigate} className="inline-flex min-h-11 items-center font-semibold text-accent underline underline-offset-2">
-                {t('tools.menu.seeAll')}
-              </PageLink>
-            </p>
-          </section>
-        )}
+        <section id="popular-tools" className="section-gap">
+          <h2 id="popular-tools-heading" className="type-h2 text-center">{t('home.popularTools')}</h2>
+          <ul className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {popularToolSlugs.flatMap((slug) => {
+              const tool = findLiveTool(slug)
+              if (!tool) return []
+              return [
+                <li key={slug}>
+                  <PageLink id={`popular-tool-link-${slug}`} path={toolPath(tool)} onNavigate={onNavigate} className="flex h-full min-h-11 items-center gap-3 rounded-[18px] border-2 border-rule bg-paper-raised p-4 transition-colors duration-200 hover:border-accent">
+                    <span aria-hidden="true" className={`nav-icon nav-icon-${findToolIcon(tool)} shrink-0`} />
+                    <span className="flex min-w-0 flex-col leading-tight">
+                      <span className="font-semibold text-ink">{pageSeo[locale][toolPath(tool)].linkText}</span>
+                      <span className="mt-1 text-sm text-ink-soft">{t(`nav.note.${slug}` as MessageKey)}</span>
+                    </span>
+                  </PageLink>
+                </li>,
+              ]
+            })}
+          </ul>
+          <p className="mt-6 text-center">
+            <PageLink id="popular-tools-all-link" path={ALL_TOOLS_PATH} onNavigate={onNavigate} className="inline-flex min-h-11 items-center font-semibold text-accent underline underline-offset-2">
+              {t('tools.menu.seeAll')}
+            </PageLink>
+          </p>
+        </section>
 
-        {toolViewer ? (
-          <div id="about-content" className="section-gap">
-            <p id="page-intro" className="type-lead mx-auto mb-12 max-w-3xl text-ink-soft">{seo.intro}</p>
-            <FormatGuide address={address} viewerId={toolViewer.id} onNavigate={onNavigate} />
-          </div>
-        ) : (
-          <>
-            <StatsRow />
-            <ShortcutTabs />
-            <FormatGrid onNavigate={onNavigate} />
-            <PrivacyContrast />
-            <FaqSection />
-            <ClosingCta onOpenFile={intake.openFilePicker} />
-          </>
-        )}
+        <StatsRow />
+        <ShortcutTabs />
+        <FormatGrid onNavigate={onNavigate} />
+        <PrivacyContrast />
+        <FaqSection />
+        <ClosingCta onOpenFile={intake.openFilePicker} />
       </main>
 
-      {isHomePage && <DemoNote />}
-      <SiteFooter currentPath={address} onNavigate={onNavigate} />
+      <DemoNote />
+      <SiteFooter currentPath="/" onNavigate={onNavigate} />
     </div>
   )
 }

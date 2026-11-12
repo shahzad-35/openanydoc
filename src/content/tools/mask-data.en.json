@@ -1,0 +1,96 @@
+{
+  "title": "Anonymize CSV Online – Mask Personal Data in Excel and JSON",
+  "description": "Anonymize CSV online: find names, emails, phone numbers, IDs, IBANs and cards in CSV, Excel or JSON files and replace them with tokens. Free, no upload.",
+  "heading": "Mask Sensitive Data in CSV, Excel and JSON Files",
+  "subtitle": "Drop a file to find the personal data in it and mask it before you share it; nothing is uploaded.",
+  "intro": "Find personal data in a CSV, Excel, JSON or text file and mask it in your browser before you share it: replace values with consistent tokens, hide all but the last characters, or remove the field. A private key file can put the values back later. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: mask sensitive data",
+  "steps": [
+    {
+      "title": "Choose your file",
+      "text": "Drop or choose a CSV, Excel, JSON or TXT file, or press Mask in the CSV, Excel or JSON viewer to mask the file you have open. Your browser scans it for names, emails, phone numbers, ID numbers, IBANs, card numbers, addresses and dates of birth."
+    },
+    {
+      "title": "Pick the columns",
+      "text": "The columns that look sensitive are ticked for you, each with its type and how sure the scan is. Open Columns to add any other column, then choose tokens, a partial mask or removal for each."
+    },
+    {
+      "title": "Check the preview",
+      "text": "The first 20 rows are shown as they will be saved; switch to Before to compare with the original. Every change of choice updates the preview."
+    },
+    {
+      "title": "Download",
+      "text": "Save the masked copy as CSV, Excel or JSON (a text file stays .txt). If you ticked the key option, also save the private key and keep it apart from the file."
+    }
+  ],
+  "handlesTitle": "What the data masking tool handles",
+  "handles": [
+    "Files: CSV and TSV, Excel workbooks with every sheet (.xlsx, .xls, .xlsm, .ods), JSON with nested objects and lists, and plain text (.txt).",
+    "Detection: names in English and Arabic, emails, phone numbers, Saudi national ID and Iqama numbers, IBANs and card numbers (checked with their checksums), addresses and dates of birth.",
+    "Masking: the same value always gets the same token, such as EMAIL-000001, in every field and inside free text such as notes.",
+    "Partial masks keep the last four characters (****1234), an email its first letter and domain, a date its year.",
+    "Restore: a masked file and its private key put the tokens back, including inside free text.",
+    "In the viewers: a Mask button in the CSV, Excel and JSON viewers masks the open file, edits included, without leaving it."
+  ],
+  "limits": [
+    "It finds common kinds of personal data from column names and values; check the chosen fields before you share the file.",
+    "Tokens can be turned back into the original values only with the key file you save."
+  ],
+  "faqTitle": "Masking data: questions and answers",
+  "faq": [
+    {
+      "question": "What is data masking?",
+      "answer": "Data masking replaces sensitive values in a file, such as names, emails, phone numbers, ID numbers, IBANs and card numbers, with harmless stand-ins, so the file can be shared, tested or pasted into an AI assistant without exposing the people in it. The rows, columns and other values stay as they were."
+    },
+    {
+      "question": "Can I mask a column the scan did not flag?",
+      "answer": "Yes. Open Columns: every column or JSON key of the file is listed, with the ones that look sensitive already ticked. Tick any other column, set its type (Other gives tokens such as VAL-000001) and choose how to mask it."
+    },
+    {
+      "question": "What is the difference between tokens, a partial mask and removing a field?",
+      "answer": "A token replaces the value with a label such as NAME-000001, the same label wherever the value appears, so rows can still be matched. A partial mask hides all but a small part (****1234). Removing deletes the column or key from the file."
+    },
+    {
+      "question": "What is the private key file, and who should have it?",
+      "answer": "It lists each token with the value it replaced, so the masked file can be turned back later. Keep it to yourself: never send it with the masked file, because anyone with both can undo the masking."
+    },
+    {
+      "question": "Can a partly hidden or removed field be restored?",
+      "answer": "No. Only tokens can be put back, because only they are in the key. Choose tokens for any field you may need again."
+    },
+    {
+      "question": "How does the scan decide a column is sensitive?",
+      "answer": "It reads the column or key name in English and Arabic and checks the values: emails by their shape, IBANs, card numbers and national IDs by their checksums, phone numbers by their length and prefix. Each finding shows its reason and how sure the scan is."
+    },
+    {
+      "question": "Will the masked file be completely anonymous?",
+      "answer": "Not necessarily. The scan can miss values, and other columns together (a job title, a city, a date) can still point to a person. Check the preview and the downloaded file before you share it; the guide to anonymizing a file before sharing lists what to look for.",
+      "link": {
+        "text": "guide to anonymizing a file before sharing",
+        "path": "/anonymize-data-before-sharing"
+      }
+    },
+    {
+      "question": "Is the file I mask sent anywhere?",
+      "answer": "No. The scan, the masking and the key are made by your browser on your device. Nothing is uploaded or stored, and the page keeps working offline once it has loaded.",
+      "link": {
+        "text": "uploaded",
+        "path": "/check-file-upload"
+      }
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "title": "XLS Viewer Online – Open Old Excel 97-2003 Files, No Upload",
+  "description": "XLS viewer online: open old Excel 97-2003 .xls files without Excel, see every sheet tab, edit cells and formulas and save as .xls again. Free, no upload.",
+  "heading": "XLS Viewer Online: Open Excel 97-2003 Files",
+  "subtitle": "Drop an old .xls file to open every sheet and edit it instantly; nothing is uploaded.",
+  "intro": "A free XLS viewer online: open an XLS file online, the older Excel 97-2003 format, without Excel and without an account. See every sheet with its values, formulas, number formats and merged cells, edit it and save it as .xls again. Fonts and colours are not shown for .xls files.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: open an XLS file online",
+  "steps": [
+    {
+      "title": "Drop the .xls file",
+      "text": "Choose the file or drop it on the page. It is read in your browser and never uploaded. For .xlsx, .xlsm and .ods files, use the Excel viewer."
+    },
+    {
+      "title": "Look through the sheets",
+      "text": "Each sheet is a tab at the bottom. Dates, percentages and currencies show as formatted in the file, and merged cells are drawn as one cell."
+    },
+    {
+      "title": "Edit values and formulas",
+      "text": "Switch to Edit and type values or formulas such as =SUM(B2:B10); formulas recalculate as you edit. Insert or delete rows, columns and sheets."
+    },
+    {
+      "title": "Save as .xls",
+      "text": "The save icon downloads an .xls file again. Keep your original: some parts of an .xls file are not written back (see below)."
+    }
+  ],
+  "handlesTitle": "What the XLS file viewer handles, and what it does not",
+  "handles": [
+    "Files: .xls (Excel 97 to 2003). Password-protected workbooks cannot be opened.",
+    "Shown: values, formulas with their results, number and date formats, merged cells and every sheet.",
+    "Not shown: fonts, colours, fills and borders. Cell styles are read only from .xlsx and .xlsm files, so the style buttons are off for .xls.",
+    "Kept on save: values, formulas with their results, number formats, merged cells and column widths, as .xls.",
+    "Not kept on save: cell styles, charts, images, pivot tables, conditional formats, data validation, defined names and macros. Keep your original file."
+  ],
+  "limits": [
+    "Old .xls files open with their values and formulas, but without fonts, colours or fills.",
+    "Charts, images, pivot tables and macros are not kept when you save."
+  ],
+  "faqTitle": "XLS files: questions and answers",
+  "faq": [
+    {
+      "question": "What is an XLS file?",
+      "answer": "XLS is the workbook format of Excel 97 to 2003, used before .xlsx arrived with Excel 2007. Many old reports, archives and exports from older systems are still .xls files."
+    },
+    {
+      "question": "How do I open an XLS file without Excel?",
+      "answer": "Drop it on this page. It opens in your browser with all its sheets, and you can read, edit and save it without installing Excel or creating an account."
+    },
+    {
+      "question": "Why don't I see the colours and fonts of my .xls file?",
+      "answer": "This viewer reads cell styles only from .xlsx and .xlsm files. In an .xls file you see the values, formulas, number formats and merged cells, but not fonts, colours, fills or borders."
+    },
+    {
+      "question": "Will saving an .xls file here lose anything?",
+      "answer": "Yes, some things. Values, formulas, number formats, merged cells and column widths are written back, but cell styles, charts, images, pivot tables, conditional formats, data validation, defined names and macros are not. The saved file is a new copy; your original is not changed."
+    },
+    {
+      "question": "Can I convert XLS to XLSX here?",
+      "answer": "No. Saving keeps the file's own format, so an .xls file is saved as .xls."
+    },
+    {
+      "question": "Do the formulas in an XLS file still work?",
+      "answer": "Yes. Formulas show their saved results, and after you edit a cell the formulas that depend on it are recalculated, for common functions such as SUM, IF, VLOOKUP and INDEX/MATCH. A formula with a function that is not supported keeps its saved result."
+    }
+  ]
+}

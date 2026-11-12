@@ -2,12 +2,13 @@ import { StrictMode } from 'react'
 import { prerender } from 'react-dom/static'
 import App from './App'
 import { loadLocale, localizePath } from './i18n'
+import { loadToolPageWords } from './seo'
 import type { Locale } from './i18n'
 
 // The build's server render: scripts/build-static-pages.mjs puts this markup into each page's <div id="root">, and src/main.tsx
 // takes it over in the browser. `prerender` (not renderToString) waits for the lazily loaded pages (About, Privacy, Terms).
 export async function renderPage(locale: Locale, path: string) {
-  await loadLocale(locale)
+  await Promise.all([loadLocale(locale), loadToolPageWords(locale, path)])
   const { prelude } = await prerender(
     <StrictMode>
       <App initialPathname={localizePath(locale, path)} />

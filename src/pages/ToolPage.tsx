@@ -1,37 +1,50 @@
 import { Suspense, lazy, useState } from 'react'
 import DropPanel from '../components/DropPanel'
+import FormatGuide from '../components/FormatGuide'
 import { Wordmark } from '../components/KitIcon'
 import LanguageSwitcher from '../components/LanguageSwitcher'
+import { Notice } from '../components/Messages'
+import { useHasMounted } from '../components/NewBadge'
 import NextSteps from '../components/NextSteps'
 import SiteFooter, { PageBreadcrumb, PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
-import { PrivacySection } from '../components/AboutSections'
 import { downloadTextFile } from '../formats/registry'
 import { localizePath, useT } from '../i18n'
 import { samplesByPage } from '../samples/toolSamples'
 import { pageSeo } from '../seo'
-import { findLiveTool, findRelatedTools, liveToolPages, toolContent, toolPath } from '../tools/registry'
+import { findLiveTool, findRelatedPages, liveTools, toolContent, toolPath } from '../tools/registry'
 import type { Tool } from '../tools/registry'
 import { useFileIntake } from '../useFileIntake'
+import { findViewerByToolPath, viewers } from '../viewers'
 import { headerRowBreak } from './changelogMarkup'
 import { usePageHead } from './HomePage'
 
-// Each tool's component, loaded when its first file is chosen (or ahead, while the page is idle: App).
-const toolComponents = new Map(liveToolPages.map((tool) => [tool.slug, lazy(tool.loadComponent as NonNullable<Tool['loadComponent']>)]))
+// The components of the tools that work on the page (Merge PDF ...), loaded when the first file is chosen (or ahead, while the
+// page is idle: App).
+const toolComponents = new Map(liveTools.flatMap((tool) => (tool.loadComponent ? [[tool.slug, lazy(tool.loadComponent)] as const] : [])))
+const MaskWorkbench = lazy(() => import('../formats/mask/MaskWorkbench'))
+// The formats the Mask Data page takes, for its list of extensions.
+const maskableViewers = viewers.filter((viewer) => ['csv', 'json', 'excel', 'text'].includes(viewer.id))
 
-// One page for every tool in src/tools/registry.ts that has no page of its own (Merge PDF ...): the Step 17C first screen (heading,
-// the sentence that answers the search, the "nothing is uploaded" badge, the drop zone with two samples, then the tool), then the
-// tool's features, how-to, limits, questions and six related tools. Its words come from src/content/tools/<slug>.<locale>.json.
-// The chosen files and the result live in React state only; App draws this page afresh for each tool, so they are forgotten on leaving.
+// One page for every tool in src/tools/registry.ts. First screen (Step 17C): breadcrumb, heading, the sentence that answers the
+// search, the "nothing is uploaded" badge, the drop zone with two samples, then the tool. Under it: the longer intro, the feature
+// blocks and FormatGuide (how-to, screenshot, what it handles, comparison, limits, questions, related pages). Words from
+// src/content/tools/<slug>.<locale>.json.
+// What a chosen file does depends on the tool: a tool with a component (Merge PDF) keeps it on the page and offers the result for
+// download and to the next tools; a viewer's page opens it in the viewer (onFileLoaded); a conversion page converts it first and
+// opens the result in the viewer of its new format; Mask data keeps it on the page. Files and results live in React state only;
+// App draws this page afresh for each tool, so they are forgotten on leaving.
 export default function ToolPage({
   tool,
+  onFileLoaded,
   onNavigate,
   handoffFile,
   onHandoffConsumed,
   onOpenInViewer,
 }: {
   tool: Tool
+  onFileLoaded: (file: File, fileContents: ArrayBuffer) => void
   onNavigate: (path: string) => void
   handoffFile: File | null
   onHandoffConsumed: () => void
@@ -41,21 +54,45 @@ export default function ToolPage({
   const address = toolPath(tool)
   const content = toolContent[locale][tool.slug]
   usePageHead(address, content.title, content.description)
+  const hasMounted = useHasMounted()
+  const hasToolComponent = toolComponents.has(tool.slug)
   const ToolComponent = toolComponents.get(tool.slug) as NonNullable<ReturnType<typeof toolComponents.get>>
+  const toolViewer = findViewerByToolPath(address)
+  const convertTo = toolViewer?.convertTo
+  const isMaskTool = toolViewer?.tool === 'mask'
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
   const [resultFile, setResultFile] = useState<File | null>(null)
   const [isDownloaded, setIsDownloaded] = useState(false)
+  // What a conversion page shows while it converts, or why it could not.
+  const [isConverting, setIsConverting] = useState(false)
+  const [conversionError, setConversionError] = useState<string | null>(null)
+
+  async function convertAndOpen(file: File) {
+    if (!toolViewer || !convertTo) return
+    setIsConverting(true)
+    setConversionError(null)
+    const { convertForViewer } = await import('../formats/conversion')
+    const result = await convertForViewer(file, toolViewer.id, convertTo, locale)
+    setIsConverting(false)
+    if ('error' in result) {
+      setConversionError(result.error)
+      return
+    }
+    onFileLoaded(result.file, await result.file.arrayBuffer())
+  }
+
+  function keepChosenFile(file: File) {
+    setResultFile(null)
+    setChosenFiles((files) => (tool.takesSeveralFiles ? [...files, file] : [file]))
+  }
 
   const intake = useFileIntake({
-    acceptedExtensions: tool.inputFormats,
-    onFileLoaded: (file) => {
-      setResultFile(null)
-      setChosenFiles((files) => (tool.takesSeveralFiles ? [...files, file] : [file]))
-    },
+    acceptedExtensions: toolViewer?.extensions ?? tool.inputFormats,
+    onFileLoaded: hasToolComponent || isMaskTool ? keepChosenFile : convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
     handoffFile,
     onHandoffConsumed,
     allowsSeveralFiles: tool.takesSeveralFiles,
-    acceptsComingSoonFormats: true,
+    acceptsComingSoonFormats: hasToolComponent,
   })
 
   function startOver() {
@@ -93,6 +130,9 @@ export default function ToolPage({
           <LanguageSwitcher className="pill-link text-[15px] xl:px-3" />
           <ThemeToggle />
         </div>
+        <button id="header-open-file-button" type="button" disabled={intake.isReading} onClick={intake.openFilePicker} className="btn btn--primary btn--compact press order-last xl:order-none xl:-ms-2">
+          {t('nav.openFile')}
+        </button>
       </header>
 
       <main id="main" className="mx-auto max-w-[1120px] px-5 pb-24">
@@ -113,10 +153,35 @@ export default function ToolPage({
               </PageLink>
             </p>
             <div className="hero-in mt-5 sm:mt-8">
-              <DropPanel intake={intake} onNavigate={onNavigate} onOpenInViewer={onOpenInViewer} showExtensions={false} showOtherFormats={false} samples={samplesByPage[address]} />
+              <DropPanel
+                intake={intake}
+                shownViewers={isMaskTool ? maskableViewers : toolViewer ? [toolViewer] : viewers}
+                currentViewerId={isMaskTool ? undefined : toolViewer?.id}
+                onNavigate={onNavigate}
+                onOpenInViewer={onOpenInViewer}
+                showExtensions={Boolean(toolViewer)}
+                showOtherFormats={Boolean(toolViewer) && !convertTo}
+                samples={samplesByPage[address]}
+              />
             </div>
           </div>
-          {chosenFiles.length > 0 && !resultFile && (
+          {(isConverting || conversionError) && (
+            <div id="conversion-messages" aria-live="polite" className="mx-auto mt-6 max-w-[640px] text-center">
+              {isConverting && (
+                <p id="conversion-status" role="status" className="font-medium text-ink-soft">
+                  {t('convert.converting')}
+                </p>
+              )}
+              <Notice id="conversion-error" kind="error" role="alert" className="font-medium text-danger" message={conversionError ?? ''} />
+            </div>
+          )}
+          {/* Mask data draws after the first render: it runs a worker and holds the file, nothing the static page can show. */}
+          {isMaskTool && hasMounted && (
+            <Suspense fallback={null}>
+              <MaskWorkbench file={chosenFiles[0] ?? null} />
+            </Suspense>
+          )}
+          {hasToolComponent && chosenFiles.length > 0 && !resultFile && (
             <div id="tool-workspace" className="mx-auto mt-8 max-w-[760px]">
               <Suspense fallback={null}>
                 <ToolComponent files={chosenFiles} onFilesChange={setChosenFiles} onAddFiles={intake.openFilePicker} onResult={setResultFile} />
@@ -151,8 +216,9 @@ export default function ToolPage({
           )}
         </section>
 
-        <div id="about-content" className="section-gap mx-auto max-w-3xl space-y-12">
-          <section id="tool-features">
+        <div id="about-content" className="section-gap">
+          {content.intro && <p id="page-intro" className="type-lead mx-auto mb-12 max-w-3xl text-ink-soft">{content.intro}</p>}
+          <section id="tool-features" className="mx-auto mb-12 max-w-3xl">
             <h2 id="tool-features-heading" className="sr-only">{t('tools.featuresHeading')}</h2>
             <ul className="grid gap-4 sm:grid-cols-3">
               {content.features.map((feature, position) => (
@@ -163,59 +229,7 @@ export default function ToolPage({
               ))}
             </ul>
           </section>
-          <section id="how-to-section">
-            <h2 id="how-to-heading" className="type-h3">{t('tools.howToHeading', { tool: content.heading })}</h2>
-            <ol id="how-to-steps" className="mt-4 space-y-5">
-              {content.steps.map((step, position) => (
-                <li key={step.title} id={`how-to-step-${position + 1}`} className="flex gap-4">
-                  <span aria-hidden="true" className="control-shape type-h3 grid size-8 shrink-0 place-items-center bg-accent text-sm text-on-accent">
-                    {position + 1}
-                  </span>
-                  <div>
-                    <h3 className="font-semibold">{step.title}</h3>
-                    <p className="mt-1 text-ink-soft">{step.text}</p>
-                  </div>
-                </li>
-              ))}
-            </ol>
-          </section>
-          <section id="tool-limits-section">
-            <h2 id="tool-limits-heading" className="type-h3">{t('tools.limitsHeading')}</h2>
-            <ul id="tool-limits-list" className="mt-4 list-disc space-y-2 ps-6">
-              {content.limits.map((limit, position) => (
-                <li key={limit} id={`tool-limit-${position + 1}`}>{limit}</li>
-              ))}
-            </ul>
-          </section>
-          <section id="format-faq-section">
-            <h2 id="format-faq-heading" className="type-h3">{t('tools.faqHeading')}</h2>
-            <dl id="format-faq-list" className="rule-list mt-2">
-              {content.faq.map((item, position) => (
-                <div key={item.question} id={`format-faq-item-${position + 1}`} className="py-4">
-                  <dt className="font-medium">{item.question}</dt>
-                  <dd className="mt-1 text-ink-soft">{item.answer}</dd>
-                </div>
-              ))}
-            </dl>
-          </section>
-          <section id="related-tools">
-            <h2 id="related-tools-heading" className="type-h3">{t('related.heading')}</h2>
-            <ul id="related-tools-list" className="mt-4 flex flex-wrap gap-3">
-              {findRelatedTools(tool).map((relatedTool) => (
-                <li key={relatedTool.slug}>
-                  <PageLink
-                    id={`related-link-${relatedTool.slug}`}
-                    path={toolPath(relatedTool)}
-                    onNavigate={onNavigate}
-                    className="control-shape solid-box inline-flex min-h-11 items-center border-rule bg-paper-raised px-4 font-medium transition-colors duration-200 hover:bg-paper"
-                  >
-                    {pageSeo[locale][toolPath(relatedTool)].linkText}
-                  </PageLink>
-                </li>
-              ))}
-            </ul>
-          </section>
-          <PrivacySection />
+          <FormatGuide content={content} fileType={toolViewer?.id ?? 'pdf'} relatedPages={findRelatedPages(tool)} onNavigate={onNavigate} />
         </div>
       </main>
 

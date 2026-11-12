@@ -3,16 +3,33 @@
   "description": "Merge PDF files into one in your browser: put them in order and download a single PDF. Free, no sign-up, no watermark, and nothing is ever uploaded.",
   "heading": "Merge PDF",
   "subtitle": "Combine several PDF files into one, in the order you choose, right in your browser; nothing is uploaded.",
-  "linkText": "Merge PDF",
   "features": [
-    { "title": "Private", "text": "Your PDFs are combined by your own browser. They are never sent to a server, so nobody else ever sees them." },
-    { "title": "Free with no limits", "text": "No account, no watermark and no daily cap on files or merges." },
-    { "title": "Works offline", "text": "Once this page has loaded, merging keeps working without an internet connection." }
+    {
+      "title": "Private",
+      "text": "Your PDFs are combined by your own browser. They are never sent to a server, so nobody else ever sees them."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files or merges."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, merging keeps working without an internet connection."
+    }
   ],
   "steps": [
-    { "title": "Choose your PDFs", "text": "Click Choose a file, or drop two or more PDF files anywhere on the page. You can add more at any time." },
-    { "title": "Put them in order", "text": "Move each file up or down. The merged PDF follows this order, page by page." },
-    { "title": "Merge and download", "text": "Click Merge PDF, then download the combined file. Nothing leaves your device." }
+    {
+      "title": "Choose your PDFs",
+      "text": "Click Choose a file, or drop two or more PDF files anywhere on the page. You can add more at any time."
+    },
+    {
+      "title": "Put them in order",
+      "text": "Move each file up or down. The merged PDF follows this order, page by page."
+    },
+    {
+      "title": "Merge and download",
+      "text": "Click Merge PDF, then download the combined file. Nothing leaves your device."
+    }
   ],
   "limits": [
     "PDFs that need a password to open can't be merged; remove the password first.",
@@ -20,11 +37,29 @@
     "Very large sets of files are limited by your device's memory."
   ],
   "faq": [
-    { "question": "Is my file uploaded?", "answer": "No. Your PDFs are read and merged by your browser, on your device, and are never sent anywhere. You can check it yourself: open your browser's network panel while you merge and you will see no upload." },
-    { "question": "How many PDFs can I merge?", "answer": "As many as you like. There is no cap on files or pages; only very large sets are limited by your device's memory." },
-    { "question": "Will the quality of my PDF change?", "answer": "No. Pages are copied as they are, so text, images and fonts keep their original quality, and text stays selectable." },
-    { "question": "Can I merge password-protected PDFs?", "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then merge it." },
-    { "question": "Does it work on my phone?", "answer": "Yes. It works in any modern browser on Android, iPhone, Windows, Mac and Linux, with no app to install." },
-    { "question": "Is it really free?", "answer": "Yes. There is no account, no watermark and no limit on how often you use it." }
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your PDFs are read and merged by your browser, on your device, and are never sent anywhere. You can check it yourself: open your browser's network panel while you merge and you will see no upload."
+    },
+    {
+      "question": "How many PDFs can I merge?",
+      "answer": "As many as you like. There is no cap on files or pages; only very large sets are limited by your device's memory."
+    },
+    {
+      "question": "Will the quality of my PDF change?",
+      "answer": "No. Pages are copied as they are, so text, images and fonts keep their original quality, and text stays selectable."
+    },
+    {
+      "question": "Can I merge password-protected PDFs?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then merge it."
+    },
+    {
+      "question": "Does it work on my phone?",
+      "answer": "Yes. It works in any modern browser on Android, iPhone, Windows, Mac and Linux, with no app to install."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
   ]
 }

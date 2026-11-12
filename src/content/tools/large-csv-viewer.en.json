@@ -1,0 +1,83 @@
+{
+  "title": "Large CSV File Viewer – Open Big CSV Files Online, Free",
+  "description": "Large CSV file viewer: open CSV files with more rows than Excel's 1,048,576 limit in your browser, then search, sort and filter them. Free, no upload.",
+  "heading": "Large CSV File Viewer: Open Big CSV Files Fast",
+  "subtitle": "Drop a big CSV file to open, search and sort it in seconds; nothing is uploaded.",
+  "intro": "A free large CSV file viewer: view large CSV files in your browser, with no row limit of its own and only the rows on screen drawn. In our tests a 120,000-row file opened in 0.9 s, and sorting it by two columns took 0.9 s. Nothing is uploaded, so big exports stay on your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: view a large CSV file",
+  "steps": [
+    {
+      "title": "Drop the big file",
+      "text": "Choose or drop the .csv, .tsv or .tab file. Files over 50 MB show a warning that they may be slow, and still open if your browser has the memory."
+    },
+    {
+      "title": "Scroll the whole table",
+      "text": "Only the rows on screen are drawn, so scrolling stays smooth however many rows the file has."
+    },
+    {
+      "title": "Find the rows you need",
+      "text": "Search every column, add filters, or sort by one or more columns. Group by shows counts, sums or averages by a column."
+    },
+    {
+      "title": "Save a smaller file",
+      "text": "Download options in the More menu can keep only the filtered rows, so you can cut a big export down to the part you need."
+    }
+  ],
+  "handlesTitle": "What the big CSV viewer handles",
+  "handles": [
+    "Rows: no row limit of its own; the limit is your browser's memory. Excel stops at 1,048,576 rows per sheet.",
+    "Measured on a 120,000-row file: open 0.9 s, sort by two columns 0.9 s, search 0.4 s, filter 0.1 s, download 0.4 s.",
+    "Files over 50 MB: a warning first, then the file still opens if memory allows.",
+    "Column profile: blanks, distinct values, numbers and a chart for the selected column.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256."
+  ],
+  "limits": [
+    "Files are limited by your device's memory; a warning appears above 50 MB.",
+    "It shows and edits the data as a table; there are no charts or pivot tables."
+  ],
+  "faqTitle": "Large CSV files: questions and answers",
+  "faq": [
+    {
+      "question": "How do I open a CSV file that is too large for Excel?",
+      "answer": "Excel shows at most 1,048,576 rows per sheet and leaves out the rest. Drop the file here instead: this viewer has no row limit of its own, only your browser's memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning. The guide CSV too big for Excel covers the other options.",
+      "link": {
+        "text": "CSV too big for Excel",
+        "path": "/csv-too-big-for-excel"
+      }
+    },
+    {
+      "question": "How fast does a large CSV file open?",
+      "answer": "In our tests a 120,000-row file with 8 columns opened in 0.9 seconds, a sort by two columns took 0.9 s, a search 0.4 s and a filter 0.1 s. Times depend on your device."
+    },
+    {
+      "question": "What happens with a CSV file over 50 MB?",
+      "answer": "You see a warning that it may be slow or run out of memory, and the viewer still tries to open it. How far it gets depends on your browser and your device's memory."
+    },
+    {
+      "question": "Can I cut a big CSV down to the rows I need?",
+      "answer": "Yes. Filter or search for the rows, then choose Download options in the More menu and keep only the filtered rows. The original file is not changed."
+    },
+    {
+      "question": "Why does a large CSV scroll smoothly here?",
+      "answer": "Only the rows on screen, and a few around them, exist in the page at any time; the rest are drawn as you scroll. Search and sort work on lists of row numbers, not copies of the rows."
+    },
+    {
+      "question": "Is a large CSV file uploaded to a server to open it?",
+      "answer": "No. Even a big file is read by your browser on your device, so there is no upload to wait for, and the limit is your device's memory."
+    }
+  ]
+}

@@ -1,0 +1,173 @@
+{
+  "title": "Open TXT File Online – Free Text Editor, No Upload",
+  "description": "Open TXT file online and edit it: find and replace, sort lines, remove duplicates and count words, with Arabic and old encodings read. Nothing uploaded.",
+  "heading": "Open TXT File Online: Free Text Viewer and Editor",
+  "subtitle": "Drop a text file to read, search and edit it instantly; nothing is uploaded.",
+  "intro": "Open TXT file online in your browser and read or edit it like a notepad online: search, line numbers, and tools for lines, whitespace and case, with Arabic text shown right to left. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: open TXT file online and edit it",
+  "steps": [
+    {
+      "title": "Drop your .txt file on the page",
+      "text": "Choose or drop a text file, such as notes, a log or a list. It is read in your browser, never uploaded, and opens ready to edit."
+    },
+    {
+      "title": "Type, or pick a tool from the ribbon",
+      "text": "Type in the text, or open a tab (Lines, Clean, Case, Find, Analyze, View, File) and click a tool: sort, de-duplicate, number or join lines, trim spaces, change case. With text selected, a tool changes only the selected lines. Each tool is one undo step."
+    },
+    {
+      "title": "Find, replace and check",
+      "text": "Press Ctrl+F (or /) to find and replace, with match case, whole word and regular expressions. Statistics count words, sentences and reading time, and Compare shows every change against the original file."
+    },
+    {
+      "title": "See what is hidden",
+      "text": "Show hidden characters to spot tabs, trailing spaces, zero-width characters and line endings, then remove them with the Clean tools. Bookmarks and Go to line help in long files."
+    },
+    {
+      "title": "Download your text file",
+      "text": "Click Download and choose UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256, and LF, CRLF or CR line endings. The original file on your device is never changed."
+    }
+  ],
+  "handlesTitle": "What the text file viewer handles: TXT files",
+  "handles": [
+    "Files: plain text .txt files, such as notes, logs and lists.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic text; you can reopen a file with another encoding, and each line shows in its own reading direction.",
+    "Size: a 46 MB text file has been tested; files over 50 MB show a warning first, and above about 2 million characters the file opens in a fast read view.",
+    "Editing: typing, plus tools for sorting, duplicates, numbering, whitespace and case, find and replace with regular expressions, statistics and compare.",
+    "Saving: UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256, with LF, CRLF or CR line endings."
+  ],
+  "screenshot": {
+    "alt": "The text editor showing a file with line numbers, the ribbon of text tools and the encoding in the status bar",
+    "caption": "A text file open in the editor: line numbers, the tools ribbon and the encoding and line endings in the status bar."
+  },
+  "comparison": {
+    "title": "Text editor compared with Excel Online, Google Sheets and upload-based viewers",
+    "columns": [
+      "OpenAnyDoc",
+      "Excel Online or Google Sheets",
+      "Upload-based online viewers"
+    ],
+    "rows": [
+      {
+        "label": "Your file is uploaded",
+        "cells": [
+          "No. It is read in your browser.",
+          "Yes, to Microsoft or Google servers.",
+          "Yes, to the service's server."
+        ]
+      },
+      {
+        "label": "Account or sign-in",
+        "cells": [
+          "None.",
+          "A Microsoft or Google account.",
+          "Often none; sometimes an email address."
+        ]
+      },
+      {
+        "label": "Edit and save",
+        "cells": [
+          "Yes. Download keeps the file's own format.",
+          "Yes, in the cloud copy.",
+          "Often view only."
+        ]
+      },
+      {
+        "label": "Works without a network once loaded",
+        "cells": [
+          "Yes.",
+          "No.",
+          "No."
+        ]
+      },
+      {
+        "label": "Size",
+        "cells": [
+          "A 46 MB file has been tested; a warning above 50 MB; a fast read view above 2 million characters.",
+          "Set by the service.",
+          "Set by the service."
+        ]
+      },
+      {
+        "label": "Cost",
+        "cells": [
+          "Free, no ads.",
+          "Free with an account; paid plans for more.",
+          "Free with ads, or paid."
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "A 46 MB file has been tested; larger files depend on your device's memory.",
+    "Above 2 million characters a file opens in a fast read view first."
+  ],
+  "faqTitle": "Online text editor: common questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the text file itself and shows it on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.",
+      "link": {
+        "text": "how to check that a website does not upload your file",
+        "path": "/check-file-upload"
+      }
+    },
+    {
+      "question": "Can I edit and save it?",
+      "answer": "Yes. The file opens ready to edit: type, or use the ribbon tools for lines, whitespace and case, then click Download and choose the encoding (UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256) and the line endings (LF, CRLF or CR)."
+    },
+    {
+      "question": "Is the original changed?",
+      "answer": "No. Your edits stay in the page's memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first."
+    },
+    {
+      "question": "Is there a file size limit?",
+      "answer": "There is no fixed limit: the limit is your browser's memory, and files over 50 MB show a warning first. A 46 MB text file shows its first lines in under half a second. A file over about 2 million characters opens in a fast read view that draws only the visible lines, and every tool still works on the whole text. Choose Edit anyway to type in it; typing in a very large file is slower."
+    },
+    {
+      "question": "Does it work on mobile?",
+      "answer": "Yes. On a phone the ribbon becomes a tools sheet and the text fills the screen, so you can read and edit text files in a phone browser."
+    },
+    {
+      "question": "Does it work offline?",
+      "answer": "Once the page and its text viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first."
+    },
+    {
+      "question": "Can my company host its own copy?",
+      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+    },
+    {
+      "question": "How do I change line endings (LF to CRLF) in a text file?",
+      "answer": "Open the file and click Download, then choose LF (macOS, Linux), CRLF (Windows) or CR for the saved file. If the file mixes line endings, File and then Fix mixed line endings makes them all the same."
+    },
+    {
+      "question": "How do I sort lines or remove duplicate lines in a text file?",
+      "answer": "Open the Lines tab and choose Sort A–Z, Z–A, numeric, natural or by length, Reverse, Shuffle or Remove duplicate lines. Select some lines first to change only those; Ignore case applies to sorting and to duplicates."
+    },
+    {
+      "question": "How do I find and replace text with a regular expression?",
+      "answer": "Press Ctrl+F, turn on the regular expression button and type a pattern such as TODO: (\\w+). In the replacement, $1 inserts a group, \\n a line break and \\t a tab. Replace all is one undo step, and you can also keep or remove the matching lines."
+    },
+    {
+      "question": "How do I count the words and characters in a text file?",
+      "answer": "The status line always shows the lines, words and characters, and the counts of the selected text. Analyze and then Statistics adds sentences, paragraphs, unique words, reading time, the most frequent words and the longest lines."
+    },
+    {
+      "question": "Can I open text files with Arabic or other non-English characters?",
+      "answer": "Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it."
+    }
+  ]
+}

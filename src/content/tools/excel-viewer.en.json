@@ -1,0 +1,186 @@
+{
+  "title": "Excel Viewer Online – Open XLSX Files Without Excel",
+  "description": "Excel viewer online: open XLSX, XLS and ODS files without Excel, switch between sheet tabs, and edit cells with formulas that recalculate. Free, no upload.",
+  "heading": "Excel Viewer Online: Open and Edit XLSX Files",
+  "subtitle": "Drop an Excel file to view every sheet, edit cells and save it instantly; nothing is uploaded.",
+  "intro": "A free Excel viewer online: open an XLSX file without Excel, with all its sheets, formats and merged cells, edit cells and formulas, and save the workbook in the same format. XLS, XLSM and ODS files open too, and your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: view an Excel file in your browser and edit it",
+  "steps": [
+    {
+      "title": "Drop your workbook on the page",
+      "text": "Choose an .xlsx, .xls, .xlsm or .ods file. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Move between sheets",
+      "text": "Every sheet is a tab at the bottom, like in Excel. Dates, percentages and currencies are shown as formatted in the file, and merged cells are drawn as one cell."
+    },
+    {
+      "title": "Switch to Edit",
+      "text": "Click a cell and type a value, or a formula such as =SUM(B2:B10). Formulas recalculate as you edit, and the cells that depend on them update."
+    },
+    {
+      "title": "Format your data",
+      "text": "Use the toolbar to change number formats and currencies, insert or delete rows, columns and sheets, merge cells and, in .xlsx files, set bold, colours, fonts and borders."
+    },
+    {
+      "title": "Save the workbook",
+      "text": "Use the save icon to download the workbook in the same format. The original file on your device is never changed."
+    }
+  ],
+  "handlesTitle": "What the free XLSX viewer handles: XLSX, XLS, XLSM and ODS",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument), with every sheet. Password-protected workbooks cannot be opened.",
+    "Display: number, date, percentage and currency formats and merged cells; fonts, colours and fills in .xlsx and .xlsm files up to 8 MB.",
+    "Editing: values and formulas that recalculate, rows, columns and sheets, merged cells and number formats; in .xlsx files also bold, italic, colours, fills and alignment.",
+    "Kept on save: values, formulas with their results, number formats, merged cells and column widths, in the file's own format. Cell styles are saved only in .xlsx files.",
+    "Not kept on save: charts, images, pivot tables, conditional formats, data validation, defined names and macros.",
+    "Size: no fixed limit; files over 50 MB show a warning first, and cell styles are read only for files up to 8 MB."
+  ],
+  "screenshot": {
+    "alt": "The Excel viewer showing a workbook with its sheet tabs, formulas and merged cells, and the formatting toolbar",
+    "caption": "An XLSX workbook open in the viewer: sheet tabs, number formats and the formatting toolbar."
+  },
+  "comparison": {
+    "title": "Excel viewer compared with Excel Online, Google Sheets and upload-based viewers",
+    "columns": [
+      "OpenAnyDoc",
+      "Excel Online or Google Sheets",
+      "Upload-based online viewers"
+    ],
+    "rows": [
+      {
+        "label": "Your file is uploaded",
+        "cells": [
+          "No. It is read in your browser.",
+          "Yes, to Microsoft or Google servers.",
+          "Yes, to the service's server."
+        ]
+      },
+      {
+        "label": "Account or sign-in",
+        "cells": [
+          "None.",
+          "A Microsoft or Google account.",
+          "Often none; sometimes an email address."
+        ]
+      },
+      {
+        "label": "Edit and save",
+        "cells": [
+          "Yes. Download keeps the file's own format.",
+          "Yes, in the cloud copy.",
+          "Often view only."
+        ]
+      },
+      {
+        "label": "Works without a network once loaded",
+        "cells": [
+          "Yes.",
+          "No.",
+          "No."
+        ]
+      },
+      {
+        "label": "Size",
+        "cells": [
+          "Your device's memory; a warning above 50 MB. Cell styles are read up to 8 MB.",
+          "Set by the service.",
+          "Set by the service."
+        ]
+      },
+      {
+        "label": "Cost",
+        "cells": [
+          "Free, no ads.",
+          "Free with an account; paid plans for more.",
+          "Free with ads, or paid."
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "Cell styles are read for files up to 8 MB.",
+    "Charts, images, pivot tables, conditional formats, data validation, defined names and macros are not kept when you save."
+  ],
+  "faqTitle": "Excel viewer online: common questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook itself and draws the sheets on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.",
+      "link": {
+        "text": "how to check that a website does not upload your file",
+        "path": "/check-file-upload"
+      }
+    },
+    {
+      "question": "Can I edit and save it?",
+      "answer": "Yes. Switch to Edit to change cells and formulas, insert or delete rows, columns and sheets, merge cells and change number formats, then save the workbook in its own format: .xlsx, .xls, .xlsm or .ods."
+    },
+    {
+      "question": "Is the original changed?",
+      "answer": "No. Your edits stay in the page's memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first."
+    },
+    {
+      "question": "Is there a file size limit?",
+      "answer": "There is no fixed limit: the limit is your browser's memory. A sheet with 100,000 rows opens in about two seconds, and files over 50 MB show a warning first. Cell styles are read only for files up to 8 MB, so larger workbooks open as values and formulas."
+    },
+    {
+      "question": "Does it work on mobile?",
+      "answer": "Yes. The Excel page adapts to a phone screen, so you can open, view and edit a workbook in a phone browser. Big sheets are easier to work with on a larger screen."
+    },
+    {
+      "question": "Does it work offline?",
+      "answer": "Once the page and its Excel viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first."
+    },
+    {
+      "question": "Can my company host its own copy?",
+      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+    },
+    {
+      "question": "How do I open an XLSX file online without Excel?",
+      "answer": "Drop the .xlsx file on this page. It opens in your browser with its sheets, formatting and merged cells, and you can edit it and save it again, with no Excel, no account and no upload. For the other free ways, and what each keeps, read how to open an XLSX file without Excel.",
+      "link": {
+        "text": "how to open an XLSX file without Excel",
+        "path": "/open-xlsx-without-excel"
+      }
+    },
+    {
+      "question": "Do formulas recalculate when I edit a cell?",
+      "answer": "Yes. After you change a cell, formulas that depend on it show the new result, including common functions such as SUM, AVERAGE, IF, COUNTIF, SUMIF, VLOOKUP and INDEX/MATCH. If a formula uses a function that is not supported, it keeps the result saved in the file."
+    },
+    {
+      "question": "Will I lose formatting when I save the workbook?",
+      "answer": "In .xlsx files, cell styles (bold, colours, fonts, borders, alignment), merged cells, number formats and column widths are kept. In .xls, .ods and .xlsm files, values, formulas, number formats, merged cells and column widths are kept but cell styles are not. Charts, images and macros are not kept in any format."
+    },
+    {
+      "question": "Can I open an old .xls file or an .ods spreadsheet online?",
+      "answer": "Yes. .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument, from LibreOffice) files open the same way as .xlsx, and are saved back in their own format."
+    },
+    {
+      "question": "Can I open a password-protected Excel file?",
+      "answer": "No. Encrypted workbooks cannot be opened, because the file has to be read in your browser without sending it anywhere. Remove the password in Excel first, then open the file here."
+    },
+    {
+      "question": "Can I anonymize an Excel workbook before sending it?",
+      "answer": "Yes. Press Mask in the top bar: every sheet is scanned for names, emails, phone numbers, IDs, IBANs and card numbers, and you choose how to mask each column. The masked copy downloads as .xlsx, CSV or JSON; see Mask data for the details.",
+      "link": {
+        "text": "Mask data",
+        "path": "/mask-data"
+      }
+    }
+  ]
+}

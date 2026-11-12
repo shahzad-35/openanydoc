@@ -1,0 +1,83 @@
+{
+  "title": "JSON Validator Online – Find and Fix JSON Syntax Errors",
+  "description": "JSON validator online: check JSON syntax, see the line and column of each error, and repair trailing commas, comments and quotes in one click. No upload.",
+  "heading": "JSON Validator Online: Check and Fix JSON",
+  "subtitle": "Paste or drop JSON to see whether it is valid and where any error is, instantly; nothing is uploaded.",
+  "intro": "A free JSON validator online: paste JSON or open a .json file and press Validate. If the JSON is not valid, you see what is wrong with its line and column, Go to error selects the spot, and Repair fixes the usual mistakes. Your JSON is checked in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: validate JSON and fix errors",
+  "steps": [
+    {
+      "title": "Paste or open the JSON",
+      "text": "Press Ctrl+V on this page or drop a .json file. A file with a syntax error opens too, and the error shows right away."
+    },
+    {
+      "title": "Press Validate",
+      "text": "Press Validate (Ctrl+Enter, or ⌘+Enter on a Mac). Valid JSON shows its size and how many keys and values it has, and how deep it goes."
+    },
+    {
+      "title": "Go to the error",
+      "text": "Invalid JSON shows the parser's message with the line and column. Go to error selects that place in the text so you can fix it by hand."
+    },
+    {
+      "title": "Repair common mistakes",
+      "text": "Repair fixes comments, trailing or missing commas, single and curly quotes, unquoted keys and the words True, False, None and NaN, then says what it changed. Validate again to confirm."
+    }
+  ],
+  "handlesTitle": "What the JSON syntax checker looks at",
+  "handles": [
+    "Syntax: standard JSON, checked with your browser's own JSON parser.",
+    "Error location: the parser's message with the line and column, and Go to error.",
+    "Repair: comments, trailing and missing commas, single and curly quotes, unquoted keys, and True, False, None, NaN, undefined and Infinity.",
+    "Not checked: JSON Schema. The validator checks the syntax, not whether the data matches a schema.",
+    "Size: files up to 10 MB."
+  ],
+  "limits": [
+    "Files up to 10 MB.",
+    "It checks that the JSON is well formed; it does not check it against a JSON Schema."
+  ],
+  "faqTitle": "JSON validator: questions and answers",
+  "faq": [
+    {
+      "question": "How do I check if my JSON is valid?",
+      "answer": "Paste it on this page or open the file, then press Validate. \"Valid JSON\" means any standard parser can read it; otherwise the message, line and column show what to fix."
+    },
+    {
+      "question": "Why is my JSON invalid?",
+      "answer": "The usual causes are a comma after the last item, comments, single quotes instead of double quotes, keys without quotes, and values such as True, None or NaN copied from Python or JavaScript. Standard JSON allows none of these, and Repair fixes all of them. The guide JSON unexpected token explains each error message.",
+      "link": {
+        "text": "JSON unexpected token",
+        "path": "/json-unexpected-token"
+      }
+    },
+    {
+      "question": "Does it validate against a JSON Schema?",
+      "answer": "No. It checks that the text is well-formed JSON. It does not compare the data with a JSON Schema."
+    },
+    {
+      "question": "What does Repair change, and can I undo it?",
+      "answer": "Only the mistakes listed in its message, and never the text inside strings. If you do not like the result, press Undo. If something else is still wrong, that error is shown with its place."
+    },
+    {
+      "question": "Is my JSON sent anywhere to be validated?",
+      "answer": "No. Validation runs with your browser's own JSON parser on your device, and nothing is sent to a server."
+    },
+    {
+      "question": "Can it validate large JSON files?",
+      "answer": "Yes, up to 10 MB. Larger files are refused before they are read."
+    }
+  ]
+}

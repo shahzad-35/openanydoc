@@ -1,0 +1,189 @@
+{
+  "title": "CSV Viewer Online – Free CSV File Editor, No Upload",
+  "description": "CSV viewer online: open a CSV file as a table, search, sort and edit cells, with Arabic text shown correctly, then download it. Free, nothing uploaded.",
+  "heading": "CSV Viewer Online and CSV Editor",
+  "subtitle": "Drop a CSV file to view, edit, sort and search it instantly; nothing is uploaded.",
+  "intro": "A free CSV viewer online and CSV editor: open a CSV or TSV file as a searchable table, view large CSV files (a 120,000-row file opens in under a second) and edit CSV in your browser before you download it. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: open and edit a CSV file online",
+  "steps": [
+    {
+      "title": "Drop your file on the page",
+      "text": "Drop a .csv, .tsv or .tab file on the page, or choose it from your device. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Check the columns",
+      "text": "The delimiter (comma, semicolon, tab or pipe) and the encoding are detected for you. If the columns look wrong, click the delimiter in the status bar at the bottom to pick another one, or turn \"First row is header\" on or off."
+    },
+    {
+      "title": "Search, filter and sort",
+      "text": "Type in the search box (press / to jump to it) to find rows in every column. Use Filter, or the menu in a column header, to keep only the rows you need, and Shift+click column headers to sort by one or more columns. Click a header to see that column's profile: blanks, distinct values, numbers and a chart."
+    },
+    {
+      "title": "Edit and clean up",
+      "text": "Every cell can be edited: click it and type, or paste cells copied from a spreadsheet. Add or delete rows and columns, use Find & replace, or open Clean up to change case, trim spaces, fill down blanks, split or merge columns, remove duplicate rows or transpose the table. Undo and redo are always there."
+    },
+    {
+      "title": "Download your CSV",
+      "text": "Click Download to save every row with the file's own delimiter, or choose \"Download options\" in the More menu to change the delimiter, quotes or line endings, or to keep only the filtered rows. The original file on your device is never changed."
+    }
+  ],
+  "handlesTitle": "What the CSV file reader handles: CSV, TSV and tab files",
+  "handles": [
+    "Files: .csv, .tsv and .tab, with the delimiter (comma, semicolon, tab or pipe) detected for you.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic files, so Arabic text shows correctly and right to left.",
+    "Size: no row limit of its own; a 120,000-row file opens in under a second, and files over 50 MB show a warning first.",
+    "Editing: cells, rows and columns, find and replace, clean-up tools, filters, sorting and column profiles, with undo and redo.",
+    "Saving: a CSV with the file's own delimiter, or your choice of delimiter, quotes and line endings; leading zeros and long numbers stay as written."
+  ],
+  "screenshot": {
+    "alt": "The CSV viewer showing a table with the delimiter and encoding in the status bar, a column profile and the search box",
+    "caption": "A CSV file open in the viewer: the table, a column profile on the right, and the delimiter and encoding in the status bar."
+  },
+  "comparison": {
+    "title": "CSV viewer compared with Excel Online, Google Sheets and upload-based viewers",
+    "columns": [
+      "OpenAnyDoc",
+      "Excel Online or Google Sheets",
+      "Upload-based online viewers"
+    ],
+    "rows": [
+      {
+        "label": "Your file is uploaded",
+        "cells": [
+          "No. It is read in your browser.",
+          "Yes, to Microsoft or Google servers.",
+          "Yes, to the service's server."
+        ]
+      },
+      {
+        "label": "Account or sign-in",
+        "cells": [
+          "None.",
+          "A Microsoft or Google account.",
+          "Often none; sometimes an email address."
+        ]
+      },
+      {
+        "label": "Edit and save",
+        "cells": [
+          "Yes. Download keeps the file's own format.",
+          "Yes, in the cloud copy.",
+          "Often view only."
+        ]
+      },
+      {
+        "label": "Works without a network once loaded",
+        "cells": [
+          "Yes.",
+          "No.",
+          "No."
+        ]
+      },
+      {
+        "label": "Size",
+        "cells": [
+          "Your device's memory; a warning above 50 MB. 120,000 rows open in under a second.",
+          "Set by the service.",
+          "Set by the service."
+        ]
+      },
+      {
+        "label": "Cost",
+        "cells": [
+          "Free, no ads.",
+          "Free with an account; paid plans for more.",
+          "Free with ads, or paid."
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "Very large files depend on your device's memory; you get a warning above 50 MB.",
+    "CSV holds no formulas or cell formatting, so there are none to show; use the Excel viewer for workbooks."
+  ],
+  "faqTitle": "CSV viewer online: common questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the CSV file itself and draws the table on your screen. Nothing is sent to a server, so the file never leaves your device. To check it yourself, see how to check that a website does not upload your file.",
+      "link": {
+        "text": "how to check that a website does not upload your file",
+        "path": "/check-file-upload"
+      }
+    },
+    {
+      "question": "Can I edit and save it?",
+      "answer": "Yes. Edit cells, add or delete rows and columns, find and replace or clean up the data, then click Download to save a CSV with the file's own delimiter, or pick another delimiter, quotes or line endings in Download options."
+    },
+    {
+      "question": "Is the original changed?",
+      "answer": "No. Your edits stay in the page's memory until you download a copy, and the file on your device is never touched. Closing the tab discards the edits; if there are unsaved ones, the browser asks first."
+    },
+    {
+      "question": "Is there a file size limit?",
+      "answer": "There is no fixed limit: the limit is your browser's memory, so you can view large CSV files. A 120,000-row file opens in under a second, because only the rows on screen are drawn, and files over 50 MB show a warning but still open if memory allows. Unlike Excel, which stops at 1,048,576 rows per sheet, the CSV viewer has no row limit of its own."
+    },
+    {
+      "question": "Does it work on mobile?",
+      "answer": "Yes. The CSV page has its own phone layout, with the tools in a menu and the table scrolling sideways, so you can view and edit a CSV file in a phone browser."
+    },
+    {
+      "question": "Does it work offline?",
+      "answer": "Once the page and its CSV viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first."
+    },
+    {
+      "question": "Can my company host its own copy?",
+      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+    },
+    {
+      "question": "Why does my CSV file open in a single column?",
+      "answer": "The file probably uses a different separator from the comma, such as a semicolon, which is common in files saved by Excel in many countries. OpenAnyDoc detects comma, semicolon, tab and pipe automatically, and you can choose the delimiter yourself by clicking it in the status bar at the bottom of the page. The guide CSV opens in one column explains the Excel side and the fixes.",
+      "link": {
+        "text": "CSV opens in one column",
+        "path": "/csv-opens-in-one-column"
+      }
+    },
+    {
+      "question": "How do I open a CSV file with Arabic or other non-English text?",
+      "answer": "Just open it: UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Arabic cells display right-to-left. When you download, a byte order mark is added if the file has non-English text, so Excel shows it correctly. For the Excel side of the problem, read Fix broken Arabic in a CSV.",
+      "link": {
+        "text": "Fix broken Arabic in a CSV",
+        "path": "/fix-arabic-csv-in-excel"
+      }
+    },
+    {
+      "question": "How do I remove duplicate rows from a CSV file?",
+      "answer": "Open Clean up and choose \"Remove duplicate rows\", then pick the columns that must match for two rows to count as duplicates. The first copy of each row is kept. The same menu can remove empty rows, trim spaces, change the case of a column and fill empty cells down."
+    },
+    {
+      "question": "Does the CSV editor keep leading zeros and long numbers?",
+      "answer": "Yes. Every cell is read as text exactly as written, so postcodes like 00123 and long ID numbers are not changed into numbers or shortened."
+    },
+    {
+      "question": "Can I open a TSV file online and edit it?",
+      "answer": "Yes. .tsv and .tab files open tab-separated, with the header row detected, and you can edit and download them the same way as a CSV file."
+    },
+    {
+      "question": "How do I hide names, emails or IDs in a CSV before I share it?",
+      "answer": "Press Mask in the top bar. The columns that look personal are picked for you, and each can be replaced with tokens such as EMAIL-000001, partly hidden or removed; you download a masked copy. The same tool has its own page: Mask data.",
+      "link": {
+        "text": "Mask data",
+        "path": "/mask-data"
+      }
+    }
+  ]
+}

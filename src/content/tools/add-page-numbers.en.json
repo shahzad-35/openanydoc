@@ -3,16 +3,33 @@
   "description": "Add page numbers to a PDF in your browser: pick where they go and the first number, then download. Free, no sign-up, and your file is never uploaded.",
   "heading": "Add Page Numbers to PDF",
   "subtitle": "Number every page of a PDF at the top or bottom, starting from any number, in your browser; nothing is uploaded.",
-  "linkText": "Add page numbers",
   "features": [
-    { "title": "Private", "text": "The numbers are drawn on your PDF by your own browser. The file is never sent to a server." },
-    { "title": "Free with no limits", "text": "No account, no watermark and no cap on pages or files." },
-    { "title": "Works offline", "text": "Once this page has loaded, numbering keeps working without an internet connection." }
+    {
+      "title": "Private",
+      "text": "The numbers are drawn on your PDF by your own browser. The file is never sent to a server."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no cap on pages or files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, numbering keeps working without an internet connection."
+    }
   ],
   "steps": [
-    { "title": "Choose your PDF", "text": "Click Choose a file, or drop a PDF anywhere on the page." },
-    { "title": "Pick the position and first number", "text": "Choose where the numbers go (top or bottom; left, centre or right) and the number of the first page." },
-    { "title": "Add numbers and download", "text": "Click Add page numbers, then download the numbered PDF. Nothing leaves your device." }
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF anywhere on the page."
+    },
+    {
+      "title": "Pick the position and first number",
+      "text": "Choose where the numbers go (top or bottom; left, centre or right) and the number of the first page."
+    },
+    {
+      "title": "Add numbers and download",
+      "text": "Click Add page numbers, then download the numbered PDF. Nothing leaves your device."
+    }
   ],
   "limits": [
     "PDFs that need a password to open can't be numbered; remove the password first.",
@@ -20,11 +37,29 @@
     "Numbers use Western digits (1, 2, 3) in a plain font, and are drawn over anything already in that corner of the page."
   ],
   "faq": [
-    { "question": "Is my file uploaded?", "answer": "No. Your PDF is read and numbered by your browser, on your device, and is never sent anywhere. You can check it yourself: open your browser's network panel and you will see no upload." },
-    { "question": "Where can the page numbers go?", "answer": "At the top or the bottom of each page, on the left, in the centre or on the right." },
-    { "question": "Can I start from a number other than 1?", "answer": "Yes. Type the number of the first page, for example 5 when the PDF continues another document." },
-    { "question": "Can I number a password-protected PDF?", "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then add the numbers." },
-    { "question": "Does the rest of my PDF change?", "answer": "No. Only the numbers are added; text, images and links stay as they were." },
-    { "question": "Is it really free?", "answer": "Yes. There is no account, no watermark and no limit on how often you use it." }
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your PDF is read and numbered by your browser, on your device, and is never sent anywhere. You can check it yourself: open your browser's network panel and you will see no upload."
+    },
+    {
+      "question": "Where can the page numbers go?",
+      "answer": "At the top or the bottom of each page, on the left, in the centre or on the right."
+    },
+    {
+      "question": "Can I start from a number other than 1?",
+      "answer": "Yes. Type the number of the first page, for example 5 when the PDF continues another document."
+    },
+    {
+      "question": "Can I number a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then add the numbers."
+    },
+    {
+      "question": "Does the rest of my PDF change?",
+      "answer": "No. Only the numbers are added; text, images and links stay as they were."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
   ]
 }

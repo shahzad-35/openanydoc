@@ -1,0 +1,83 @@
+{
+  "title": "JSON to CSV Converter Online – Flatten Nested JSON, Free",
+  "description": "JSON to CSV converter online: turn a JSON array into a CSV table, with nested objects flattened into columns like address.city. No upload.",
+  "heading": "JSON to CSV Converter: Flatten JSON to a Table",
+  "subtitle": "Drop a JSON file and it opens as a CSV table, ready to edit and download; nothing is uploaded.",
+  "intro": "Convert JSON to CSV in your browser: drop or paste a JSON array of objects and it opens in the CSV viewer with one row per object. Nested objects become columns such as address.city, and lists become items.0, items.1. Edit, filter and download it there. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert JSON to CSV",
+  "steps": [
+    {
+      "title": "Open or paste your JSON",
+      "text": "Drop a .json file, choose it, or press Ctrl+V to paste JSON. It should be an array of objects, or a single object."
+    },
+    {
+      "title": "It opens as a table",
+      "text": "Each object becomes a row in the CSV viewer. Nested objects are flattened with dots (address.city) and lists with their position (items.0.name)."
+    },
+    {
+      "title": "Filter and edit it",
+      "text": "Search, sort, filter and edit the rows in the CSV viewer before you save."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves a .csv file with the JSON file's name. For a semicolon, tab or pipe, choose Download options in the More menu."
+    }
+  ],
+  "handlesTitle": "What the JSON to CSV converter handles",
+  "handles": [
+    "Input: a JSON array of objects, or one object, from a .json file or pasted text, up to 10 MB.",
+    "Nested data: objects flattened into dot-notation columns such as address.city; lists into items.0, items.1.",
+    "Columns: every key that appears in any object, in the order they first appear; missing values are left empty.",
+    "Long numbers: integers beyond 2^53 are written digit for digit, not rounded.",
+    "Delimiters: a comma, with the byte order mark Excel needs when there is non-Latin text; a semicolon, tab or pipe from Download options."
+  ],
+  "limits": [
+    "The JSON must be a list of records (or hold one); other shapes can't become a table.",
+    "Files up to 10 MB."
+  ],
+  "faqTitle": "JSON to CSV: questions and answers",
+  "faq": [
+    {
+      "question": "How are nested objects turned into columns?",
+      "answer": "Each nested key is joined to its parent with a dot. {\"address\": {\"city\": \"Riyadh\"}} becomes a column named address.city holding Riyadh."
+    },
+    {
+      "question": "What happens to arrays inside the objects?",
+      "answer": "Each item gets its position in the column name: tags.0, tags.1, or items.0.name for a list of objects. An empty list is written as []."
+    },
+    {
+      "question": "What JSON shapes can be converted?",
+      "answer": "An array of objects, which gives one row per object, or a single object, which gives one row. A list of plain values or a number on its own is not a table, so the page says so."
+    },
+    {
+      "question": "My objects do not all have the same keys. Is that a problem?",
+      "answer": "No. The CSV gets a column for every key found in any object, and a row leaves the cell empty where its object has no such key."
+    },
+    {
+      "question": "My JSON has an error. Can I still convert it?",
+      "answer": "Not until it is valid. The page shows what is wrong; the JSON validator shows the line and column and repairs common mistakes.",
+      "link": {
+        "text": "JSON validator",
+        "path": "/json-validator"
+      }
+    },
+    {
+      "question": "Is my JSON uploaded?",
+      "answer": "No. The JSON is parsed and converted by your browser on your device; nothing is sent to a server."
+    }
+  ]
+}

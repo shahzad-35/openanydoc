@@ -1,0 +1,87 @@
+{
+  "title": "CSV to Excel Converter Online – Make an XLSX File, Free",
+  "description": "CSV to Excel converter online: turn a CSV or TSV file into an XLSX workbook with a bold header and columns sized to fit, Arabic included. Free, no upload.",
+  "heading": "CSV to Excel Converter: Make an XLSX File",
+  "subtitle": "Drop a CSV file and it opens as an Excel workbook, ready to edit and download; nothing is uploaded.",
+  "intro": "Convert CSV to Excel in your browser: drop a CSV or TSV file and it opens as an .xlsx workbook in the Excel viewer, with a bold header row and each column as wide as its text. Codes with leading zeros stay text. Edit it, then download. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert CSV to Excel",
+  "steps": [
+    {
+      "title": "Drop or paste your CSV",
+      "text": "Drop a .csv, .tsv or .tab file, choose it, or press Ctrl+V to paste CSV text. The delimiter and encoding are detected for you."
+    },
+    {
+      "title": "It opens as a workbook",
+      "text": "The table is converted at once and opens as an .xlsx file in the Excel viewer, with a bold header row and each column as wide as its text."
+    },
+    {
+      "title": "Edit it",
+      "text": "Change cells, write formulas, and add formats, colours or sheets in the Excel viewer."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves the .xlsx file, ready for Excel, Google Sheets, Numbers or LibreOffice."
+    }
+  ],
+  "handlesTitle": "What the CSV to Excel converter handles",
+  "handles": [
+    "Files: .csv, .tsv and .tab, or CSV text you paste.",
+    "Delimiters: comma, semicolon, tab and pipe, detected for you; UTF-8 and other common encodings.",
+    "Layout: one sheet, a bold header row, and columns sized to their longest text (up to 60 characters).",
+    "Numbers: plain numbers such as 42 or 3.5 become real numbers; values like 007, phone numbers and long IDs stay text, so no digit is lost.",
+    "Arabic and other non-Latin text is kept exactly in the workbook."
+  ],
+  "limits": [
+    "The workbook gets a bold header row and fitted columns, but no formulas, charts or other formatting.",
+    "Very large files are limited by your device's memory."
+  ],
+  "faqTitle": "CSV to Excel: questions and answers",
+  "faq": [
+    {
+      "question": "Why convert a CSV to Excel instead of opening it in Excel?",
+      "answer": "Opening a CSV makes Excel guess the delimiter and encoding, which can put every row in one column or garble Arabic. An .xlsx file has no such guesses: the columns, the text and the header are fixed."
+    },
+    {
+      "question": "Are leading zeros kept, for example in codes like 00123?",
+      "answer": "Yes. Only plain numbers become numbers in the workbook. A value that starts with 0, a phone number or an ID longer than 15 digits stays text, exactly as it was in the CSV."
+    },
+    {
+      "question": "What if the columns come out wrong?",
+      "answer": "The delimiter is detected from the file: comma, semicolon, tab or pipe. If the columns still look wrong, open the file in the CSV viewer, pick the delimiter in its reading settings, then click Convert at the top and choose Convert to Excel.",
+      "link": {
+        "text": "CSV viewer",
+        "path": "/csv-viewer"
+      }
+    },
+    {
+      "question": "How many rows can the Excel file hold?",
+      "answer": "Excel shows up to 1,048,576 rows per sheet. A CSV with more rows converts, but Excel will not show the rows past that limit.",
+      "link": {
+        "text": "CSV too big for Excel",
+        "path": "/csv-too-big-for-excel"
+      }
+    },
+    {
+      "question": "Does the converter keep my edits from the CSV viewer?",
+      "answer": "Yes. In the CSV viewer, click Convert at the top, then Convert to Excel: the table, with your unsaved edits, opens as an .xlsx file in the Excel viewer, ready to edit and download."
+    },
+    {
+      "question": "Is my CSV uploaded to make the Excel file?",
+      "answer": "No. The workbook is built by your browser on your device, and nothing is sent to a server."
+    }
+  ]
+}

@@ -4,7 +4,7 @@ import { localizePath, useT } from '../i18n'
 import type { Locale, MessageKey } from '../i18n'
 import { SEARCH_ICON_PATH, navClasses, searchBoxFormats } from '../pages/changelogMarkup'
 import { guideAddresses, pageSeo } from '../seo'
-import { ALL_TOOLS_PATH, findToolIcon, liveToolPages, toolPath } from '../tools/registry'
+import { ALL_TOOLS_PATH, findToolIcon, liveTools, toolPath } from '../tools/registry'
 import { landingPages, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 
@@ -37,7 +37,7 @@ function buildSearchEntries(locale: Locale, translate: (key: MessageKey) => stri
     return entry(page.path, icon, isConversionOrTool ? 'convert' : 'tools', page.extensions ?? viewer.extensions)
   })
   // The tools drawn by ToolPage (src/tools/registry.ts), in their category's group: today the PDF tools.
-  const toolPageEntries = liveToolPages.filter((tool) => tool.category === 'pdf').map((tool) => entry(toolPath(tool), findToolIcon(tool), 'pdf', tool.inputFormats))
+  const toolPageEntries = liveTools.filter((tool) => tool.category === 'pdf').map((tool) => entry(toolPath(tool), findToolIcon(tool), 'pdf', tool.inputFormats))
   const guideEntries = guideAddresses.map((path) => entry(path, 'guide', 'guides', []))
   return [...viewerEntries, ...landingEntries, ...toolPageEntries, ...guideEntries]
 }

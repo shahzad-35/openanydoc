@@ -1,0 +1,83 @@
+{
+  "title": "Excel to JSON Converter Online – XLSX to JSON Array, Free",
+  "description": "Excel to JSON converter online: turn the first sheet of an XLSX, XLS or ODS file into a JSON array of objects keyed by the header row. No upload.",
+  "heading": "Excel to JSON Converter Online",
+  "subtitle": "Drop an Excel file and it opens as JSON, ready to format and download; nothing is uploaded.",
+  "intro": "Convert Excel to JSON in your browser: drop a workbook and its first sheet opens in the JSON viewer as an array of objects, one per row, with the header row as keys. Numbers stay numbers and dates become ISO text. Format, copy or download it there. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to JSON",
+  "steps": [
+    {
+      "title": "Drop your Excel file",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page or choose it. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "It opens as JSON",
+      "text": "The first sheet becomes an array of objects, one per row, keyed by the header row, and opens in the JSON viewer."
+    },
+    {
+      "title": "Explore and edit it",
+      "text": "See it as a tree, a table or formatted text, edit values, or minify it to one line."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy formatted or minified JSON to your clipboard, or download a .json file."
+    }
+  ],
+  "handlesTitle": "What the Excel to JSON converter handles",
+  "handles": [
+    "Files: .xlsx, .xls, .xlsm and .ods workbooks; the first sheet, or any sheet through Convert in the Excel viewer.",
+    "Shape: an array of objects, one per row, keyed by the header row.",
+    "Types: numbers and true/false stay numbers and booleans, dates become ISO 8601 text, empty cells become null.",
+    "Keys: an empty header cell becomes its column letter (C), and a repeated header gets _2, _3.",
+    "Output: indented with 2 spaces; minify or re-indent it in the JSON viewer."
+  ],
+  "limits": [
+    "Formulas become their values; formatting, charts and images are not kept.",
+    "Each row becomes an object keyed by the header row, so the first row should hold the column names."
+  ],
+  "faqTitle": "Excel to JSON: questions and answers",
+  "faq": [
+    {
+      "question": "What does the JSON look like?",
+      "answer": "An array with one object per row. The header row gives the keys, so a sheet with Name and Price columns becomes [{\"Name\": \"Pen\", \"Price\": 2.5}, ...]."
+    },
+    {
+      "question": "Are numbers written as numbers or as text?",
+      "answer": "As numbers. A cell that holds a number in Excel becomes a JSON number, TRUE and FALSE become true and false, and text stays a string."
+    },
+    {
+      "question": "How are dates converted?",
+      "answer": "Dates become ISO 8601 text such as \"2026-01-05T00:00:00.000Z\", which every programming language can read back."
+    },
+    {
+      "question": "What happens to empty cells and empty header cells?",
+      "answer": "An empty cell becomes null, so every object has the same keys. An empty header cell takes its column letter as the key, and a header that appears twice gets _2."
+    },
+    {
+      "question": "Can I convert a sheet other than the first?",
+      "answer": "Yes. This page converts the first sheet. For another, open the workbook in the Excel viewer, click the sheet's tab, then click Convert at the top and choose Convert to JSON.",
+      "link": {
+        "text": "Excel viewer",
+        "path": "/excel-viewer"
+      }
+    },
+    {
+      "question": "Is my spreadsheet sent anywhere?",
+      "answer": "No. Your browser reads the workbook and writes the JSON on your device; nothing is uploaded."
+    }
+  ]
+}

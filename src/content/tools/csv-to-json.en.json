@@ -1,0 +1,79 @@
+{
+  "title": "CSV to JSON Converter Online – Free, Private, No Upload",
+  "description": "CSV to JSON converter online: turn a CSV file into a JSON array of objects keyed by the header row, with codes and phone numbers kept as text. No upload.",
+  "heading": "CSV to JSON Converter Online",
+  "subtitle": "Drop a CSV file and it opens as JSON, ready to format and download; nothing is uploaded.",
+  "intro": "Convert CSV to JSON in your browser: drop or paste a CSV or TSV file and it opens in the JSON viewer as an array of objects, one per row, with the header row as keys. The delimiter and encoding are detected for you. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Free with no limits",
+      "text": "No account, no watermark and no daily cap on files."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert CSV to JSON",
+  "steps": [
+    {
+      "title": "Drop or paste your CSV",
+      "text": "Drop a .csv, .tsv or .tab file, choose it, or press Ctrl+V to paste CSV text. The delimiter and encoding are detected for you."
+    },
+    {
+      "title": "It opens as JSON",
+      "text": "The rows become an array of objects keyed by the header row, and open in the JSON viewer."
+    },
+    {
+      "title": "Check and edit it",
+      "text": "See it as a tree, a table or formatted text, and edit any value."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy formatted or minified JSON to your clipboard, or download a .json file with the CSV's name."
+    }
+  ],
+  "handlesTitle": "What the CSV to JSON converter handles",
+  "handles": [
+    "Files: .csv, .tsv and .tab, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Shape: an array of objects keyed by the header row, one object per row.",
+    "Numbers: plain numbers such as 42 or 3.5 become JSON numbers; 007, phone numbers and long IDs stay strings.",
+    "Keys: an empty header cell becomes its column letter, and a repeated header gets _2, _3.",
+    "Text: UTF-8 and other common encodings, Arabic included, written as UTF-8 JSON."
+  ],
+  "limits": [
+    "Each row becomes an object keyed by the header row, so the first row should hold the column names.",
+    "Very large files are limited by your device's memory."
+  ],
+  "faqTitle": "CSV to JSON: questions and answers",
+  "faq": [
+    {
+      "question": "Which row becomes the JSON keys?",
+      "answer": "The first row of the CSV. Every row below it becomes one object with those keys, in the same column order."
+    },
+    {
+      "question": "Does the converter turn numbers into JSON numbers?",
+      "answer": "Plain numbers, yes: 42 and -3.5 become numbers. Values that would lose something as a number, such as 00123, a phone number or an ID over 15 digits, stay strings."
+    },
+    {
+      "question": "What if a row has fewer cells than the header?",
+      "answer": "The missing cells become null, so every object has every key. Empty cells that are present stay empty strings."
+    },
+    {
+      "question": "Does it work with semicolon-separated CSV files?",
+      "answer": "Yes. The delimiter is detected from the file, whether it is a comma, semicolon, tab or pipe, so CSV files saved by Excel in Europe convert too."
+    },
+    {
+      "question": "Can I convert the CSV I am editing in the CSV viewer?",
+      "answer": "Yes. In the CSV viewer, click Convert at the top, then Convert to JSON: the table, with your unsaved edits, opens as a .json file in the JSON viewer, ready to edit and download."
+    },
+    {
+      "question": "Is the CSV uploaded?",
+      "answer": "No. Your browser reads the CSV and writes the JSON on your device; nothing is sent to a server."
+    }
+  ]
+}
