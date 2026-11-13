@@ -9,7 +9,7 @@ import type { JsonPath, JsonValue, TreeRow } from './jsonModel'
 const ROW_HEIGHT_PX = window.matchMedia('(max-width: 760px)').matches ? 32 : 26
 const PREVIEW_CHILD_COUNT = 3
 
-export type TreeRowAction = 'add' | 'duplicate' | 'up' | 'down' | 'delete'
+export type TreeRowAction = 'add' | 'duplicate' | 'up' | 'down' | 'delete' | 'copyPath'
 
 type JsonTreeProps = {
   root: JsonValue
@@ -213,6 +213,9 @@ export default function JsonTree({ root, expandedKeys, onToggleExpanded, searchT
               {showTypes && <span className="ty">{getTypeName(row.value)}</span>}
               {line !== null && <span className="ln-ref">L{line}</span>}
               <span className="acts">
+                <button id={`tree-copy-path-${rowId}`} type="button" tabIndex={-1} aria-label={t('json.wb.copyPath')} title={t('json.wb.copyPath')} onClick={() => onRowAction('copyPath', row)}>
+                  <SmallIcon name="copy" />
+                </button>
                 <button id={`tree-add-${rowId}`} type="button" tabIndex={-1} aria-label={t(isContainer(row.value) ? 'json.wb.addChild' : 'json.wb.addAfter')} title={t(isContainer(row.value) ? 'json.wb.addChild' : 'json.wb.addAfter')} onClick={() => onRowAction('add', row)}>
                   <SmallIcon name="plus" />
                 </button>

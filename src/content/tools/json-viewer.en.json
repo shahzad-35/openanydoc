@@ -48,7 +48,10 @@
     "Numbers: integers longer than JavaScript can hold (beyond 2^53) are kept exactly.",
     "Errors: the line and column of the problem, and Repair for comments, trailing or missing commas, single quotes and unquoted keys.",
     "Editing: in the text or the tree; change, add, duplicate, move or delete nodes, format with 1 to 8 spaces or a tab, minify and sort keys, with undo.",
-    "Saving: a .json file in the layout you chose."
+    "Saving: a .json file in the layout you chose.",
+    "More views and tools: a graph of objects and lists you can pan, zoom and export as PNG or SVG; compare with a second JSON (added, removed and changed keys, key order ignored if you choose); JSON Schema checks with errors linked to the node, and a schema generated from the document; live JSONPath queries with filters and slices; copy a node's path (data.items[3].price).",
+    "Clean-up and conversion: sort keys A–Z or Z–A, remove nulls and empty values, escape or unescape a JSON string, Repair with a preview of the changed lines; convert to YAML, XML, TypeScript interfaces, CSV or Excel.",
+    "Other files: JSON Lines (.jsonl, .ndjson), JSON5, YAML (.yaml, .yml) and GeoJSON (feature count, area and a property table; no map tiles). You can also open a file from an https address: your browser fetches it directly, and sites that block other pages (CORS) are explained."
   ],
   "screenshot": {
     "alt": "The JSON viewer showing the text pane with syntax colours on the left and the tree view with types on the right",

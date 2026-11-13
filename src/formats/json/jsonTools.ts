@@ -186,71 +186,41 @@ export function countRepairFixes(fixes: RepairFixes) {
   return Object.values(fixes).reduce((total, count) => total + count, 0)
 }
 
-// ---------------------------------------------------------------- path query
+// ---------------------------------------------------------------- JSONPath
 
-type QueryStep = { kind: 'child'; name: string | number } | { kind: 'all' } | { kind: 'descendant'; name: string }
-
-// Reads a path such as $.orders[*].total, $..id, $["zip code"] or items[0]. Returns null when it cannot be read.
-function readQuery(query: string): QueryStep[] | null {
-  const steps: QueryStep[] = []
-  let rest = query.trim().replace(/^\$/, '')
-  if (rest !== '' && !/^[.[]/.test(rest)) rest = `.${rest}`
-  while (rest !== '') {
-    const match =
-      /^\.\.([A-Za-z_$][\w$-]*)/.exec(rest) ??
-      /^\.\*/.exec(rest) ??
-      /^\.([A-Za-z_$][\w$-]*)/.exec(rest) ??
-      /^\[\*\]/.exec(rest) ??
-      /^\[(-?\d+)\]/.exec(rest) ??
-      /^\[\s*(["'])((?:\\.|(?!\1).)*)\1\s*\]/.exec(rest)
-    if (!match) return null
-    const token = match[0]
-    if (token.startsWith('..')) steps.push({ kind: 'descendant', name: match[1] })
-    else if (token === '.*' || token === '[*]') steps.push({ kind: 'all' })
-    else if (token.startsWith('.')) steps.push({ kind: 'child', name: match[1] })
-    else if (/^\[-?\d+\]$/.test(token)) steps.push({ kind: 'child', name: Number(match[1]) })
-    else steps.push({ kind: 'child', name: match[2].replace(/\\(.)/g, '$1') })
-    rest = rest.slice(token.length)
-  }
-  return steps
+// A big number (kept as its exact text) as a plain number, for the libraries that read the document (JSONPath, JSON Schema).
+export function toPlainJson(value: JsonValue): unknown {
+  if (isBigNumber(value)) return Number(value.rawJSON)
+  if (Array.isArray(value)) return value.map(toPlainJson)
+  if (typeof value === 'object' && value !== null) return Object.fromEntries(Object.entries(value).map(([key, child]) => [key, toPlainJson(child)]))
+  return value
 }
 
-function childrenOf(value: JsonValue): [string | number, JsonValue][] {
-  if (typeof value !== 'object' || value === null || isBigNumber(value)) return []
-  return Array.isArray(value) ? value.map((child, position) => [position, child]) : Object.entries(value)
-}
-
-// The paths that a query selects, in document order (at most `limit`), or null when the query cannot be read.
-export function runPathQuery(root: JsonValue, query: string, limit: number): JsonPath[] | null {
-  const steps = readQuery(query)
-  if (steps === null) return null
-  let current: { path: JsonPath; value: JsonValue }[] = [{ path: [], value: root }]
+// "/items/3/price" (a JSON Pointer, with or without "#") → ["items", 3, "price"]; a step is a position when its parent is a list.
+export function pointerToPath(pointer: string, document: unknown): JsonPath {
+  const steps = pointer.replace(/^#/, '').split('/').slice(1).map((step) => decodeURIComponent(step).replace(/~1/g, '/').replace(/~0/g, '~'))
+  const path: JsonPath = []
+  let node = document
   for (const step of steps) {
-    const nextNodes: { path: JsonPath; value: JsonValue }[] = []
-    for (const node of current) {
-      if (step.kind === 'all') {
-        for (const [label, child] of childrenOf(node.value)) nextNodes.push({ path: [...node.path, label], value: child })
-      } else if (step.kind === 'child') {
-        const children = childrenOf(node.value)
-        const label = typeof step.name === 'number' && Array.isArray(node.value) && step.name < 0 ? node.value.length + step.name : step.name
-        const found = children.find(([childLabel]) => childLabel === label)
-        if (found) nextNodes.push({ path: [...node.path, found[0]], value: found[1] })
-      } else {
-        const pending = [node]
-        while (pending.length > 0 && nextNodes.length < limit) {
-          const candidate = pending.shift() as { path: JsonPath; value: JsonValue }
-          for (const [label, child] of childrenOf(candidate.value)) {
-            const childNode = { path: [...candidate.path, label], value: child }
-            if (label === step.name) nextNodes.push(childNode)
-            pending.push(childNode)
-          }
-        }
-      }
-      if (nextNodes.length >= limit) break
-    }
-    current = nextNodes.slice(0, limit)
+    const isPosition = Array.isArray(node) && /^\d+$/.test(step)
+    path.push(isPosition ? Number(step) : step)
+    node = node && typeof node === 'object' ? (node as Record<string, unknown>)[step] : undefined
   }
-  return current.map((node) => node.path)
+  return path
+}
+
+// The paths a JSONPath query selects ($..items[?(@.price > 10)], $.a[0:3], $['x','y'] ...), at most `limit`, with jsonpath-plus
+// (MIT, fetched with the query box). Its "safe" evaluator reads filter expressions itself: the "native" one would need eval,
+// which the Content-Security-Policy blocks. An expression it cannot read gives its error message.
+export async function runPathQuery(root: JsonValue, query: string, limit: number): Promise<{ paths: JsonPath[] } | { error: string }> {
+  const { JSONPath } = await import('jsonpath-plus')
+  const document = toPlainJson(root)
+  try {
+    const pointers = JSONPath({ path: query.trim() || '$', json: document as object, resultType: 'pointer', eval: 'safe', wrap: true }) as string[]
+    return { paths: pointers.slice(0, limit).map((pointer) => pointerToPath(pointer, document)) }
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : String(error) }
+  }
 }
 
 // ---------------------------------------------------------------- text lines and tree nodes
