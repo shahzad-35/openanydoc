@@ -7,7 +7,7 @@ import type { CellValue } from 'exceljs'
 import * as XLSX from 'xlsx'
 import { createFormulaCalculator, translateFormulaRefs } from './excelFormulas'
 import { getColumnIds, getCoveredKeys, getMerges, getRowIds, getSheetRecords, getSheetView, readCell, readStyle } from './excelModel'
-import type { ExcelEdits, FormulaCalculator, ParsedWorkbook, SheetView } from './excelModel'
+import type { ExcelEdits, FormulaCalculator, ParsedWorkbook, SheetRecord, SheetView, SheetVisibility } from './excelModel'
 import { loadExcelJs } from './excelStyles'
 
 export const FILE_MIME_TYPE_BY_BOOK_TYPE: Partial<Record<XLSX.BookType, string>> = {
@@ -85,6 +85,24 @@ function getMergesToSave(sheet: SheetView, layout: SheetLayout) {
   )
 }
 
+// Hidden and very hidden sheets stay hidden; a workbook needs one visible sheet, so if every sheet left is hidden the first is shown.
+function getSavedVisibilities(parsed: ParsedWorkbook, sheetRecords: readonly SheetRecord[]): SheetVisibility[] {
+  const visibilities = sheetRecords.map((record) => (record.id >= 0 ? (parsed.sheets[record.id]?.visibility ?? 'visible') : 'visible'))
+  if (visibilities.length > 0 && !visibilities.includes('visible')) visibilities[0] = 'visible'
+  return visibilities
+}
+
+const HIDDEN_FLAG_BY_VISIBILITY: Record<SheetVisibility, 0 | 1 | 2> = { visible: 0, hidden: 1, veryHidden: 2 }
+
+// The frozen panes are kept while the frozen rows and columns are still the sheet's first ones.
+function getFrozenToSave(sheet: SheetView, layout: SheetLayout) {
+  const frozen = sheet.original?.frozen
+  if (!frozen) return null
+  const rowsStayFirst = layout.rowIds.slice(0, frozen.rowCount).every((rowId, position) => rowId === position)
+  const columnsStayFirst = layout.columnIds.slice(0, frozen.columnCount).every((columnId, position) => columnId === position)
+  return rowsStayFirst && columnsStayFirst ? frozen : null
+}
+
 // ---------------------------------------------------------------- SheetJS
 
 function buildWorksheet(sheet: SheetView): XLSX.WorkSheet {
@@ -117,11 +135,14 @@ function buildWorksheet(sheet: SheetView): XLSX.WorkSheet {
 function writeWithSheetJs(parsed: ParsedWorkbook, edits: ExcelEdits, calculator: FormulaCalculator | null) {
   const workbookToSave = XLSX.utils.book_new()
   workbookToSave.Props = parsed.workbook.Props
-  for (const record of getSheetRecords(parsed, edits)) {
+  const sheetRecords = getSheetRecords(parsed, edits)
+  for (const record of sheetRecords) {
     const sheet = getSheetView(parsed, edits, record.id, calculator)
     const worksheet = sheet.edits || !sheet.original || calculator ? buildWorksheet(sheet) : sheet.original.worksheet
     XLSX.utils.book_append_sheet(workbookToSave, worksheet, record.name)
   }
+  const visibilities = getSavedVisibilities(parsed, sheetRecords)
+  workbookToSave.Workbook = { Sheets: sheetRecords.map((record, position) => ({ name: record.name, Hidden: HIDDEN_FLAG_BY_VISIBILITY[visibilities[position]] })) }
   return new Blob([XLSX.write(workbookToSave, { type: 'array', bookType: parsed.bookType, bookSST: true })])
 }
 
@@ -137,11 +158,17 @@ function toExcelJsValue(cell: XLSX.CellObject): CellValue {
 async function writeWithExcelJs(parsed: ParsedWorkbook, edits: ExcelEdits, calculator: FormulaCalculator | null) {
   const ExcelJS = await loadExcelJs()
   const workbook = new ExcelJS.Workbook()
-  for (const record of getSheetRecords(parsed, edits)) {
+  const sheetRecords = getSheetRecords(parsed, edits)
+  const visibilities = getSavedVisibilities(parsed, sheetRecords)
+  for (const [position, record] of sheetRecords.entries()) {
     const sheet = getSheetView(parsed, edits, record.id, calculator)
     const layout = layoutOf(sheet)
     const coveredKeys = getCoveredKeys(sheet)
-    const worksheet = workbook.addWorksheet(record.name)
+    const frozen = getFrozenToSave(sheet, layout)
+    const worksheet = workbook.addWorksheet(record.name, {
+      state: visibilities[position],
+      views: frozen ? [{ state: 'frozen', xSplit: frozen.columnCount, ySplit: frozen.rowCount }] : undefined,
+    })
     layout.rowIds.forEach((rowId, rowIndex) => {
       layout.columnIds.forEach((columnId, columnIndex) => {
         if (coveredKeys.has(`${rowId}:${columnId}`)) return
@@ -151,6 +178,8 @@ async function writeWithExcelJs(parsed: ParsedWorkbook, edits: ExcelEdits, calcu
         const target = worksheet.getCell(rowIndex + 1, columnIndex + 1)
         if (cell) {
           target.value = toExcelJsValue(cell)
+          const noteText = cell.c?.map((comment) => comment.t).join('\n')
+          if (noteText) target.note = noteText
           if (typeof cell.z === 'string' && cell.z !== 'General') target.numFmt = cell.z
           else if (cell.t === 'd') target.numFmt = 'yyyy-mm-dd'
         }
@@ -167,11 +196,13 @@ async function writeWithExcelJs(parsed: ParsedWorkbook, edits: ExcelEdits, calcu
       const originalColumn = originalColumns?.[columnId]
       const width = editedWidthPx !== undefined ? editedWidthPx / PIXELS_PER_CHARACTER : (originalColumn?.wch ?? (originalColumn?.wpx ? originalColumn.wpx / PIXELS_PER_CHARACTER : undefined))
       if (width !== undefined) worksheet.getColumn(columnIndex + 1).width = width
+      if (originalColumn?.hidden) worksheet.getColumn(columnIndex + 1).hidden = true
     })
     if (originalRows) {
       layout.rowIds.forEach((rowId, rowIndex) => {
         const heightPoints = originalRows[rowId]?.hpt
         if (heightPoints) worksheet.getRow(rowIndex + 1).height = heightPoints
+        if (originalRows[rowId]?.hidden) worksheet.getRow(rowIndex + 1).hidden = true
       })
     }
     for (const merge of getMergesToSave(sheet, layout)) worksheet.mergeCells(merge.s.r + 1, merge.s.c + 1, merge.e.r + 1, merge.e.c + 1)

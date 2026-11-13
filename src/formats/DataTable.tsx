@@ -3,7 +3,7 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { isolateText, useT } from '../i18n'
 import { useEffect, useImperativeHandle, useMemo, useRef, useState } from 'react'
-import type { CSSProperties, KeyboardEvent, MouseEvent, ReactNode, RefObject } from 'react'
+import type { CSSProperties, Key, KeyboardEvent, MouseEvent, ReactNode, RefObject } from 'react'
 
 // The table shared by every format that shows rows and columns (CSV, JSON arrays of objects, later Excel). It draws the grid,
 // keeps only the rows on screen in the page, and sorts and searches lists of row ids. It owns no data and no editing state:
@@ -287,7 +287,21 @@ type DataTableProps = {
   // Shown under the header when there are no rows.
   emptyMessage: string | null
   tableRef: RefObject<DataTableHandle | null>
+  // Frozen panes (Excel): the first rows of `rowIds` stay under the header and the first columns stay at the start while scrolling.
+  pinnedRowCount?: number
+  frozenColumnCount?: number
+  // A column's letter when columns are hidden from view (so D stays D after C is hidden); by default its position.
+  getColumnLetter?: (columnId: number) => string
+  // Hidden rows and columns drawn on request are hatched; a header next to lines that are not drawn gets a double edge.
+  isHiddenLine?: (kind: 'row' | 'column', id: number) => boolean
+  hasHiddenLineBefore?: (kind: 'row' | 'column', id: number) => boolean
+  // A cell's note (Excel comment): a red corner, and the text on hover.
+  getCellNote?: (rowId: number, columnId: number) => string | null
+  // A filter box under each column name.
+  filterRow?: { getText: (columnId: number) => string; onChange: (columnId: number, text: string) => void; onBlur: (columnId: number) => void } | null
 }
+
+const FILTER_ROW_HEIGHT_PX = window.matchMedia('(pointer: coarse)').matches ? 48 : 30
 
 export default function DataTable({
   label,
@@ -323,6 +337,13 @@ export default function DataTable({
   onKeyDown,
   emptyMessage,
   tableRef,
+  pinnedRowCount = 0,
+  frozenColumnCount = 0,
+  getColumnLetter,
+  isHiddenLine,
+  hasHiddenLineBefore,
+  getCellNote,
+  filterRow = null,
 }: DataTableProps) {
   const { locale, t } = useT()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -340,41 +361,63 @@ export default function DataTable({
   }, [columnWidthsPx, gridWidthPx, rowNumberWidthPx])
   const tableMinWidthPx = rowNumberWidthPx + columnWidthsPx.reduce((totalWidthPx, columnWidthPx) => totalWidthPx + columnWidthPx, 0)
 
+  // The rows drawn under the header (frozen panes) and the rows that scroll.
+  const pinnedRowIds = rowIds.slice(0, pinnedRowCount)
+  const bodyRowIds = pinnedRowCount > 0 ? rowIds.slice(pinnedRowCount) : rowIds
+  const headerHeightPx = ROW_HEIGHT_PX + (filterRow ? FILTER_ROW_HEIGHT_PX : 0)
+  // Where each frozen column sticks: after the row numbers and the frozen columns before it.
+  const frozenColumnStartsPx = useMemo(() => {
+    const startsPx: number[] = []
+    let startPx = rowNumberWidthPx
+    for (let columnPosition = 0; columnPosition < frozenColumnCount; columnPosition++) {
+      startsPx.push(startPx)
+      startPx += shownColumnWidthsPx[columnPosition] ?? 0
+    }
+    return startsPx
+  }, [frozenColumnCount, rowNumberWidthPx, shownColumnWidthsPx])
+
+  // A row's height depends only on its original text and the column widths, so it is worked out once per row (measuring text is
+  // slow) and kept while searching, sorting and editing change which rows are shown.
+  function measureRowHeight(rowId: number) {
+    // Until the table's width is known the heights would be estimated from the wrong column widths, and then again.
+    if (gridWidthPx === 0) return ROW_HEIGHT_PX
+    let cache = rowHeightCacheRef.current
+    if (!cache || cache.dataKey !== dataKey || cache.columnIds !== columnIds || cache.widthsPx !== shownColumnWidthsPx) {
+      cache = { dataKey, columnIds, widthsPx: shownColumnWidthsPx, heightsByRowId: new Map() }
+      rowHeightCacheRef.current = cache
+    }
+    const cachedHeight = cache.heightsByRowId.get(rowId)
+    if (cachedHeight !== undefined) return cachedHeight
+    let tallestCellLineCount = 1
+    columnIds.forEach((columnId, columnPosition) => {
+      const cellLineCount = countCellLines(getOriginalText(rowId, columnId), shownColumnWidthsPx[columnPosition])
+      tallestCellLineCount = Math.max(tallestCellLineCount, cellLineCount)
+    })
+    const rowHeight = Math.max(ROW_HEIGHT_PX, tallestCellLineCount * CELL_LINE_HEIGHT_PX + 2 * CELL_VERTICAL_PADDING_PX)
+    cache.heightsByRowId.set(rowId, rowHeight)
+    return rowHeight
+  }
+  const pinnedRowsHeightPx = pinnedRowIds.reduce((totalHeightPx, rowId) => totalHeightPx + measureRowHeight(rowId), 0)
+
   // TanStack Virtual returns functions the React Compiler cannot memoize; this project does not use the compiler.
   // oxlint-disable-next-line react/incompatible-library
   const rowVirtualizer = useVirtualizer({
-    count: rowIds.length,
+    count: bodyRowIds.length,
     getScrollElement: () => scrollContainerRef.current,
-    estimateSize: (rowPosition) => {
-      // Until the table's width is known the heights would be estimated from the wrong column widths, and then again.
-      if (gridWidthPx === 0) return ROW_HEIGHT_PX
-      let cache = rowHeightCacheRef.current
-      if (!cache || cache.dataKey !== dataKey || cache.columnIds !== columnIds || cache.widthsPx !== shownColumnWidthsPx) {
-        cache = { dataKey, columnIds, widthsPx: shownColumnWidthsPx, heightsByRowId: new Map() }
-        rowHeightCacheRef.current = cache
-      }
-      const rowId = rowIds[rowPosition]
-      const cachedHeight = cache.heightsByRowId.get(rowId)
-      if (cachedHeight !== undefined) return cachedHeight
-      let tallestCellLineCount = 1
-      columnIds.forEach((columnId, columnPosition) => {
-        const cellLineCount = countCellLines(getOriginalText(rowId, columnId), shownColumnWidthsPx[columnPosition])
-        tallestCellLineCount = Math.max(tallestCellLineCount, cellLineCount)
-      })
-      const rowHeight = Math.max(ROW_HEIGHT_PX, tallestCellLineCount * CELL_LINE_HEIGHT_PX + 2 * CELL_VERTICAL_PADDING_PX)
-      cache.heightsByRowId.set(rowId, rowHeight)
-      return rowHeight
-    },
+    estimateSize: (bodyPosition) => measureRowHeight(bodyRowIds[bodyPosition]),
     overscan: 12,
   })
 
   useImperativeHandle(
     tableRef,
     () => ({
-      scrollToRow: (rowPosition) => rowVirtualizer.scrollToIndex(rowPosition),
+      // A pinned row is always on screen.
+      scrollToRow: (rowPosition) => {
+        if (rowPosition >= pinnedRowCount) rowVirtualizer.scrollToIndex(rowPosition - pinnedRowCount)
+      },
       focus: (options) => scrollContainerRef.current?.focus(options),
     }),
-    [rowVirtualizer],
+    [rowVirtualizer, pinnedRowCount],
   )
 
   // The window's width decides how much spare room the columns share.
@@ -404,6 +447,123 @@ export default function DataTable({
     )
   }
 
+  // One row: in the scrolling body (absolutely placed at `top`) or pinned under the header.
+  function renderRow(rowId: number, rowPosition: number, rowHeightPx: number, top: number | null, rowKey: Key) {
+    const isSelectedRow = selectedCell?.rowId === rowId
+    const isNewRow = isInsertedRow?.(rowId) ?? false
+    const isPinned = top === null
+    return (
+      <div
+        key={rowKey}
+        id={`row-${rowId}`}
+        role="row"
+        aria-rowindex={rowPosition + 2}
+        className={`${isPinned ? 'relative border-b-2 border-b-rule' : 'absolute inset-x-0 border-b border-rule/70'} flex bg-paper-raised ${isHiddenLine?.('row', rowId) ? 'hidden-line' : ''}`}
+        style={{ top: top ?? undefined, height: rowHeightPx }}
+      >
+        <div
+          id={`row-header-${rowId}`}
+          role="rowheader"
+          onClick={onRowHeaderClick ? (event) => onRowHeaderClick(rowId, event) : undefined}
+          className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
+            isSelectedRow ? `${selectedCellTint} font-semibold text-(--file-color)` : 'bg-paper text-ink-soft'
+          } ${isNewRow ? 'italic' : ''} ${onRowHeaderClick ? 'cursor-pointer' : ''} ${hasHiddenLineBefore?.('row', rowId) ? 'after-hidden-row' : ''}`}
+          style={{ width: rowNumberWidthPx }}
+        >
+          {getRowLabel ? getRowLabel(rowId) : isNewRow ? t('table.newRow') : (rowId + 1).toLocaleString('en')}
+        </div>
+        {columnIds.map((columnId, columnPosition) => {
+          const isEdited = isCellEdited(rowId, columnId)
+          const isSelected = isSelectedRow && selectedCell?.columnId === columnId
+          const isInRange = !isSelected && (isCellInSelection?.(rowId, columnId) ?? false)
+          const cellText = getCellText(rowId, columnId)
+          const cellEditor = renderCellEditor?.(rowId, columnId, columnNames[columnPosition]) ?? null
+          const isMatch = isFindMatch?.(cellText) ?? false
+          const span = getCellSpan?.(rowId, columnId) ?? null
+          const cellStyle = getCellStyle?.(rowId, columnId)
+          const shownCellStyle = isSelected || isInRange ? { ...cellStyle, backgroundColor: undefined } : cellStyle
+          const note = getCellNote?.(rowId, columnId) ?? null
+          const isFrozenColumn = columnPosition < frozenColumnCount
+          let spanWidthPx = 0
+          let spanHeightPx = 0
+          if (span) {
+            for (let offset = 0; offset < span.columnSpan; offset++) spanWidthPx += shownColumnWidthsPx[columnPosition + offset] ?? 0
+            for (let offset = 0; offset < span.rowSpan; offset++) spanHeightPx += rowIds[rowPosition + offset] === undefined ? 0 : measureRowHeight(rowIds[rowPosition + offset])
+          }
+          const isExpandedHere = expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId
+          return (
+            <div
+              key={columnId}
+              id={`cell-${rowId}-${columnId}`}
+              role="gridcell"
+              aria-selected={isSelected}
+              dir="auto"
+              title={note ?? undefined}
+              onMouseEnter={(event) => {
+                anchorCellExpansion(event.currentTarget, { rowId, columnId })
+                if (event.buttons === 1) onCellDragOver?.({ rowId, columnId })
+              }}
+              onMouseDown={onCellMouseDown ? (event) => onCellMouseDown({ rowId, columnId }, event) : undefined}
+              onClick={(event) => {
+                anchorCellExpansion(event.currentTarget, { rowId, columnId })
+                onCellClick({ rowId, columnId })
+                scrollContainerRef.current?.focus({ preventScroll: true })
+              }}
+              onDoubleClick={() => {
+                if (isEditable) onCellDoubleClick({ rowId, columnId })
+              }}
+              className={`group min-w-0 ${isFrozenColumn ? `sticky z-[6] ${columnPosition === frozenColumnCount - 1 ? 'border-r-2 border-r-rule' : ''}` : 'relative'} ${span ? 'z-[3]' : ''} ${isEditable ? 'cursor-cell' : 'cursor-default'} border-r border-rule/60 tabular-nums ${
+                isSelected
+                  ? `z-[1] ${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)`
+                  : isInRange
+                    ? selectedCellTint
+                    : isMatch
+                    ? 'bg-accent/15'
+                    : isEdited
+                      ? 'bg-edit-mark/10'
+                      : isFrozenColumn
+                        ? 'bg-paper-raised'
+                        : ''
+              } ${isHiddenLine?.('column', columnId) ? 'hidden-line' : ''}`}
+              style={{ ...shownCellStyle, flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${CELL_LINE_HEIGHT_PX}px`, left: isFrozenColumn ? frozenColumnStartsPx[columnPosition] : undefined }}
+            >
+              {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
+              {note !== null && (
+                <>
+                  <span aria-hidden="true" className="absolute right-0 top-0 z-[2] size-0 border-l-[7px] border-t-[7px] border-l-transparent border-t-[#d93025]" />
+                  <span className="sr-only">{t('table.cellNote', { note })}</span>
+                </>
+              )}
+              {!cellEditor && span && (
+                <span
+                  dir="auto"
+                  style={{ backgroundColor: shownCellStyle?.backgroundColor, textDecoration: cellStyle?.textDecoration, width: spanWidthPx, height: spanHeightPx, paddingBlock: CELL_VERTICAL_PADDING_PX }}
+                  className={`absolute left-0 top-0 overflow-hidden whitespace-pre-wrap break-words border-b border-r border-rule/60 px-3 ${
+                    isSelected ? `${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)` : isInRange ? selectedCellTint : 'bg-paper-raised'
+                  }`}
+                >
+                  {cellText}
+                </span>
+              )}
+              {cellEditor ?? (span ? null : (
+                <span
+                  dir="auto"
+                  style={{ paddingBlock: CELL_VERTICAL_PADDING_PX, textDecoration: cellStyle?.textDecoration }}
+                  className={`absolute px-3 ${isExpandedHere && expandAnchor.fromRight ? 'right-0' : 'left-0'} ${
+                    isExpandedHere && expandAnchor.fromBottom ? 'bottom-0' : 'top-0'
+                  } ${isSelected ? `${expandedCellTextClassName} ${selectedCellTint}` : `${restingCellTextClassName} ${hoverExpandedCellTextClassName}`}`}
+                >
+                  {cellText}
+                </span>
+              ))}
+              {isEdited && <span className="sr-only">{t('table.edited')}</span>}
+            </div>
+          )
+        })}
+      </div>
+    )
+  }
+
   return (
     <div
       id="data-table"
@@ -413,7 +573,7 @@ export default function DataTable({
       onKeyDown={onKeyDown}
       aria-label={t('table.labelScrollable', { label })}
       className="min-h-0 flex-1 overflow-auto outline-none"
-      style={{ scrollPaddingTop: ROW_HEIGHT_PX, scrollPaddingLeft: rowNumberWidthPx }}
+      style={{ scrollPaddingTop: headerHeightPx + pinnedRowsHeightPx, scrollPaddingLeft: frozenColumnCount > 0 ? frozenColumnStartsPx[frozenColumnCount - 1] + (shownColumnWidthsPx[frozenColumnCount - 1] ?? 0) : rowNumberWidthPx }}
     >
       <div
         id="data-grid"
@@ -423,178 +583,97 @@ export default function DataTable({
         aria-colcount={columnIds.length + 1}
         style={{ minWidth: tableMinWidthPx }}
       >
-        <div id="data-grid-header" role="row" aria-rowindex={1} className="sticky top-0 z-20 flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
-          <div
-            role="columnheader"
-            className="sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule bg-paper px-3 text-xs text-ink-soft"
-            style={{ width: rowNumberWidthPx, height: ROW_HEIGHT_PX }}
-          >
-            <span aria-hidden="true">#</span>
-            <span className="sr-only">{t('table.rowNumber')}</span>
-          </div>
-          {columnIds.map((columnId, columnPosition) => {
-            const columnName = columnNames[columnPosition]
-            const columnDirection = sort?.columnId === columnId ? sort.direction : null
-            const isSelectedColumn = selectedCell?.columnId === columnId
-            return (
-              <div
-                key={columnId}
-                id={`column-header-${columnId}`}
-                role="columnheader"
-                aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
-                className={`group relative min-w-0 border-r border-rule/60 ${isSelectedColumn ? selectedCellTint : ''}`}
-                style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, height: ROW_HEIGHT_PX }}
-              >
-                {/* The name is cut off to fit the column. While the pointer is over the header (or it has focus) this strip grows to
-                    show the whole name, over the neighbouring headers, and shrinks back when the pointer leaves. */}
+        <div className="sticky top-0 z-20">
+          <div id="data-grid-header" role="row" aria-rowindex={1} className="flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
+            <div
+              role="columnheader"
+              className="sticky left-0 z-10 flex shrink-0 items-start justify-end border-r border-rule bg-paper px-3 text-xs text-ink-soft"
+              style={{ width: rowNumberWidthPx, height: headerHeightPx, paddingTop: (ROW_HEIGHT_PX - 16) / 2 }}
+            >
+              <span aria-hidden="true">#</span>
+              <span className="sr-only">{t('table.rowNumber')}</span>
+            </div>
+            {columnIds.map((columnId, columnPosition) => {
+              const columnName = columnNames[columnPosition]
+              const columnDirection = sort?.columnId === columnId ? sort.direction : null
+              const isSelectedColumn = selectedCell?.columnId === columnId
+              const isFrozenColumn = columnPosition < frozenColumnCount
+              return (
                 <div
-                  className={`absolute inset-y-0 ${columnPosition === columnIds.length - 1 ? 'right-0' : 'left-0'} flex w-full items-center gap-1.5 px-2 group-focus-within:z-10 group-focus-within:w-max group-focus-within:max-w-96 group-focus-within:min-w-full group-focus-within:bg-paper-raised group-hover:z-10 group-hover:w-max group-hover:max-w-96 group-hover:min-w-full group-hover:bg-paper-raised group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule`}
+                  key={columnId}
+                  id={`column-header-${columnId}`}
+                  role="columnheader"
+                  aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
+                  className={`group min-w-0 border-r border-rule/60 ${isFrozenColumn ? `sticky z-[6] bg-paper ${columnPosition === frozenColumnCount - 1 ? 'border-r-2 border-r-rule' : ''}` : 'relative'} ${isSelectedColumn ? selectedCellTint : ''} ${isHiddenLine?.('column', columnId) ? 'hidden-line' : ''} ${hasHiddenLineBefore?.('column', columnId) ? 'after-hidden-column' : ''}`}
+                  style={{ flex: `1 0 ${columnWidthsPx[columnPosition]}px`, height: headerHeightPx, left: isFrozenColumn ? frozenColumnStartsPx[columnPosition] : undefined }}
                 >
-                  {showColumnLetters && (
-                    <span aria-hidden="true" className="font-mono text-[10px] font-normal text-ink-soft">
-                      {columnLabel(columnPosition)}
-                    </span>
-                  )}
-                  {onColumnNameClick ? (
-                    <button
-                      id={`column-menu-button-${columnId}`}
-                      type="button"
-                      dir="auto"
-                      aria-haspopup="menu"
-                      aria-expanded={openMenuColumnId === columnId}
-                      title={t('table.columnActions', { name: isolateText(columnName) })}
-                      onClick={(event) => onColumnNameClick(columnId, event.currentTarget)}
-                      className="min-w-0 flex-1 cursor-pointer truncate text-start text-xs font-semibold hover:underline"
-                    >
-                      {columnName}
-                    </button>
-                  ) : (
-                    <span dir="auto" className="min-w-0 flex-1 truncate text-xs font-semibold">
-                      {columnName}
-                    </span>
-                  )}
-                  <button
-                    id={`sort-column-${columnId}`}
-                    type="button"
-                    onClick={() => onCycleSort(columnId)}
-                    aria-label={t('table.sortBy', { name: isolateText(columnName) })}
-                    title={t('table.sortBy', { name: isolateText(columnName) })}
-                    className="grid size-5 pointer-coarse:size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 hover:bg-paper-raised"
+                  {/* The name is cut off to fit the column. While the pointer is over the header (or it has focus) this strip grows to
+                      show the whole name, over the neighbouring headers, and shrinks back when the pointer leaves. */}
+                  <div
+                    className={`absolute top-0 ${columnPosition === columnIds.length - 1 ? 'right-0' : 'left-0'} flex w-full items-center gap-1.5 px-2 group-focus-within:z-10 group-focus-within:w-max group-focus-within:max-w-96 group-focus-within:min-w-full group-focus-within:bg-paper-raised group-hover:z-10 group-hover:w-max group-hover:max-w-96 group-hover:min-w-full group-hover:bg-paper-raised group-hover:outline group-hover:-outline-offset-1 group-hover:outline-rule`}
+                    style={{ height: ROW_HEIGHT_PX }}
                   >
-                    <SortChevron direction={columnDirection} />
-                  </button>
+                    {showColumnLetters && (
+                      <span aria-hidden="true" className="font-mono text-[10px] font-normal text-ink-soft">
+                        {getColumnLetter ? getColumnLetter(columnId) : columnLabel(columnPosition)}
+                      </span>
+                    )}
+                    {onColumnNameClick ? (
+                      <button
+                        id={`column-menu-button-${columnId}`}
+                        type="button"
+                        dir="auto"
+                        aria-haspopup="menu"
+                        aria-expanded={openMenuColumnId === columnId}
+                        title={t('table.columnActions', { name: isolateText(columnName) })}
+                        onClick={(event) => onColumnNameClick(columnId, event.currentTarget)}
+                        className="min-w-0 flex-1 cursor-pointer truncate text-start text-xs font-semibold hover:underline"
+                      >
+                        {columnName}
+                      </button>
+                    ) : (
+                      <span dir="auto" className="min-w-0 flex-1 truncate text-xs font-semibold">
+                        {columnName}
+                      </span>
+                    )}
+                    <button
+                      id={`sort-column-${columnId}`}
+                      type="button"
+                      onClick={() => onCycleSort(columnId)}
+                      aria-label={t('table.sortBy', { name: isolateText(columnName) })}
+                      title={t('table.sortBy', { name: isolateText(columnName) })}
+                      className="grid size-5 pointer-coarse:size-9 shrink-0 cursor-pointer place-items-center rounded-full transition-colors duration-200 hover:bg-paper-raised"
+                    >
+                      <SortChevron direction={columnDirection} />
+                    </button>
+                  </div>
+                  {filterRow && (
+                    <input
+                      id={`filter-row-input-${columnId}`}
+                      type="text"
+                      dir="auto"
+                      autoComplete="off"
+                      spellCheck={false}
+                      aria-label={t('table.filterColumn', { name: isolateText(columnName) })}
+                      placeholder={t('table.filterPlaceholder')}
+                      value={filterRow.getText(columnId)}
+                      onChange={(event) => filterRow.onChange(columnId, event.target.value)}
+                      onBlur={() => filterRow.onBlur(columnId)}
+                      onKeyDown={(event) => event.stopPropagation()}
+                      className="filter-row-input absolute inset-x-1 bottom-1"
+                      style={{ height: FILTER_ROW_HEIGHT_PX - 6 }}
+                    />
+                  )}
+                  {renderHeaderExtras?.(columnId, columnName)}
                 </div>
-                {renderHeaderExtras?.(columnId, columnName)}
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
+          {pinnedRowIds.map((rowId, rowPosition) => renderRow(rowId, rowPosition, measureRowHeight(rowId), null, `pinned-${rowId}`))}
         </div>
 
         <div id="data-grid-body" role="rowgroup" className="relative" style={{ height: rowVirtualizer.getTotalSize() }}>
-          {rowVirtualizer.getVirtualItems().map((virtualRow) => {
-            const rowId = rowIds[virtualRow.index]
-            const isSelectedRow = selectedCell?.rowId === rowId
-            const isNewRow = isInsertedRow?.(rowId) ?? false
-            return (
-              <div
-                key={virtualRow.key}
-                id={`row-${rowId}`}
-                role="row"
-                aria-rowindex={virtualRow.index + 2}
-                className="absolute inset-x-0 flex border-b border-rule/70 bg-paper-raised"
-                style={{ top: virtualRow.start, height: virtualRow.size }}
-              >
-                <div
-                  id={`row-header-${rowId}`}
-                  role="rowheader"
-                  onClick={onRowHeaderClick ? (event) => onRowHeaderClick(rowId, event) : undefined}
-                  className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
-                    isSelectedRow ? `${selectedCellTint} font-semibold text-(--file-color)` : 'bg-paper text-ink-soft'
-                  } ${isNewRow ? 'italic' : ''} ${onRowHeaderClick ? 'cursor-pointer' : ''}`}
-                  style={{ width: rowNumberWidthPx }}
-                >
-                  {getRowLabel ? getRowLabel(rowId) : isNewRow ? t('table.newRow') : (rowId + 1).toLocaleString('en')}
-                </div>
-                {columnIds.map((columnId, columnPosition) => {
-                  const isEdited = isCellEdited(rowId, columnId)
-                  const isSelected = isSelectedRow && selectedCell?.columnId === columnId
-                  const isInRange = !isSelected && (isCellInSelection?.(rowId, columnId) ?? false)
-                  const cellText = getCellText(rowId, columnId)
-                  const cellEditor = renderCellEditor?.(rowId, columnId, columnNames[columnPosition]) ?? null
-                  const isMatch = isFindMatch?.(cellText) ?? false
-                  const span = getCellSpan?.(rowId, columnId) ?? null
-                  const cellStyle = getCellStyle?.(rowId, columnId)
-                  const shownCellStyle = isSelected || isInRange ? { ...cellStyle, backgroundColor: undefined } : cellStyle
-                  let spanWidthPx = 0
-                  let spanHeightPx = 0
-                  if (span) {
-                    for (let offset = 0; offset < span.columnSpan; offset++) spanWidthPx += shownColumnWidthsPx[columnPosition + offset] ?? 0
-                    for (let offset = 0; offset < span.rowSpan; offset++) spanHeightPx += rowVirtualizer.options.estimateSize(virtualRow.index + offset)
-                  }
-                  const isExpandedHere = expandAnchor?.rowId === rowId && expandAnchor.columnId === columnId
-                  return (
-                    <div
-                      key={columnId}
-                      id={`cell-${rowId}-${columnId}`}
-                      role="gridcell"
-                      aria-selected={isSelected}
-                      dir="auto"
-                      onMouseEnter={(event) => {
-                        anchorCellExpansion(event.currentTarget, { rowId, columnId })
-                        if (event.buttons === 1) onCellDragOver?.({ rowId, columnId })
-                      }}
-                      onMouseDown={onCellMouseDown ? (event) => onCellMouseDown({ rowId, columnId }, event) : undefined}
-                      onClick={(event) => {
-                        anchorCellExpansion(event.currentTarget, { rowId, columnId })
-                        onCellClick({ rowId, columnId })
-                        scrollContainerRef.current?.focus({ preventScroll: true })
-                      }}
-                      onDoubleClick={() => {
-                        if (isEditable) onCellDoubleClick({ rowId, columnId })
-                      }}
-                      className={`group relative min-w-0 ${span ? 'z-[3]' : ''} ${isEditable ? 'cursor-cell' : 'cursor-default'} border-r border-rule/60 tabular-nums ${
-                        isSelected
-                          ? `z-[1] ${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)`
-                          : isInRange
-                            ? selectedCellTint
-                            : isMatch
-                            ? 'bg-accent/15'
-                            : isEdited
-                              ? 'bg-edit-mark/10'
-                              : ''
-                      }`}
-                      style={{ ...shownCellStyle, flex: `1 0 ${columnWidthsPx[columnPosition]}px`, lineHeight: `${CELL_LINE_HEIGHT_PX}px` }}
-                    >
-                      {isEdited && <span aria-hidden="true" className="absolute inset-y-0 left-0 w-[3px] bg-edit-mark" />}
-                      {!cellEditor && span && (
-                        <span
-                          dir="auto"
-                          style={{ backgroundColor: shownCellStyle?.backgroundColor, textDecoration: cellStyle?.textDecoration, width: spanWidthPx, height: spanHeightPx, paddingBlock: CELL_VERTICAL_PADDING_PX }}
-                          className={`absolute left-0 top-0 overflow-hidden whitespace-pre-wrap break-words border-b border-r border-rule/60 px-3 ${
-                            isSelected ? `${selectedCellTint} outline-2 -outline-offset-2 outline-(--file-color)` : isInRange ? selectedCellTint : 'bg-paper-raised'
-                          }`}
-                        >
-                          {cellText}
-                        </span>
-                      )}
-                      {cellEditor ?? (span ? null : (
-                        <span
-                          dir="auto"
-                          style={{ paddingBlock: CELL_VERTICAL_PADDING_PX, textDecoration: cellStyle?.textDecoration }}
-                          className={`absolute px-3 ${isExpandedHere && expandAnchor.fromRight ? 'right-0' : 'left-0'} ${
-                            isExpandedHere && expandAnchor.fromBottom ? 'bottom-0' : 'top-0'
-                          } ${isSelected ? `${expandedCellTextClassName} ${selectedCellTint}` : `${restingCellTextClassName} ${hoverExpandedCellTextClassName}`}`}
-                        >
-                          {cellText}
-                        </span>
-                      ))}
-                      {isEdited && <span className="sr-only">{t('table.edited')}</span>}
-                    </div>
-                  )
-                })}
-              </div>
-            )
-          })}
+          {rowVirtualizer.getVirtualItems().map((virtualRow) => renderRow(bodyRowIds[virtualRow.index], virtualRow.index + pinnedRowCount, virtualRow.size, virtualRow.start, virtualRow.key))}
         </div>
       </div>
       {rowIds.length === 0 && emptyMessage && <p dir={locale === 'ar' ? 'rtl' : 'ltr'} className="p-6 text-start text-ink-soft">{emptyMessage}</p>}

@@ -1,20 +1,25 @@
+import { useState } from 'react'
 import type { KeyboardEvent } from 'react'
 import { useT } from '../../i18n'
-import type { SheetRecord } from './excelModel'
+import type { SheetRecord, SheetVisibility } from './excelModel'
 
 type SheetTabsProps = {
   sheets: readonly SheetRecord[]
+  // Sheets the file hides that have no tab yet; listed under a "hidden" button, and given a tab when chosen.
+  hiddenSheets: readonly (SheetRecord & { visibility: SheetVisibility })[]
   activeSheetId: number
   // Edit mode adds the "+" button and lets a double-click rename the sheet.
   isEditable: boolean
   onSelect: (sheetId: number) => void
+  onShowHiddenSheet: (sheetId: number) => void
   onAdd: () => void
   onRename: () => void
 }
 
 // The sheet names at the bottom of the workbook, like Excel's. The arrow keys move between tabs.
-export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect, onAdd, onRename }: SheetTabsProps) {
-  const { t } = useT()
+export default function SheetTabs({ sheets, hiddenSheets, activeSheetId, isEditable, onSelect, onShowHiddenSheet, onAdd, onRename }: SheetTabsProps) {
+  const { t, tp } = useT()
+  const [isHiddenListOpen, setIsHiddenListOpen] = useState(false)
 
   function moveBetweenTabs(event: KeyboardEvent<HTMLDivElement>) {
     if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return
@@ -68,6 +73,32 @@ export default function SheetTabs({ sheets, activeSheetId, isEditable, onSelect,
         >
           +
         </button>
+      )}
+      {hiddenSheets.length > 0 && (
+        <div className="hidden-sheets">
+          <button id="hidden-sheets-button" type="button" className="btn sm" aria-expanded={isHiddenListOpen} aria-controls="hidden-sheets-list" onClick={() => setIsHiddenListOpen(!isHiddenListOpen)}>
+            {tp('excel.tabs.hiddenCount', hiddenSheets.length)}
+          </button>
+          {isHiddenListOpen && (
+            <ul id="hidden-sheets-list" className="hidden-sheets-list">
+              {hiddenSheets.map((sheet) => (
+                <li key={sheet.id}>
+                  <button
+                    id={`show-hidden-sheet-${sheet.id}`}
+                    type="button"
+                    onClick={() => {
+                      setIsHiddenListOpen(false)
+                      onShowHiddenSheet(sheet.id)
+                    }}
+                  >
+                    <bdi>{sheet.name}</bdi>
+                    <span className="excel-result-tag">{sheet.visibility === 'veryHidden' ? t('excel.info.veryHidden') : t('excel.info.hidden')}</span>
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       )}
     </div>
   )

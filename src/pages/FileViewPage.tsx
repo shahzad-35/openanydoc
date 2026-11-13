@@ -225,7 +225,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   // The spreadsheet frame (Excel), the same as the CSV page's: title row, menu bar, one slim toolbar, then the workbook.
   return (
     <div id="file-page" data-file-type={viewer?.id} data-dragging={anotherFileIntake.isDraggingOver} {...anotherFileIntake.dropTargetProps}>
-      <div id="excel-workbench" className="sidebar-closed">
+      <div id="excel-workbench">
       <SheetIconSprite />
       <TopBar
         format="xlsx"

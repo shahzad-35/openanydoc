@@ -7,7 +7,7 @@ import MenuBar from '../../components/MenuBar'
 import type { MenuDefinition } from '../../components/MenuBar'
 import { FatalFileError, useIsPhone, useToast } from '../../components/Messages'
 import { localizePath, useT } from '../../i18n'
-import type { Locale, MessageKey } from '../../i18n'
+import type { MessageKey } from '../../i18n'
 import { DELIMITER_OPTIONS, buildCsvFileText, describeParseNotice, firstRowLooksLikeHeader, parseCsv } from '../../parseCsv'
 import { ENCODING_LABELS } from '../text/textEditing'
 import type { CsvFileOptions, DelimiterChoice, ParsedCsv } from '../../parseCsv'
@@ -16,6 +16,7 @@ import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { findTableFormat } from '../../viewers'
 import type { ConversionTarget } from '../../viewers'
 import { columnLabel, measureColumnWidthsPx } from '../DataTable'
+import { ColumnProfileView, HistogramChart, formatNumber, formatShortDate } from '../ColumnProfile'
 import { buildDownloadName, downloadTextFile, findFormatForFileName } from '../registry'
 import { useMaskDrawer } from '../mask/useMaskDrawer'
 import type { FormatViewerProps } from '../registry'
@@ -28,8 +29,6 @@ import {
   COLUMN_TYPE_LABEL_KEYS,
   buildColumnProfile,
   buildFindPattern,
-  buildHistogram,
-  countRowsPerWeek,
   detectColumnInfo,
   formatFilterRowText,
   groupRows,
@@ -199,17 +198,6 @@ function Icon({ name, size = '', className = '', flipped = false }: { name: stri
   )
 }
 
-function formatNumber(number: number | null | undefined, decimals: number) {
-  if (number === null || number === undefined || Number.isNaN(number)) return '—'
-  return number.toLocaleString('en-US', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
-}
-
-function formatShortDate(text: string, locale: Locale) {
-  const time = Date.parse(text.slice(0, 10))
-  if (Number.isNaN(time)) return text
-  return new Intl.DateTimeFormat(locale, { month: 'short', day: 'numeric', timeZone: 'UTC' }).format(time)
-}
-
 function useIsNarrowScreen() {
   const [isNarrow, setIsNarrow] = useState(() => window.matchMedia(PHONE_QUERY).matches)
   useEffect(() => {
@@ -236,85 +224,6 @@ function WorkbenchDialog({ id, titleId, isOpen, onClose, children }: { id: strin
     <dialog id={id} ref={dialogRef} aria-labelledby={titleId} onClose={isOpen ? onClose : undefined}>
       {isOpen && children}
     </dialog>
-  )
-}
-
-function HistogramChart({ numbers, decimals, columnName, activeRange, onBinClick }: { numbers: number[]; decimals: number; columnName: string; activeRange?: { min: number | null; max: number | null }; onBinClick?: (from: number, to: number) => void }) {
-  const { t } = useT()
-  const bins = buildHistogram(numbers, 10)
-  if (bins.length === 0) return null
-  const width = 320
-  const height = 96
-  const tallest = Math.max(...bins.map((bin) => bin.count))
-  const binWidth = (width - 8) / bins.length
-  const min = bins[0].from
-  const max = bins[bins.length - 1].to
-  return (
-    <svg className="hist" viewBox={`0 0 ${width} ${height + 18}`} role="img" aria-label={t('csv.wb.histogramLabel', { name: columnName, from: formatNumber(min, decimals), to: formatNumber(max, decimals) })}>
-      {bins.map((bin, binPosition) => {
-        const barHeight = bin.count ? Math.max(3, (bin.count / tallest) * (height - 14)) : 0
-        const isInRange = !activeRange || ((activeRange.min === null || bin.to >= activeRange.min) && (activeRange.max === null || bin.from <= activeRange.max))
-        return (
-          <g key={binPosition} onClick={onBinClick ? () => onBinClick(bin.from, bin.to) : undefined} style={onBinClick ? { cursor: 'pointer' } : undefined}>
-            <rect className={`b${isInRange ? ' in' : ''}`} x={4 + binPosition * binWidth + 1.5} y={height - barHeight} width={binWidth - 3} height={barHeight} rx="2">
-              <title>{t('csv.wb.histogramBin', { from: formatNumber(bin.from, decimals), to: formatNumber(bin.to, decimals), count: bin.count })}</title>
-            </rect>
-            {bin.count > 0 && (
-              <text x={4 + binPosition * binWidth + binWidth / 2} y={height - barHeight - 3} textAnchor="middle">
-                {bin.count}
-              </text>
-            )}
-          </g>
-        )
-      })}
-      <line className="axis" x1="4" x2={width - 4} y1={height + 0.5} y2={height + 0.5} />
-      <text x="4" y={height + 13}>
-        {formatNumber(min, decimals)}
-      </text>
-      <text x={width / 2} y={height + 13} textAnchor="middle">
-        {formatNumber(min + (max - min) / 2, decimals)}
-      </text>
-      <text x={width - 4} y={height + 13} textAnchor="end">
-        {formatNumber(max, decimals)}
-      </text>
-    </svg>
-  )
-}
-
-function WeekChart({ dateTexts, locale }: { dateTexts: string[]; locale: Locale }) {
-  const { t } = useT()
-  const weekCounts = countRowsPerWeek(dateTexts)
-  if (weekCounts.length === 0) return null
-  const width = 320
-  const height = 80
-  const tallest = Math.max(...weekCounts)
-  const barWidth = (width - 8) / weekCounts.length
-  const sorted = [...dateTexts].sort()
-  return (
-    <svg className="hist" viewBox={`0 0 ${width} ${height + 18}`} role="img" aria-label={t('csv.wb.rowsPerWeek')}>
-      {weekCounts.map((count, week) => {
-        const barHeight = count ? Math.max(3, (count / tallest) * (height - 14)) : 0
-        return (
-          <g key={week}>
-            <rect className="b in" x={4 + week * barWidth + 2} y={height - barHeight} width={Math.max(1, barWidth - 4)} height={barHeight} rx="2">
-              <title>{t('csv.wb.weekBar', { week: week + 1, count })}</title>
-            </rect>
-            {count > 0 && (
-              <text x={4 + week * barWidth + barWidth / 2} y={height - barHeight - 3} textAnchor="middle">
-                {count}
-              </text>
-            )}
-          </g>
-        )
-      })}
-      <line className="axis" x1="4" x2={width - 4} y1={height + 0.5} y2={height + 0.5} />
-      <text x="4" y={height + 13}>
-        {formatShortDate(sorted[0], locale)}
-      </text>
-      <text x={width - 4} y={height + 13} textAnchor="end">
-        {formatShortDate(sorted[sorted.length - 1], locale)}
-      </text>
-    </svg>
   )
 }
 
@@ -2246,67 +2155,19 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     if (!profile) return null
     const type = typeOf(profileColumnId)
     const decimals = infoOf(profileColumnId).decimals
-    const numberSummary = summarizeNumbers(profile.numbers)
-    const statItems: [string, string][] = [
-      [t('csv.wb.count'), profile.filledCount.toLocaleString('en-US')],
-      [t('csv.wb.blanks'), profile.blankCount.toLocaleString('en-US')],
-      [t('csv.wb.distinct'), profile.distinctCount.toLocaleString('en-US')],
-      ...(type === 'number'
-        ? ([
-            [t('csv.wb.min'), formatNumber(numberSummary?.min, decimals)],
-            [t('csv.wb.max'), formatNumber(numberSummary?.max, decimals)],
-            [t('csv.wb.mean'), formatNumber(numberSummary?.mean, 2)],
-          ] as [string, string][])
-        : type === 'date'
-          ? ([
-              [t('csv.wb.earliest'), profile.dates ? formatShortDate(profile.dates.first, locale) : '—'],
-              [t('csv.wb.latest'), profile.dates ? formatShortDate(profile.dates.last, locale) : '—'],
-            ] as [string, string][])
-          : []),
-    ]
-    const topMax = profile.topValues[0]?.[1] ?? 1
     const rangeFilter = filters.find((filter) => filter.columnId === profileColumnId && filter.kind === 'range')
     return (
       <>
-        <div className="sec">
-          <div className="stats">
-            {statItems.map(([label, value]) => (
-              <div key={label} className="stat">
-                <div className="l">{label}</div>
-                <div className="v" title={value}>
-                  {value}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-        <div className="sec">
-          <div className="sec-title">{type === 'number' ? t('csv.wb.distribution') : type === 'date' ? t('csv.wb.rowsPerWeek') : t('csv.wb.topValues')}</div>
-          {type === 'number' && (
-            <HistogramChart
-              numbers={profile.numbers}
-              decimals={decimals}
-              columnName={nameOf(profileColumnId)}
-              activeRange={rangeFilter?.kind === 'range' ? rangeFilter : undefined}
-              onBinClick={(from, to) => setFilter(profileColumnId, { columnId: profileColumnId, kind: 'range', min: Number(from.toFixed(decimals)), max: Number(to.toFixed(decimals)) })}
-            />
-          )}
-          {type === 'date' && <WeekChart dateTexts={profile.texts.filter((text) => text !== '')} locale={locale} />}
-          {(type === 'text' || type === 'bool') && (
-            <ul className="top-list">
-              {profile.topValues.length === 0 && <li style={{ color: 'var(--muted)' }}>{t('csv.wb.noValues')}</li>}
-              {profile.topValues.map(([value, count], position) => (
-                <li key={value}>
-                  <button className="tv" id={`top-value-${position}`} type="button" title={t('csv.wb.showOnlyValue', { name: nameOf(profileColumnId), value })} onClick={() => filterToValue(profileColumnId, value)}>
-                    <span className="fillbar" style={{ width: `${((count / topMax) * 100).toFixed(1)}%` }} />
-                    <span dir="auto">{type === 'bool' ? (value.toLowerCase() === 'true' ? t('csv.wb.yesTrue') : t('csv.wb.noFalse')) : value}</span>
-                  </button>
-                  <span className="c">{count.toLocaleString('en-US')}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+        <ColumnProfileView
+          texts={profile.texts}
+          profile={profile}
+          type={type}
+          decimals={decimals}
+          columnName={nameOf(profileColumnId)}
+          activeRange={rangeFilter?.kind === 'range' ? rangeFilter : undefined}
+          onRangeClick={(from, to) => setFilter(profileColumnId, { columnId: profileColumnId, kind: 'range', min: Number(from.toFixed(decimals)), max: Number(to.toFixed(decimals)) })}
+          onValueClick={(value) => filterToValue(profileColumnId, value)}
+        />
         <div className="sec" style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12, color: 'var(--muted)' }}>
           <label htmlFor="profile-type-select">{t('csv.wb.readAs')}</label>
           <select

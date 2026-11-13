@@ -13,7 +13,7 @@ import { ActionMenu, Icon, IconButton, IconMenuButton, iconButtonClassName } fro
 import { CellInput } from '../DataTable'
 import type { EditingModule, EditorTool, ExportOption } from '../registry'
 import { FILE_MIME_TYPE_BY_BOOK_TYPE, writeWorkbookFile } from './excelSave'
-import type { ExcelEdits, ExcelExportSource, ExcelSelection, ExcelViewerCommands } from './excelModel'
+import type { ExcelEdits, ExcelExportSource, ExcelPanelTab, ExcelSelection, ExcelViewerCommands, ExcelWorkbookDialog } from './excelModel'
 
 // Everything in this file is loaded only when Edit is first used.
 
@@ -72,8 +72,15 @@ export type ExcelActions = {
   openAddSheet: () => void
   openRenameSheet: () => void
   openDeleteSheet: () => void
+  toggleShowFormulas: () => void
+  toggleShowHidden: () => void
+  toggleFilterRow: () => void
+  clearFilters: () => void
+  openPanel: (tab: ExcelPanelTab) => void
+  openWorkbookDialog: (kind: ExcelWorkbookDialog) => void
 }
 
+const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgent)
 const FONT_FAMILIES = ['Arial', 'Calibri', 'Cambria', 'Courier New', 'Georgia', 'Tahoma', 'Times New Roman', 'Verdana']
 const FONT_SIZES = [8, 9, 10, 11, 12, 14, 16, 18, 20, 24, 36]
 
@@ -612,6 +619,24 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
       ],
     },
     {
+      id: 'view',
+      label: text('menu.view'),
+      items: [
+        { id: 'show-formulas', label: text('excel.view.showFormulas'), kind: 'checkbox', isChecked: current?.showFormulas, hint: IS_MAC ? '⌘`' : 'Ctrl+`', onSelect: run((actions) => actions.toggleShowFormulas()) },
+        { id: 'show-hidden', label: text('excel.view.showHidden'), kind: 'checkbox', isChecked: current?.showHidden, onSelect: run((actions) => actions.toggleShowHidden()) },
+        { id: 'filter-row', label: text('excel.view.filterRow'), kind: 'checkbox', isChecked: current?.isFilterRowShown, onSelect: run((actions) => actions.toggleFilterRow()) },
+        { id: 'clear-filters', label: text('excel.view.clearFilters'), onSelect: run((actions) => actions.clearFilters()) },
+        'separator',
+        { id: 'column-profile', label: text('excel.panel.profile'), kind: 'radio', isChecked: current?.panelTab === 'profile', onSelect: run((actions) => actions.openPanel('profile')) },
+        { id: 'formula-list', label: text('excel.panel.formulas'), kind: 'radio', isChecked: current?.panelTab === 'formulas', onSelect: run((actions) => actions.openPanel('formulas')) },
+        { id: 'search-all-sheets', label: text('excel.panel.search'), kind: 'radio', isChecked: current?.panelTab === 'search', hint: IS_MAC ? '⇧⌘F' : 'Ctrl+Shift+F', onSelect: run((actions) => actions.openPanel('search')) },
+        { id: 'compare-sheets', label: text('excel.panel.compare'), kind: 'radio', isChecked: current?.panelTab === 'compare', onSelect: run((actions) => actions.openPanel('compare')) },
+        'separator',
+        { id: 'workbook-info', label: text('excel.info.title'), onSelect: run((actions) => actions.openWorkbookDialog('info')) },
+        { id: 'print', label: text('excel.print.title'), onSelect: run((actions) => actions.openWorkbookDialog('print')) },
+      ],
+    },
+    {
       id: 'insert',
       label: text('menu.insert'),
       items: [
@@ -689,6 +714,7 @@ function buildExcelMenus(selection: unknown, commands: unknown, locale: Locale):
         { id: 'rename-sheet', label: text('excel.menu.renameSheet'), onSelect: run((actions) => actions.openRenameSheet()) },
         { id: 'move-sheet-left', label: text('excel.menu.moveSheetLeft'), onSelect: run((actions) => actions.moveSheet(-1)) },
         { id: 'move-sheet-right', label: text('excel.menu.moveSheetRight'), onSelect: run((actions) => actions.moveSheet(1)) },
+        { id: 'workbook-files', label: text('excel.files.title'), onSelect: run((actions) => actions.openWorkbookDialog('files')) },
         'separator',
         { id: 'delete-sheet', label: text('excel.menu.deleteSheet'), isDanger: true, isDisabled: !current?.canDeleteSheet, disabledReason: text('disabled.lastSheet'), onSelect: run((actions) => actions.openDeleteSheet()) },
       ],

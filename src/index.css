@@ -920,3 +920,19 @@ html[lang="ar"] .type-h2 {
   color: var(--danger);
   font-weight: 600;
 }
+
+/* Print / Save as PDF of an Excel sheet (ExcelDialogs.tsx): the page prints only the table built for the printout. */
+#print-area{display:none}
+@page sheet-landscape{size:landscape}
+@media print{
+  html.printing-sheet body>*:not(#print-area){display:none!important}
+  html.printing-sheet #print-area{display:block;color:#000;background:#fff;font:9pt system-ui,sans-serif}
+  #print-area.landscape{page:sheet-landscape}
+  #print-area h1{margin:0 0 6pt;font-size:12pt}
+  #print-sheet{border-collapse:collapse}
+  #print-area.fit-width #print-sheet{width:100%;table-layout:fixed;font-size:var(--print-font-size,8pt)}
+  #print-sheet th,#print-sheet td{padding:2pt 4pt;text-align:start;vertical-align:top;overflow-wrap:anywhere}
+  #print-area.gridlines #print-sheet th,#print-area.gridlines #print-sheet td{border:.5pt solid #999}
+  #print-sheet thead{display:table-header-group}
+  #print-sheet tr{break-inside:avoid}
+}

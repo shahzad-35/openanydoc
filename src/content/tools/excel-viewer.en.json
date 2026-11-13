@@ -43,10 +43,11 @@
   ],
   "handlesTitle": "What the free XLSX viewer handles: XLSX, XLS, XLSM and ODS",
   "handles": [
-    "Files: .xlsx, .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument), with every sheet. Password-protected workbooks cannot be opened.",
-    "Display: number, date, percentage and currency formats and merged cells; fonts, colours and fills in .xlsx and .xlsm files up to 8 MB.",
+    "Files: .xlsx, .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument), with every sheet. Password-protected workbooks get a clear message; they cannot be opened yet.",
+    "Display: number, date, percentage and currency formats and merged cells; fonts, colours and fills in .xlsx and .xlsm files up to 8 MB; frozen panes, hidden rows and columns (with Show hidden), hidden sheets, notes and clickable links (Ctrl+click).",
     "Editing: values and formulas that recalculate, rows, columns and sheets, merged cells and number formats; in .xlsx files also bold, italic, colours, fills and alignment.",
-    "Kept on save: values, formulas with their results, number formats, merged cells and column widths, in the file's own format. Cell styles are saved only in .xlsx files.",
+    "Tools: column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compare two sheets or two workbooks, one file per sheet, merging sheets from several workbooks, every sheet as CSV in one ZIP, print or save as PDF, and Workbook info (macros are detected, never run).",
+    "Kept on save: values, formulas with their results, number formats, merged cells, column widths, notes, hidden sheets and hidden rows and columns, in the file's own format. Cell styles and frozen panes are saved only in .xlsx files.",
     "Not kept on save: charts, images, pivot tables, conditional formats, data validation, defined names and macros.",
     "Size: no fixed limit; files over 50 MB show a warning first, and cell styles are read only for files up to 8 MB."
   ],
