@@ -47,7 +47,11 @@
     "Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic files, so Arabic text shows correctly and right to left.",
     "Size: no row limit of its own; a 120,000-row file opens in under a second, and files over 50 MB show a warning first.",
     "Editing: cells, rows and columns, find and replace, clean-up tools, filters, sorting and column profiles, with undo and redo.",
-    "Saving: a CSV with the file's own delimiter, or your choice of delimiter, quotes and line endings; leading zeros and long numbers stay as written."
+    "Saving: a CSV with the file's own delimiter, or your choice of delimiter, quotes and line endings; leading zeros and long numbers stay as written.",
+    "Parquet: a .parquet file opens as a table (read only from Parquet) and can be saved as CSV or any format below.",
+    "Analysis: a filter row under the headers (text, =exact, empty, 10..50, >5, date ranges), a health check (mixed types, spaces at either end, repeated rows), group-by totals you can download, and a bar, line or pie chart of the rows shown.",
+    "SQL: run SQLite queries on the table in your browser, and download the result.",
+    "More formats: save what you see as Excel (.xlsx), a Markdown or HTML table, or SQL INSERT statements; split a large CSV into a zip of smaller files; add the rows of other CSV files with the same header."
   ],
   "screenshot": {
     "alt": "The CSV viewer showing a table with the delimiter and encoding in the status bar, a column profile and the search box",

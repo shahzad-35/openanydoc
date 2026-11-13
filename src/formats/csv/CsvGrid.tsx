@@ -60,7 +60,18 @@ type CsvGridProps = {
   onColumnMove: (columnId: number, beforeColumnId: number) => void
   onKeyDown: (event: ReactKeyboardEvent<HTMLDivElement>) => void
   emptyContent: ReactNode
+  // The filter row: a box under each header name whose text filters that column (parseFilterRowText in csvAnalysis.ts).
+  // `readOnlyText`: a filter set from the column menu that has no text form (a pick list) shows here as a label instead.
+  filterRow: {
+    getText: (columnId: number) => string
+    readOnlyText: (columnId: number) => string | null
+    onChange: (columnId: number, text: string) => void
+    onBlur: (columnId: number) => void
+  } | null
 }
+
+// The filter box's example, by the column's type.
+const FILTER_PLACEHOLDER_KEYS = { text: 'csv.filterRow.placeholderText', number: 'csv.filterRow.placeholderNumber', date: 'csv.filterRow.placeholderDate', bool: 'csv.filterRow.placeholderBool' } as const
 
 function FilterIcon() {
   return (
@@ -246,6 +257,29 @@ export default function CsvGrid(props: CsvGridProps) {
                   >
                     <FilterIcon />
                   </button>
+                  {props.filterRow && (
+                    <div className="hd-filter">
+                      {props.filterRow.readOnlyText(column.id) !== null ? (
+                        <span className="hd-filter-label" id={`filter-row-label-${columnPosition}`} dir="auto" title={props.filterRow.readOnlyText(column.id) ?? ''}>
+                          {props.filterRow.readOnlyText(column.id)}
+                        </span>
+                      ) : (
+                        <input
+                          id={`filter-row-input-${columnPosition}`}
+                          type="text"
+                          dir="auto"
+                          autoComplete="off"
+                          spellCheck={false}
+                          aria-label={t('csv.filterRow.label', { name: column.name })}
+                          placeholder={t(FILTER_PLACEHOLDER_KEYS[column.type])}
+                          value={props.filterRow.getText(column.id)}
+                          onChange={(event) => props.filterRow?.onChange(column.id, event.target.value)}
+                          onBlur={() => props.filterRow?.onBlur(column.id)}
+                          onKeyDown={(event) => event.stopPropagation()}
+                        />
+                      )}
+                    </div>
+                  )}
                   <span className="col-resize" title={t('csv.wb.dragToResize')} onMouseDown={(event) => startResize(event, column)} />
                 </th>
               )

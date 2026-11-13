@@ -23,6 +23,7 @@ const PICKER_MIME_TYPES: Record<string, string[]> = {
   '.pptx': ['application/vnd.openxmlformats-officedocument.presentationml.presentation'],
   '.ppt': ['application/vnd.ms-powerpoint'],
   '.pdf': ['application/pdf'],
+  '.parquet': ['application/vnd.apache.parquet'],
 }
 
 export const LARGE_FILE_WARNING_BYTES = 50 * 1024 * 1024

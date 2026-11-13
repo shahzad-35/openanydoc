@@ -15,7 +15,7 @@ import { faqItems } from '../src/content.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
-import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, loadToolPageWords, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, setToolPageWords, openGraphLocales, pageSeo } from '../src/seo.ts'
 import { findBreadcrumbParent, findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
 import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage, hubs, liveHubs, liveTools, toolContent, toolPath } from '../src/tools/registry.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
@@ -28,7 +28,7 @@ const messages = { en: readJson('src/i18n/en.json'), ar: readJson('src/i18n/ar.j
 const changelog = readJson('src/data/changelog.json')
 const locales = ['en', 'ar']
 // Every tool page's words (the browser fetches only the page shown).
-await Promise.all(locales.flatMap((locale) => liveTools.map((tool) => loadToolPageWords(locale, toolPath(tool)))))
+for (const locale of locales) for (const tool of liveTools) setToolPageWords(locale, tool.slug, JSON.parse(fs.readFileSync(path.join(projectRoot, 'src/content/tools', `${tool.slug}.${locale}.json`), 'utf8')))
 
 const escapeHtml = (text) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 const translate = (locale, key, values = {}) => messages[locale][key].replace(/\{(\w+)\}/g, (placeholder, name) => values[name] ?? placeholder)
