@@ -1,0 +1,40 @@
+{
+  "title": "JSON Escape & Unescape Online – Free, No Upload | OpenAnyDoc",
+  "description": "Escape JSON into one string, or unescape a JSON string back into readable JSON, in your browser: quotes, backslashes and line breaks handled. No upload.",
+  "heading": "JSON Escape and Unescape",
+  "subtitle": "Turn JSON into one escaped string, or an escaped string back into readable JSON, in your browser; nothing is uploaded.",
+  "intro": "A free JSON escape and unescape tool: open or paste a JSON document and escape it into a single string, with every quote, backslash and line break written as \\\", \\\\ and \\n, ready to put inside another JSON field, a log line or a test. Or open an escaped string, the kind copied from a log or an API response, and unescape it back into JSON you can read, format and check. Your file never leaves your device.",
+  "features": [
+    { "title": "Private", "text": "Your JSON is escaped and unescaped by your own browser and never sent to a server, so nobody else sees it." },
+    { "title": "Free with no limits", "text": "No account, no watermark and no daily cap on files." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How to escape or unescape JSON online",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, or paste the text. An escaped string (it starts with a quote) can be pasted as it is." },
+    { "title": "Escape or unescape", "text": "The page offers the right step for what you opened: Escape for a JSON document, Unescape for an escaped string. Both are also in the More menu, and Undo takes either back." },
+    { "title": "Copy or download", "text": "Copy the result from the text pane or download it as a .json file. Unescape again if the string was escaped twice." }
+  ],
+  "handlesTitle": "What the JSON escape and unescape tool handles",
+  "handles": [
+    "Escaping: the whole document becomes one JSON string, with quotes, backslashes, tabs and line breaks escaped and non-ASCII text kept as it is.",
+    "Unescaping: a document that is a single string holding JSON becomes that JSON again, shown as a tree and as formatted text.",
+    "Strings escaped twice or more: unescape once per layer, with undo after each step.",
+    "Long numbers such as IDs keep every digit when they are escaped and unescaped.",
+    "After unescaping, the usual JSON tools: format, validate, sort keys, query with JSONPath, convert to CSV, Excel, YAML or XML."
+  ],
+  "limits": [
+    "It escapes or unescapes the whole document; a single string field inside a larger document is not unescaped on its own.",
+    "Unescape needs the string to hold valid JSON; for plain text inside quotes, Repair or the text pane is the way.",
+    "Files up to 10 MB."
+  ],
+  "faqTitle": "Questions about escaping and unescaping JSON",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON is read, escaped and unescaped by your browser, on your device, and is never sent anywhere. You can check it yourself: open your browser's network panel and you will see no upload." },
+    { "question": "What does escaping JSON mean?", "answer": "Escaping turns a JSON document into a single JSON string: every quote becomes \\\", every backslash \\\\ and every line break \\n, so the document can be stored inside another JSON value, a database field or a log line without breaking it." },
+    { "question": "How do I unescape a JSON string from a log or an API response?", "answer": "Paste the string here with its surrounding quotes, or save it as a .json file and open it, then choose Unescape. The JSON inside becomes the document, ready to read, format and check." },
+    { "question": "The string was escaped twice. What do I do?", "answer": "Choose Unescape again. Each Unescape removes one layer of escaping, and Undo takes a step back if you go one too far." },
+    { "question": "Can I unescape just one field of a larger document?", "answer": "Not yet: Escape and Unescape work on the whole document. Copy the field's value from the tree, paste it here on its own and unescape it." },
+    { "question": "Is it really free?", "answer": "Yes. There is no account, no watermark and no limit on how often you use it." }
+  ]
+}
