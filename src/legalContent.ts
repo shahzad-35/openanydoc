@@ -53,7 +53,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'How you can check that nothing is uploaded',
           paragraphs: [
-            "Three things back the promise. The site's security policy lets your browser send requests only to openanydoc.com itself, so not even a mistake in the code could send your file anywhere else. An automated test opens every page and fails the build if any of them makes a network request, sets a cookie or stores anything beyond the theme choice. And the source code is public, so anyone can read it.",
+            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So not even a mistake in the code could send your file anywhere else. An automated test opens every page and fails the build if any of them makes a network request, sets a cookie or stores anything beyond the theme choice. And the source code is public, so anyone can read it.",
             'You can check it yourself in a minute: open your browser\'s network panel, open a file here and see that no request carries it. The steps are in how to check that a website does not upload your file.',
           ],
           links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
@@ -92,7 +92,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
       ],
     },
     '/privacy': {
-      lastUpdated: 'Last updated: 2026-10-17',
+      lastUpdated: 'Last updated: 2026-11-12',
       sections: [
         {
           heading: 'Your files are never uploaded',
@@ -110,6 +110,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'No analytics, no cookies, no tracking',
           paragraphs: [
             'OpenAnyDoc has no analytics, no advertising, no cookies and no tracking of any kind. We do not record which files or file types you open.',
+          ],
+        },
+        {
+          heading: 'Opening a file from a web address',
+          paragraphs: [
+            'On the JSON page you can open a file from a web address you type. Only then, and only after you click Load, your browser asks that site for the file directly, as if you had opened the address yourself: the site sees your IP address and browser, as with any visit. OpenAnyDoc\'s servers are not involved, and the address is not stored. Nothing is sent to that site except the request for its file.',
           ],
         },
         {
@@ -191,7 +197,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'كيف تتحقق بنفسك من أن شيئًا لا يُرفع',
           paragraphs: [
-            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لمتصفحك بإرسال الطلبات إلا إلى openanydoc.com نفسه، فحتى خطأ في الكود لا يستطيع إرسال ملفك إلى أي مكان آخر. واختبار آلي يفتح كل صفحة ويُفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
+            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فحتى خطأ في الكود لا يستطيع إرسال ملفك إلى أي مكان آخر. واختبار آلي يفتح كل صفحة ويُفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
             'ويمكنك التحقق بنفسك خلال دقيقة: افتح لوحة الشبكة في متصفحك، وافتح ملفًا هنا، وتأكد أن أي طلب لا يحمله. الخطوات في دليل كيف تتحقق من أن الموقع لا يرفع ملفك.',
           ],
           links: [{ text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' }],
@@ -230,7 +236,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
       ],
     },
     '/privacy': {
-      lastUpdated: 'آخر تحديث: 2026-10-17',
+      lastUpdated: 'آخر تحديث: 2026-11-12',
       sections: [
         {
           heading: 'ملفاتك لا تُرفع أبدًا',
@@ -248,6 +254,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'لا تحليلات ولا ملفات تعريف ارتباط ولا تتبع',
           paragraphs: [
             'لا يستخدم OpenAnyDoc أي أدوات تحليلات أو إعلانات أو ملفات تعريف ارتباط (كوكيز) أو أي نوع من التتبع. ولا نسجّل الملفات أو أنواع الملفات التي تفتحها.',
+          ],
+        },
+        {
+          heading: 'فتح ملف من عنوان ويب',
+          paragraphs: [
+            'في صفحة JSON يمكنك فتح ملف من عنوان ويب تكتبه. عندها فقط، وبعد أن تنقر «تحميل»، يطلب متصفحك الملف من ذلك الموقع مباشرة كأنك فتحت العنوان بنفسك: يرى الموقع عنوان IP ومتصفحك كما في أي زيارة. لا تشارك خوادم OpenAnyDoc في ذلك، ولا يُحفظ العنوان. ولا يُرسل إلى ذلك الموقع شيء سوى طلب ملفه.',
           ],
         },
         {

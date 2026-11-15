@@ -200,7 +200,7 @@ const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewe
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
-const landingPages = ['/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
+const landingPages = ['/json-formatter', '/json-validator', '/json-escape-unescape', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
 // Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
 const registryToolPages = ['/merge-pdf', '/add-page-numbers']
 const hubPages = ['/pdf-tools', '/data-tools', '/office-tools', '/all-tools']
@@ -527,6 +527,8 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
   expect(headers.includes('Strict-Transport-Security: max-age=31536000; includeSubDomains'), 'HSTS is missing from _headers')
   // 'wasm-unsafe-eval' lets the CSV page's query mode compile SQLite's WebAssembly; it does not allow JavaScript eval.
   expect(/script-src 'self' 'sha256-[A-Za-z0-9+/=]+' 'wasm-unsafe-eval';/.test(headers) && !headers.includes('unsafe-inline') && !/'unsafe-eval'/.test(headers), 'the CSP does not allow the theme script by hash alone')
+  // https: lets the JSON page's "Open from a URL" read a file from an address the visitor types; nothing wider (no http:, no *).
+  expect(/connect-src 'self' https:;/.test(headers), 'connect-src must be exactly self and https: (the JSON page\'s Open from a URL)')
   expect(/^\/en\n  Link: <\/assets\/fredoka-latin-700[^>]+>; rel=preload; as=font; crossorigin/m.test(headers) && /^\/ar\/\*\n  Link: <\/assets\/ibm-plex-sans-arabic/m.test(headers), 'the Early Hints Link headers for the fonts are missing')
   const html = await (await fetch(`${siteOrigin}/en`)).text()
   expect(/<link rel="preload" as="font" type="font\/woff2" crossorigin href="\/assets\/fredoka-latin-700/.test(html) && !html.includes('theme-init.js'), 'English pages should preload the display font and have no theme-init.js request')
@@ -725,7 +727,7 @@ await test('About, Privacy, Terms and guide pages: one h1, their own title and d
   }
   await openPage('/en/privacy')
   const privacyText = await evaluate('document.body.innerText')
-  expect(privacyText.includes('Last updated: 2026-10-17') && privacyText.includes('No analytics, no cookies, no tracking') && privacyText.includes('Cloudflare'), 'the privacy policy is missing a required part')
+  expect(privacyText.includes('Last updated: 2026-11-12') && privacyText.includes('No analytics, no cookies, no tracking') && privacyText.includes('Cloudflare'), 'the privacy policy is missing a required part')
 })
 
 await test('format pages show a real screenshot and a comparison table in both languages', async () => {

@@ -1,4 +1,4 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import { Suspense, lazy, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import type { CSSProperties, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import { MiniFormatIcon, Wordmark, uiIconShapes } from '../../components/KitIcon'
 import type { UiIconName } from '../../components/KitIcon'
@@ -34,6 +34,7 @@ import {
   buildJsonDownload,
   expandNodesUpToLimit,
   findMatchingPaths,
+  formatPathForCode,
   formatPathText,
   getNodeAt,
   getPathKey,
@@ -49,15 +50,30 @@ import {
   withoutNodeAt,
   withRenamedKey,
   withValueAt,
+  withoutEmptyValues,
 } from './jsonModel'
 import type { JsonEdits, JsonIndent, JsonParseResult, JsonPath, JsonValue, TreeRow } from './jsonModel'
 import './jsonWorkbench.css'
 import NextSteps from '../../components/NextSteps'
+import { WorkbenchDialog } from '../sheet/SheetChrome'
+import { buildJsonLines, findJsonSourceFormat, isGeoJson } from './jsonFormats'
+import type { EmptyValueKinds } from './jsonModel'
+import { diffLines } from './jsonDiff'
+import type { LineChange } from './jsonDiff'
+
+// The views and tools fetched when first opened: graph (React Flow), compare, JSON Schema, GeoJSON's map data, load from a URL.
+const JsonGraph = lazy(() => import('./JsonGraph'))
+const JsonComparePanel = lazy(() => import('./JsonComparePanel'))
+const JsonSchemaPanel = lazy(() => import('./JsonSchemaPanel'))
+const JsonGeoPanel = lazy(() => import('./JsonGeoPanel'))
+const JsonUrlLoader = lazy(() => import('./JsonUrlLoader'))
 
 const COMMIT_DELAY_MS = 600
 const LINE_HEIGHT_PX = 20
 const MAX_TREE_MATCHES = 500
 const MAX_QUERY_RESULTS = 200
+const MAX_REPAIR_PREVIEW_CHANGES = 200
+const QUERY_DELAY_MS = 150
 const TOAST_MS = 1600
 // The table looks this far into the document for the first list of objects.
 const TABLE_SEARCH_NODE_LIMIT = 5000
@@ -89,6 +105,20 @@ type WorkbenchNotice =
   | { kind: 'formatted'; indentLabel: string }
   | { kind: 'minified'; bytesBefore: number }
   | { kind: 'sorted' }
+  // A JSON Lines, JSON5 or YAML file: shown and edited as JSON.
+  | { kind: 'convertedSource'; format: 'jsonLines' | 'json5' | 'yaml' }
+  | { kind: 'done'; title: string; detail: string }
+  // Opened from /json-escape-unescape: the step that fits what was opened (Unescape for a string, else Escape), one click away.
+  | { kind: 'escapeMode' }
+  | null
+
+type StructureView = 'tree' | 'table' | 'graph' | 'compare' | 'schema' | 'geo'
+// The dialogs: Repair's preview, "Remove empty values", a converted text (YAML, XML, TypeScript) and "Open from a URL".
+type JsonDialog =
+  | { kind: 'repair'; repairedText: string; fixes: RepairFixes; changes: LineChange[] }
+  | { kind: 'empties' }
+  | { kind: 'text'; title: string; fileName: string; text: string; mimeType: string }
+  | { kind: 'url' }
   | null
 
 // "removed 2 trailing commas, quoted 1 key and removed 1 comment", from what Repair changed.
@@ -258,15 +288,23 @@ const iconPaths: Record<string, ReactNode> = {
 // inspector on the other, linked both ways, and a status bar with the document's stats and a path query. It fills the whole
 // screen (the format is marked `ownsWholePage`). The file is parsed in a Web Worker; edits are kept as the parsed document
 // (changing a node copies only the path to it), so undo stays small.
-export default function JsonViewer({ openedFile, session: untypedSession, onOpenAnotherFile, onClose, onOpenConvertedFile }: FormatViewerProps) {
+export default function JsonViewer({ openedFile, session: untypedSession, onOpenAnotherFile, onOpenFile, onClose, onOpenConvertedFile }: FormatViewerProps) {
   const { locale, t, tp } = useT()
   const session = untypedSession as EditSession<JsonEdits>
   const edits = session.edits
-  const originalText = useMemo(() => new TextDecoder().decode(openedFile.contents), [openedFile])
   const fileName = openedFile.file.name
+  // A JSON Lines, JSON5 or YAML file is read as JSON (jsonFormats.ts, in the parse worker); its JSON text then stands in for the
+  // file's own text everywhere (the text pane, Repair, Download when unchanged).
+  const sourceFormat = findJsonSourceFormat(fileName)
+  const decodedText = useMemo(() => new TextDecoder().decode(openedFile.contents), [openedFile])
+  const [convertedText, setConvertedText] = useState<string | null>(null)
+  const originalText = convertedText ?? decodedText
 
   const [parseResult, setParseResult] = useState<JsonParseResult | null>(null)
-  const [structureView, setStructureView] = useState<'tree' | 'table'>('tree')
+  const [structureView, setStructureView] = useState<StructureView>('tree')
+  const [openDialog, setOpenDialog] = useState<JsonDialog>(null)
+  const [emptyKinds, setEmptyKinds] = useState<EmptyValueKinds>({ nulls: true, emptyStrings: true, emptyObjects: true, emptyArrays: true })
+  const [queryOutcome, setQueryOutcome] = useState<{ query: string; root: JsonValue; paths: JsonPath[] | null; error: string } | null>(null)
   const [mobileTab, setMobileTab] = useState<MobileTab>('tree')
   const [expandedKeys, setExpandedKeys] = useState<ReadonlySet<string>>(new Set())
   const [expandLevel, setExpandLevel] = useState<number | null>(null)
@@ -285,6 +323,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   const [notice, setNotice] = useState<WorkbenchNotice>(() => {
     const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
     if (largeFileWarning) return { kind: 'largeFile', message: largeFileWarning }
+    if (sourceFormat !== 'json') return { kind: 'convertedSource', format: sourceFormat }
+    if (openedFile.openedFrom === '/json-escape-unescape') return { kind: 'escapeMode' }
     return openedFile.openedFrom === '/json-formatter' ? { kind: 'formatterHint' } : { kind: 'opened' }
   })
   // Opened from the validator page: validate once as soon as the file is read, so the result is the first thing shown.
@@ -363,10 +403,12 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
 
   useEffect(() => {
     setParseResult(null)
+    setConvertedText(null)
     setExpandedKeys(new Set())
     let isStale = false
-    parseJsonText(originalText, locale).then((result) => {
+    parseJsonText(decodedText, locale, sourceFormat).then((result) => {
       if (isStale) return
+      if (result.status === 'ok' && result.convertedText !== undefined) setConvertedText(result.convertedText)
       setParseResult(result)
       if (result.status === 'ok') setExpandedKeys(expandNodesUpToLimit(result.value, 2).expandedKeys)
       else setMobileTab('text')
@@ -376,7 +418,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     }
   // The language only words a start-up failure message; changing it must not read the file again.
   // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [originalText])
+  }, [decodedText])
 
   useEffect(() => () => window.clearTimeout(commitTimerRef.current), [])
 
@@ -566,14 +608,20 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     // oxlint-disable-next-line react-hooks/exhaustive-deps
   }, [openedFile.openedFrom, parseResult])
 
-  // Repair: fix the usual hand-written mistakes, then read the result. The text box then shows the repaired document.
-  async function repairText() {
+  // Repair: fix the usual hand-written mistakes. A preview of the changed lines comes first; Apply makes them (one undo step).
+  function repairText() {
     const sourceText = showText ? latestDraftRef.current : originalText
     const { text: repairedText, fixes } = repairJson(sourceText)
     if (countRepairFixes(fixes) === 0) {
       setNotice({ kind: 'nothingToRepair' })
       return
     }
+    setOpenDialog({ kind: 'repair', repairedText, fixes, changes: diffLines(sourceText, repairedText, MAX_REPAIR_PREVIEW_CHANGES) })
+  }
+
+  // The repaired text read and applied; the text box then shows the repaired document.
+  async function applyRepair(repairedText: string, fixes: RepairFixes) {
+    setOpenDialog(null)
     const result = await parseJsonText(repairedText, locale)
     if (result.status === 'error') {
       replaceDraft(repairedText)
@@ -607,10 +655,68 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     if (await formatWithIndent(0)) setNotice({ kind: 'minified', bytesBefore })
   }
 
-  async function sortDocumentKeys() {
+  // A–Z or Z–A, on every level, or only the keys of the selected object (the root when nothing is selected).
+  async function sortDocumentKeys(direction: 'asc' | 'desc' = 'asc', selectedLevelOnly = false) {
+    setOpenMenu(null)
     if (!(await commitTypingFirst())) return
-    changeDocument((currentRoot) => sortKeys(currentRoot, 'asc', true))
+    const levelPath = selectedLevelOnly && selectedPath !== null ? selectedPath : []
+    changeDocument((currentRoot) => (levelPath.length === 0 ? sortKeys(currentRoot, direction, !selectedLevelOnly) : withValueAt(currentRoot, levelPath, sortKeys(getNodeAt(currentRoot, levelPath), direction, false))))
     setNotice({ kind: 'sorted' })
+  }
+
+  async function removeEmptyValues() {
+    setOpenDialog(null)
+    if (!(await commitTypingFirst()) || root === null) return
+    const { value, removedCount } = withoutEmptyValues(root, emptyKinds)
+    if (removedCount === 0) {
+      showToast(t('json.empties.none'))
+      return
+    }
+    changeDocument(() => value)
+    setNotice({ kind: 'done', title: t('json.empties.doneTitle'), detail: tp('json.empties.doneDetail', removedCount) })
+  }
+
+  // Escape: the whole document becomes one JSON string (as when JSON is stored inside another JSON). Unescape does the reverse,
+  // for a document that is a string holding JSON.
+  async function escapeDocument() {
+    setOpenMenu(null)
+    if (!(await commitTypingFirst()) || root === null) return
+    changeDocument((currentRoot) => JSON.stringify(currentRoot))
+    setNotice({ kind: 'done', title: t('json.escape.doneTitle'), detail: t('json.escape.doneDetail') })
+  }
+
+  async function unescapeDocument() {
+    setOpenMenu(null)
+    if (!(await commitTypingFirst()) || root === null) return
+    if (typeof root !== 'string') {
+      showToast(t('json.escape.notAString'))
+      return
+    }
+    let value: JsonValue
+    try {
+      value = parseValueExactly(root)
+    } catch {
+      showToast(t('json.escape.notJsonInside'))
+      return
+    }
+    changeDocument(() => value)
+    setNotice({ kind: 'done', title: t('json.escape.unescapedTitle'), detail: t('json.escape.unescapedDetail') })
+  }
+
+  // YAML, XML or TypeScript interfaces from the document as Download would save it, shown to copy or download.
+  async function convertToText(target: 'yaml' | 'xml' | 'typescript') {
+    setOpenMenu(null)
+    const documentText = await buildDocumentText()
+    if (!documentText || root === null) return
+    const baseName = fileName.replace(/\.[^.]+$/, '')
+    if (target === 'yaml') {
+      const { dump } = await import('js-yaml')
+      setOpenDialog({ kind: 'text', title: t('convert.toYaml'), fileName: `${baseName}.yaml`, text: dump(JSON.parse(documentText.fileText), { lineWidth: -1 }), mimeType: 'application/yaml;charset=utf-8' })
+      return
+    }
+    const { jsonToTypeScript, jsonToXml } = await import('./jsonConvert')
+    if (target === 'xml') setOpenDialog({ kind: 'text', title: t('convert.toXml'), fileName: `${baseName}.xml`, text: jsonToXml(root), mimeType: 'application/xml;charset=utf-8' })
+    else setOpenDialog({ kind: 'text', title: t('convert.toTypeScript'), fileName: `${baseName}.ts`, text: jsonToTypeScript(root), mimeType: 'text/plain;charset=utf-8' })
   }
 
   async function undoLastChange() {
@@ -626,7 +732,9 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   function runRowAction(action: TreeRowAction, row: TreeRow) {
     const parentPath = row.path.slice(0, -1)
     const step = row.path[row.path.length - 1]
-    if (action === 'add') {
+    if (action === 'copyPath') {
+      void copyText(formatPathForCode(row.path) || '$', t('json.wb.pathCopied'))
+    } else if (action === 'add') {
       if (isContainer(row.value)) {
         changeDocument((currentRoot) => withAddedChild(currentRoot, row.path))
         setExpandedKeys((currentKeys) => new Set(currentKeys).add(row.pathKey))
@@ -708,18 +816,24 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     return { fileText: hasUncommittedTyping ? latestDraftRef.current : buildJsonDownload(edits, { originalText }), hasUncommittedTyping }
   }
 
+  // A JSON Lines file is saved as JSON Lines again (one item per line); JSON5 and YAML files are saved as JSON.
   async function downloadDocument() {
     const documentText = await buildDocumentText()
     if (!documentText) return
-    downloadTextFile(buildDownloadName(fileName, documentText.hasUncommittedTyping || session.changeCount > 0, null), documentText.fileText, 'application/json;charset=utf-8')
+    const isEdited = documentText.hasUncommittedTyping || session.changeCount > 0
+    if (sourceFormat === 'jsonLines') {
+      downloadTextFile(buildDownloadName(fileName, isEdited, null), buildJsonLines(JSON.parse(documentText.fileText) as JsonValue), 'application/x-ndjson;charset=utf-8')
+      return
+    }
+    downloadTextFile(buildDownloadName(fileName, isEdited, sourceFormat === 'json' ? null : '.json'), documentText.fileText, 'application/json;charset=utf-8')
   }
 
   // The JSON as Download would save it, converted to CSV and opened in the CSV viewer.
-  async function convertToCsv() {
+  async function convertToCsv(target: 'csv' | 'xlsx' = 'csv') {
     const documentText = await buildDocumentText()
     if (!documentText) return
     const { convertForViewer } = await import('../conversion')
-    const result = await convertForViewer(new File([documentText.fileText], fileName, { type: 'application/json' }), 'json', 'csv', locale)
+    const result = await convertForViewer(new File([documentText.fileText], fileName, { type: 'application/json' }), 'json', target, locale)
     if ('error' in result) showToast(result.error)
     else onOpenConvertedFile(result.file)
   }
@@ -815,14 +929,35 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     return new TextEncoder().encode(JSON.stringify(deferredRoot, null, edits.indent)).length
   }, [edits.root, edits.indent, deferredRoot, openedFile])
 
-  const queryPaths = useMemo(
-    () => (deferredPathQuery.trim() === '' || deferredRoot === null ? null : runPathQuery(deferredRoot, deferredPathQuery, MAX_QUERY_RESULTS)),
-    [deferredPathQuery, deferredRoot],
-  )
-  const isQueryInvalid = deferredPathQuery.trim() !== '' && deferredRoot !== null && queryPaths === null
+  // The query runs as it is typed (a moment after the last key), with jsonpath-plus fetched on first use. An answer counts only
+  // for the query and document it was asked about.
+  useEffect(() => {
+    if (deferredPathQuery.trim() === '' || deferredRoot === null) return
+    let isCurrent = true
+    const timer = window.setTimeout(() => {
+      void runPathQuery(deferredRoot, deferredPathQuery, MAX_QUERY_RESULTS).then((result) => {
+        if (isCurrent) setQueryOutcome({ query: deferredPathQuery, root: deferredRoot, paths: 'paths' in result ? result.paths : null, error: 'error' in result ? result.error : '' })
+      })
+    }, QUERY_DELAY_MS)
+    return () => {
+      isCurrent = false
+      window.clearTimeout(timer)
+    }
+  }, [deferredPathQuery, deferredRoot])
+  const currentQueryOutcome = queryOutcome !== null && deferredPathQuery.trim() !== '' && queryOutcome.query === deferredPathQuery && queryOutcome.root === deferredRoot ? queryOutcome : null
+  const queryPaths = currentQueryOutcome?.paths ?? null
+  const isQueryInvalid = currentQueryOutcome !== null && currentQueryOutcome.paths === null
+  // The query's matches are marked in the tree too, with the nodes above them opened.
+  const queryPathKeys = useMemo(() => new Set(queryPaths?.map(getPathKey) ?? []), [queryPaths])
+  useEffect(() => {
+    if (!queryPaths || queryPaths.length === 0) return
+    setExpandedKeys((currentKeys) => queryPaths.reduce(withAncestorsExpanded, currentKeys))
+  }, [queryPaths])
+  const markedPathKeys = useMemo(() => (queryPathKeys.size === 0 ? matchPathKeys : new Set([...matchPathKeys, ...queryPathKeys])), [matchPathKeys, queryPathKeys])
 
   const tablePath = useMemo(() => (root === null ? null : findTablePath(root)), [root])
-  const activeView = structureView === 'table' && tablePath !== null ? 'table' : 'tree'
+  const isGeoDocument = useMemo(() => isGeoJson(deferredRoot), [deferredRoot])
+  const activeView: StructureView = structureView === 'table' ? (tablePath !== null ? 'table' : 'tree') : structureView === 'geo' && !isGeoDocument ? 'tree' : structureView
 
   function toggleExpanded(pathKey: string) {
     setExpandLevel(null)
@@ -932,6 +1067,33 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           content: (
             <>
               <strong>{t('json.wb.minifiedTitle')}</strong> {t('json.wb.minifiedDetail', { before: isolateLeftToRight(formatFileSize(currentNotice.bytesBefore)), after: isolateLeftToRight(formatFileSize(sizeInBytes)) })}
+            </>
+          ),
+        }
+      case 'convertedSource':
+        return { className: 'info', icon: 'sparkle', canUndo: false, content: t(currentNotice.format === 'jsonLines' ? 'json.source.jsonLines' : currentNotice.format === 'json5' ? 'json.source.json5' : 'json.source.yaml') }
+      case 'escapeMode':
+        return {
+          className: 'info',
+          icon: 'sparkle',
+          canUndo: false,
+          content: (
+            <>
+              {t(typeof root === 'string' ? 'json.escapeMode.isString' : 'json.escapeMode.isDocument')}{' '}
+              <button className="btn sm primary" type="button" id="escape-mode-button" disabled={root === null} onClick={() => void (typeof root === 'string' ? unescapeDocument() : escapeDocument())}>
+                {t(typeof root === 'string' ? 'json.escape.unescapeButton' : 'json.escape.escapeButton')}
+              </button>
+            </>
+          ),
+        }
+      case 'done':
+        return {
+          className: 'ok',
+          icon: 'check',
+          canUndo: true,
+          content: (
+            <>
+              <strong>{currentNotice.title}</strong> {currentNotice.detail}
             </>
           ),
         }
@@ -1270,6 +1432,11 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
             <SpriteIcon name="panel" isSmall />
             {t('json.structure.table')}
           </button>
+          {(['graph', 'compare', 'schema', ...(isGeoDocument ? ['geo' as const] : [])] as const).map((view) => (
+            <button key={view} role="tab" type="button" id={`${view}-tab`} aria-selected={activeView === view} aria-controls={`${view}-view`} onClick={() => setStructureView(view)}>
+              {t(`json.structure.${view}` as MessageKey)}
+            </button>
+          ))}
         </div>
         <span className="pane-sub" id="tree-sync-label">
           <span className={`live-dot${validationError ? ' paused' : ''}`} id="live-dot" />
@@ -1337,6 +1504,23 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         <div className="view" id="tree-view">
           <p className="empty">{validationError ? t('json.wb.fixToSeeTree') : t('json.wb.emptyTree')}</p>
         </div>
+      ) : activeView === 'graph' || activeView === 'compare' || activeView === 'schema' || activeView === 'geo' ? (
+        <Suspense fallback={<p className="empty">{t('json.viewer.reading')}</p>}>
+          {activeView === 'graph' && <JsonGraph root={root} selectedPath={selectedPath} onSelectPath={(path) => selectNode(path, false)} fileName={fileName} />}
+          {activeView === 'compare' && <JsonComparePanel root={root} />}
+          {activeView === 'schema' && (
+            <JsonSchemaPanel
+              root={root}
+              fileName={fileName}
+              onCopy={(text) => void copyText(text, t('json.schema.copied'))}
+              onSelectPath={(path) => {
+                selectNode(path, false)
+                setStructureView('tree')
+              }}
+            />
+          )}
+          {activeView === 'geo' && <JsonGeoPanel root={root} />}
+        </Suspense>
       ) : activeView === 'table' && tablePath !== null ? (
         <div className="view" id="table-view">
           <JsonTable
@@ -1352,7 +1536,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           expandedKeys={expandedKeys}
           onToggleExpanded={toggleExpanded}
           searchText={deferredSearchText}
-          matchPathKeys={matchPathKeys}
+          matchPathKeys={markedPathKeys}
           selectedPathKey={selectedPathKey}
           onSelectPath={(path) => selectNode(path, false)}
           revealPathKey={revealPathKey}
@@ -1536,6 +1720,24 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
                 <SpriteIcon name="file" isSmall />
                 {t('convert.toCsv')}
               </button>
+              <button
+                role="menuitem"
+                type="button"
+                id="convert-button-menu-to-excel"
+                onClick={() => {
+                  setOpenMenu(null)
+                  void convertToCsv('xlsx')
+                }}
+              >
+                <SpriteIcon name="file" isSmall />
+                {t('convert.toExcel')}
+              </button>
+              {(['yaml', 'xml', 'typescript'] as const).map((target) => (
+                <button key={target} role="menuitem" type="button" id={`convert-button-menu-to-${target}`} onClick={() => void convertToText(target)}>
+                  <SpriteIcon name="file" isSmall />
+                  {t(target === 'yaml' ? 'convert.toYaml' : target === 'xml' ? 'convert.toXml' : 'convert.toTypeScript')}
+                </button>
+              ))}
             </div>
           )}
         </span>
@@ -1562,6 +1764,31 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
           {openMenu === 'more' && (
             // The links open in a new tab, so the open file and its edits stay where they are.
             <div className="menu right" id="more-button-menu" role="menu">
+              <button role="menuitem" type="button" id="more-menu-open-url" onClick={() => (setOpenMenu(null), setOpenDialog({ kind: 'url' }))}>
+                <SpriteIcon name="file" isSmall />
+                {t('json.url.menu')}
+              </button>
+              <button role="menuitem" type="button" id="more-menu-sort-desc" disabled={!canChangeDocument} onClick={() => void sortDocumentKeys('desc')}>
+                <SpriteIcon name="sort" isSmall />
+                {t('json.sort.desc')}
+              </button>
+              <button role="menuitem" type="button" id="more-menu-sort-level" disabled={!canChangeDocument} onClick={() => void sortDocumentKeys('asc', true)}>
+                <SpriteIcon name="sort" isSmall />
+                {t('json.sort.levelOnly')}
+              </button>
+              <button role="menuitem" type="button" id="more-menu-remove-empties" disabled={!canChangeDocument} onClick={() => (setOpenMenu(null), setOpenDialog({ kind: 'empties' }))}>
+                <SpriteIcon name="x" isSmall />
+                {t('json.empties.menu')}
+              </button>
+              <button role="menuitem" type="button" id="more-menu-escape" disabled={!canChangeDocument} onClick={() => void escapeDocument()}>
+                <SpriteIcon name="braces" isSmall />
+                {t('json.escape.menu')}
+              </button>
+              <button role="menuitem" type="button" id="more-menu-unescape" disabled={!canChangeDocument} onClick={() => void unescapeDocument()}>
+                <SpriteIcon name="braces" isSmall />
+                {t('json.escape.unescapeMenu')}
+              </button>
+              <hr />
               <a role="menuitem" id="menu-link-privacy" href={localizePath(locale, '/privacy')} target="_blank" rel="noopener" onClick={() => setOpenMenu(null)}>
                 <SpriteIcon name="lock" isSmall />
                 {t('legal.privacy')}
@@ -1775,6 +2002,86 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         </button>
       </nav>
 
+      <WorkbenchDialog id="json-dialog" titleId="json-dialog-title" isOpen={openDialog !== null} onClose={() => setOpenDialog(null)}>
+        {openDialog && (
+          <div className="jdlg">
+            <div className="jdlg-head">
+              <h2 id="json-dialog-title">
+                {openDialog.kind === 'repair' ? t('json.repair.previewTitle') : openDialog.kind === 'empties' ? t('json.empties.menu') : openDialog.kind === 'url' ? t('json.url.menu') : openDialog.title}
+              </h2>
+              <button className="btn icon sm" type="button" id="json-dialog-close-button" aria-label={t('find.close')} onClick={() => setOpenDialog(null)}>
+                <SpriteIcon name="x" isSmall />
+              </button>
+            </div>
+            {openDialog.kind === 'repair' && (
+              <>
+                <p className="jdlg-note">{describeRepairFixes(openDialog.fixes, locale)}</p>
+                <div className="jdlg-diff" id="repair-preview" dir="ltr">
+                  {openDialog.changes.map((change, position) => (
+                    <div key={position} className={`dl ${change.kind}`}>
+                      <span className="ln">{change.lineNumber}</span>
+                      <span className="sg">{change.kind === 'added' ? '+' : '−'}</span>
+                      {change.text}
+                    </div>
+                  ))}
+                </div>
+                <div className="jdlg-foot">
+                  <button className="btn" type="button" id="repair-cancel-button" onClick={() => setOpenDialog(null)}>
+                    {t('json.dialog.cancel')}
+                  </button>
+                  <button className="btn primary" type="button" id="repair-apply-button" onClick={() => void applyRepair(openDialog.repairedText, openDialog.fixes)}>
+                    {t('json.repair.apply')}
+                  </button>
+                </div>
+              </>
+            )}
+            {openDialog.kind === 'empties' && (
+              <>
+                {(['nulls', 'emptyStrings', 'emptyObjects', 'emptyArrays'] as const).map((kind) => (
+                  <label key={kind} className="jdlg-check">
+                    <input type="checkbox" id={`empties-${kind}-checkbox`} checked={emptyKinds[kind]} onChange={(event) => setEmptyKinds({ ...emptyKinds, [kind]: event.target.checked })} />
+                    {t(`json.empties.${kind}` as MessageKey)}
+                  </label>
+                ))}
+                <p className="jdlg-note">{root !== null && tp('json.empties.preview', withoutEmptyValues(root, emptyKinds).removedCount)}</p>
+                <div className="jdlg-foot">
+                  <button className="btn" type="button" id="empties-cancel-button" onClick={() => setOpenDialog(null)}>
+                    {t('json.dialog.cancel')}
+                  </button>
+                  <button className="btn primary" type="button" id="empties-apply-button" onClick={() => void removeEmptyValues()}>
+                    {t('json.empties.apply')}
+                  </button>
+                </div>
+              </>
+            )}
+            {openDialog.kind === 'text' && (
+              <>
+                <pre className="jdlg-text" id="converted-text" dir="ltr">
+                  {openDialog.text}
+                </pre>
+                <div className="jdlg-foot">
+                  <button className="btn" type="button" id="converted-copy-button" onClick={() => void copyText(openDialog.text, t('json.convert.copied'))}>
+                    {t('json.convert.copy')}
+                  </button>
+                  <button className="btn primary" type="button" id="converted-download-button" onClick={() => downloadTextFile(openDialog.fileName, openDialog.text, openDialog.mimeType)}>
+                    {t('json.convert.download', { name: openDialog.fileName })}
+                  </button>
+                </div>
+              </>
+            )}
+            {openDialog.kind === 'url' && (
+              <Suspense fallback={null}>
+                <JsonUrlLoader
+                  onFileLoaded={(file) => {
+                    setOpenDialog(null)
+                    onOpenFile(file)
+                  }}
+                />
+              </Suspense>
+            )}
+          </div>
+        )}
+      </WorkbenchDialog>
       <div id="drop-overlay">{t('json.wb.dropOverlay')}</div>
       <div id="toast" role="status" aria-live="polite" className={toast.isShown ? 'show' : undefined}>
         {toast.message}

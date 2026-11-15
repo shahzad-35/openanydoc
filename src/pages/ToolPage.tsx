@@ -24,7 +24,8 @@ import { usePageHead } from './HomePage'
 // page is idle: App).
 const toolComponents = new Map(liveTools.flatMap((tool) => (tool.loadComponent ? [[tool.slug, lazy(tool.loadComponent)] as const] : [])))
 const MaskWorkbench = lazy(() => import('../formats/mask/MaskWorkbench'))
-// The formats the Mask Data page takes, for its list of extensions.
+const JsonUrlLoader = lazy(() => import('../formats/json/JsonUrlLoader'))
+// The formats the Mask Data page takes, for its list of extensions (only the extensions the page accepts are listed).
 const maskableViewers = viewers.filter((viewer) => ['csv', 'json', 'excel', 'text'].includes(viewer.id))
 
 // One page for every tool in src/tools/registry.ts. First screen (Step 17C): breadcrumb, heading, the sentence that answers the
@@ -63,6 +64,7 @@ export default function ToolPage({
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
   const [resultFile, setResultFile] = useState<File | null>(null)
   const [isDownloaded, setIsDownloaded] = useState(false)
+  const [isUrlLoaderShown, setIsUrlLoaderShown] = useState(false)
   // What a conversion page shows while it converts, or why it could not.
   const [isConverting, setIsConverting] = useState(false)
   const [conversionError, setConversionError] = useState<string | null>(null)
@@ -155,7 +157,7 @@ export default function ToolPage({
             <div className="hero-in mt-5 sm:mt-8">
               <DropPanel
                 intake={intake}
-                shownViewers={isMaskTool ? maskableViewers : toolViewer ? [toolViewer] : viewers}
+                shownViewers={isMaskTool && toolViewer ? maskableViewers.map((viewer) => ({ ...viewer, extensions: viewer.extensions.filter((extension) => toolViewer.extensions.includes(extension)) })) : toolViewer ? [toolViewer] : viewers}
                 currentViewerId={isMaskTool ? undefined : toolViewer?.id}
                 onNavigate={onNavigate}
                 onOpenInViewer={onOpenInViewer}
@@ -163,6 +165,20 @@ export default function ToolPage({
                 showOtherFormats={Boolean(toolViewer) && !convertTo}
                 samples={samplesByPage[address]}
               />
+              {/* The JSON pages can also open a file from a web address the visitor types (their browser fetches it). */}
+              {toolViewer?.id === 'json' && (
+                <div className="mt-4">
+                  {isUrlLoaderShown ? (
+                    <Suspense fallback={null}>
+                      <JsonUrlLoader onFileLoaded={(file) => void intake.openSampleFile(file)} />
+                    </Suspense>
+                  ) : (
+                    <button id="open-url-button" type="button" className="btn btn--quiet btn--compact press" onClick={() => setIsUrlLoaderShown(true)}>
+                      {t('json.url.menu')}
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
           {(isConverting || conversionError) && (

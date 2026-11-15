@@ -374,3 +374,69 @@
 @media (max-width: 760px) {
   #json-workbench:has(> #next-steps) { grid-template-rows: auto auto auto 1fr auto auto }
 }
+
+/* The view tabs can be more than fit (Tree, Table, Graph, Compare, Schema, Map data): they scroll sideways. */
+#json-workbench .pane-head .tabs { overflow-x: auto; min-width: 0; scrollbar-width: none }
+
+/* Graph view (JsonGraph.tsx, React Flow). The canvas stays left to right. */
+#json-workbench #graph-view { display: flex; flex-direction: column; overflow: hidden }
+#json-workbench .jg-bar { display: flex; gap: 6px; align-items: center; padding: 6px 8px; border-bottom: 1px solid var(--line); flex-wrap: wrap }
+#json-workbench .jg-bar .spacer { flex: 1 }
+#json-workbench .jg-note { margin: 0; padding: 6px 10px; font-size: 12px; color: var(--warn); background: var(--warn-soft) }
+#json-workbench .jg-canvas { flex: 1; min-height: 280px }
+#json-workbench .jg-canvas .react-flow { --xy-background-color: var(--panel); --xy-node-border-radius: 8px; --xy-minimap-background-color: var(--panel-2); --xy-controls-button-background-color: var(--raised); --xy-controls-button-color: var(--text); --xy-edge-stroke: var(--line-strong) }
+#json-workbench .jg-box { width: 240px; padding: 10px; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--raised); color: var(--text); font: 12px/18px var(--mono); box-shadow: 0 1px 2px rgba(0,0,0,.06) }
+#json-workbench .jg-box.selected { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft) }
+#json-workbench .jg-title { font-weight: 600; color: var(--sx-key) }
+#json-workbench .jg-field, #json-workbench .jg-more { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--muted) }
+
+/* Compare, Schema and Map data (JsonComparePanel, JsonSchemaPanel, JsonGeoPanel). */
+#json-workbench #compare-view, #json-workbench #schema-view, #json-workbench #geo-view { display: flex; flex-direction: column; gap: 8px; padding: 10px }
+#json-workbench .cmp-input textarea { width: 100%; min-height: 96px; resize: vertical; padding: 8px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); color: var(--text); font: 12px/1.5 var(--mono) }
+#json-workbench .cmp-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 6px }
+#json-workbench .cmp-name { font-size: 12px; color: var(--muted) }
+#json-workbench .cmp-check { display: inline-flex; gap: 6px; align-items: center; font-size: 12px; margin-inline-start: auto }
+#json-workbench .cmp-hint { margin: 4px 0 0; font-size: 12px; color: var(--faint) }
+#json-workbench .cmp-error { margin: 0; padding: 8px; border-radius: 6px; background: var(--err-soft); color: var(--err); font: 12px var(--mono); white-space: pre-wrap }
+#json-workbench .cmp-summary { margin: 0; font-weight: 600; font-size: 13px }
+#json-workbench .cmp-summary.ok { color: var(--ok) }
+#json-workbench .cmp-list { list-style: none; margin: 0; padding: 0; max-height: 180px; overflow: auto; border: 1px solid var(--line); border-radius: 6px }
+#json-workbench .cmp-diff { display: flex; gap: 8px; width: 100%; padding: 4px 8px; border: 0; border-bottom: 1px solid var(--guide); background: transparent; color: var(--text); text-align: start; font-size: 12px; cursor: pointer }
+#json-workbench .cmp-diff:hover { background: var(--hover) }
+#json-workbench .cmp-diff .k { font-weight: 600; min-width: 72px }
+#json-workbench .cmp-diff .m { color: var(--muted) }
+#json-workbench .cmp-diff.added .k { color: var(--ok) }
+#json-workbench .cmp-diff.removed .k { color: var(--err) }
+#json-workbench .cmp-diff.changed .k, #json-workbench .cmp-diff.reordered .k { color: var(--warn) }
+#json-workbench .cmp-sides { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; min-height: 0 }
+#json-workbench .cmp-side { margin: 0; max-height: 60vh; overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); font: 12px/18px var(--mono) }
+#json-workbench .cmp-line { padding-inline-end: 8px; white-space: pre }
+#json-workbench .cmp-line .ln { display: inline-block; width: 44px; padding-inline-end: 8px; color: var(--faint); text-align: right; user-select: none }
+#json-workbench .cmp-line.added { background: var(--ok-soft) }
+#json-workbench .cmp-line.removed { background: var(--err-soft) }
+#json-workbench .cmp-line.changed, #json-workbench .cmp-line.reordered { background: var(--warn-soft) }
+#json-workbench .geo-table { max-height: 60vh }
+@media (max-width: 760px) { #json-workbench .cmp-sides { grid-template-columns: 1fr } }
+
+/* The JSON page's dialogs: Repair's preview, remove empty values, a converted text, open from a URL. */
+#json-dialog { margin: auto; padding: 0; width: min(720px, calc(100vw - 24px)); max-height: calc(100dvh - 48px); border: 1px solid var(--line-strong); border-radius: 10px; background: var(--raised); color: var(--text); box-shadow: var(--shadow) }
+#json-dialog::backdrop { background: rgba(10, 14, 22, .45) }
+#json-dialog .jdlg { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; max-height: calc(100dvh - 50px) }
+#json-dialog .jdlg-head { display: flex; align-items: center; justify-content: space-between; gap: 8px }
+#json-dialog h2 { margin: 0; font-size: 15px; font-weight: 600 }
+#json-dialog .jdlg-note { margin: 0; font-size: 13px; color: var(--muted) }
+#json-dialog .jdlg-check { display: flex; gap: 8px; align-items: center; min-height: 32px; font-size: 13px }
+#json-dialog .jdlg-diff, #json-dialog .jdlg-text { margin: 0; flex: 1; min-height: 120px; max-height: 55vh; overflow: auto; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); font: 12px/18px var(--mono); white-space: pre }
+#json-dialog .jdlg-text { padding: 8px }
+#json-dialog .dl { padding-inline-end: 8px }
+#json-dialog .dl .ln { display: inline-block; width: 48px; padding-inline-end: 6px; color: var(--faint); text-align: right; user-select: none }
+#json-dialog .dl .sg { display: inline-block; width: 16px; font-weight: 700 }
+#json-dialog .dl.added { background: var(--ok-soft) }
+#json-dialog .dl.removed { background: var(--err-soft); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--err) 50%, transparent) }
+#json-dialog .jdlg-foot { display: flex; justify-content: flex-end; gap: 8px; flex-wrap: wrap }
+#json-dialog .url-loader { max-width: none; margin: 0 }
+#json-dialog .url-loader input { border: 1px solid var(--line); border-radius: 6px; background: var(--panel-2); color: var(--text); min-height: 36px }
+#json-dialog .url-loader .url-note { color: var(--muted) }
+#json-dialog .url-loader .url-error { color: var(--err) }
+#json-workbench .cmp-col { min-width: 0 }
+#json-workbench .cmp-col-title { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--muted) }

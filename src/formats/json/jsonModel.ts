@@ -2,6 +2,8 @@ import { translate, translatePlural } from '../../i18n'
 import type { Locale } from '../../i18n'
 import { isBigNumber, restoreBigNumbers } from './jsonTools'
 import type { BigNumber } from './jsonTools'
+import type { JsonSourceFormat } from './jsonFormats'
+import type { JsonParseRequest } from './jsonParse.worker'
 
 // A BigNumber is a number too long to keep in a JavaScript number, held as its exact text (see jsonTools.ts).
 export type JsonValue = null | boolean | number | BigNumber | string | JsonValue[] | { [key: string]: JsonValue }
@@ -9,7 +11,8 @@ export type JsonContainer = JsonValue[] | { [key: string]: JsonValue }
 // The steps from the document root to a node: object keys and array positions.
 export type JsonPath = (string | number)[]
 
-export type JsonParseResult = { status: 'ok'; value: JsonValue; bigNumberCount: number } | { status: 'error'; message: string; line: number | null; column: number | null }
+// `convertedText`: the JSON text a JSON Lines, JSON5 or YAML file was turned into (jsonFormats.ts).
+export type JsonParseResult = { status: 'ok'; value: JsonValue; bigNumberCount: number; convertedText?: string } | { status: 'error'; message: string; line: number | null; column: number | null }
 
 // The edit model: the parsed document, changed by copying only the path to the changed node, so the undo history shares
 // everything else and stays small even for a 50 MB file. `root` is null until the first edit (the original text is then used).
@@ -51,7 +54,7 @@ function getChild(container: JsonContainer, step: string | number): JsonValue {
 }
 
 // Parsing runs in a Web Worker so a 50 MB file never freezes the page.
-export function parseJsonText(text: string, locale: Locale): Promise<JsonParseResult> {
+export function parseJsonText(text: string, locale: Locale, format: JsonSourceFormat = 'json'): Promise<JsonParseResult> {
   return new Promise((resolve) => {
     const worker = new Worker(new URL('./jsonParse.worker.ts', import.meta.url), { type: 'module' })
     worker.onmessage = (event: MessageEvent<JsonParseResult>) => {
@@ -63,7 +66,7 @@ export function parseJsonText(text: string, locale: Locale): Promise<JsonParseRe
       worker.terminate()
       resolve({ status: 'error', message: translate(locale, 'json.parse.readerFailed'), line: null, column: null })
     }
-    worker.postMessage(text)
+    worker.postMessage({ text, format } satisfies JsonParseRequest)
   })
 }
 
@@ -212,6 +215,36 @@ export function formatPathText(path: JsonPath) {
     (text, step) => (typeof step === 'number' ? `${text}[${step}]` : /^[A-Za-z_$][\w$]*$/.test(step) ? `${text}.${step}` : `${text}[${JSON.stringify(step)}]`),
     '$',
   )
+}
+
+// A path as code writes it, without the "$": data.items[3].price (a key that is not a plain name in brackets: data["zip code"]).
+export function formatPathForCode(path: JsonPath) {
+  return formatPathText(path).replace(/^\$\.?/, '')
+}
+
+export type EmptyValueKinds = { nulls: boolean; emptyStrings: boolean; emptyObjects: boolean; emptyArrays: boolean }
+
+// The document without the chosen kinds of empty value, inside objects and lists, and how many were taken out. A container left
+// empty by the removal is removed too when that kind is chosen. The root itself always stays.
+export function withoutEmptyValues(root: JsonValue, kinds: EmptyValueKinds): { value: JsonValue; removedCount: number } {
+  let removedCount = 0
+  const isRemovable = (value: JsonValue) =>
+    (kinds.nulls && value === null) ||
+    (kinds.emptyStrings && value === '') ||
+    (kinds.emptyArrays && Array.isArray(value) && value.length === 0) ||
+    (kinds.emptyObjects && isPlainObject(value) && Object.keys(value).length === 0)
+  const clean = (value: JsonValue): JsonValue => {
+    if (Array.isArray(value)) {
+      const kept = value.map(clean).filter((child) => !isRemovable(child) || (removedCount++, false))
+      return kept.length === value.length && kept.every((child, position) => child === value[position]) ? value : kept
+    }
+    if (isPlainObject(value)) {
+      const keptEntries = Object.entries(value).map(([key, child]) => [key, clean(child)] as const).filter(([, child]) => !isRemovable(child) || (removedCount++, false))
+      return Object.fromEntries(keptEntries)
+    }
+    return value
+  }
+  return { value: clean(root), removedCount }
 }
 
 // `position` and `siblingCount` place the row among its parent's children (the root is 0 of 1).

@@ -22,7 +22,7 @@ export type ConversionTarget = 'csv' | 'xlsx' | 'json'
 export const viewers: Viewer[] = [
   { id: 'csv', label: 'CSV', extensions: ['.csv', '.tsv', '.tab', '.parquet'], toolPath: '/csv-viewer', featureKeys: ['highlights.csv.open', 'highlights.csv.edit', 'highlights.csv.large'] },
   { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer', featureKeys: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'] },
-  { id: 'json', label: 'JSON', extensions: ['.json'], toolPath: '/json-viewer', featureKeys: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'] },
+  { id: 'json', label: 'JSON', extensions: ['.json', '.jsonl', '.ndjson', '.json5', '.geojson', '.yaml', '.yml'], toolPath: '/json-viewer', featureKeys: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'] },
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer', featureKeys: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'] },
   { id: 'word', label: 'Word', extensions: ['.docx'], toolPath: '/word-viewer', featureKeys: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'] },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'] },
@@ -56,6 +56,7 @@ export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: s
 export const landingPages: LandingPage[] = [
   { path: '/json-formatter', viewerId: 'json' },
   { path: '/json-validator', viewerId: 'json' },
+  { path: '/json-escape-unescape', viewerId: 'json', extensions: ['.json'] },
   { path: '/tsv-viewer', viewerId: 'csv', extensions: ['.tsv', '.tab'] },
   { path: '/large-csv-viewer', viewerId: 'csv' },
   { path: '/xls-viewer', viewerId: 'excel', extensions: ['.xls'] },
@@ -63,7 +64,7 @@ export const landingPages: LandingPage[] = [
   { path: '/csv-to-excel', viewerId: 'csv', convertTo: 'xlsx' },
   { path: '/excel-to-json', viewerId: 'excel', convertTo: 'json' },
   { path: '/csv-to-json', viewerId: 'csv', convertTo: 'json' },
-  { path: '/json-to-csv', viewerId: 'json', convertTo: 'csv' },
+  { path: '/json-to-csv', viewerId: 'json', extensions: ['.json'], convertTo: 'csv' },
   { path: '/mask-data', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.json', '.xlsx', '.xls', '.xlsm', '.ods', '.txt'], tool: 'mask' },
 ]
 

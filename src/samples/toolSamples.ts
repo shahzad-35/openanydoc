@@ -42,6 +42,14 @@ const ARABIC_CSV = `الرقم,الاسم,المدينة,الطلبات,المب
 7,نور سالم,الرياض,9,512.75,2025-06-03
 8,أحمد سعيد,جدة,1,18.40,2025-06-21
 `
+const ESCAPE_SAMPLE_JSON = `{
+  "event": "order.created",
+  "orderId": 90210,
+  "customer": { "name": "Chloé Martin", "email": "chloe.martin@example.com" },
+  "note": "Ring twice and say \\"hi\\"",
+  "items": [{ "sku": "BK-01", "qty": 2 }, { "sku": "PN-07", "qty": 5 }]
+}
+`
 const PRODUCTS_TSV = 'sku\tproduct\tcategory\tprice\tin_stock\nBK-01\tNotebook, A5\tStationery\t4.90\t120\nPN-07\tGel pen (black)\tStationery\t1.20\t540\nLM-03\tDesk lamp\tHome\t29.00\t18\nBP-11\tBackpack 20 L\tBags\t39.50\t32\nWB-02\tWater bottle\tHome\t12.00\t75\n'
 const ARABIC_TSV = 'الرمز\tالمنتج\tالفئة\tالسعر\tالمخزون\nBK-01\tدفتر ملاحظات\tقرطاسية\t4.90\t120\nPN-07\tقلم حبر أسود\tقرطاسية\t1.20\t540\nLM-03\tمصباح مكتب\tالمنزل\t29.00\t18\nBP-11\tحقيبة ظهر\tحقائب\t39.50\t32\n'
 const RELEASE_NOTES_TXT = `Release notes, version 2.4 (synthetic sample)
@@ -121,6 +129,9 @@ const samples = {
   recordsJson: { id: 'records-json', buildFile: textFile('customers.json', RECORDS_JSON, 'application/json') },
   nestedOrdersJson: { id: 'nested-orders-json', buildFile: textFile('orders.json', NESTED_ORDERS_JSON, 'application/json') },
   brokenJson: { id: 'broken-json', buildFile: textFile('broken.json', BROKEN_JSON, 'application/json') },
+  // An API payload to escape, and the same kind of payload as an escaped string (as copied from a log) to unescape.
+  payloadJson: { id: 'payload-json', buildFile: textFile('payload.json', ESCAPE_SAMPLE_JSON, 'application/json') },
+  escapedJson: { id: 'escaped-json', buildFile: textFile('escaped-payload.json', JSON.stringify(JSON.stringify(JSON.parse(ESCAPE_SAMPLE_JSON))), 'application/json') },
   salesXlsx: bundledSample('sales-xlsx', 'sales-three-sheets.xlsx', XLSX_TYPE, () => import('./sales-three-sheets.xlsx?inline')),
   arabicXlsx: bundledSample('arabic-xlsx', 'arabic-branches.xlsx', XLSX_TYPE, () => import('./arabic-branches.xlsx?inline')),
   budgetXls: bundledSample('budget-xls', 'budget-1997.xls', 'application/vnd.ms-excel', () => import('./budget-1997.xls?inline')),
@@ -146,6 +157,7 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/json-viewer': [samples.nestedJson, samples.recordsJson],
   '/json-formatter': [samples.nestedJson, samples.recordsJson],
   '/json-validator': [samples.brokenJson, samples.nestedJson],
+  '/json-escape-unescape': [samples.escapedJson, samples.payloadJson],
   '/json-to-csv': [samples.recordsJson, samples.nestedOrdersJson],
   '/excel-viewer': [samples.salesXlsx, samples.arabicXlsx],
   '/excel-to-csv': [samples.salesXlsx, samples.arabicXlsx],
