@@ -1,11 +1,15 @@
-import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
-import type { ClipboardEvent, KeyboardEvent } from 'react'
+import { Suspense, lazy, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
+import type { ClipboardEvent, KeyboardEvent, MouseEvent } from 'react'
 import { textControlClassName } from '../../buttonStyles'
 import { FatalFileError, Notice } from '../../components/Messages'
-import { getLargeFileWarning } from '../../useFileIntake'
+import { formatFileSize, getLargeFileWarning } from '../../useFileIntake'
 import { isolateText, useT } from '../../i18n'
 import type { Locale } from '../../i18n'
 import type { FormatViewerProps } from '../registry'
+import { ColumnProfileView } from '../ColumnProfile'
+import { COLUMN_TYPE_LABEL_KEYS, buildColumnProfile, detectColumnInfo, formatFilterRowText, parseFilterRowText, parseNumber, passesFilter } from '../csv/csvAnalysis'
+import type { ColumnFilter } from '../csv/csvAnalysis'
+import { Sidebar, WorkbenchDialog } from '../sheet/SheetChrome'
 import DataTable, { SearchIcon, columnLabel, getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
 import type { DataTableHandle, SortState } from '../DataTable'
 import type { EditSession } from '../useEditSession'
@@ -24,6 +28,9 @@ import {
   getSheetView,
   parseCellInput,
   describeUnreadableWorkbook,
+  findCellByAddress,
+  getCellNote,
+  getCellValueText,
   parseWorkbook,
   readCell,
   readOriginalCell,
@@ -48,7 +55,7 @@ import {
   withRenamedSheet,
   withReplacedText,
 } from './excelModel'
-import type { CellPosition, CellStyle, ExcelEdits, ExcelExportSource, ExcelSelection, ExcelViewerCommands, ParseResult } from './excelModel'
+import type { CellPosition, CellStyle, ExcelEdits, ExcelExportSource, ExcelPanelTab, ExcelSelection, ExcelViewerCommands, ExcelWorkbookDialog, ParseResult } from './excelModel'
 import type { ExcelActions, ExcelEditingComponents, SheetDialog } from './excelEditing'
 import { createFormulaCalculator, translateFormulaRefs } from './excelFormulas'
 import { MAX_STYLED_FILE_BYTES, readWorkbookStyles } from './excelStyles'
@@ -61,6 +68,26 @@ type CellRange = { anchor: CellPosition; focus: CellPosition }
 
 const noIds: number[] = []
 const MAX_CLIPBOARD_CELLS = 200_000
+const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgent)
+
+// Only web and e-mail links are opened; javascript:, file: and other schemes are not.
+function isSafeLink(address: string) {
+  try {
+    return ['http:', 'https:', 'mailto:'].includes(new URL(address).protocol)
+  } catch {
+    return false
+  }
+}
+
+// The side panels and workbook dialogs are fetched when first opened.
+const FormulaListPanel = lazy(() => import('./ExcelPanels').then((panels) => ({ default: panels.FormulaListPanel })))
+const WorkbookSearchPanel = lazy(() => import('./ExcelPanels').then((panels) => ({ default: panels.WorkbookSearchPanel })))
+const SheetComparePanel = lazy(() => import('./ExcelPanels').then((panels) => ({ default: panels.SheetComparePanel })))
+const WorkbookInfoDialog = lazy(() => import('./ExcelDialogs').then((dialogs) => ({ default: dialogs.WorkbookInfoDialog })))
+const PrintSheetDialog = lazy(() => import('./ExcelDialogs').then((dialogs) => ({ default: dialogs.PrintSheetDialog })))
+const WorkbookFilesDialog = lazy(() => import('./ExcelDialogs').then((dialogs) => ({ default: dialogs.WorkbookFilesDialog })))
+
+const DIALOG_TITLE_IDS: Record<ExcelWorkbookDialog, string> = { info: 'workbook-info-title', print: 'print-sheet-title', files: 'workbook-files-title' }
 
 // SheetJS reads the file in a Web Worker (a 20,000-row workbook held the page for about 300 ms). It lives here, not in
 // excelModel.ts, because the worker imports excelModel.ts. If the worker cannot start, the page reads the file itself.
@@ -70,7 +97,7 @@ export function readWorkbookInWorker(contents: ArrayBuffer, fileName: string, lo
     worker.onmessage = (event: MessageEvent<ExcelParseMessage>) => {
       worker.terminate()
       const message = event.data
-      resolve(message.status === 'ok' ? message : { status: 'error', message: describeUnreadableWorkbook(message.reason, locale) })
+      resolve(message.status === 'ok' ? message : describeUnreadableWorkbook(message.reason, locale))
     }
     worker.onerror = () => {
       worker.terminate()
@@ -96,6 +123,7 @@ export default function ExcelViewer({
   session: untypedSession,
   editingComponents,
   onOpenAnotherFile,
+  onOpenFile,
   onSelectionChange,
   onCommandsChange,
   onExportSourceChange,
@@ -122,6 +150,18 @@ export default function ExcelViewer({
   const [matchCase, setMatchCase] = useState(false)
   const [matchPosition, setMatchPosition] = useState(0)
   const [replaceResultMessage, setReplaceResultMessage] = useState('')
+  const [showFormulas, setShowFormulas] = useState(false)
+  const [showHidden, setShowHidden] = useState(false)
+  const [isFilterRowShown, setIsFilterRowShown] = useState(false)
+  // Filters belong to the sheet on screen and are cleared when another sheet is shown.
+  const [columnFilters, setColumnFilters] = useState<ColumnFilter[]>([])
+  const [filterRowDrafts, setFilterRowDrafts] = useState<ReadonlyMap<number, string>>(new Map())
+  const [panelTab, setPanelTab] = useState<ExcelPanelTab | null>(null)
+  const [workbookDialog, setWorkbookDialog] = useState<ExcelWorkbookDialog | null>(null)
+  // Hidden sheets the visitor chose to see get a tab.
+  const [revealedSheetIds, setRevealedSheetIds] = useState<ReadonlySet<number>>(new Set())
+  const [comparedCellKeys, setComparedCellKeys] = useState<ReadonlySet<string>>(new Set())
+  const [revealRequestCount, setRevealRequestCount] = useState(0)
   const deferredSearchText = useDeferredValue(searchText)
   const deferredFindText = useDeferredValue(findText)
   const tableRef = useRef<DataTableHandle>(null)
@@ -141,6 +181,8 @@ export default function ExcelViewer({
     setSortState(null)
     setRange(null)
     setEditingCell(null)
+    setColumnFilters([])
+    setRevealedSheetIds(new Set())
     resetEditSession()
     let isCurrentRead = true
     void readWorkbookInWorker(openedFile.contents, openedFile.file.name, locale).then((newParseResult) => {
@@ -152,14 +194,22 @@ export default function ExcelViewer({
     // A language change must not re-read the file and drop the visitor's edits.
   }, [openedFile, resetEditSession]) // oxlint-disable-line react-hooks/exhaustive-deps
 
-  // "/" jumps to the search box. It is registered only while this viewer is on screen.
+  // "/" jumps to the search box, Ctrl+` (⌘` on a Mac) shows formulas and Ctrl+Shift+F searches every sheet. They are registered only
+  // while this viewer is on screen.
   useEffect(() => {
     function focusSearchOnSlash(event: globalThis.KeyboardEvent) {
       const target = event.target
       const isTyping = target instanceof HTMLInputElement || target instanceof HTMLSelectElement || target instanceof HTMLTextAreaElement
-      if (event.key === '/' && !isTyping && !event.ctrlKey && !event.metaKey) {
+      const hasShortcutModifier = event.ctrlKey || event.metaKey
+      if (event.key === '/' && !isTyping && !hasShortcutModifier) {
         event.preventDefault()
         searchInputRef.current?.focus()
+      } else if (event.key === '`' && hasShortcutModifier) {
+        event.preventDefault()
+        setShowFormulas((isShown) => !isShown)
+      } else if (event.key.toLowerCase() === 'f' && hasShortcutModifier && event.shiftKey) {
+        event.preventDefault()
+        setPanelTab('search')
       }
     }
     window.addEventListener('keydown', focusSearchOnSlash)
@@ -194,7 +244,10 @@ export default function ExcelViewer({
     }
   }, [parsed, hasStyledFileType, openedFile])
   const sheetRecords = useMemo(() => (parsed ? getSheetRecords(parsed, edits) : []), [parsed, edits])
-  const activeSheetId = sheetRecords.some((sheetRecord) => sheetRecord.id === pickedSheetId) ? pickedSheetId : (sheetRecords[0]?.id ?? null)
+  // A workbook opens on its first sheet that is not hidden.
+  const isHiddenSheet = (sheetId: number) => sheetId >= 0 && parsed !== null && parsed.sheets[sheetId]?.visibility !== 'visible'
+  const firstShownSheet = sheetRecords.find((sheetRecord) => !isHiddenSheet(sheetRecord.id)) ?? sheetRecords[0]
+  const activeSheetId = sheetRecords.some((sheetRecord) => sheetRecord.id === pickedSheetId) ? pickedSheetId : (firstShownSheet?.id ?? null)
   const activeSheetName = sheetRecords.find((sheetRecord) => sheetRecord.id === activeSheetId)?.name ?? ''
   // Formula cells show values worked out from the edits; the calculator is rebuilt with every edit and works only on the cells drawn.
   const formulaCalculator = useMemo(() => (parsed ? createFormulaCalculator(parsed, edits) : null), [parsed, edits])
@@ -225,6 +278,13 @@ export default function ExcelViewer({
   const displayRowIds = useMemo(() => (hasHeaderRow ? allRowIds.slice(1) : allRowIds), [allRowIds, hasHeaderRow])
   const allRowPositionById = useMemo(() => new Map(allRowIds.map((rowId, position) => [rowId, position])), [allRowIds])
 
+  // Rows and columns the file hides are left out unless "Show hidden rows and columns" is on.
+  const hiddenRowIds = useMemo(() => new Set((sheetOriginal?.worksheet['!rows'] ?? []).flatMap((rowInfo, rowId) => (rowInfo?.hidden ? [rowId] : []))), [sheetOriginal])
+  const hiddenColumnIds = useMemo(() => new Set((sheetOriginal?.worksheet['!cols'] ?? []).flatMap((columnInfo, columnId) => (columnInfo?.hidden ? [columnId] : []))), [sheetOriginal])
+  const unhiddenRowIds = useMemo(() => (showHidden || hiddenRowIds.size === 0 ? displayRowIds : displayRowIds.filter((rowId) => !hiddenRowIds.has(rowId))), [displayRowIds, hiddenRowIds, showHidden])
+  const shownColumnIds = useMemo(() => (showHidden || hiddenColumnIds.size === 0 ? columnIds : columnIds.filter((columnId) => !hiddenColumnIds.has(columnId))), [columnIds, hiddenColumnIds, showHidden])
+  const shownColumnPositionById = useMemo(() => new Map(shownColumnIds.map((columnId, position) => [columnId, position])), [shownColumnIds])
+
   const columnNames = useMemo(
     () =>
       columnIds.map((columnId, columnPosition) => {
@@ -249,10 +309,19 @@ export default function ExcelViewer({
   const activeSort = sortState && columnIds.includes(sortState.columnId) ? sortState : null
   const sheetDataKey = useMemo(() => ({}), [parsed, activeSheetId]) // oxlint-disable-line react-hooks/exhaustive-deps
 
+  // Column filters compare a cell's plain value (numbers without their format, dates as yyyy-mm-dd), read when the filters change.
+  // Rows added here stay in view, and so do frozen rows (titles and headers), as Excel filters only below them.
+  const frozenRowCount = sheetOriginal?.frozen?.rowCount ?? 0
+  const filteredRowIds = useMemo(() => {
+    if (columnFilters.length === 0 || !sheet) return unhiddenRowIds
+    const isKept = (rowId: number) => rowId < 0 || (allRowPositionById.get(rowId) ?? Infinity) < frozenRowCount
+    return unhiddenRowIds.filter((rowId) => isKept(rowId) || columnFilters.every((filter) => passesFilter(getCellValueText(sheet, rowId, filter.columnId), filter)))
+  }, [unhiddenRowIds, columnFilters, frozenRowCount, sheetDataKey]) // oxlint-disable-line react-hooks/exhaustive-deps
+
   // Search and sort read the sheet as it was when they last changed, so a row does not jump away while it is edited.
   const visibleRowIds = useVisibleRowIds({
-    rowIds: displayRowIds,
-    columnIds,
+    rowIds: filteredRowIds,
+    columnIds: shownColumnIds,
     searchText: deferredSearchText,
     sort: activeSort,
     readText: (rowId, columnId) => (sheetRef.current ? getCellText(sheetRef.current, rowId, columnId) : ''),
@@ -269,26 +338,40 @@ export default function ExcelViewer({
     if (!sheet) return spans
     for (const merge of getMerges(sheet)) {
       const firstRowPosition = visiblePositionByRowId.get(merge.rowIds[0])
-      const firstColumnPosition = columnPositionById.get(merge.columnIds[0])
+      const firstColumnPosition = shownColumnPositionById.get(merge.columnIds[0])
       if (firstRowPosition === undefined || firstColumnPosition === undefined) continue
       const rowsAreTogether = merge.rowIds.every((rowId, offset) => visiblePositionByRowId.get(rowId) === firstRowPosition + offset)
-      const columnsAreTogether = merge.columnIds.every((columnId, offset) => columnPositionById.get(columnId) === firstColumnPosition + offset)
+      const columnsAreTogether = merge.columnIds.every((columnId, offset) => shownColumnPositionById.get(columnId) === firstColumnPosition + offset)
       if (rowsAreTogether && columnsAreTogether && merge.rowIds.length * merge.columnIds.length > 1) {
         spans.set(cellKey(merge.rowIds[0], merge.columnIds[0]), { rowSpan: merge.rowIds.length, columnSpan: merge.columnIds.length })
       }
     }
     return spans
-  }, [sheet, visiblePositionByRowId, columnPositionById])
+  }, [sheet, visiblePositionByRowId, shownColumnPositionById])
+
+  // Frozen panes: the frozen rows that lead the shown rows stay under the header, and the frozen columns that lead the shown
+  // columns stay at the start. Sorting a frozen row away simply unpins it.
+  const frozen = sheetOriginal?.frozen ?? null
+  let pinnedRowCount = 0
+  while (frozen && pinnedRowCount < visibleRowIds.length && (allRowPositionById.get(visibleRowIds[pinnedRowCount]) ?? Infinity) < frozen.rowCount) pinnedRowCount++
+  let frozenColumnCount = 0
+  while (frozen && frozenColumnCount < shownColumnIds.length && (columnPositionById.get(shownColumnIds[frozenColumnCount]) ?? Infinity) < frozen.columnCount) frozenColumnCount++
+
+  const shownColumnNames = useMemo(() => shownColumnIds.map((columnId) => columnNames[columnPositionById.get(columnId) ?? 0]), [shownColumnIds, columnNames, columnPositionById])
+  const shownColumnWidthsPx = useMemo(() => shownColumnIds.map((columnId) => columnWidthsPx[columnPositionById.get(columnId) ?? 0]), [shownColumnIds, columnWidthsPx, columnPositionById])
 
   // Like a spreadsheet, a cell is always selected: the first one until the visitor picks another, so every tool works at once.
+  // When a filter hides the picked cell's row, the first shown row of the same column is selected, so the column (and its profile)
+  // stays the same.
   const firstRowId = visibleRowIds[0]
-  const firstColumnId = columnIds[0]
+  const firstColumnId = pickedRange && shownColumnPositionById.has(pickedRange.focus.columnId) ? pickedRange.focus.columnId : shownColumnIds[0]
+  const isPickedRowShown = pickedRange !== null && visiblePositionByRowId.has(pickedRange.focus.rowId)
   const range = useMemo(
-    () => pickedRange ?? (firstRowId !== undefined && firstColumnId !== undefined ? { anchor: { rowId: firstRowId, columnId: firstColumnId }, focus: { rowId: firstRowId, columnId: firstColumnId } } : null),
-    [pickedRange, firstRowId, firstColumnId],
+    () => (pickedRange && (isPickedRowShown || columnFilters.length === 0) ? pickedRange : firstRowId !== undefined && firstColumnId !== undefined ? { anchor: { rowId: firstRowId, columnId: firstColumnId }, focus: { rowId: firstRowId, columnId: firstColumnId } } : null),
+    [pickedRange, isPickedRowShown, columnFilters.length, firstRowId, firstColumnId],
   )
   // The selected cell is the end of the range; it stays selected only while its row and column are still shown.
-  const selectedCell = range && visiblePositionByRowId.has(range.focus.rowId) && columnPositionById.has(range.focus.columnId) ? range.focus : null
+  const selectedCell = range && visiblePositionByRowId.has(range.focus.rowId) && shownColumnPositionById.has(range.focus.columnId) ? range.focus : null
   const rangeBounds = useMemo(() => {
     if (!range || !selectedCell) return null
     const anchorRow = visiblePositionByRowId.get(range.anchor.rowId)
@@ -365,8 +448,8 @@ export default function ExcelViewer({
   function moveSelection(rowStep: number, columnStep: number, extendRange: boolean) {
     if (!selectedCell || !range) return
     const rowPosition = Math.max(0, Math.min((visiblePositionByRowId.get(selectedCell.rowId) as number) + rowStep, visibleRowIds.length - 1))
-    const columnPosition = Math.max(0, Math.min((columnPositionById.get(selectedCell.columnId) as number) + columnStep, columnIds.length - 1))
-    const newFocus = { rowId: visibleRowIds[rowPosition], columnId: columnIds[columnPosition] }
+    const columnPosition = Math.max(0, Math.min((shownColumnPositionById.get(selectedCell.columnId) as number) + columnStep, shownColumnIds.length - 1))
+    const newFocus = { rowId: visibleRowIds[rowPosition], columnId: shownColumnIds[columnPosition] }
     setRange({ anchor: extendRange ? range.anchor : newFocus, focus: newFocus })
     tableRef.current?.scrollToRow(rowPosition)
   }
@@ -628,6 +711,104 @@ export default function ExcelViewer({
     setEditingCell(null)
     setInputMessage('')
     setColumnMenu(null)
+    setColumnFilters([])
+    setFilterRowDrafts(new Map())
+  }
+
+  // Shows a cell anywhere in the workbook (from the formula list, search, compare or a link): its sheet, with the search and filters
+  // cleared and hidden rows and columns shown when it is in one, then selects it once it is drawn.
+  function goToCell(sheetId: number, rowId: number, columnId: number) {
+    const original = sheetId >= 0 ? parsed?.sheets[sheetId] : undefined
+    if (original && original.visibility !== 'visible') setRevealedSheetIds((sheetIds) => new Set(sheetIds).add(sheetId))
+    if (original?.worksheet['!rows']?.[rowId]?.hidden || original?.worksheet['!cols']?.[columnId]?.hidden) setShowHidden(true)
+    if (sheetId !== activeSheetId) selectSheet(sheetId)
+    setSearchText('')
+    clearColumnFilters()
+    pendingRevealRef.current = { rowId, columnId }
+    setRevealRequestCount((count) => count + 1)
+  }
+
+  // A link opens with Ctrl+click (⌘+click on a Mac), as in Excel; a plain click selects the cell. A link to a place in the workbook
+  // ("Sheet2!B4") goes there; only web and e-mail links open, in a new tab that cannot reach back to this page.
+  function openCellLink(link: XLSX.Hyperlink) {
+    const location = (link as XLSX.Hyperlink & { location?: string }).location
+    const target = location ?? link.Target
+    if (location || target.startsWith('#')) {
+      const reference = target.replace(/^#/, '')
+      const separatorPosition = reference.lastIndexOf('!')
+      const sheetName = separatorPosition > 0 ? reference.slice(0, separatorPosition).replace(/^'(.*)'$/, '$1').replaceAll("''", "'") : activeSheetName
+      const record = sheetRecords.find((sheetRecord) => sheetRecord.name.toLowerCase() === sheetName.toLowerCase())
+      const targetCell = record && parsed ? findCellByAddress(getSheetView(parsed, edits, record.id), reference.slice(separatorPosition + 1).split(':')[0]) : null
+      if (!record || !targetCell) setInputMessage(t('excel.msg.linkTargetMissing'))
+      else goToCell(record.id, targetCell.rowId, targetCell.columnId)
+      return
+    }
+    if (isSafeLink(target)) window.open(target, '_blank', 'noopener,noreferrer')
+    else setInputMessage(t('excel.msg.linkBlocked'))
+  }
+
+  // ------------------------------------------------------------ column filters and profile
+
+  function setColumnFilter(columnId: number, filter: ColumnFilter | null) {
+    setColumnFilters((currentFilters) => {
+      const otherFilters = currentFilters.filter((existing) => existing.columnId !== columnId)
+      return filter ? [...otherFilters, filter] : otherFilters
+    })
+  }
+
+  // A filter set from the profile replaces what was typed in that column's filter box.
+  function setColumnFilterFromProfile(columnId: number, filter: ColumnFilter) {
+    setColumnFilter(columnId, filter)
+    setFilterRowDrafts((drafts) => {
+      const remainingDrafts = new Map(drafts)
+      remainingDrafts.delete(columnId)
+      return remainingDrafts
+    })
+    setIsFilterRowShown(true)
+  }
+
+  function clearColumnFilters() {
+    setColumnFilters([])
+    setFilterRowDrafts(new Map())
+  }
+
+  // The filter row: a box's text becomes that column's filter at once ("north", ">=100", "10..20", "2026-01-01..", "=Done", "empty").
+  const filterRow = {
+    getText: (columnId: number) => {
+      const draft = filterRowDrafts.get(columnId)
+      if (draft !== undefined) return draft
+      const filter = columnFilters.find((existing) => existing.columnId === columnId)
+      return filter ? (formatFilterRowText(filter) ?? '') : ''
+    },
+    onChange: (columnId: number, text: string) => {
+      setFilterRowDrafts((drafts) => new Map(drafts).set(columnId, text))
+      setColumnFilter(columnId, parseFilterRowText(text, columnId))
+    },
+    onBlur: (columnId: number) =>
+      setFilterRowDrafts((drafts) => {
+        const remainingDrafts = new Map(drafts)
+        remainingDrafts.delete(columnId)
+        return remainingDrafts
+      }),
+  }
+
+  // The profile describes the selected cell's column over the data rows on screen (frozen title and total rows left out).
+  const deferredSheet = useDeferredValue(sheet)
+  const profileColumnId = panelTab === 'profile' ? (selectedCell?.columnId ?? null) : null
+  const deferredVisibleRowIds = useDeferredValue(visibleRowIds)
+  const columnProfile = useMemo(() => {
+    if (profileColumnId === null || !deferredSheet) return null
+    const dataRowIds = frozenRowCount > 0 ? deferredVisibleRowIds.filter((rowId) => (allRowPositionById.get(rowId) ?? Infinity) >= frozenRowCount) : deferredVisibleRowIds
+    const readValue = (rowId: number) => getCellValueText(deferredSheet, rowId, profileColumnId)
+    const columnInfo = detectColumnInfo(readValue, dataRowIds)
+    const texts = dataRowIds.map(readValue)
+    return { ...columnInfo, texts, profile: buildColumnProfile(texts, columnInfo.type) }
+  }, [profileColumnId, deferredVisibleRowIds, deferredSheet, frozenRowCount, allRowPositionById])
+
+  // A click on a profile value shows only its rows, and opens the filter row so the filter can be seen and cleared.
+  function filterColumnToValue(columnId: number, value: string) {
+    const number = columnProfile?.type === 'number' ? parseNumber(value) : null
+    setColumnFilterFromProfile(columnId, number !== null ? { columnId, kind: 'range', min: number, max: number } : { columnId, kind: 'equals', value })
   }
 
   function addSheet(name: string) {
@@ -662,7 +843,6 @@ export default function ExcelViewer({
   }
 
   // Find and replace works on every shown cell of the active sheet; a live count and next / previous move the selection.
-  const deferredSheet = useDeferredValue(sheet)
   const matchingCells = useMemo(
     () => (isFindOpen && deferredSheet ? findMatchingCells(deferredSheet, deferredFindText, matchCase) : []),
     [isFindOpen, deferredSheet, deferredFindText, matchCase],
@@ -714,13 +894,14 @@ export default function ExcelViewer({
     const reveal = pendingRevealRef.current
     if (!reveal) return
     const rowPosition = visiblePositionByRowId.get(reveal.rowId)
-    if (rowPosition === undefined || !columnPositionById.has(reveal.columnId)) return
+    if (rowPosition === undefined || !shownColumnPositionById.has(reveal.columnId)) return
     pendingRevealRef.current = null
-    // A line was just added; selecting it once it is on screen is the point of this effect.
+    // A line was just added or a cell was chosen in a panel; selecting it once it is on screen is the point of this effect.
     // oxlint-disable-next-line react/set-state-in-effect
     setRange({ anchor: reveal, focus: reveal })
     tableRef.current?.scrollToRow(rowPosition)
-  }, [visiblePositionByRowId, columnPositionById])
+    requestAnimationFrame(() => document.getElementById(`cell-${reveal.rowId}-${reveal.columnId}`)?.scrollIntoView({ block: 'nearest', inline: 'nearest' }))
+  }, [visiblePositionByRowId, shownColumnPositionById, revealRequestCount])
 
   useEffect(() => {
     if (!parsed || !sheet) {
@@ -744,9 +925,13 @@ export default function ExcelViewer({
       isStruckThrough: focusStyle?.font?.strike === true,
       alignment: focusStyle?.alignment?.horizontal,
       isMerged: sheet && selectedCell ? findMergeAt(sheet, selectedCell) !== undefined : false,
+      showFormulas,
+      showHidden,
+      isFilterRowShown,
+      panelTab,
     }
     onSelectionChange(selection)
-  }, [parsed, sheet, activeSheetName, sheetRecords.length, selectedCell, hasHeaderRow, selectedRowIds.length, selectedColumnIds.length, canStyle, stylesUnavailable, focusStyle, onSelectionChange])
+  }, [parsed, sheet, activeSheetName, sheetRecords.length, selectedCell, hasHeaderRow, selectedRowIds.length, selectedColumnIds.length, canStyle, stylesUnavailable, focusStyle, showFormulas, showHidden, isFilterRowShown, panelTab, onSelectionChange])
 
   useEffect(() => {
     onExportSourceChange(parsed ? ({ parsed } satisfies ExcelExportSource) : null)
@@ -763,6 +948,42 @@ export default function ExcelViewer({
     ? `${columnLabel(columnPositionById.get(selectedCell.columnId) as number)}${(allRowPositionById.get(selectedCell.rowId) ?? 0) + 1}`
     : '–'
   const selectedCellText = selectedCell ? getEditText(selectedCell.rowId, selectedCell.columnId) : ''
+  const selectedCellLink = sheet && selectedCell ? readCell(sheet, selectedCell.rowId, selectedCell.columnId)?.l : undefined
+  const selectedCellLinkTarget = selectedCellLink ? ((selectedCellLink as XLSX.Hyperlink & { location?: string }).location ?? selectedCellLink.Target) : ''
+  const isSelectedLinkInWorkbook = selectedCellLinkTarget.startsWith('#') || Boolean((selectedCellLink as { location?: string } | undefined)?.location)
+  const selectedCellNote = sheet && selectedCell ? getCellNote(sheet, selectedCell.rowId, selectedCell.columnId) : null
+  const isFiltered = columnFilters.length > 0
+  // Hidden sheets have no tab until the visitor asks to see one (or goes to a cell in it).
+  const hiddenSheetRecords = sheetRecords.filter((sheetRecord) => isHiddenSheet(sheetRecord.id) && !revealedSheetIds.has(sheetRecord.id) && sheetRecord.id !== activeSheetId)
+  const tabSheetRecords = sheetRecords.filter((sheetRecord) => !hiddenSheetRecords.includes(sheetRecord))
+  const hiddenSheetCount = parsed ? parsed.sheets.filter((originalSheet) => originalSheet.visibility !== 'visible').length : 0
+  const workbookNotice = parsed
+    ? [
+        hiddenSheetCount > 0 && tp('excel.msg.hiddenSheets', hiddenSheetCount),
+        parsed.info.hasMacros && t('excel.msg.hasMacros'),
+        parsed.info.externalLinks.length > 0 && tp('excel.msg.externalLinks', parsed.info.externalLinks.length),
+      ]
+        .filter(Boolean)
+        .join(' ')
+    : ''
+  const profileRangeFilter = columnFilters.find((filter) => filter.columnId === profileColumnId && filter.kind === 'range')
+  const readOtherWorkbook = async (file: File) => readWorkbookInWorker(await file.arrayBuffer(), file.name, locale)
+
+  // The sheet as it is on screen, for printing: the column names, then the shown rows.
+  function readShownTable() {
+    const readShownText = (rowId: number, columnId: number) => (showFormulas && sheet && readCell(sheet, rowId, columnId)?.f ? getEditText(rowId, columnId) : getText(rowId, columnId))
+    return [shownColumnNames, ...visibleRowIds.map((rowId) => shownColumnIds.map((columnId) => readShownText(rowId, columnId)))]
+  }
+
+  const panelTitle =
+    panelTab === 'profile'
+      ? selectedCell
+        ? (shownColumnNames[shownColumnPositionById.get(selectedCell.columnId) ?? 0] ?? '')
+        : t('excel.panel.profile')
+      : panelTab
+        ? t(({ formulas: 'excel.panel.formulas', search: 'excel.panel.search', compare: 'excel.panel.compare' } as const)[panelTab])
+        : ''
+  const panelSubtitle = panelTab === 'profile' && columnProfile ? `${t(COLUMN_TYPE_LABEL_KEYS[columnProfile.type])} · ${tp('csv.wb.shownRows', columnProfile.texts.length)}` : panelTab === 'search' || panelTab === 'formulas' ? t('excel.panel.allSheets') : ''
 
   const actions: ExcelActions = {
     insertRows: (side) => insertLines('row', side === 'above' ? 'before' : 'after'),
@@ -849,6 +1070,12 @@ export default function ExcelViewer({
     openAddSheet: () => setDialog({ kind: 'add-sheet' }),
     openRenameSheet: () => setDialog({ kind: 'rename-sheet' }),
     openDeleteSheet: () => setDialog({ kind: 'delete-sheet' }),
+    toggleShowFormulas: () => setShowFormulas((isShown) => !isShown),
+    toggleShowHidden: () => setShowHidden((isShown) => !isShown),
+    toggleFilterRow: () => setIsFilterRowShown((isShown) => !isShown),
+    clearFilters: clearColumnFilters,
+    openPanel: (tab) => setPanelTab(tab),
+    openWorkbookDialog: (kind) => setWorkbookDialog(kind),
   }
   useEffect(() => {
     latestActionsRef.current = { toggleFindReplace: () => setIsFindOpen((wasOpen) => !wasOpen), actions }
@@ -965,11 +1192,50 @@ export default function ExcelViewer({
         message={parsed?.bookType === 'biff8' ? t('excel.legacyNote') : ''}
       />
 
-      <main id="main" className="flex min-h-0 flex-1 flex-col bg-paper-raised">
+      <Notice id="workbook-notice" kind="info" role="status" className="border-b border-rule bg-paper-raised px-4 py-1 text-sm" message={workbookNotice} />
+
+      {(selectedCellLink || selectedCellNote) && (
+        <div id="cell-details-bar" className="cell-details-bar">
+          {selectedCellLink &&
+            (isSelectedLinkInWorkbook ? (
+              <button type="button" id="selected-cell-link" className="link" onClick={() => openCellLink(selectedCellLink)}>
+                {t('excel.link.goTo', { place: isolateText(selectedCellLinkTarget.replace(/^#/, '')) })}
+              </button>
+            ) : (
+              <span className="cell-details-item">
+                <span className="cell-details-label">{t('excel.link.label')}</span>
+                {isSafeLink(selectedCellLinkTarget) ? (
+                  <a id="selected-cell-link" href={selectedCellLinkTarget} target="_blank" rel="noopener noreferrer" dir="ltr">
+                    {selectedCellLinkTarget}
+                  </a>
+                ) : (
+                  <span id="selected-cell-link" dir="ltr" title={t('excel.msg.linkBlocked')}>
+                    {selectedCellLinkTarget}
+                  </span>
+                )}
+                <span className="cell-details-hint">{t('excel.link.hint', { key: IS_MAC ? '⌘' : 'Ctrl' })}</span>
+              </span>
+            ))}
+          {selectedCellNote && (
+            <span className="cell-details-item" id="selected-cell-note">
+              <span className="cell-details-label">{t('excel.note.label')}</span>
+              <span dir="auto">{selectedCellNote}</span>
+            </span>
+          )}
+        </div>
+      )}
+
+      <div id="excel-studio" className="flex min-h-0 flex-1">
+      <main id="main" className="flex min-h-0 min-w-0 flex-1 flex-col bg-paper-raised">
         {parseResult === null && <p className="p-6 text-ink-soft">{t('excel.view.reading')}</p>}
 
         {parseResult?.status === 'error' && (
-          <FatalFileError title={t('excel.view.errorTitle')} reason={parseResult.message} hint={t('excel.view.errorHint')} onOpenAnotherFile={onOpenAnotherFile} />
+          <FatalFileError
+            title={parseResult.isPasswordProtected ? t('excel.view.protectedTitle') : t('excel.view.errorTitle')}
+            reason={parseResult.message}
+            hint={t('excel.view.errorHint')}
+            onOpenAnotherFile={onOpenAnotherFile}
+          />
         )}
 
         {parsed && sheet && isSheetEmpty && (
@@ -981,20 +1247,39 @@ export default function ExcelViewer({
             <DataTable
               tableRef={tableRef}
               label={activeSheetName}
-              columnIds={columnIds}
-              columnNames={columnNames}
-              columnWidthsPx={columnWidthsPx}
+              columnIds={shownColumnIds}
+              columnNames={shownColumnNames}
+              columnWidthsPx={shownColumnWidthsPx}
               rowNumberWidthPx={rowNumberColumnWidthPx}
               rowIds={visibleRowIds}
-              getCellText={(rowId, columnId) => (editingCell?.source === 'bar' && editingCell.rowId === rowId && editingCell.columnId === columnId ? editingCell.draft : getText(rowId, columnId))}
+              getCellText={(rowId, columnId) => {
+                if (editingCell?.source === 'bar' && editingCell.rowId === rowId && editingCell.columnId === columnId) return editingCell.draft
+                return showFormulas && readCell(sheet, rowId, columnId)?.f ? getEditText(rowId, columnId) : getText(rowId, columnId)
+              }}
+              pinnedRowCount={pinnedRowCount}
+              frozenColumnCount={frozenColumnCount}
+              getColumnLetter={(columnId) => columnLabel(columnPositionById.get(columnId) ?? 0)}
+              isHiddenLine={showHidden ? (kind, id) => (kind === 'row' ? hiddenRowIds : hiddenColumnIds).has(id) : undefined}
+              hasHiddenLineBefore={
+                showHidden
+                  ? undefined
+                  : (kind, id) => {
+                      const position = kind === 'row' ? allRowPositionById.get(id) : columnPositionById.get(id)
+                      if (!position) return false
+                      return kind === 'row' ? hiddenRowIds.has(allRowIds[position - 1]) : hiddenColumnIds.has(columnIds[position - 1])
+                    }
+              }
+              getCellNote={(rowId, columnId) => getCellNote(sheet, rowId, columnId)}
+              filterRow={isFilterRowShown ? filterRow : null}
               getOriginalText={(rowId, columnId) => getOriginalCellText(sheet, rowId, columnId)}
               dataKey={sheetDataKey}
               isCellEdited={(rowId, columnId) => rowId < 0 || columnId < 0 || (sheet.edits?.cells.has(cellKey(rowId, columnId)) ?? false)}
               getCellSpan={(rowId, columnId) => mergeSpanByAnchorKey.get(cellKey(rowId, columnId)) ?? null}
               getCellStyle={(rowId, columnId) => {
                 const css = cssForStyle(readStyle(sheet, rowId, columnId))
-                // A cell with a link looks like a link unless it was given its own colour.
-                return readCell(sheet, rowId, columnId)?.l?.Target ? { color: '#0563c1', textDecoration: 'underline', ...css } : css
+                // A cell with a link looks like a link unless it was given its own colour; a cell that differs in Compare is tinted.
+                const linkedCss = readCell(sheet, rowId, columnId)?.l?.Target ? { color: '#0563c1', textDecoration: 'underline', ...css } : css
+                return comparedCellKeys.has(cellKey(rowId, columnId)) ? { ...linkedCss, backgroundColor: 'color-mix(in srgb, #f5a623 32%, var(--paper-raised))' } : linkedCss
               }}
               getRowLabel={(rowId) => String((allRowPositionById.get(rowId) ?? 0) + 1)}
               isFindMatch={isEditable && isFindOpen && deferredFindText !== '' ? (cellText) => textMatches(cellText, deferredFindText, matchCase) : undefined}
@@ -1004,8 +1289,15 @@ export default function ExcelViewer({
                 const columnPosition = columnPositionById.get(columnId) as number
                 return rowPosition >= rangeBounds.firstRow && rowPosition <= rangeBounds.lastRow && columnPosition >= rangeBounds.firstColumn && columnPosition <= rangeBounds.lastColumn
               }}
-              onCellMouseDown={(position, event) => {
+              onCellMouseDown={(position, event: MouseEvent<HTMLDivElement>) => {
                 if (event.button !== 0) return
+                const link = event.ctrlKey || event.metaKey ? readCell(sheet, position.rowId, position.columnId)?.l : undefined
+                if (link) {
+                  event.preventDefault()
+                  selectCell(position)
+                  openCellLink(link)
+                  return
+                }
                 if (event.shiftKey && range) setRange({ anchor: range.anchor, focus: position })
                 else selectCell(position)
               }}
@@ -1097,12 +1389,69 @@ export default function ExcelViewer({
         )}
       </main>
 
+      {parsed && activeSheetId !== null && panelTab && (
+        <Sidebar
+          tabs={[
+            { id: 'profile', label: t('excel.panel.profileShort') },
+            { id: 'formulas', label: t('excel.panel.formulasShort') },
+            { id: 'search', label: t('excel.panel.searchShort') },
+            { id: 'compare', label: t('excel.panel.compareShort') },
+          ]}
+          activeTab={panelTab}
+          onTabChange={(tabId) => setPanelTab(tabId as ExcelPanelTab)}
+          title={panelTitle}
+          subtitle={panelSubtitle}
+          onClose={() => setPanelTab(null)}
+          isSheetOpen
+          onSheetToggle={() => setPanelTab(null)}
+          sheetSummary={panelTitle}
+        >
+          <Suspense fallback={<p className="excel-panel-summary">{t('excel.view.reading')}</p>}>
+            {panelTab === 'profile' &&
+              (columnProfile && profileColumnId !== null ? (
+                <ColumnProfileView
+                  texts={columnProfile.texts}
+                  profile={columnProfile.profile}
+                  type={columnProfile.type}
+                  decimals={columnProfile.decimals}
+                  columnName={panelTitle}
+                  activeRange={profileRangeFilter?.kind === 'range' ? profileRangeFilter : undefined}
+                  onRangeClick={(from, to) => setColumnFilterFromProfile(profileColumnId, { columnId: profileColumnId, kind: 'range', min: Number(from.toFixed(columnProfile.decimals)), max: Number(to.toFixed(columnProfile.decimals)) })}
+                  onValueClick={(value) => filterColumnToValue(profileColumnId, value)}
+                />
+              ) : (
+                <p className="excel-panel-summary">{t('excel.panel.selectCell')}</p>
+              ))}
+            {panelTab === 'formulas' && <FormulaListPanel parsed={parsed} edits={edits} calculator={formulaCalculator} sheetRecords={sheetRecords} activeSheetId={activeSheetId} onGoToCell={goToCell} />}
+            {panelTab === 'search' && <WorkbookSearchPanel parsed={parsed} edits={edits} calculator={formulaCalculator} sheetRecords={sheetRecords} onGoToCell={goToCell} />}
+            {panelTab === 'compare' && (
+              <SheetComparePanel
+                parsed={parsed}
+                edits={edits}
+                calculator={formulaCalculator}
+                sheetRecords={sheetRecords}
+                activeSheetId={activeSheetId}
+                onGoToCell={goToCell}
+                readOtherWorkbook={readOtherWorkbook}
+                onComparedCellsChange={setComparedCellKeys}
+              />
+            )}
+          </Suspense>
+        </Sidebar>
+      )}
+      </div>
+
       {parsed && activeSheetId !== null && (
         <SheetTabs
-          sheets={sheetRecords}
+          sheets={tabSheetRecords}
+          hiddenSheets={hiddenSheetRecords.map((sheetRecord) => ({ ...sheetRecord, visibility: parsed.sheets[sheetRecord.id]?.visibility ?? 'hidden' }))}
           activeSheetId={activeSheetId}
           isEditable={isEditable}
           onSelect={selectSheet}
+          onShowHiddenSheet={(sheetId) => {
+            setRevealedSheetIds((sheetIds) => new Set(sheetIds).add(sheetId))
+            selectSheet(sheetId)
+          }}
           onAdd={actions.openAddSheet}
           onRename={actions.openRenameSheet}
         />
@@ -1111,10 +1460,25 @@ export default function ExcelViewer({
       {parsed && (
         <footer id="excel-status-bar" className="flex flex-wrap items-center gap-x-6 gap-y-1 border-t border-rule bg-paper px-4 py-0.5 text-xs">
           <p id="sheet-size" aria-live="polite" className="whitespace-nowrap font-semibold">
-            {isSearching
+            {isSearching || isFiltered
               ? t('excel.status.rowsFound', { shown: visibleRowIds.length, total: displayRowIds.length })
               : `${tp('excel.status.rows', displayRowIds.length)} × ${tp('excel.status.columns', columnIds.length)}`}
           </p>
+          {isFiltered && (
+            <button type="button" id="clear-filters-button" className="link" onClick={clearColumnFilters}>
+              {tp('excel.status.clearFilters', columnFilters.length)}
+            </button>
+          )}
+          {(hiddenRowIds.size > 0 || hiddenColumnIds.size > 0) && (
+            <button type="button" id="show-hidden-button" className="link" aria-pressed={showHidden} onClick={() => setShowHidden((isShown) => !isShown)}>
+              {showHidden ? t('excel.status.hideHidden') : t('excel.status.hiddenLines', { rows: hiddenRowIds.size, columns: hiddenColumnIds.size })}
+            </button>
+          )}
+          {showFormulas && (
+            <button type="button" id="hide-formulas-button" className="link" onClick={() => setShowFormulas(false)}>
+              {t('excel.status.showingFormulas')}
+            </button>
+          )}
           <span id="sheet-count" className="text-ink-soft">
             {tp('excel.status.sheets', sheetRecords.length)}
           </span>
@@ -1142,6 +1506,18 @@ export default function ExcelViewer({
           <span className="ms-auto hidden text-ink-soft md:inline">{isEditable ? t('excel.status.editHint') : t('excel.status.searchHint')}</span>
         </footer>
       )}
+
+      <WorkbenchDialog id="workbook-dialog" titleId={workbookDialog ? DIALOG_TITLE_IDS[workbookDialog] : 'workbook-info-title'} isOpen={workbookDialog !== null && parsed !== null} onClose={() => setWorkbookDialog(null)}>
+        {parsed && (
+          <Suspense fallback={<p className="excel-panel-summary">{t('excel.view.reading')}</p>}>
+            {workbookDialog === 'info' && <WorkbookInfoDialog parsed={parsed} fileName={openedFile.file.name} fileSize={formatFileSize(openedFile.file.size)} onClose={() => setWorkbookDialog(null)} />}
+            {workbookDialog === 'print' && <PrintSheetDialog sheetName={activeSheetName} cellCount={visibleRowIds.length * shownColumnIds.length} readTable={readShownTable} onClose={() => setWorkbookDialog(null)} />}
+            {workbookDialog === 'files' && (
+              <WorkbookFilesDialog parsed={parsed} edits={edits} sheetRecords={sheetRecords} fileName={openedFile.file.name} readOtherWorkbook={readOtherWorkbook} onOpenFile={onOpenFile} onClose={() => setWorkbookDialog(null)} />
+            )}
+          </Suspense>
+        )}
+      </WorkbenchDialog>
 
       {isEditable && dialog && sheet && (
         <editing.SheetDialogs

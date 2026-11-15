@@ -18,6 +18,8 @@ import { emptySheetEdits } from './excelEdits'
 import type { CellStyle, ExcelEdits, Merge, SheetEdits, SheetRecord } from './excelEdits'
 export type { CellPosition, CellStyle, ExcelEdits, Merge, SheetEdits, SheetRecord }
 
+export type SheetVisibility = 'visible' | 'hidden' | 'veryHidden'
+
 export type OriginalSheet = {
   name: string
   worksheet: XLSX.WorkSheet
@@ -26,11 +28,23 @@ export type OriginalSheet = {
   merges: Merge[]
   // Cells that are part of a merged range but not its top-left cell; they are shown blank.
   coveredKeys: ReadonlySet<string>
+  visibility: SheetVisibility
+  // The rows at the top and columns at the start that stay in place while scrolling (.xlsx and .xlsm only).
+  frozen: { rowCount: number; columnCount: number } | null
+}
+
+// What the workbook holds besides its cells, for Workbook info. Macros are only noticed, never run.
+export type WorkbookInfo = {
+  hasMacros: boolean
+  // The files other workbooks' formulas point to (.xlsx and .xlsm only).
+  externalLinks: string[]
+  definedNames: string[]
 }
 
 export type ParsedWorkbook = {
   workbook: XLSX.WorkBook
   sheets: OriginalSheet[]
+  info: WorkbookInfo
   bookType: XLSX.BookType
   // The file's cell styles by sheet position and "rowId:columnId", filled in after the file is shown (see excelStyles.ts); null
   // while loading, for file types or sizes without styles, and when they could not be read.
@@ -55,6 +69,9 @@ export type SheetView = {
 
 export type ExcelExportSource = { parsed: ParsedWorkbook }
 
+export type ExcelPanelTab = 'profile' | 'formulas' | 'search' | 'compare'
+export type ExcelWorkbookDialog = 'info' | 'print' | 'files'
+
 // What the toolbar menus need to know about the selection.
 export type ExcelSelection = {
   activeSheetId: number
@@ -76,6 +93,11 @@ export type ExcelSelection = {
   isStruckThrough: boolean
   alignment: string | undefined
   isMerged: boolean
+  // The View menu's toggles and the open side panel.
+  showFormulas: boolean
+  showHidden: boolean
+  isFilterRowShown: boolean
+  panelTab: ExcelPanelTab | null
 } | null
 
 // Things the toolbar can ask the viewer to do.
@@ -85,7 +107,7 @@ export type ExcelViewerCommands = {
   getActions: () => ExcelActions
 }
 
-export type ParseResult = { status: 'ok'; parsed: ParsedWorkbook } | { status: 'error'; message: string }
+export type ParseResult = { status: 'ok'; parsed: ParsedWorkbook } | { status: 'error'; message: string; isPasswordProtected: boolean }
 
 const BOOK_TYPE_BY_EXTENSION: Record<string, XLSX.BookType> = { xlsx: 'xlsx', xlsm: 'xlsm', xls: 'biff8', ods: 'ods' }
 const MAX_FULL_SCAN_AREA = 1_000_000
@@ -162,34 +184,104 @@ function readWithoutConsoleNoise(contents: ArrayBuffer) {
   const originalConsoleError = console.error
   console.error = () => {}
   try {
-    return XLSX.read(contents, { type: 'array', cellDates: true, cellNF: true, cellStyles: false, bookVBA: false })
+    // `bookFiles` keeps the file's parts, read below and dropped before the workbook leaves the worker. `cellStyles` stays off:
+    // it would add a style and a blank stub to every cell, so hidden rows and columns are read from the sheet's XML instead.
+    return XLSX.read(contents, { type: 'array', cellDates: true, cellNF: true, cellStyles: false, bookVBA: false, bookFiles: true })
   } finally {
     console.error = originalConsoleError
   }
 }
 
+type FileParts = Record<string, { content?: Uint8Array } | undefined>
+
+function readPartText(fileParts: FileParts | undefined, path: string) {
+  const content = fileParts?.[path]?.content
+  return content ? new TextDecoder().decode(content) : ''
+}
+
+const readXmlAttribute = (tag: string, name: string) => new RegExp(`\\s${name}="([^"]*)"`).exec(tag)?.[1]
+
+// Frozen panes and hidden rows and columns, from a sheet's XML (.xlsx and .xlsm). Hidden rows and columns are written into the
+// worksheet's !rows and !cols, where SheetJS keeps them and the save code already copies them from.
+function readSheetLayout(sheetXml: string, worksheet: XLSX.WorkSheet, rowCount: number, columnCount: number): OriginalSheet['frozen'] {
+  const rows: XLSX.RowInfo[] = []
+  for (const [rowTag] of sheetXml.matchAll(/<row\s[^>]*\shidden="(?:1|true)"[^>]*>/g)) {
+    const rowIndex = Number(readXmlAttribute(rowTag, 'r')) - 1
+    if (rowIndex >= 0 && rowIndex < rowCount) rows[rowIndex] = { hidden: true }
+  }
+  const columns: XLSX.ColInfo[] = []
+  for (const [columnTag] of sheetXml.matchAll(/<col\s[^>]*\shidden="(?:1|true)"[^>]*>/g)) {
+    // A file often hides every unused column at once (min 10, max 16384); only the columns the sheet has are kept.
+    const lastIndex = Math.min(Number(readXmlAttribute(columnTag, 'max')), columnCount) - 1
+    for (let columnIndex = Number(readXmlAttribute(columnTag, 'min')) - 1; columnIndex <= lastIndex; columnIndex++) columns[columnIndex] = { hidden: true }
+  }
+  if (rows.length > 0) worksheet['!rows'] = rows
+  if (columns.length > 0) worksheet['!cols'] = columns
+  const paneTag = /<pane\s[^>]*>/.exec(sheetXml)?.[0]
+  if (!paneTag || !readXmlAttribute(paneTag, 'state')?.startsWith('frozen')) return null
+  const frozen = { rowCount: Number(readXmlAttribute(paneTag, 'ySplit') ?? 0), columnCount: Number(readXmlAttribute(paneTag, 'xSplit') ?? 0) }
+  return frozen.rowCount > 0 || frozen.columnCount > 0 ? frozen : null
+}
+
+// The file names other workbooks are linked by: each external link part has a relationship whose target is that file.
+function readExternalLinks(fileParts: FileParts | undefined, partPaths: readonly string[]) {
+  return partPaths.flatMap((path) => {
+    const match = /^xl\/externalLinks\/(externalLink\d+\.xml)$/.exec(path)
+    if (!match) return []
+    const target = readXmlAttribute(/<Relationship\s[^>]*>/.exec(readPartText(fileParts, `xl/externalLinks/_rels/${match[1]}.rels`))?.[0] ?? '', 'Target')
+    return target ? [decodeURIComponent(target.replace(/^file:\/+/, ''))] : []
+  })
+}
+
+const VISIBILITY_BY_HIDDEN_FLAG: Record<number, SheetVisibility> = { 0: 'visible', 1: 'hidden', 2: 'veryHidden' }
+
 // Reads the file into sheets; throws when SheetJS cannot read it. Runs in excelParse.worker.ts (and here when the worker cannot start).
 export function readWorkbookFile(contents: ArrayBuffer, fileName: string): ParsedWorkbook {
   const workbook = readWithoutConsoleNoise(contents)
-  const sheets = workbook.SheetNames.map((name): OriginalSheet => {
+  const bookParts = workbook as XLSX.WorkBook & { files?: FileParts; keys?: string[] }
+  const fileParts = bookParts.files
+  const partPaths = bookParts.keys ?? []
+  // Each sheet's XML part, found through the relationship id the workbook lists it with.
+  const sheetPathByRelationshipId = new Map<string, string>()
+  for (const [relationshipTag] of readPartText(fileParts, 'xl/_rels/workbook.xml.rels').matchAll(/<Relationship\s[^>]*>/g)) {
+    const target = readXmlAttribute(relationshipTag, 'Target') ?? ''
+    sheetPathByRelationshipId.set(readXmlAttribute(relationshipTag, 'Id') ?? '', target.startsWith('/') ? target.slice(1) : `xl/${target}`)
+  }
+  const sheets = workbook.SheetNames.map((name, sheetIndex): OriginalSheet => {
     const worksheet = workbook.Sheets[name]
     const merges = (worksheet['!merges'] ?? []).flatMap((range) => rangeToMerge(range) ?? [])
-    return { name, worksheet, ...measureSheet(worksheet), merges, coveredKeys: findCoveredKeys(merges) }
+    const size = measureSheet(worksheet)
+    const sheetProperties = workbook.Workbook?.Sheets?.[sheetIndex] as { Hidden?: number; id?: string } | undefined
+    const sheetXml = readPartText(fileParts, sheetPathByRelationshipId.get(sheetProperties?.id ?? '') ?? '')
+    const frozen = sheetXml ? readSheetLayout(sheetXml, worksheet, size.rowCount, size.columnCount) : null
+    return { name, worksheet, ...size, merges, coveredKeys: findCoveredKeys(merges), visibility: VISIBILITY_BY_HIDDEN_FLAG[sheetProperties?.Hidden ?? 0] ?? 'visible', frozen }
   })
+  const info: WorkbookInfo = {
+    hasMacros: partPaths.some((path) => /vbaProject\.bin$|_VBA_PROJECT/i.test(path)),
+    externalLinks: readExternalLinks(fileParts, partPaths),
+    definedNames: ((workbook.Workbook?.Names ?? []) as (XLSX.DefinedName & { Hidden?: boolean })[]).filter((definedName) => !definedName.Hidden && !definedName.Name.startsWith('_xlnm.')).map((definedName) => definedName.Name),
+  }
+  // The file's parts are large and only needed above; they must not be copied out of the worker.
+  delete bookParts.files
+  delete bookParts.keys
   const extension = fileName.slice(fileName.lastIndexOf('.') + 1).toLowerCase()
-  return { workbook, sheets, bookType: BOOK_TYPE_BY_EXTENSION[extension] ?? 'xlsx', styles: null }
+  return { workbook, sheets, info, bookType: BOOK_TYPE_BY_EXTENSION[extension] ?? 'xlsx', styles: null }
 }
 
+// SheetJS says "File is password-protected" for every encrypted .xlsx, .xls and .ods file.
+export const isPasswordProtectedReason = (reason: string) => /password-protected/i.test(reason)
+
 // `reason` is SheetJS's own message; empty when it gave none.
-export function describeUnreadableWorkbook(reason: string, locale: Locale) {
-  return translate(locale, 'excel.msg.cannotReadWorkbook', { reason: isolateText(reason || translate(locale, 'excel.msg.unknownError')) })
+export function describeUnreadableWorkbook(reason: string, locale: Locale): ParseResult {
+  if (isPasswordProtectedReason(reason)) return { status: 'error', message: translate(locale, 'excel.msg.passwordProtected'), isPasswordProtected: true }
+  return { status: 'error', message: translate(locale, 'excel.msg.cannotReadWorkbook', { reason: isolateText(reason || translate(locale, 'excel.msg.unknownError')) }), isPasswordProtected: false }
 }
 
 export function parseWorkbook(contents: ArrayBuffer, fileName: string, locale: Locale = 'en'): ParseResult {
   try {
     return { status: 'ok', parsed: readWorkbookFile(contents, fileName) }
   } catch (error) {
-    return { status: 'error', message: describeUnreadableWorkbook(error instanceof Error ? error.message : '', locale) }
+    return describeUnreadableWorkbook(error instanceof Error ? error.message : '', locale)
   }
 }
 
@@ -267,6 +359,30 @@ export function getCellText(sheet: SheetView, rowId: number, columnId: number) {
   const cell = isEdited ? (sheet.edits?.cells.get(key) ?? undefined) : readOriginalCell(sheet, rowId, columnId)
   const result = cell?.f ? sheet.calculator?.(sheet.id, rowId, columnId) : undefined
   return cell && result ? formatFormulaResult(result, cell) : formatCellText(cell)
+}
+
+const twoDigits = (number: number) => String(number).padStart(2, '0')
+
+// A cell's value as plain text, for filters and the column profile: numbers without their number format and dates as yyyy-mm-dd,
+// so "1,234.50" filters as 1234.5 and dates sort in order. Text and formula results are as shown.
+export function getCellValueText(sheet: SheetView, rowId: number, columnId: number) {
+  const cell = readCell(sheet, rowId, columnId)
+  if (cell && !cell.f && !getCoveredKeys(sheet).has(cellKey(rowId, columnId))) {
+    if (cell.v instanceof Date) return cell.v.toISOString().slice(0, 10)
+    if (typeof cell.v === 'number') {
+      const format = typeof cell.z === 'string' ? cell.z : 'General'
+      if (format === 'General' || !XLSX.SSF.is_date(format)) return String(cell.v)
+      const date = XLSX.SSF.parse_date_code(cell.v)
+      return `${date.y}-${twoDigits(date.m)}-${twoDigits(date.d)}`
+    }
+  }
+  return getCellText(sheet, rowId, columnId)
+}
+
+// A cell's note (Excel comment), or null.
+export function getCellNote(sheet: SheetView, rowId: number, columnId: number) {
+  const comments = readCell(sheet, rowId, columnId)?.c
+  return comments && comments.length > 0 ? comments.map((comment) => comment.t).join('\n') : null
 }
 
 export function getOriginalCellText(sheet: SheetView, rowId: number, columnId: number) {
@@ -406,7 +522,9 @@ export function withCells(edits: ExcelEdits, parsed: ParsedWorkbook, sheetId: nu
       const currentStyle = currentCells.has(key) ? (currentCells.get(key)?.s as CellStyle | undefined) : sheet.originalStyles?.get(key)
       const currentCell = currentCells.has(key) ? currentCells.get(key) : readOriginalCellWithStyle(sheet, rowId, columnId)
       // A new value keeps the cell's style, and clearing a cell clears its value only, as in Excel.
-      const newCell = newCellWithoutStyle === null ? (currentStyle ? ({ t: 'z', s: currentStyle } as XLSX.CellObject) : null) : newCellWithoutStyle.s === undefined && currentStyle ? { ...newCellWithoutStyle, s: currentStyle } : newCellWithoutStyle
+      const newCellWithStyle = newCellWithoutStyle === null ? (currentStyle ? ({ t: 'z', s: currentStyle } as XLSX.CellObject) : null) : newCellWithoutStyle.s === undefined && currentStyle ? { ...newCellWithoutStyle, s: currentStyle } : newCellWithoutStyle
+      // A note stays on its cell when the value changes, as in Excel.
+      const newCell = newCellWithStyle && currentCell?.c && !newCellWithStyle.c ? { ...newCellWithStyle, c: currentCell.c } : newCellWithStyle
       if (isSameCell(currentCell ?? undefined, newCell ?? undefined)) continue
       nextCells ??= new Map(sheetEdits.cells)
       if (isSameCell(readOriginalCellWithStyle(sheet, rowId, columnId), newCell ?? undefined)) nextCells.delete(key)
@@ -597,6 +715,53 @@ export function withDeletedSheet(edits: ExcelEdits, currentSheets: readonly Shee
   const bySheetId = new Map(edits.bySheetId)
   bySheetId.delete(sheetId)
   return { ...edits, sheets: currentSheets.filter((sheet) => sheet.id !== sheetId), bySheetId, sheetChangeCount: edits.sheetChangeCount + 1 }
+}
+
+// The cell at an A1 address ("B4", "$B$4") as the sheet shows it now, or null when the sheet has no such cell.
+export function findCellByAddress(sheet: SheetView, address: string): CellPosition | null {
+  const cleanAddress = address.replaceAll('$', '').toUpperCase()
+  if (!/^[A-Z]{1,3}\d+$/.test(cleanAddress)) return null
+  const { r: rowPosition, c: columnPosition } = XLSX.utils.decode_cell(cleanAddress)
+  const rowId = getRowIds(sheet)[rowPosition]
+  const columnId = getColumnIds(sheet)[columnPosition]
+  return rowId === undefined || columnId === undefined ? null : { rowId, columnId }
+}
+
+// ---------------------------------------------------------------- comparing sheets
+
+export type CellDifference = { rowPosition: number; columnPosition: number; kind: 'added' | 'removed' | 'changed'; before: string; after: string }
+
+// Two sheets cell by cell, by position (A1 with A1), over the larger of the two. A cell is changed when its shown text differs, or
+// with `compareFormulas` when its formula does; then the formulas are what is listed. Every difference is counted; the first
+// `maxListed` are kept.
+export function compareSheetCells(beforeSheet: SheetView, afterSheet: SheetView, compareFormulas: boolean, maxListed: number) {
+  const beforeRowIds = getRowIds(beforeSheet)
+  const beforeColumnIds = getColumnIds(beforeSheet)
+  const afterRowIds = getRowIds(afterSheet)
+  const afterColumnIds = getColumnIds(afterSheet)
+  const differences: CellDifference[] = []
+  const counts = { added: 0, removed: 0, changed: 0 }
+  const readSide = (sheet: SheetView, rowIds: number[], columnIds: number[], rowPosition: number, columnPosition: number) => {
+    const rowId = rowIds[rowPosition]
+    const columnId = columnIds[columnPosition]
+    if (rowId === undefined || columnId === undefined) return { text: '', formula: '' }
+    const formula = readCell(sheet, rowId, columnId)?.f
+    return { text: getCellText(sheet, rowId, columnId), formula: formula ? `=${formula}` : '' }
+  }
+  for (let rowPosition = 0; rowPosition < Math.max(beforeRowIds.length, afterRowIds.length); rowPosition++) {
+    for (let columnPosition = 0; columnPosition < Math.max(beforeColumnIds.length, afterColumnIds.length); columnPosition++) {
+      const before = readSide(beforeSheet, beforeRowIds, beforeColumnIds, rowPosition, columnPosition)
+      const after = readSide(afterSheet, afterRowIds, afterColumnIds, rowPosition, columnPosition)
+      const isFormulaChange = compareFormulas && before.formula !== after.formula
+      if (before.text === after.text && !isFormulaChange) continue
+      const kind = before.text === '' && before.formula === '' ? 'added' : after.text === '' && after.formula === '' ? 'removed' : 'changed'
+      counts[kind]++
+      if (differences.length < maxListed) {
+        differences.push({ rowPosition, columnPosition, kind, before: isFormulaChange ? before.formula : before.text, after: isFormulaChange ? after.formula : after.text })
+      }
+    }
+  }
+  return { differences, counts }
 }
 
 // ---------------------------------------------------------------- find and replace

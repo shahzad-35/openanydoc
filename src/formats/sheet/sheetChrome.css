@@ -51,6 +51,28 @@
   & .link{border:0;background:transparent;color:var(--accent-text);font-size:12px;padding:0;font-weight:500}
   & .link:hover{text-decoration:underline}
 
+  /* the column profile (ColumnProfile.tsx) */
+  & .sec{padding:12px 16px}
+  & .sec-title{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;letter-spacing:.07em;text-transform:uppercase;color:var(--faint);margin:0 0 9px}
+  & .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:14px 12px;margin-top:4px}
+  & .stat .l{font-size:11.5px;color:var(--faint)}
+  & .stat .v{font:500 16px var(--mono);font-variant-numeric:tabular-nums;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;letter-spacing:-.01em}
+  & .stat .v.warn{color:var(--warn)}
+  & .hist{width:100%;height:auto;display:block}
+  & .hist .b{fill:var(--bar-dim)}
+  & .hist .b.in{fill:var(--bar)}
+  & .hist .b.in:hover{fill:var(--accent-text)}
+  & .hist text{fill:var(--faint);font:10px var(--mono)}
+  & .hist .axis{stroke:var(--line-strong)}
+  & .top-list{display:grid;gap:5px;margin:0;padding:0;list-style:none}
+  & .top-list li{display:grid;grid-template-columns:minmax(0,1fr) 62px;gap:8px;align-items:center;font-size:12px}
+  & .tv{position:relative;height:22px;border-radius:5px;background:var(--panel-2);overflow:hidden;display:flex;align-items:center;padding-inline:8px;border:0;width:100%;text-align:start;font-size:12px}
+  & .tv:hover{box-shadow:inset 0 0 0 1px var(--accent-line)}
+  & .tv .fillbar{position:absolute;inset-block:0;inset-inline-start:0;background:var(--bar-dim)}
+  & .tv span{position:relative;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-family:var(--mono);font-size:11.5px}
+  & .top-list .c{font:11.5px var(--mono);color:var(--muted);text-align:right}
+  & .top-list .empty-value{color:var(--muted)}
+
   /* title row */
   & #top-bar{display:flex;align-items:center;gap:10px;height:48px;padding-inline:12px;background:var(--panel);border-bottom:1px solid var(--line)}
   & .brand{display:flex;align-items:center;gap:8px;flex:none;border:0;background:transparent;padding:0 4px 0 0;height:28px;border-radius:6px}
@@ -270,3 +292,70 @@
 @media (max-width:760px){#docs-workbench .docs-canvas{padding:12px}#docs-workbench .docs-page{padding:28px 20px}}
 /* On a phone Excel keeps its sheet tabs: there is no other way to switch sheets. */
 @media (max-width:760px){#excel-workbench #sheet-tabs{display:flex}}
+
+/* Excel: the side panel (profile, formula list, search, compare), the cell details bar, hidden lines, frozen panes, the filter row,
+   hidden sheets and the workbook dialogs. */
+#excel-workbench{
+  & #sidebar{width:min(340px,40vw);border-inline-start:1px solid var(--line)}
+  & .cell-details-bar{display:flex;flex-wrap:wrap;align-items:center;gap:4px 16px;padding:4px 12px;background:var(--panel-2);border-bottom:1px solid var(--line);font-size:12px}
+  & .cell-details-item{display:inline-flex;align-items:baseline;gap:6px;min-width:0;max-width:100%}
+  & .cell-details-item a{color:var(--accent-text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  & .cell-details-label{color:var(--faint);font-size:11px;text-transform:uppercase;letter-spacing:.06em}
+  & .cell-details-hint{color:var(--faint)}
+  & .hidden-line{background-image:repeating-linear-gradient(135deg,transparent 0 6px,color-mix(in srgb,var(--ink) 7%,transparent) 6px 12px)}
+  & .after-hidden-row{border-top:3px double var(--line-strong)}
+  & .after-hidden-column{border-left:3px double var(--line-strong)}
+  & .filter-row-input{border:1px solid var(--line);border-radius:5px;background:var(--panel);font:12px var(--ui);padding-inline:6px;color:var(--text);min-height:0}
+  & .filter-row-input::placeholder{color:var(--faint)}
+  & .filter-row-input:focus{outline:2px solid var(--sel-line);outline-offset:-1px}
+  & .hidden-sheets{flex:none;margin-inline-start:auto}
+  & .hidden-sheets-list{position:fixed;inset-inline-end:12px;bottom:64px;z-index:50;min-width:200px;max-height:50dvh;overflow:auto;margin:0;padding:4px;list-style:none;background:var(--raised);border:1px solid var(--line-strong);border-radius:8px;box-shadow:var(--shadow)}
+  & .hidden-sheets-list button{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;min-height:30px;padding-inline:8px;border:0;border-radius:5px;background:transparent;font-size:12.5px;text-align:start}
+  & .hidden-sheets-list button:hover{background:var(--hover)}
+  & .excel-panel{display:grid;gap:10px;padding:8px 16px 16px}
+  & .excel-panel-controls{display:grid;gap:8px}
+  & .excel-panel-row{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+  & .excel-panel-input,& .excel-panel-field select{width:100%;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);padding-inline:8px;font-size:12.5px;color:var(--text)}
+  & .excel-panel-field{display:grid;gap:4px;font-size:12px;color:var(--muted)}
+  & .excel-panel-check{display:flex;align-items:center;gap:8px;font-size:12.5px;min-height:24px}
+  & .excel-panel-summary{margin:0;padding:8px 16px;font-size:12.5px;color:var(--muted)}
+  & .excel-panel .excel-panel-summary{padding:0}
+  & .excel-panel-note{margin:0;font-size:12px;color:var(--muted)}
+  & .excel-panel-error{margin:0;padding:8px;border-radius:6px;background:var(--err-soft);color:var(--err);font-size:12px}
+  & .excel-panel-action{justify-self:start}
+  & .excel-result-group h3{display:flex;align-items:center;gap:6px;margin:6px 0 4px;font-size:12px;font-weight:500}
+  & .excel-result-count{font:11px var(--mono);color:var(--faint)}
+  & .excel-result-list{display:grid;gap:2px;margin:0;padding:0;list-style:none}
+  & .excel-result{display:grid;gap:1px;width:100%;padding:5px 8px;border:0;border-radius:6px;background:transparent;text-align:start;font-size:12px}
+  & .excel-result:hover{background:var(--hover)}
+  & .excel-result:disabled{cursor:default;opacity:.6}
+  & .excel-result-address{font:500 11.5px var(--mono);color:var(--accent-text);text-align:start}
+  & .excel-result-text{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--mono);font-size:11.5px}
+  & .excel-result-value{color:var(--muted);font-size:11.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  & .excel-result-tag{margin-inline-start:6px;padding:0 5px;border-radius:4px;background:var(--panel-2);color:var(--muted);font:11px var(--ui)}
+  & .excel-result del{color:var(--err)}
+  & .excel-result ins{color:var(--ok);text-decoration:none}
+  & .excel-difference-added .excel-result-address{color:var(--ok)}
+  & .excel-difference-removed .excel-result-address{color:var(--err)}
+  & #workbook-dialog{width:min(640px,calc(100vw - 24px))}
+  & .excel-info-list{display:grid;grid-template-columns:max-content 1fr;gap:6px 16px;margin:0;font-size:12.5px}
+  & .excel-info-list dt{color:var(--muted)}
+  & .excel-info-list dd{margin:0;min-width:0;overflow-wrap:anywhere}
+  & .excel-info-list ul{margin:0;padding-inline-start:16px}
+  & .excel-info-table{width:100%;border-collapse:collapse;font-size:12px}
+  & .excel-info-table th,& .excel-info-table td{padding:4px 6px;border-bottom:1px solid var(--line);text-align:start;vertical-align:top}
+  & .excel-info-table th{font-weight:500;color:var(--muted)}
+  & .excel-files{max-height:70dvh;overflow:auto}
+  & .excel-files section{display:grid;gap:6px;justify-items:start}
+  & .excel-files h3{margin:0;font-size:13px;font-weight:500}
+  & .excel-merge-source{display:grid;gap:2px;width:100%;margin:0;padding:6px 10px;border:1px solid var(--line);border-radius:6px}
+  & .excel-merge-source legend{padding-inline:4px;font-size:12px;color:var(--muted)}
+}
+@media (pointer:coarse){
+  #excel-workbench .filter-row-input,#excel-workbench .excel-panel-input,#excel-workbench .excel-panel-field select{min-height:44px}
+  #excel-workbench .excel-panel-check input{width:20px;height:20px}
+}
+@media (max-width:760px){
+  #excel-workbench #sidebar{width:auto;bottom:0;border-inline-start:0}
+  #excel-workbench .hidden-sheets-list{inset-inline:8px;bottom:72px}
+}
