@@ -1,0 +1,48 @@
+/* The PDF page: thumbnails beside pdf.js's scroll box on the docs canvas (sheetChrome.css), the page counter, the search bar and
+   the password dialog. pdf.js's own look (pages, text layer, search highlights) comes from pdfjs-dist/web/pdf_viewer.css. */
+#docs-workbench.pdf-workbench{
+  & #toolbar .zoom-value{min-width:48px;text-align:center;font:500 12px/1 var(--mono);color:var(--text)}
+  &:dir(rtl) #pdf-previous-page-button .ico,&:dir(rtl) #pdf-next-page-button .ico{transform:scaleX(-1)}
+  & .pdf-page-form{display:inline-flex;align-items:center;gap:4px;margin-inline:2px}
+  & .pdf-page-input{width:48px;height:26px;padding-inline:6px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);font:500 12px var(--mono);text-align:center}
+  & .pdf-page-input:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
+  & .pdf-page-count{font:500 12px var(--mono);color:var(--muted);white-space:nowrap}
+  & .pdf-search-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;padding:6px 12px;border-bottom:1px solid var(--line);background:var(--panel)}
+  & .pdf-search-input{flex:0 1 280px;min-width:140px;height:28px;padding-inline:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);color:var(--text);font-size:13px}
+  & .pdf-search-input:focus{outline:none;border-color:var(--accent-line);box-shadow:0 0 0 3px var(--accent-soft)}
+  & .pdf-search-count{min-width:72px;font:12px var(--mono);color:var(--accent-text);white-space:nowrap}
+  & .pdf-search-option{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;color:var(--muted)}
+  &:dir(rtl) #pdf-search-previous-button .ico,&:dir(rtl) #pdf-search-next-button .ico{transform:scaleX(-1)}
+  & #pdf-search-close-button{margin-inline-start:auto}
+  & .pdf-layout{flex:1 1 auto;min-height:0;display:flex}
+  & #pdf-thumbnails{flex:none;width:168px;overflow:hidden;border-inline-end:1px solid var(--line);background:var(--panel)}
+  & #pdf-thumbnails ol{height:100%;margin:0;padding:10px 8px;overflow:auto;list-style:none}
+  & .pdf-thumbnail{display:flex;flex-direction:column;align-items:center;gap:4px;width:100%;margin-bottom:8px;padding:6px;border:0;border-radius:6px;background:transparent;color:var(--muted);font:inherit;cursor:pointer}
+  & .pdf-thumbnail:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}
+  & .pdf-thumbnail[aria-current="page"]{background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--text)}
+  & .pdf-thumbnail[aria-current="page"] .pdf-thumbnail-canvas{outline:2px solid var(--accent);outline-offset:1px}
+  & .pdf-thumbnail-canvas{display:block;width:120px;height:auto;background:#fff;box-shadow:0 1px 2px rgba(16,24,40,.18)}
+  & .pdf-thumbnail-number{font:500 11px/1.2 var(--mono)}
+  & .pdf-canvas{position:relative;flex:1 1 auto;min-width:0;min-height:0;background:color-mix(in srgb,var(--ink) 6%,var(--surface-2))}
+  & .pdf-loading{margin:48px auto;text-align:center;color:var(--muted)}
+  /* pdf.js measures and scrolls this box; it must be absolutely positioned. */
+  & #pdf-scroll{position:absolute;inset:0;overflow:auto}
+  & #pdf-scroll[hidden]{display:none}
+  & #pdf-scroll.is-sizing{visibility:hidden}
+  & #pdf-scroll .pdfViewer .page{margin:12px auto;border:0;box-shadow:0 1px 3px rgba(16,24,40,.12),0 8px 24px -10px rgba(16,24,40,.25)}
+  & .pdf-password-text{margin:0;font-size:13.5px}
+  & .pdf-password-field{display:grid;gap:4px;font-size:12.5px;color:var(--muted)}
+  & .pdf-password-field input{height:32px!important;font-size:14px!important}
+  & .pdf-password-note{margin:0;font-size:12px;color:var(--faint)}
+  & .dlg-foot .spacer{flex:1}
+}
+@media (pointer:coarse){
+  #docs-workbench.pdf-workbench .pdf-page-input{height:44px;width:56px}
+  #docs-workbench.pdf-workbench .pdf-search-input,#docs-workbench.pdf-workbench .pdf-password-field input{height:44px!important}
+  #docs-workbench.pdf-workbench .pdf-search-option input{width:20px;height:20px}
+}
+@media (max-width:760px){
+  #docs-workbench.pdf-workbench #pdf-thumbnails{position:absolute;inset-block:0;inset-inline-start:0;z-index:5;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+  #docs-workbench.pdf-workbench .pdf-layout{position:relative}
+  #docs-workbench.pdf-workbench .pdf-search-input{flex:1 1 100%}
+}

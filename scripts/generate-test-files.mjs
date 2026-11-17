@@ -1,4 +1,4 @@
-// Generates synthetic CSV, Word and PowerPoint test files into test-files/, and the binary sample files the tool pages bundle
+// Generates synthetic CSV, Word, PowerPoint, PDF and photo test files into test-files/, and the binary sample files the tool pages bundle
 // ("Try a sample file") into src/samples/ (commit those). Run: node scripts/generate-test-files.mjs
 import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
@@ -898,3 +898,257 @@ writeSampleFile(
     ['Invoice 2026-118', '12 x Notebook, A5     58.80', 'Shipping               4.90', 'Total                 63.70'],
   ]),
 )
+
+// ---------------------------------------------------------------- PDF and photo test files (macOS: Chrome, sips, cwebp, Swift)
+// Long, scanned, Arabic, Urdu, password-protected and fillable-form PDFs, and synthetic photos as JPG, PNG, WebP and HEIC.
+const chromePath = process.env.CHROME_PATH ?? '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+const testFilePath = (fileName) => new URL(fileName, outputDirectory).pathname
+
+function runChromeOnHtml(html, chromeArguments) {
+  const htmlPath = join(tmpdir(), 'openanydoc-test-page.html')
+  writeFileSync(htmlPath, html)
+  execFileSync(chromePath, ['--headless=new', '--disable-gpu', '--hide-scrollbars', '--no-pdf-header-footer', ...chromeArguments, `file://${htmlPath}`], { stdio: 'ignore' })
+  rmSync(htmlPath)
+}
+const printHtmlToPdf = (html, fileName) => runChromeOnHtml(html, [`--print-to-pdf=${testFilePath(fileName)}`])
+const screenshotHtml = (html, width, height, pngPath) => runChromeOnHtml(html, [`--screenshot=${pngPath}`, `--window-size=${width},${height}`])
+
+const longPdf = await PDFDocument.create()
+const longPdfHeadingFont = await longPdf.embedFont(StandardFonts.HelveticaBold)
+const longPdfBodyFont = await longPdf.embedFont(StandardFonts.Helvetica)
+for (let pageNumber = 1; pageNumber <= 300; pageNumber++) {
+  const page = longPdf.addPage([595, 842])
+  page.drawText(`Chapter ${Math.ceil(pageNumber / 10)}, page ${pageNumber}`, { x: 60, y: 770, size: 20, font: longPdfHeadingFont })
+  for (let lineIndex = 0; lineIndex < 30; lineIndex++) {
+    const line = `${pickFrom(firstNames)} ${pickFrom(lastNames)} shipped ${Math.floor(nextRandom() * 900) + 10} units to ${pickFrom(cities)} on line ${lineIndex + 1}.`
+    page.drawText(line, { x: 60, y: 730 - lineIndex * 22, size: 11, font: longPdfBodyFont })
+  }
+}
+writeFileSync(testFilePath('pdf-long-300-pages.pdf'), await longPdf.save())
+
+const formPdf = await PDFDocument.create()
+const formPdfFont = await formPdf.embedFont(StandardFonts.Helvetica)
+const formPage = formPdf.addPage([595, 842])
+const form = formPdf.getForm()
+formPage.drawText('Membership form (synthetic)', { x: 60, y: 770, size: 20, font: formPdfFont })
+const formLabels = ['Full name', 'Email', 'City', 'Plan', 'Contact by', 'Newsletter', 'Comments']
+formLabels.forEach((label, index) => formPage.drawText(label, { x: 60, y: 715 - index * 50, size: 12, font: formPdfFont }))
+form.createTextField('full-name').addToPage(formPage, { x: 180, y: 705, width: 300, height: 24 })
+form.createTextField('email').addToPage(formPage, { x: 180, y: 655, width: 300, height: 24 })
+form.createTextField('city').addToPage(formPage, { x: 180, y: 605, width: 300, height: 24 })
+const planDropdown = form.createDropdown('plan')
+planDropdown.addOptions(['Free', 'Team', 'Business'])
+planDropdown.select('Free')
+planDropdown.addToPage(formPage, { x: 180, y: 555, width: 150, height: 24 })
+const contactRadioGroup = form.createRadioGroup('contact-by')
+contactRadioGroup.addOptionToPage('email', formPage, { x: 180, y: 507, width: 16, height: 16 })
+contactRadioGroup.addOptionToPage('phone', formPage, { x: 240, y: 507, width: 16, height: 16 })
+formPage.drawText('Email        Phone', { x: 200, y: 510, size: 11, font: formPdfFont })
+form.createCheckBox('newsletter').addToPage(formPage, { x: 180, y: 457, width: 16, height: 16 })
+const commentsField = form.createTextField('comments')
+commentsField.enableMultiline()
+commentsField.addToPage(formPage, { x: 180, y: 340, width: 300, height: 100 })
+const fillableFormBytes = await formPdf.save()
+writeFileSync(testFilePath('pdf-fillable-form.pdf'), fillableFormBytes)
+
+// PDFKit encrypts with AES; the open password is test1234.
+const unprotectedPdfPath = join(tmpdir(), 'openanydoc-unprotected.pdf')
+writeFileSync(unprotectedPdfPath, fillableFormBytes)
+const encryptPdfSwift = `import PDFKit
+let arguments = CommandLine.arguments
+let document = PDFDocument(url: URL(fileURLWithPath: arguments[1]))!
+let options: [PDFDocumentWriteOption: Any] = [.userPasswordOption: "test1234", .ownerPasswordOption: "owner-test1234"]
+if !document.write(to: URL(fileURLWithPath: arguments[2]), withOptions: options) { exit(1) }`
+execFileSync('swift', ['-', unprotectedPdfPath, testFilePath('pdf-password-test1234.pdf')], { input: encryptPdfSwift })
+rmSync(unprotectedPdfPath)
+
+const rightToLeftPageHtml = (language, fontFamily, heading, paragraphs, [regionWord, northWord, southWord]) => `<!doctype html><html lang="${language}" dir="rtl"><meta charset="utf-8">
+<style>@page { size: A4; margin: 2cm } body { font-family: ${fontFamily}; font-size: 15pt; line-height: 2.1 } h1 { font-size: 24pt }
+p { break-inside: avoid } table { border-collapse: collapse; width: 100% } td, th { border: 1px solid #888; padding: 4px 10px }</style>
+<h1>${heading}</h1>${paragraphs.map((paragraph) => `<p>${paragraph}</p>`).join('')}
+<table><tr><th>${regionWord}</th><th>2025</th><th>2026</th></tr><tr><td>${northWord}</td><td>١٢٤٠</td><td>1,380</td></tr><tr><td>${southWord}</td><td>٩٨٠</td><td>1,105</td></tr></table></html>`
+printHtmlToPdf(
+  rightToLeftPageHtml('ar', '"Geeza Pro", serif', 'تقرير المبيعات الربع سنوي (عينة اصطناعية)', [
+    'نمت المبيعات في جميع المناطق خلال هذا الربع، وارتفع عدد العملاء الجدد إلى ٣٤٠ عميلاً.',
+    'يحتوي هذا الملف على نص عربي مع أرقام عربية وأرقام لاتينية مثل 2026 وكلمات إنجليزية مثل <bdi>OpenAnyDoc</bdi> داخل الجملة.',
+    'الخطوات التالية: مراجعة قائمة الأسعار في شهر مارس، ثم مشاركة الملخص مع الفريق.',
+  ], ['المنطقة', 'الشمال', 'الجنوب']),
+  'pdf-arabic.pdf',
+)
+printHtmlToPdf(
+  rightToLeftPageHtml('ur', '"Noto Nastaliq Urdu", serif', 'سہ ماہی فروخت کی رپورٹ (مصنوعی نمونہ)', [
+    'اس سہ ماہی میں تمام علاقوں میں فروخت بڑھی، اور نئے گاہکوں کی تعداد ۳۴۰ ہو گئی۔',
+    'یہ فائل اردو متن پر مشتمل ہے جس میں ٹ، ڈ، ڑ، ں اور ے جیسے حروف، اور 2026 جیسے لاطینی ہندسے شامل ہیں۔',
+    'اگلے اقدامات: مارچ میں قیمتوں کی فہرست کا جائزہ لیں، پھر خلاصہ ٹیم کے ساتھ شیئر کریں۔',
+  ], ['علاقہ', 'شمال', 'جنوب']),
+  'pdf-urdu.pdf',
+)
+
+// A scanned letter: two page pictures (slightly tilted, greyish paper) and no text layer.
+const scannedPdf = await PDFDocument.create()
+for (const [pageNumber, tilt] of [[1, -0.8], [2, 0.6]]) {
+  const scanPngPath = join(tmpdir(), `openanydoc-scan-${pageNumber}.png`)
+  const scanJpgPath = join(tmpdir(), `openanydoc-scan-${pageNumber}.jpg`)
+  screenshotHtml(
+    `<!doctype html><meta charset="utf-8"><body style="margin:0;background:#cfccc4"><div style="margin:30px;padding:90px;height:1600px;background:#f1eee6;transform:rotate(${tilt}deg);filter:blur(0.6px) contrast(1.1);font:28px/1.7 Georgia,serif;color:#333">
+<h1 style="font-size:44px">Scanned letter, page ${pageNumber} of 2</h1><p>Dear customer,</p><p>This page is a picture of paper, made for testing. It has no text layer, so text search and copy find nothing until the page is read with OCR.</p>
+<p>Invoice 2026-${117 + pageNumber}: 12 notebooks, total 63.70.</p><p>Kind regards,<br>The synthetic team</p></div></body>`,
+    1240,
+    1754,
+    scanPngPath,
+  )
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '60', scanPngPath, '--out', scanJpgPath], { stdio: 'ignore' })
+  const scanImage = await scannedPdf.embedJpg(readFileSync(scanJpgPath))
+  scannedPdf.addPage([595, 842]).drawImage(scanImage, { x: 0, y: 0, width: 595, height: 842 })
+  rmSync(scanPngPath)
+  rmSync(scanJpgPath)
+}
+writeFileSync(testFilePath('pdf-scanned-2-pages.pdf'), await scannedPdf.save())
+
+// Synthetic photos: a landscape and a portrait scene, each saved as PNG, JPG, WebP and HEIC.
+for (const [photoName, width, height] of [['photo-landscape', 1600, 1200], ['photo-portrait', 1200, 1600]]) {
+  const photoPngPath = testFilePath(`${photoName}.png`)
+  screenshotHtml(
+    `<!doctype html><body style="margin:0;height:100vh;overflow:hidden;background:linear-gradient(#5b8fd6,#f3c9a0 62%,#3f7a3a 62%,#25502a)">
+<div style="position:absolute;left:62%;top:30%;width:160px;height:160px;border-radius:50%;background:radial-gradient(#fff6c8,#ffb347)"></div>
+<div style="position:absolute;left:-10%;top:52%;width:70%;height:40%;border-radius:50%;background:#4f8a45"></div>
+<div style="position:absolute;left:40%;top:56%;width:80%;height:45%;border-radius:50%;background:#386b33"></div></body>`,
+    width,
+    height,
+    photoPngPath,
+  )
+  execFileSync('sips', ['-s', 'format', 'jpeg', photoPngPath, '--out', testFilePath(`${photoName}.jpg`)], { stdio: 'ignore' })
+  execFileSync('sips', ['-s', 'format', 'heic', photoPngPath, '--out', testFilePath(`${photoName}.heic`)], { stdio: 'ignore' })
+  execFileSync('cwebp', ['-quiet', '-q', '80', photoPngPath, '-o', testFilePath(`${photoName}.webp`)])
+}
+console.log('Wrote the PDF and photo test files.')
+
+// The PDF viewer's second sample: a bilingual Arabic and English guide drawn by Chrome, so the Arabic is shaped and the text can be
+// selected and searched. The fonts are the site's own (IBM Plex Sans and IBM Plex Sans Arabic, SIL Open Font License), embedded in
+// the page as data so Chrome embeds them in the PDF.
+const embeddedFont = (packageName, fileName) => `data:font/woff2;base64,${readFileSync(new URL(`../node_modules/@fontsource/${packageName}/files/${fileName}`, import.meta.url)).toString('base64')}`
+const guideFontFaces = [
+  ['IBM Plex Sans', 'ibm-plex-sans', 'ibm-plex-sans-latin-400-normal.woff2', 400],
+  ['IBM Plex Sans', 'ibm-plex-sans', 'ibm-plex-sans-latin-600-normal.woff2', 600],
+  ['IBM Plex Sans Arabic', 'ibm-plex-sans-arabic', 'ibm-plex-sans-arabic-arabic-400-normal.woff2', 400],
+  ['IBM Plex Sans Arabic', 'ibm-plex-sans-arabic', 'ibm-plex-sans-arabic-arabic-600-normal.woff2', 600],
+]
+  .map(([family, packageName, fileName, weight]) => `@font-face { font-family: "${family}"; font-weight: ${weight}; src: url(${embeddedFont(packageName, fileName)}) format("woff2") }`)
+  .join('\n')
+const guideHtml = `<!doctype html><html lang="ar"><meta charset="utf-8"><title>Arabic and English guide (synthetic sample)</title>
+<style>${guideFontFaces}
+@page { size: A4; margin: 2cm } body { font-family: "IBM Plex Sans", "IBM Plex Sans Arabic", sans-serif; font-size: 12pt; line-height: 1.7; color: #1f2328 }
+h1 { font-size: 22pt; margin: 0 0 4pt } h2 { font-size: 15pt; margin: 18pt 0 6pt } section { break-after: page } section:last-child { break-after: auto }
+.ar { direction: rtl; text-align: right; font-family: "IBM Plex Sans Arabic", "IBM Plex Sans", sans-serif; font-size: 13pt }
+.en { direction: ltr } table { border-collapse: collapse; width: 100%; margin-top: 8pt } td, th { border: 1px solid #9aa0a6; padding: 4pt 8pt }
+.note { color: #5b616e; font-size: 10pt }</style>
+<section>
+<div class="ar"><h1>دليل المستخدم (عينة اصطناعية)</h1><p>هذا ملف PDF تجريبي باللغتين العربية والإنجليزية، صُنع لتجربة عارض PDF في OpenAnyDoc. ابحث عن كلمة «المبيعات» أو حدّد هذه الفقرة لنسخها.</p>
+<h2>ملخص الربع</h2><p>نمت المبيعات في جميع المناطق، وارتفع عدد العملاء الجدد إلى ٣٤٠ عميلًا. يحتوي السطر التالي على أرقام لاتينية مثل 2026 وكلمة <bdi>OpenAnyDoc</bdi> داخل الجملة.</p>
+<table><tr><th>المنطقة</th><th>2025</th><th>2026</th></tr><tr><td>الشمال</td><td>١٢٤٠</td><td>1,380</td></tr><tr><td>الجنوب</td><td>٩٨٠</td><td>1,105</td></tr><tr><td>الغرب</td><td>١١٠٥</td><td>1,240</td></tr></table></div>
+<p class="note en">A synthetic sample: the names and numbers are made up.</p>
+</section>
+<section class="en"><h1>User guide (synthetic sample)</h1><p>This two-page PDF is a made-up guide in Arabic and English for trying the OpenAnyDoc PDF viewer. Search for the word "sales", select this paragraph, or rotate the page.</p>
+<h2>Quarter summary</h2><p>Sales grew in every region, and new customers rose to 340. The table repeats the figures from the Arabic page.</p>
+<table><tr><th>Region</th><th>2025</th><th>2026</th></tr><tr><td>North</td><td>1,240</td><td>1,380</td></tr><tr><td>South</td><td>980</td><td>1,105</td></tr><tr><td>West</td><td>1,105</td><td>1,240</td></tr></table>
+<h2 class="ar">الخطوات التالية</h2><p class="ar">مراجعة قائمة الأسعار في شهر مارس، ثم مشاركة الملخص مع الفريق.</p></section></html>`
+runChromeOnHtml(guideHtml, [`--print-to-pdf=${new URL('arabic-english-guide.pdf', sampleDirectory).pathname}`])
+console.log('Wrote the PDF viewer sample arabic-english-guide.pdf.')
+
+// The JPG to PDF page's two samples: a landscape photo (JPG) and a bar chart (PNG), small enough to bundle.
+const samplePhotoPngPath = join(tmpdir(), 'openanydoc-sample-photo.png')
+screenshotHtml(
+  `<!doctype html><body style="margin:0;height:100vh;overflow:hidden;background:linear-gradient(#5b8fd6,#f3c9a0 62%,#3f7a3a 62%,#25502a)">
+<div style="position:absolute;left:62%;top:30%;width:90px;height:90px;border-radius:50%;background:radial-gradient(#fff6c8,#ffb347)"></div>
+<div style="position:absolute;left:-10%;top:52%;width:70%;height:40%;border-radius:50%;background:#4f8a45"></div>
+<div style="position:absolute;left:40%;top:56%;width:80%;height:45%;border-radius:50%;background:#386b33"></div></body>`,
+  900,
+  600,
+  samplePhotoPngPath,
+)
+execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '70', samplePhotoPngPath, '--out', new URL('landscape-photo.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
+rmSync(samplePhotoPngPath)
+screenshotHtml(
+  `<!doctype html><body style="margin:0;padding:40px;background:#fff;font:20px Helvetica,Arial,sans-serif;color:#1f1f1f">
+<div style="font-weight:bold;font-size:26px;margin-bottom:24px">Sales by region, 2026</div>
+<div style="display:flex;align-items:flex-end;gap:36px;height:320px;border-bottom:2px solid #1f1f1f;padding:0 30px">
+${[['North', 280, '#2f6fd6'], ['South', 220, '#e8833a'], ['West', 250, '#3a9a5b'], ['East', 170, '#8a5cc7']].map(([region, barHeight, color]) => `<div style="flex:1;text-align:center"><div style="height:${barHeight}px;background:${color};border-radius:6px 6px 0 0"></div><div style="margin-top:10px">${region}</div></div>`).join('')}
+</div></body>`,
+  700,
+  480,
+  new URL('sales-chart.png', sampleDirectory).pathname,
+)
+console.log('Wrote the JPG to PDF samples landscape-photo.jpg and sales-chart.png.')
+
+// The Extract images page's sample: a 2-page PDF holding the photo and the chart above as pictures.
+const picturesPdf = await PDFDocument.create()
+picturesPdf.setTitle('Photo report (synthetic sample)')
+picturesPdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+picturesPdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+const picturesHeadingFont = await picturesPdf.embedFont(StandardFonts.HelveticaBold)
+const samplePhoto = await picturesPdf.embedJpg(new Uint8Array(readFileSync(new URL('landscape-photo.jpg', sampleDirectory))))
+const sampleChart = await picturesPdf.embedPng(new Uint8Array(readFileSync(new URL('sales-chart.png', sampleDirectory))))
+for (const [heading, picture] of [['Site visit', samplePhoto], ['Sales by region', sampleChart]]) {
+  const page = picturesPdf.addPage([595, 842])
+  page.drawText(heading, { x: 60, y: 760, size: 22, font: picturesHeadingFont, color: rgb(0.1, 0.1, 0.15) })
+  const pictureSize = picture.scaleToFit(475, 600)
+  page.drawImage(picture, { x: 60, y: 730 - pictureSize.height, width: pictureSize.width, height: pictureSize.height })
+}
+writeSampleFile('photo-report-2-pages.pdf', await picturesPdf.save())
+console.log('Wrote the Extract images sample photo-report-2-pages.pdf.')
+
+// The Fill PDF page's sample: a 2-page form with text fields, a drop-down, a checkbox and a radio group (made-up labels).
+const formPdf = await PDFDocument.create()
+formPdf.setTitle('Registration form (synthetic sample)')
+formPdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+formPdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+const formHeadingFont = await formPdf.embedFont(StandardFonts.HelveticaBold)
+const formBodyFont = await formPdf.embedFont(StandardFonts.Helvetica)
+const sampleForm = formPdf.getForm()
+const firstFormPage = formPdf.addPage([595, 842])
+firstFormPage.drawText('Workshop registration', { x: 60, y: 760, size: 22, font: formHeadingFont, color: rgb(0.1, 0.1, 0.15) })
+for (const [label, fieldName, y] of [['Full name', 'full_name', 690], ['Email', 'email', 640], ['Company', 'company', 590]]) {
+  firstFormPage.drawText(label, { x: 60, y: y + 6, size: 12, font: formBodyFont })
+  sampleForm.createTextField(fieldName).addToPage(firstFormPage, { x: 180, y, width: 300, height: 24 })
+}
+firstFormPage.drawText('City', { x: 60, y: 546, size: 12, font: formBodyFont })
+const cityField = sampleForm.createDropdown('city')
+cityField.addOptions(['Riyadh', 'Jeddah', 'Dammam', 'Other'])
+cityField.addToPage(firstFormPage, { x: 180, y: 540, width: 160, height: 24 })
+const secondFormPage = formPdf.addPage([595, 842])
+secondFormPage.drawText('Session and consent', { x: 60, y: 760, size: 22, font: formHeadingFont, color: rgb(0.1, 0.1, 0.15) })
+const sessionField = sampleForm.createRadioGroup('session')
+for (const [label, value, y] of [['Morning session', 'morning', 700], ['Afternoon session', 'afternoon', 670]]) {
+  sessionField.addOptionToPage(value, secondFormPage, { x: 60, y, width: 16, height: 16 })
+  secondFormPage.drawText(label, { x: 86, y: y + 3, size: 12, font: formBodyFont })
+}
+const consentField = sampleForm.createCheckBox('newsletter')
+consentField.addToPage(secondFormPage, { x: 60, y: 620, width: 16, height: 16 })
+secondFormPage.drawText('Send me the workshop notes by email', { x: 86, y: 623, size: 12, font: formBodyFont })
+writeSampleFile('form-2-pages.pdf', await formPdf.save())
+console.log('Wrote the Fill PDF sample form-2-pages.pdf.')
+
+// Fill PDF's second sample: a one-page feedback form (text box, rating drop-down, checkbox).
+const feedbackPdf = await PDFDocument.create()
+feedbackPdf.setTitle('Feedback form (synthetic sample)')
+feedbackPdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+feedbackPdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+const feedbackHeadingFont = await feedbackPdf.embedFont(StandardFonts.HelveticaBold)
+const feedbackBodyFont = await feedbackPdf.embedFont(StandardFonts.Helvetica)
+const feedbackForm = feedbackPdf.getForm()
+const feedbackPage = feedbackPdf.addPage([595, 842])
+feedbackPage.drawText('Customer feedback', { x: 60, y: 760, size: 22, font: feedbackHeadingFont, color: rgb(0.1, 0.1, 0.15) })
+feedbackPage.drawText('Order number', { x: 60, y: 706, size: 12, font: feedbackBodyFont })
+feedbackForm.createTextField('order_number').addToPage(feedbackPage, { x: 180, y: 700, width: 160, height: 24 })
+feedbackPage.drawText('Rating', { x: 60, y: 656, size: 12, font: feedbackBodyFont })
+const ratingField = feedbackForm.createDropdown('rating')
+ratingField.addOptions(['Excellent', 'Good', 'Fair', 'Poor'])
+ratingField.addToPage(feedbackPage, { x: 180, y: 650, width: 160, height: 24 })
+feedbackPage.drawText('Comments', { x: 60, y: 606, size: 12, font: feedbackBodyFont })
+const commentsField = feedbackForm.createTextField('comments')
+commentsField.enableMultiline()
+commentsField.addToPage(feedbackPage, { x: 180, y: 500, width: 340, height: 120 })
+feedbackForm.createCheckBox('contact_me').addToPage(feedbackPage, { x: 60, y: 460, width: 16, height: 16 })
+feedbackPage.drawText('You may contact me about this feedback', { x: 86, y: 463, size: 12, font: feedbackBodyFont })
+writeSampleFile('feedback-form.pdf', await feedbackPdf.save())
+console.log('Wrote the Fill PDF sample feedback-form.pdf.')

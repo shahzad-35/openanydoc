@@ -28,6 +28,7 @@ const sampleFiles = {
     // Word and PowerPoint samples are the synthetic files scripts/generate-test-files.mjs writes into test-files/ (run it first).
     word: ['report.docx', 'test-files/word-rich.docx'],
     powerpoint: ['review.pptx', 'test-files/powerpoint-rich.pptx'],
+    pdf: ['report.pdf', 'src/samples/report-3-pages.pdf'],
     excel: ['budget.xlsx', [['Item', 'Qty', 'Unit price', 'Total'], ['Desks', 4, 320, { t: 'n', f: 'B2*C2', v: 1280 }], ['Chairs', 8, 95, { t: 'n', f: 'B3*C3', v: 760 }], ['Monitors', 6, 210, { t: 'n', f: 'B4*C4', v: 1260 }], ['Total', '', '', { t: 'n', f: 'SUM(D2:D4)', v: 3300 }]]],
   },
   ar: {
@@ -36,11 +37,12 @@ const sampleFiles = {
     text: ['ملاحظات.txt', 'ملاحظات الإصدار\n\n- فتحنا التصدير الربعي بدون Excel.\n- أصلحنا ترميز العربية في قائمة العملاء.\n- شاركنا الصفوف المصفّاة مع فريق المالية.\n\nالتالي: مقارنة التصديرين والاحتفاظ بالفرق.\n'],
     word: ['تقرير.docx', 'test-files/word-arabic.docx'],
     powerpoint: ['مراجعة.pptx', 'test-files/powerpoint-rich.pptx'],
+    pdf: ['دليل.pdf', 'src/samples/arabic-english-guide.pdf'],
     excel: ['الميزانية.xlsx', [['البند', 'الكمية', 'سعر الوحدة', 'الإجمالي'], ['مكاتب', 4, 320, { t: 'n', f: 'B2*C2', v: 1280 }], ['كراسي', 8, 95, { t: 'n', f: 'B3*C3', v: 760 }], ['شاشات', 6, 210, { t: 'n', f: 'B4*C4', v: 1260 }], ['الإجمالي', '', '', { t: 'n', f: 'SUM(D2:D4)', v: 3300 }]]],
   },
 }
-const pagePath = { csv: '/csv-viewer', json: '/json-viewer', text: '/txt-viewer', excel: '/excel-viewer', word: '/word-viewer', powerpoint: '/powerpoint-viewer' }
-const readySelector = { csv: '#data-table [id^="cell-"]', json: '#tree-view .row', text: '#text-editor', excel: '#data-table [id^="cell-"]', word: '#word-document section.docx', powerpoint: '#slide-thumbnail-4 .slide-thumbnail-picture > *' }
+const pagePath = { csv: '/csv-viewer', json: '/json-viewer', text: '/txt-viewer', excel: '/excel-viewer', word: '/word-viewer', powerpoint: '/powerpoint-viewer', pdf: '/pdf-viewer' }
+const readySelector = { csv: '#data-table [id^="cell-"]', json: '#tree-view .row', text: '#text-editor', excel: '#data-table [id^="cell-"]', word: '#word-document section.docx', powerpoint: '#slide-thumbnail-4 .slide-thumbnail-picture > *', pdf: '#pdf-pages .page[data-loaded] canvas' }
 
 function writeSampleFile(locale, viewerId) {
   const [name, content] = sampleFiles[locale][viewerId]
@@ -50,7 +52,7 @@ function writeSampleFile(locale, viewerId) {
     const workbook = XLSX.utils.book_new()
     XLSX.utils.book_append_sheet(workbook, XLSX.utils.aoa_to_sheet(content), locale === 'ar' ? 'الميزانية' : 'Budget')
     fs.writeFileSync(filePath, XLSX.write(workbook, { type: 'buffer', bookType: 'xlsx' }))
-  } else if (viewerId === 'word' || viewerId === 'powerpoint') {
+  } else if (viewerId === 'word' || viewerId === 'powerpoint' || viewerId === 'pdf') {
     fs.copyFileSync(path.join(projectRoot, content), filePath)
   } else {
     fs.writeFileSync(filePath, '﻿' + content)

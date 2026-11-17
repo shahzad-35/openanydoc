@@ -9,6 +9,17 @@ import { supportedExtensions, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 import type { ToolSample } from '../samples/toolSamples'
 
+// The "This looks like a ... file" line of the wrong-file offer, one per viewer (a new viewer without one fails the type check).
+const LOOKS_LIKE_MESSAGES: Record<Viewer['id'], MessageKey> = {
+  csv: 'redirect.looksLike.csv',
+  text: 'redirect.looksLike.text',
+  json: 'redirect.looksLike.json',
+  excel: 'redirect.looksLike.excel',
+  word: 'redirect.looksLike.word',
+  pdf: 'redirect.looksLike.pdf',
+  powerpoint: 'redirect.looksLike.powerpoint',
+}
+
 // One class per pill position (written out in full so Tailwind finds them). Each --ext-pill-N is pointed at a hue in the session's
 // shuffled order by public/theme-init.js before the first paint, so the server markup, the first browser render and the colours
 // the visitor sees all agree. A class, not a style attribute: the Content-Security-Policy blocks style attributes in the HTML.
@@ -81,7 +92,7 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
   const otherFormats = currentViewerId && showOtherFormats ? getOtherReleasedFormats(currentViewerId) : []
   const suggestion = intake.redirectSuggestion
   const isPhone = useIsPhone()
-  const wrongFileMessage = suggestion ? translate(locale, `redirect.looksLike.${suggestion.viewer.id}` as MessageKey) : ''
+  const wrongFileMessage = suggestion ? translate(locale, LOOKS_LIKE_MESSAGES[suggestion.viewer.id]) : ''
   const openSuggestedViewer = () => suggestion && onOpenInViewer?.(suggestion.file, localizePath(locale, suggestion.viewer.toolPath as string))
   return (
     <>

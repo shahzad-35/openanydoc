@@ -104,7 +104,6 @@ export type FormatDefinition = {
   canMask?: boolean
 }
 
-const comingSoonViewer = lazy(() => import('./ComingSoonViewer'))
 const loadCsvViewer = () => import('./csv/CsvViewer')
 const loadTextViewer = () => import('./text/TextViewer')
 const loadJsonViewer = () => import('./json/JsonViewer')
@@ -112,6 +111,7 @@ const loadExcelViewer = () => import('./excel/ExcelViewer')
 const loadExcelEditing = () => import('./excel/excelEditing')
 const loadWordViewer = () => import('./word/WordViewer')
 const loadPowerPointViewer = () => import('./powerpoint/PowerPointViewer')
+const loadPdfViewer = () => import('./pdf/PdfViewer')
 
 // To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now; Word and
 // PowerPoint are view only, and their Edit toggles turn on by themselves once their entries have `editing`.
@@ -184,7 +184,13 @@ export const formatDefinitions: FormatDefinition[] = [
     preloadViewer: loadWordViewer,
     ownsWholePage: true,
   },
-  { viewerId: 'pdf', ViewerComponent: comingSoonViewer, ownsWholePage: true },
+  {
+    viewerId: 'pdf',
+    addedOn: '2026-11-16',
+    ViewerComponent: lazy(loadPdfViewer),
+    preloadViewer: () => Promise.all([loadPdfViewer(), import('./pdf/pdfLibrary').then((pdfLibrary) => pdfLibrary.warmUpPdfWorker())]),
+    ownsWholePage: true,
+  },
   {
     viewerId: 'powerpoint',
     addedOn: '2026-11-02',

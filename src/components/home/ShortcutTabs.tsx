@@ -2,14 +2,13 @@ import { Fragment, useState, useSyncExternalStore } from 'react'
 import type { KeyboardEvent } from 'react'
 import { useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
-import { viewers } from '../../viewers'
 import { MiniFormatIcon } from '../KitIcon'
 import type { MiniFormat } from '../KitIcon'
 
 // 'mod' is ⌘ on an Apple keyboard and Ctrl elsewhere; anything else is the key's own letter.
 type ShortcutKey = 'mod' | 'shift' | 'enter' | string
 type Shortcut = { keys: ShortcutKey[]; labelKey: MessageKey }
-type ShortcutTab = { id: string; format: MiniFormat; labelKey: MessageKey; shortcuts: Shortcut[]; noteKey: MessageKey; extensions?: string[] }
+type ShortcutTab = { id: string; format: MiniFormat; labelKey: MessageKey; shortcuts: Shortcut[]; noteKey: MessageKey }
 
 // Only shortcuts the viewers really have: see the keydown handlers in src/formats/*/…Viewer.tsx and src/pages/FileViewPage.tsx.
 const shortcutTabs: ShortcutTab[] = [
@@ -50,12 +49,16 @@ const shortcutTabs: ShortcutTab[] = [
     ],
   },
   {
-    id: 'soon',
-    format: 'unsupported',
-    labelKey: 'tabs.soon',
-    noteKey: 'shortcut.note.soon',
-    shortcuts: [],
-    extensions: viewers.filter((viewer) => !viewer.toolPath).flatMap((viewer) => viewer.extensions),
+    id: 'pdf',
+    format: 'pdf',
+    labelKey: 'tabs.pdf',
+    noteKey: 'shortcut.note.pdf',
+    shortcuts: [
+      { keys: ['mod', 'f'], labelKey: 'shortcut.search' },
+      { keys: ['mod', '+'], labelKey: 'shortcut.zoomIn' },
+      { keys: ['mod', '−'], labelKey: 'shortcut.zoomOut' },
+      { keys: ['mod', '0'], labelKey: 'shortcut.fitWidth' },
+    ],
   },
 ]
 
@@ -135,35 +138,25 @@ export default function ShortcutTabs() {
         ))}
       </div>
       <div id={`format-panel-${selectedTab.id}`} role="tabpanel" aria-labelledby={`format-tab-${selectedTab.id}`} className="soft-card mt-6">
-        {selectedTab.shortcuts.length > 0 ? (
-          <ul className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
-            {selectedTab.shortcuts.map((shortcut) => (
-              <li key={shortcut.labelKey} className="flex flex-wrap items-center gap-4">
-                <span dir="ltr" className="flex items-center gap-2">
-                  {shortcut.keys.map((key, position) => (
-                    <Fragment key={key}>
-                      {position > 0 && (
-                        <span aria-hidden="true" className="keycap-plus">
-                          +
-                        </span>
-                      )}
-                      <Keycap keyName={key} isMac={isMac} />
-                    </Fragment>
-                  ))}
-                </span>
-                <span className="text-lg font-semibold">{t(shortcut.labelKey)}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {selectedTab.extensions?.map((extension) => (
-              <span key={extension} dir="ltr" className="chip chip--soft">
-                {extension}
+        <ul className="grid gap-x-10 gap-y-6 sm:grid-cols-2">
+          {selectedTab.shortcuts.map((shortcut) => (
+            <li key={shortcut.labelKey} className="flex flex-wrap items-center gap-4">
+              <span dir="ltr" className="flex items-center gap-2">
+                {shortcut.keys.map((key, position) => (
+                  <Fragment key={key}>
+                    {position > 0 && (
+                      <span aria-hidden="true" className="keycap-plus">
+                        +
+                      </span>
+                    )}
+                    <Keycap keyName={key} isMac={isMac} />
+                  </Fragment>
+                ))}
               </span>
-            ))}
-          </div>
-        )}
+              <span className="text-lg font-semibold">{t(shortcut.labelKey)}</span>
+            </li>
+          ))}
+        </ul>
         <p className="mt-6 text-sm text-ink-soft">{t(selectedTab.noteKey)}</p>
       </div>
     </section>

@@ -130,6 +130,11 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   const reportUnsavedEdits = useCallback((hasUnsavedEdits: boolean) => {
     hasUnsavedEditsRef.current = hasUnsavedEdits
   }, [])
+  // An editing tool page: Back or Forward with unsaved edits returns to this same address while the dialog asks.
+  const reportToolUnsavedEdits = useCallback((hasUnsavedEdits: boolean) => {
+    hasUnsavedEditsRef.current = hasUnsavedEdits
+    if (hasUnsavedEdits) openedFilePathRef.current = window.location.pathname
+  }, [])
 
   // The file only lives in memory, so an address that exists only for an open file (/en/view-pdf ...) never shows without one: a
   // reload or Forward lands on home instead. A format's own address (/en/json-viewer ...) shows its page with the drop zone.
@@ -182,10 +187,16 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
     setPathname(openedFilePathRef.current)
   }
 
-  async function navigateTo(path: string) {
-    await loadAddressWords(path)
-    window.history.pushState(null, '', path)
-    setPathname(path)
+  // Leaving a tool page with unsaved edits asks first; the same page in the other language keeps them, so it does not ask.
+  async function navigateTo(newAddress: string) {
+    const isSamePageInOtherLanguage = splitLocalePath(newAddress).path === path
+    if (!openedFile && hasUnsavedEditsRef.current && !isSamePageInOtherLanguage) {
+      if (!(await confirmDiscardEdits())) return
+      hasUnsavedEditsRef.current = false
+    }
+    await loadAddressWords(newAddress)
+    window.history.pushState(null, '', newAddress)
+    setPathname(newAddress)
     window.scrollTo(0, 0)
   }
 
@@ -217,7 +228,6 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
 
   // Hands a file to another format's page. Leaving a page with unsaved edits asks first, as everywhere else.
   async function openInViewer(file: File, toolPath: string) {
-    if (hasUnsavedEditsRef.current && !(await confirmDiscardEdits())) return
     await navigateTo(toolPath)
     setHandoffFile(file)
   }
@@ -264,6 +274,8 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
                   handoffFile={handoffFile}
                   onHandoffConsumed={() => setHandoffFile(null)}
                   onOpenInViewer={openInViewer}
+                  onUnsavedEditsChange={reportToolUnsavedEdits}
+                  confirmDiscardEdits={confirmDiscardEdits}
                 />
               ) : findLiveHub(path) || path === ALL_TOOLS_PATH ? (
                 <Suspense fallback={null}>

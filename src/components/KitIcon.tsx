@@ -148,7 +148,7 @@ export function KitIcon({ name, size = 24, label, className }: { name: UiIconNam
 }
 
 // The kit's 24px format blocks: a face on a base, with the format's glyph.
-export type MiniFormat = 'csv' | 'xlsx' | 'json' | 'txt' | 'docx' | 'pptx' | 'unsupported'
+export type MiniFormat = 'csv' | 'xlsx' | 'json' | 'txt' | 'docx' | 'pptx' | 'pdf' | 'unsupported'
 
 const miniGlyphs: Record<MiniFormat, ReactNode> = {
   csv: <path d="M7 9h10M7 12.5h10M7 16h10M12 7.5v10" />,
@@ -162,6 +162,7 @@ const miniGlyphs: Record<MiniFormat, ReactNode> = {
   txt: <path d="M7 8.5h10M7 12h10M7 15.5h6" />,
   docx: <path d="M7 8l1.6 8 3.4-6.5 3.4 6.5L17 8" />,
   pptx: <path d="M9.5 17V7h3.5a3 3 0 0 1 0 6H9.5" />,
+  pdf: <path d="M8 16.5V7.5h3a2.5 2.5 0 0 1 0 5H8M14.5 16.5v-9H17M14.5 12H16.5" />,
   unsupported: <path d="M10 9.5a2 2 0 1 1 2.8 1.8c-.5.3-.8.7-.8 1.2v.5M12 15.5h.01" />,
 }
 
@@ -172,6 +173,7 @@ const miniColors: Record<MiniFormat, { face: string; base: string; ink: string }
   txt: { face: 'var(--txt)', base: 'var(--txt-base)', ink: 'var(--txt-ink)' },
   docx: { face: 'var(--docx)', base: 'var(--docx-base)', ink: 'var(--docx-ink)' },
   pptx: { face: 'var(--pptx)', base: 'var(--pptx-base)', ink: 'var(--pptx-ink)' },
+  pdf: { face: 'var(--pdf)', base: 'var(--pdf-base)', ink: 'var(--pdf-ink)' },
   unsupported: { face: 'var(--warn)', base: 'var(--warn-base)', ink: 'var(--warn-ink)' },
 }
 

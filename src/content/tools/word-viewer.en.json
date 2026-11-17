@@ -39,11 +39,13 @@
   ],
   "handlesTitle": "What the Word viewer handles: DOCX files",
   "handles": [
-    "Files: Word documents in the .docx format, made by Word, Google Docs, Pages or LibreOffice. Older .doc files are not supported: save them as .docx first.",
+    "Files: Word documents (.docx), Word templates (.dotx), macro-enabled documents (.docm, macros are never run) and OpenDocument text (.odt), made by Word, Google Docs, Pages or LibreOffice. Older .doc files are not supported: save them as .docx first.",
     "Layout: page size and margins, page breaks, headers and footers with page numbers, footnotes and endnotes.",
     "Content: fonts and text formatting, tables with borders, shading and merged cells, pictures, and bullet and numbered lists.",
+    "Review: comments and tracked changes in the margin (read only), with a switch to hide them; a navigation pane from the headings; search with highlighted matches; word, character and page counts, reading time, and the author and dates.",
+    "Reading: a reading mode with a comfortable column, larger text and light, sepia or dark pages, and read aloud with the voices installed on your device.",
     "Arabic: right-to-left paragraphs and tables, with Arabic and English mixed in one line.",
-    "Output: zoom from 50% to 200% or fit to width, print, save as PDF, or download the original file."
+    "Output: zoom from 50% to 200% or fit to width, print, save as PDF, export as plain text, Markdown or a web page, save all pictures as a ZIP, or download the original file."
   ],
   "screenshot": {
     "alt": "The Word viewer showing a document as a page with a table, a list and a picture, and the zoom and print buttons above it",
@@ -109,7 +111,8 @@
   },
   "limits": [
     "View only: documents can't be edited.",
-    "Old .doc files are not supported; save them as .docx first."
+    "Old .doc files are not supported; save them as .docx first.",
+    "For .odt files the pages are shown as one flowing page, without the comments margin, and Markdown export is for Word files only."
   ],
   "faqTitle": "Word viewer online: common questions",
   "faq": [
@@ -156,6 +159,10 @@
     {
       "question": "Can I open an old .doc file?",
       "answer": "No. Only .docx is supported; a .doc file shows a message instead. Open it in Word, Pages or LibreOffice, choose Save As and pick Word Document (.docx), then open the new file here."
+    },
+    {
+      "question": "Can it open .dotx, .docm and .odt files?",
+      "answer": "Yes. Word templates (.dotx) and macro-enabled documents (.docm) open like any .docx; macros are detected and never run. OpenDocument text files (.odt) from LibreOffice open as one flowing page, with headings, search, counts, read aloud and export."
     },
     {
       "question": "How do I convert a Word document to PDF?",

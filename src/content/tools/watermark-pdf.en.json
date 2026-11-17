@@ -1,0 +1,69 @@
+{
+  "title": "Watermark PDF – Add Text or Image Watermark, No Upload",
+  "description": "Add a text or picture watermark to a PDF in your browser, with opacity, rotation, position and the pages you choose. Free, and nothing is uploaded.",
+  "heading": "Watermark PDF",
+  "subtitle": "Put a text or picture watermark on every page, or the pages you choose, with your own opacity and angle; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Text or picture",
+      "text": "Type words such as CONFIDENTIAL or DRAFT in any language, or use your logo."
+    },
+    {
+      "title": "Your placement",
+      "text": "Opacity, rotation, one of nine positions or repeated across the page, on all pages or a range."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Design the watermark",
+      "text": "Type the text or choose a picture, then set size, colour, opacity and rotation."
+    },
+    {
+      "title": "Place it",
+      "text": "Pick a position or repeat it across the page, and choose the pages. The preview shows the result."
+    },
+    {
+      "title": "Add and download",
+      "text": "Click Add watermark, check the preview and download the PDF."
+    }
+  ],
+  "limits": [
+    "The watermark is drawn on top of the page; it can't be placed behind the existing content.",
+    "Text watermarks are drawn as pictures, so they can't be selected or searched.",
+    "PDFs that need a password to open can't be watermarked; remove the password first."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can I use Arabic text?",
+      "answer": "Yes. The text is drawn by your browser, so Arabic letters join and run right to left as they should."
+    },
+    {
+      "question": "Can someone remove the watermark?",
+      "answer": "It is drawn into the page content, so it is not a separate layer that can be switched off, but anyone with a PDF editor can still cover or cut it. A watermark marks a document; it does not lock it."
+    },
+    {
+      "question": "Can the added text be selected or searched?",
+      "answer": "No. It is drawn as a sharp picture so Arabic letters join and run right to left correctly in every PDF app, which means it can't be selected, copied or searched."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    }
+  ]
+}

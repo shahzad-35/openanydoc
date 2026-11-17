@@ -1,0 +1,69 @@
+{
+  "title": "Edit PDF – Add Text, Highlights & Shapes Free, No Upload",
+  "description": "Edit a PDF in your browser: add text boxes, highlight text, draw, add shapes and pictures, then save a copy. Free, and nothing is uploaded.",
+  "heading": "Edit PDF",
+  "subtitle": "Add text boxes, highlights, drawings, shapes and pictures to a PDF and save a copy; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Mark up any page",
+      "text": "Text boxes, highlights over the PDF's own text, freehand drawing, rectangles, ellipses, lines, arrows and pictures."
+    },
+    {
+      "title": "Undo and redo",
+      "text": "Every change can be undone and redone, and you are asked before unsaved changes are thrown away."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Pick a tool",
+      "text": "Choose Text box, Highlight, Draw, a shape or Picture, with a colour and line thickness."
+    },
+    {
+      "title": "Mark up the pages",
+      "text": "Click or drag on a page. Drag what you placed to move it; drag its corner to resize it."
+    },
+    {
+      "title": "Save a copy",
+      "text": "Click Save a copy, check the preview and download the edited PDF."
+    }
+  ],
+  "limits": [
+    "Text already in the PDF can't be rewritten; cover it with a white rectangle and add a text box on top.",
+    "PDFs that need a password to open can't be edited; remove the password first.",
+    "Shapes and pictures become part of the page; text boxes, highlights and drawings stay editable in other PDF apps."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can I change the text that is already in the PDF?",
+      "answer": "No. A PDF stores its text as placed letters, not as paragraphs, so it can't be rewritten here. To change a word, cover it with a white rectangle and type over it with a text box."
+    },
+    {
+      "question": "Is my original file changed?",
+      "answer": "No. Save a copy makes a new PDF to download; the file on your device stays exactly as it was."
+    },
+    {
+      "question": "Can I undo a change?",
+      "answer": "Yes. Undo and Redo step back and forward through every change, in the order you made them, until you save."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    }
+  ]
+}

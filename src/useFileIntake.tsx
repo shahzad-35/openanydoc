@@ -10,6 +10,15 @@ import { findReleasedFormat, getFormatCapabilities, getReleasedFormats } from '.
 // The file chooser lists each extension's media types as well: iOS Safari and Android Chrome match files by type, and leave
 // some greyed out when given only an extension they cannot map (.tsv, .json on older iOS). Android labels CSV either way.
 const PICKER_MIME_TYPES: Record<string, string[]> = {
+  '.jpg': ['image/jpeg'],
+  '.jpeg': ['image/jpeg'],
+  '.png': ['image/png'],
+  '.webp': ['image/webp'],
+  '.heic': ['image/heic'],
+  '.heif': ['image/heif'],
+  '.tif': ['image/tiff'],
+  '.tiff': ['image/tiff'],
+  '.svg': ['image/svg+xml'],
   '.csv': ['text/csv', 'text/comma-separated-values'],
   '.tsv': ['text/tab-separated-values'],
   '.txt': ['text/plain'],
@@ -51,7 +60,7 @@ type FileIntakeOptions = {
   handoffFile?: File | null
   onHandoffConsumed?: () => void
   // A tool page (src/pages/ToolPage.tsx): takes several files at once (each goes to onFileLoaded), and takes its formats even when
-  // no viewer opens them yet (Merge PDF takes .pdf although the PDF viewer is "coming soon").
+  // no viewer opens them yet (JPG to PDF takes pictures, which no viewer opens).
   allowsSeveralFiles?: boolean
   acceptsComingSoonFormats?: boolean
 }
@@ -155,7 +164,10 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   function openChosenFiles(files: File[]) {
     if (files.length === 0) return
     if (allowsSeveralFiles) {
-      for (const file of files) void loadFile(file)
+      // One after another, so the files keep the order they were chosen in (a large file would otherwise arrive last).
+      void (async () => {
+        for (const file of files) await loadFile(file)
+      })()
       return
     }
     if (files.length > 1) {

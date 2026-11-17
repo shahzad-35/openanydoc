@@ -1,0 +1,61 @@
+{
+  "title": "Extract Images from PDF – Save All Pictures, No Upload",
+  "description": "Extract every picture inside a PDF in your browser and download them as PNG files in one ZIP, each picture once. Free, and nothing is uploaded.",
+  "heading": "Extract images from a PDF",
+  "subtitle": "Save every picture inside a PDF as PNG files in one ZIP; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Every picture, once",
+      "text": "Pictures are saved at their own size, and a logo repeated on every page is saved only once."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Extract the pictures",
+      "text": "Click Extract images; the pages are read one by one."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview lists the pictures found; download the ZIP."
+    }
+  ],
+  "limits": [
+    "Pictures are saved as PNG files, whatever format they have inside the PDF.",
+    "Very small pictures (under 16 pixels) and drawings made of lines are not saved.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Why are some pictures missing?",
+      "answer": "Charts and diagrams are often drawn with lines rather than stored as pictures, so there is no picture to save. Use PDF to JPG to save the whole page instead."
+    },
+    {
+      "question": "What size are the pictures?",
+      "answer": "Each picture is saved at the size it has inside the PDF, which can be larger than it looks on the page."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

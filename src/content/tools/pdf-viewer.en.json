@@ -1,0 +1,144 @@
+{
+  "title": "PDF Viewer Online – Open PDF Files Free, No Upload",
+  "description": "Open PDF files online in your browser: scroll pages with thumbnails, zoom, rotate, search and select text, Arabic too. Free, with no upload.",
+  "heading": "Open PDF Online: Free PDF Viewer",
+  "subtitle": "Drop a PDF to read it page by page, search it and zoom in; nothing is uploaded.",
+  "intro": "Open a PDF online in your browser: a free PDF viewer that shows every page in one scroll, with page thumbnails, zoom, fit to width and rotation. Search the text with highlights, select and copy it, Arabic included, and open password-protected PDFs by typing the password here. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your PDF is opened by your own browser and never sent to a server. A password you type is used only on this page."
+    },
+    {
+      "title": "Search and select",
+      "text": "Find words across every page with highlighted matches, and select text to copy it, right to left for Arabic."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, PDFs keep opening without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: open a PDF online",
+  "steps": [
+    {
+      "title": "Drop your PDF on the page",
+      "text": "Choose or drop a .pdf file. It is read in your browser, never uploaded, and its pages appear in one scroll."
+    },
+    {
+      "title": "Move around",
+      "text": "Click a thumbnail, type a page number, or scroll. Zoom in or out, fit the page to the width, or rotate it."
+    },
+    {
+      "title": "Search and copy",
+      "text": "Press Ctrl+F (⌘F on a Mac) to search; matches are highlighted on the page. Select any text to copy it."
+    },
+    {
+      "title": "Open a protected PDF",
+      "text": "If the PDF has a password, type it in the box that appears. It is used only in this tab and never stored."
+    }
+  ],
+  "handlesTitle": "What the PDF viewer handles",
+  "handles": [
+    "Files: PDF documents (.pdf) from any app, including long ones: pages are drawn as you reach them.",
+    "Navigation: page thumbnails, a page counter with go to page, previous and next, and continuous scrolling.",
+    "View: zoom from 50% to 400%, fit to width or to the page, and rotate the pages.",
+    "Text: search with highlighted matches, match case and whole words, and text you can select and copy.",
+    "Arabic: text is searched and selected in reading order, right to left.",
+    "Protected files: a password prompt for PDFs that need one; the password stays in this tab.",
+    "Forms: fillable form fields are shown with their values."
+  ],
+  "screenshot": {
+    "alt": "The PDF viewer showing a page with thumbnails on the side and the page counter, zoom and search in the toolbar",
+    "caption": "A PDF open as one scroll of pages, with thumbnails, the page counter, zoom, rotation and search in the toolbar."
+  },
+  "comparison": {
+    "title": "PDF viewer compared with your browser's PDF viewer and upload-based viewers",
+    "columns": [
+      "OpenAnyDoc",
+      "Your browser's built-in PDF viewer",
+      "Upload-based online viewers"
+    ],
+    "rows": [
+      {
+        "label": "Your file is uploaded",
+        "cells": [
+          "No. It is read in your browser.",
+          "No.",
+          "Yes, to the service's server."
+        ]
+      },
+      {
+        "label": "Account or sign-in",
+        "cells": [
+          "None.",
+          "None.",
+          "Often none; sometimes an email address."
+        ]
+      },
+      {
+        "label": "Arabic interface",
+        "cells": [
+          "Yes, the page and viewer are in Arabic too.",
+          "Follows the browser's language.",
+          "Varies."
+        ]
+      },
+      {
+        "label": "Opens next to CSV, Excel, Word and PowerPoint files",
+        "cells": [
+          "Yes, one page for every format.",
+          "No, PDF only.",
+          "Varies."
+        ]
+      },
+      {
+        "label": "Works without a network once loaded",
+        "cells": [
+          "Yes.",
+          "Yes.",
+          "No."
+        ]
+      },
+      {
+        "label": "Cost",
+        "cells": [
+          "Free, no ads.",
+          "Free.",
+          "Free with ads, or paid."
+        ]
+      }
+    ]
+  },
+  "limits": [
+    "View only: PDFs can't be edited or filled in here.",
+    "Scanned PDFs show their pictures; with no text layer there is nothing to select or search (no OCR).",
+    "Very large PDFs are limited by your device's memory."
+  ],
+  "faqTitle": "PDF viewer online: common questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the PDF itself and draws its pages on your screen. Nothing is sent to a server, so the file never leaves your device. To check, open your browser's network panel while you open a PDF and you will see no upload."
+    },
+    {
+      "question": "Can I open a password-protected PDF?",
+      "answer": "Yes. A box asks for the password, and the PDF opens when it is right. The password is used only by this page in your browser: it is never stored or sent anywhere."
+    },
+    {
+      "question": "Does it show Arabic PDFs correctly?",
+      "answer": "Yes. Pages are drawn exactly as the PDF lays them out, and Arabic text can be searched and selected in reading order, right to left."
+    },
+    {
+      "question": "Why can't I select or search the text of a scanned PDF?",
+      "answer": "A scanned PDF is a picture of each page, with no text inside. The viewer shows the pictures, but there is no text to find or copy, because it does not run text recognition (OCR)."
+    },
+    {
+      "question": "Can I fill in or edit the PDF?",
+      "answer": "Not here: the viewer shows the PDF, with any form fields and their values, but does not change it. To combine PDFs or number their pages, use Merge PDF or Add page numbers."
+    },
+    {
+      "question": "Does it work on my phone?",
+      "answer": "Yes. It works in any modern browser on Android, iPhone, Windows, Mac and Linux, with no app to install. On a phone, the thumbnails open from the toolbar."
+    }
+  ]
+}

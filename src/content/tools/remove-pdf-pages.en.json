@@ -1,0 +1,61 @@
+{
+  "title": "Remove PDF Pages – Delete Pages Free, No Upload | OpenAnyDoc",
+  "description": "Delete pages from a PDF in your browser: click the thumbnails of the pages to remove and download the rest, in order. Free, and nothing is uploaded.",
+  "heading": "Remove pages from a PDF",
+  "subtitle": "Click the pages you don't want and download the PDF without them; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Click to remove",
+      "text": "Every page is a thumbnail: click the ones to delete, or Shift+click to mark a run of pages."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page. Its pages appear as thumbnails."
+    },
+    {
+      "title": "Mark the pages to remove",
+      "text": "Click each page you don't want; it is crossed out. Click again to keep it."
+    },
+    {
+      "title": "Remove and download",
+      "text": "Click Remove pages, check the preview and download the new PDF."
+    }
+  ],
+  "limits": [
+    "At least one page must stay in the PDF.",
+    "PDFs that need a password to open can't be changed; remove the password first.",
+    "Bookmarks that point to removed pages may stop working."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is the original PDF changed?",
+      "answer": "No. You download a new PDF; the file on your device stays as it was."
+    },
+    {
+      "question": "Can I remove many pages at once?",
+      "answer": "Yes. Shift+click marks every page between the last one you clicked and this one, and Select all marks them all."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -196,19 +196,19 @@ async function openPage(pathname) {
 
 // ---------------------------------------------------------------- the tests
 
-const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer']
+const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer']
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
 const landingPages = ['/json-formatter', '/json-validator', '/json-escape-unescape', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
 // Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
-const registryToolPages = ['/merge-pdf', '/add-page-numbers']
+const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf']
 const hubPages = ['/pdf-tools', '/data-tools', '/office-tools', '/all-tools']
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
-const comingSoonFile = path.join(scratchFolder, 'report.pdf')
-fs.writeFileSync(comingSoonFile, 'not a real PDF')
+// A real PDF (the tool pages' sample): the home drop zone opens it in the PDF viewer.
+const samplePdf = path.join(projectRoot, 'src', 'samples', 'report-3-pages.pdf')
 const unknownFile = path.join(scratchFolder, 'notes.xyz')
 fs.writeFileSync(unknownFile, 'not a file type anyone opens')
 const legacyDocument = path.join(scratchFolder, 'notes.doc')
@@ -516,7 +516,7 @@ await test('unknown addresses get a real 404 page with noindex, and open-file ad
     await expectCleanIds(address)
     expect(await evaluate(`document.querySelectorAll('h1').length === 1 && document.querySelector('#not-found-link-csv')?.getAttribute('href') === '/${locale}/csv-viewer'`), `${address}: the not-found page lacks its links`)
   }
-  for (const [address, target] of [['/en/view-csv', '/en/csv-viewer'], ['/ar/view-excel', '/ar/excel-viewer'], ['/en/view-pdf', '/en'], ['/ar/view', '/ar']]) {
+  for (const [address, target] of [['/en/view-csv', '/en/csv-viewer'], ['/ar/view-excel', '/ar/excel-viewer'], ['/en/view-pdf', '/en/pdf-viewer'], ['/ar/view', '/ar']]) {
     const response = await fetch(`${siteOrigin}${address}`, { redirect: 'manual' })
     expect(response.status === 302 && response.headers.get('location') === target, `${address}: expected 302 to ${target}, got ${response.status} ${response.headers.get('location')}`)
   }
@@ -682,16 +682,16 @@ await test('tool pages and hubs: their own title and description, h1, the no-upl
     await openPage(`/${locale}/csv-viewer`)
     await evaluate(`document.querySelector('#site-search-button').click()`)
     await waitFor(`document.querySelector('#site-search-option-merge-pdf')`, 'the PDF tools in the search')
-    expect(await evaluate(`document.querySelector('#site-search-option-merge-pdf').getAttribute('href') === '/${locale}/merge-pdf' && !document.querySelector('#site-search-option-split-pdf') && document.querySelector('#site-search-all-tools-link')?.getAttribute('href') === '/${locale}/all-tools'`), `/${locale}: the search lists a tool that is not live, or misses Merge PDF or the All tools link`)
+    expect(await evaluate(`document.querySelector('#site-search-option-merge-pdf').getAttribute('href') === '/${locale}/merge-pdf' && !document.querySelector('#site-search-option-compress-pdf') && document.querySelector('#site-search-all-tools-link')?.getAttribute('href') === '/${locale}/all-tools'`), `/${locale}: the search lists a tool that is not live, or misses Merge PDF or the All tools link`)
   }
 })
 
 await test('Merge PDF merges the two samples, and Add page numbers takes the result in memory', async () => {
   await openPage('/en/merge-pdf')
   await evaluate(`document.querySelector('#sample-button-report-pdf').click()`)
-  await waitFor(`document.querySelector('#pdf-file-1')?.innerText.includes('3 pages')`, 'the first sample to be read')
+  await waitFor(`document.querySelector('#merge-pdf-grid-card-1')?.innerText.includes('3 pages')`, 'the first sample to be read')
   await evaluate(`document.querySelector('#sample-button-letter-pdf').click()`)
-  await waitFor(`document.querySelector('#pdf-file-2')?.innerText.includes('2 pages') && !document.querySelector('#merge-pdf-button').disabled`, 'the second sample to be read')
+  await waitFor(`document.querySelector('#merge-pdf-grid-card-2')?.innerText.includes('2 pages') && !document.querySelector('#merge-pdf-button').disabled`, 'the second sample to be read')
   await evaluate(`document.querySelector('#merge-pdf-button').click()`)
   await waitFor(`document.querySelector('#tool-download-button')`, 'the merged file')
   await evaluate(`window.__blobs = []; const make = URL.createObjectURL; URL.createObjectURL = (blob) => { window.__blobs.push(blob); return make(blob) }`)
@@ -817,22 +817,19 @@ for (const [name, address, file, readyElement, menuButton] of [
 
 // ---------------------------------------------------------------- one drop zone for every format
 
-await test('the format list is read from the registry: View and edit, View, or Coming soon', async () => {
-  for (const [locale, words] of [['en', { edit: 'View and edit', view: 'View', soon: 'Coming soon' }], ['ar', { edit: 'عرض وتحرير', view: 'عرض', soon: 'قريبًا' }]]) {
+await test('the format list is read from the registry: View and edit, or View', async () => {
+  for (const [locale, words] of [['en', { edit: 'View and edit', view: 'View' }], ['ar', { edit: 'عرض وتحرير', view: 'عرض' }]]) {
     await openPage(`/${locale}`)
     for (const id of ['csv', 'text', 'json', 'excel']) {
       expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.edit, `${locale}: ${id} does not say "${words.edit}"`)
     }
-    for (const id of ['word', 'powerpoint']) {
+    for (const id of ['word', 'powerpoint', 'pdf']) {
       expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.view, `${locale}: ${id} does not say "${words.view}"`)
-    }
-    for (const id of ['pdf']) {
-      expect((await evaluate(`document.querySelector('#extension-row-${id} #extension-capabilities-${id}')?.innerText`)) === words.soon, `${locale}: ${id} does not say "${words.soon}"`)
     }
   }
 })
 
-await test('one drop zone opens every live format with its tools; Coming soon stays on the page', async () => {
+await test('one drop zone opens every format with its tools, PDF included', async () => {
   const sampleFiles = [['CSV', sampleCsv], ['TXT', sampleText], ['JSON', sampleJson], ['Excel', sampleWorkbook], ['Word', sampleDocument], ['PowerPoint', samplePresentation]]
   for (const [name, file] of sampleFiles) {
     await openPage('/en')
@@ -843,10 +840,9 @@ await test('one drop zone opens every live format with its tools; Coming soon st
   }
   for (const locale of ['en', 'ar']) {
     await openPage(`/${locale}`)
-    await chooseFile(comingSoonFile)
-    await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the Coming soon toast')
-    expect((await evaluate('location.pathname')) === `/${locale}`, `${locale}: left the home page`)
-    expect(await evaluate(`document.querySelector('#file-page') === null && document.querySelector('#coming-soon-message') === null`), `${locale}: a file page or an inline line showed for a Coming soon format`)
+    await chooseFile(samplePdf)
+    await waitFor(`document.querySelector('#pdf-pages .page[data-loaded] canvas')`, `${locale}: the PDF opened in the viewer`, 20000)
+    expect((await evaluate('location.pathname')) === `/${locale}/pdf-viewer`, `${locale}: the PDF did not open on the PDF viewer page`)
   }
   expect(await evaluate(`document.querySelector('#privacy-note').innerText.length > 40`), 'the privacy note is missing')
 })
@@ -974,10 +970,6 @@ await test('on a phone an unsupported file shows a toast, not a banner; it can b
       await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
       await waitFor(`!document.querySelector('#toast-region:popover-open')`, `${locale}: the toast to close`)
     }
-    await openPage('/en')
-    await chooseFile(comingSoonFile)
-    await waitFor(`document.querySelector('#toast-region:popover-open [role=status]')`, 'the Coming soon toast')
-    expect(await evaluate(`document.querySelector('#coming-soon-message') === null`), 'the inline Coming soon line showed on a phone')
   })
 })
 
@@ -1078,11 +1070,6 @@ await test('the same unsupported file twice shows the toast both times', async (
   await chooseFile(unknownFile)
   await waitFor(`document.querySelectorAll('#toast-region [id^=toast-title]').length === 1`, 'one toast, not two, while the first one is still showing')
   await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
-  await chooseFile(comingSoonFile)
-  await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the Coming soon toast')
-  await evaluate(`document.querySelector('[id^=toast-dismiss-button]').click()`)
-  await chooseFile(comingSoonFile)
-  await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the Coming soon toast for the second try')
 })
 
 
@@ -1861,7 +1848,7 @@ await test('once a tool page is idle, its file opens with no network; code that 
 
 // ---------------------------------------------------------------- first screen of the tool pages (Step 17C)
 
-const formatPagesWithSamples = ['/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', ...landingPages]
+const formatPagesWithSamples = ['/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', ...landingPages]
 
 await test('every tool page shows its choose button and two sample files on the first screen of a 375 x 667 phone, in both languages', async () => {
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true })

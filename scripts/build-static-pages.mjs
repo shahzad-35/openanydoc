@@ -542,5 +542,11 @@ fs.writeFileSync(
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${sitemapEntries.join('\n')}\n</urlset>\n`,
 )
 fs.writeFileSync(path.join(distFolder, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`)
+// pdf.js reads these from the site itself, only when a PDF needs them: character maps (CJK), the 14 standard fonts, image
+// decoders (JPEG 2000, JBIG2), colour profiles and annotation icons. QuickJS (PDF JavaScript) is left out: scripting is off.
+const pdfjsFolder = path.join(projectRoot, 'node_modules', 'pdfjs-dist')
+for (const [from, to] of [['cmaps', 'cmaps'], ['standard_fonts', 'standard_fonts'], ['iccs', 'iccs'], ['wasm', 'wasm'], [path.join('web', 'images'), path.join('web', 'images')]]) {
+  fs.cpSync(path.join(pdfjsFolder, from), path.join(distFolder, 'pdfjs', to), { recursive: true, filter: (source) => !/quickjs/i.test(path.basename(source)) })
+}
 fs.rmSync(serverBuildFolder, { recursive: true, force: true })
 console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml (lastmod from src/data/pageDates.json) and robots.txt into dist/`)

@@ -20,7 +20,6 @@ const searchGroups: SearchGroup[] = ['pdf', 'viewers', 'tools', 'convert', 'guid
 const unsupportedEntries: UnsupportedEntry[] = [
   { id: 'ppt', icon: 'pptx', nameKey: 'search.unsupported.ppt', noteKey: 'search.unsupported.pptNote' },
   { id: 'doc', icon: 'docx', nameKey: 'search.unsupported.doc', noteKey: 'search.unsupported.docNote' },
-  { id: 'pdf', icon: 'pdf', nameKey: 'search.unsupported.pdf', noteKey: 'search.unsupported.pdfNote' },
 ]
 
 function buildSearchEntries(locale: Locale, translate: (key: MessageKey) => string): SearchEntry[] {
@@ -37,7 +36,7 @@ function buildSearchEntries(locale: Locale, translate: (key: MessageKey) => stri
     return entry(page.path, icon, isConversionOrTool ? 'convert' : 'tools', page.extensions ?? viewer.extensions)
   })
   // The tools drawn by ToolPage (src/tools/registry.ts), in their category's group: today the PDF tools.
-  const toolPageEntries = liveTools.filter((tool) => tool.category === 'pdf').map((tool) => entry(toolPath(tool), findToolIcon(tool), 'pdf', tool.inputFormats))
+  const toolPageEntries = liveTools.filter((tool) => tool.category === 'pdf' && !viewers.some((viewer) => viewer.toolPath === toolPath(tool))).map((tool) => entry(toolPath(tool), findToolIcon(tool), 'pdf', tool.inputFormats))
   const guideEntries = guideAddresses.map((path) => entry(path, 'guide', 'guides', []))
   return [...viewerEntries, ...landingEntries, ...toolPageEntries, ...guideEntries]
 }

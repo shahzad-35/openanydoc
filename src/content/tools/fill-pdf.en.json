@@ -1,0 +1,65 @@
+{
+  "title": "Fill PDF Form – Fill In PDF Forms Free, No Upload",
+  "description": "Fill in a PDF form in your browser: type in text fields, tick boxes, pick options, and flatten the answers on save if you want. Free, nothing uploaded.",
+  "heading": "Fill a PDF form",
+  "subtitle": "Type into a PDF form's fields, tick its boxes and save a filled copy; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Every common field",
+      "text": "Text fields, checkboxes, radio buttons and drop-down lists, in English or Arabic."
+    },
+    {
+      "title": "Flatten on save",
+      "text": "Make the answers part of the page, so the copy you send can't be changed."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF form",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Fill it in",
+      "text": "Click each field and type, tick or choose your answer."
+    },
+    {
+      "title": "Save a copy",
+      "text": "Tick Flatten on save if the answers should be fixed, then click Save a copy and download the filled form."
+    }
+  ],
+  "limits": [
+    "Only PDFs with real form fields can be filled; for a scanned or plain form, use Edit PDF to add text boxes.",
+    "XFA forms (made with Adobe LiveCycle) are not supported.",
+    "Flattened answers are drawn as pictures, so they can't be selected or searched."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "What does Flatten on save do?",
+      "answer": "It draws every answer onto the page and removes the form fields, so the copy can't be changed in other PDF apps. Leave it off to keep the fields fillable."
+    },
+    {
+      "question": "Why can't I click anything in my form?",
+      "answer": "The PDF probably has no form fields: it is a scan or a plain page that looks like a form. Use Edit PDF to place text boxes on it instead."
+    },
+    {
+      "question": "Is my original file changed?",
+      "answer": "No. Save a copy makes a new PDF to download; the file on your device stays exactly as it was."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    }
+  ]
+}

@@ -47,6 +47,7 @@
   --txt: #ff8a3d; --txt-base: #c25a16; --txt-glow: rgba(194, 90, 22, 0.5); --txt-ink: #2a1300;
   --docx: #3d7cf2; --docx-base: #1f4fae; --docx-ink: #ffffff;
   --pptx: #f0643a; --pptx-base: #b03d16; --pptx-ink: #ffffff;
+  --pdf: #e5484d; --pdf-base: #a1242a; --pdf-ink: #ffffff;
   --yellow: #ffd84d; --yellow-base: #d9a900; --yellow-glow: rgba(217, 169, 0, 0.55); --yellow-ink: #2a2100;
   --warn: #ffb020; --warn-base: #c27c00; --warn-ink: #2a1d00; --warn-bg: #fff8ec;
   --ok: #2ead60; --ok-base: #19733d;
@@ -935,4 +936,51 @@ html[lang="ar"] .type-h2 {
   #print-area.gridlines #print-sheet th,#print-area.gridlines #print-sheet td{border:.5pt solid #999}
   #print-sheet thead{display:table-header-group}
   #print-sheet tr{break-inside:avoid}
+}
+
+/* The PDF tools' thumbnail grid (src/tools/pdf/PdfToolParts.tsx): cards in reading order (right to left in Arabic), selectable,
+   draggable with a mouse, with optional buttons under each card; and the tools' progress bar. */
+.pdf-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 14px; margin: 0 auto; padding: 0; list-style: none; text-align: center; }
+.pdf-grid-item { display: flex; flex-direction: column; align-items: center; gap: 4px; min-width: 0; }
+.pdf-grid-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; padding: 8px; border: 2px solid transparent; border-radius: 16px; background: none; color: inherit; font: inherit; cursor: default; }
+button.pdf-grid-card { cursor: pointer; }
+.pdf-grid-card.is-movable { cursor: grab; user-select: none; }
+.pdf-grid-card:hover { background: var(--color-surface); }
+.pdf-grid-card:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+.pdf-grid-card.is-selected { border-color: var(--color-accent); background: color-mix(in srgb, var(--color-accent) 12%, transparent); }
+.pdf-grid-card.is-marked .pdf-grid-frame::after { content: ""; position: absolute; inset: 0; background: color-mix(in srgb, var(--color-danger, #c53030) 30%, transparent) linear-gradient(to top right, transparent calc(50% - 2px), var(--color-danger, #c53030) calc(50% - 2px), var(--color-danger, #c53030) calc(50% + 2px), transparent calc(50% + 2px)); }
+.pdf-grid-card.is-dragged { opacity: 0.4; }
+.pdf-grid-card.is-drop-target { border-color: var(--color-accent); border-style: dashed; }
+.pdf-grid-frame { position: relative; display: grid; place-items: center; width: 132px; height: 150px; overflow: hidden; }
+.pdf-grid-canvas, .pdf-grid-image { display: block; max-width: 132px; max-height: 150px; background: #fff; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25); transition: transform 0.15s ease; }
+.pdf-grid-canvas { width: auto; height: auto; }
+.pdf-grid-image { object-fit: contain; }
+.pdf-grid-blank, .pdf-grid-problem { display: grid; place-items: center; width: 102px; height: 144px; padding: 8px; background: #fff; color: #5b6170; font-size: 12px; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25); }
+.pdf-grid-problem { color: var(--color-danger, #c53030); font-weight: 600; }
+.pdf-grid-caption { max-width: 100%; overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.pdf-grid-actions { display: flex; flex-wrap: wrap; justify-content: center; }
+.tool-progress { width: 100%; height: 10px; accent-color: var(--color-accent); }
+.stamp-preview { display: block; width: 300px; max-width: 100%; height: auto; margin-inline: auto; background: #fff; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25), 0 8px 24px -12px rgba(16, 24, 40, 0.3); }
+@media (prefers-reduced-motion: reduce) { .pdf-grid-canvas, .pdf-grid-image { transition: none; } }
+/* PDF editing tools (src/tools/pdf/PdfEditTools.tsx): pdf.js's pages in a scroll box, with our layer of shapes and pictures. */
+.pdf-editor-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
+.pdf-editor-toolbar [aria-pressed="true"] { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.pdf-editor-frame { position: relative; height: min(78vh, 900px); min-height: 420px; overflow: hidden; border: 2px solid var(--color-rule); border-radius: 18px; background: color-mix(in srgb, var(--color-ink) 6%, var(--color-paper)); }
+.pdf-editor-scroll { position: absolute; inset: 0; overflow: auto; }
+.pdf-editor-scroll .pdfViewer .page { margin: 12px auto; border: 0; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.15), 0 8px 24px -10px rgba(16, 24, 40, 0.3); }
+.pdf-editor-loading { position: absolute; inset: 40% 0 auto; text-align: center; color: var(--color-ink-soft); }
+.pdf-overlay { position: absolute; top: 0; left: 0; width: 0; height: 0; z-index: 20; }
+.pdf-overlay-surface { position: absolute; top: 0; left: 0; cursor: crosshair; touch-action: none; }
+.pdf-item { position: absolute; cursor: move; touch-action: none; outline: none; }
+.pdf-item.is-selected, .pdf-item:focus-visible { outline: 2px dashed var(--color-accent); outline-offset: 2px; }
+.pdf-item-picture { display: block; width: 100%; height: 100%; pointer-events: none; user-select: none; }
+.pdf-item-shape { display: block; pointer-events: none; }
+.pdf-item-handle { position: absolute; right: -9px; bottom: -9px; width: 18px; height: 18px; border: 2px solid #fff; border-radius: 50%; background: var(--color-accent); cursor: nwse-resize; }
+.pdf-item-delete { position: absolute; top: -16px; right: -16px; display: grid; width: 28px; height: 28px; place-items: center; border-radius: 50%; background: var(--color-ink); color: var(--color-paper); font-size: 18px; line-height: 1; }
+.pdf-shape-preview { position: absolute; border: 1.5px dashed var(--color-accent); pointer-events: none; }
+.sign-draw-canvas { display: block; width: 100%; aspect-ratio: 3 / 1; border: 2px dashed var(--color-rule); border-radius: 12px; background: #fff; touch-action: none; cursor: crosshair; }
+.sign-preview { display: block; max-width: 100%; max-height: 120px; margin-inline: auto; background: #fff; }
+@media (pointer: coarse) {
+  .pdf-item-handle { width: 32px; height: 32px; right: -16px; bottom: -16px; }
+  .pdf-item-delete { width: 44px; height: 44px; top: -22px; right: -22px; }
 }

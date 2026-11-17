@@ -1,0 +1,65 @@
+{
+  "title": "JPG to PDF – Convert Images to PDF Free, No Upload",
+  "description": "Convert JPG, PNG, WebP, TIFF, SVG and HEIC images to PDF in your browser, with page size and margins. Free, no watermark, and nothing is uploaded.",
+  "heading": "JPG to PDF",
+  "subtitle": "Turn photos and pictures into one PDF, or one PDF each, with the page size and margin you choose; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Many picture formats",
+      "text": "JPG, PNG, WebP, TIFF and SVG; HEIC photos where your browser can read them (Safari)."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your pictures",
+      "text": "Click Choose a file, or drop pictures on the page. Add more at any time."
+    },
+    {
+      "title": "Order them and pick the page",
+      "text": "Drag the pictures into order, then choose the page size, orientation and margin."
+    },
+    {
+      "title": "Make the PDF",
+      "text": "Click Make PDF, check the preview and download one PDF, or a ZIP with one PDF per picture."
+    }
+  ],
+  "limits": [
+    "HEIC photos open only where the browser can read them (Safari on Mac and iPhone); elsewhere save them as JPG first.",
+    "SVG drawings become pictures in the PDF, not vector shapes.",
+    "Very large sets of pictures are limited by your device's memory."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is the quality of my photos kept?",
+      "answer": "Yes. JPG and PNG pictures go into the PDF as they are, without being compressed again."
+    },
+    {
+      "question": "Why can't my HEIC photo be read?",
+      "answer": "Only some browsers can read HEIC photos. Safari on Mac and iPhone can; in Chrome, Edge or Firefox save the photo as JPG first, or open this page in Safari."
+    },
+    {
+      "question": "Can I make one PDF per picture?",
+      "answer": "Yes. Tick One PDF per picture and you get a ZIP with a PDF for each picture."
+    },
+    {
+      "question": "What are the page size options?",
+      "answer": "A4 and Letter, in portrait, landscape or following each picture, or a page the same size as the picture, with no, small or large margins."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

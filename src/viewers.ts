@@ -24,9 +24,9 @@ export const viewers: Viewer[] = [
   { id: 'text', label: 'TXT', extensions: ['.txt'], toolPath: '/txt-viewer', featureKeys: ['highlights.text.view', 'highlights.text.edit', 'highlights.text.endings'] },
   { id: 'json', label: 'JSON', extensions: ['.json', '.jsonl', '.ndjson', '.json5', '.geojson', '.yaml', '.yml'], toolPath: '/json-viewer', featureKeys: ['highlights.json.views', 'highlights.json.edit', 'highlights.json.errors'] },
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer', featureKeys: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'] },
-  { id: 'word', label: 'Word', extensions: ['.docx'], toolPath: '/word-viewer', featureKeys: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'] },
-  { id: 'pdf', label: 'PDF', extensions: ['.pdf'] },
-  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx'], toolPath: '/powerpoint-viewer', featureKeys: ['highlights.powerpoint.view', 'highlights.powerpoint.thumbnails', 'highlights.powerpoint.fullscreen'] },
+  { id: 'word', label: 'Word', extensions: ['.docx', '.dotx', '.docm', '.odt'], toolPath: '/word-viewer', featureKeys: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'] },
+  { id: 'pdf', label: 'PDF', extensions: ['.pdf'], toolPath: '/pdf-viewer', featureKeys: ['highlights.pdf.view', 'highlights.pdf.search', 'highlights.pdf.rtl'] },
+  { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx', '.ppsx', '.potx', '.pptm'], toolPath: '/powerpoint-viewer', featureKeys: ['highlights.powerpoint.view', 'highlights.powerpoint.thumbnails', 'highlights.powerpoint.fullscreen'] },
 ]
 
 // How the table viewer treats each kind of table file: .csv starts on auto-detect (real CSVs are often semicolon separated),

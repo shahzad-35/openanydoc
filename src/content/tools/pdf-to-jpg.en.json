@@ -1,0 +1,61 @@
+{
+  "title": "PDF to JPG – Convert PDF Pages to Images, No Upload",
+  "description": "Convert PDF pages to JPG or PNG images in your browser: every page or the ones you pick, at the quality you choose, in a ZIP. Free, nothing is uploaded.",
+  "heading": "PDF to JPG",
+  "subtitle": "Turn every page, or the pages you pick, into JPG or PNG pictures; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Your choice of quality",
+      "text": "JPG or PNG, at screen, standard or print resolution, with a JPG quality slider."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page. Its pages appear as thumbnails."
+    },
+    {
+      "title": "Pick pages and quality",
+      "text": "Select pages, or none for all, then choose JPG or PNG, the resolution and the quality."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to pictures. One page downloads as a picture; several come in a ZIP."
+    }
+  ],
+  "limits": [
+    "PDFs that need a password to open can't be converted; remove the password first.",
+    "Print resolution (300 dpi) makes large files and takes longer for long PDFs.",
+    "Very large PDFs are limited by your device's memory."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Which resolution should I choose?",
+      "answer": "150 dpi suits most screens and documents; 300 dpi is for printing; 72 dpi makes the smallest files."
+    },
+    {
+      "question": "JPG or PNG?",
+      "answer": "JPG makes smaller files and suits pages with photos; PNG keeps text and lines perfectly sharp but is larger."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

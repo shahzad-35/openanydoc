@@ -1,0 +1,61 @@
+{
+  "title": "Split PDF – Separate PDF Pages Free, No Upload | OpenAnyDoc",
+  "description": "Split a PDF into several files in your browser: by page ranges, every few pages, or one file per page in a ZIP. Free, and nothing is uploaded.",
+  "heading": "Split PDF",
+  "subtitle": "Split one PDF into several by page ranges, every few pages, or one file per page; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Three ways to split",
+      "text": "Type ranges such as 1-3, 5, 8-10, cut every few pages, or make one file per page."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page. Its pages appear as thumbnails."
+    },
+    {
+      "title": "Pick how to split",
+      "text": "Type page ranges, choose how many pages go in each file, or make one file per page."
+    },
+    {
+      "title": "Split and download",
+      "text": "Click Split PDF and check the preview. Several files come in one ZIP."
+    }
+  ],
+  "limits": [
+    "PDFs that need a password to open can't be split; remove the password first.",
+    "Bookmarks and links between pages may not carry over to the new files.",
+    "Very large PDFs are limited by your device's memory."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I write page ranges?",
+      "answer": "Separate them with commas: 1-3, 5, 8-10 makes three PDFs, with pages 1 to 3, page 5, and pages 8 to 10."
+    },
+    {
+      "question": "Will the quality change?",
+      "answer": "No. Pages are copied as they are, so text, pictures and fonts keep their quality and text stays selectable."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

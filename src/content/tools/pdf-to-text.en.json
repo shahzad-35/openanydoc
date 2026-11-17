@@ -1,0 +1,61 @@
+{
+  "title": "PDF to Text – Extract Text from PDF Free, No Upload",
+  "description": "Extract all the text of a PDF in your browser and save it as a .txt file, with each page marked, Arabic in reading order. Free, nothing is uploaded.",
+  "heading": "PDF to text",
+  "subtitle": "Get all the text of a PDF as a plain .txt file, page by page; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Readable text",
+      "text": "Lines follow the page, each page can be marked, and Arabic text comes out in reading order."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Get the text",
+      "text": "Choose whether to mark where each page starts, then click Get the text."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the first lines; download the .txt file."
+    }
+  ],
+  "limits": [
+    "Scanned PDFs hold pictures of pages, so there is no text to get; that needs text recognition (OCR), which this tool does not do.",
+    "Tables and columns come out as lines of text, not as a table.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Why is no text found?",
+      "answer": "The PDF is probably scanned: its pages are pictures. Getting text from them needs OCR, which this tool does not do."
+    },
+    {
+      "question": "Does it work with Arabic PDFs?",
+      "answer": "Yes. Arabic text comes out in reading order, right to left, ready to paste."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

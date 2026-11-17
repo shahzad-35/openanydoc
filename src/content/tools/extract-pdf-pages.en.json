@@ -1,0 +1,61 @@
+{
+  "title": "Extract PDF Pages – Save Selected Pages Free, No Upload",
+  "description": "Extract pages from a PDF in your browser: click the pages you want and save them as a new PDF, or one PDF per page. Free, and nothing is uploaded.",
+  "heading": "Extract pages from a PDF",
+  "subtitle": "Click the pages you want and save them as a new PDF; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Pick by clicking",
+      "text": "Click the thumbnails of the pages to keep; Shift+click picks a run of pages."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page. Its pages appear as thumbnails."
+    },
+    {
+      "title": "Select the pages to keep",
+      "text": "Click each page you want. Tick One PDF per page to get each page as its own file."
+    },
+    {
+      "title": "Extract and download",
+      "text": "Click Extract pages, check the preview and download the PDF or the ZIP."
+    }
+  ],
+  "limits": [
+    "PDFs that need a password to open can't be read; remove the password first.",
+    "Pages keep the order they have in the original PDF.",
+    "Bookmarks of the original PDF are not carried over."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can I get each page as its own file?",
+      "answer": "Yes. Tick One PDF per page and the pages come as separate PDFs in one ZIP."
+    },
+    {
+      "question": "Will the quality change?",
+      "answer": "No. Pages are copied as they are, so text stays sharp and selectable."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

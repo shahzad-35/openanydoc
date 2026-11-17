@@ -359,3 +359,14 @@
   #excel-workbench #sidebar{width:auto;bottom:0;border-inline-start:0}
   #excel-workbench .hidden-sheets-list{inset-inline:8px;bottom:72px}
 }
+
+/* Read aloud (ReadAloudPanel.tsx), shared by the Word and PowerPoint side panels. */
+#docs-workbench{
+  & .read-aloud-note{margin:8px 0 0;font-size:12.5px;color:var(--muted)}
+  & .read-aloud-note:empty{display:none}
+  & .read-aloud-field{display:grid;gap:4px;margin:10px 0 0;font-size:12.5px;color:var(--muted)}
+  & .read-aloud-field select{width:100%;height:32px;padding-inline:8px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--text);font-size:13px}
+  & .read-aloud-buttons{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  & .is-read-aloud{background:color-mix(in srgb,var(--accent) 16%,transparent);border-radius:2px}
+}
+@media (pointer:coarse){#docs-workbench .read-aloud-field select{height:44px}}

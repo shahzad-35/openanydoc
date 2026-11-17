@@ -1,0 +1,65 @@
+{
+  "title": "Organize PDF – Reorder, Rotate & Delete Pages, No Upload",
+  "description": "Organize PDF pages in your browser: drag to reorder, rotate, duplicate, delete, add blank pages or another PDF. Free, and nothing is uploaded.",
+  "heading": "Organize PDF pages",
+  "subtitle": "Drag pages into order, turn, duplicate or delete them, and add blank pages or another PDF; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Every page change in one place",
+      "text": "Reorder by dragging, rotate, duplicate, delete, insert a blank page, or add the pages of another PDF, with undo."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page. Its pages appear as thumbnails."
+    },
+    {
+      "title": "Arrange the pages",
+      "text": "Drag pages into order, or use the buttons under each page. Add another PDF to put its pages at the end."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Save PDF, check the preview and download the organized PDF."
+    }
+  ],
+  "limits": [
+    "PDFs that need a password to open can't be organized; remove the password first.",
+    "Bookmarks and form fields may not carry over to the new PDF.",
+    "Very large PDFs are limited by your device's memory."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can I undo a change?",
+      "answer": "Yes. Undo and Redo step through every change to the page list until you save."
+    },
+    {
+      "question": "How do I combine two PDFs here?",
+      "answer": "Click Add another PDF: its pages are added at the end, and you can drag them anywhere."
+    },
+    {
+      "question": "Can I reorder pages on a phone?",
+      "answer": "Yes. Under each page there are buttons to move it earlier or later; dragging works with a mouse."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

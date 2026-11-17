@@ -3,7 +3,7 @@
   "description": "PowerPoint viewer online: open PPTX slides with their text, images and tables, flip through thumbnails and present them full screen. No upload.",
   "heading": "PowerPoint Viewer Online (Beta)",
   "subtitle": "Drop a PowerPoint file to flip through its slides and present them full screen; nothing is uploaded.",
-  "intro": "Open a PowerPoint presentation in your browser: a free PPTX viewer, in beta, that shows your slides with their text, images, tables and shapes. Move between them with thumbnails, buttons or the arrow keys, and present them full screen. Animations and some effects are simplified. Your file never leaves your device.",
+  "intro": "Open a PowerPoint presentation in your browser: a free PPTX viewer, in beta, that shows your slides with their text, images, tables and shapes. Move between them with thumbnails, buttons or the arrow keys, and present them full screen. Animations and some effects are simplified. Microsoft's standalone PowerPoint Viewer has been retired; this page opens .pptx files without installing anything. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -39,11 +39,14 @@
   ],
   "handlesTitle": "What the PowerPoint viewer handles: PPTX files (beta)",
   "handles": [
-    "Files: PowerPoint presentations in the .pptx format, made by PowerPoint, Google Slides, Keynote or LibreOffice. Older .ppt files are not supported: save them as .pptx first.",
+    "Files: PowerPoint presentations (.pptx), slide shows (.ppsx), templates (.potx) and macro-enabled presentations (.pptm, macros are never run), made by PowerPoint, Google Slides, Keynote or LibreOffice. Older .ppt files are not supported: save them as .pptx first.",
     "Content: text with its fonts and formatting, pictures, tables with merged cells, basic shapes, lines and arrows, and slide backgrounds.",
     "Simplified: SmartArt is shown as last drawn by PowerPoint, and charts are drawn approximately. Animations and transitions are not played, and embedded video may not play.",
     "Slides that cannot be drawn: a slide with features the viewer cannot show yet displays a note instead of a broken layout, and the other slides are not affected.",
-    "Navigation: thumbnails, previous and next buttons, arrow keys, a slide counter and full screen."
+    "Navigation: thumbnails, a grid of all slides, previous and next buttons, arrow keys, a slide counter and full screen.",
+    "Presenting: speaker notes under the slide, and a presenter view with the current and next slide, notes and a timer, while the audience sees the slide in a second window or full screen.",
+    "Find and listen: search across slide text and speaker notes, and read the slides or notes aloud with the voices installed on your device.",
+    "Output: export an outline of titles, text and notes as Markdown or plain text, save one slide or all slides as PNG pictures (a ZIP), print one slide per page, or save as PDF."
   ],
   "screenshot": {
     "alt": "The PowerPoint viewer showing a title slide with a picture, with slide thumbnails on the side and the previous, next and full screen buttons above it",
@@ -110,7 +113,9 @@
   "limits": [
     "View only: slides can't be edited.",
     "Animations and transitions are not played.",
-    "Old .ppt files are not supported; save them as .pptx first."
+    "Old .ppt files are not supported; save them as .pptx first.",
+    "Macros in .pptm files are never run.",
+    "Slide pictures (PNG) use the fonts on your device, so text may look slightly different."
   ],
   "faqTitle": "PowerPoint viewer online: common questions",
   "faq": [
@@ -161,6 +166,10 @@
     {
       "question": "Can I present full screen?",
       "answer": "Yes. Click Full screen: only the slide is shown, as large as your screen allows. Move with the arrow keys, Page Up and Page Down, and press Esc to leave. Some phones, such as iPhones, do not allow full screen in the browser, so the button is hidden there."
+    },
+    {
+      "question": "Do I need Microsoft's PowerPoint Viewer?",
+      "answer": "No. Microsoft's standalone PowerPoint Viewer has been retired. This page opens .pptx, .ppsx, .potx and .pptm files in your browser without installing anything, and the file stays on your device."
     },
     {
       "question": "Can I open an old .ppt file?",

@@ -1,5 +1,5 @@
 // The "Try a sample file" buttons of the tool pages: two small synthetic files per page (made-up names, example.com addresses, a
-// published example IBAN, test card numbers). Text samples are written here; the binary ones (xlsx, xls, docx, pptx, pdf) are files in
+// published example IBAN, test card numbers). Text samples are written here; the binary ones (xlsx, xls, docx, pptx, pdf, jpg, png) are files in
 // this folder made by scripts/generate-test-files.mjs and bundled as data, so a sample opens with no network request.
 // This module is loaded on demand (and while the page is idle, so samples also open offline).
 import { SAMPLE_JSON_TEXT } from '../formats/json/jsonTools'
@@ -144,6 +144,12 @@ const samples = {
   peopleXlsx: bundledSample('people-xlsx', 'people-two-sheets.xlsx', XLSX_TYPE, () => import('./people-two-sheets.xlsx?inline')),
   reportPdf: bundledSample('report-pdf', 'report-3-pages.pdf', 'application/pdf', () => import('./report-3-pages.pdf?inline')),
   letterPdf: bundledSample('letter-pdf', 'letter-2-pages.pdf', 'application/pdf', () => import('./letter-2-pages.pdf?inline')),
+  guidePdf: bundledSample('guide-pdf', 'arabic-english-guide.pdf', 'application/pdf', () => import('./arabic-english-guide.pdf?inline')),
+  photoJpg: bundledSample('photo-jpg', 'landscape-photo.jpg', 'image/jpeg', () => import('./landscape-photo.jpg?inline')),
+  chartPng: bundledSample('chart-png', 'sales-chart.png', 'image/png', () => import('./sales-chart.png?inline')),
+  photoReportPdf: bundledSample('photo-report-pdf', 'photo-report-2-pages.pdf', 'application/pdf', () => import('./photo-report-2-pages.pdf?inline')),
+  formPdf: bundledSample('form-pdf', 'form-2-pages.pdf', 'application/pdf', () => import('./form-2-pages.pdf?inline')),
+  feedbackFormPdf: bundledSample('feedback-form-pdf', 'feedback-form.pdf', 'application/pdf', () => import('./feedback-form.pdf?inline')),
 } satisfies Record<string, ToolSample>
 
 // The two samples of each tool page, by its address without the language. Each file has an extension the page accepts.
@@ -166,8 +172,23 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/word-viewer': [samples.quarterlyDocx, samples.arabicDocx],
   '/powerpoint-viewer': [samples.reviewPptx, samples.arabicPptx],
   '/mask-data': [samples.peopleCsv, samples.peopleXlsx],
+  '/pdf-viewer': [samples.reportPdf, samples.guidePdf],
   '/merge-pdf': [samples.reportPdf, samples.letterPdf],
   '/add-page-numbers': [samples.reportPdf, samples.letterPdf],
+  '/split-pdf': [samples.reportPdf, samples.guidePdf],
+  '/remove-pdf-pages': [samples.reportPdf, samples.letterPdf],
+  '/extract-pdf-pages': [samples.reportPdf, samples.guidePdf],
+  '/organize-pdf': [samples.reportPdf, samples.letterPdf],
+  '/rotate-pdf': [samples.letterPdf, samples.reportPdf],
+  '/jpg-to-pdf': [samples.photoJpg, samples.chartPng],
+  '/pdf-to-jpg': [samples.reportPdf, samples.guidePdf],
+  '/pdf-to-text': [samples.guidePdf, samples.reportPdf],
+  '/extract-pdf-images': [samples.photoReportPdf, samples.guidePdf],
+  '/edit-pdf': [samples.reportPdf, samples.guidePdf],
+  '/sign-pdf': [samples.letterPdf, samples.formPdf],
+  '/fill-pdf': [samples.formPdf, samples.feedbackFormPdf],
+  '/watermark-pdf': [samples.reportPdf, samples.guidePdf],
+  '/header-footer-pdf': [samples.reportPdf, samples.guidePdf],
 }
 
 // Fetches a page's bundled samples while the page is idle, so they open with no network later.

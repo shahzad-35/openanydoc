@@ -1,0 +1,61 @@
+{
+  "title": "Rotate PDF – Turn PDF Pages Free, No Upload | OpenAnyDoc",
+  "description": "Rotate PDF pages in your browser: turn every page or only the ones you pick, left, right or upside down, and save. Free, and nothing is uploaded.",
+  "heading": "Rotate PDF",
+  "subtitle": "Turn every page, or only the pages you pick, and save the PDF; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "All pages or a few",
+      "text": "Pick pages to turn, or pick none to turn them all; the thumbnails show the result before you save."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page. Its pages appear as thumbnails."
+    },
+    {
+      "title": "Turn the pages",
+      "text": "Select pages, or none for all, then turn them left, right or upside down."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Save rotated PDF, check the preview and download it."
+    }
+  ],
+  "limits": [
+    "PDFs that need a password to open can't be rotated; remove the password first.",
+    "Pages turn in steps of 90 degrees.",
+    "Very large PDFs are limited by your device's memory."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is the rotation permanent?",
+      "answer": "Yes. The new PDF opens with the pages turned in every PDF app; your original file is not changed."
+    },
+    {
+      "question": "Does rotating lower the quality?",
+      "answer": "No. Only the page's turn is changed; its text and pictures stay exactly as they were."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

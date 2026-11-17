@@ -1,4 +1,4 @@
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useEffect, useState } from 'react'
 import DropPanel from '../components/DropPanel'
 import FormatGuide from '../components/FormatGuide'
 import { Wordmark } from '../components/KitIcon'
@@ -23,6 +23,8 @@ import { usePageHead } from './HomePage'
 // The components of the tools that work on the page (Merge PDF ...), loaded when the first file is chosen (or ahead, while the
 // page is idle: App).
 const toolComponents = new Map(liveTools.flatMap((tool) => (tool.loadComponent ? [[tool.slug, lazy(tool.loadComponent)] as const] : [])))
+// What a tool made, shown before the download (loaded with the first result only).
+const ToolResultPreview = lazy(() => import('../tools/pdf/ToolResultPreview'))
 const MaskWorkbench = lazy(() => import('../formats/mask/MaskWorkbench'))
 const JsonUrlLoader = lazy(() => import('../formats/json/JsonUrlLoader'))
 // The formats the Mask Data page takes, for its list of extensions (only the extensions the page accepts are listed).
@@ -43,6 +45,8 @@ export default function ToolPage({
   handoffFile,
   onHandoffConsumed,
   onOpenInViewer,
+  onUnsavedEditsChange,
+  confirmDiscardEdits,
 }: {
   tool: Tool
   onFileLoaded: (file: File, fileContents: ArrayBuffer) => void
@@ -50,6 +54,8 @@ export default function ToolPage({
   handoffFile: File | null
   onHandoffConsumed: () => void
   onOpenInViewer: (file: File, toolPath: string) => void
+  onUnsavedEditsChange: (hasUnsavedEdits: boolean) => void
+  confirmDiscardEdits: () => Promise<boolean>
 }) {
   const { locale, t } = useT()
   const address = toolPath(tool)
@@ -97,17 +103,40 @@ export default function ToolPage({
     acceptsComingSoonFormats: hasToolComponent,
   })
 
-  function startOver() {
+  // An editing tool's edits count as saved once their copy is downloaded; going back to edit makes them unsaved again.
+  const [toolHasEdits, setToolHasEdits] = useState(false)
+  const hasUnsavedEdits = toolHasEdits && !(resultFile && isDownloaded)
+  useEffect(() => {
+    onUnsavedEditsChange(hasUnsavedEdits)
+    if (!hasUnsavedEdits) return
+    const warnBeforeLeaving = (event: BeforeUnloadEvent) => event.preventDefault()
+    window.addEventListener('beforeunload', warnBeforeLeaving)
+    return () => window.removeEventListener('beforeunload', warnBeforeLeaving)
+  }, [hasUnsavedEdits, onUnsavedEditsChange])
+  useEffect(() => () => onUnsavedEditsChange(false), [onUnsavedEditsChange])
+
+  async function startOver() {
+    if (hasUnsavedEdits && !(await confirmDiscardEdits())) return
     setChosenFiles([])
+    setResultFile(null)
+    setIsDownloaded(false)
+    setToolHasEdits(false)
+  }
+
+  function backToTool() {
     setResultFile(null)
     setIsDownloaded(false)
   }
 
   // The next tools take the result in memory (App's hand-over, as the "Open it in the ... viewer" button does), never in the URL.
+  // A next tool that can't take the result (pictures, text or a ZIP made from a PDF) gets the PDF that was chosen instead.
   const nextSteps = (tool.nextTools ?? []).flatMap((slug) => {
     const nextTool = findLiveTool(slug)
     if (!nextTool || !resultFile) return []
-    return [{ id: slug, label: pageSeo[locale][toolPath(nextTool)].linkText as string, onSelect: () => onOpenInViewer(resultFile, localizePath(locale, toolPath(nextTool))) }]
+    const takes = (file: File) => nextTool.inputFormats.some((extension) => file.name.toLowerCase().endsWith(extension))
+    const handedFile = takes(resultFile) ? resultFile : chosenFiles.find(takes)
+    if (!handedFile) return []
+    return [{ id: slug, label: pageSeo[locale][toolPath(nextTool)].linkText as string, onSelect: () => onOpenInViewer(handedFile, localizePath(locale, toolPath(nextTool))) }]
   })
 
   return (
@@ -197,19 +226,33 @@ export default function ToolPage({
               <MaskWorkbench file={chosenFiles[0] ?? null} />
             </Suspense>
           )}
-          {hasToolComponent && chosenFiles.length > 0 && !resultFile && (
-            <div id="tool-workspace" className="mx-auto mt-8 max-w-[760px]">
+          {/* Kept while the result shows (hidden), so an editing tool's edits are still there after "Back to the tool". */}
+          {hasToolComponent && chosenFiles.length > 0 && (
+            <div id="tool-workspace" hidden={resultFile !== null} className={`mx-auto mt-8 ${tool.isEditor ? 'max-w-[1100px]' : 'max-w-[760px]'}`}>
               <Suspense fallback={null}>
-                <ToolComponent files={chosenFiles} onFilesChange={setChosenFiles} onAddFiles={intake.openFilePicker} onResult={setResultFile} />
+                <ToolComponent
+                  files={chosenFiles}
+                  onFilesChange={setChosenFiles}
+                  onAddFiles={intake.openFilePicker}
+                  onResult={(file) => {
+                    setResultFile(file)
+                    setIsDownloaded(false)
+                  }}
+                  onUnsavedEditsChange={setToolHasEdits}
+                  confirmDiscardEdits={confirmDiscardEdits}
+                />
               </Suspense>
             </div>
           )}
           {resultFile && (
-            <div id="tool-result" className="mx-auto mt-8 max-w-[640px] overflow-hidden rounded-[22px] border-2 border-rule bg-paper-raised text-center">
+            <div id="tool-result" className="mx-auto mt-8 max-w-[760px] overflow-hidden rounded-[22px] border-2 border-rule bg-paper-raised text-center">
               <div className="p-6">
                 <p id="tool-result-message" role="status" className="font-semibold">
                   {t('tools.result.ready')} <bdi dir="ltr">{resultFile.name}</bdi>
                 </p>
+                <Suspense fallback={null}>
+                  <ToolResultPreview file={resultFile} />
+                </Suspense>
                 <div className="mt-4 flex flex-wrap justify-center gap-3">
                   <button
                     id="tool-download-button"
@@ -222,7 +265,12 @@ export default function ToolPage({
                   >
                     {t('tools.result.download')}
                   </button>
-                  <button id="tool-start-over-button" type="button" onClick={startOver} className="btn btn--quiet press">
+                  {tool.isEditor && (
+                    <button id="tool-back-button" type="button" onClick={backToTool} className="btn btn--quiet press">
+                      {t('tools.result.backToEditing')}
+                    </button>
+                  )}
+                  <button id="tool-start-over-button" type="button" onClick={() => void startOver()} className="btn btn--quiet press">
                     {t('tools.result.startOver')}
                   </button>
                 </div>

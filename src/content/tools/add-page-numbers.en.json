@@ -1,8 +1,8 @@
 {
   "title": "Add Page Numbers to PDF – Free, No Upload | OpenAnyDoc",
-  "description": "Add page numbers to a PDF in your browser: pick where they go and the first number, then download. Free, no sign-up, and your file is never uploaded.",
+  "description": "Add page numbers to a PDF in your browser: 1, 1 / N or Page 1 of N, Western or Arabic-Indic digits, any position. Free, and nothing is uploaded.",
   "heading": "Add Page Numbers to PDF",
-  "subtitle": "Number every page of a PDF at the top or bottom, starting from any number, in your browser; nothing is uploaded.",
+  "subtitle": "Number the pages of a PDF as 1, 1 / N or Page 1 of N, in Western or Arabic-Indic digits; nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -23,8 +23,8 @@
       "text": "Click Choose a file, or drop a PDF anywhere on the page."
     },
     {
-      "title": "Pick the position and first number",
-      "text": "Choose where the numbers go (top or bottom; left, centre or right) and the number of the first page."
+      "title": "Pick how the numbers look",
+      "text": "Choose the position, format, digits, size and first number, and whether to skip the first page. The preview shows the result."
     },
     {
       "title": "Add numbers and download",
@@ -33,8 +33,8 @@
   ],
   "limits": [
     "PDFs that need a password to open can't be numbered; remove the password first.",
-    "Every page gets a number; leaving out a cover page isn't offered yet.",
-    "Numbers use Western digits (1, 2, 3) in a plain font, and are drawn over anything already in that corner of the page."
+    "Numbers are drawn as small pictures, so they can't be selected or searched.",
+    "Numbers are drawn over anything already in that corner of the page."
   ],
   "faq": [
     {
@@ -43,7 +43,7 @@
     },
     {
       "question": "Where can the page numbers go?",
-      "answer": "At the top or the bottom of each page, on the left, in the centre or on the right."
+      "answer": "At the top or bottom of the page, on the left, in the centre or on the right, as 1, 1 / N or Page 1 of N, in Western (1 2 3) or Arabic-Indic (١ ٢ ٣) digits."
     },
     {
       "question": "Can I start from a number other than 1?",

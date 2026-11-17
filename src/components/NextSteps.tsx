@@ -4,7 +4,8 @@ import { useT } from '../i18n'
 export type NextStep = { id: string; label: string; onSelect: () => void }
 
 // Under a viewer's top bar once a file is open: the two or three things people most often do next with that format, one tap each
-// (the same actions as the viewer's own menus). It shows once per opened file and goes away after a choice or its close button.
+// (the same actions as the viewer's own menus). It stays after a choice, so the other steps are still one tap away, until its
+// close button hides it for this file.
 // It is drawn as soon as the viewer opens, with its buttons off until the file is read (`isReady`): appearing later pushed the file
 // down (a layout shift of 0.1 to 0.2 on a phone).
 export default function NextSteps({ steps, isReady }: { steps: NextStep[]; isReady: boolean }) {
@@ -23,10 +24,7 @@ export default function NextSteps({ steps, isReady }: { steps: NextStep[]; isRea
             type="button"
             className="next-step-button"
             disabled={!isReady}
-            onClick={() => {
-              setIsHidden(true)
-              step.onSelect()
-            }}
+            onClick={step.onSelect}
           >
             {step.label}
           </button>

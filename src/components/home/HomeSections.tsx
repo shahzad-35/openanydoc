@@ -50,7 +50,7 @@ const formatGroups: FormatGroup[] = [
   { id: 'text', format: 'txt', titleKey: 'formats.group.text', viewerIds: ['text'], noteKey: 'formats.note.text' },
   { id: 'word', format: 'docx', titleKey: 'formats.group.word', viewerIds: ['word'], noteKey: 'formats.note.word' },
   { id: 'powerpoint', format: 'pptx', titleKey: 'formats.group.powerpoint', viewerIds: ['powerpoint'], noteKey: 'formats.note.powerpoint' },
-  { id: 'soon', format: 'unsupported', titleKey: 'formats.group.soon', viewerIds: ['pdf'], noteKey: 'about.notSupported' },
+  { id: 'pdf', format: 'pdf', titleKey: 'formats.group.pdf', viewerIds: ['pdf'], noteKey: 'formats.note.pdf' },
 ]
 
 const jsonLimitMegabytes = (formatDefinitions.find((definition) => definition.viewerId === 'json')?.maxFileBytes ?? 0) / MEGABYTE

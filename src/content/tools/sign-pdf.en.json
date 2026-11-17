@@ -1,0 +1,73 @@
+{
+  "title": "Sign PDF – Draw, Type or Upload a Signature, No Upload",
+  "description": "Sign a PDF in your browser: draw, type or upload your signature, place and resize it on one or many pages, then save a copy. Free, nothing uploaded.",
+  "heading": "Sign PDF",
+  "subtitle": "Draw, type or upload your signature and place it on the pages of a PDF; nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Three ways to sign",
+      "text": "Draw with a mouse, finger or pen, type your name in a signature style, or upload a picture of your signature."
+    },
+    {
+      "title": "One page or many",
+      "text": "Place the signature, resize it, and copy it to all pages or the pages you choose."
+    }
+  ],
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Create your signature",
+      "text": "Click Create signature, then draw, type or upload it."
+    },
+    {
+      "title": "Place it",
+      "text": "Drag the signature where it belongs and drag its corner to resize it. Copy it to other pages if needed."
+    },
+    {
+      "title": "Save a copy",
+      "text": "Click Save a copy, check the preview and download the signed PDF."
+    }
+  ],
+  "limits": [
+    "This is a visual signature, a picture of your signature; it is not a certificate-based digital signature and does not prove who signed.",
+    "Your signature is kept only while this page is open; it is never saved or sent anywhere.",
+    "PDFs that need a password to open can't be signed; remove the password first."
+  ],
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is this a legally binding digital signature?",
+      "answer": "It is a visual signature: a picture of your signature placed on the page, like signing a printout. It is not a certificate-based digital signature and does not prove who signed. Whether it is accepted depends on who asks for it; check with them, or with your legal team."
+    },
+    {
+      "question": "Is my signature stored?",
+      "answer": "No. It lives only in this tab while you work and disappears when you close the page."
+    },
+    {
+      "question": "Is my original file changed?",
+      "answer": "No. Save a copy makes a new PDF to download; the file on your device stays exactly as it was."
+    },
+    {
+      "question": "Can I sign every page at once?",
+      "answer": "Yes. Select the placed signature and copy it to all pages or to the pages you type, at the same place."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    }
+  ]
+}
