@@ -27,8 +27,8 @@ export const ALL_PROFILE_URLS = [REPOSITORY_URL, ...SOCIAL_PROFILES.map((profile
 export const X_HANDLE = '@openanydoc'
 // The one sentence that says what OpenAnyDoc is, wherever the brand is described as data (Organization, WebSite, llms.txt, README).
 export const SITE_DESCRIPTION: Record<'en' | 'ar', string> = {
-  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, and a viewer for Word documents and PowerPoint slides, that runs in your browser: files are never uploaded.',
-  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT، وعارض لمستندات Word وشرائح PowerPoint، يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
+  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, a viewer for Word, PowerPoint and PDF files, and a set of PDF tools, that runs in your browser: files are never uploaded.',
+  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT، وعارض لملفات Word وPowerPoint وPDF، ومجموعة أدوات PDF، يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
 }
 
 type Locale = 'en' | 'ar'
@@ -36,7 +36,8 @@ type Locale = 'en' | 'ar'
 // `linkText`: the short, descriptive name that links to a format or landing page use (header nav, footer, related tools).
 // `answer`: a tool page's one sentence under the H1 that answers the search (the tool stays on a phone's first screen; `intro` moves
 // under the tool).
-export type PageSeo = { title: string; description: string; heading: string; intro: string; answer?: string; linkText?: string }
+// `body`: the paragraphs a hub page shows under its tools (what the group is for and how to choose), so the page says more than a list.
+export type PageSeo = { title: string; description: string; heading: string; intro: string; answer?: string; linkText?: string; body?: string[] }
 
 // Keyed by language, then by the page address: the home page, the info pages, the guides and the hubs. The tool pages (format,
 // landing and conversion pages, Mask data, PDF tools) are added below from src/content/tools/.
@@ -46,7 +47,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       title: 'Free Online File Viewer and Editor, No Upload – OpenAnyDoc',
       description: 'Free online file viewer and editor: open CSV, Excel, JSON, TXT, Word and PowerPoint files with no software and edit them in your browser. No upload, no sign-up.',
       heading: 'Free online file viewer and editor: open any file, upload nothing',
-      intro: 'Drop a CSV, Excel, JSON or text file to edit it, or view Word documents and PowerPoint slides, right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
+      intro: 'Drop a CSV, Excel, JSON or text file to edit it, view Word, PowerPoint and PDF files, or edit, sign and merge PDFs, right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
     },
     '/about': {
       title: 'About OpenAnyDoc – Private Online File Viewer',
@@ -136,6 +137,20 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'What to hide, the difference between masking and anonymizing, and how to do it without uploading the file anywhere.',
       linkText: 'Anonymize data before sharing',
     },
+    '/sign-pdf-without-adobe': {
+      title: 'How to Sign a PDF Without Adobe: Free Ways, No Upload',
+      description: 'Sign a PDF without Adobe Acrobat for free: in the browser with no upload, with Preview on Mac, Markup on iPhone or Edge on Windows, and when a digital ID helps.',
+      heading: 'How to sign a PDF without Adobe',
+      intro: 'Free ways to sign a PDF on a computer or phone, which of them upload your file, and when a picture of a signature is not enough.',
+      linkText: 'Sign a PDF without Adobe',
+    },
+    '/pdf-tools-without-upload': {
+      title: 'PDF Tools That Don\'t Upload Your File: iLovePDF Alternatives',
+      description: 'How iLovePDF, Smallpdf, PDF24 and Sejda handle your PDF, from their own pages, and free PDF tools that run in your browser so the file never leaves your device.',
+      heading: 'PDF tools that do not upload your file',
+      intro: 'How popular PDF sites handle your file, where they do more, and the tools that keep a PDF on your own device.',
+      linkText: 'PDF tools without upload',
+    },
     '/guides': {
       title: 'Guides: Fix CSV, Excel, JSON and Word File Problems',
       description: 'Practical guides to CSV, Excel, JSON and Word files: open them without Excel or Word, fix broken Arabic and one-column CSVs, and check a site does not upload.',
@@ -149,6 +164,11 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'PDF tools',
       intro: 'Free PDF tools that work on your own device: add text, highlights, drawings and a signature, fill in forms, add watermarks, headers and page numbers, merge, split and organize pages, and turn pictures into a PDF and pages into pictures or text, without uploading anything.',
       linkText: 'PDF tools',
+      body: [
+        'Every PDF tool here runs on your own device. Your browser reads the PDF, changes it and hands you a new file; nothing is sent to a server, so contracts, invoices and forms stay private, and the tools keep working offline once the page has loaded.',
+        'To change which pages a PDF has, use Merge, Split, Remove pages, Extract pages or Organize. To change what is on the pages, use Edit PDF for text boxes, highlights, drawings and shapes, Sign PDF for a drawn, typed or uploaded signature, Fill PDF form for form fields, and Watermark, Header and footer or Add page numbers for text on every page. To change the format, turn pictures into a PDF with JPG to PDF, or a PDF into pictures, text or its embedded images.',
+        'Each tool shows a preview before you download, and its next steps pass the result to another tool in memory, so you can merge, number and sign a PDF in one visit.',
+      ],
     },
     '/data-tools': {
       title: 'Data Tools Online – Convert CSV, JSON and Excel, No Upload',
@@ -156,6 +176,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'Data tools',
       intro: 'Free tools for tables and data files: open CSV and JSON, convert between CSV, Excel and JSON, check JSON and hide personal data, all in your browser.',
       linkText: 'Data tools',
+      body: [
+        'The data tools open CSV, TSV, JSON and Excel files as tables or trees in your browser, convert between them and clean them up, without uploading a single row. Large files are read in a background worker, so a CSV with 120,000 rows opens in about a second.',
+        'Use the converters to move data between formats: CSV to Excel or JSON, Excel to CSV or JSON, and JSON to CSV with nested objects flattened into columns. Use the JSON formatter and validator to pretty print a file or find the exact line of a syntax error, and Mask sensitive data to replace names, emails, phone numbers and IDs before you share a file.',
+      ],
     },
     '/office-tools': {
       title: 'Office Tools Online – Open Word, Excel and PowerPoint Files',
@@ -163,6 +187,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'Office tools',
       intro: 'Open Word, Excel, PowerPoint and text files without installing Office: free viewers that run in your browser and never upload your files.',
       linkText: 'Office tools',
+      body: [
+        'The office tools open the files people send at work without Microsoft Office: Word documents (.docx, .dotx, .docm and OpenDocument .odt), Excel workbooks (.xlsx, .xlsm, .ods and old .xls files), PowerPoint presentations (.pptx and .ppsx, in beta) and plain text files. Everything is drawn by your browser, so a confidential document is never uploaded to read it.',
+        'The Word viewer shows pages with their fonts, tables and pictures, plus a navigation pane, search, comments and read aloud. The Excel viewer keeps formulas, number formats and frozen panes and lets you edit cells and download the workbook. The PowerPoint viewer shows slides with notes, a grid and a presenter view. Each can print or save as PDF, and Arabic documents display right to left.',
+      ],
     },
     '/all-tools': {
       title: 'All Free File Tools: PDF, Data and Office – OpenAnyDoc',
@@ -170,6 +198,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'All tools',
       intro: 'Every tool on OpenAnyDoc, grouped by the kind of file it works on. Each one runs in your browser, and none of them uploads your files.',
       linkText: 'All tools',
+      body: [
+        'Every OpenAnyDoc tool works the same way: you choose a file, your browser does the work, and you download the result. Nothing is uploaded, there is no account and no watermark, and the tools work offline once a page has loaded. Pick a tool from the PDF, data or office groups above, or drop any supported file on the home page and it opens in the right viewer.',
+      ],
     },
   },
   ar: {
@@ -177,7 +208,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       title: 'عارض ملفات اون لاين مجاني – فتح الملفات بدون برامج',
       description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV وExcel وJSON وTXT وWord وPowerPoint في متصفحك وعدّلها، بدون برامج وبدون تسجيل، وملفاتك لا تُرفع ولا تغادر جهازك.',
       heading: 'عارض ومحرر ملفات اون لاين مجاني: افتح أي ملف بدون رفع',
-      intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا لتعدّله، أو اعرض مستندات Word وشرائح PowerPoint، هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
+      intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا لتعدّله، أو اعرض ملفات Word وPowerPoint وPDF، أو عدّل ملفات PDF ووقّعها وادمجها، هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
     },
     '/about': {
       title: 'عن OpenAnyDoc – عارض ملفات خاص اون لاين',
@@ -267,6 +298,20 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'ما الذي تخفيه، والفرق بين الإخفاء وإخفاء الهوية، وكيف تفعل ذلك دون رفع الملف إلى أي مكان.',
       linkText: 'إخفاء البيانات قبل المشاركة',
     },
+    '/sign-pdf-without-adobe': {
+      title: 'كيف توقّع ملف PDF بدون Adobe: طرق مجانية دون رفع',
+      description: 'وقّع ملف PDF دون Adobe Acrobat مجانًا: في متصفحك دون رفع، أو بتطبيق Preview على Mac، أو Markup على iPhone، أو Edge على Windows، ومتى تحتاج إلى هوية رقمية.',
+      heading: 'كيف توقّع ملف PDF بدون Adobe',
+      intro: 'طرق مجانية لتوقيع ملف PDF على الحاسوب أو الهاتف، وأيّها يرفع ملفك، ومتى لا تكفي صورة التوقيع.',
+      linkText: 'توقيع PDF بدون Adobe',
+    },
+    '/pdf-tools-without-upload': {
+      title: 'أدوات PDF لا ترفع ملفك: بدائل iLovePDF وSmallpdf',
+      description: 'كيف تتعامل iLovePDF وSmallpdf وPDF24 وSejda مع ملف PDF وفق صفحاتها، وأدوات PDF مجانية تعمل في متصفحك فلا يغادر الملف جهازك أبدًا ولا يُرفع إلى أي خادم.',
+      heading: 'أدوات PDF لا ترفع ملفك',
+      intro: 'كيف تتعامل مواقع PDF الشائعة مع ملفك، وأين تقدّم أكثر، والأدوات التي تُبقي الملف على جهازك.',
+      linkText: 'أدوات PDF بدون رفع',
+    },
     '/guides': {
       title: 'أدلة: حل مشكلات ملفات CSV وExcel وJSON ووورد',
       description: 'أدلة عملية لملفات CSV وExcel وJSON ووورد: افتحها دون Excel أو Word، وأصلح العربية المشوّهة وملف CSV في عمود واحد، وتحقق من أن الموقع لا يرفع ملفك أبدًا.',
@@ -280,6 +325,11 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'أدوات PDF',
       intro: 'أدوات PDF مجانية تعمل على جهازك: أضف نصوصًا وتظليلًا ورسومًا وتوقيعك، وعبّئ النماذج، وأضف علامات مائية ورؤوسًا وأرقام صفحات، وادمج الصفحات وقسّمها ورتّبها، وحوّل الصور إلى PDF والصفحات إلى صور أو نص، دون رفع أي شيء.',
       linkText: 'أدوات PDF',
+      body: [
+        'تعمل كل أدوات PDF هنا على جهازك. يقرأ متصفحك ملف PDF ويعدّله ويعطيك ملفًا جديدًا، ولا يُرسل شيء إلى خادم، فتبقى العقود والفواتير والنماذج خاصة، وتواصل الأدوات العمل دون اتصال بعد تحميل الصفحة.',
+        'لتغيير صفحات الملف استخدم الدمج أو التقسيم أو حذف الصفحات أو استخراجها أو ترتيبها. ولتغيير ما على الصفحات استخدم «تعديل PDF» لمربعات النص والتظليل والرسم والأشكال، و«توقيع PDF» لتوقيع مرسوم أو مكتوب أو مرفوع، و«تعبئة نموذج PDF» لحقول النماذج، والعلامة المائية والرأس والتذييل وترقيم الصفحات للنص على كل صفحة. ولتغيير الصيغة حوّل الصور إلى PDF، أو PDF إلى صور أو نص أو استخرج صوره.',
+        'تعرض كل أداة معاينة قبل التنزيل، وتمرر خطواتها التالية النتيجة إلى أداة أخرى في الذاكرة، فيمكنك دمج ملف وترقيمه وتوقيعه في زيارة واحدة.',
+      ],
     },
     '/data-tools': {
       title: 'أدوات البيانات – تحويل CSV وJSON وExcel دون رفع الملفات',
@@ -287,6 +337,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'أدوات البيانات',
       intro: 'أدوات مجانية للجداول وملفات البيانات: افتح CSV وJSON، وحوّل بين CSV وExcel وJSON، وتحقق من JSON، وأخفِ البيانات الشخصية، كل ذلك في متصفحك.',
       linkText: 'أدوات البيانات',
+      body: [
+        'تفتح أدوات البيانات ملفات CSV وTSV وJSON وExcel جداولَ أو أشجارًا في متصفحك، وتحوّل بينها وتنظّفها، دون رفع صف واحد. تُقرأ الملفات الكبيرة في عامل خلفي، فيُفتح ملف CSV فيه 120,000 صف في نحو ثانية.',
+        'استخدم المحوّلات لنقل البيانات بين الصيغ: CSV إلى Excel أو JSON، وExcel إلى CSV أو JSON، وJSON إلى CSV مع تسطيح الكائنات المتداخلة في أعمدة. واستخدم منسّق JSON ومدقّقه لتنسيق الملف أو إيجاد سطر الخطأ بالضبط، و«إخفاء البيانات الحساسة» لاستبدال الأسماء والبريد وأرقام الهواتف والهويات قبل مشاركة الملف.',
+      ],
     },
     '/office-tools': {
       title: 'أدوات المكتب – افتح ملفات Word وExcel وPowerPoint دون Office',
@@ -294,6 +348,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'أدوات المكتب',
       intro: 'افتح ملفات Word وExcel وPowerPoint والملفات النصية دون تثبيت Office: عارضات مجانية تعمل في متصفحك ولا ترفع ملفاتك أبدًا. وفي عارضات Word وExcel وPowerPoint يمكنك البحث في الملف وطباعته أو حفظه بصيغة PDF، وتواصل الصفحة العمل دون اتصال بالإنترنت بعد تحميلها.',
       linkText: 'أدوات المكتب',
+      body: [
+        'تفتح أدوات المكتب الملفات التي تصلك في العمل دون Microsoft Office: مستندات Word (‎.docx و‎.dotx و‎.docm وOpenDocument ‎.odt)، ومصنفات Excel (‎.xlsx و‎.xlsm و‎.ods وملفات ‎.xls القديمة)، وعروض PowerPoint (‎.pptx و‎.ppsx، تجريبيًا)، والملفات النصية. يرسم متصفحك كل شيء، فلا يُرفع مستند سري لقراءته.',
+        'يعرض عارض Word الصفحات بخطوطها وجداولها وصورها، مع لوحة تنقل وبحث وتعليقات وقراءة بصوت عالٍ. ويحتفظ عارض Excel بالمعادلات وتنسيقات الأرقام والأجزاء المثبتة، ويتيح تعديل الخلايا وتنزيل المصنف. ويعرض عارض PowerPoint الشرائح مع الملاحظات وشبكة الشرائح وعرض المقدّم. ويمكن لكلٍّ منها الطباعة أو الحفظ بصيغة PDF، وتظهر المستندات العربية من اليمين إلى اليسار.',
+      ],
     },
     '/all-tools': {
       title: 'كل الأدوات المجانية: PDF والبيانات والمكتب | OpenAnyDoc',
@@ -301,6 +359,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'كل الأدوات',
       intro: 'كل أدوات OpenAnyDoc مرتبة حسب نوع الملف الذي تعمل عليه. كلها تعمل في متصفحك، ولا ترفع أي منها ملفاتك.',
       linkText: 'كل الأدوات',
+      body: [
+        'تعمل كل أدوات OpenAnyDoc بالطريقة نفسها: تختار ملفًا، ويقوم متصفحك بالعمل، وتنزّل النتيجة. لا يُرفع شيء، ولا حساب ولا علامة مائية، وتعمل الأدوات دون اتصال بعد تحميل الصفحة. اختر أداة من مجموعات PDF أو البيانات أو المكتب أعلاه، أو أفلت أي ملف مدعوم على الصفحة الرئيسية فيُفتح في العارض المناسب.',
+      ],
     },
   },
 }
@@ -336,9 +397,9 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
 // The guides, in the order of the /guides index (App.tsx shows them with InfoPage; the header's search lists them).
-export const guideAddresses = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
+export const guideAddresses = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload']
 
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload']
 
 // The live tool and hub pages have one each too, drawn from the registry.
 export const registryPagesWithShareImage = [...liveTools.map(toolPath), ...liveHubs.map((hub) => hub.path), ALL_TOOLS_PATH]

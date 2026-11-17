@@ -428,7 +428,9 @@ export function cssForStyle(style: CellStyle | undefined): CSSProperties | undef
   if (fillColor) css.backgroundColor = fillColor
   const textColor = argbToCss(font?.color)
   // Excel's automatic text colour is black, which stays readable on any fill; in dark mode the page's own colour is light.
-  if (textColor) css.color = textColor
+  // A file's own text colour on an unfilled cell (Excel's link blue, a dark red) is lightened toward white in dark mode only,
+  // keeping its hue but staying readable on the dark page (light-dark() follows the workbench's color-scheme).
+  if (textColor) css.color = fillColor ? textColor : `light-dark(${textColor}, color-mix(in srgb, ${textColor} 35%, #ffffff))`
   else if (fillColor) css.color = '#000000'
   if (font?.bold) css.fontWeight = 700
   if (font?.italic) css.fontStyle = 'italic'

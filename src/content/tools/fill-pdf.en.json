@@ -3,6 +3,7 @@
   "description": "Fill in a PDF form in your browser: type in text fields, tick boxes, pick options, and flatten the answers on save if you want. Free, nothing uploaded.",
   "heading": "Fill a PDF form",
   "subtitle": "Type into a PDF form's fields, tick its boxes and save a filled copy; nothing is uploaded.",
+  "intro": "Fill in a PDF form online: type into its text fields, tick checkboxes, choose radio buttons and drop-down options, then save a filled copy. Tick Flatten on save to make the answers part of the page so they cannot be changed. Arabic answers work, and the form is filled in your browser, so it is never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Make the answers part of the page, so the copy you send can't be changed."
     }
   ],
+  "stepsTitle": "How to fill in a PDF form",
   "steps": [
     {
       "title": "Choose your PDF form",
@@ -31,11 +33,19 @@
       "text": "Tick Flatten on save if the answers should be fixed, then click Save a copy and download the filled form."
     }
   ],
+  "handlesTitle": "What Fill PDF form handles",
+  "handles": [
+    "Fields: text fields, multi-line boxes, checkboxes, radio buttons and drop-down lists.",
+    "Languages: answers in English, Arabic or any language your keyboard types.",
+    "Flatten on save: answers drawn onto the page and the fields removed.",
+    "Forms without fields: detected, with a pointer to Edit PDF for adding text boxes."
+  ],
   "limits": [
     "Only PDFs with real form fields can be filled; for a scanned or plain form, use Edit PDF to add text boxes.",
     "XFA forms (made with Adobe LiveCycle) are not supported.",
     "Flattened answers are drawn as pictures, so they can't be selected or searched."
   ],
+  "faqTitle": "Fill PDF form: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

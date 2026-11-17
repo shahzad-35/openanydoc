@@ -3,6 +3,7 @@
   "description": "Split a PDF into several files in your browser: by page ranges, every few pages, or one file per page in a ZIP. Free, and nothing is uploaded.",
   "heading": "Split PDF",
   "subtitle": "Split one PDF into several by page ranges, every few pages, or one file per page; nothing is uploaded.",
+  "intro": "Split a PDF online into separate files without uploading it: type page ranges such as 1-3, 5, cut the PDF every few pages, or save every page as its own PDF. Several files come in one ZIP, named after your PDF and its page numbers, and the pages keep their original quality.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to split a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "Click Split PDF and check the preview. Several files come in one ZIP."
     }
   ],
+  "handlesTitle": "What Split PDF handles",
+  "handles": [
+    "Page ranges: 1-3, 5, 8-10 makes three PDFs; Arabic digits and the Arabic comma work too.",
+    "Every N pages: cut a long PDF into equal parts.",
+    "One file per page: every page as its own PDF, all in one ZIP.",
+    "Long files: a 150-page PDF splits in seconds, with a progress bar."
+  ],
   "limits": [
     "PDFs that need a password to open can't be split; remove the password first.",
     "Bookmarks and links between pages may not carry over to the new files.",
     "Very large PDFs are limited by your device's memory."
   ],
+  "faqTitle": "Split PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

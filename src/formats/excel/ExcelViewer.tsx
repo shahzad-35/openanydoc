@@ -68,6 +68,9 @@ type CellRange = { anchor: CellPosition; focus: CellPosition }
 
 const noIds: number[] = []
 const MAX_CLIPBOARD_CELLS = 200_000
+// Excel's link blue on a light sheet; on the dark sheet a lighter blue of the same hue (light-dark() follows the workbench's
+// color-scheme), so links stay readable (WCAG 4.5:1).
+const LINK_COLOR_CSS = 'light-dark(#0563c1, #8fb8ff)'
 const IS_MAC = /Mac|iPhone|iPad/.test(navigator.userAgent)
 
 // Only web and e-mail links are opened; javascript:, file: and other schemes are not.
@@ -1278,7 +1281,7 @@ export default function ExcelViewer({
               getCellStyle={(rowId, columnId) => {
                 const css = cssForStyle(readStyle(sheet, rowId, columnId))
                 // A cell with a link looks like a link unless it was given its own colour; a cell that differs in Compare is tinted.
-                const linkedCss = readCell(sheet, rowId, columnId)?.l?.Target ? { color: '#0563c1', textDecoration: 'underline', ...css } : css
+                const linkedCss = readCell(sheet, rowId, columnId)?.l?.Target ? { color: LINK_COLOR_CSS, textDecoration: 'underline', ...css } : css
                 return comparedCellKeys.has(cellKey(rowId, columnId)) ? { ...linkedCss, backgroundColor: 'color-mix(in srgb, #f5a623 32%, var(--paper-raised))' } : linkedCss
               }}
               getRowLabel={(rowId) => String((allRowPositionById.get(rowId) ?? 0) + 1)}

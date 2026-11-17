@@ -51,7 +51,7 @@ export const breadcrumbClasses = {
   nav: 'mb-3 text-sm text-ink-soft sm:mb-5',
   list: 'flex flex-wrap items-center gap-x-2 gap-y-1',
   item: 'inline-flex items-center gap-2',
-  link: 'underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline',
+  link: 'inline-flex min-h-6 items-center underline-offset-4 transition-colors duration-150 hover:text-accent hover:underline',
   current: 'text-ink',
   separator: 'size-3 shrink-0 rtl:-scale-x-100',
 } as const
@@ -83,7 +83,7 @@ export const navClasses = {
 } as const
 
 // The formats drawn inside the search box, in this order (`.nav-icon-*` in index.css).
-export const searchBoxFormats = ['csv', 'xlsx', 'json', 'txt', 'docx', 'pptx'] as const
+export const searchBoxFormats = ['csv', 'xlsx', 'json', 'txt', 'docx', 'pptx', 'pdf'] as const
 
 // A magnifying glass, drawn inside a 24 x 24 box.
 export const SEARCH_ICON_PATH = 'M10.5 17a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13zm5-1.5 4.5 4.5'

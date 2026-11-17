@@ -3,6 +3,7 @@
   "description": "Add a text or picture watermark to a PDF in your browser, with opacity, rotation, position and the pages you choose. Free, and nothing is uploaded.",
   "heading": "Watermark PDF",
   "subtitle": "Put a text or picture watermark on every page, or the pages you choose, with your own opacity and angle; nothing is uploaded.",
+  "intro": "Add a watermark to a PDF online: type text such as CONFIDENTIAL or DRAFT in any language, or use your logo, then set its size, colour, opacity and angle, place it in one of nine positions or repeat it across the page, and choose the pages. A live preview shows the result, and nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Opacity, rotation, one of nine positions or repeated across the page, on all pages or a range."
     }
   ],
+  "stepsTitle": "How to add a watermark to a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -35,11 +37,19 @@
       "text": "Click Add watermark, check the preview and download the PDF."
     }
   ],
+  "handlesTitle": "What Watermark PDF handles",
+  "handles": [
+    "Text: any words, Arabic included, in grey, red, blue or black.",
+    "Pictures: PNG, JPG or WebP logos, sized as a share of the page width.",
+    "Look: opacity from 10% to 100%, rotation of 0, 45, 90 or -45 degrees.",
+    "Placement: nine positions or tiled, on all pages or a page range."
+  ],
   "limits": [
     "The watermark is drawn on top of the page; it can't be placed behind the existing content.",
     "Text watermarks are drawn as pictures, so they can't be selected or searched.",
     "PDFs that need a password to open can't be watermarked; remove the password first."
   ],
+  "faqTitle": "Watermark PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

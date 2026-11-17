@@ -3,6 +3,7 @@
   "description": "Organize PDF pages in your browser: drag to reorder, rotate, duplicate, delete, add blank pages or another PDF. Free, and nothing is uploaded.",
   "heading": "Organize PDF pages",
   "subtitle": "Drag pages into order, turn, duplicate or delete them, and add blank pages or another PDF; nothing is uploaded.",
+  "intro": "Organize PDF pages online in one place: drag pages into a new order, rotate them, duplicate or delete them, insert blank pages and add the pages of another PDF, with undo and redo for every change. It is a free PDF page organizer that runs in your browser, so your document is never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to organize PDF pages",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "Click Save PDF, check the preview and download the organized PDF."
     }
   ],
+  "handlesTitle": "What Organize PDF handles",
+  "handles": [
+    "Reorder: drag thumbnails with a mouse, or use the earlier and later buttons on a phone.",
+    "Page changes: rotate left or right, duplicate, delete, and insert a blank page the size of its neighbour.",
+    "Combine: add another PDF and its pages join the end, ready to move anywhere.",
+    "History: undo and redo every change until you save."
+  ],
   "limits": [
     "PDFs that need a password to open can't be organized; remove the password first.",
     "Bookmarks and form fields may not carry over to the new PDF.",
     "Very large PDFs are limited by your device's memory."
   ],
+  "faqTitle": "Organize PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

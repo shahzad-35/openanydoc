@@ -3,6 +3,7 @@
   "description": "Delete pages from a PDF in your browser: click the thumbnails of the pages to remove and download the rest, in order. Free, and nothing is uploaded.",
   "heading": "Remove pages from a PDF",
   "subtitle": "Click the pages you don't want and download the PDF without them; nothing is uploaded.",
+  "intro": "Remove pages from a PDF online for free: every page appears as a thumbnail, you click the ones to delete, and you download the PDF without them. Nothing is uploaded, the remaining pages keep their order and quality, and your original file stays as it was.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to delete pages from a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "Click Remove pages, check the preview and download the new PDF."
     }
   ],
+  "handlesTitle": "What Remove PDF pages handles",
+  "handles": [
+    "Picking pages: click a thumbnail to mark it, Shift+click to mark a run, or Select all.",
+    "Safety: a PDF must keep at least one page, so removing every page is refused.",
+    "Quality: the pages you keep are copied unchanged.",
+    "Next: pass the result to Organize, Rotate or Merge without downloading it first."
+  ],
   "limits": [
     "At least one page must stay in the PDF.",
     "PDFs that need a password to open can't be changed; remove the password first.",
     "Bookmarks that point to removed pages may stop working."
   ],
+  "faqTitle": "Remove PDF pages: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

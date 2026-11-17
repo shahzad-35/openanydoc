@@ -3,6 +3,7 @@
   "description": "Extract every picture inside a PDF in your browser and download them as PNG files in one ZIP, each picture once. Free, and nothing is uploaded.",
   "heading": "Extract images from a PDF",
   "subtitle": "Save every picture inside a PDF as PNG files in one ZIP; nothing is uploaded.",
+  "intro": "Extract images from a PDF online: every picture stored inside the PDF is saved as a PNG file at its own size, and all of them download together in one ZIP. A logo repeated on every page is saved only once. It is free, private and runs in your browser, so the PDF never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to extract images from a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "The preview lists the pictures found; download the ZIP."
     }
   ],
+  "handlesTitle": "What Extract images handles",
+  "handles": [
+    "Pictures: photos, scans and logos stored in the PDF, each saved once.",
+    "Size: the picture's own resolution, which can be larger than it looks on the page.",
+    "Names: built from your PDF's name, the page and the picture number.",
+    "Not pictures: charts drawn with lines; use PDF to JPG to save the whole page instead."
+  ],
   "limits": [
     "Pictures are saved as PNG files, whatever format they have inside the PDF.",
     "Very small pictures (under 16 pixels) and drawings made of lines are not saved.",
     "PDFs that need a password to open can't be read; remove the password first."
   ],
+  "faqTitle": "Extract images from PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

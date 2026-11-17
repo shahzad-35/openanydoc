@@ -3,6 +3,7 @@
   "description": "Edit a PDF in your browser: add text boxes, highlight text, draw, add shapes and pictures, then save a copy. Free, and nothing is uploaded.",
   "heading": "Edit PDF",
   "subtitle": "Add text boxes, highlights, drawings, shapes and pictures to a PDF and save a copy; nothing is uploaded.",
+  "intro": "Edit a PDF online for free: add text boxes, highlight the PDF's own text, draw freehand, place rectangles, ellipses, lines, arrows and pictures, then save a copy. Every change can be undone and redone, the editor asks before unsaved changes are thrown away, and the PDF is edited in your browser, so it is never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Every change can be undone and redone, and you are asked before unsaved changes are thrown away."
     }
   ],
+  "stepsTitle": "How to edit a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -35,11 +37,19 @@
       "text": "Click Save a copy, check the preview and download the edited PDF."
     }
   ],
+  "handlesTitle": "What Edit PDF handles",
+  "handles": [
+    "Text and marks: text boxes, highlights over the existing text and freehand drawing, in your choice of colour.",
+    "Shapes and pictures: rectangles, ellipses, lines, arrows and PNG, JPG or WebP pictures, moved and resized by dragging.",
+    "History: one undo and redo for every change, in order.",
+    "Saving: a new PDF; text boxes, highlights and drawings stay editable in other PDF apps."
+  ],
   "limits": [
     "Text already in the PDF can't be rewritten; cover it with a white rectangle and add a text box on top.",
     "PDFs that need a password to open can't be edited; remove the password first.",
     "Shapes and pictures become part of the page; text boxes, highlights and drawings stay editable in other PDF apps."
   ],
+  "faqTitle": "Edit PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

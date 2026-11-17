@@ -3,6 +3,7 @@
   "description": "Extract pages from a PDF in your browser: click the pages you want and save them as a new PDF, or one PDF per page. Free, and nothing is uploaded.",
   "heading": "Extract pages from a PDF",
   "subtitle": "Click the pages you want and save them as a new PDF; nothing is uploaded.",
+  "intro": "Extract pages from a PDF online: click the pages you want to keep and save them as a new PDF, or tick One PDF per page to get each one as a separate file in a ZIP. It is free, it runs in your browser so nothing is uploaded, and the extracted pages look exactly like the original.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to extract pages from a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "Click Extract pages, check the preview and download the PDF or the ZIP."
     }
   ],
+  "handlesTitle": "What Extract PDF pages handles",
+  "handles": [
+    "Picking pages: click thumbnails, Shift+click for a run, Select all or Select none.",
+    "Output: one PDF with the chosen pages in their original order, or one PDF per page in a ZIP.",
+    "File names: built from your PDF's name and the page numbers, such as report-pages-2,4-6.pdf.",
+    "Quality: text stays selectable and pictures are not compressed again."
+  ],
   "limits": [
     "PDFs that need a password to open can't be read; remove the password first.",
     "Pages keep the order they have in the original PDF.",
     "Bookmarks of the original PDF are not carried over."
   ],
+  "faqTitle": "Extract PDF pages: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

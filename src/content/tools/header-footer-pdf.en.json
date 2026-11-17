@@ -3,6 +3,7 @@
   "description": "Add a header and footer to a PDF in your browser, with page numbers, page count and date, in English or Arabic. Free, and nothing is uploaded.",
   "heading": "Add a header and footer to a PDF",
   "subtitle": "Put text, page numbers and the date at the top and bottom of every page; nothing is uploaded.",
+  "intro": "Add a header and footer to a PDF online: write in up to six places at the top and bottom of each page, insert the page number, page count and date, choose Western or Arabic-Indic digits, and leave the cover page out if you like. A live preview shows the result, and the PDF never leaves your browser.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Insert the page number, page count or a date; Western or Arabic-Indic digits."
     }
   ],
+  "stepsTitle": "How to add a header and footer to a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -35,11 +37,19 @@
       "text": "Click Add header and footer, check the preview and download the PDF."
     }
   ],
+  "handlesTitle": "What Header and footer handles",
+  "handles": [
+    "Places: start, centre and end of the header and of the footer.",
+    "Fields: page number, page count and a date you choose, mixed with your own words.",
+    "Look: three text sizes, three distances from the edge, Western or Arabic-Indic digits.",
+    "Pages: every page, a range, or all but the first."
+  ],
   "limits": [
     "Text is drawn on top of anything already at the top or bottom of the page.",
     "The added text is drawn as a picture, so it can't be selected or searched.",
     "PDFs that need a password to open can't be changed; remove the password first."
   ],
+  "faqTitle": "Header and footer: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

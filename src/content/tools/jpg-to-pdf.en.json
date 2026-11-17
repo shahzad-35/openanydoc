@@ -3,6 +3,7 @@
   "description": "Convert JPG, PNG, WebP, TIFF, SVG and HEIC images to PDF in your browser, with page size and margins. Free, no watermark, and nothing is uploaded.",
   "heading": "JPG to PDF",
   "subtitle": "Turn photos and pictures into one PDF, or one PDF each, with the page size and margin you choose; nothing is uploaded.",
+  "intro": "Convert JPG to PDF online, along with PNG, WebP, TIFF and SVG pictures: drag them into order, choose A4, Letter or the picture's own size, pick a margin, and make one PDF or one PDF per picture. JPG and PNG photos go in without being compressed again, and nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to convert JPG to PDF",
   "steps": [
     {
       "title": "Choose your pictures",
@@ -31,11 +33,19 @@
       "text": "Click Make PDF, check the preview and download one PDF, or a ZIP with one PDF per picture."
     }
   ],
+  "handlesTitle": "What JPG to PDF handles",
+  "handles": [
+    "Pictures: JPG, PNG, WebP, TIFF and SVG; HEIC photos where the browser can read them (Safari).",
+    "Page: A4, Letter or fit to the picture; portrait, landscape or following each picture; no, small or large margin.",
+    "Orientation: phone photos turned by their EXIF data are drawn upright.",
+    "Output: one PDF, or a ZIP with one PDF per picture."
+  ],
   "limits": [
     "HEIC photos open only where the browser can read them (Safari on Mac and iPhone); elsewhere save them as JPG first.",
     "SVG drawings become pictures in the PDF, not vector shapes.",
     "Very large sets of pictures are limited by your device's memory."
   ],
+  "faqTitle": "JPG to PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

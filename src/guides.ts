@@ -553,11 +553,121 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/sign-pdf-without-adobe': {
+      published: '2026-11-17',
+      updated: '2026-11-17',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['You do not need Adobe Acrobat to sign a PDF. You can sign it for free in your browser with OpenAnyDoc\'s Sign PDF, where nothing is uploaded, with Preview on a Mac, with Markup on an iPhone or iPad, or by drawing on the PDF in Microsoft Edge on Windows. All of these place a picture of your signature on the page. If the person who asked for the signature needs a certificate-based digital signature, you also need a digital ID, and LibreOffice can apply one for free.'],
+        },
+        {
+          heading: 'In your browser, with nothing uploaded',
+          paragraphs: ['Sign PDF works on any computer or phone with a modern browser, and the PDF never leaves your device:'],
+          list: [
+            'Open Sign PDF and choose your PDF, or drop it on the page.',
+            'Click Create signature, then draw it with a mouse, finger or pen, type your name in one of three signature styles, or upload a photo of your signature (a white background can be made see-through).',
+            'Drag the signature where it belongs and drag its corner to make it bigger or smaller.',
+            'To sign every page, select the signature and copy it to all pages or to the pages you type, such as 1-3, 5.',
+            'Click Save a copy, check the preview and download the signed PDF. Your signature is kept only while the page is open.',
+          ],
+          links: [{ text: 'Sign PDF', path: '/sign-pdf' }],
+        },
+        {
+          heading: 'On a Mac: Preview',
+          paragraphs: ['Preview, the PDF app that comes with every Mac, signs PDFs without any download. Open the PDF in Preview, show the Markup toolbar and click the Sign button. Create a signature with the trackpad, with the Mac\'s camera (sign on white paper and hold it up), or with an iPhone or iPad, then click the signature to place it and drag it into position. Saved signatures are available on your other Macs that use iCloud Drive. Apple describes the steps in its Preview guide.'],
+          links: [{ text: 'Preview guide', path: 'https://support.apple.com/guide/preview/prvw35725/mac' }],
+        },
+        {
+          heading: 'On an iPhone or iPad: Markup',
+          paragraphs: ['Open the PDF in the Files app, tap the Markup button (a pen tip in a circle), tap the plus button and choose Add Signature. Draw your signature with your finger, tap Done, then drag and resize it on the page. If an app does not show Markup, save the PDF to Files first and open it there. Saved signatures can be reused on the next document.'],
+        },
+        {
+          heading: 'On Windows: Microsoft Edge',
+          paragraphs: ['Microsoft Edge, the browser that comes with Windows, opens PDFs and has a Draw tool. Open the PDF in Edge, choose Draw, write your signature with a mouse, pen or finger, then save the PDF. It is quick, but the signature is drawn freehand each time; Sign PDF in the browser lets you type or upload one instead and copy it to every page.'],
+          links: [{ text: 'Sign PDF in the browser', path: '/sign-pdf' }],
+        },
+        {
+          heading: 'A picture of a signature is not a digital signature',
+          paragraphs: ['Every method above adds a visual signature: a picture of your handwriting placed on the page, like signing a printout. It does not prove who signed, and someone with a PDF editor could copy it.', 'A certificate-based digital signature is different. It uses a digital ID issued to you (by an employer, a bank, a government service or a certificate authority) and seals the file, so any later change shows. Some contracts, government forms and regulated processes require this kind.', 'If you have a digital ID, LibreOffice can sign an existing PDF with it for free: open LibreOffice, choose File, Digital Signatures, Sign Existing PDF, and follow the steps. Whether a visual signature is enough depends on who asked for it; when in doubt, ask them or your legal team.'],
+          links: [{ text: 'Sign Existing PDF', path: 'https://help.libreoffice.org/latest/en-US/text/shared/01/signexistingpdf.html' }],
+        },
+        {
+          heading: 'Before you send it',
+          paragraphs: ['A few checks save a second round:'],
+          list: [
+            'Open the signed PDF again and look at every signed page; in OpenAnyDoc the preview shows the first pages before you download.',
+            'If the PDF is a form, fill in its fields first with Fill PDF form, and tick Flatten on save so the answers cannot be changed.',
+            'If you need to send several signed documents as one file, put them together with Merge PDF.',
+          ],
+          links: [{ text: 'Fill PDF form', path: '/fill-pdf' }, { text: 'Merge PDF', path: '/merge-pdf' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe what you need (no personal data).`],
+        },
+      ],
+    },
+    '/pdf-tools-without-upload': {
+      published: '2026-11-17',
+      updated: '2026-11-17',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Most free online PDF tools, including iLovePDF, Smallpdf and the PDF24 website, upload your file to their servers, process it there and delete it after a set time. That is fine for many documents. If a file must not leave your device, use a tool that processes it locally: OpenAnyDoc in the browser, or a desktop app that works offline, such as PDF24 Creator on Windows. The facts below come from each service\'s own pages, checked on 17 November 2026.'],
+        },
+        {
+          heading: 'How popular PDF sites handle your file (checked 17 November 2026)',
+          paragraphs: ['What each service says on its own pages; follow the links for the current wording:'],
+          list: [
+            'iLovePDF: files are uploaded over HTTPS and kept "for a maximum of 2 hours" so you can download the result, then removed. A desktop app is available for Mac and Windows.',
+            'Smallpdf: files are "permanently removed" from its servers one hour after processing. Smallpdf says it is ISO 27001 certified and stores files in the EU.',
+            'PDF24 Tools (website): uploaded files are deleted from the processing server within one hour. PDF24 Creator, its Windows app, works offline and keeps all files on your computer.',
+            'Sejda (website): its privacy policy says uploaded and output files are stored for processing and then permanently deleted, with no backups.',
+          ],
+          links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'Smallpdf', path: 'https://smallpdf.com/blog/is-smallpdf-safe' }, { text: 'PDF24 Tools', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
+        },
+        {
+          heading: 'Where those services do more',
+          paragraphs: ['To be fair about the choice: these sites offer tools that OpenAnyDoc does not have yet, such as compressing a PDF, recognising text in scanned pages (OCR), converting Word or Excel files to PDF, and password-protecting a PDF. Several have desktop apps, accounts with cloud storage and batch processing. If you need one of those and the document is not sensitive, they are reasonable choices.'],
+        },
+        {
+          heading: 'What OpenAnyDoc does differently',
+          paragraphs: ['Every OpenAnyDoc PDF tool runs in your browser. The file is read, changed and saved on your device, and the page\'s security policy only lets it contact its own site, so there is no upload to delete later. You can check this yourself in the browser\'s network panel while a tool runs. The tools work offline once a page has loaded, have no account, watermark or daily limit, read Arabic PDFs correctly, and the code is open source.'],
+          links: [{ text: 'check this yourself', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'The PDF tools that never upload',
+          paragraphs: ['Each of these works on your own device:'],
+          list: [
+            'Merge, split, remove or extract pages, organize and rotate PDF pages.',
+            'Edit PDF (text boxes, highlights, drawings, shapes, pictures), Sign PDF and Fill PDF form.',
+            'Add page numbers, a watermark, or a header and footer.',
+            'Convert JPG, PNG, WebP, TIFF or SVG to PDF, and PDF to JPG, PNG, text or its embedded images.',
+          ],
+          links: [{ text: 'Merge', path: '/merge-pdf' }, { text: 'Edit PDF', path: '/edit-pdf' }, { text: 'Sign PDF', path: '/sign-pdf' }, { text: 'Fill PDF form', path: '/fill-pdf' }, { text: 'Add page numbers', path: '/add-page-numbers' }, { text: 'JPG', path: '/jpg-to-pdf' }, { text: 'PDF to JPG', path: '/pdf-to-jpg' }],
+        },
+        {
+          heading: 'Which to choose',
+          paragraphs: ['A simple rule of thumb:'],
+          list: [
+            'Contracts, payslips, IDs, medical or customer files: use a tool that keeps the file on your device.',
+            'You need compression or OCR: use a desktop app, or an online service if the document is not sensitive.',
+            'You are on a work computer where you cannot install software: a browser tool with no upload, such as OpenAnyDoc, avoids both problems.',
+            'Your organisation has rules about where files may be processed: follow them, and ask your IT or compliance team when unsure.',
+          ],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe what you need (no personal data).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
           heading: 'Guides',
-          paragraphs: ['Short, practical answers to the problems people hit with CSV, Excel and JSON files and Word documents, each with the free tool that fixes it in your browser:'],
+          paragraphs: ['Short, practical answers to the problems people hit with CSV, Excel and JSON files, Word documents and PDFs, each with the free tool that fixes it in your browser:'],
           list: [
             'Why your CSV shows broken Arabic text in Excel',
             'CSV opens in one column in Excel: how to fix the delimiter',
@@ -569,6 +679,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'How to open a DOCX file without Word',
             'CSV vs Excel vs JSON: the differences and when to use each',
             'How to anonymize a CSV or Excel file before sharing it',
+            'PDF tools that do not upload your file',
+            'How to sign a PDF without Adobe',
           ],
           links: [
             { text: 'Why your CSV shows broken Arabic text in Excel', path: '/fix-arabic-csv-in-excel' },
@@ -581,6 +693,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'How to open a DOCX file without Word', path: '/open-docx-without-word' },
             { text: 'CSV vs Excel vs JSON: the differences and when to use each', path: '/csv-vs-excel-vs-json' },
             { text: 'How to anonymize a CSV or Excel file before sharing it', path: '/anonymize-data-before-sharing' },
+            { text: 'PDF tools that do not upload your file', path: '/pdf-tools-without-upload' },
+            { text: 'How to sign a PDF without Adobe', path: '/sign-pdf-without-adobe' },
           ],
         },
         {
@@ -1140,11 +1254,121 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/sign-pdf-without-adobe': {
+      published: '2026-11-17',
+      updated: '2026-11-17',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['لا تحتاج إلى Adobe Acrobat لتوقيع ملف PDF. يمكنك توقيعه مجانًا في متصفحك باستخدام «توقيع PDF» من OpenAnyDoc دون رفع أي شيء، أو بتطبيق Preview على Mac، أو بأداة Markup على iPhone أو iPad، أو بالرسم على الملف في متصفح Microsoft Edge على Windows. كل هذه الطرق تضع صورة لتوقيعك على الصفحة. وإن طلبت الجهة توقيعًا رقميًا قائمًا على شهادة، فستحتاج أيضًا إلى هوية رقمية، ويمكن لبرنامج LibreOffice أن يطبّقها مجانًا.'],
+        },
+        {
+          heading: 'في متصفحك دون رفع أي شيء',
+          paragraphs: ['تعمل أداة «توقيع PDF» على أي حاسوب أو هاتف بمتصفح حديث، ولا يغادر الملف جهازك:'],
+          list: [
+            'افتح «توقيع PDF» واختر ملفك أو أفلته على الصفحة.',
+            'انقر «إنشاء توقيع»، ثم ارسمه بالفأرة أو الإصبع أو القلم، أو اكتب اسمك بأحد ثلاثة أنماط توقيع، أو ارفع صورة لتوقيعك (ويمكن جعل الخلفية البيضاء شفافة).',
+            'اسحب التوقيع إلى مكانه، واسحب زاويته لتكبيره أو تصغيره.',
+            'لتوقيع كل الصفحات، حدّد التوقيع وانسخه إلى كل الصفحات أو إلى الصفحات التي تكتبها، مثل 1-3، 5.',
+            'انقر «حفظ نسخة»، وراجع المعاينة، ونزّل الملف الموقّع. يبقى توقيعك فقط ما دامت الصفحة مفتوحة.',
+          ],
+          links: [{ text: 'توقيع PDF', path: '/sign-pdf' }],
+        },
+        {
+          heading: 'على Mac: تطبيق Preview',
+          paragraphs: ['يوقّع تطبيق Preview، الموجود في كل جهاز Mac، ملفات PDF دون تنزيل أي شيء. افتح الملف في Preview، وأظهر شريط أدوات Markup، وانقر زر التوقيع. أنشئ توقيعًا بلوحة اللمس، أو بكاميرا Mac (وقّع على ورقة بيضاء وارفعها أمامها)، أو بجهاز iPhone أو iPad، ثم انقر التوقيع لوضعه واسحبه إلى مكانه. وتتوفر التواقيع المحفوظة على أجهزة Mac الأخرى التي تستخدم iCloud Drive. وتشرح Apple الخطوات في دليل Preview.'],
+          links: [{ text: 'دليل Preview', path: 'https://support.apple.com/ar-ae/guide/preview/prvw35725/mac' }],
+        },
+        {
+          heading: 'على iPhone أو iPad: أداة Markup',
+          paragraphs: ['افتح ملف PDF في تطبيق «الملفات»، واضغط زر Markup (رأس قلم داخل دائرة)، ثم زر الإضافة واختر «إضافة توقيع». ارسم توقيعك بإصبعك، واضغط «تم»، ثم اسحبه وغيّر حجمه على الصفحة. وإن لم يظهر Markup في تطبيق ما، فاحفظ الملف في «الملفات» أولًا وافتحه هناك. ويمكن إعادة استخدام التواقيع المحفوظة في المستند التالي.'],
+        },
+        {
+          heading: 'على Windows: متصفح Microsoft Edge',
+          paragraphs: ['يفتح متصفح Microsoft Edge، الموجود مع Windows، ملفات PDF وفيه أداة رسم. افتح الملف في Edge، واختر «رسم»، واكتب توقيعك بالفأرة أو القلم أو الإصبع، ثم احفظ الملف. الطريقة سريعة، لكن التوقيع يُرسم يدويًا في كل مرة؛ أما «توقيع PDF» في المتصفح فيتيح لك كتابته أو رفعه ونسخه إلى كل الصفحات.'],
+          links: [{ text: 'توقيع PDF في المتصفح', path: '/sign-pdf' }],
+        },
+        {
+          heading: 'صورة التوقيع ليست توقيعًا رقميًا',
+          paragraphs: ['كل الطرق السابقة تضيف توقيعًا مرئيًا: صورة لخط يدك على الصفحة، كالتوقيع على ورقة مطبوعة. وهو لا يثبت هوية الموقّع، ويمكن لمن لديه محرر PDF أن ينسخه.', 'أما التوقيع الرقمي القائم على شهادة فمختلف: يستخدم هوية رقمية صادرة لك (من جهة عملك أو بنك أو خدمة حكومية أو جهة إصدار شهادات) ويختم الملف، فيظهر أي تغيير لاحق. وتشترط بعض العقود والنماذج الحكومية والإجراءات المنظّمة هذا النوع.', 'إن كانت لديك هوية رقمية، يمكن لبرنامج LibreOffice توقيع ملف PDF موجود بها مجانًا: افتح LibreOffice، واختر «ملف» ثم «التوقيعات الرقمية» ثم «توقيع ملف PDF موجود»، واتبع الخطوات. أما كفاية التوقيع المرئي فتعود إلى الجهة التي طلبته؛ وإن كنت غير متأكد فاسألها أو اسأل الفريق القانوني لديك.'],
+          links: [{ text: 'توقيع ملف PDF موجود', path: 'https://help.libreoffice.org/latest/ar/text/shared/01/signexistingpdf.html' }],
+        },
+        {
+          heading: 'قبل أن ترسله',
+          paragraphs: ['بعض الفحوص توفّر عليك جولة ثانية:'],
+          list: [
+            'افتح الملف الموقّع مرة أخرى وانظر إلى كل صفحة موقّعة؛ وفي OpenAnyDoc تعرض المعاينة الصفحات الأولى قبل التنزيل.',
+            'إن كان الملف نموذجًا، فعبّئ حقوله أولًا بأداة «تعبئة نموذج PDF»، وفعّل «تثبيت عند الحفظ» حتى لا يمكن تغيير الإجابات.',
+            'وإن احتجت إلى إرسال عدة مستندات موقّعة في ملف واحد، فاجمعها بأداة «دمج PDF».',
+          ],
+          links: [{ text: 'تعبئة نموذج PDF', path: '/fill-pdf' }, { text: 'دمج PDF', path: '/merge-pdf' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصف ما تحتاجه (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/pdf-tools-without-upload': {
+      published: '2026-11-17',
+      updated: '2026-11-17',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['معظم أدوات PDF المجانية على الإنترنت، ومنها iLovePDF وSmallpdf وموقع PDF24، ترفع ملفك إلى خوادمها وتعالجه هناك ثم تحذفه بعد مدة محددة. وهذا مقبول لكثير من المستندات. أما إن كان الملف لا يجوز أن يغادر جهازك، فاستخدم أداة تعالجه محليًا: OpenAnyDoc في المتصفح، أو تطبيق سطح مكتب يعمل دون اتصال مثل PDF24 Creator على Windows. والمعلومات أدناه من صفحات كل خدمة نفسها، وقد رُوجعت في 17 نوفمبر 2026.'],
+        },
+        {
+          heading: 'كيف تتعامل مواقع PDF الشائعة مع ملفك (رُوجع في 17 نوفمبر 2026)',
+          paragraphs: ['ما تقوله كل خدمة في صفحاتها؛ اتبع الروابط للاطلاع على النص الحالي:'],
+          list: [
+            'iLovePDF: تُرفع الملفات عبر HTTPS وتُحفظ «لمدة أقصاها ساعتان» لتتمكن من تنزيل النتيجة، ثم تُحذف. ويتوفر تطبيق سطح مكتب لـ Mac وWindows.',
+            'Smallpdf: تُحذف الملفات نهائيًا من خوادمها بعد ساعة من المعالجة. وتقول Smallpdf إنها حاصلة على شهادة ISO 27001 وإنها تخزّن الملفات داخل الاتحاد الأوروبي.',
+            'أدوات PDF24 (الموقع): تُحذف الملفات المرفوعة من خادم المعالجة خلال ساعة. أما PDF24 Creator، تطبيقها على Windows، فيعمل دون اتصال ويُبقي كل الملفات على حاسوبك.',
+            'Sejda (الموقع): تقول سياسة الخصوصية إن الملفات المرفوعة والناتجة تُخزَّن للمعالجة ثم تُحذف نهائيًا، دون نسخ احتياطية.',
+          ],
+          links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'Smallpdf', path: 'https://smallpdf.com/blog/is-smallpdf-safe' }, { text: 'PDF24', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
+        },
+        {
+          heading: 'أين تقدّم تلك الخدمات أكثر',
+          paragraphs: ['إنصافًا في المقارنة: تقدّم هذه المواقع أدوات لا يملكها OpenAnyDoc بعد، مثل ضغط ملف PDF، والتعرّف على النص في الصفحات الممسوحة ضوئيًا (OCR)، وتحويل ملفات Word أو Excel إلى PDF، وحماية الملف بكلمة مرور. ولعدد منها تطبيقات سطح مكتب وحسابات بتخزين سحابي ومعالجة دفعات. فإن احتجت إلى شيء من ذلك ولم يكن المستند حساسًا، فهي خيارات معقولة.'],
+        },
+        {
+          heading: 'ما الذي يفعله OpenAnyDoc بشكل مختلف',
+          paragraphs: ['تعمل كل أدوات PDF في OpenAnyDoc داخل متصفحك. يُقرأ الملف ويُعدَّل ويُحفظ على جهازك، ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه، فلا يوجد رفع يحتاج إلى حذف لاحقًا. ويمكنك التحقق بنفسك من لوحة الشبكة في المتصفح أثناء عمل الأداة. وتعمل الأدوات دون اتصال بعد تحميل الصفحة، بلا حساب ولا علامة مائية ولا حد يومي، وتقرأ ملفات PDF العربية بشكل صحيح، والكود مفتوح المصدر.'],
+          links: [{ text: 'التحقق بنفسك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'أدوات PDF التي لا ترفع ملفك أبدًا',
+          paragraphs: ['كلٌّ منها يعمل على جهازك:'],
+          list: [
+            'الدمج والتقسيم وحذف الصفحات واستخراجها وترتيبها وتدويرها.',
+            '«تعديل PDF» (مربعات نص وتظليل ورسم وأشكال وصور)، و«توقيع PDF»، و«تعبئة نموذج PDF».',
+            'ترقيم الصفحات، والعلامة المائية، والرأس والتذييل.',
+            'تحويل صور JPG وPNG وWebP وTIFF وSVG إلى PDF، وتحويل PDF إلى JPG أو PNG أو نص أو استخراج صوره.',
+          ],
+          links: [{ text: 'الدمج', path: '/merge-pdf' }, { text: '«تعديل PDF»', path: '/edit-pdf' }, { text: '«توقيع PDF»', path: '/sign-pdf' }, { text: '«تعبئة نموذج PDF»', path: '/fill-pdf' }, { text: 'ترقيم الصفحات', path: '/add-page-numbers' }, { text: 'تحويل صور JPG', path: '/jpg-to-pdf' }, { text: 'تحويل PDF إلى JPG', path: '/pdf-to-jpg' }],
+        },
+        {
+          heading: 'أيّها تختار',
+          paragraphs: ['قاعدة بسيطة:'],
+          list: [
+            'العقود وكشوف الرواتب والهويات والملفات الطبية وملفات العملاء: استخدم أداة تُبقي الملف على جهازك.',
+            'تحتاج إلى الضغط أو OCR: استخدم تطبيق سطح مكتب، أو خدمة على الإنترنت إن لم يكن المستند حساسًا.',
+            'تعمل على حاسوب عمل لا تستطيع تثبيت برامج عليه: أداة في المتصفح بلا رفع، مثل OpenAnyDoc، تحل المشكلتين معًا.',
+            'لدى جهتك قواعد حول مكان معالجة الملفات: اتبعها، واسأل فريق تقنية المعلومات أو الامتثال عند الشك.',
+          ],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصف ما تحتاجه (دون بيانات شخصية).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
           heading: 'الأدلة',
-          paragraphs: ['إجابات قصيرة وعملية للمشكلات التي يصطدم بها الناس مع ملفات CSV وExcel وJSON ومستندات وورد، مع الأداة المجانية التي تحلها في متصفحك:'],
+          paragraphs: ['إجابات قصيرة وعملية للمشكلات التي يصطدم بها الناس مع ملفات CSV وExcel وJSON ومستندات وورد وملفات PDF، مع الأداة المجانية التي تحلها في متصفحك:'],
           list: [
             'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel',
             'ملف CSV يُفتح في عمود واحد في Excel: كيف تصلح الفاصل',
@@ -1156,6 +1380,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'كيف تفتح ملف DOCX بدون وورد',
             'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها',
             'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته',
+            'أدوات PDF لا ترفع ملفك',
+            'كيف توقّع ملف PDF بدون Adobe',
           ],
           links: [
             { text: 'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel', path: '/fix-arabic-csv-in-excel' },
@@ -1168,6 +1394,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'كيف تفتح ملف DOCX بدون وورد', path: '/open-docx-without-word' },
             { text: 'CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها', path: '/csv-vs-excel-vs-json' },
             { text: 'كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته', path: '/anonymize-data-before-sharing' },
+            { text: 'أدوات PDF لا ترفع ملفك', path: '/pdf-tools-without-upload' },
+            { text: 'كيف توقّع ملف PDF بدون Adobe', path: '/sign-pdf-without-adobe' },
           ],
         },
         {

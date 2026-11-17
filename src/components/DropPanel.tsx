@@ -122,7 +122,7 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
         )}
         {intake.acceptsPastedText && <p id="paste-hint" className="mt-4 text-sm text-ink-soft">{pasteHint ?? t(currentViewerId === 'json' ? 'drop.pasteHintJson' : 'drop.pasteHint')}</p>}
         {showExtensions && <p id="privacy-note" className="mt-1 text-sm text-ink-soft">{t('drop.privacyNote')}</p>}
-        {showExtensions && <ExtensionList id="supported-extensions" shownViewers={shownViewers} className="mx-auto mt-6 grid max-w-2xl gap-x-8 gap-y-3 text-start md:grid-cols-2" />}
+        {showExtensions && <ExtensionList id="supported-extensions" shownViewers={shownViewers} className={`mx-auto mt-6 grid gap-x-8 gap-y-3 text-start ${shownViewers.length > 1 ? 'max-w-2xl md:grid-cols-2' : 'w-fit max-w-full'}`} />}
 
         <div id="drop-messages" aria-live="polite" className="mt-4 space-y-2">
           <Notice id="large-file-warning" kind="warning" message={intake.largeFileWarning ?? ''} />

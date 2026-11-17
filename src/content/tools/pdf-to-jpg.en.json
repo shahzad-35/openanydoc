@@ -3,6 +3,7 @@
   "description": "Convert PDF pages to JPG or PNG images in your browser: every page or the ones you pick, at the quality you choose, in a ZIP. Free, nothing is uploaded.",
   "heading": "PDF to JPG",
   "subtitle": "Turn every page, or the pages you pick, into JPG or PNG pictures; nothing is uploaded.",
+  "intro": "Convert PDF to JPG online: turn every page, or only the pages you pick, into JPG or PNG pictures at 72, 150 or 300 dpi, with a quality slider for JPG. One page downloads as a picture and several come in a ZIP named after your PDF. It is free and runs in your browser, so the PDF is never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to convert PDF to JPG",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "Click Convert to pictures. One page downloads as a picture; several come in a ZIP."
     }
   ],
+  "handlesTitle": "What PDF to JPG handles",
+  "handles": [
+    "Pages: all of them, or the ones you click.",
+    "Formats: JPG with a quality from 60 to 100, or PNG for sharp text and lines.",
+    "Resolution: 72 dpi for screens, 150 dpi for most uses, 300 dpi for printing.",
+    "Long files: page after page with a progress bar; a 150-page PDF works on a laptop."
+  ],
   "limits": [
     "PDFs that need a password to open can't be converted; remove the password first.",
     "Print resolution (300 dpi) makes large files and takes longer for long PDFs.",
     "Very large PDFs are limited by your device's memory."
   ],
+  "faqTitle": "PDF to JPG: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

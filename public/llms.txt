@@ -1,6 +1,6 @@
 # OpenAnyDoc
 
-> OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files, and a viewer for Word documents (DOCX) and PowerPoint slides (PPTX), that runs in your browser: files are never uploaded. No account, no cookies, no analytics. English and Arabic. MIT licence.
+> OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files, a viewer for Word documents (DOCX), PowerPoint slides (PPTX) and PDF files, and a set of PDF tools, that runs in your browser: files are never uploaded. No account, no cookies, no analytics. English and Arabic. MIT licence.
 
 How it keeps files private: the site's Content-Security-Policy is `default-src 'self'; connect-src 'self'`, so the browser refuses any request to another origin, and an automated test suite fails the build if any page makes a network request or writes browser storage beyond the theme choice. Anyone can confirm this in the browser's Network tab while opening a file.
 
@@ -8,8 +8,8 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 
 ## Answers
 
-- Is my file uploaded? No. The browser reads it; the page's Content-Security-Policy (`connect-src 'self'`) blocks requests to any other site. How to verify: https://www.openanydoc.com/en/check-file-upload
-- Which formats? .csv, .tsv, .tab, .xlsx, .xls, .xlsm, .ods, .json, .txt, .docx and .pptx (view only). Not old .doc or .ppt files. PDFs open in the PDF viewer and the PDF tools.
+- Is my file uploaded? No. The browser reads and changes it on the device. The page's Content-Security-Policy lets it contact only its own site, plus one exception: the JSON page's "Open from a URL" fetches the https address the visitor types. How to verify: https://www.openanydoc.com/en/check-file-upload
+- Which formats? .csv, .tsv, .tab, .parquet, .xlsx, .xls, .xlsm, .ods, .json, .jsonl, .txt, .docx, .dotx, .docm, .odt, .pptx, .ppsx, .potx, .pptm and .pdf. Word and PowerPoint files are view only. Not old .doc or .ppt files. JPG to PDF also takes .jpg, .png, .webp, .tif and .svg pictures.
 - Word to PDF? Open the .docx in the Word viewer (https://www.openanydoc.com/en/word-viewer) and choose Print / Save as PDF; the browser's print dialog saves only the document's pages. Old .doc files are not supported: save them as .docx first.
 - How big a file? CSV has no fixed limit (a 120,000-row file opens in under a second; a warning above 50 MB). JSON up to 10 MB. Excel cell styles are read for files up to 8 MB.
 - Arabic? The whole interface is in Arabic too (https://www.openanydoc.com/ar). CSV files in Windows-1256 are detected, and downloads add a UTF-8 byte order mark so Excel shows Arabic correctly.
@@ -18,6 +18,14 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - Price? Free, with no account, plans or ads.
 - Can I try it without a file? Yes. Every tool page has two "Try a sample file" buttons with small made-up files (Arabic text, a workbook with three sheets, a 150,000-row CSV, a short Word document, three slides), opened in the browser like any other file.
 - Can I hide personal data before sharing a file or pasting it into an AI assistant? Yes. The Mask data tool finds names, emails, phone numbers, Saudi national ID and Iqama numbers, IBANs and card numbers in CSV, Excel, JSON and TXT files and replaces them with consistent tokens (EMAIL-000001), partial masks (****1234) or removes the field, in the browser. An optional private key file restores the tokens later. https://www.openanydoc.com/en/mask-data
+
+- Can I edit a PDF? Yes: Edit PDF (https://www.openanydoc.com/en/edit-pdf) adds text boxes, highlights, freehand drawing, shapes and pictures, with undo and redo. Text already in the PDF cannot be rewritten; cover it with a white rectangle and type over it.
+- Can I sign a PDF? Yes: Sign PDF (https://www.openanydoc.com/en/sign-pdf) places a drawn, typed or uploaded signature on one or many pages. It is a visual signature, not a certificate-based digital signature, and it does not prove who signed.
+- Can I fill in a PDF form? Yes: Fill PDF form (https://www.openanydoc.com/en/fill-pdf) fills text fields, checkboxes, radio buttons and drop-downs; "Flatten on save" makes the answers part of the page. XFA forms are not supported.
+- Merge or split a PDF without uploading it? Yes: Merge PDF (https://www.openanydoc.com/en/merge-pdf) and Split PDF (https://www.openanydoc.com/en/split-pdf) copy pages unchanged in the browser, with no size cap other than the device's memory.
+- Password-protected PDFs? The PDF viewer opens them after you type the password (it stays on the device). The PDF tools do not take them yet: remove the password first.
+- Scanned PDFs? They open and can be merged, split, rotated, signed and watermarked, but there is no OCR, so PDF to text finds no text in them.
+- Arabic PDFs? Text is searched, selected and extracted in reading order; page numbers, headers and watermarks can use Arabic words and Arabic-Indic digits.
 
 ## Pricing
 
@@ -74,6 +82,8 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [How to open a DOCX file without Word](https://www.openanydoc.com/en/open-docx-without-word): the browser, LibreOffice, Google Docs, Pages and phones; which upload the file; saving as PDF; .doc and related formats
 - [CSV vs Excel vs JSON: the differences and when to use each](https://www.openanydoc.com/en/csv-vs-excel-vs-json)
 - [How to anonymize a CSV or Excel file before sharing it](https://www.openanydoc.com/en/anonymize-data-before-sharing): what counts as personal data, masking vs pseudonymization vs anonymization, the steps, and what to check before sending
+- [How to sign a PDF without Adobe](https://www.openanydoc.com/en/sign-pdf-without-adobe): the browser with no upload, Preview on Mac, Markup on iPhone, Edge on Windows; visual vs certificate-based signatures
+- [PDF tools that do not upload your file](https://www.openanydoc.com/en/pdf-tools-without-upload): how iLovePDF, Smallpdf, PDF24 and Sejda handle files (from their own pages, dated) and the PDF tools that stay on the device
 - [All guides](https://www.openanydoc.com/en/guides)
 
 ## Arabic pages

@@ -115,6 +115,16 @@ export default function HubPage({ hub, onNavigate }: { hub?: Hub; onNavigate: (p
             </ul>
           </section>
         )}
+        {seo.body && (
+          <section id="hub-about" aria-labelledby="hub-about-heading" className="mt-12 max-w-3xl">
+            <h2 id="hub-about-heading" className="type-h3">{t('tools.hub.aboutHeading')}</h2>
+            {seo.body.map((paragraph, position) => (
+              <p key={position} id={`hub-about-text-${position + 1}`} className="mt-4 text-ink-soft">
+                {paragraph}
+              </p>
+            ))}
+          </section>
+        )}
       </main>
 
       <SiteFooter currentPath={address} onNavigate={onNavigate} />

@@ -3,6 +3,7 @@
   "description": "Sign a PDF in your browser: draw, type or upload your signature, place and resize it on one or many pages, then save a copy. Free, nothing uploaded.",
   "heading": "Sign PDF",
   "subtitle": "Draw, type or upload your signature and place it on the pages of a PDF; nothing is uploaded.",
+  "intro": "Sign a PDF online for free: draw your signature with a mouse, finger or pen, type your name in a signature style, or upload a picture of it, then place and resize it on the page and copy it to every page that needs it. Your signature stays in this tab only. It is a visual signature, not a certificate-based digital signature.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Place the signature, resize it, and copy it to all pages or the pages you choose."
     }
   ],
+  "stepsTitle": "How to sign a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -35,11 +37,19 @@
       "text": "Click Save a copy, check the preview and download the signed PDF."
     }
   ],
+  "handlesTitle": "What Sign PDF handles",
+  "handles": [
+    "Draw: a signature pad that works with a mouse, a finger or a stylus, in black or blue ink.",
+    "Type: your name in three signature styles, Arabic included.",
+    "Upload: a PNG, JPG or WebP picture, with an option to make a white background see-through.",
+    "Placement: drag, resize, and copy to all pages or the pages you list."
+  ],
   "limits": [
     "This is a visual signature, a picture of your signature; it is not a certificate-based digital signature and does not prove who signed.",
     "Your signature is kept only while this page is open; it is never saved or sent anywhere.",
     "PDFs that need a password to open can't be signed; remove the password first."
   ],
+  "faqTitle": "Sign PDF: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",
@@ -47,7 +57,11 @@
     },
     {
       "question": "Is this a legally binding digital signature?",
-      "answer": "It is a visual signature: a picture of your signature placed on the page, like signing a printout. It is not a certificate-based digital signature and does not prove who signed. Whether it is accepted depends on who asks for it; check with them, or with your legal team."
+      "answer": "It is a visual signature: a picture of your signature placed on the page, like signing a printout. It is not a certificate-based digital signature and does not prove who signed. Whether it is accepted depends on who asks for it; check with them, or with your legal team. The guide to signing a PDF without Adobe explains the difference and when a digital ID is needed.",
+      "link": {
+        "text": "guide to signing a PDF without Adobe",
+        "path": "/sign-pdf-without-adobe"
+      }
     },
     {
       "question": "Is my signature stored?",

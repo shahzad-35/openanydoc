@@ -3,6 +3,7 @@
   "description": "Add page numbers to a PDF in your browser: 1, 1 / N or Page 1 of N, Western or Arabic-Indic digits, any position. Free, and nothing is uploaded.",
   "heading": "Add Page Numbers to PDF",
   "subtitle": "Number the pages of a PDF as 1, 1 / N or Page 1 of N, in Western or Arabic-Indic digits; nothing is uploaded.",
+  "intro": "Add page numbers to a PDF online: choose where they go, the first number and the format, 1, 1 / N or Page 1 of N, in Western or Arabic-Indic digits, and skip the cover page if you like. A live preview shows the result before you save, and the PDF is numbered in your browser, so nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -17,6 +18,7 @@
       "text": "Once this page has loaded, numbering keeps working without an internet connection."
     }
   ],
+  "stepsTitle": "How to add page numbers to a PDF",
   "steps": [
     {
       "title": "Choose your PDF",
@@ -31,11 +33,19 @@
       "text": "Click Add page numbers, then download the numbered PDF. Nothing leaves your device."
     }
   ],
+  "handlesTitle": "What Add page numbers handles",
+  "handles": [
+    "Position: top or bottom; left, centre or right.",
+    "Format: 1, 1 / N, or Page 1 of N in the page's language.",
+    "Digits: Western (1 2 3) or Arabic-Indic (١ ٢ ٣), and a small, medium or large size.",
+    "Pages: every page, or all but the first."
+  ],
   "limits": [
     "PDFs that need a password to open can't be numbered; remove the password first.",
     "Numbers are drawn as small pictures, so they can't be selected or searched.",
     "Numbers are drawn over anything already in that corner of the page."
   ],
+  "faqTitle": "Add page numbers: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",

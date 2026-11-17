@@ -125,7 +125,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
                     </PageLink>
                   </li>
                 ))}
-              {[ALL_TOOLS_PATH, '/guides']
+              {[ALL_TOOLS_PATH, '/pdf-tools', '/guides']
                 .filter((address) => address !== currentPath)
                 .map((address) => (
                   <li key={address} className={footerClasses.item}>

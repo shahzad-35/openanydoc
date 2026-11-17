@@ -55,7 +55,8 @@ const formatGroups: FormatGroup[] = [
 
 const jsonLimitMegabytes = (formatDefinitions.find((definition) => definition.viewerId === 'json')?.maxFileBytes ?? 0) / MEGABYTE
 
-// Every format grouped by what it is for, with its extensions as chips and one line of fine print. The rows keep the
+// Every format grouped by what it is for, with its extensions as chips and one line of fine print. The name keeps at least
+// 11rem and the chips wrap in the room left (seven JSON extensions squeezed the name to one word a line). The rows keep the
 // extension-row / extension-capabilities ids that scripts/test-whats-new.mjs reads.
 export function FormatGrid({ onNavigate }: { onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
@@ -76,7 +77,7 @@ export function FormatGrid({ onNavigate }: { onNavigate: (path: string) => void 
                 const viewer = viewers.find((candidate) => candidate.id === viewerId) as Viewer
                 const card = toolCards[locale].find((candidate) => candidate.path === viewer.toolPath)
                 return (
-                  <li key={viewerId} id={`extension-row-${viewerId}`} className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+                  <li key={viewerId} id={`extension-row-${viewerId}`} className="grid gap-2 sm:grid-cols-[minmax(11rem,1fr)_minmax(0,max-content)] sm:items-start">
                     <div>
                       <p className="font-semibold">
                         {viewer.toolPath && card ? (
