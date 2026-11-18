@@ -196,14 +196,14 @@ async function openPage(pathname) {
 
 // ---------------------------------------------------------------- the tests
 
-const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer']
+const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', '/image-viewer']
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
 const landingPages = ['/json-formatter', '/json-validator', '/json-escape-unescape', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
 // Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
-const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf']
-const hubPages = ['/pdf-tools', '/data-tools', '/office-tools', '/all-tools']
+const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator']
+const hubPages = ['/pdf-tools', '/image-tools', '/data-tools', '/office-tools', '/all-tools']
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
@@ -490,7 +490,7 @@ for (const [name, address, file, readyElement] of [
   })
 }
 
-for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token', '/en/mask-data', '/ar/mask-data', '/en/merge-pdf', '/ar/add-page-numbers', '/en/pdf-tools', '/ar/all-tools']) {
+for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/guides', '/en/csv-too-big-for-excel', '/ar/json-unexpected-token', '/en/mask-data', '/ar/mask-data', '/en/merge-pdf', '/ar/add-page-numbers', '/en/pdf-tools', '/ar/all-tools', '/en/compress-image', '/ar/image-tools']) {
   await test(`${address}: every field has an id and no id repeats`, async () => {
     await openPage(address)
     await expectCleanIds(address)
@@ -499,7 +499,7 @@ for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/abou
 
 await test('sitemap.xml and robots.txt list the pages', async () => {
   const sitemap = await (await fetch(`${siteOrigin}/sitemap.xml`)).text()
-  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column', '/en/mask-data', '/ar/mask-data', '/en/merge-pdf', '/ar/add-page-numbers', '/en/pdf-tools', '/ar/data-tools', '/en/office-tools', '/ar/all-tools']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
+  for (const address of ['/en', '/ar', '/en/changelog', '/ar/changelog', '/en/json-viewer', '/ar/json-viewer', '/en/excel-viewer', '/ar/excel-viewer', '/en/about', '/ar/about', '/en/privacy', '/ar/privacy', '/en/terms', '/ar/terms', '/en/fix-arabic-csv-in-excel', '/ar/fix-arabic-csv-in-excel', '/en/guides', '/ar/csv-opens-in-one-column', '/en/mask-data', '/ar/mask-data', '/en/merge-pdf', '/ar/add-page-numbers', '/en/pdf-tools', '/ar/data-tools', '/en/office-tools', '/ar/all-tools', '/en/image-tools', '/ar/heic-to-jpg', '/en/meme-generator']) expect(sitemap.includes(`https://www.openanydoc.com${address}`), `${address} is not in the sitemap`)
   expect(!sitemap.includes('/view-'), 'a /view- address is in the sitemap')
   expect((await (await fetch(`${siteOrigin}/robots.txt`)).text()).includes('Sitemap: https://www.openanydoc.com/sitemap.xml'), 'robots.txt does not point to the sitemap')
 })
@@ -1848,7 +1848,7 @@ await test('once a tool page is idle, its file opens with no network; code that 
 
 // ---------------------------------------------------------------- first screen of the tool pages (Step 17C)
 
-const formatPagesWithSamples = ['/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', ...landingPages]
+const formatPagesWithSamples = ['/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', '/image-viewer', ...landingPages]
 
 await test('every tool page shows its choose button and two sample files on the first screen of a 375 x 667 phone, in both languages', async () => {
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true })

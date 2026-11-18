@@ -4,6 +4,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { crc32, deflateSync } from 'node:zlib'
 import JSZip from 'jszip'
 import { PDFDocument, StandardFonts, rgb } from 'pdf-lib'
 import * as XLSX from 'xlsx'
@@ -1021,6 +1022,173 @@ for (const [photoName, width, height] of [['photo-landscape', 1600, 1200], ['pho
   execFileSync('sips', ['-s', 'format', 'heic', photoPngPath, '--out', testFilePath(`${photoName}.heic`)], { stdio: 'ignore' })
   execFileSync('cwebp', ['-quiet', '-q', '80', photoPngPath, '-o', testFilePath(`${photoName}.webp`)])
 }
+
+// More photos for the picture tools: a large JPG with GPS data, an iPhone-style HEIC, a transparent PNG, an SVG and a transparent
+// WebP. Made-up place and device: the GPS point is a public square, the camera a generic iPhone model name.
+
+// An EXIF block (big-endian TIFF) with the camera, the date, and a GPS position in degrees, minutes and seconds.
+function buildExifSegment({ make, model, dateTime, latitude, longitude, altitudeMeters }) {
+  const entries = (tags) => tags.length
+  const ifd0Tags = [
+    [0x010f, 2, `${make}\0`],
+    [0x0110, 2, `${model}\0`],
+    [0x0112, 3, 1],
+    [0x0132, 2, `${dateTime}\0`],
+    [0x8825, 4, 0],
+  ]
+  const toRational = (value) => {
+    const degrees = Math.floor(Math.abs(value))
+    const minutesFull = (Math.abs(value) - degrees) * 60
+    const minutes = Math.floor(minutesFull)
+    const secondsHundredths = Math.round((minutesFull - minutes) * 60 * 100)
+    return [[degrees, 1], [minutes, 1], [secondsHundredths, 100]]
+  }
+  const gpsTags = [
+    [0x0000, 1, [2, 3, 0, 0]],
+    [0x0001, 2, latitude >= 0 ? 'N\0' : 'S\0'],
+    [0x0002, 5, toRational(latitude)],
+    [0x0003, 2, longitude >= 0 ? 'E\0' : 'W\0'],
+    [0x0004, 5, toRational(longitude)],
+    [0x0005, 1, [0]],
+    [0x0006, 5, [[Math.round(altitudeMeters * 10), 10]]],
+  ]
+  // Lay out: header (8) | IFD0 | IFD0 data | GPS IFD | GPS data.
+  const ifdSize = (tags) => 2 + entries(tags) * 12 + 4
+  const valueBytes = (type, value) => {
+    if (type === 2) return Buffer.from(value, 'latin1')
+    if (type === 1) return Buffer.from(value)
+    if (type === 3) { const buffer = Buffer.alloc(2); buffer.writeUInt16BE(value); return buffer }
+    if (type === 4) { const buffer = Buffer.alloc(4); buffer.writeUInt32BE(value); return buffer }
+    const buffer = Buffer.alloc(value.length * 8)
+    value.forEach(([numerator, denominator], index) => { buffer.writeUInt32BE(numerator, index * 8); buffer.writeUInt32BE(denominator, index * 8 + 4) })
+    return buffer
+  }
+  const countOf = (type, value) => (type === 2 || type === 1 ? valueBytes(type, value).length : type === 5 ? value.length : 1)
+  function writeIfd(tags, start, gpsOffset) {
+    const head = Buffer.alloc(ifdSize(tags))
+    head.writeUInt16BE(tags.length, 0)
+    const extra = []
+    let dataOffset = start + head.length
+    tags.forEach(([tag, type, rawValue], index) => {
+      const value = tag === 0x8825 ? gpsOffset : rawValue
+      const bytes = valueBytes(type, value)
+      const at = 2 + index * 12
+      head.writeUInt16BE(tag, at)
+      head.writeUInt16BE(type, at + 2)
+      head.writeUInt32BE(countOf(type, value), at + 4)
+      if (bytes.length <= 4) bytes.copy(head, at + 8)
+      else {
+        head.writeUInt32BE(dataOffset, at + 8)
+        const padded = bytes.length % 2 ? Buffer.concat([bytes, Buffer.alloc(1)]) : bytes
+        extra.push(padded)
+        dataOffset += padded.length
+      }
+    })
+    return Buffer.concat([head, ...extra])
+  }
+  const ifd0Length = writeIfd(ifd0Tags, 8, 0).length
+  const tiff = Buffer.concat([Buffer.from([0x4d, 0x4d, 0x00, 0x2a, 0x00, 0x00, 0x00, 0x08]), writeIfd(ifd0Tags, 8, 8 + ifd0Length), writeIfd(gpsTags, 8 + ifd0Length, 0)])
+  const payload = Buffer.concat([Buffer.from('Exif\0\0', 'latin1'), tiff])
+  const segmentHeader = Buffer.alloc(4)
+  segmentHeader.writeUInt16BE(0xffe1, 0)
+  segmentHeader.writeUInt16BE(payload.length + 2, 2)
+  return Buffer.concat([segmentHeader, payload])
+}
+
+// The JPEG with its own APP0/APP1 segments replaced by the EXIF block above.
+function withExif(jpegBytes, exifSegment) {
+  let offset = 2
+  while (jpegBytes[offset] === 0xff && (jpegBytes[offset + 1] === 0xe0 || jpegBytes[offset + 1] === 0xe1)) offset += 2 + jpegBytes.readUInt16BE(offset + 2)
+  return Buffer.concat([jpegBytes.subarray(0, 2), exifSegment, jpegBytes.subarray(offset)])
+}
+
+const outdoorSceneHtml = `<!doctype html><body style="margin:0;height:100vh;overflow:hidden;background:linear-gradient(#4f86d4,#f2c79b 58%,#6b9b4f 58%,#2f5c27)">
+<div style="position:absolute;left:68%;top:22%;width:8vw;height:8vw;border-radius:50%;background:radial-gradient(#fff7cf,#ffb347)"></div>
+<div style="position:absolute;left:10%;top:40%;width:18%;height:20%;background:#d8c3a5;border-radius:6px 6px 0 0"></div>
+<div style="position:absolute;left:12%;top:44%;width:4%;height:6%;background:#5d7fa8"></div><div style="position:absolute;left:20%;top:44%;width:4%;height:6%;background:#5d7fa8"></div>
+<div style="position:absolute;left:-10%;top:55%;width:70%;height:45%;border-radius:50%;background:#4f8a45"></div>
+<div style="position:absolute;left:45%;top:60%;width:75%;height:45%;border-radius:50%;background:#386b33"></div></body>`
+const exifScene = { make: 'Apple', model: 'iPhone 15 Pro', dateTime: '2026:11:10 16:42:05', latitude: 24.6877, longitude: 46.7219, altitudeMeters: 612.4 }
+
+// 1. A large JPG (6000 x 4000, about 24 megapixels) with GPS data.
+const largePngPath = join(tmpdir(), 'openanydoc-large-photo.png')
+// Fine grain like a camera sensor's, so the file is as heavy as a real 24-megapixel photo (a flat scene compresses to under 1 MB).
+const sensorGrainScript = `<canvas id="grain" style="position:absolute;inset:0;width:100%;height:100%;mix-blend-mode:overlay"></canvas><script>
+const canvas = document.getElementById('grain'); canvas.width = innerWidth; canvas.height = innerHeight
+const context = canvas.getContext('2d'); const pixels = context.createImageData(canvas.width, canvas.height)
+let seed = 7; const next = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648)
+for (let index = 0; index < pixels.data.length; index += 4) { const shade = 90 + next() * 76; pixels.data.set([shade, shade, shade, 120], index) }
+context.putImageData(pixels, 0, 0)</script>`
+screenshotHtml(outdoorSceneHtml.replace('</body>', `${sensorGrainScript}</body>`), 6000, 4000, largePngPath)
+const largeJpgPath = join(tmpdir(), 'openanydoc-large-photo.jpg')
+execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '92', largePngPath, '--out', largeJpgPath], { stdio: 'ignore' })
+writeFileSync(testFilePath('photo-large-gps.jpg'), withExif(readFileSync(largeJpgPath), buildExifSegment(exifScene)))
+rmSync(largePngPath)
+rmSync(largeJpgPath)
+
+// 2. An iPhone-style HEIC: 4032 x 3024 like an iPhone's main camera, HEVC-encoded by macOS (the encoder iPhones use), with the
+// iPhone EXIF and GPS above.
+const iphonePngPath = join(tmpdir(), 'openanydoc-iphone-photo.png')
+screenshotHtml(outdoorSceneHtml, 4032, 3024, iphonePngPath)
+const iphoneJpgPath = join(tmpdir(), 'openanydoc-iphone-photo.jpg')
+execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '95', iphonePngPath, '--out', iphoneJpgPath], { stdio: 'ignore' })
+writeFileSync(iphoneJpgPath, withExif(readFileSync(iphoneJpgPath), buildExifSegment(exifScene)))
+execFileSync('sips', ['-s', 'format', 'heic', iphoneJpgPath, '--out', testFilePath('photo-iphone.heic')], { stdio: 'ignore' })
+rmSync(iphonePngPath)
+rmSync(iphoneJpgPath)
+
+// 3. A transparent PNG (RGBA): a logo-like badge with soft edges on a fully see-through background, written directly.
+function encodePng(width, height, pixelAt) {
+  const rows = Buffer.alloc((width * 4 + 1) * height)
+  for (let y = 0; y < height; y++) {
+    rows[y * (width * 4 + 1)] = 0
+    for (let x = 0; x < width; x++) rows.set(pixelAt(x, y), y * (width * 4 + 1) + 1 + x * 4)
+  }
+  const chunk = (type, data) => {
+    const length = Buffer.alloc(4)
+    length.writeUInt32BE(data.length)
+    const body = Buffer.concat([Buffer.from(type, 'latin1'), data])
+    const checksum = Buffer.alloc(4)
+    checksum.writeUInt32BE(crc32(body) >>> 0)
+    return Buffer.concat([length, body, checksum])
+  }
+  const header = Buffer.alloc(13)
+  header.writeUInt32BE(width, 0)
+  header.writeUInt32BE(height, 4)
+  header.set([8, 6, 0, 0, 0], 8)
+  return Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]), chunk('IHDR', header), chunk('IDAT', deflateSync(rows)), chunk('IEND', Buffer.alloc(0))])
+}
+const badgeSize = 800
+const transparentPng = encodePng(badgeSize, badgeSize, (x, y) => {
+  const distance = Math.hypot(x - badgeSize / 2, y - badgeSize / 2)
+  const ring = badgeSize * 0.42
+  const alpha = Math.max(0, Math.min(1, ring - distance + 1))
+  const isInnerSquare = Math.abs(x - badgeSize / 2) < badgeSize * 0.16 && Math.abs(y - badgeSize / 2) < badgeSize * 0.16
+  return isInnerSquare ? [255, 255, 255, Math.round(alpha * 255)] : [47, 95, 208, Math.round(alpha * 230)]
+})
+writeFileSync(testFilePath('logo-transparent.png'), transparentPng)
+
+// 4. An SVG with a viewBox, a gradient, text in English and Arabic, and a rotated shape (drawn by the browser).
+writeFileSync(
+  testFilePath('diagram.svg'),
+  `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="800" viewBox="0 0 1200 800">
+  <defs><linearGradient id="sky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#e8f0ff"/><stop offset="1" stop-color="#ffffff"/></linearGradient></defs>
+  <rect width="1200" height="800" fill="url(#sky)"/>
+  <rect x="140" y="220" width="300" height="180" rx="24" fill="#2f5fd0"/>
+  <rect x="760" y="220" width="300" height="180" rx="24" fill="#1e8449"/>
+  <path d="M440 310 H760" stroke="#1f1f1f" stroke-width="8" marker-end="url(#arrow)"/>
+  <defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#1f1f1f"/></marker></defs>
+  <text x="290" y="320" fill="#ffffff" font-family="Helvetica, Arial, sans-serif" font-size="40" text-anchor="middle">Upload</text>
+  <text x="910" y="320" fill="#ffffff" font-family="Geeza Pro, Arial, sans-serif" font-size="40" text-anchor="middle">جهازك</text>
+  <rect x="560" y="520" width="80" height="80" fill="#c0392b" transform="rotate(30 600 560)"/>
+  <text x="600" y="720" fill="#1f1f1f" font-family="Helvetica, Arial, sans-serif" font-size="28" text-anchor="middle">Synthetic test diagram</text>
+</svg>
+`,
+)
+
+// 5. A WebP with transparency (lossy colour, lossless alpha), made from the transparent PNG.
+execFileSync('cwebp', ['-quiet', '-q', '80', '-alpha_q', '100', testFilePath('logo-transparent.png'), '-o', testFilePath('logo-transparent.webp')])
+console.log('Wrote the extra photo test files (large GPS JPG, iPhone HEIC, transparent PNG, SVG, transparent WebP).')
 console.log('Wrote the PDF and photo test files.')
 
 // The PDF viewer's second sample: a bilingual Arabic and English guide drawn by Chrome, so the Arabic is shaped and the text can be
@@ -1080,6 +1248,47 @@ ${[['North', 280, '#2f6fd6'], ['South', 220, '#e8833a'], ['West', 250, '#3a9a5b'
 )
 console.log('Wrote the JPG to PDF samples landscape-photo.jpg and sales-chart.png.')
 
+// The image pages' samples, small enough to bundle: a phone photo with the made-up camera, date and GPS point above (JPG and
+// HEIC), a beach photo as HEIC, the landscape photo as WebP, a transparent badge (PNG and WebP) and two meme templates.
+const phonePhotoPngPath = join(tmpdir(), 'openanydoc-phone-photo.png')
+screenshotHtml(outdoorSceneHtml, 900, 675, phonePhotoPngPath)
+const phonePhotoJpgPath = new URL('phone-photo-gps.jpg', sampleDirectory).pathname
+execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', phonePhotoPngPath, '--out', phonePhotoJpgPath], { stdio: 'ignore' })
+writeFileSync(phonePhotoJpgPath, withExif(readFileSync(phonePhotoJpgPath), buildExifSegment(exifScene)))
+execFileSync('sips', ['-s', 'format', 'heic', '-s', 'formatOptions', '60', phonePhotoJpgPath, '--out', new URL('phone-photo.heic', sampleDirectory).pathname], { stdio: 'ignore' })
+rmSync(phonePhotoPngPath)
+const beachSceneHtml = `<!doctype html><body style="margin:0;height:100vh;overflow:hidden;background:linear-gradient(#f7a35c,#fbd38d 45%,#3d8fc4 45%,#2a6f9e 70%,#f1d9a8 70%)">
+<div style="position:absolute;left:44%;top:30%;width:12vw;height:12vw;border-radius:50%;background:radial-gradient(#fff3c4,#ff8c42)"></div>
+<div style="position:absolute;left:8%;top:62%;width:6%;height:30%;background:#6b4226;transform:rotate(-8deg)"></div>
+<div style="position:absolute;left:0;top:52%;width:22%;height:16%;border-radius:50%;background:#2e7d32"></div></body>`
+const beachPngPath = join(tmpdir(), 'openanydoc-beach.png')
+screenshotHtml(beachSceneHtml, 800, 600, beachPngPath)
+execFileSync('sips', ['-s', 'format', 'heic', '-s', 'formatOptions', '60', beachPngPath, '--out', new URL('beach-photo.heic', sampleDirectory).pathname], { stdio: 'ignore' })
+execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', beachPngPath, '--out', new URL('meme-beach.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
+rmSync(beachPngPath)
+const deskSceneHtml = `<!doctype html><body style="margin:0;height:100vh;overflow:hidden;background:linear-gradient(#dfe7ef,#c9d6e3 64%,#8d6e4f 64%,#6d5038)">
+<div style="position:absolute;left:30%;top:34%;width:40%;height:28%;background:#2b2f36;border-radius:10px;border:10px solid #4a505a"></div>
+<div style="position:absolute;left:26%;top:62%;width:48%;height:4%;background:#4a505a;border-radius:0 0 12px 12px"></div>
+<div style="position:absolute;left:78%;top:50%;width:7%;height:12%;background:#f4f4f4;border-radius:0 0 10px 10px"></div>
+<div style="position:absolute;left:10%;top:14%;width:16%;height:24%;background:#fff;border:8px solid #b08a5a"></div></body>`
+const deskPngPath = join(tmpdir(), 'openanydoc-desk.png')
+screenshotHtml(deskSceneHtml, 800, 600, deskPngPath)
+execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', deskPngPath, '--out', new URL('meme-desk.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
+rmSync(deskPngPath)
+const badgeSampleSize = 400
+writeFileSync(
+  new URL('badge-transparent.png', sampleDirectory),
+  encodePng(badgeSampleSize, badgeSampleSize, (x, y) => {
+    const distance = Math.hypot(x - badgeSampleSize / 2, y - badgeSampleSize / 2)
+    const alpha = Math.max(0, Math.min(1, badgeSampleSize * 0.42 - distance + 1))
+    const isInnerSquare = Math.abs(x - badgeSampleSize / 2) < badgeSampleSize * 0.16 && Math.abs(y - badgeSampleSize / 2) < badgeSampleSize * 0.16
+    return isInnerSquare ? [255, 255, 255, Math.round(alpha * 255)] : [214, 64, 159, Math.round(alpha * 235)]
+  }),
+)
+execFileSync('cwebp', ['-quiet', '-q', '80', '-alpha_q', '100', new URL('badge-transparent.png', sampleDirectory).pathname, '-o', new URL('badge-transparent.webp', sampleDirectory).pathname])
+execFileSync('cwebp', ['-quiet', '-q', '75', new URL('landscape-photo.jpg', sampleDirectory).pathname, '-o', new URL('landscape-photo.webp', sampleDirectory).pathname])
+console.log('Wrote the image page samples (phone photo JPG and HEIC, beach HEIC, landscape WebP, transparent badge PNG and WebP, two meme templates).')
+
 // The Extract images page's sample: a 2-page PDF holding the photo and the chart above as pictures.
 const picturesPdf = await PDFDocument.create()
 picturesPdf.setTitle('Photo report (synthetic sample)')
@@ -1098,14 +1307,14 @@ writeSampleFile('photo-report-2-pages.pdf', await picturesPdf.save())
 console.log('Wrote the Extract images sample photo-report-2-pages.pdf.')
 
 // The Fill PDF page's sample: a 2-page form with text fields, a drop-down, a checkbox and a radio group (made-up labels).
-const formPdf = await PDFDocument.create()
-formPdf.setTitle('Registration form (synthetic sample)')
-formPdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
-formPdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
-const formHeadingFont = await formPdf.embedFont(StandardFonts.HelveticaBold)
-const formBodyFont = await formPdf.embedFont(StandardFonts.Helvetica)
-const sampleForm = formPdf.getForm()
-const firstFormPage = formPdf.addPage([595, 842])
+const registrationFormPdf = await PDFDocument.create()
+registrationFormPdf.setTitle('Registration form (synthetic sample)')
+registrationFormPdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+registrationFormPdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+const formHeadingFont = await registrationFormPdf.embedFont(StandardFonts.HelveticaBold)
+const formBodyFont = await registrationFormPdf.embedFont(StandardFonts.Helvetica)
+const sampleForm = registrationFormPdf.getForm()
+const firstFormPage = registrationFormPdf.addPage([595, 842])
 firstFormPage.drawText('Workshop registration', { x: 60, y: 760, size: 22, font: formHeadingFont, color: rgb(0.1, 0.1, 0.15) })
 for (const [label, fieldName, y] of [['Full name', 'full_name', 690], ['Email', 'email', 640], ['Company', 'company', 590]]) {
   firstFormPage.drawText(label, { x: 60, y: y + 6, size: 12, font: formBodyFont })
@@ -1115,7 +1324,7 @@ firstFormPage.drawText('City', { x: 60, y: 546, size: 12, font: formBodyFont })
 const cityField = sampleForm.createDropdown('city')
 cityField.addOptions(['Riyadh', 'Jeddah', 'Dammam', 'Other'])
 cityField.addToPage(firstFormPage, { x: 180, y: 540, width: 160, height: 24 })
-const secondFormPage = formPdf.addPage([595, 842])
+const secondFormPage = registrationFormPdf.addPage([595, 842])
 secondFormPage.drawText('Session and consent', { x: 60, y: 760, size: 22, font: formHeadingFont, color: rgb(0.1, 0.1, 0.15) })
 const sessionField = sampleForm.createRadioGroup('session')
 for (const [label, value, y] of [['Morning session', 'morning', 700], ['Afternoon session', 'afternoon', 670]]) {
@@ -1125,7 +1334,7 @@ for (const [label, value, y] of [['Morning session', 'morning', 700], ['Afternoo
 const consentField = sampleForm.createCheckBox('newsletter')
 consentField.addToPage(secondFormPage, { x: 60, y: 620, width: 16, height: 16 })
 secondFormPage.drawText('Send me the workshop notes by email', { x: 86, y: 623, size: 12, font: formBodyFont })
-writeSampleFile('form-2-pages.pdf', await formPdf.save())
+writeSampleFile('form-2-pages.pdf', await registrationFormPdf.save())
 console.log('Wrote the Fill PDF sample form-2-pages.pdf.')
 
 // Fill PDF's second sample: a one-page feedback form (text box, rating drop-down, checkbox).
@@ -1145,9 +1354,9 @@ const ratingField = feedbackForm.createDropdown('rating')
 ratingField.addOptions(['Excellent', 'Good', 'Fair', 'Poor'])
 ratingField.addToPage(feedbackPage, { x: 180, y: 650, width: 160, height: 24 })
 feedbackPage.drawText('Comments', { x: 60, y: 606, size: 12, font: feedbackBodyFont })
-const commentsField = feedbackForm.createTextField('comments')
-commentsField.enableMultiline()
-commentsField.addToPage(feedbackPage, { x: 180, y: 500, width: 340, height: 120 })
+const feedbackCommentsField = feedbackForm.createTextField('comments')
+feedbackCommentsField.enableMultiline()
+feedbackCommentsField.addToPage(feedbackPage, { x: 180, y: 500, width: 340, height: 120 })
 feedbackForm.createCheckBox('contact_me').addToPage(feedbackPage, { x: 60, y: 460, width: 16, height: 16 })
 feedbackPage.drawText('You may contact me about this feedback', { x: 86, y: 463, size: 12, font: feedbackBodyFont })
 writeSampleFile('feedback-form.pdf', await feedbackPdf.save())

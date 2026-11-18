@@ -1,0 +1,75 @@
+{
+  "title": "Resize Image – Pixels, Percent & Passport Sizes, No Upload",
+  "description": "Resize pictures in your browser by pixels, by percent or to ready sizes for Instagram, WhatsApp and passport photos. Many at once, free, no upload.",
+  "heading": "Resize Images Online",
+  "subtitle": "Change a picture's size in pixels, by percent or to a ready size; nothing is uploaded.",
+  "intro": "Resize pictures to an exact width and height, by a percentage, or to a ready size: Instagram square, portrait and story, a WhatsApp profile photo, or common passport photo sizes at 300 dpi. Keep the aspect ratio on to avoid stretching; ready sizes fill the frame by trimming the edges evenly. Resizing uses the Lanczos filter for sharp results.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Ready sizes",
+      "text": "Instagram, WhatsApp and passport photo sizes in one list, filled without stretching."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to resize pictures",
+  "steps": [
+    {
+      "title": "Add your pictures",
+      "text": "Choose or drop one picture or many."
+    },
+    {
+      "title": "Choose the size",
+      "text": "Type a width and height, pick a percentage, or choose a ready size."
+    },
+    {
+      "title": "Resize and download",
+      "text": "Click Resize pictures and download the result, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What Resize image handles",
+  "handles": [
+    "Pixels: any width and height up to 16,384 px, with the aspect ratio kept or not.",
+    "Percent: from 5% to 200% of each picture's size.",
+    "Social: Instagram 1080 × 1080, 1080 × 1350 and 1080 × 1920; WhatsApp 500 × 500.",
+    "Passport photos at 300 dpi: US 2 × 2 in, UK and EU 35 × 45 mm, Saudi Arabia 4 × 6 cm, India 35 × 45 mm."
+  ],
+  "limits": [
+    "Passport sizes are common sizes, not official checks: confirm the issuing office's current rules for background, head size and print.",
+    "Making a picture larger can't add detail it never had.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Resize image: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will my picture be stretched?",
+      "answer": "Not with Keep aspect ratio on. Ready sizes fill the frame and trim the edges evenly instead of stretching."
+    },
+    {
+      "question": "Which passport photo sizes are included?",
+      "answer": "US 2 × 2 inches, UK and EU 35 × 45 mm, Saudi Arabia 4 × 6 cm and India 35 × 45 mm, all at 300 dpi. Check the issuing office's rules before you print."
+    },
+    {
+      "question": "Can I resize many pictures to the same size?",
+      "answer": "Yes. Add them all; each one gets the same size and they download together as a ZIP."
+    },
+    {
+      "question": "Does resizing keep the format?",
+      "answer": "Yes by default. You can also choose JPG, PNG, WebP or AVIF for every picture."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

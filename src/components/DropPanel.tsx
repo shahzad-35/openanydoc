@@ -18,6 +18,7 @@ const LOOKS_LIKE_MESSAGES: Record<Viewer['id'], MessageKey> = {
   word: 'redirect.looksLike.word',
   pdf: 'redirect.looksLike.pdf',
   powerpoint: 'redirect.looksLike.powerpoint',
+  image: 'redirect.looksLike.image',
 }
 
 // One class per pill position (written out in full so Tailwind finds them). Each --ext-pill-N is pointed at a hue in the session's

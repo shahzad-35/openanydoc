@@ -1,0 +1,71 @@
+{
+  "title": "Watermark Image – Add Text or Logo to Photos, No Upload",
+  "description": "Add a text or logo watermark to pictures in your browser, with size, opacity, angle and position, or tiled across. Many at once, and nothing is uploaded.",
+  "heading": "Add a Watermark to Images",
+  "subtitle": "Put your name or logo on pictures, once or tiled across; nothing is uploaded.",
+  "intro": "Protect photos before you share them with a text or logo watermark. Type your name or pick a logo (a PNG with transparency works best), then set its size, opacity, angle and one of nine positions, or tile it across the whole picture. The preview shows the first picture, and every picture gets the watermark at the same relative size and place.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Text or logo",
+      "text": "Your name, a copyright line or your logo, in any of nine positions or tiled across."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to watermark pictures",
+  "steps": [
+    {
+      "title": "Add your pictures",
+      "text": "Choose or drop one picture or many."
+    },
+    {
+      "title": "Design the watermark",
+      "text": "Type the text or choose a logo, then set size, opacity, angle and position."
+    },
+    {
+      "title": "Add and download",
+      "text": "Click Add watermark and download the result, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What Watermark image handles",
+  "handles": [
+    "Text: any words, Arabic included, in white, grey, black or red.",
+    "Logo: a PNG, JPG, WebP or SVG picture, transparent parts kept.",
+    "Placement: nine positions or tiled, with opacity and an angle of 0, 45, 90 or -45 degrees.",
+    "Batch: the same watermark at the same relative size on every picture."
+  ],
+  "limits": [
+    "A watermark discourages copying but can't stop it: anyone can crop or paint over it.",
+    "The watermark is part of the pixels and can't be removed from the saved picture later; keep your originals.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Watermark image: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can I use my logo as a watermark?",
+      "answer": "Yes. Choose Logo and pick the file; a PNG with a transparent background looks best. Lower the opacity so the photo still shows through."
+    },
+    {
+      "question": "Can I write the watermark in Arabic?",
+      "answer": "Yes. Arabic text is drawn joined and right to left, with the site's Arabic font."
+    },
+    {
+      "question": "Does the watermark fit pictures of different sizes?",
+      "answer": "Yes. Its size is a share of each picture's width, so it looks the same on a small and a large photo."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "title": "SVG to PNG – Convert SVG Graphics at Any Size, No Upload",
+  "description": "Convert SVG logos, icons and drawings to PNG in your browser at 1000, 2000 or 4000 px, with transparency kept. Many at once, free, and nothing is uploaded.",
+  "heading": "Convert SVG to PNG",
+  "subtitle": "Turn SVG drawings into sharp PNG pictures at the size you need; nothing is uploaded.",
+  "intro": "SVG logos and icons stay sharp at any size, but many apps, slides and social sites only accept pictures. Convert them to PNG at 1000, 2000 or 4000 pixels on the long side, with the transparent background kept. Your browser draws each SVG, so the result matches what you see on the page.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Sharp at any size",
+      "text": "Pick 1000, 2000 or 4000 px; the drawing is rendered at that size, not stretched."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert SVG to PNG",
+  "steps": [
+    {
+      "title": "Add your SVG files",
+      "text": "Choose or drop one or many .svg files."
+    },
+    {
+      "title": "Choose the size",
+      "text": "Pick the long side in pixels: 1000, 2000 or 4000."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert and download the PNG, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What SVG to PNG handles",
+  "handles": [
+    "Files: SVG logos, icons, charts and drawings.",
+    "Size: 1000, 2000 or 4000 px on the long side, the shape kept.",
+    "Transparency: kept in the PNG.",
+    "Batch: many drawings in one ZIP."
+  ],
+  "limits": [
+    "Fonts the SVG names but doesn't include are drawn with a fallback font.",
+    "Pictures the SVG loads from other websites are not drawn.",
+    "Scripts and animation inside an SVG are not run; you get one still picture."
+  ],
+  "faqTitle": "SVG to PNG: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "What size should I choose?",
+      "answer": "2000 px suits slides and documents; 4000 px suits print and large screens. Logos for the web rarely need more than 1000 px."
+    },
+    {
+      "question": "Is the background transparent?",
+      "answer": "Yes, where the SVG has no background. Convert to JPG in the image converter if you need white.",
+      "link": {
+        "text": "image converter",
+        "path": "/convert-image"
+      }
+    },
+    {
+      "question": "Why does my text look different?",
+      "answer": "If the SVG uses a font that isn't inside the file or on your device, the browser draws a similar one. Turn text into outlines in your design app to keep it exact."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -1,11 +1,29 @@
 // The "Try a sample file" buttons of the tool pages: two small synthetic files per page (made-up names, example.com addresses, a
-// published example IBAN, test card numbers). Text samples are written here; the binary ones (xlsx, xls, docx, pptx, pdf, jpg, png) are files in
+// published example IBAN, test card numbers). Text samples are written here; the binary ones (xlsx, xls, docx, pptx, pdf, jpg, png, heic, webp) are files in
 // this folder made by scripts/generate-test-files.mjs and bundled as data, so a sample opens with no network request.
 // This module is loaded on demand (and while the page is idle, so samples also open offline).
 import { SAMPLE_JSON_TEXT } from '../formats/json/jsonTools'
 
 // `preloadBundledFile`: fetches a bundled (binary) sample's data ahead, so it opens offline; text samples need nothing.
 export type ToolSample = { id: string; buildFile: () => Promise<File>; preloadBundledFile?: () => Promise<unknown> }
+
+const DIAGRAM_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400" viewBox="0 0 600 400">
+  <rect width="600" height="400" fill="#f4f7ff"/>
+  <rect x="60" y="120" width="180" height="110" rx="18" fill="#2f5fd0"/>
+  <rect x="360" y="120" width="180" height="110" rx="18" fill="#1e8449"/>
+  <path d="M240 175 H350" stroke="#1f1f1f" stroke-width="6"/>
+  <path d="M350 165 L364 175 L350 185 Z" fill="#1f1f1f"/>
+  <text x="150" y="183" fill="#fff" font-family="Arial, sans-serif" font-size="26" text-anchor="middle">Your file</text>
+  <text x="450" y="183" fill="#fff" font-family="Arial, sans-serif" font-size="26" text-anchor="middle">Your device</text>
+  <text x="300" y="320" fill="#1f1f1f" font-family="Arial, sans-serif" font-size="20" text-anchor="middle">Synthetic sample diagram</text>
+</svg>
+`
+const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 24 24" fill="none" stroke="#d6409f" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+  <rect x="3" y="3" width="18" height="18" rx="4"/>
+  <path d="M6.5 16.5l3.5-4.5 2.5 3 2-2.5 3 4"/>
+  <circle cx="15" cy="8.5" r="1.5"/>
+</svg>
+`
 
 const textFile = (fileName: string, text: string, type: string) => async () => new File([text], fileName, { type })
 // A bundled file arrives as a data: address (Vite's ?inline); its bytes are decoded here, not fetched.
@@ -150,6 +168,16 @@ const samples = {
   photoReportPdf: bundledSample('photo-report-pdf', 'photo-report-2-pages.pdf', 'application/pdf', () => import('./photo-report-2-pages.pdf?inline')),
   formPdf: bundledSample('form-pdf', 'form-2-pages.pdf', 'application/pdf', () => import('./form-2-pages.pdf?inline')),
   feedbackFormPdf: bundledSample('feedback-form-pdf', 'feedback-form.pdf', 'application/pdf', () => import('./feedback-form.pdf?inline')),
+  phonePhotoJpg: bundledSample('phone-photo-jpg', 'phone-photo-gps.jpg', 'image/jpeg', () => import('./phone-photo-gps.jpg?inline')),
+  phonePhotoHeic: bundledSample('phone-photo-heic', 'phone-photo.heic', 'image/heic', () => import('./phone-photo.heic?inline')),
+  beachHeic: bundledSample('beach-heic', 'beach-photo.heic', 'image/heic', () => import('./beach-photo.heic?inline')),
+  photoWebp: bundledSample('photo-webp', 'landscape-photo.webp', 'image/webp', () => import('./landscape-photo.webp?inline')),
+  badgePng: bundledSample('badge-png', 'badge-transparent.png', 'image/png', () => import('./badge-transparent.png?inline')),
+  badgeWebp: bundledSample('badge-webp', 'badge-transparent.webp', 'image/webp', () => import('./badge-transparent.webp?inline')),
+  memeDesk: bundledSample('meme-desk', 'meme-desk.jpg', 'image/jpeg', () => import('./meme-desk.jpg?inline')),
+  memeBeach: bundledSample('meme-beach', 'meme-beach.jpg', 'image/jpeg', () => import('./meme-beach.jpg?inline')),
+  diagramSvg: { id: 'diagram-svg', buildFile: textFile('diagram.svg', DIAGRAM_SVG, 'image/svg+xml') },
+  iconSvg: { id: 'icon-svg', buildFile: textFile('picture-icon.svg', ICON_SVG, 'image/svg+xml') },
 } satisfies Record<string, ToolSample>
 
 // The two samples of each tool page, by its address without the language. Each file has an extension the page accepts.
@@ -189,6 +217,22 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/fill-pdf': [samples.formPdf, samples.feedbackFormPdf],
   '/watermark-pdf': [samples.reportPdf, samples.guidePdf],
   '/header-footer-pdf': [samples.reportPdf, samples.guidePdf],
+  '/image-viewer': [samples.phonePhotoJpg, samples.phonePhotoHeic],
+  '/compress-image': [samples.photoJpg, samples.chartPng],
+  '/resize-image': [samples.phonePhotoJpg, samples.chartPng],
+  '/crop-image': [samples.phonePhotoJpg, samples.badgePng],
+  '/rotate-image': [samples.photoJpg, samples.chartPng],
+  '/watermark-image': [samples.photoJpg, samples.phonePhotoJpg],
+  '/remove-image-metadata': [samples.phonePhotoJpg, samples.phonePhotoHeic],
+  '/photo-editor': [samples.photoJpg, samples.phonePhotoJpg],
+  '/convert-image': [samples.phonePhotoHeic, samples.badgePng],
+  '/heic-to-jpg': [samples.phonePhotoHeic, samples.beachHeic],
+  '/webp-to-jpg': [samples.photoWebp, samples.badgeWebp],
+  '/png-to-jpg': [samples.chartPng, samples.badgePng],
+  '/jpg-to-png': [samples.photoJpg, samples.phonePhotoJpg],
+  '/svg-to-png': [samples.diagramSvg, samples.iconSvg],
+  '/image-to-webp': [samples.photoJpg, samples.badgePng],
+  '/meme-generator': [samples.memeDesk, samples.memeBeach],
 }
 
 // Fetches a page's bundled samples while the page is idle, so they open with no network later.

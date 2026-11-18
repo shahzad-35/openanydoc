@@ -27,8 +27,8 @@ export const ALL_PROFILE_URLS = [REPOSITORY_URL, ...SOCIAL_PROFILES.map((profile
 export const X_HANDLE = '@openanydoc'
 // The one sentence that says what OpenAnyDoc is, wherever the brand is described as data (Organization, WebSite, llms.txt, README).
 export const SITE_DESCRIPTION: Record<'en' | 'ar', string> = {
-  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, a viewer for Word, PowerPoint and PDF files, and a set of PDF tools, that runs in your browser: files are never uploaded.',
-  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT، وعارض لملفات Word وPowerPoint وPDF، ومجموعة أدوات PDF، يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
+  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, a viewer for Word, PowerPoint, PDF and image files, and a set of PDF and image tools, that runs in your browser: files are never uploaded.',
+  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT، وعارض لملفات Word وPowerPoint وPDF والصور، ومجموعة أدوات PDF والصور، يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
 }
 
 type Locale = 'en' | 'ar'
@@ -168,6 +168,18 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
         'Every PDF tool here runs on your own device. Your browser reads the PDF, changes it and hands you a new file; nothing is sent to a server, so contracts, invoices and forms stay private, and the tools keep working offline once the page has loaded.',
         'To change which pages a PDF has, use Merge, Split, Remove pages, Extract pages or Organize. To change what is on the pages, use Edit PDF for text boxes, highlights, drawings and shapes, Sign PDF for a drawn, typed or uploaded signature, Fill PDF form for form fields, and Watermark, Header and footer or Add page numbers for text on every page. To change the format, turn pictures into a PDF with JPG to PDF, or a PDF into pictures, text or its embedded images.',
         'Each tool shows a preview before you download, and its next steps pass the result to another tool in memory, so you can merge, number and sign a PDF in one visit.',
+      ],
+    },
+    '/image-tools': {
+      title: 'Image Tools Online – Compress, Resize, Convert, No Upload',
+      description: 'Free image tools in your browser: compress, resize, crop, rotate and watermark pictures, convert HEIC to JPG, remove GPS data and make memes. Nothing uploaded.',
+      heading: 'Image tools',
+      intro: 'Free picture tools that work on your own device: make photos smaller, resize them for Instagram, WhatsApp or a passport, crop, rotate and watermark them, convert HEIC, WebP, PNG and SVG, remove the GPS location, and edit photos or make memes, many pictures at once.',
+      linkText: 'Image tools',
+      body: [
+        'Every image tool here runs on your own device. Your browser reads the pictures, a background worker changes them, and you download the result; nothing is sent to a server, so family photos, ID pictures and screenshots stay private, and the tools keep working offline once the page has loaded.',
+        'To make pictures smaller, use Compress image or convert them to WebP. To change their shape, use Resize, Crop or Rotate. To change their format, use the image converter or one of the pages for a single pair, such as HEIC to JPG for iPhone photos. To protect them, add a watermark, or remove the camera, date and GPS location before you share them.',
+        'Most tools take many pictures at once and hand you one ZIP file. JPG to PDF puts pictures into a PDF, and PDF to JPG turns PDF pages back into pictures.',
       ],
     },
     '/data-tools': {
@@ -329,6 +341,18 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
         'تعمل كل أدوات PDF هنا على جهازك. يقرأ متصفحك ملف PDF ويعدّله ويعطيك ملفًا جديدًا، ولا يُرسل شيء إلى خادم، فتبقى العقود والفواتير والنماذج خاصة، وتواصل الأدوات العمل دون اتصال بعد تحميل الصفحة.',
         'لتغيير صفحات الملف استخدم الدمج أو التقسيم أو حذف الصفحات أو استخراجها أو ترتيبها. ولتغيير ما على الصفحات استخدم «تعديل PDF» لمربعات النص والتظليل والرسم والأشكال، و«توقيع PDF» لتوقيع مرسوم أو مكتوب أو مرفوع، و«تعبئة نموذج PDF» لحقول النماذج، والعلامة المائية والرأس والتذييل وترقيم الصفحات للنص على كل صفحة. ولتغيير الصيغة حوّل الصور إلى PDF، أو PDF إلى صور أو نص أو استخرج صوره.',
         'تعرض كل أداة معاينة قبل التنزيل، وتمرر خطواتها التالية النتيجة إلى أداة أخرى في الذاكرة، فيمكنك دمج ملف وترقيمه وتوقيعه في زيارة واحدة.',
+      ],
+    },
+    '/image-tools': {
+      title: 'أدوات الصور – ضغط وتغيير حجم وتحويل الصور دون رفع',
+      description: 'أدوات صور مجانية في متصفحك: اضغط الصور وغيّر حجمها وقصّها ودوّرها وأضف علامة مائية، وحوّل HEIC إلى JPG، وأزل بيانات GPS، واصنع الميمز. لا يُرفع أي ملف.',
+      heading: 'أدوات الصور',
+      intro: 'أدوات صور مجانية تعمل على جهازك: صغّر حجم الصور، وغيّر مقاسها لإنستغرام أو واتساب أو الجواز، وقصّها ودوّرها وأضف إليها علامة مائية، وحوّل HEIC وWebP وPNG وSVG، وأزل موقع GPS، وعدّل الصور أو اصنع الميمز، لعدة صور معًا.',
+      linkText: 'أدوات الصور',
+      body: [
+        'تعمل كل أدوات الصور هنا على جهازك. يقرأ متصفحك الصور، ويعدّلها عامل في الخلفية، ثم تنزّل النتيجة؛ ولا يُرسل شيء إلى خادم، فتبقى صور العائلة وصور الهوية ولقطات الشاشة خاصة، وتواصل الأدوات العمل دون اتصال بعد تحميل الصفحة.',
+        'لتصغير حجم الصور استخدم ضغط الصور أو حوّلها إلى WebP. ولتغيير شكلها استخدم تغيير الحجم أو القص أو التدوير. ولتغيير صيغتها استخدم محوّل الصور أو إحدى صفحات التحويل المخصصة، مثل HEIC إلى JPG لصور الآيفون. ولحمايتها أضف علامة مائية، أو أزل بيانات الكاميرا والتاريخ وموقع GPS قبل مشاركتها.',
+        'تقبل معظم الأدوات عدة صور معًا وتعطيك ملف ZIP واحدًا. ويضع «JPG إلى PDF» الصور في ملف PDF، ويحوّل «PDF إلى JPG» صفحات PDF إلى صور.',
       ],
     },
     '/data-tools': {

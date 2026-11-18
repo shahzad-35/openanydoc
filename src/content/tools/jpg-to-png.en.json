@@ -1,0 +1,75 @@
+{
+  "title": "JPG to PNG – Convert JPG Images to PNG Free, No Upload",
+  "description": "Convert JPG photos to PNG in your browser, so further edits don't lose quality, or to meet a form that asks for PNG. Many at once, free, nothing uploaded.",
+  "heading": "Convert JPG to PNG",
+  "subtitle": "Save JPG pictures as PNG for editing or for forms that ask for it; nothing is uploaded.",
+  "intro": "Convert JPG photos to PNG when a form, an app or a print shop asks for PNG, or before you edit a picture several times, because PNG saves without losing more detail each time. Phone photos are turned upright first, and you can add as many pictures as you like and download them as one ZIP.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "No further loss",
+      "text": "PNG stores every pixel exactly, so later edits don't wear the picture down."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert JPG to PNG",
+  "steps": [
+    {
+      "title": "Add your JPG pictures",
+      "text": "Choose or drop the .jpg or .jpeg files."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert; there is no quality to choose because PNG keeps every pixel."
+    },
+    {
+      "title": "Download",
+      "text": "Download the PNG, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What JPG to PNG handles",
+  "handles": [
+    "Files: .jpg and .jpeg photos and pictures.",
+    "Phone photos: turned upright from their orientation tag.",
+    "Output: lossless PNG at full size.",
+    "Batch: many pictures in one ZIP."
+  ],
+  "limits": [
+    "PNG files of photos are much larger than the JPG they came from.",
+    "Converting can't remove the blur or blocks a JPG already has, and it doesn't make the background transparent.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "JPG to PNG: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will converting to PNG improve quality?",
+      "answer": "No. It keeps the picture exactly as the JPG shows it, and stops any further loss from now on."
+    },
+    {
+      "question": "Will the background become transparent?",
+      "answer": "No. A JPG has no transparency to keep; crop it into a circle if you need a transparent outside.",
+      "link": {
+        "text": "crop it into a circle",
+        "path": "/crop-image"
+      }
+    },
+    {
+      "question": "Why is the PNG so much bigger?",
+      "answer": "PNG stores every pixel without loss, while JPG throws away detail you rarely see. For photos that makes PNG several times larger."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

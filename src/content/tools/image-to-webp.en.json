@@ -1,0 +1,75 @@
+{
+  "title": "Convert Images to WebP – Smaller Pictures, No Upload",
+  "description": "Convert JPG, PNG, HEIC and other pictures to WebP in your browser for smaller, faster web pages, with a quality slider. Many at once, nothing uploaded.",
+  "heading": "Convert Images to WebP",
+  "subtitle": "Make pictures for your website smaller with WebP; nothing is uploaded.",
+  "intro": "WebP pictures are usually 25–35% smaller than JPG at the same look, and keep transparency like PNG, so pages load faster. Convert your JPG, PNG, HEIC, TIFF or SVG pictures to WebP with the libwebp encoder, choose the quality, and download one file or a ZIP ready to upload to your site.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Smaller pages",
+      "text": "WebP is supported by every current browser and is usually much smaller than JPG and PNG."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert pictures to WebP",
+  "steps": [
+    {
+      "title": "Add your pictures",
+      "text": "Choose or drop one picture or many."
+    },
+    {
+      "title": "Pick the quality",
+      "text": "75 to 85 is a good range for photos on a website."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert and download the WebP, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What Image to WebP handles",
+  "handles": [
+    "From: JPG, PNG, AVIF, GIF, BMP, TIFF, SVG and HEIC.",
+    "Encoder: libwebp, the reference encoder.",
+    "Transparency: kept.",
+    "Batch: a whole folder of site pictures in one ZIP."
+  ],
+  "limits": [
+    "Animated GIFs become a still WebP of their first frame.",
+    "Some older email apps and desktop programs still can't open WebP; keep JPG copies for those.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Image to WebP: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Do all browsers show WebP?",
+      "answer": "Yes. Chrome, Edge, Firefox and Safari all show WebP pictures."
+    },
+    {
+      "question": "Is WebP better than AVIF?",
+      "answer": "AVIF is often smaller still but slower to make. Both are in the image converter if you want to compare.",
+      "link": {
+        "text": "image converter",
+        "path": "/convert-image"
+      }
+    },
+    {
+      "question": "Does WebP keep transparency?",
+      "answer": "Yes. Transparent PNG logos stay transparent as WebP."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

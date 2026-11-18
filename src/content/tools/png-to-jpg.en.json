@@ -1,0 +1,75 @@
+{
+  "title": "PNG to JPG – Convert & Shrink PNG Images, No Upload",
+  "description": "Convert PNG pictures and screenshots to smaller JPG files in your browser, with a quality slider and white behind transparency. Free, with no upload.",
+  "heading": "Convert PNG to JPG",
+  "subtitle": "Turn large PNG pictures into smaller JPG files; nothing is uploaded.",
+  "intro": "PNG photos and screenshots can be several times larger than they need to be. Converting them to JPG usually makes them much smaller, which helps when an email, form or website limits the file size. Choose the quality, add as many as you like, and transparent parts are filled with white.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Much smaller files",
+      "text": "Photos saved as PNG often shrink by 70–90% as JPG."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert PNG to JPG",
+  "steps": [
+    {
+      "title": "Add your PNG pictures",
+      "text": "Choose or drop the .png files."
+    },
+    {
+      "title": "Pick the quality",
+      "text": "80 to 90 for photos; higher for screenshots with text."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert and download the JPG, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What PNG to JPG handles",
+  "handles": [
+    "Files: PNG pictures of any size your device can open.",
+    "Transparency: filled with white, because JPG has none.",
+    "Output: JPG with MozJPEG at the quality you choose.",
+    "Batch: many pictures in one ZIP."
+  ],
+  "limits": [
+    "Screenshots with small text can show soft edges in JPG; keep them as PNG or use a quality of 90 or more.",
+    "Transparent parts become white.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "PNG to JPG: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Why is my PNG so large?",
+      "answer": "PNG stores every pixel without loss, which is ideal for graphics but heavy for photos. JPG is designed for photos and is much smaller."
+    },
+    {
+      "question": "When should I keep PNG?",
+      "answer": "For logos, icons, screenshots with text and anything that needs a transparent background. To shrink those, use Compress image instead.",
+      "link": {
+        "text": "Compress image",
+        "path": "/compress-image"
+      }
+    },
+    {
+      "question": "Will my picture lose quality?",
+      "answer": "JPG drops some detail you rarely notice in photos. At quality 90 the difference is very hard to see."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

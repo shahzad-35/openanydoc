@@ -48,6 +48,7 @@
   --docx: #3d7cf2; --docx-base: #1f4fae; --docx-ink: #ffffff;
   --pptx: #f0643a; --pptx-base: #b03d16; --pptx-ink: #ffffff;
   --pdf: #e5484d; --pdf-base: #a1242a; --pdf-ink: #ffffff;
+  --image: #d6409f; --image-base: #932a6c; --image-ink: #ffffff;
   --yellow: #ffd84d; --yellow-base: #d9a900; --yellow-glow: rgba(217, 169, 0, 0.55); --yellow-ink: #2a2100;
   --warn: #ffb020; --warn-base: #c27c00; --warn-ink: #2a1d00; --warn-bg: #fff8ec;
   --ok: #2ead60; --ok-base: #19733d;
@@ -62,6 +63,7 @@
   --type-word: #2459b5;
   --type-pdf: #b0214f;
   --type-powerpoint: #c2441a;
+  --type-image: #a8287a;
 
   /* Ten hues for the extension pills in the "Choose a file" box. Pill N is painted with --ext-pill-N, which public/theme-init.js
      points at one of the hues in the order shuffled for this browser session, before the first paint. */
@@ -130,6 +132,7 @@ html[lang="ar"] {
   --type-word: #7fb0ff;
   --type-pdf: #ff7a9f;
   --type-powerpoint: #ff8f66;
+  --type-image: #f28ad0;
 
   --ext-1: #ff8f66;
   --ext-2: #f2b04c;
@@ -170,6 +173,10 @@ html[lang="ar"] {
 
 [data-file-type="powerpoint"] {
   --file-color: var(--type-powerpoint);
+}
+
+[data-file-type="image"] {
+  --file-color: var(--type-image);
 }
 
 @theme inline {
@@ -556,6 +563,7 @@ html[lang="ar"] .type-h2 {
 .nav-icon-convert { background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect x=%222%22 y=%224%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23d9a900%22/%3E%3Crect x=%222%22 y=%221.5%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23ffd84d%22/%3E%3Cg fill=%22none%22 stroke=%22%232a2100%22 stroke-width=%221.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 transform=%22translate%280 -1%29%22%3E%3Cpath d=%22M7 9.5h10l-3-3M17 14.5H7l3 3%22/%3E%3C/g%3E%3C/svg%3E"); }
 .nav-icon-guide { background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect x=%222%22 y=%224%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23c3cad8%22/%3E%3Crect x=%222%22 y=%221.5%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23e7ebf3%22/%3E%3Cg fill=%22none%22 stroke=%22%231f2433%22 stroke-width=%221.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 transform=%22translate%280 -1%29%22%3E%3Cpath d=%22M8 7.5h5.5a2.5 2.5 0 0 1 2.5 2.5v6.5H10.5A2.5 2.5 0 0 1 8 14z%22/%3E%3C/g%3E%3C/svg%3E"); }
 .nav-icon-pdf { background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect x=%222%22 y=%224%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23b42323%22/%3E%3Crect x=%222%22 y=%221.5%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23ff5c5c%22/%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%221.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 transform=%22translate%280 -1%29%22%3E%3Cpath d=%22M8 16.5V7.5h3a2.5 2.5 0 0 1 0 5H8M14.5 16.5v-9H17M14.5 12H16.5%22/%3E%3C/g%3E%3C/svg%3E"); }
+.nav-icon-image { background-image: url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect x=%222%22 y=%224%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23932a6c%22/%3E%3Crect x=%222%22 y=%221.5%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23d6409f%22/%3E%3Cg fill=%22none%22 stroke=%22%23ffffff%22 stroke-width=%221.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 transform=%22translate%280 -1%29%22%3E%3Cpath d=%22M6.5 16.5l3.5-4.5 2.5 3 2-2.5 3 4M14.5 9.5h.01%22/%3E%3C/g%3E%3C/svg%3E"); }
 .nav-icon-mask { background-image:url("data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 24 24%22%3E%3Crect x=%222%22 y=%224%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23c3cad8%22/%3E%3Crect x=%222%22 y=%221.5%22 width=%2220%22 height=%2219%22 rx=%225.5%22 fill=%22%23e7ebf3%22/%3E%3Cg fill=%22none%22 stroke=%22%231f2433%22 stroke-width=%221.8%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22 transform=%22translate%280 -1%29%22%3E%3Cpath d=%22M5.5 10c2-2 11-2 13 0 .6 2.6-.7 5-3 5-1.6 0-2-1.5-3.5-1.5S10.1 15 8.5 15c-2.3 0-3.6-2.4-3-5z%22/%3E%3C/g%3E%3C/svg%3E"); }
 
 /* Extension chips (.csv, .xlsx ...). */
@@ -963,6 +971,26 @@ button.pdf-grid-card { cursor: pointer; }
 .tool-progress { width: 100%; height: 10px; accent-color: var(--color-accent); }
 .stamp-preview { display: block; width: 300px; max-width: 100%; height: auto; margin-inline: auto; background: #fff; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25), 0 8px 24px -12px rgba(16, 24, 40, 0.3); }
 @media (prefers-reduced-motion: reduce) { .pdf-grid-canvas, .pdf-grid-image { transition: none; } }
+/* Image tools (src/tools/image/): before/after slider, crop box, rotate preview and canvas previews. Pictures stay left to right. */
+.image-tool-preview { display: block; max-width: 100%; max-height: 70vh; width: auto; height: auto; margin-inline: auto; background: #fff; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25), 0 8px 24px -12px rgba(16, 24, 40, 0.3); }
+#crop-image-tool [aria-pressed="true"], #rotate-image-tool [aria-pressed="true"] { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }
+.before-after { position: relative; width: fit-content; max-width: 100%; margin-inline: auto; overflow: hidden; border-radius: 12px; cursor: ew-resize; touch-action: none; user-select: none; box-shadow: 0 1px 3px rgba(16, 24, 40, 0.25); }
+.before-after-picture { display: block; max-width: 100%; max-height: 60vh; width: auto; height: auto; }
+.before-after-after { position: absolute; inset: 0; }
+.before-after-after .before-after-picture { width: 100%; height: 100%; max-height: none; }
+.before-after-line { position: absolute; top: 0; bottom: 0; width: 3px; margin-inline-start: -1.5px; background: #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.35); pointer-events: none; }
+.before-after-tag { position: absolute; top: 8px; padding: 2px 8px; border-radius: 999px; background: rgba(0, 0, 0, 0.6); color: #fff; font-size: 12px; font-weight: 600; pointer-events: none; }
+.before-after-tag-before { left: 8px; }
+.before-after-tag-after { right: 8px; }
+.crop-frame { position: relative; width: fit-content; max-width: 100%; overflow: hidden; touch-action: none; user-select: none; }
+.crop-picture { display: block; max-width: 100%; max-height: 65vh; width: auto; height: auto; }
+.crop-box { position: absolute; cursor: move; outline: 2px solid #fff; box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.5), 0 0 0 9999px rgba(0, 0, 0, 0.5); }
+.crop-box.is-circle { border-radius: 50%; }
+.crop-handle { position: absolute; right: 2px; bottom: 2px; width: 24px; height: 24px; border: 2px solid #1f1f1f; border-radius: 50%; background: #fff; cursor: nwse-resize; }
+.crop-handle::before { content: ""; position: absolute; inset: -10px; }
+.rotate-preview { display: grid; place-items: center; width: min(320px, 100%); aspect-ratio: 1; margin-inline: auto; overflow: hidden; border-radius: 12px; background: color-mix(in srgb, var(--color-ink) 6%, var(--color-paper)); }
+.rotate-preview-picture { max-width: 70%; max-height: 70%; transition: transform 0.2s ease; }
+@media (prefers-reduced-motion: reduce) { .rotate-preview-picture { transition: none; } }
 /* PDF editing tools (src/tools/pdf/PdfEditTools.tsx): pdf.js's pages in a scroll box, with our layer of shapes and pictures. */
 .pdf-editor-toolbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 8px; }
 .pdf-editor-toolbar [aria-pressed="true"] { background: color-mix(in srgb, var(--color-accent) 22%, transparent); }

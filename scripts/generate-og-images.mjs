@@ -54,7 +54,8 @@ function renderCard(locale, address) {
   const iconImage = iconTool && iconImages[findToolIcon(iconTool)]
   const extensionChips = iconTool
     ? [...new Set(liveTools.filter((tool) => (hub ? tool.category === hub.category : tool === iconTool)).flatMap((tool) => tool.inputFormats))].slice(0, 4).map((extension) => `<span class="chip" style="background:${palette.ink}">${extension}</span>`)
-    : shownViewers.flatMap((shown) => shown.extensions.map((extension) => `<span class="chip" style="background:${palette[`type-${shown.id}`]}">${extension}</span>`))
+    : shownViewers.flatMap((shown) => shown.extensions.slice(0, viewer ? undefined : 2).map((extension) => `<span class="chip" style="background:${palette[`type-${shown.id}`]}">${extension}</span>`))
+  // The home card shows every format, so it keeps two extensions each to fit above the band.
   // The chip row is left to right, so in Arabic the label goes last to be read first.
   const labelChips = iconTool ? [`<span class="chip chip--label" style="background:${palette.accent}">${noUploadLabels[locale]}</span>`] : []
   const chips = (locale === 'ar' ? [...extensionChips, ...labelChips] : [...labelChips, ...extensionChips]).join('')

@@ -1,0 +1,71 @@
+{
+  "title": "Rotate Image – Turn & Flip Pictures Free, No Upload",
+  "description": "Rotate pictures 90 degrees left or right, turn them upside down, or flip them as a mirror image, right in your browser. Many at once, with no upload.",
+  "heading": "Rotate and Flip Images Online",
+  "subtitle": "Turn pictures left, right or upside down, or mirror them; nothing is uploaded.",
+  "intro": "Rotate a picture that came out sideways, or flip a selfie that is mirrored. Turn it 90 degrees left or right or 180 degrees, flip it horizontally or vertically, and see the result in the preview before you save. Photos that a phone stored sideways with an orientation tag are drawn upright first, so the new file looks the same in every app.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Upright everywhere",
+      "text": "The turn is saved in the pixels, so the picture looks the same in every app and website."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to rotate a picture",
+  "steps": [
+    {
+      "title": "Add your pictures",
+      "text": "Choose or drop one picture or many."
+    },
+    {
+      "title": "Turn or flip",
+      "text": "Rotate left or right, turn upside down, or flip, and watch the preview."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Save pictures and download the result, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What Rotate image handles",
+  "handles": [
+    "Turns: 90 degrees left, 90 degrees right and 180 degrees, as many times as you like.",
+    "Flips: horizontal (mirror) and vertical.",
+    "Phone photos: the EXIF orientation is applied first, then removed, so nothing turns twice.",
+    "Formats: each picture keeps its format; HEIC and TIFF are saved as JPG, and SVG, GIF and BMP as PNG."
+  ],
+  "limits": [
+    "Pictures turn in steps of 90 degrees; there is no free angle.",
+    "JPG pictures are saved again, so choose a high quality to keep them sharp.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Rotate image: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Why is my photo sideways on some websites?",
+      "answer": "Phones often save the photo sideways with a tag saying how to turn it, and some apps ignore that tag. The saved picture here is turned in its pixels, so it is upright everywhere."
+    },
+    {
+      "question": "How do I un-mirror a selfie?",
+      "answer": "Click Flip horizontally and save. The text and faces read the right way round."
+    },
+    {
+      "question": "Does rotating lower the quality?",
+      "answer": "PNG keeps every pixel. JPG, WebP and AVIF are saved again at the quality you choose; 90 or more looks the same as the original."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

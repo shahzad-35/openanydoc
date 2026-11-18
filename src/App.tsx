@@ -232,6 +232,14 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
     setHandoffFile(file)
   }
 
+  // The open file handed to a tool page (the image viewer's Compress, Resize ...): the file page closes and the tool gets the file.
+  async function openFileInTool(file: File, toolPath: string) {
+    hasUnsavedEditsRef.current = false
+    setOpenedFile(null)
+    await navigateTo(toolPath)
+    setHandoffFile(file)
+  }
+
   function closeFile() {
     hasUnsavedEditsRef.current = false
     if (window.history.state?.fromHomePage) {
@@ -259,6 +267,7 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
                     onReplaceFile={replaceFile}
                     confirmDiscardEdits={confirmDiscardEdits}
                     onUnsavedEditsChange={reportUnsavedEdits}
+                    onOpenInTool={(file, toolPath) => void openFileInTool(file, toolPath)}
                   />
                 </Suspense>
               ) : path === '/changelog' ? (

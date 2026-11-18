@@ -1,0 +1,75 @@
+{
+  "title": "Crop Image – Free, Square, 16:9 or Circle, No Upload",
+  "description": "Crop pictures in your browser: drag a free box or pick square, 4:3, 16:9, passport or a circle with a transparent outside. Free, and nothing is uploaded.",
+  "heading": "Crop Images Online",
+  "subtitle": "Drag the crop box, choose a shape, and save; nothing is uploaded.",
+  "intro": "Crop a picture by dragging a box over it, freely or at a fixed shape: square, 4:3, 3:2, 16:9, 9:16 for stories, passport 35:45, or a circle saved as a PNG with a transparent outside for profile pictures and logos. The size of the crop in pixels is shown as you drag. Add several pictures and the same shape is cut from the centre of each.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Circle crop",
+      "text": "A round picture with a transparent outside, ready for a profile photo or a logo."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to crop a picture",
+  "steps": [
+    {
+      "title": "Add your picture",
+      "text": "Choose or drop a picture; the first one is shown with the crop box."
+    },
+    {
+      "title": "Choose the shape",
+      "text": "Pick free, a fixed ratio or a circle, then drag the box and its corner."
+    },
+    {
+      "title": "Crop and download",
+      "text": "Click Crop pictures and download the result."
+    }
+  ],
+  "handlesTitle": "What Crop image handles",
+  "handles": [
+    "Shapes: free, square, 4:3, 3:2, 16:9, 9:16, passport 35:45 and circle.",
+    "Precision: the crop size in pixels of the original picture, shown as you drag.",
+    "Circle: saved as PNG, so the corners are transparent.",
+    "Batch: the same shape cut from the centre of every other picture."
+  ],
+  "limits": [
+    "The crop box is placed on the first picture; the others are cropped from their centre.",
+    "A circle is always saved as PNG, which is larger than JPG for photos.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Crop image: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I crop a picture into a circle?",
+      "answer": "Choose Circle, move the box over the face or logo, and click Crop. The result is a PNG with a transparent outside."
+    },
+    {
+      "question": "Is the crop full quality?",
+      "answer": "Yes. The box is applied to the original picture, not to the preview, so the result keeps every pixel inside it."
+    },
+    {
+      "question": "Can I crop many pictures at once?",
+      "answer": "Yes, with a fixed shape: the first picture uses your box and the others are cut to the same shape from their centre."
+    },
+    {
+      "question": "Can I use iPhone HEIC photos?",
+      "answer": "Yes. Safari reads them itself; in Chrome, Edge and Firefox a HEIC decoder loads the first time you add one, and the photo is still read on your device."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -26,6 +26,7 @@ type FileViewPageProps = {
   confirmDiscardEdits: () => Promise<boolean>
   // Tells App whether there are unsaved edits, so the browser's Back button can ask first.
   onUnsavedEditsChange: (hasUnsavedEdits: boolean) => void
+  onOpenInTool: (file: File, toolPath: string) => void
 }
 
 const noEdits = () => null
@@ -33,7 +34,7 @@ const countNoEdits = () => 0
 
 // The page a file opens on: the header, the View / Edit toggle, the edit toolbar and the format's viewer. It owns the edit
 // session, so edits survive switching between View and Edit.
-export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange }: FileViewPageProps) {
+export default function FileViewPage({ openedFile, onClose, onReplaceFile, confirmDiscardEdits, onUnsavedEditsChange, onOpenInTool }: FileViewPageProps) {
   const { locale, t } = useT()
   const { showToast } = useToast()
   const viewer = findViewerForFileName(openedFile.file.name)
@@ -165,6 +166,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         onCommandsChange={setViewerCommands}
         onExportSourceChange={setExportSource}
         onOpenConvertedFile={openConvertedFile}
+        onOpenInTool={onOpenInTool}
       />
     </Suspense>
   )

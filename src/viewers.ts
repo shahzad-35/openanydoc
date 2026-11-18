@@ -2,7 +2,7 @@ import type { DelimiterChoice } from './parseCsv'
 import { findHubOfTool, findLiveToolPage } from './tools/registry.ts'
 
 export type Viewer = {
-  id: 'csv' | 'text' | 'json' | 'excel' | 'word' | 'pdf' | 'powerpoint'
+  id: 'csv' | 'text' | 'json' | 'excel' | 'word' | 'pdf' | 'powerpoint' | 'image'
   label: string
   extensions: string[]
   // The address of this format's own page (a drop zone for just this format), without the language: /csv-viewer is served at
@@ -26,6 +26,7 @@ export const viewers: Viewer[] = [
   { id: 'excel', label: 'Excel', extensions: ['.xlsx', '.xls', '.xlsm', '.ods'], toolPath: '/excel-viewer', featureKeys: ['highlights.excel.open', 'highlights.excel.edit', 'highlights.excel.format'] },
   { id: 'word', label: 'Word', extensions: ['.docx', '.dotx', '.docm', '.odt'], toolPath: '/word-viewer', featureKeys: ['highlights.word.view', 'highlights.word.rtl', 'highlights.word.print'] },
   { id: 'pdf', label: 'PDF', extensions: ['.pdf'], toolPath: '/pdf-viewer', featureKeys: ['highlights.pdf.view', 'highlights.pdf.search', 'highlights.pdf.rtl'] },
+  { id: 'image', label: 'Image', extensions: ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.bmp', '.heic', '.heif', '.tif', '.tiff', '.svg'], toolPath: '/image-viewer', featureKeys: ['highlights.image.view', 'highlights.image.metadata', 'highlights.image.formats'] },
   { id: 'powerpoint', label: 'PowerPoint', extensions: ['.pptx', '.ppsx', '.potx', '.pptm'], toolPath: '/powerpoint-viewer', featureKeys: ['highlights.powerpoint.view', 'highlights.powerpoint.thumbnails', 'highlights.powerpoint.fullscreen'] },
 ]
 

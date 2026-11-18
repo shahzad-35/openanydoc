@@ -37,6 +37,8 @@ export type FormatViewerProps = {
   // Opens a file converted from this one (Convert in the top bar) in the viewer of its format, in place of this file. The
   // edits are inside the converted file, so this does not ask about them.
   onOpenConvertedFile: (file: File) => void
+  // Hands the open file to a tool page (the image viewer's next steps: compress, resize ...), in memory, never in the address.
+  onOpenInTool: (file: File, toolPath: string) => void
 }
 
 // One button in the edit toolbar, for this format only (undo, redo and revert all are shared and always there).
@@ -112,6 +114,7 @@ const loadExcelEditing = () => import('./excel/excelEditing')
 const loadWordViewer = () => import('./word/WordViewer')
 const loadPowerPointViewer = () => import('./powerpoint/PowerPointViewer')
 const loadPdfViewer = () => import('./pdf/PdfViewer')
+const loadImageViewer = () => import('./image/ImageViewer')
 
 // To make another format editable, add `editing` to its entry. CSV, plain text, JSON and Excel are editable for now; Word and
 // PowerPoint are view only, and their Edit toggles turn on by themselves once their entries have `editing`.
@@ -189,6 +192,13 @@ export const formatDefinitions: FormatDefinition[] = [
     addedOn: '2026-11-16',
     ViewerComponent: lazy(loadPdfViewer),
     preloadViewer: () => Promise.all([loadPdfViewer(), import('./pdf/pdfLibrary').then((pdfLibrary) => pdfLibrary.warmUpPdfWorker())]),
+    ownsWholePage: true,
+  },
+  {
+    viewerId: 'image',
+    addedOn: '2026-11-18',
+    ViewerComponent: lazy(loadImageViewer),
+    preloadViewer: loadImageViewer,
     ownsWholePage: true,
   },
   {

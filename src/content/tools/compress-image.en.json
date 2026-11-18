@@ -1,0 +1,79 @@
+{
+  "title": "Compress Image – Reduce JPG, PNG & WebP Size, No Upload",
+  "description": "Compress JPG, PNG, WebP and AVIF pictures in your browser with a quality slider and a before/after view. Many at once, free, and nothing is uploaded.",
+  "heading": "Compress Images Online",
+  "subtitle": "Make pictures smaller with a quality slider and compare before and after; nothing is uploaded.",
+  "intro": "Reduce the file size of JPG, PNG, WebP and AVIF pictures with the same encoders the Squoosh app uses (MozJPEG, OxiPNG, libwebp and libavif). Move the quality slider and the before/after view shows the first picture at that setting with the size saved. Keep each file's format or convert them all, and download one picture or a ZIP of many.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "See before you save",
+      "text": "A before/after slider and the size saved for the first picture, updated as you move the quality."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to compress pictures",
+  "steps": [
+    {
+      "title": "Add your pictures",
+      "text": "Choose or drop one picture or many: JPG, PNG, WebP, AVIF, HEIC and more."
+    },
+    {
+      "title": "Pick the quality",
+      "text": "Keep the format or choose another, then move the quality slider while you watch the comparison."
+    },
+    {
+      "title": "Compress and download",
+      "text": "Click Compress pictures and download the result, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What Compress image handles",
+  "handles": [
+    "JPG: MozJPEG, usually 40–80% smaller at quality 75 with little visible change.",
+    "PNG: OxiPNG lossless optimisation; the pixels stay exactly the same.",
+    "WebP and AVIF: modern formats that are often much smaller than JPG at the same look.",
+    "Batch: every picture in one go, with progress, and the results as one ZIP."
+  ],
+  "limits": [
+    "PNG compression is lossless, so photos saved as PNG shrink less; convert them to JPG or WebP for a bigger saving.",
+    "AVIF is slow to encode: allow a few seconds per large photo.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Compress image: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "What quality should I choose?",
+      "answer": "75 is a good start for photos: files are usually less than half the size and the difference is hard to see. Use the before/after slider to check."
+    },
+    {
+      "question": "Why did my picture get larger?",
+      "answer": "A file that was already compressed hard can grow when it is saved again at a higher quality. Lower the quality or keep the original."
+    },
+    {
+      "question": "Does compressing remove the photo's location?",
+      "answer": "The encoders write only the picture, so camera, date and GPS details are not copied into the new file.",
+      "link": {
+        "text": "camera, date and GPS details",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "Can I use iPhone HEIC photos?",
+      "answer": "Yes. Safari reads them itself; in Chrome, Edge and Firefox a HEIC decoder loads the first time you add one, and the photo is still read on your device."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

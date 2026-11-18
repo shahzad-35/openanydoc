@@ -1,0 +1,79 @@
+{
+  "title": "Image Viewer Online – Open HEIC, WebP & TIFF, No Upload",
+  "description": "Open any picture in your browser: JPG, PNG, WebP, AVIF, HEIC, TIFF and SVG, with zoom and the photo's camera, date and GPS details. Free, nothing uploaded.",
+  "heading": "Image Viewer: Open Any Picture Online",
+  "subtitle": "Drop a picture to zoom in and see the details it carries; nothing is uploaded.",
+  "intro": "Open a picture online, including formats your computer may not open: iPhone HEIC photos, WebP, AVIF, TIFF and SVG. Zoom in, fit it to the window and see transparent parts on a checkerboard. The details panel lists the camera, lens, date taken and, when the photo carries it, the GPS location, with a link to clean it out.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "See what a photo reveals",
+      "text": "Camera, lens, date taken and GPS location, read from the file's own metadata."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How to open a picture online",
+  "steps": [
+    {
+      "title": "Drop your picture",
+      "text": "Choose or drop a JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF or SVG file."
+    },
+    {
+      "title": "Look around",
+      "text": "Zoom in and out, fit the picture to the window, and open the details panel."
+    },
+    {
+      "title": "Take the next step",
+      "text": "Compress it, resize it, remove its metadata or turn it into a PDF without choosing the file again."
+    }
+  ],
+  "handlesTitle": "What the image viewer handles",
+  "handles": [
+    "Formats: JPG, PNG, WebP, AVIF, GIF (first frame), BMP, HEIC and HEIF, TIFF (first page) and SVG.",
+    "View: zoom from 10% to 800%, fit to the window, and a checkerboard behind transparent parts.",
+    "Details: size in pixels, file size, camera, lens, date taken, software and author.",
+    "Location: the GPS position a photo carries, with a link to open it on OpenStreetMap when you choose to."
+  ],
+  "limits": [
+    "GIF animations show their first frame, and multi-page TIFF files their first page.",
+    "A few HEIC photos taken with the newest iPhone settings may not decode; save those as JPG on the phone first.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Image viewer: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I open a HEIC photo on Windows?",
+      "answer": "Drop it here. Chrome, Edge and Firefox can't show HEIC themselves, so a HEIC decoder loads the first time you open one; the photo is still read on your device."
+    },
+    {
+      "question": "Why does it say my photo contains my location?",
+      "answer": "Phones save the GPS position in each photo unless location is turned off for the camera. Anyone you send the original file to can read it.",
+      "link": {
+        "text": "GPS position",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "Can I edit the picture here?",
+      "answer": "The viewer only shows it. Use the next steps above the picture to compress, resize, crop or clean it; the file moves over without being chosen again."
+    },
+    {
+      "question": "Why does an animated GIF not move?",
+      "answer": "The viewer shows the first frame of an animation. Your browser can still play the GIF itself."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

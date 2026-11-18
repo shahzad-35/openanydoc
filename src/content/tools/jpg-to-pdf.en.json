@@ -11,7 +11,7 @@
     },
     {
       "title": "Many picture formats",
-      "text": "JPG, PNG, WebP, TIFF and SVG; HEIC photos where your browser can read them (Safari)."
+      "text": "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and iPhone HEIC photos, in any browser."
     },
     {
       "title": "Works offline",
@@ -35,13 +35,13 @@
   ],
   "handlesTitle": "What JPG to PDF handles",
   "handles": [
-    "Pictures: JPG, PNG, WebP, TIFF and SVG; HEIC photos where the browser can read them (Safari).",
+    "Pictures: JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and HEIC.",
     "Page: A4, Letter or fit to the picture; portrait, landscape or following each picture; no, small or large margin.",
     "Orientation: phone photos turned by their EXIF data are drawn upright.",
     "Output: one PDF, or a ZIP with one PDF per picture."
   ],
   "limits": [
-    "HEIC photos open only where the browser can read them (Safari on Mac and iPhone); elsewhere save them as JPG first.",
+    "Outside Safari, HEIC photos are decoded by a separate decoder that loads the first time you add one, so the first HEIC takes a moment longer.",
     "SVG drawings become pictures in the PDF, not vector shapes.",
     "Very large sets of pictures are limited by your device's memory."
   ],
@@ -56,8 +56,8 @@
       "answer": "Yes. JPG and PNG pictures go into the PDF as they are, without being compressed again."
     },
     {
-      "question": "Why can't my HEIC photo be read?",
-      "answer": "Only some browsers can read HEIC photos. Safari on Mac and iPhone can; in Chrome, Edge or Firefox save the photo as JPG first, or open this page in Safari."
+      "question": "Can I add iPhone HEIC photos?",
+      "answer": "Yes. Safari reads them itself; in Chrome, Edge and Firefox a HEIC decoder loads the first time you add one, and the photo is still read on your device. A few photos taken with the newest iPhone settings may not decode; save those as JPG first."
     },
     {
       "question": "Can I make one PDF per picture?",

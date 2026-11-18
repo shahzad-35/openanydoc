@@ -1,0 +1,71 @@
+{
+  "title": "Meme Generator – Arabic & English Captions, No Upload",
+  "description": "Make a meme in your browser: top and bottom captions in bold outlined letters, and Arabic written right to left in an Arabic font. Free, no upload.",
+  "heading": "Meme Generator",
+  "subtitle": "Add top and bottom captions to any picture, in English or Arabic; nothing is uploaded.",
+  "intro": "Make a meme from your own picture or one of the two sample templates. Type the top and bottom captions and they appear in the classic style, white letters with a black outline, sized and wrapped to the picture. Arabic captions are drawn with an Arabic font and written right to left automatically, and the meme saves as JPG or PNG at full size.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Arabic that joins",
+      "text": "Arabic captions use an Arabic font, joined and right to left, without any setting."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How to make a meme",
+  "steps": [
+    {
+      "title": "Choose a picture",
+      "text": "Drop your own picture or try a sample template."
+    },
+    {
+      "title": "Write the captions",
+      "text": "Type the top and bottom text and set the size."
+    },
+    {
+      "title": "Save the meme",
+      "text": "Choose JPG or PNG and click Save meme."
+    }
+  ],
+  "handlesTitle": "What the meme generator handles",
+  "handles": [
+    "Captions: top and bottom, wrapped to fit, in capital letters or as typed.",
+    "Fonts: Anton for Latin letters, Baloo Bhaijaan 2 for Arabic.",
+    "Pictures: JPG, PNG, WebP, HEIC and the other picture formats.",
+    "Output: JPG or PNG at the picture's full size."
+  ],
+  "limits": [
+    "One picture at a time.",
+    "Urdu and other scripts are drawn with your device's fonts.",
+    "No stickers or moving GIF memes."
+  ],
+  "faqTitle": "Meme generator: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can I write the meme in Arabic?",
+      "answer": "Yes. Type Arabic and the caption switches to an Arabic font, joined and right to left. Capital letters only affect Latin letters."
+    },
+    {
+      "question": "Is there a watermark?",
+      "answer": "No. The meme is your picture and your words, nothing else."
+    },
+    {
+      "question": "Can I use any picture?",
+      "answer": "Yes, any picture on your device. Make sure you have the right to share it."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

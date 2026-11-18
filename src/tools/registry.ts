@@ -74,6 +74,8 @@ export type ToolContent = {
 const PDF = ['.pdf']
 // The pictures JPG to PDF takes; HEIC only opens where the browser can read it (Safari).
 const IMAGES = ['.jpg', '.jpeg', '.png', '.webp', '.heic', '.heif', '.tif', '.tiff', '.svg']
+// Every picture the image tools read.
+const IMAGE_FILES = ['.jpg', '.jpeg', '.png', '.webp', '.avif', '.gif', '.bmp', '.heic', '.heif', '.tif', '.tiff', '.svg']
 
 export const tools: Tool[] = [
   // PDF
@@ -96,6 +98,23 @@ export const tools: Tool[] = [
   { slug: 'header-footer-pdf', name: { en: 'Header and footer', ar: 'رأس وتذييل PDF' }, category: 'pdf', group: 'edit', inputFormats: PDF, loadComponent: () => import('./pdf/PdfStampTools').then((tools) => ({ default: tools.HeaderFooterPdf })), nextTools: ['watermark-pdf', 'sign-pdf', 'merge-pdf', 'pdf-to-jpg'], relatedPages: ['/add-page-numbers', '/watermark-pdf', '/edit-pdf', '/sign-pdf', '/merge-pdf', '/organize-pdf'], isLive: true },
   { slug: 'sign-pdf', name: { en: 'Sign PDF', ar: 'توقيع PDF' }, category: 'pdf', group: 'security', inputFormats: PDF, isEditor: true, loadComponent: () => import('./pdf/PdfEditTools').then((tools) => ({ default: tools.SignPdf })), nextTools: ['merge-pdf', 'add-page-numbers', 'pdf-to-jpg', 'watermark-pdf'], relatedPages: ['/sign-pdf-without-adobe', '/fill-pdf', '/edit-pdf', '/merge-pdf', '/add-page-numbers', '/watermark-pdf', '/pdf-tools-without-upload'], isLive: true },
   { slug: 'summarize-pdf', category: 'pdf', group: 'intelligence', inputFormats: PDF, isLive: false },
+  // Images (Step 17S)
+  { slug: 'image-viewer', name: { en: 'Image viewer', ar: 'عارض الصور' }, category: 'image', group: 'view', inputFormats: IMAGE_FILES, nextTools: ['compress-image', 'resize-image', 'remove-image-metadata', 'jpg-to-pdf'], relatedPages: ['/compress-image', '/resize-image', '/remove-image-metadata', '/heic-to-jpg', '/jpg-to-pdf', '/check-file-upload'], isLive: true },
+  { slug: 'compress-image', name: { en: 'Compress image', ar: 'ضغط الصور' }, category: 'image', group: 'optimize', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.CompressImage })), nextTools: ['resize-image', 'image-to-webp', 'remove-image-metadata', 'jpg-to-pdf'], relatedPages: ['/resize-image', '/image-to-webp', '/convert-image', '/remove-image-metadata', '/jpg-to-pdf', '/check-file-upload'], isLive: true },
+  { slug: 'resize-image', name: { en: 'Resize image', ar: 'تغيير حجم الصورة' }, category: 'image', group: 'optimize', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.ResizeImage })), nextTools: ['compress-image', 'crop-image', 'convert-image', 'jpg-to-pdf'], relatedPages: ['/crop-image', '/compress-image', '/rotate-image', '/convert-image', '/jpg-to-pdf'], isLive: true },
+  { slug: 'crop-image', name: { en: 'Crop image', ar: 'قص الصورة' }, category: 'image', group: 'edit', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.CropImage })), nextTools: ['resize-image', 'compress-image', 'photo-editor', 'jpg-to-pdf'], relatedPages: ['/resize-image', '/rotate-image', '/photo-editor', '/compress-image', '/jpg-to-pdf'], isLive: true },
+  { slug: 'rotate-image', name: { en: 'Rotate image', ar: 'تدوير الصورة' }, category: 'image', group: 'edit', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.RotateImage })), nextTools: ['crop-image', 'compress-image', 'jpg-to-pdf', 'resize-image'], relatedPages: ['/crop-image', '/resize-image', '/photo-editor', '/jpg-to-pdf'], isLive: true },
+  { slug: 'watermark-image', name: { en: 'Watermark image', ar: 'علامة مائية على الصور' }, category: 'image', group: 'edit', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.WatermarkImage })), nextTools: ['compress-image', 'resize-image', 'remove-image-metadata', 'jpg-to-pdf'], relatedPages: ['/remove-image-metadata', '/photo-editor', '/compress-image', '/watermark-pdf', '/jpg-to-pdf'], isLive: true },
+  { slug: 'remove-image-metadata', name: { en: 'Remove image metadata', ar: 'حذف بيانات الصور' }, category: 'image', group: 'edit', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.RemoveImageMetadata })), nextTools: ['compress-image', 'watermark-image', 'image-viewer', 'jpg-to-pdf'], relatedPages: ['/image-viewer', '/compress-image', '/mask-data', '/check-file-upload', '/jpg-to-pdf'], isLive: true },
+  { slug: 'photo-editor', name: { en: 'Photo editor', ar: 'محرر الصور' }, category: 'image', group: 'edit', inputFormats: IMAGE_FILES, isEditor: true, loadComponent: () => import('./image/ImageEditors').then((tools) => ({ default: tools.PhotoEditor })), nextTools: ['compress-image', 'resize-image', 'meme-generator', 'jpg-to-pdf'], relatedPages: ['/crop-image', '/meme-generator', '/watermark-image', '/compress-image', '/jpg-to-pdf'], isLive: true },
+  { slug: 'convert-image', name: { en: 'Convert image', ar: 'تحويل الصور' }, category: 'image', group: 'convert', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.ConvertImage })), nextTools: ['compress-image', 'resize-image', 'jpg-to-pdf', 'image-viewer'], relatedPages: ['/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/jpg-to-pdf', '/pdf-to-jpg'], isLive: true },
+  { slug: 'heic-to-jpg', name: { en: 'HEIC to JPG', ar: 'تحويل HEIC إلى JPG' }, category: 'image', group: 'convert', inputFormats: ['.heic', '.heif'], takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.HeicToJpg })), nextTools: ['compress-image', 'resize-image', 'jpg-to-pdf', 'remove-image-metadata'], relatedPages: ['/convert-image', '/remove-image-metadata', '/compress-image', '/jpg-to-pdf', '/image-viewer'], isLive: true },
+  { slug: 'webp-to-jpg', name: { en: 'WebP to JPG', ar: 'تحويل WebP إلى JPG' }, category: 'image', group: 'convert', inputFormats: ['.webp'], takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.WebpToJpg })), nextTools: ['compress-image', 'resize-image', 'jpg-to-pdf', 'image-to-webp'], relatedPages: ['/convert-image', '/image-to-webp', '/png-to-jpg', '/jpg-to-pdf'], isLive: true },
+  { slug: 'png-to-jpg', name: { en: 'PNG to JPG', ar: 'تحويل PNG إلى JPG' }, category: 'image', group: 'convert', inputFormats: ['.png'], takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.PngToJpg })), nextTools: ['compress-image', 'resize-image', 'jpg-to-pdf', 'jpg-to-png'], relatedPages: ['/convert-image', '/jpg-to-png', '/compress-image', '/jpg-to-pdf'], isLive: true },
+  { slug: 'jpg-to-png', name: { en: 'JPG to PNG', ar: 'تحويل JPG إلى PNG' }, category: 'image', group: 'convert', inputFormats: ['.jpg', '.jpeg'], takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.JpgToPng })), nextTools: ['compress-image', 'crop-image', 'png-to-jpg', 'jpg-to-pdf'], relatedPages: ['/convert-image', '/png-to-jpg', '/crop-image', '/jpg-to-pdf'], isLive: true },
+  { slug: 'svg-to-png', name: { en: 'SVG to PNG', ar: 'تحويل SVG إلى PNG' }, category: 'image', group: 'convert', inputFormats: ['.svg'], takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.SvgToPng })), nextTools: ['compress-image', 'resize-image', 'jpg-to-pdf', 'image-to-webp'], relatedPages: ['/convert-image', '/resize-image', '/image-to-webp', '/jpg-to-pdf'], isLive: true },
+  { slug: 'image-to-webp', name: { en: 'Image to WebP', ar: 'تحويل الصور إلى WebP' }, category: 'image', group: 'convert', inputFormats: IMAGE_FILES, takesSeveralFiles: true, loadComponent: () => import('./image/ImageTools').then((tools) => ({ default: tools.ImageToWebp })), nextTools: ['compress-image', 'resize-image', 'webp-to-jpg', 'jpg-to-pdf'], relatedPages: ['/compress-image', '/webp-to-jpg', '/convert-image', '/jpg-to-pdf'], isLive: true },
+  { slug: 'meme-generator', name: { en: 'Meme generator', ar: 'صانع الميمز' }, category: 'image', group: 'create', inputFormats: IMAGE_FILES, isEditor: true, loadComponent: () => import('./image/ImageEditors').then((tools) => ({ default: tools.MemeGenerator })), nextTools: ['compress-image', 'photo-editor', 'resize-image', 'jpg-to-pdf'], relatedPages: ['/photo-editor', '/watermark-image', '/crop-image', '/compress-image'], isLive: true },
   // Data: the existing viewers, converters and Mask data
   { slug: 'csv-viewer', name: { en: 'CSV viewer', ar: 'عارض CSV' }, category: 'data', group: 'view', inputFormats: ['.csv', '.tsv', '.tab'], relatedPages: ['/tsv-viewer', '/large-csv-viewer', '/excel-viewer', '/csv-to-excel', '/csv-to-json', '/mask-data', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/check-file-upload'], isLive: true },
   { slug: 'large-csv-viewer', name: { en: 'Large CSV file viewer', ar: 'عارض ملفات CSV الكبيرة' }, category: 'data', group: 'view', inputFormats: ['.csv'], relatedPages: ['/csv-viewer', '/tsv-viewer', '/excel-viewer', '/csv-too-big-for-excel'], isLive: true },
@@ -158,6 +177,22 @@ export const toolContentLoaders: Record<Locale, Record<string, () => Promise<{ d
     'fill-pdf': () => import('../content/tools/fill-pdf.en.json'),
     'watermark-pdf': () => import('../content/tools/watermark-pdf.en.json'),
     'header-footer-pdf': () => import('../content/tools/header-footer-pdf.en.json'),
+    'image-viewer': () => import('../content/tools/image-viewer.en.json'),
+    'compress-image': () => import('../content/tools/compress-image.en.json'),
+    'resize-image': () => import('../content/tools/resize-image.en.json'),
+    'crop-image': () => import('../content/tools/crop-image.en.json'),
+    'rotate-image': () => import('../content/tools/rotate-image.en.json'),
+    'watermark-image': () => import('../content/tools/watermark-image.en.json'),
+    'remove-image-metadata': () => import('../content/tools/remove-image-metadata.en.json'),
+    'photo-editor': () => import('../content/tools/photo-editor.en.json'),
+    'convert-image': () => import('../content/tools/convert-image.en.json'),
+    'heic-to-jpg': () => import('../content/tools/heic-to-jpg.en.json'),
+    'webp-to-jpg': () => import('../content/tools/webp-to-jpg.en.json'),
+    'png-to-jpg': () => import('../content/tools/png-to-jpg.en.json'),
+    'jpg-to-png': () => import('../content/tools/jpg-to-png.en.json'),
+    'svg-to-png': () => import('../content/tools/svg-to-png.en.json'),
+    'image-to-webp': () => import('../content/tools/image-to-webp.en.json'),
+    'meme-generator': () => import('../content/tools/meme-generator.en.json'),
   },
   ar: {
     'csv-viewer': () => import('../content/tools/csv-viewer.ar.json'),
@@ -195,17 +230,34 @@ export const toolContentLoaders: Record<Locale, Record<string, () => Promise<{ d
     'fill-pdf': () => import('../content/tools/fill-pdf.ar.json'),
     'watermark-pdf': () => import('../content/tools/watermark-pdf.ar.json'),
     'header-footer-pdf': () => import('../content/tools/header-footer-pdf.ar.json'),
+    'image-viewer': () => import('../content/tools/image-viewer.ar.json'),
+    'compress-image': () => import('../content/tools/compress-image.ar.json'),
+    'resize-image': () => import('../content/tools/resize-image.ar.json'),
+    'crop-image': () => import('../content/tools/crop-image.ar.json'),
+    'rotate-image': () => import('../content/tools/rotate-image.ar.json'),
+    'watermark-image': () => import('../content/tools/watermark-image.ar.json'),
+    'remove-image-metadata': () => import('../content/tools/remove-image-metadata.ar.json'),
+    'photo-editor': () => import('../content/tools/photo-editor.ar.json'),
+    'convert-image': () => import('../content/tools/convert-image.ar.json'),
+    'heic-to-jpg': () => import('../content/tools/heic-to-jpg.ar.json'),
+    'webp-to-jpg': () => import('../content/tools/webp-to-jpg.ar.json'),
+    'png-to-jpg': () => import('../content/tools/png-to-jpg.ar.json'),
+    'jpg-to-png': () => import('../content/tools/jpg-to-png.ar.json'),
+    'svg-to-png': () => import('../content/tools/svg-to-png.ar.json'),
+    'image-to-webp': () => import('../content/tools/image-to-webp.ar.json'),
+    'meme-generator': () => import('../content/tools/meme-generator.ar.json'),
   },
 }
 // The words fetched so far, by language and slug.
 export const toolContent: Record<Locale, Record<string, ToolContent>> = { en: {}, ar: {} }
 
 // A hub page per category, with its task groups in the order shown. `guides`: the guides that help with that category's files.
-export type Hub = { category: ToolCategory; path: string; groups: string[]; guides: string[] }
+// `relatedTools`: tools of another category the hub also links (the image hub's JPG to PDF and PDF to JPG).
+export type Hub = { category: ToolCategory; path: string; groups: string[]; guides: string[]; relatedTools?: string[] }
 
 export const hubs: Hub[] = [
   { category: 'pdf', path: '/pdf-tools', groups: ['view', 'organize', 'optimize', 'convertTo', 'convertFrom', 'edit', 'security', 'intelligence'], guides: ['/check-file-upload'] },
-  { category: 'image', path: '/image-tools', groups: ['edit', 'optimize', 'convert'], guides: [] },
+  { category: 'image', path: '/image-tools', groups: ['view', 'optimize', 'edit', 'convert', 'create'], guides: ['/check-file-upload'], relatedTools: ['jpg-to-pdf', 'pdf-to-jpg'] },
   { category: 'video', path: '/video-tools', groups: ['edit', 'optimize', 'convert'], guides: [] },
   { category: 'audio', path: '/audio-tools', groups: ['edit', 'optimize', 'convert'], guides: [] },
   { category: 'data', path: '/data-tools', groups: ['view', 'convert', 'clean'], guides: ['/csv-opens-in-one-column', '/csv-too-big-for-excel', '/fix-arabic-csv-in-excel', '/open-json-file', '/json-unexpected-token', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing'] },
@@ -227,6 +279,7 @@ export const findHubOfTool = (tool: Tool) => hubs.find((hub) => hub.category ===
 const iconByExtension: Record<string, string> = { '.pdf': 'pdf', '.csv': 'csv', '.tsv': 'csv', '.json': 'json', '.xlsx': 'xlsx', '.xls': 'xlsx', '.docx': 'docx', '.dotx': 'docx', '.docm': 'docx', '.odt': 'docx', '.pptx': 'pptx', '.ppsx': 'pptx', '.potx': 'pptx', '.pptm': 'pptx', '.txt': 'txt', '.jpg': 'convert', '.jpeg': 'convert', '.png': 'convert', '.webp': 'convert', '.heic': 'convert', '.heif': 'convert', '.tif': 'convert', '.tiff': 'convert', '.svg': 'convert' }
 export function findToolIcon(tool: Tool) {
   if (tool.slug === 'mask-data') return 'mask'
+  if (tool.category === 'image') return 'image'
   if (tool.group === 'convert') return 'convert'
   return iconByExtension[tool.inputFormats[0]] ?? 'guide'
 }

@@ -1,0 +1,71 @@
+{
+  "title": "Image Converter – JPG, PNG, WebP, AVIF & HEIC, No Upload",
+  "description": "Convert pictures between JPG, PNG, WebP and AVIF in your browser, from HEIC, TIFF, SVG, GIF and BMP too. Many at once, free, and nothing is uploaded.",
+  "heading": "Image Converter: Change Picture Formats",
+  "subtitle": "Turn any picture into JPG, PNG, WebP or AVIF; nothing is uploaded.",
+  "intro": "Convert pictures to the format you need: JPG for photos that open everywhere, PNG for sharp graphics and transparency, WebP and AVIF for small files on the web. Pictures can come from JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG or iPhone HEIC. Transparent parts become white in JPG, and quality is yours to choose for JPG, WebP and AVIF.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Any picture in",
+      "text": "HEIC, TIFF, SVG, GIF and BMP come in; JPG, PNG, WebP and AVIF come out."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert pictures",
+  "steps": [
+    {
+      "title": "Add your pictures",
+      "text": "Choose or drop one picture or many, in any format."
+    },
+    {
+      "title": "Choose the format",
+      "text": "Pick JPG, PNG, WebP or AVIF and the quality."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert and download the result, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What the image converter handles",
+  "handles": [
+    "From: JPG, PNG, WebP, AVIF, GIF (first frame), BMP, TIFF (first page), SVG, HEIC and HEIF.",
+    "To: JPG (MozJPEG), PNG, WebP and AVIF.",
+    "Transparency: kept in PNG, WebP and AVIF; white in JPG.",
+    "Phone photos: turned upright from their orientation tag."
+  ],
+  "limits": [
+    "Animated GIFs become a still picture of their first frame.",
+    "A few HEIC photos taken with the newest iPhone settings may not decode; save those as JPG on the phone first.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Image converter: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Which format should I choose?",
+      "answer": "JPG for photos you share anywhere, PNG for screenshots and graphics with sharp edges or transparency, WebP or AVIF for the smallest files on a website."
+    },
+    {
+      "question": "Why did my transparent background turn white?",
+      "answer": "JPG can't store transparency. Choose PNG or WebP to keep it."
+    },
+    {
+      "question": "Can I use iPhone HEIC photos?",
+      "answer": "Yes. Safari reads them itself; in Chrome, Edge and Firefox a HEIC decoder loads the first time you add one, and the photo is still read on your device."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

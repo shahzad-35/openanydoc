@@ -1,0 +1,75 @@
+{
+  "title": "Remove Photo Metadata – Strip GPS & EXIF, No Upload",
+  "description": "See the GPS location, camera and date hidden in your photos, then download clean copies without them. JPG pixels kept exactly. Free, and nothing uploaded.",
+  "heading": "Remove GPS and EXIF from Photos",
+  "subtitle": "See what your photo reveals, then save a clean copy; nothing is uploaded.",
+  "intro": "Photos from phones carry hidden details: the exact GPS location where they were taken, the phone or camera model, and the date and time. This tool lists what each picture contains, for example \"This photo contains your GPS location\", then saves a clean copy. JPG, PNG and WebP files keep their exact pixels because only the metadata is cut out; each copy is checked again before you get it.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Pixels untouched",
+      "text": "JPG, PNG and WebP are cleaned without being re-saved, so the picture looks exactly the same."
+    },
+    {
+      "title": "Checked before download",
+      "text": "Each clean copy is read again, and the tool stops if any location, camera or date is still there."
+    }
+  ],
+  "stepsTitle": "How to remove metadata from a photo",
+  "steps": [
+    {
+      "title": "Add your photos",
+      "text": "Choose or drop one photo or many."
+    },
+    {
+      "title": "See what they reveal",
+      "text": "Each photo lists its GPS location, camera, date and other details found."
+    },
+    {
+      "title": "Download clean copies",
+      "text": "Click Download clean copies; several photos come as one ZIP."
+    }
+  ],
+  "handlesTitle": "What Remove metadata handles",
+  "handles": [
+    "Found and removed: GPS location, camera and lens, date taken, software, author and other EXIF, XMP and IPTC fields.",
+    "JPG: EXIF, XMP, IPTC and comments cut out; the colour profile is kept so colours don't shift.",
+    "PNG and WebP: text, EXIF and XMP chunks removed; pixels unchanged.",
+    "HEIC, TIFF and others: saved again as a clean JPG."
+  ],
+  "limits": [
+    "A JPG with a sideways orientation tag is saved again upright, so its pixels change slightly.",
+    "Metadata can't hide what is in the picture itself, such as a street sign or a face.",
+    "Metadata inside screenshots of documents, or in file names, is not changed."
+  ],
+  "faqTitle": "Remove photo metadata: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Does my photo really contain my location?",
+      "answer": "If location was on for the camera, yes: most phones save the GPS position in every photo. Add the photo here and it says so in plain words."
+    },
+    {
+      "question": "Do messaging apps remove it for me?",
+      "answer": "Some do when they shrink the photo, but sending it as a file or by email usually keeps everything. Cleaning it first makes sure."
+    },
+    {
+      "question": "Will the photo lose quality?",
+      "answer": "No for JPG, PNG and WebP: only the metadata is cut out and the picture data is copied as it is. HEIC and TIFF are saved again as high-quality JPG."
+    },
+    {
+      "question": "Why is a turned JPG saved again?",
+      "answer": "Its orientation tag is metadata too. Removing it would show the photo sideways, so the photo is turned upright in its pixels first."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

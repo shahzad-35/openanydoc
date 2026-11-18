@@ -1,0 +1,75 @@
+{
+  "title": "HEIC to JPG – Convert iPhone Photos Free, No Upload",
+  "description": "Convert iPhone HEIC photos to JPG in your browser, many at once, upright and at the quality you choose. Works in Chrome and Windows. Free, no upload.",
+  "heading": "Convert HEIC to JPG",
+  "subtitle": "Turn iPhone HEIC photos into JPG that opens everywhere; nothing is uploaded.",
+  "intro": "iPhones save photos as HEIC, which Windows, many websites and older apps can't open. Drop your HEIC photos here and download them as JPG at the quality you choose, one photo or a ZIP of the whole set. The photos are decoded on your device, by the browser in Safari or by a HEIC decoder that loads only when needed in Chrome, Edge and Firefox.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Works on Windows",
+      "text": "No app to install: Chrome, Edge and Firefox decode HEIC on this page."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert HEIC to JPG",
+  "steps": [
+    {
+      "title": "Add your HEIC photos",
+      "text": "Choose or drop the .heic or .heif files from your iPhone."
+    },
+    {
+      "title": "Pick the quality",
+      "text": "90 keeps the photos looking the same; lower makes smaller files."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert and download the JPG, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What HEIC to JPG handles",
+  "handles": [
+    "Files: .heic and .heif photos from iPhone and iPad, and from some Android phones.",
+    "Browsers: Safari reads HEIC itself; Chrome, Edge and Firefox use a HEIC decoder loaded once.",
+    "Output: JPG at the quality you choose, upright, at full size.",
+    "Batch: a whole holiday's photos in one ZIP."
+  ],
+  "limits": [
+    "A few HEIC photos taken with the newest iPhone settings may not decode; save those as JPG on the phone first.",
+    "Live Photos become a still JPG; the short video is not kept.",
+    "The camera, date and GPS details are not copied into the JPG."
+  ],
+  "faqTitle": "HEIC to JPG: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Why can't I open HEIC photos on Windows?",
+      "answer": "Windows needs an extra codec for HEIC, and most browsers can't show it. Converting to JPG makes the photo open everywhere."
+    },
+    {
+      "question": "Will the JPG look worse?",
+      "answer": "At quality 90 the difference is very hard to see. JPG files are usually larger than the HEIC they came from."
+    },
+    {
+      "question": "Does the JPG keep the location?",
+      "answer": "No. The JPG carries only the picture, so the GPS location, camera and date are left out."
+    },
+    {
+      "question": "Can I stop my iPhone saving HEIC?",
+      "answer": "Yes: Settings, Camera, Formats, Most Compatible. New photos are then saved as JPG."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

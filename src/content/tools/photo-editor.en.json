@@ -1,0 +1,71 @@
+{
+  "title": "Photo Editor Online – Brightness, Filters & Text, No Upload",
+  "description": "Edit a photo in your browser: brightness, contrast, saturation and warmth, seven filters and text you can drag, with undo. Free, and nothing is uploaded.",
+  "heading": "Free Online Photo Editor",
+  "subtitle": "Adjust light and colour, add a filter or text, and save a copy; nothing is uploaded.",
+  "intro": "A simple photo editor for quick fixes: brighten a dark photo, add contrast and colour, warm it up or cool it down, or pick a filter such as black and white, sepia or vivid. Add text, Arabic included, and drag it into place. Every change can be undone, the preview updates as you move the sliders, and Save a copy never changes your original file.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Undo everything",
+      "text": "Every change is one step to undo or redo, and Reset goes back to the original."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How to edit a photo",
+  "steps": [
+    {
+      "title": "Open your photo",
+      "text": "Choose or drop one picture."
+    },
+    {
+      "title": "Make your changes",
+      "text": "Move the sliders, pick a filter, add text and drag it into place."
+    },
+    {
+      "title": "Save a copy",
+      "text": "Choose JPG, PNG or WebP and click Save a copy."
+    }
+  ],
+  "handlesTitle": "What the photo editor handles",
+  "handles": [
+    "Light and colour: brightness, contrast, saturation and warmth.",
+    "Filters: black and white, sepia, vivid, fade, cool and warm.",
+    "Text: as many lines as you like, in four colours and any size, Arabic included.",
+    "Saving: JPG, PNG or WebP at the quality you choose, at the photo's full size."
+  ],
+  "limits": [
+    "One photo at a time.",
+    "No drawing, cut-outs or background removal.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "Photo editor: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is my original photo changed?",
+      "answer": "No. Save a copy makes a new file; the photo on your device stays as it was."
+    },
+    {
+      "question": "Can I undo a change?",
+      "answer": "Yes. Undo and Redo step through every change, and Reset goes back to the original in one step that can itself be undone."
+    },
+    {
+      "question": "Is the saved photo full size?",
+      "answer": "Yes. The preview is smaller for speed, but the same changes are applied to the full-size photo when you save."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

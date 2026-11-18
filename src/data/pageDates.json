@@ -1,6 +1,6 @@
 {
   "/en": {
-    "hash": "ddcc4408d12dfc5f185658dd6fb401fec0448d9a",
+    "hash": "b576c1d92467cedb801e8b0b63fd7c374b29f372",
     "date": "2026-11-17"
   },
   "/en/about": {
@@ -71,6 +71,10 @@
     "hash": "1762a499cda1ea5819e41d1666079131a2dcb6e9",
     "date": "2026-11-17"
   },
+  "/en/image-tools": {
+    "hash": "fc5b5915c6c2e0324f02eadd7a76488e8b79a3d2",
+    "date": "2026-11-17"
+  },
   "/en/data-tools": {
     "hash": "160005306bd8e56fa42a1474b686c3a89e791251",
     "date": "2026-11-17"
@@ -80,11 +84,11 @@
     "date": "2026-11-17"
   },
   "/en/all-tools": {
-    "hash": "0ceea4fce2fc1014b2e91b02e5896b72a9cc2b80",
+    "hash": "4936ff302fe328d8ab2e9e676aa03509a3f4d65a",
     "date": "2026-11-17"
   },
   "/en/pdf-viewer": {
-    "hash": "5959962364997c96b3dd2e6540f15a58f60383d0",
+    "hash": "795e01bad10fba1c70e90c3e47f2bc5efdb65451",
     "date": "2026-11-17"
   },
   "/en/merge-pdf": {
@@ -112,7 +116,7 @@
     "date": "2026-11-17"
   },
   "/en/jpg-to-pdf": {
-    "hash": "fcf0cea01309f25047b1b754619e94c6e538a945",
+    "hash": "b2be481a9221f80b0b8482956b2bc4fba28e5c1a",
     "date": "2026-11-17"
   },
   "/en/pdf-to-jpg": {
@@ -151,33 +155,97 @@
     "hash": "a8f7087b005708b9dcf4af7a3b95d37bd481ce2e",
     "date": "2026-11-17"
   },
+  "/en/image-viewer": {
+    "hash": "2b0ae130d1dbfddc0e51f0dfd452166366a01ed6",
+    "date": "2026-11-17"
+  },
+  "/en/compress-image": {
+    "hash": "79f7dd4d994e0e3dfc62903e76e57e5cc46a916e",
+    "date": "2026-11-17"
+  },
+  "/en/resize-image": {
+    "hash": "01dee0075b6ab55d48dd5d6a13e23bf847afe963",
+    "date": "2026-11-17"
+  },
+  "/en/crop-image": {
+    "hash": "389f618b1ed93be2926edec62a4819cbdf48af02",
+    "date": "2026-11-17"
+  },
+  "/en/rotate-image": {
+    "hash": "32b847f9b9b5ce0f16d5aa6dabdcd39dd98a221d",
+    "date": "2026-11-17"
+  },
+  "/en/watermark-image": {
+    "hash": "ad61d4d1cfef50abb76a44e07cf300890a6a59f8",
+    "date": "2026-11-17"
+  },
+  "/en/remove-image-metadata": {
+    "hash": "3fc392a854d276c435652ca24e492c2717ed815f",
+    "date": "2026-11-17"
+  },
+  "/en/photo-editor": {
+    "hash": "70632a56c8f8542b097a278640324ffccb87867d",
+    "date": "2026-11-17"
+  },
+  "/en/convert-image": {
+    "hash": "1cbeab5eb35879359fb0d32a48423da6288beb4b",
+    "date": "2026-11-17"
+  },
+  "/en/heic-to-jpg": {
+    "hash": "9699d0f77112c40e26cfd72d6d62cd01b47fad26",
+    "date": "2026-11-17"
+  },
+  "/en/webp-to-jpg": {
+    "hash": "315fea723e9ef0a03240cc59749e17cfb8486419",
+    "date": "2026-11-17"
+  },
+  "/en/png-to-jpg": {
+    "hash": "46701e6b42a41e407478e016a2459fffa1fc1a5b",
+    "date": "2026-11-17"
+  },
+  "/en/jpg-to-png": {
+    "hash": "2080a59d6b6f0ae08c4ecf857265798a81f80d34",
+    "date": "2026-11-17"
+  },
+  "/en/svg-to-png": {
+    "hash": "7290d518d5292ab113b5b33a2432ec083d954e11",
+    "date": "2026-11-17"
+  },
+  "/en/image-to-webp": {
+    "hash": "39bf072694c7b99dcc43f4ac9267c7024ffc2177",
+    "date": "2026-11-17"
+  },
+  "/en/meme-generator": {
+    "hash": "835d83483b2f697690311a43b89512cd329689da",
+    "date": "2026-11-17"
+  },
   "/en/csv-viewer": {
-    "hash": "ad1d23a01db2a8774b61962285c5f26bd048c521",
-    "date": "2026-11-16"
+    "hash": "0a7b746fc2263f034b0f49fb5dcabcfa82a6d12c",
+    "date": "2026-11-17"
   },
   "/en/large-csv-viewer": {
-    "hash": "8dc0487044ca963bcfee5d1f3e60bd931569ac6c",
-    "date": "2026-11-16"
+    "hash": "a9e456dc30f521dfb508def35c3309b7e478f40b",
+    "date": "2026-11-17"
   },
   "/en/tsv-viewer": {
-    "hash": "217f000247228916e65fa34e91681d924d5a2a97",
-    "date": "2026-11-16"
+    "hash": "b642ae1af97dd4fa06bc558913459fc0dc9d3ea5",
+    "date": "2026-11-17"
   },
   "/en/json-viewer": {
-    "hash": "71811a45922e02c20f5c35f0a3beee62988b7c8c",
-    "date": "2026-11-16"
+    "hash": "d6f22f69d509e7c592c772603a90e766ef39cf16",
+    "date": "2026-11-17"
   },
   "/en/json-formatter": {
-    "hash": "f646704a21fe0381eeae6b452d1e159d3e75200b",
-    "date": "2026-11-16"
+    "hash": "3de63bb10a4d67e779e10b00ac327b772e4b9c3b",
+    "date": "2026-11-17"
   },
   "/en/json-validator": {
-    "hash": "414580205fe9dd8b0124fc3afc5c2405d8d5e5b5",
-    "date": "2026-11-16"
+    "hash": "b140a1bd6cd84054122025097291fc8e02beb0ce",
+    "date": "2026-11-17"
   },
   "/en/json-escape-unescape": {
-    "hash": "a8d6c0869cb454136c2a444bda92454315224bf6",
-    "date": "2026-11-16"
+    "hash": "c0ad3466b690ff52fd24ce82fcc2e61de7865503",
+    "date": "2026-11-17"
   },
   "/en/mask-data": {
     "hash": "af7f64fbdd09854a129286b75efc3165bad7a35c",
@@ -204,27 +272,27 @@
     "date": "2026-11-12"
   },
   "/en/excel-viewer": {
-    "hash": "c3e81a593884d1c0f64e5776deaeac0f0ccc6a70",
-    "date": "2026-11-16"
+    "hash": "c3205e85900241973ff7c72e70a5bf54e678df9f",
+    "date": "2026-11-17"
   },
   "/en/xls-viewer": {
-    "hash": "66f9d732b3cafc90a1df81b02dceadfc1445acf7",
-    "date": "2026-11-16"
+    "hash": "5f74cf5ed7f7fa9c77f45042939233a4b45d929d",
+    "date": "2026-11-17"
   },
   "/en/word-viewer": {
-    "hash": "d7c94bb1a4a007d34e5e34b1c1a7a1d83c6f30e8",
-    "date": "2026-11-16"
+    "hash": "4710fbe9cfc0e6e1ddb0e8d40483920b644cb34d",
+    "date": "2026-11-17"
   },
   "/en/powerpoint-viewer": {
-    "hash": "292eb83bd0f281d768d96010de264c0e105707f3",
-    "date": "2026-11-16"
+    "hash": "9670e7a4579d34c90911f8408086ba00c9734637",
+    "date": "2026-11-17"
   },
   "/en/txt-viewer": {
-    "hash": "3bad9d4a393f3e988d72316f65f0b03f922c4cba",
-    "date": "2026-11-16"
+    "hash": "84ae4944698ba9aa6c4c68643cbe9eb55f38f1c6",
+    "date": "2026-11-17"
   },
   "/ar": {
-    "hash": "195e99459ed96dafae67fc28e861c152a0d1d82b",
+    "hash": "5e8ae1a83b20c30c70ea90628b49a9747f15fe5c",
     "date": "2026-11-17"
   },
   "/ar/about": {
@@ -295,6 +363,10 @@
     "hash": "e0d0be113b00effcfcf7113576610b7d726cacfe",
     "date": "2026-11-17"
   },
+  "/ar/image-tools": {
+    "hash": "59e0b1cd2da21cbada82b4759503489cf17f26f2",
+    "date": "2026-11-17"
+  },
   "/ar/data-tools": {
     "hash": "7868406adab8800d176d7767b045fc08014629b0",
     "date": "2026-11-17"
@@ -304,11 +376,11 @@
     "date": "2026-11-17"
   },
   "/ar/all-tools": {
-    "hash": "8861ac4b3df4958bd0fd489dc401764ce99f905d",
+    "hash": "a33a72cb4f5bb8746a8e3c7cb235e05795d157c5",
     "date": "2026-11-17"
   },
   "/ar/pdf-viewer": {
-    "hash": "f5f6fce5614dc50f59dd26d2c51830c75619bc65",
+    "hash": "07341d603f7180c4b3b3df3678afa444f39e06e2",
     "date": "2026-11-17"
   },
   "/ar/merge-pdf": {
@@ -336,7 +408,7 @@
     "date": "2026-11-17"
   },
   "/ar/jpg-to-pdf": {
-    "hash": "c0ac9859b7ad931919cb322baf194d2d93325a6b",
+    "hash": "f49a5ed1bece2ac783e0a155845f6f7e4eb13846",
     "date": "2026-11-17"
   },
   "/ar/pdf-to-jpg": {
@@ -375,33 +447,97 @@
     "hash": "159b23ad5455e870026bca7c3dd65e63c726ba44",
     "date": "2026-11-17"
   },
+  "/ar/image-viewer": {
+    "hash": "a0e8e8ca49f22e977a8afea0140aa5d3bb5b214d",
+    "date": "2026-11-17"
+  },
+  "/ar/compress-image": {
+    "hash": "95f60abc5368fac9e271ec6eb8117f1368b6d2b5",
+    "date": "2026-11-17"
+  },
+  "/ar/resize-image": {
+    "hash": "477b1e34d76c992b972e256835002805faa5d6e0",
+    "date": "2026-11-17"
+  },
+  "/ar/crop-image": {
+    "hash": "5c32a68ff9d8cbb6b459c91bf86039a74ca09b76",
+    "date": "2026-11-17"
+  },
+  "/ar/rotate-image": {
+    "hash": "67b885868f9280141ea3cbb4c2c5a9a1af8cc2c6",
+    "date": "2026-11-17"
+  },
+  "/ar/watermark-image": {
+    "hash": "59b13e0d05e16bc543f042bb031f6fb8a97c349f",
+    "date": "2026-11-17"
+  },
+  "/ar/remove-image-metadata": {
+    "hash": "30c9b82b41abba8bcdfd9143fc7f2962b03173c5",
+    "date": "2026-11-17"
+  },
+  "/ar/photo-editor": {
+    "hash": "3897441e3276ccebdcdb32ace8ebdb09b4439371",
+    "date": "2026-11-17"
+  },
+  "/ar/convert-image": {
+    "hash": "63a242a682e941a784ddad623fe44373ac23d920",
+    "date": "2026-11-17"
+  },
+  "/ar/heic-to-jpg": {
+    "hash": "050c75bfee53755384423c0623ed805305b0dc5d",
+    "date": "2026-11-17"
+  },
+  "/ar/webp-to-jpg": {
+    "hash": "e3d20ef0d14ad6f5a42a303c636dd21218ecfffb",
+    "date": "2026-11-17"
+  },
+  "/ar/png-to-jpg": {
+    "hash": "222ab73485f4b54321e0e8e9d8824c5da0dc43cd",
+    "date": "2026-11-17"
+  },
+  "/ar/jpg-to-png": {
+    "hash": "4bf8337c148c2d2083f6ab4d996832ce76a40f35",
+    "date": "2026-11-17"
+  },
+  "/ar/svg-to-png": {
+    "hash": "5ee9ba042ab8f85d8be01ee6271db1e58867eff2",
+    "date": "2026-11-17"
+  },
+  "/ar/image-to-webp": {
+    "hash": "5ee3a47706f535b6558967037ee1f2b7f6261d55",
+    "date": "2026-11-17"
+  },
+  "/ar/meme-generator": {
+    "hash": "93fbdbbd13a7e140948443dc7cd311d3aefc5579",
+    "date": "2026-11-17"
+  },
   "/ar/csv-viewer": {
-    "hash": "3fec4ecf6fab0f44033facab29a1f9a1df230ea0",
-    "date": "2026-11-16"
+    "hash": "8076676e822add135e1eb031e5f99e63d664dcef",
+    "date": "2026-11-17"
   },
   "/ar/large-csv-viewer": {
-    "hash": "4338bd23c5f0fd2f4062e5fe7d5bc8047ab9bed1",
-    "date": "2026-11-16"
+    "hash": "36003c7b710c70ece74813bf754e52e84c324214",
+    "date": "2026-11-17"
   },
   "/ar/tsv-viewer": {
-    "hash": "43c858504bd245587c127b80d171d6c0922fc327",
-    "date": "2026-11-16"
+    "hash": "1560d70c03f8deda10f69ace2b7986205669e22c",
+    "date": "2026-11-17"
   },
   "/ar/json-viewer": {
-    "hash": "4bdc6fbb61aeab266941a398e1176a6400ccc8aa",
-    "date": "2026-11-16"
+    "hash": "8b31cfcd5d120c0ff9418735e0570ff390884b49",
+    "date": "2026-11-17"
   },
   "/ar/json-formatter": {
-    "hash": "ff05059a0a757de8a191541ee2ad8fcc93ad97a0",
-    "date": "2026-11-16"
+    "hash": "97d746ccf380d07b0ff8487ae73099450e63edb3",
+    "date": "2026-11-17"
   },
   "/ar/json-validator": {
-    "hash": "1134ef4737abc6e67b23670f3bb98e38ad76b010",
-    "date": "2026-11-16"
+    "hash": "fd230c78774bb7047ec5909934d083b4eeb47b5a",
+    "date": "2026-11-17"
   },
   "/ar/json-escape-unescape": {
-    "hash": "731732d5c2b27811c06ffe4a7dcd24eceec80e2b",
-    "date": "2026-11-16"
+    "hash": "45e1b75adfa5593eadb766c87ac30ca4b6ec6cbf",
+    "date": "2026-11-17"
   },
   "/ar/mask-data": {
     "hash": "1b71b84bec498d8c6e0cd8a14af3dc605756e4c2",
@@ -428,23 +564,23 @@
     "date": "2026-11-12"
   },
   "/ar/excel-viewer": {
-    "hash": "cd0f76b84236b63f5cab84c29e39706a5151a153",
-    "date": "2026-11-16"
+    "hash": "49cd230b8c25743b7dcb54ec4cd798e5f87c2750",
+    "date": "2026-11-17"
   },
   "/ar/xls-viewer": {
-    "hash": "4ab2d7782e390784d5cfc40caae613ceb0a77fcc",
-    "date": "2026-11-16"
+    "hash": "514c14f597ada1192b85188fdd66aafb023e8f4d",
+    "date": "2026-11-17"
   },
   "/ar/word-viewer": {
-    "hash": "6f73725aa2453f5edd7722937b76f1ebf205a57e",
-    "date": "2026-11-16"
+    "hash": "43a552012fcf9f837e3fce24ad090daa3e36ccac",
+    "date": "2026-11-17"
   },
   "/ar/powerpoint-viewer": {
-    "hash": "50eb9014c1014b303603eef7073affd9405706dd",
-    "date": "2026-11-16"
+    "hash": "1e05226d420a5bb76414f500887e994fcd942f9d",
+    "date": "2026-11-17"
   },
   "/ar/txt-viewer": {
-    "hash": "9d833719ae66e167c44900608a44556d3e232bac",
-    "date": "2026-11-16"
+    "hash": "7d113306deba387ddaa560c2ff5cea1a1ed5021f",
+    "date": "2026-11-17"
   }
 }

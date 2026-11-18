@@ -1,0 +1,75 @@
+{
+  "title": "WebP to JPG – Convert WebP Images Free, No Upload",
+  "description": "Convert WebP pictures saved from websites to JPG in your browser, so they open in every app. Many at once, transparency on white. Free, nothing uploaded.",
+  "heading": "Convert WebP to JPG",
+  "subtitle": "Turn WebP pictures from the web into JPG that every app opens; nothing is uploaded.",
+  "intro": "Pictures saved from websites often arrive as WebP, which some photo apps, printers and upload forms still refuse. Convert them to JPG here: choose the quality, add as many as you like, and transparent parts are placed on white. The conversion runs in your browser, so the pictures never leave your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your pictures are read and changed by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Opens everywhere",
+      "text": "JPG works in every app, printer and upload form that turns WebP away."
+    },
+    {
+      "title": "Many at once",
+      "text": "Add as many pictures as you like; one result downloads as a picture, several as one ZIP file."
+    }
+  ],
+  "stepsTitle": "How to convert WebP to JPG",
+  "steps": [
+    {
+      "title": "Add your WebP pictures",
+      "text": "Choose or drop the .webp files."
+    },
+    {
+      "title": "Pick the quality",
+      "text": "85 to 90 keeps them looking the same."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert and download the JPG, or a ZIP of all of them."
+    }
+  ],
+  "handlesTitle": "What WebP to JPG handles",
+  "handles": [
+    "Files: still WebP pictures, lossy or lossless.",
+    "Transparency: placed on a white background, because JPG has none.",
+    "Output: JPG at the quality you choose, at full size.",
+    "Batch: many pictures in one ZIP."
+  ],
+  "limits": [
+    "Animated WebP files become a still picture of their first frame.",
+    "JPG has no transparency; use WebP to PNG through the image converter to keep it.",
+    "Very large pictures (above about 100 megapixels) are limited by your device's memory."
+  ],
+  "faqTitle": "WebP to JPG: questions",
+  "faq": [
+    {
+      "question": "Are my pictures uploaded?",
+      "answer": "No. Your pictures are read and changed by your own browser, on your device, and are never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Why do websites give me WebP pictures?",
+      "answer": "WebP files are smaller than JPG at the same look, so websites load faster. Your apps may just not read them yet."
+    },
+    {
+      "question": "How do I keep the transparent background?",
+      "answer": "JPG can't store it. Convert to PNG in the image converter instead.",
+      "link": {
+        "text": "image converter",
+        "path": "/convert-image"
+      }
+    },
+    {
+      "question": "Will the JPG be bigger?",
+      "answer": "Usually a little, because WebP compresses better. Choose a quality of about 80 to keep it close."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

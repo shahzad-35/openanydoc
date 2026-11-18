@@ -115,6 +115,20 @@ export default function HubPage({ hub, onNavigate }: { hub?: Hub; onNavigate: (p
             </ul>
           </section>
         )}
+        {hub?.relatedTools && (
+          <section id="hub-related-tools" className="mt-12">
+            <h2 id="hub-related-tools-heading" className="type-h3">{t('tools.hub.relatedToolsHeading')}</h2>
+            <ul id="hub-related-tools-list" className="mt-4 flex flex-wrap gap-3">
+              {hub.relatedTools.map((slug) => (
+                <li key={slug}>
+                  <PageLink id={`hub-related-tool-link-${slug}`} path={`/${slug}`} onNavigate={onNavigate} className="control-shape solid-box inline-flex min-h-11 items-center border-rule bg-paper-raised px-4 font-medium transition-colors duration-200 hover:bg-paper">
+                    {pageSeo[locale][`/${slug}`].linkText ?? pageSeo[locale][`/${slug}`].heading}
+                  </PageLink>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         {seo.body && (
           <section id="hub-about" aria-labelledby="hub-about-heading" className="mt-12 max-w-3xl">
             <h2 id="hub-about-heading" className="type-h3">{t('tools.hub.aboutHeading')}</h2>

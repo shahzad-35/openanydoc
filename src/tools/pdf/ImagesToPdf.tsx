@@ -1,6 +1,6 @@
 // JPG to PDF: pictures (JPG, PNG, WebP, HEIC, TIFF, SVG) in the order shown become one PDF, or one PDF per picture in a ZIP, with
 // a page size, orientation and margin. JPG and PNG go into the PDF as they are; the other formats are read by the browser (HEIC
-// only where it can: Safari), TIFF by utif2 (MIT, loaded only for a TIFF), and drawn once on a canvas.
+// by libheif-js where the browser can't), TIFF by utif2 (MIT, loaded only for a TIFF), and drawn once on a canvas.
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
@@ -50,6 +50,22 @@ async function canvasToImage(canvas: HTMLCanvasElement, name: string, kind: 'jpg
   return { image: { name, kind, bytes: await blob.arrayBuffer(), width: canvas.width, height: canvas.height }, previewUrl: URL.createObjectURL(blob) }
 }
 
+// Where the browser can't read HEIC (everywhere but Safari), libheif-js decodes it in the image worker.
+async function readHeicWithLibheif(file: File): Promise<ReadPicture> {
+  try {
+    const { decodeImage } = await import('../../formats/image/imageFiles')
+    const picture = await decodeImage(file)
+    const canvas = document.createElement('canvas')
+    canvas.width = picture.width
+    canvas.height = picture.height
+    canvas.getContext('2d')!.drawImage(picture, 0, 0)
+    picture.close()
+    return canvasToImage(canvas, file.name, 'jpg')
+  } catch {
+    return { problem: 'heic' }
+  }
+}
+
 async function readPicture(file: File): Promise<ReadPicture> {
   const extension = extensionOf(file.name)
   const bytes = await file.arrayBuffer()
@@ -76,7 +92,8 @@ async function readPicture(file: File): Promise<ReadPicture> {
     await picture.decode()
   } catch {
     URL.revokeObjectURL(previewUrl)
-    return { problem: extension === 'heic' || extension === 'heif' ? 'heic' : 'unreadable' }
+    if (extension === 'heic' || extension === 'heif') return readHeicWithLibheif(file)
+    return { problem: 'unreadable' }
   }
   const isJpeg = extension === 'jpg' || extension === 'jpeg'
   if ((isJpeg && readJpegOrientation(bytes) === 1) || extension === 'png') {

@@ -66,7 +66,7 @@ function renderChangelogFooter(locale) {
     landingPages
       .map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))))
       .join('') +
-    [ALL_TOOLS_PATH, '/pdf-tools', '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
+    [ALL_TOOLS_PATH, '/pdf-tools', '/image-tools', '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
     item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =
     legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
