@@ -78,8 +78,8 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['Word documents (.docx) open as pages that you can zoom, print or save as PDF; editing them is coming. Older .doc files are not supported.', 'PowerPoint presentations (.pptx) open one slide at a time, with thumbnails and full screen, in beta: animations are not played, and older .ppt files are not supported.'],
         },
         {
-          heading: 'Coming later',
-          paragraphs: ['PDF files are coming. They cannot be opened yet.'],
+          heading: 'PDF files and pictures',
+          paragraphs: ['PDF files open in the PDF viewer, and the PDF tools merge, split, convert, sign, protect and translate them. Pictures open in the image viewer, with tools to compress, resize, convert and edit them.'],
         },
         {
           heading: 'Languages',
@@ -129,7 +129,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Hosting',
           paragraphs: [
-            'The site is hosted on Cloudflare Pages. To deliver the pages, Cloudflare\'s servers process standard request data, such as your IP address and your browser\'s user agent. We do not receive or store file data, because files never leave your browser.',
+            'The site is hosted on Cloudflare. To deliver the pages, Cloudflare\'s servers process standard request data, such as your IP address and your browser\'s user agent. We do not receive or store file data, because files never leave your browser.',
           ],
         },
         {
@@ -222,8 +222,8 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['تُفتح مستندات وورد (.docx) صفحاتٍ يمكنك تكبيرها وطباعتها أو حفظها PDF، وتحريرها قادم. ملفات .doc القديمة غير مدعومة.', 'تُفتح عروض باوربوينت (.pptx) شريحةً شريحة، مع صور مصغّرة وملء الشاشة، في نسخة تجريبية: لا تُشغَّل الحركات، وملفات .ppt القديمة غير مدعومة.'],
         },
         {
-          heading: 'قريبًا',
-          paragraphs: ['ملفات PDF قادمة، ولا يمكن فتحها بعد.'],
+          heading: 'ملفات PDF والصور',
+          paragraphs: ['تُفتح ملفات PDF في عارض PDF، وتدمجها أدوات PDF وتقسّمها وتحوّلها وتوقّعها وتحميها وتترجمها. وتُفتح الصور في عارض الصور، مع أدوات لضغطها وتغيير حجمها وتحويلها وتحريرها.'],
         },
         {
           heading: 'اللغات',
@@ -273,7 +273,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'الاستضافة',
           paragraphs: [
-            'الموقع مستضاف على Cloudflare Pages. ولتوصيل الصفحات تعالج خوادم Cloudflare بيانات الطلب المعتادة، مثل عنوان IP ووكيل المستخدم في متصفحك. ونحن لا نستقبل بيانات الملفات ولا نخزّنها، لأن الملفات لا تغادر متصفحك.',
+            'الموقع مستضاف على Cloudflare. ولتوصيل الصفحات تعالج خوادم Cloudflare بيانات الطلب المعتادة، مثل عنوان IP ووكيل المستخدم في متصفحك. ونحن لا نستقبل بيانات الملفات ولا نخزّنها، لأن الملفات لا تغادر متصفحك.',
           ],
         },
         {

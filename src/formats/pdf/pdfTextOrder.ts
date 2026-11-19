@@ -23,19 +23,46 @@ function withTypedArabicLetters(item: TextItem): TextItem {
 }
 const directionOf = (text: string) => (RIGHT_TO_LEFT_LETTER.test(text) ? 'rtl' : LEFT_TO_RIGHT_LETTER.test(text) ? 'ltr' : 'neutral')
 
-// One line's items (already in visual order) as one string in reading order.
+const COMBINING_MARKS_ONLY = /^\p{M}+$/u
+// A gap wider than this many text heights between two pieces of a line is a gap between table cells.
+const COLUMN_GAP_HEIGHTS = 1.2
+// A Latin piece's own spaces and punctuation at its ends ("." of ".OpenAnyDoc", as pdf.js gives it) are split off, so they can
+// sit in the Arabic text around it.
+const LATIN_PIECE_ENDS = /^([^A-Za-z0-9À-ɏ]*)(.*?)([^A-Za-z0-9À-ɏ]*)$/su
+
+// One line's items (already in visual order) as one string in reading order. Spaces and punctuation inside a Latin piece stay in
+// it; between a Latin and an Arabic piece, or at the line's ends, they belong to the Arabic text (the line reads right to left).
 function readLineRightToLeft(itemsLeftToRight: TextItem[]) {
   const runs: { direction: 'rtl' | 'ltr'; texts: string[] }[] = []
-  for (const item of itemsLeftToRight) {
-    const itemDirection = directionOf(item.str)
-    // Spaces and punctuation join the run they sit in; a line read right to left starts and ends in a right-to-left run.
-    const direction = itemDirection === 'neutral' ? (runs.at(-1)?.direction ?? 'rtl') : itemDirection
+  let neutralsAfterLatin: string[] = []
+  const addToRun = (direction: 'rtl' | 'ltr', texts: string[]) => {
     if (runs.at(-1)?.direction !== direction) runs.push({ direction, texts: [] })
-    runs.at(-1)!.texts.push(item.str)
+    runs.at(-1)!.texts.push(...texts)
+  }
+  const pieces = itemsLeftToRight.flatMap((item) => (directionOf(item.str) === 'ltr' ? LATIN_PIECE_ENDS.exec(item.str)!.slice(1).filter(Boolean) : [item.str]))
+  for (const piece of pieces) {
+    const direction = directionOf(piece)
+    if (direction === 'neutral' && runs.at(-1)?.direction === 'ltr') neutralsAfterLatin.push(piece)
+    else if (direction === 'ltr' && runs.at(-1)?.direction === 'ltr') addToRun('ltr', [...neutralsAfterLatin, piece])
+    else {
+      if (neutralsAfterLatin.length) addToRun('rtl', neutralsAfterLatin)
+      addToRun(direction === 'ltr' ? 'ltr' : 'rtl', [piece])
+    }
+    if (direction !== 'neutral') neutralsAfterLatin = []
+  }
+  if (neutralsAfterLatin.length) addToRun('rtl', neutralsAfterLatin)
+  // In an Arabic run a diacritic (a zero-width piece drawn over the letter on its left) stays after its letter when the run is reversed.
+  const readRightToLeft = (texts: string[]) => {
+    const letters: string[] = []
+    for (const text of texts) {
+      if (COMBINING_MARKS_ONLY.test(text) && letters.length) letters[letters.length - 1] += text
+      else letters.push(text.length === 1 ? (MIRRORED_BRACKETS[text] ?? text) : text)
+    }
+    return letters.reverse().join('')
   }
   return runs
     .reverse()
-    .map((run) => (run.direction === 'ltr' ? run.texts.join('') : [...run.texts].reverse().map((text) => (text.length === 1 ? (MIRRORED_BRACKETS[text] ?? text) : text)).join('')))
+    .map((run) => (run.direction === 'ltr' ? run.texts.join('') : readRightToLeft(run.texts)))
     .join('')
 }
 
@@ -51,22 +78,34 @@ export function putRightToLeftLinesInReadingOrder(entries: TextContentEntry[]): 
     // Only lines split into several Arabic pieces and mostly Arabic are rebuilt; any other line passes through as it came.
     if (rightToLeftItems.length >= 2 && rightToLeftItems.length >= leftToRightItems.length) {
       const itemsLeftToRight = [...lineItems].sort((first, second) => first.transform[4] - second.transform[4])
-      const left = itemsLeftToRight[0].transform[4]
-      const right = Math.max(...lineItems.map((item) => item.transform[4] + item.width))
-      const merged: TextItem = {
-        ...itemsLeftToRight[0],
-        str: readLineRightToLeft(itemsLeftToRight),
-        dir: 'rtl',
-        width: right - left,
-        height: Math.max(...lineItems.map((item) => item.height)),
-        hasEOL: lineItems.at(-1)!.hasEOL,
+      // A table row is one line with wide gaps between its cells: each cell is rebuilt on its own and keeps its own place, and the
+      // cells come in reading order, right to left, a space apart, so the gaps are not lost.
+      const cells: TextItem[][] = []
+      for (const item of itemsLeftToRight) {
+        const cell = cells.at(-1)
+        const cellRight = cell ? Math.max(...cell.map((cellItem) => cellItem.transform[4] + cellItem.width)) : 0
+        if (cell && item.transform[4] - cellRight <= COLUMN_GAP_HEIGHTS * Math.max(item.height, cell[0].height)) cell.push(item)
+        else cells.push([item])
       }
-      // The merged item takes the place of the line's first item; its other items are dropped, marked-content entries stay.
+      const mergedCells = cells.reverse().map((cellItems, cellIndex): TextItem => {
+        const left = cellItems[0].transform[4]
+        const right = Math.max(...cellItems.map((item) => item.transform[4] + item.width))
+        const isLastCell = cellIndex === cells.length - 1
+        return {
+          ...cellItems[0],
+          str: readLineRightToLeft(cellItems) + (isLastCell ? '' : ' '),
+          dir: 'rtl',
+          width: right - left,
+          height: Math.max(...cellItems.map((item) => item.height)),
+          hasEOL: isLastCell && lineItems.at(-1)!.hasEOL,
+        }
+      })
+      // The rebuilt cells take the place of the line's first item; its other items are dropped, marked-content entries stay.
       let isMergedPlaced = false
       for (const entry of lineEntries) {
         if (!isTextItem(entry)) result.push(entry)
         else if (!isMergedPlaced) {
-          result.push(merged)
+          result.push(...mergedCells)
           isMergedPlaced = true
         }
       }
@@ -80,8 +119,10 @@ export function putRightToLeftLinesInReadingOrder(entries: TextContentEntry[]): 
   for (const originalEntry of entries) {
     const entry = isTextItem(originalEntry) ? withTypedArabicLetters(originalEntry) : originalEntry
     if (isTextItem(entry)) {
-      const previous = lineItems.at(-1)
-      const isSameLine = previous && !previous.hasEOL && Math.abs(entry.transform[5] - previous.transform[5]) <= Math.max(previous.height, entry.height) * 0.3
+      // A diacritic sits above or below its letter, so it never starts a line, and the next letter is compared with the letter.
+      const previous = lineItems.findLast((item) => !COMBINING_MARKS_ONLY.test(item.str)) ?? lineItems.at(-1)
+      const isDiacritic = COMBINING_MARKS_ONLY.test(entry.str)
+      const isSameLine = previous && !lineItems.at(-1)!.hasEOL && (isDiacritic || Math.abs(entry.transform[5] - previous.transform[5]) <= Math.max(previous.height, entry.height) * 0.3)
       if (previous && !isSameLine) flushLine()
       lineItems.push(entry)
     }

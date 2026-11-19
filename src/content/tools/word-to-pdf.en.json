@@ -1,0 +1,83 @@
+{
+  "title": "Word to PDF – Convert DOCX to PDF Online Free, No Upload",
+  "description": "Convert a Word document to PDF in your browser: pages as the Word viewer shows them, with text you can still select and search. Free, no upload.",
+  "heading": "Word to PDF",
+  "subtitle": "Save a Word document as a PDF, page by page, with text you can still select and search; nothing is uploaded.",
+  "intro": "Convert DOCX to PDF online without Word: the document is laid out the way this site's Word viewer shows it, with Word's own page size and page breaks, headers, footers, tables and pictures, then saved as PDF pages. Each page carries its text, so the PDF can be searched and copied, Arabic included. Works with .docx, .dotx, .docm and OpenDocument .odt files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "The pages carry their text, so it can be selected, searched and copied in any PDF reader."
+    },
+    {
+      "title": "Word's pages",
+      "text": "Word's page size and the page breaks it saved are kept, with headers, footers, tables and pictures."
+    }
+  ],
+  "stepsTitle": "How to convert Word to PDF",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx or .odt file on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to PDF."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the first pages; download the PDF."
+    }
+  ],
+  "handlesTitle": "What Word to PDF handles",
+  "handles": [
+    "Word files: .docx, .dotx and .docm; OpenDocument .odt.",
+    "Headers, footers, page numbers, tables, lists and pictures.",
+    "Arabic and English, each in its own direction.",
+    "Long documents without Word's page marks: cut into pages between lines."
+  ],
+  "limits": [
+    "The pages follow this site's Word viewer, which is close to Word but not identical; fonts your browser doesn't have are replaced.",
+    "Pages are pictures with their text laid over them: the text can be selected and searched, but zooming in is less sharp than in Word's own PDF.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "faqTitle": "Word to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will it look exactly like Word?",
+      "answer": "Close, not identical: the layout follows this site's Word viewer, and fonts your browser doesn't have are replaced. Open the file in the Word viewer to see how it will come out.",
+      "link": {
+        "text": "Word viewer",
+        "path": "/word-viewer"
+      }
+    },
+    {
+      "question": "Can I search the text of the PDF?",
+      "answer": "Yes. Each page carries its text, so it can be selected, searched and copied, Arabic included."
+    },
+    {
+      "question": "Does it work with .doc files?",
+      "answer": "Not yet. Old .doc files can't be read here; save them as .docx in Word or LibreOffice first."
+    },
+    {
+      "question": "Can I edit the PDF afterwards?",
+      "answer": "You can add text, shapes and signatures with Edit PDF; to change the words themselves, edit the Word file and convert it again.",
+      "link": {
+        "text": "Edit PDF",
+        "path": "/edit-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -1,0 +1,84 @@
+{
+  "title": "Redact PDF – Black Out Text in a PDF for Good, No Upload",
+  "description": "Redact a PDF in your browser: black out names, numbers or any area, and the text under each box is removed from the file, not just covered. No upload.",
+  "heading": "Redact PDF",
+  "subtitle": "Black out names, numbers or whole areas, and what is under each box is removed from the file; nothing is uploaded.",
+  "intro": "Redact a PDF online before you share it: draw black boxes over anything private, or type a name or number and mark every place it appears. Each page with a box is rebuilt as a picture with the boxes filled in and an invisible layer of the rest of its text, so the words, pictures and links under the boxes are gone from the new file while everything else can still be selected and searched. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Really removed",
+      "text": "A redacted page is rebuilt from a picture of it, so nothing under a box can be copied or searched; the rest of its text stays selectable."
+    },
+    {
+      "title": "Find and mark",
+      "text": "Type a word or number once and every match on every page gets a box; check them, then save."
+    }
+  ],
+  "stepsTitle": "How to redact a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Mark what to hide",
+      "text": "Drag boxes over the parts to hide, or type a word and click Mark every match."
+    },
+    {
+      "title": "Check every page",
+      "text": "Scroll through the pages; move, resize or delete boxes as needed."
+    },
+    {
+      "title": "Redact and download",
+      "text": "Click Redact and save, check the preview and download the redacted copy."
+    }
+  ],
+  "handlesTitle": "What Redact PDF handles",
+  "handles": [
+    "Text: what a box covers is removed; the page's other text stays selectable and searchable through an invisible layer.",
+    "Pictures and links: whatever lies under a box, and links on that page, are gone too.",
+    "Search: matches are found in the text of every page, upper or lower case."
+  ],
+  "limits": [
+    "Pages with a box become pictures with an invisible text layer: their text can be selected and searched but not edited, and zooming in is less sharp. Pages without a box are copied as they are.",
+    "A line of text that a box touches is left out of the selectable text whole, to be safe; it still shows on the page.",
+    "Bookmarks, form fields and the document's links are not carried into the redacted copy.",
+    "Search finds text, not words inside scanned pictures; mark scanned pages by hand.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faqTitle": "Redact PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is the text really gone, or just covered?",
+      "answer": "Gone. Each page with a box is replaced by a picture of the page with the boxes filled in black, so the words under them are no longer in the file. Pages without a box are copied as they are."
+    },
+    {
+      "question": "Can I still select text on redacted pages?",
+      "answer": "Yes, everything except the lines the boxes touch. The page is a picture with an invisible text layer over it, the way scanned PDFs with OCR work. A line of text that a box touches is left out of that layer whole, to be safe."
+    },
+    {
+      "question": "Can it find every place a name appears?",
+      "answer": "Yes, in text the PDF holds: type the name and click Mark every match, then check each page before saving. Scanned pages hold pictures, so mark them by hand."
+    },
+    {
+      "question": "Is it different from hiding data in a spreadsheet?",
+      "answer": "Yes. For CSV, Excel or JSON files, Mask data replaces the values in the cells instead.",
+      "link": {
+        "text": "Mask data",
+        "path": "/mask-data"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

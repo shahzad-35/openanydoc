@@ -3,6 +3,10 @@
 //   pictures that pdf-lib draws when the copy is saved (pdfTools.worker.ts, `stamp-pdf`).
 // - Sign: a drawn, typed or uploaded signature placed as a picture on one or more pages (a visual signature only).
 // - Fill: pdf.js's form fields; "Flatten on save" draws each value as a picture and takes the fields out.
+// - PDF Forms: fillable fields (text, multi-line, checkbox, drop-down, radio, date, signature) drawn as boxes, named and set up,
+//   then added by pdf-lib (pdfTools.worker.ts, `add-form-fields`).
+// - Redact: black boxes drawn or put on every match of a search; each page with a box becomes a picture of itself with the boxes
+//   filled in, so what was under them is gone from the file.
 // One undo history covers both our layer and pdf.js's editor, and the page asks before unsaved edits are thrown away.
 // "Save a copy" makes a new file; the chosen file is never changed.
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
@@ -21,10 +25,10 @@ import { useEditSession } from '../../formats/useEditSession'
 import { PDFJS_DATA_ROOT, loadPdfLibrary, pdfDocumentOptions } from '../../formats/pdf/pdfLibrary'
 import { reorderRightToLeftTextOf } from '../../formats/pdf/pdfTextOrder'
 import type { ToolProps } from '../registry'
-import { PagesChoice, ProgressBar, baseNameOf, chosenPageIndexes, drawTextPicture, pdfResultFile, pngBytesOf, problemMessageKey, turnPicture } from './PdfToolParts'
+import { PagesChoice, ProgressBar, baseNameOf, chosenPageIndexes, drawPagePicture, drawTextPicture, pdfResultFile, pngBytesOf, problemMessageKey, turnPicture } from './PdfToolParts'
 import type { PagesChoiceValue, StampPicture } from './PdfToolParts'
 import { runPdfTask } from './pdfTasks'
-import type { PageBox, PageShape, PageStamp } from './pdfTasks'
+import type { FormFieldKind, NewFormField, PageBox, PageShape, PageStamp } from './pdfTasks'
 
 // pdf.js's own words would come from its translation files, which it fetches; it gets none (as in the PDF viewer).
 const silentLocalization = {
@@ -44,7 +48,8 @@ const fieldClass = 'control-shape min-h-11 border-2 border-rule bg-paper-raised 
 
 type ShapeKind = PageShape['kind']
 type PictureItem = { id: number; pageIndex: number; box: PageBox; kind: 'picture'; picture: StampPicture; pictureUrl: string }
-type ShapeItem = { id: number; pageIndex: number; box: PageBox; kind: ShapeKind; color: string; thickness: number }
+// `fill`: a filled box (a redaction, a form field); `caption`: the name written in it (a form field).
+type ShapeItem = { id: number; pageIndex: number; box: PageBox; kind: ShapeKind; color: string; thickness: number; fill?: string; caption?: string }
 type OverlayItem = PictureItem | ShapeItem
 // Where a page sits in the overlay (CSS pixels from the overlay's top-left corner) and how many pixels a point takes.
 type PageFrame = { left: number; top: number; width: number; height: number; pixelsPerPoint: number }
@@ -207,7 +212,13 @@ function ShapeDrawing({ item, frame }: { item: ShapeItem; frame: PageFrame }) {
   const head = [-1, 1].map((side) => `${to.x + headLength * Math.cos(angle + Math.PI + (side * Math.PI) / 7)},${to.y + headLength * Math.sin(angle + Math.PI + (side * Math.PI) / 7)}`)
   return (
     <svg width={width + 2 * padding} height={height + 2 * padding} className="pdf-item-shape" aria-hidden="true">
-      {item.kind === 'rectangle' && <rect x={padding} y={padding} width={width} height={height} fill="none" stroke={item.color} strokeWidth={stroke} />}
+      {item.kind === 'rectangle' && <rect x={padding} y={padding} width={width} height={height} fill={item.fill ?? 'none'} stroke={item.color} strokeWidth={stroke} />}
+      {/* A name that would not fit (a checkbox, a choice button) is left out; the field panel and its label still name it. */}
+      {item.caption && width >= 40 * scale && (
+        <text x={padding + 3} y={padding + height / 2} dominantBaseline="middle" fontSize={Math.max(Math.min(height * 0.6, 11 * scale), 7)} fill={item.color} className="pdf-item-caption">
+          {item.caption}
+        </text>
+      )}
       {item.kind === 'ellipse' && <ellipse cx={padding + width / 2} cy={padding + height / 2} rx={width / 2} ry={height / 2} fill="none" stroke={item.color} strokeWidth={stroke} />}
       {(item.kind === 'line' || item.kind === 'arrow') && <line x1={from.x} y1={from.y} x2={to.x} y2={to.y} stroke={item.color} strokeWidth={stroke} strokeLinecap="round" />}
       {item.kind === 'arrow' && <polyline points={`${head[0]} ${to.x},${to.y} ${head[1]}`} fill="none" stroke={item.color} strokeWidth={stroke} strokeLinecap="round" strokeLinejoin="round" />}
@@ -359,7 +370,7 @@ function OverlayLayer({
             id={`pdf-item-${position + 1}`}
             role="group"
             tabIndex={0}
-            aria-label={t(item.kind === 'picture' ? 'tools.editor.pictureItem' : `tools.editor.shape.${item.kind}`, { page: item.pageIndex + 1 })}
+            aria-label={item.kind !== 'picture' && item.caption ? t('tools.forms.item', { name: item.caption, page: item.pageIndex + 1 }) : t(item.kind === 'picture' ? 'tools.editor.pictureItem' : item.fill ? 'tools.redact.item' : `tools.editor.shape.${item.kind}`, { page: item.pageIndex + 1 })}
             className={`pdf-item${isSelected ? ' is-selected' : ''}`}
             ref={(element) => {
               if (!element) return
@@ -1112,6 +1123,333 @@ export function FillPdf(props: ToolProps) {
             {t('tools.editor.saveCopy')}
           </button>
         </>
+      }
+    />
+  )
+}
+
+// ---------------------------------------------------------------- Redact PDF
+
+const REDACTION_COLOR = '#000000'
+// Room around a found word, in points, so the edges of its letters are covered too.
+const MATCH_PADDING_POINTS = 1.5
+const positiveBox = (box: PageBox): PageBox => ({ x: Math.min(box.x, box.x + box.width), y: Math.min(box.y, box.y + box.height), width: Math.abs(box.width), height: Math.abs(box.height) })
+
+export function RedactPdf(props: ToolProps) {
+  const { t } = useT()
+  const view = usePdfPageView(props.files[0], { withEditor: false, withForms: false })
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const frames = usePageFrames(view, overlayRef)
+  const history = useOverlayHistory(null)
+  const [isMarking, setIsMarking] = useState(true)
+  const [searchText, setSearchText] = useState('')
+  const [searchMessage, setSearchMessage] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const nextIdRef = useRef(1)
+  const saving = useEditorSaving(props, history.items.length > 0, 'redacted')
+  const redactionBox = (pageIndex: number, box: PageBox): ShapeItem => ({ id: nextIdRef.current++, kind: 'rectangle', pageIndex, box, color: REDACTION_COLOR, thickness: 1, fill: REDACTION_COLOR })
+
+  function addBox(pageIndex: number, box: PageBox) {
+    const item = redactionBox(pageIndex, box)
+    history.changeItems((items) => [...items, item])
+    setSelectedId(item.id)
+  }
+
+  // A box over every place the search text appears, on every page. Letters are taken as equally wide, so a match inside a longer
+  // run of text is placed by its share of the run (a right-to-left run starts at its right end).
+  async function markMatches() {
+    const { pdfDocument } = view
+    const query = searchText.trim().toLocaleLowerCase()
+    if (!pdfDocument || !query) return
+    setIsSearching(true)
+    const found: ShapeItem[] = []
+    for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
+      const page = await pdfDocument.getPage(pageNumber)
+      const viewport = page.getViewport({ scale: 1 })
+      const content = await page.getTextContent()
+      for (const item of content.items) {
+        if (!('str' in item) || !item.str) continue
+        const runText = item.str.toLocaleLowerCase()
+        const [scaleX, skewY, skewX, scaleY, baselineX, baselineY] = item.transform as number[]
+        const directionLength = Math.hypot(scaleX, skewY) || 1
+        const direction = { x: scaleX / directionLength, y: skewY / directionLength }
+        const fontHeight = Math.hypot(skewX, scaleY)
+        for (let start = runText.indexOf(query); start !== -1; start = runText.indexOf(query, start + query.length)) {
+          let [startShare, endShare] = [start / runText.length, (start + query.length) / runText.length]
+          if (item.dir === 'rtl') [startShare, endShare] = [1 - endShare, 1 - startShare]
+          const along = (share: number) => ({ x: baselineX + direction.x * item.width * share, y: baselineY + direction.y * item.width * share })
+          // From a quarter of the font's height under the baseline (descenders) to its full height above.
+          const corners = [along(startShare), along(endShare)].flatMap((point) => [-0.25, 1].map((up) => viewport.convertToViewportPoint(point.x - direction.y * fontHeight * up, point.y + direction.x * fontHeight * up)))
+          const xs = corners.map(([x]) => x)
+          const ys = corners.map(([, y]) => y)
+          found.push(redactionBox(pageNumber - 1, { x: Math.min(...xs) - MATCH_PADDING_POINTS, y: Math.min(...ys) - MATCH_PADDING_POINTS, width: Math.max(...xs) - Math.min(...xs) + 2 * MATCH_PADDING_POINTS, height: Math.max(...ys) - Math.min(...ys) + 2 * MATCH_PADDING_POINTS }))
+        }
+      }
+      page.cleanup()
+    }
+    if (found.length) history.changeItems((items) => [...items, ...found])
+    setSearchMessage(found.length ? t('tools.redact.matchesMarked', { count: found.length }) : t('tools.redact.noMatches'))
+    setIsSearching(false)
+  }
+
+  function saveRedactedCopy() {
+    const { pdfDocument } = view
+    if (!pdfDocument) return
+    void saving.saveCopy(async (onProgress) => {
+      const boxesByPage = new Map<number, PageBox[]>()
+      for (const item of history.items) boxesByPage.set(item.pageIndex, [...(boxesByPage.get(item.pageIndex) ?? []), positiveBox(item.box)])
+      const pictures = []
+      for (const [pageIndex, boxes] of boxesByPage) {
+        pictures.push(await drawPagePicture(pdfDocument, pageIndex, { blackBoxes: boxes }))
+        onProgress(pictures.length, boxesByPage.size)
+      }
+      const response = await runPdfTask({ type: 'picture-pages', pdf: (await pdfDocument.getData()).slice().buffer, pageCount: pdfDocument.numPages, pictures })
+      if (response.status !== 'ok' || !response.pdf) throw new Error('The redacted copy could not be made')
+      return response.pdf
+    })
+  }
+
+  const deleteItem = (id: number | null) => id !== null && history.changeItems((items) => items.filter((item) => item.id !== id))
+  const isReady = view.viewState === 'ready'
+  return (
+    <EditorFrame
+      id="redact-pdf-tool"
+      view={view}
+      menus={[fileMenu(t, saveRedactedCopy, () => void saving.closeFile(), !isReady || history.items.length === 0 || saving.saveProgress !== null), editMenu(t, history, selectedId, () => deleteItem(selectedId))]}
+      saveProgress={saving.saveProgress}
+      error={saving.error}
+      note={
+        <>
+          <p id="redact-pdf-note" className="text-center text-sm text-ink-soft">{t('tools.redact.note')}</p>
+          <p id="redact-search-result" aria-live="polite" className="text-center text-sm font-medium">{searchMessage}</p>
+        </>
+      }
+      toolbar={
+        <>
+          <button id="redact-mark-button" type="button" aria-pressed={isMarking} disabled={!isReady} onClick={() => setIsMarking(true)} className="btn btn--quiet btn--compact press">
+            {t('tools.redact.mark')}
+          </button>
+          <button id="redact-select-button" type="button" aria-pressed={!isMarking} disabled={!isReady} onClick={() => setIsMarking(false)} className="btn btn--quiet btn--compact press">
+            {t('tools.edit.mode.select')}
+          </button>
+          <form
+            id="redact-search-form"
+            className="flex flex-wrap items-center justify-center gap-2"
+            onSubmit={(event) => {
+              event.preventDefault()
+              void markMatches()
+            }}
+          >
+            <input id="redact-search-input" type="search" dir="auto" value={searchText} disabled={!isReady} placeholder={t('tools.redact.searchPlaceholder')} aria-label={t('tools.redact.searchLabel')} onChange={(event) => setSearchText(event.target.value)} className={`${fieldClass} w-48`} />
+            <button id="redact-search-button" type="submit" disabled={!isReady || !searchText.trim() || isSearching} className="btn btn--quiet btn--compact press whitespace-nowrap">
+              {t('tools.redact.markMatches')}
+            </button>
+          </form>
+          <UndoRedoButtons history={history} itemCount={history.items.length} />
+          <button id="redact-save-button" type="button" disabled={!isReady || history.items.length === 0 || saving.saveProgress !== null} onClick={saveRedactedCopy} className="btn btn--primary btn--compact press">
+            {t('tools.redact.save')}
+          </button>
+        </>
+      }
+      overlay={<OverlayLayer overlayRef={overlayRef} frames={frames} items={history.items} selectedId={selectedId} drawingKind={isMarking ? 'rectangle' : null} onSelect={setSelectedId} onChangeBox={(id, box) => history.changeItems((items) => items.map((item) => (item.id === id ? { ...item, box } : item)))} onDelete={deleteItem} onCreateShape={addBox} pageSizes={view.pageSizes} />}
+    />
+  )
+}
+
+// ---------------------------------------------------------------- PDF Forms (fillable fields added to a PDF)
+
+type FieldSettings = { kind: FormFieldKind; name: string; isRequired: boolean; defaultValue: string; optionsText: string }
+const FIELD_KINDS: FormFieldKind[] = ['text', 'multiline', 'checkbox', 'dropdown', 'radio', 'date', 'signature']
+// A click without a drag gives a 120 × 80 box (OverlayLayer); such a click places a field of the usual size for its kind, in points.
+const CLICKED_BOX = { width: 120, height: 80 }
+const FIELD_SIZES: Record<FormFieldKind, [number, number]> = { text: [180, 22], multiline: [240, 64], checkbox: [14, 14], dropdown: [160, 22], radio: [14, 42], date: [110, 22], signature: [180, 44] }
+const FIELD_COLOR = '#2563c9'
+const FIELD_FILL = 'rgba(37, 99, 201, 0.12)'
+// pdf-lib draws field values with Helvetica, which has Latin letters only: a default value or a drop-down choice must fit it.
+const HELVETICA_TEXT = /^[ -~ -ÿ]*$/
+const optionsOf = (settings: FieldSettings) => settings.optionsText.split('\n').map((option) => option.trim()).filter(Boolean)
+
+// What is wrong with a field before the form can be saved, or null.
+function fieldProblem(settings: FieldSettings, takenNames: string[]): MessageKey | null {
+  const name = settings.name.trim()
+  if (!name) return 'tools.forms.problem.noName'
+  if (takenNames.filter((takenName) => takenName === name).length > 0) return 'tools.forms.problem.sameName'
+  const options = optionsOf(settings)
+  if (settings.kind === 'dropdown' && options.length < 1) return 'tools.forms.problem.options'
+  if (settings.kind === 'radio' && options.length < 2) return 'tools.forms.problem.options'
+  if (!HELVETICA_TEXT.test(settings.defaultValue) || (settings.kind === 'dropdown' && !options.every((option) => HELVETICA_TEXT.test(option)))) return 'tools.forms.problem.latinOnly'
+  if ((settings.kind === 'dropdown' || settings.kind === 'radio') && settings.defaultValue && !options.includes(settings.defaultValue)) return 'tools.forms.problem.defaultNotOption'
+  return null
+}
+
+export function CreatePdfForm(props: ToolProps) {
+  const { t } = useT()
+  const view = usePdfPageView(props.files[0], { withEditor: false, withForms: true })
+  const overlayRef = useRef<HTMLDivElement>(null)
+  const frames = usePageFrames(view, overlayRef)
+  const history = useOverlayHistory(null)
+  const [placingKind, setPlacingKind] = useState<FormFieldKind | null>('text')
+  const [settingsById, setSettingsById] = useState(new Map<number, FieldSettings>())
+  const [existingNames, setExistingNames] = useState<string[]>([])
+  const [selectedId, setSelectedId] = useState<number | null>(null)
+  const nextIdRef = useRef(1)
+  const saving = useEditorSaving(props, history.items.length > 0, 'fillable')
+  const { pdfDocument } = view
+
+  // The PDF's own fields keep their names, so a new field can't take one of them.
+  useEffect(() => {
+    if (!pdfDocument) return
+    void (async () => {
+      const names: string[] = []
+      for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
+        const annotations = (await (await pdfDocument.getPage(pageNumber)).getAnnotations()) as { subtype: string; fieldName?: string }[]
+        for (const annotation of annotations) if (annotation.subtype === 'Widget' && annotation.fieldName) names.push(annotation.fieldName)
+      }
+      setExistingNames(names)
+    })()
+  }, [pdfDocument])
+
+  const fields = history.items.map((item) => ({ item, settings: settingsById.get(item.id)! }))
+  const problemOf = (itemId: number) => {
+    const settings = settingsById.get(itemId)!
+    const otherNames = [...existingNames, ...fields.filter((field) => field.item.id !== itemId).map((field) => field.settings.name.trim())]
+    return fieldProblem(settings, otherNames)
+  }
+  const fieldsWithProblems = fields.filter((field) => problemOf(field.item.id) !== null)
+  const selected = fields.find((field) => field.item.id === selectedId)
+
+  function freeNameFor(kind: FormFieldKind) {
+    const takenNames = new Set([...existingNames, ...fields.map((field) => field.settings.name)])
+    let number = 1
+    while (takenNames.has(`${kind}_${number}`)) number++
+    return `${kind}_${number}`
+  }
+  function addField(pageIndex: number, box: PageBox) {
+    if (!placingKind) return
+    const isClick = box.width === CLICKED_BOX.width && box.height === CLICKED_BOX.height
+    const [width, height] = FIELD_SIZES[placingKind]
+    const id = nextIdRef.current++
+    const hasOptions = placingKind === 'dropdown' || placingKind === 'radio'
+    setSettingsById((previous) => new Map(previous).set(id, { kind: placingKind, name: freeNameFor(placingKind), isRequired: false, defaultValue: '', optionsText: hasOptions ? t('tools.forms.sampleOptions') : '' }))
+    history.changeItems((items) => [...items, { id, kind: 'rectangle', pageIndex, box: isClick ? { x: box.x, y: box.y, width, height } : box, color: FIELD_COLOR, thickness: 1, fill: FIELD_FILL }])
+    setSelectedId(id)
+    setPlacingKind(null)
+  }
+  const changeSelected = (change: Partial<FieldSettings>) => selected && setSettingsById((previous) => new Map(previous).set(selected.item.id, { ...selected.settings, ...change }))
+  const deleteItem = (id: number | null) => id !== null && history.changeItems((items) => items.filter((item) => item.id !== id))
+
+  function saveFillableCopy() {
+    if (!pdfDocument || fieldsWithProblems.length) return
+    void saving.saveCopy(async () => {
+      const newFields: NewFormField[] = fields.map(({ item, settings }) => ({ kind: settings.kind, name: settings.name.trim(), pageIndex: item.pageIndex, box: positiveBox(item.box), isRequired: settings.isRequired, defaultValue: settings.defaultValue, options: optionsOf(settings) }))
+      const response = await runPdfTask({ type: 'add-form-fields', pdf: (await pdfDocument.getData()).slice().buffer, fields: newFields })
+      if (response.status !== 'ok' || !response.pdf) throw new Error('The fields could not be added')
+      return response.pdf
+    })
+  }
+
+  const isReady = view.viewState === 'ready'
+  const selectedProblem = selected ? problemOf(selected.item.id) : null
+  const selectedOptions = selected ? optionsOf(selected.settings) : []
+  return (
+    <EditorFrame
+      id="pdf-forms-tool"
+      view={view}
+      menus={[fileMenu(t, saveFillableCopy, () => void saving.closeFile(), !isReady || fields.length === 0 || fieldsWithProblems.length > 0), editMenu(t, history, selectedId, () => deleteItem(selectedId))]}
+      saveProgress={saving.saveProgress}
+      error={saving.error}
+      note={
+        <>
+          <p id="pdf-forms-note" className="text-center text-sm text-ink-soft">{placingKind ? t('tools.forms.placeHint', { kind: t(`tools.forms.kind.${placingKind}`) }) : t('tools.forms.note')}</p>
+          {fieldsWithProblems.length > 0 && (
+            <p id="pdf-forms-problems" role="status" className="text-center text-sm font-medium text-danger">
+              {t('tools.forms.fixFields', { count: fieldsWithProblems.length })}
+            </p>
+          )}
+          {selected && (
+            <fieldset id="pdf-forms-field-panel" className="mx-auto flex max-w-[860px] flex-wrap items-end justify-center gap-3 rounded-[14px] border-2 border-rule p-3 text-start">
+              <legend className="px-1 text-sm font-semibold">{t('tools.forms.panelTitle', { kind: t(`tools.forms.kind.${selected.settings.kind}`), page: selected.item.pageIndex + 1 })}</legend>
+              <label className="flex flex-col gap-1 text-sm font-medium">
+                {t('tools.forms.name')}
+                <input id="pdf-forms-name-input" type="text" dir="auto" value={selected.settings.name} aria-invalid={selectedProblem === 'tools.forms.problem.noName' || selectedProblem === 'tools.forms.problem.sameName'} onChange={(event) => changeSelected({ name: event.target.value })} className={`${fieldClass} w-44`} />
+              </label>
+              {(selected.settings.kind === 'dropdown' || selected.settings.kind === 'radio') && (
+                <label className="flex flex-col gap-1 text-sm font-medium">
+                  {t('tools.forms.options')}
+                  <textarea id="pdf-forms-options-input" dir="auto" rows={3} value={selected.settings.optionsText} onChange={(event) => changeSelected({ optionsText: event.target.value })} className="control-shape w-44 border-2 border-rule bg-paper-raised px-3 py-2 text-ink" />
+                </label>
+              )}
+              {selected.settings.kind === 'checkbox' ? (
+                <label className="inline-flex min-h-11 items-center gap-2 text-sm font-medium">
+                  <input id="pdf-forms-checked-checkbox" type="checkbox" checked={selected.settings.defaultValue === 'checked'} onChange={(event) => changeSelected({ defaultValue: event.target.checked ? 'checked' : '' })} className="size-5" />
+                  {t('tools.forms.checkedByDefault')}
+                </label>
+              ) : selected.settings.kind === 'dropdown' || selected.settings.kind === 'radio' ? (
+                <label className="flex flex-col gap-1 text-sm font-medium">
+                  {t('tools.forms.defaultValue')}
+                  <select id="pdf-forms-default-select" value={selectedOptions.includes(selected.settings.defaultValue) ? selected.settings.defaultValue : ''} onChange={(event) => changeSelected({ defaultValue: event.target.value })} className={fieldClass}>
+                    <option value="">{t('tools.forms.noDefault')}</option>
+                    {selectedOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              ) : (
+                selected.settings.kind !== 'signature' && (
+                  <label className="flex flex-col gap-1 text-sm font-medium">
+                    {t('tools.forms.defaultValue')}
+                    <input id="pdf-forms-default-input" type="text" dir="auto" value={selected.settings.defaultValue} placeholder={selected.settings.kind === 'date' ? 'yyyy-mm-dd' : ''} onChange={(event) => changeSelected({ defaultValue: event.target.value })} className={`${fieldClass} w-44`} />
+                  </label>
+                )
+              )}
+              <label className="inline-flex min-h-11 items-center gap-2 text-sm font-medium">
+                <input id="pdf-forms-required-checkbox" type="checkbox" checked={selected.settings.isRequired} onChange={(event) => changeSelected({ isRequired: event.target.checked })} className="size-5" />
+                {t('tools.forms.required')}
+              </label>
+              <button id="pdf-forms-delete-button" type="button" onClick={() => deleteItem(selected.item.id)} className="btn btn--quiet btn--compact press">
+                {t('tools.editor.deleteItem')}
+              </button>
+              {selectedProblem && (
+                <p id="pdf-forms-field-problem" role="alert" className="w-full text-center text-sm font-medium text-danger">
+                  {t(selectedProblem)}
+                </p>
+              )}
+            </fieldset>
+          )}
+        </>
+      }
+      toolbar={
+        <>
+          <button id="pdf-forms-select-button" type="button" aria-pressed={placingKind === null} disabled={!isReady} onClick={() => setPlacingKind(null)} className="btn btn--quiet btn--compact press">
+            {t('tools.edit.mode.select')}
+          </button>
+          {FIELD_KINDS.map((kind) => (
+            <button key={kind} id={`pdf-forms-add-${kind}-button`} type="button" aria-pressed={placingKind === kind} disabled={!isReady} onClick={() => setPlacingKind(kind)} className="btn btn--quiet btn--compact press">
+              {t(`tools.forms.kind.${kind}`)}
+            </button>
+          ))}
+          <UndoRedoButtons history={history} itemCount={history.items.length} />
+          <button id="pdf-forms-save-button" type="button" disabled={!isReady || fields.length === 0 || fieldsWithProblems.length > 0 || saving.saveProgress !== null} onClick={saveFillableCopy} className="btn btn--primary btn--compact press">
+            {t('tools.editor.saveCopy')}
+          </button>
+        </>
+      }
+      overlay={
+        <OverlayLayer
+          overlayRef={overlayRef}
+          frames={frames}
+          items={history.items.map((item) => ({ ...item, caption: settingsById.get(item.id)?.name || '?' }))}
+          selectedId={selectedId}
+          drawingKind={placingKind ? 'rectangle' : null}
+          onSelect={setSelectedId}
+          onChangeBox={(id, box) => history.changeItems((items) => items.map((item) => (item.id === id ? { ...item, box } : item)))}
+          onDelete={deleteItem}
+          onCreateShape={addField}
+          pageSizes={view.pageSizes}
+        />
       }
     />
   )

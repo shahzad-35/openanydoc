@@ -1,0 +1,79 @@
+{
+  "title": "Upscale Image Online – Enlarge a Photo 2× or 4×, No Upload",
+  "description": "Upscale a picture 2× or 4× in your browser with a model that adds detail instead of blurring it. JPG, PNG, WebP and HEIC. Free, nothing is uploaded.",
+  "heading": "Upscale image",
+  "subtitle": "Make a small picture two or four times larger with sharper detail than a plain resize; nothing is uploaded.",
+  "intro": "Upscale an image online without sending it anywhere: Swin2SR, a super-resolution model, runs in your browser and redraws the picture at twice the size, guessing fine detail where a normal resize only blurs. Choose 4× to run it twice. It works best on small photos, logos and screenshots. The first time, the model (7 MB, plus its 15 MB runtime) is loaded from this site and kept by your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The picture is enlarged on your device; it never goes to a server."
+    },
+    {
+      "title": "Sharper than resizing",
+      "text": "Edges and textures are redrawn, not just stretched."
+    },
+    {
+      "title": "2× or 4×",
+      "text": "Twice or four times the width and height."
+    }
+  ],
+  "stepsTitle": "How to upscale an image",
+  "steps": [
+    {
+      "title": "Choose your picture",
+      "text": "Click Choose a file, or drop a JPG, PNG, WebP or HEIC picture on the page."
+    },
+    {
+      "title": "Pick the size",
+      "text": "Choose 2 times or 4 times larger."
+    },
+    {
+      "title": "Upscale and download",
+      "text": "Click Upscale, wait while each part is drawn, and download the result."
+    }
+  ],
+  "handlesTitle": "What Upscale image handles",
+  "handles": [
+    "Small photos, logos, icons and screenshots.",
+    "2× in one pass, 4× in two.",
+    "JPG, PNG, WebP and HEIC; saved in the same format (HEIC as JPG).",
+    "Pictures up to 1,024 pixels on the long side for 2×, 512 for 4×."
+  ],
+  "limits": [
+    "It is a small model that runs on your device: it sharpens, but can't invent detail that was never there, and faces or text may look painted.",
+    "Large pictures take a while, since every part is worked out on your device.",
+    "The first use loads the model and its runtime (about 22 MB) from this site; after that it works offline."
+  ],
+  "faqTitle": "Upscale image: questions",
+  "faq": [
+    {
+      "question": "Is my picture uploaded?",
+      "answer": "No. Your picture is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How is this different from Resize image?",
+      "answer": "Resize image stretches the pixels, which blurs a picture made larger. Upscale redraws it with a model that adds edges and texture.",
+      "link": {
+        "text": "Resize image",
+        "path": "/resize-image"
+      }
+    },
+    {
+      "question": "How large can the picture be?",
+      "answer": "Up to 1,024 pixels on its long side for 2×, and 512 for 4×. Larger pictures already have enough detail for most uses."
+    },
+    {
+      "question": "Why does it take a while?",
+      "answer": "The model works through the picture in small parts on your own device. A small picture takes seconds; a large one can take a minute or two."
+    },
+    {
+      "question": "What does the first use download?",
+      "answer": "The model and the runtime that runs it, about 22 MB, from this site itself. Your browser keeps them, so later uses start at once and work offline."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

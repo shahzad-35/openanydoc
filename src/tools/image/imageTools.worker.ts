@@ -196,5 +196,12 @@ self.onmessage = async (event: MessageEvent<ImageTaskRequest>) => {
   } catch {
     response = { status: 'error', reason: 'failed' }
   }
-  postMessage(response, { transfer: response.status === 'ok' && response.picture ? [response.picture] : [] })
+  // The results are moved to the page, not copied (a batch can be hundreds of megabytes).
+  const transfer: Transferable[] = []
+  if (response.status === 'ok') {
+    if (response.picture) transfer.push(response.picture)
+    for (const image of response.images ?? []) transfer.push(image.bytes.buffer)
+    if (response.zip) transfer.push(response.zip.buffer)
+  }
+  postMessage(response, { transfer: [...new Set(transfer)] })
 }

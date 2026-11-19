@@ -2,7 +2,7 @@
   "title": "JSON Viewer Online – Tree View, Formatter & Validator",
   "description": "JSON viewer online: see any JSON file as a tree you can fold, or as a table, then format it, validate it and fix errors by line. Free, nothing is uploaded.",
   "heading": "JSON Viewer Online, Formatter and Editor",
-  "subtitle": "Drop or paste JSON to see it as a tree, format it and find errors instantly; nothing is uploaded.",
+  "subtitle": "Paste or drop JSON to see a tree, format it and find errors; nothing is uploaded.",
   "intro": "A free JSON viewer online: open a JSON file or paste JSON, explore it as a tree, a table or formatted code, validate it and fix errors by line and column, then pretty print and download it. Your JSON never leaves your device.",
   "features": [
     {

@@ -1,0 +1,79 @@
+{
+  "title": "Crop PDF – Cut PDF Margins Online Free, No Upload",
+  "description": "Crop PDF pages in your browser: drag a box over the part to keep and cut the same margins from every page or chosen pages. Free, nothing is uploaded.",
+  "heading": "Crop PDF",
+  "subtitle": "Drag a box over the part of the page to keep and cut the rest off every page you choose; nothing is uploaded.",
+  "intro": "Crop a PDF online to cut wide margins, a scanner's dark edges or a printer's crop marks: drag the box on any page, see the size in millimetres, and apply it to all pages or to the pages you type. By default what lies outside the box is removed from the file and the text inside stays selectable; turn that off to keep sharp vector pages that only hide the outside. Nothing leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Really cut",
+      "text": "What lies outside the box is removed from the file, and the text inside it stays selectable and searchable."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How to crop a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Drag the box",
+      "text": "Move and resize the box over the part to keep; pick another page to check it there."
+    },
+    {
+      "title": "Choose the pages",
+      "text": "Keep all pages, or choose Only these pages and type them, such as 1-3, 5."
+    },
+    {
+      "title": "Crop and download",
+      "text": "Click Crop PDF, check the preview and download the new file."
+    }
+  ],
+  "handlesTitle": "What Crop PDF handles",
+  "handles": [
+    "Margins: the same share of every chosen page is kept, so pages of one size line up.",
+    "Turned pages: the box is placed as the page is shown, whatever its rotation.",
+    "Keyboard: arrow keys move the box and Shift with an arrow resizes it.",
+    "Removed or hidden: remove what's outside the box (pages rebuilt as pictures with selectable text), or only hide it and keep vector pages."
+  ],
+  "limits": [
+    "With Remove what's outside the box on, cropped pages become pictures with an invisible text layer: text can be selected and searched but not edited, and zooming in is less sharp. Turn it off to keep vector pages; the outside is then only hidden.",
+    "The box is a share of each page, so pages of different sizes are cut in proportion, not by the same millimetres.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faqTitle": "Crop PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Is the cropped part deleted?",
+      "answer": "Yes, by default: the page is rebuilt from the part inside the box, so nothing outside it stays in the file. Turn off Remove what's outside the box to keep vector pages; the outside is then hidden, not deleted."
+    },
+    {
+      "question": "Can I crop only some pages?",
+      "answer": "Yes. Choose Only these pages and type them, such as 1-3, 5. The other pages stay as they are."
+    },
+    {
+      "question": "Does the text stay selectable?",
+      "answer": "Yes. The text inside the box is kept as an invisible layer over the cropped page, so it can be selected, searched and copied. With Remove what's outside the box off, the page is not changed at all, only its visible area."
+    },
+    {
+      "question": "Can I use a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

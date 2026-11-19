@@ -65,7 +65,7 @@ export type ImageMetadata = {
 export async function readImageMetadata(file: Blob): Promise<ImageMetadata> {
   try {
     const exifr = await import('exifr')
-    const fields = (await exifr.parse(file, { tiff: true, exif: true, gps: true, iptc: true, xmp: true, icc: false, mergeOutput: true, translateValues: true, reviveValues: true })) as Record<string, unknown> | undefined
+    const fields = (await exifr.parse(file, { tiff: true, exif: true, gps: true, iptc: true, xmp: true, icc: false, mergeOutput: true, translateValues: false, reviveValues: true })) as Record<string, unknown> | undefined
     if (!fields) return { fieldCount: 0 }
     const text = (value: unknown) => (typeof value === 'string' && value.trim() ? value.trim() : undefined)
     const make = text(fields.Make)
@@ -89,46 +89,70 @@ export async function readImageMetadata(file: Blob): Promise<ImageMetadata> {
 
 // ---------------------------------------------------------------- removing metadata without re-encoding
 
-// JPEG: everything but the picture and how to show it goes: APP1 (EXIF, XMP), APP13 (IPTC), APP12 and comments. The JFIF header,
-// the colour profile (APP2) and Adobe's colour marker (APP14) stay, so the picture looks exactly the same.
+// Only what draws the picture is kept (an allowlist): a file can carry metadata in many more places than the usual ones (preview
+// images and gain maps after the picture, the MPF index, C2PA manifests, makers' own segments and chunks).
+
+// JPEG: the JFIF header (APP0), the colour profile (APP2 ICC_PROFILE), Adobe's colour marker (APP14), the tables, the frame and the
+// scans, up to the end of the first picture. Every other application segment, the comments and everything after the picture's end
+// go. A file whose end can't be found returns null, so it is re-encoded instead.
 function stripJpeg(bytes: Uint8Array) {
   const kept: Uint8Array[] = [bytes.subarray(0, 2)]
+  const startsWithText = (at: number, text: string) => Array.from(text).every((character, index) => bytes[at + index] === character.charCodeAt(0))
   let offset = 2
-  while (offset + 4 <= bytes.length && bytes[offset] === 0xff) {
+  while (offset + 1 < bytes.length && bytes[offset] === 0xff) {
     const marker = bytes[offset + 1]
-    if (marker === 0xda) break
-    const length = (bytes[offset + 2] << 8) | bytes[offset + 3]
-    const isMetadata = marker === 0xe1 || marker === 0xed || marker === 0xec || marker === 0xfe
-    if (!isMetadata) kept.push(bytes.subarray(offset, offset + 2 + length))
-    offset += 2 + length
+    // 0xFF fill bytes may come before a marker.
+    if (marker === 0xff) {
+      offset++
+      continue
+    }
+    if (marker === 0xd9) {
+      kept.push(bytes.subarray(offset, offset + 2))
+      return concatBytes(kept)
+    }
+    const segmentEnd = offset + 2 + ((bytes[offset + 2] << 8) | bytes[offset + 3])
+    const isApplicationSegment = marker >= 0xe0 && marker <= 0xef
+    const isKept = isApplicationSegment ? (marker === 0xe0 && startsWithText(offset + 4, 'JFIF\0')) || (marker === 0xe2 && startsWithText(offset + 4, 'ICC_PROFILE\0')) || marker === 0xee : marker !== 0xfe
+    if (isKept) kept.push(bytes.subarray(offset, segmentEnd))
+    offset = segmentEnd
+    if (marker === 0xda) {
+      // A scan's coded data runs to the next marker: 0xFF followed by 0x00 (an escaped byte) or a restart marker belongs to it.
+      let scanEnd = offset
+      while (scanEnd + 1 < bytes.length && !(bytes[scanEnd] === 0xff && bytes[scanEnd + 1] !== 0x00 && (bytes[scanEnd + 1] < 0xd0 || bytes[scanEnd + 1] > 0xd7))) scanEnd++
+      kept.push(bytes.subarray(offset, scanEnd))
+      offset = scanEnd
+    }
   }
-  kept.push(bytes.subarray(offset))
-  return concatBytes(kept)
+  return null
 }
 
-// PNG: text chunks (tEXt, iTXt, zTXt), EXIF (eXIf) and the time stamp (tIME) go; the picture's chunks stay.
+// PNG: the picture's chunks, its colour and transparency, its pixel size and an animation's frames, up to IEND.
+const KEPT_PNG_CHUNKS = ['IHDR', 'PLTE', 'IDAT', 'IEND', 'tRNS', 'cHRM', 'gAMA', 'iCCP', 'sBIT', 'sRGB', 'cICP', 'mDCV', 'cLLI', 'bKGD', 'pHYs', 'acTL', 'fcTL', 'fdAT']
 function stripPng(bytes: Uint8Array) {
   const kept: Uint8Array[] = [bytes.subarray(0, 8)]
   let offset = 8
   while (offset + 12 <= bytes.length) {
     const length = new DataView(bytes.buffer, bytes.byteOffset + offset).getUint32(0)
     const type = String.fromCharCode(...bytes.subarray(offset + 4, offset + 8))
-    if (!['tEXt', 'iTXt', 'zTXt', 'eXIf', 'tIME'].includes(type)) kept.push(bytes.subarray(offset, offset + 12 + length))
+    if (KEPT_PNG_CHUNKS.includes(type)) kept.push(bytes.subarray(offset, offset + 12 + length))
     offset += 12 + length
+    if (type === 'IEND') break
   }
   return concatBytes(kept)
 }
 
-// WebP: the EXIF and XMP chunks go and the extended header's flags for them are cleared.
+// WebP: the picture, alpha, animation and colour profile chunks; the extended header's EXIF and XMP flags are cleared.
+const KEPT_WEBP_CHUNKS = ['VP8 ', 'VP8L', 'VP8X', 'ALPH', 'ANIM', 'ANMF', 'ICCP']
 function stripWebp(bytes: Uint8Array) {
   const kept: Uint8Array[] = []
+  const riffEnd = Math.min(bytes.length, 8 + new DataView(bytes.buffer, bytes.byteOffset).getUint32(4, true))
   let offset = 12
-  while (offset + 8 <= bytes.length) {
+  while (offset + 8 <= riffEnd) {
     const type = String.fromCharCode(...bytes.subarray(offset, offset + 4))
     const size = new DataView(bytes.buffer, bytes.byteOffset + offset).getUint32(4, true)
     const chunk = bytes.slice(offset, offset + 8 + size + (size % 2))
     if (type === 'VP8X') chunk[8] &= ~0x0c
-    if (type !== 'EXIF' && type !== 'XMP ') kept.push(chunk)
+    if (KEPT_WEBP_CHUNKS.includes(type)) kept.push(chunk)
     offset += 8 + size + (size % 2)
   }
   const body = concatBytes(kept)
@@ -148,10 +172,13 @@ function concatBytes(parts: Uint8Array[]) {
 }
 
 // The picture without its metadata, when that is possible without re-encoding (JPEG, PNG, WebP); null for the other formats, and
-// for a JPEG turned by its EXIF orientation (without that field it would show sideways), which are re-encoded instead.
-export function stripMetadataLosslessly(bytes: Uint8Array, extension: string, orientation: number | undefined) {
-  if ((extension === 'jpg' || extension === 'jpeg') && (orientation ?? 1) === 1) return stripJpeg(bytes)
-  if (extension === 'png') return stripPng(bytes)
-  if (extension === 'webp') return stripWebp(bytes)
+// for a JPEG turned by its EXIF orientation (without that field it would show sideways) and for a JPEG whose end can't be found,
+// which are re-encoded instead.
+// The format is read from the file's first bytes, so a file with the wrong extension is re-encoded rather than garbled.
+export function stripMetadataLosslessly(bytes: Uint8Array, orientation: number | undefined) {
+  const startsWith = (signature: number[], at = 0) => signature.every((byte, index) => bytes[at + index] === byte)
+  if (startsWith([0xff, 0xd8])) return (orientation ?? 1) === 1 ? stripJpeg(bytes) : null
+  if (startsWith([0x89, 0x50, 0x4e, 0x47])) return stripPng(bytes)
+  if (startsWith([0x52, 0x49, 0x46, 0x46]) && startsWith([0x57, 0x45, 0x42, 0x50], 8)) return stripWebp(bytes)
   return null
 }

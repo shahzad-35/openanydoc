@@ -2,11 +2,11 @@
 // metadata. Each reads the chosen pictures once (useReadImages), shows the first one as a preview, and makes every picture in the
 // image worker; several results come as one ZIP.
 import { useEffect, useRef, useState } from 'react'
-import type { PointerEvent as ReactPointerEvent } from 'react'
+import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react'
 import { useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { formatFileSize } from '../../useFileIntake'
-import { extensionOf, readImageMetadata, stripMetadataLosslessly } from '../../formats/image/imageFiles'
+import { decodeImage, extensionOf, readImageMetadata, stripMetadataLosslessly } from '../../formats/image/imageFiles'
 import type { ToolProps } from '../registry'
 import { baseNameOf, drawTextPicture, turnPicture } from '../pdf/PdfToolParts'
 import type { StampPicture } from '../pdf/PdfToolParts'
@@ -49,28 +49,35 @@ export function CompressImage({ files, onFilesChange, onResult }: ToolProps) {
   const [quality, setQuality] = useState(75)
   const [preview, setPreview] = useState<{ beforeUrl: string; afterUrl: string; beforeSize: number; afterSize: number } | null>(null)
   const batch = useBatch(onResult)
-  const first = pictures[0]
+  // The picture and file, not pictures[0]: readablePictures builds new objects on every render, which would rerun the effects.
+  const firstPicture = pictures[0]?.picture
+  const firstFile = pictures[0]?.file
+  const previewUrlsRef = useRef<string[]>([])
 
   // The first picture compressed with the current settings, shown before and after, a moment after the settings stop changing.
   useEffect(() => {
-    if (!first) return
+    if (!firstPicture || !firstFile) return
     let isCurrent = true
     const timer = window.setTimeout(async () => {
-      const outputFormat = formatOf(format, first.file.name)
-      const { images } = await runImageBatch([{ name: outputNameOf(first.file.name, 'compressed', outputFormat), steps: [], output: { format: outputFormat, quality, optimisePng: true } }], [first.picture], 'preview.zip', () => {})
-      if (!isCurrent) return
-      const afterUrl = URL.createObjectURL(new Blob([images[0].bytes as BlobPart], { type: IMAGE_MIME_TYPES[outputFormat] }))
-      const beforeUrl = await previewAddressOf(first.picture, 1600)
-      setPreview((previous) => {
-        if (previous) [previous.beforeUrl, previous.afterUrl].forEach((url) => URL.revokeObjectURL(url))
-        return { beforeUrl, afterUrl, beforeSize: first.file.size, afterSize: images[0].bytes.length }
-      })
+      try {
+        const outputFormat = formatOf(format, firstFile.name)
+        const { images } = await runImageBatch([{ name: outputNameOf(firstFile.name, 'compressed', outputFormat), steps: [], output: { format: outputFormat, quality, optimisePng: true } }], [firstPicture], 'preview.zip', () => {})
+        if (!isCurrent) return
+        const afterUrl = URL.createObjectURL(new Blob([images[0].bytes as BlobPart], { type: IMAGE_MIME_TYPES[outputFormat] }))
+        const beforeUrl = await previewAddressOf(firstPicture, 1600)
+        previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url))
+        previewUrlsRef.current = [beforeUrl, afterUrl]
+        setPreview({ beforeUrl, afterUrl, beforeSize: firstFile.size, afterSize: images[0].bytes.length })
+      } catch {
+        // The preview stays as it was; the Compress button reports its own errors.
+      }
     }, 400)
     return () => {
       isCurrent = false
       window.clearTimeout(timer)
     }
-  }, [first, format, quality])
+  }, [firstPicture, firstFile, format, quality])
+  useEffect(() => () => previewUrlsRef.current.forEach((url) => URL.revokeObjectURL(url)), [])
 
   function compressAll() {
     void batch.run(async (onProgress) => {
@@ -141,14 +148,14 @@ export function ResizeImage({ files, onFilesChange, onResult }: ToolProps) {
   const [quality, setQuality] = useState(90)
   const batch = useBatch(onResult)
   const first = pictures[0]
+  const firstPicture = first?.picture
 
-  // The fields start at the first picture's own size.
+  // The fields start at the first picture's own size, once per picture, so an emptied field stays empty while typing.
   useEffect(() => {
-    if (first && width === 0) {
-      setWidth(first.picture.width)
-      setHeight(first.picture.height)
-    }
-  }, [first, width])
+    if (!firstPicture) return
+    setWidth(firstPicture.width)
+    setHeight(firstPicture.height)
+  }, [firstPicture])
 
   function changeWidth(value: number) {
     setWidth(value)
@@ -278,9 +285,11 @@ export function CropImage({ files, onFilesChange, onResult }: ToolProps) {
   const ratio = CROP_RATIOS.find((choice) => choice.id === ratioId)!.ratio
   const isCircle = ratioId === 'circle'
 
+  const firstPicture = first?.picture
+
   useEffect(() => {
-    if (first) setBox(centredBox(first.picture.width, first.picture.height, ratio))
-  }, [first, ratio])
+    if (firstPicture) setBox(centredBox(firstPicture.width, firstPicture.height, ratio))
+  }, [firstPicture, ratio])
   useEffect(() => {
     const element = boxRef.current
     if (!element) return
@@ -295,28 +304,33 @@ export function CropImage({ files, onFilesChange, onResult }: ToolProps) {
     event.currentTarget.setPointerCapture(event.pointerId)
     dragRef.current = { mode, startX: event.clientX, startY: event.clientY, startBox: box }
   }
-  function moveDrag(event: ReactPointerEvent) {
-    const drag = dragRef.current
-    const frame = frameRef.current
-    if (!drag || !frame || !first) return
-    const deltaX = (event.clientX - drag.startX) / frame.clientWidth
-    const deltaY = (event.clientY - drag.startY) / frame.clientHeight
-    const start = drag.startBox
-    if (drag.mode === 'move') {
-      setBox({ ...start, x: Math.min(Math.max(start.x + deltaX, 0), 1 - start.width), y: Math.min(Math.max(start.y + deltaY, 0), 1 - start.height) })
-      return
-    }
+  // The box moved or resized by a share of the picture, kept inside it (drag and arrow keys).
+  function changedBox(start: CropBox, mode: 'move' | 'resize', deltaX: number, deltaY: number, picture: ImageBitmap): CropBox {
+    if (mode === 'move') return { ...start, x: Math.min(Math.max(start.x + deltaX, 0), 1 - start.width), y: Math.min(Math.max(start.y + deltaY, 0), 1 - start.height) }
     let width = Math.min(Math.max(start.width + deltaX, 0.05), 1 - start.x)
     let height = Math.min(Math.max(start.height + deltaY, 0.05), 1 - start.y)
     // A fixed ratio is kept in pixels, so the box's fractions follow the picture's own shape.
     if (ratio) {
-      height = (width * first.picture.width) / ratio / first.picture.height
+      height = (width * picture.width) / ratio / picture.height
       if (start.y + height > 1) {
         height = 1 - start.y
-        width = (height * first.picture.height * ratio) / first.picture.width
+        width = (height * picture.height * ratio) / picture.width
       }
     }
-    setBox({ ...start, width, height })
+    return { ...start, width, height }
+  }
+  function moveDrag(event: ReactPointerEvent) {
+    const drag = dragRef.current
+    const frame = frameRef.current
+    if (!drag || !frame || !firstPicture) return
+    setBox(changedBox(drag.startBox, drag.mode, (event.clientX - drag.startX) / frame.clientWidth, (event.clientY - drag.startY) / frame.clientHeight, firstPicture))
+  }
+  // Arrow keys move the box by 1% of the picture; with Shift they resize it.
+  function moveWithKeys(event: ReactKeyboardEvent) {
+    const steps: Record<string, [number, number]> = { ArrowLeft: [-0.01, 0], ArrowRight: [0.01, 0], ArrowUp: [0, -0.01], ArrowDown: [0, 0.01] }
+    if (!steps[event.key] || !firstPicture) return
+    event.preventDefault()
+    setBox(changedBox(box, event.shiftKey ? 'resize' : 'move', steps[event.key][0], steps[event.key][1], firstPicture))
   }
 
   // The box applies to every picture; with a fixed ratio, other pictures get the largest centred box of that ratio.
@@ -347,11 +361,12 @@ export function CropImage({ files, onFilesChange, onResult }: ToolProps) {
           {/* The picture itself stays left to right on an Arabic page. */}
           <div ref={frameRef} dir="ltr" className="crop-frame" onPointerMove={moveDrag} onPointerUp={() => (dragRef.current = null)}>
             <img src={first.read.previewUrl} alt={first.file.name} className="crop-picture" draggable={false} />
-            <div ref={boxRef} id="crop-box" className={`crop-box${isCircle ? ' is-circle' : ''}`} role="group" aria-label={t('tools.image.crop.box', { size: pixelSize })} onPointerDown={(event) => startDrag(event, 'move')}>
+            <div ref={boxRef} id="crop-box" className={`crop-box${isCircle ? ' is-circle' : ''}`} role="group" tabIndex={0} aria-label={t('tools.image.crop.box', { size: pixelSize })} aria-describedby="crop-keyboard-hint" onKeyDown={moveWithKeys} onPointerDown={(event) => startDrag(event, 'move')}>
               <span className="crop-handle" onPointerDown={(event) => startDrag(event, 'resize')} aria-hidden="true" />
             </div>
           </div>
           <p id="crop-size" className="text-sm text-ink-soft" dir="ltr">{pixelSize}</p>
+          <p id="crop-keyboard-hint" className="sr-only">{t('tools.image.crop.keyboardHint')}</p>
           {pictures.length > 1 && <p className="max-w-md text-center text-sm text-ink-soft">{t('tools.image.crop.batchNote')}</p>}
         </div>
       )}
@@ -445,7 +460,7 @@ export function RotateImage({ files, onFilesChange, onResult }: ToolProps) {
 
   useEffect(() => {
     if (previewRef.current) previewRef.current.style.transform = `rotate(${quarterTurns * 90}deg) scale(${flipHorizontal ? -1 : 1}, ${flipVertical ? -1 : 1})`
-  }, [quarterTurns, flipHorizontal, flipVertical, first])
+  }, [quarterTurns, flipHorizontal, flipVertical, first?.picture])
 
   function rotateAll() {
     void batch.run(async (onProgress) => {
@@ -519,7 +534,9 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
   const readByFile = useReadImages(files)
   const pictures = readablePictures(files, readByFile)
   const [isLogo, setIsLogo] = useState(false)
-  const [text, setText] = useState(() => t('tools.image.watermark.defaultText'))
+  // null until the visitor types, so the suggested text follows the page language.
+  const [typedText, setTypedText] = useState<string | null>(null)
+  const text = typedText ?? t('tools.image.watermark.defaultText')
   const [color, setColor] = useState('white')
   const [logo, setLogo] = useState<ImageBitmap | null>(null)
   const [sizePercent, setSizePercent] = useState(30)
@@ -530,7 +547,7 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
   const previewRef = useRef<HTMLCanvasElement>(null)
   const logoInputRef = useRef<HTMLInputElement>(null)
   const batch = useBatch(onResult)
-  const first = pictures[0]
+  const firstPicture = pictures[0]?.picture
 
   useEffect(() => {
     let isCurrent = true
@@ -541,7 +558,15 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
     void (async () => {
       const drawn = isLogo && logo ? turnPicture(logo, 600, rotation) : await drawTextPicture(text.trim(), { sizePoints: 40, color: WATERMARK_COLORS[color], fontWeight: 700, rotationDegrees: rotation })
       const bitmap = await createImageBitmap(drawn.canvas)
-      if (isCurrent) setMark({ ...drawn, bitmap })
+      if (!isCurrent) {
+        bitmap.close()
+        return
+      }
+      // The previous watermark picture is freed when a new one replaces it.
+      setMark((previous) => {
+        previous?.bitmap.close()
+        return { ...drawn, bitmap }
+      })
     })()
     return () => {
       isCurrent = false
@@ -551,19 +576,19 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
   // The first picture with the watermark, drawn on the page as the worker will draw it.
   useEffect(() => {
     const canvas = previewRef.current
-    if (!canvas || !first || !mark) return
-    const scale = Math.min(1, 720 / first.picture.width)
-    canvas.width = Math.round(first.picture.width * scale)
-    canvas.height = Math.round(first.picture.height * scale)
+    if (!canvas || !firstPicture || !mark) return
+    const scale = Math.min(1, 720 / firstPicture.width)
+    canvas.width = Math.round(firstPicture.width * scale)
+    canvas.height = Math.round(firstPicture.height * scale)
     const context = canvas.getContext('2d')!
-    context.drawImage(first.picture, 0, 0, canvas.width, canvas.height)
-    for (const step of watermarkSteps(mark, first.picture, sizePercent / 100, place, opacityPercent / 100)) {
+    context.drawImage(firstPicture, 0, 0, canvas.width, canvas.height)
+    for (const step of watermarkSteps(mark, firstPicture, sizePercent / 100, place, opacityPercent / 100)) {
       if (step.type !== 'overlay') continue
       context.globalAlpha = step.opacity
       context.drawImage(step.picture, step.x * canvas.width, step.y * canvas.height, step.width * canvas.width, step.height * canvas.height)
     }
     context.globalAlpha = 1
-  }, [first, mark, sizePercent, place, opacityPercent])
+  }, [firstPicture, mark, sizePercent, place, opacityPercent])
 
   function watermarkAll() {
     if (!mark) return
@@ -596,7 +621,14 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
           <>
             <input ref={logoInputRef} id="image-watermark-logo-input" type="file" accept=".png,.jpg,.jpeg,.webp,.svg,image/png,image/jpeg,image/webp,image/svg+xml" className="sr-only" tabIndex={-1} onChange={(event) => {
               const logoFile = event.target.files?.[0]
-              if (logoFile) void createImageBitmap(logoFile).then(setLogo, () => setLogo(null))
+              // decodeImage reads every picture format, SVG included (createImageBitmap can't read an SVG file).
+              if (logoFile) void decodeImage(logoFile).then(
+                (decoded) => setLogo((previous) => {
+                  previous?.close()
+                  return decoded
+                }),
+                () => setLogo(null),
+              )
               event.target.value = ''
             }} />
             <button id="image-watermark-choose-logo-button" type="button" onClick={() => logoInputRef.current?.click()} className="btn btn--quiet press">
@@ -607,7 +639,7 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
           <>
             <label className="flex flex-col gap-1 text-sm font-medium">
               {t('tools.watermark.textLabel')}
-              <input id="image-watermark-text-input" type="text" dir="auto" value={text} onChange={(event) => setText(event.target.value)} className={`${fieldClass} w-56`} />
+              <input id="image-watermark-text-input" type="text" dir="auto" value={text} onChange={(event) => setTypedText(event.target.value)} className={`${fieldClass} w-56`} />
             </label>
             <label className="flex flex-col gap-1 text-sm font-medium">
               {t('tools.watermark.color')}
@@ -653,7 +685,7 @@ export function WatermarkImage({ files, onFilesChange, onResult }: ToolProps) {
           {t('tools.watermark.tiled')}
         </label>
       </fieldset>
-      {first && mark && <canvas id="image-watermark-preview" ref={previewRef} role="img" aria-label={t('tools.image.previewLabel')} className="image-tool-preview" />}
+      {firstPicture && mark && <canvas id="image-watermark-preview" ref={previewRef} role="img" aria-label={t('tools.image.previewLabel')} className="image-tool-preview" />}
       <ActionButton id="watermark-image-button" label={t('tools.image.watermarkButton', { count: pictures.length })} isDisabled={pictures.length === 0 || !mark} isRunning={batch.isRunning} onClick={watermarkAll} />
       {batch.progressBar}
       {batch.errorLine}
@@ -677,7 +709,7 @@ export function RemoveImageMetadata({ files, onFilesChange, onResult }: ToolProp
       const made: { name: string; bytes: Uint8Array; type: string }[] = []
       for (const [position, { file, picture, read }] of pictures.entries()) {
         const extension = extensionOf(file.name)
-        const stripped = stripMetadataLosslessly(new Uint8Array(await file.arrayBuffer()), extension, read.metadata.orientation)
+        const stripped = stripMetadataLosslessly(new Uint8Array(await file.arrayBuffer()), read.metadata.orientation)
         if (stripped) {
           made.push({ name: `${baseNameOf(file.name)}-clean.${extension}`, bytes: stripped, type: file.type || IMAGE_MIME_TYPES[keptFormatOf(file.name)] })
         } else {

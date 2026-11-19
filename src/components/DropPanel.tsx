@@ -1,7 +1,7 @@
 import { joinNodesAsList, localizePath, translate, translateWithNodes, useT } from '../i18n'
 import type { MessageKey } from '../i18n'
 import { getFormatCapabilities, getOtherReleasedFormats } from '../whatsNew'
-import { Notice, REJECTED_FILE_TOAST_SECONDS, useIsPhone } from './Messages'
+import { Notice, REJECTED_FILE_ADVICE_TOAST_SECONDS, REJECTED_FILE_TOAST_SECONDS, useIsPhone } from './Messages'
 import ModalDialog from './ModalDialog'
 import NewBadge from './NewBadge'
 import type { useFileIntake } from '../useFileIntake'
@@ -131,12 +131,12 @@ export default function DropPanel({ intake, shownViewers = viewers, currentViewe
             id="coming-soon-message"
             kind="info"
             alwaysToast
-            seconds={REJECTED_FILE_TOAST_SECONDS}
+            seconds={REJECTED_FILE_ADVICE_TOAST_SECONDS}
             attempt={intake.attemptCount}
             message={intake.comingSoonViewer ? t('intake.comingSoon', { format: intake.comingSoonViewer.label }) : ''}
             detail={t('intake.tryThese')}
           />
-          <Notice id="drop-error" kind={intake.errorDetail ? 'info' : 'error'} alwaysToast seconds={REJECTED_FILE_TOAST_SECONDS} attempt={intake.attemptCount} message={intake.errorMessage ?? ''} detail={intake.errorDetail ?? undefined} />
+          <Notice id="drop-error" kind={intake.errorDetail ? 'info' : 'error'} alwaysToast seconds={intake.errorDetail ? REJECTED_FILE_ADVICE_TOAST_SECONDS : REJECTED_FILE_TOAST_SECONDS} attempt={intake.attemptCount} message={intake.errorMessage ?? ''} detail={intake.errorDetail ?? undefined} />
           {suggestion && !isPhone && (
             <div id="wrong-file-redirect" className="flex flex-col items-center gap-3">
               <p id="wrong-file-message" className="font-medium">{wrongFileMessage}</p>

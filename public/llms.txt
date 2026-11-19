@@ -68,6 +68,22 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Fill PDF form](https://www.openanydoc.com/en/fill-pdf): text fields, checkboxes, radio buttons and drop-downs, with Flatten on save
 - [Watermark PDF](https://www.openanydoc.com/en/watermark-pdf): text or picture, opacity, rotation, nine positions or tiled, chosen pages
 - [Header and footer](https://www.openanydoc.com/en/header-footer-pdf): six text slots with page number, page count and date; Western or Arabic-Indic digits
+- [Crop PDF](https://www.openanydoc.com/en/crop-pdf): drag a box to cut margins from every page or chosen pages; what is outside is removed from the file (or only hidden, to keep vector pages), text stays selectable
+- [Redact PDF](https://www.openanydoc.com/en/redact-pdf): black out areas or every match of a word; the text under the boxes is removed from the file and the rest of the page stays selectable
+- [Compare PDF](https://www.openanydoc.com/en/compare-pdf): two versions, added and removed lines page by page, and changed areas painted red
+- [PDF to Markdown](https://www.openanydoc.com/en/pdf-to-markdown): headings, lists and paragraphs as a .md file (no OCR for scanned PDFs)
+- [Repair PDF](https://www.openanydoc.com/en/repair-pdf): rewrites a damaged PDF with a new cross-reference table, or rebuilds readable pages as pictures
+- [Scan to PDF](https://www.openanydoc.com/en/scan-to-pdf): phone photos of paper straightened from four corners, cleaned in black and white, saved as one PDF
+- [PDF Forms](https://www.openanydoc.com/en/pdf-forms): add fillable text, long text, checkbox, drop-down, choice-button, date and signature fields to a PDF
+- [Protect PDF](https://www.openanydoc.com/en/protect-pdf): AES-256 password with qpdf in the browser; printing, copying and changes allowed or blocked
+- [Unlock PDF](https://www.openanydoc.com/en/unlock-pdf): removes a known password, or printing and copying restrictions (no password guessing)
+- [PDF to Word](https://www.openanydoc.com/en/pdf-to-word): editable .docx with paragraphs, headings, lists and pictures; layout approximate
+- [PDF to Excel](https://www.openanydoc.com/en/pdf-to-excel): one sheet per page, text columns into cells, numbers as numbers
+- [PDF to PowerPoint](https://www.openanydoc.com/en/pdf-to-powerpoint): one slide per page with editable text boxes and pictures
+- [Word to PDF](https://www.openanydoc.com/en/word-to-pdf): .docx, .dotx, .docm and .odt as PDF pages laid out like the Word viewer, text searchable
+- [Excel to PDF](https://www.openanydoc.com/en/excel-to-pdf): visible sheets fitted to A4 or Letter with colours, borders and merges, text searchable
+- [OCR PDF](https://www.openanydoc.com/en/ocr-pdf): reads scanned pages (English, Arabic) on the device and adds an invisible text layer; pages unchanged
+- [Translate PDF](https://www.openanydoc.com/en/translate-pdf): English to Arabic or Arabic to English on the device (Mozilla's Firefox Translations models), saved as an editable Word document
 - [Image viewer](https://www.openanydoc.com/en/image-viewer): JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF and SVG with zoom and the camera, date and GPS details
 - [Compress image](https://www.openanydoc.com/en/compress-image): JPG, PNG, WebP and AVIF with a quality slider, before/after comparison and size saved
 - [Resize image](https://www.openanydoc.com/en/resize-image): pixels, percent, or Instagram, WhatsApp and passport photo sizes
@@ -78,6 +94,9 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Photo editor](https://www.openanydoc.com/en/photo-editor): brightness, contrast, saturation, warmth, seven filters and text, with undo
 - [Image converter](https://www.openanydoc.com/en/convert-image): to JPG, PNG, WebP or AVIF from any picture format, plus [HEIC to JPG](https://www.openanydoc.com/en/heic-to-jpg), [WebP to JPG](https://www.openanydoc.com/en/webp-to-jpg), [PNG to JPG](https://www.openanydoc.com/en/png-to-jpg), [JPG to PNG](https://www.openanydoc.com/en/jpg-to-png), [SVG to PNG](https://www.openanydoc.com/en/svg-to-png) and [Image to WebP](https://www.openanydoc.com/en/image-to-webp)
 - [Meme generator](https://www.openanydoc.com/en/meme-generator): top and bottom captions in outlined letters, Arabic written right to left
+- [Blur faces](https://www.openanydoc.com/en/blur-face): faces found on the device, blurred or pixelated; areas can be added or skipped by hand
+- [Remove background](https://www.openanydoc.com/en/remove-background): cut out a person or an object on the device, transparent PNG or white
+- [Upscale image](https://www.openanydoc.com/en/upscale-image): 2× or 4× with the Swin2SR model on the device, up to 1,024 px input
 - [All tools](https://www.openanydoc.com/en/all-tools), grouped as [PDF tools](https://www.openanydoc.com/en/pdf-tools), [Image tools](https://www.openanydoc.com/en/image-tools), [Data tools](https://www.openanydoc.com/en/data-tools) and [Office tools](https://www.openanydoc.com/en/office-tools)
 
 ## Guides
@@ -123,12 +142,31 @@ Every page has an Arabic version under /ar with the same address, for example:
 - [تعبئة نموذج PDF](https://www.openanydoc.com/ar/fill-pdf)
 - [علامة مائية على PDF](https://www.openanydoc.com/ar/watermark-pdf)
 - [رأس وتذييل PDF](https://www.openanydoc.com/ar/header-footer-pdf)
+- [قص PDF](https://www.openanydoc.com/ar/crop-pdf)
+- [تنقيح PDF](https://www.openanydoc.com/ar/redact-pdf)
+- [مقارنة ملفات PDF](https://www.openanydoc.com/ar/compare-pdf)
+- [تحويل PDF إلى Markdown](https://www.openanydoc.com/ar/pdf-to-markdown)
+- [إصلاح PDF](https://www.openanydoc.com/ar/repair-pdf)
+- [مسح ضوئي إلى PDF](https://www.openanydoc.com/ar/scan-to-pdf)
+- [إنشاء نماذج PDF](https://www.openanydoc.com/ar/pdf-forms)
+- [حماية PDF بكلمة مرور](https://www.openanydoc.com/ar/protect-pdf)
+- [فتح قفل PDF](https://www.openanydoc.com/ar/unlock-pdf)
+- [تحويل PDF إلى Word](https://www.openanydoc.com/ar/pdf-to-word)
+- [تحويل PDF إلى Excel](https://www.openanydoc.com/ar/pdf-to-excel)
+- [تحويل PDF إلى PowerPoint](https://www.openanydoc.com/ar/pdf-to-powerpoint)
+- [تحويل Word إلى PDF](https://www.openanydoc.com/ar/word-to-pdf)
+- [تحويل Excel إلى PDF](https://www.openanydoc.com/ar/excel-to-pdf)
+- [التعرّف الضوئي على نص PDF](https://www.openanydoc.com/ar/ocr-pdf)
+- [ترجمة PDF](https://www.openanydoc.com/ar/translate-pdf)
 - [أدوات الصور](https://www.openanydoc.com/ar/image-tools)
 - [ضغط الصور](https://www.openanydoc.com/ar/compress-image)
 - [تغيير حجم الصور](https://www.openanydoc.com/ar/resize-image)
 - [تحويل HEIC إلى JPG](https://www.openanydoc.com/ar/heic-to-jpg)
 - [إزالة بيانات الصور](https://www.openanydoc.com/ar/remove-image-metadata)
 - [صانع الميمز](https://www.openanydoc.com/ar/meme-generator)
+- [تمويه الوجوه](https://www.openanydoc.com/ar/blur-face)
+- [إزالة خلفية الصورة](https://www.openanydoc.com/ar/remove-background)
+- [تكبير الصورة بدقة](https://www.openanydoc.com/ar/upscale-image)
 - [كيف تفتح ملف DOCX بدون وورد](https://www.openanydoc.com/ar/open-docx-without-word)
 - [لماذا تظهر العربية في ملف CSV برموز غريبة في Excel](https://www.openanydoc.com/ar/fix-arabic-csv-in-excel)
 - [الأدلة](https://www.openanydoc.com/ar/guides)

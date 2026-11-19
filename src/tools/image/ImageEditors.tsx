@@ -52,6 +52,7 @@ export function PhotoEditor({ files, onResult, onUnsavedEditsChange }: ToolProps
   const readByFile = useReadImages(files)
   const read = readByFile.get(file)
   const picture = read && 'picture' in read ? read.picture : null
+  const readingMessage = read && 'problem' in read ? t(read.problem === 'heic' ? 'tools.image.heicFailed' : 'tools.image.unreadable') : t('tools.pdf.reading')
   const session = useEditSession<PhotoEdits>(createNoEdits, countEdits)
   const [draft, setDraft] = useState<Adjustments | null>(null)
   const [selectedTextId, setSelectedTextId] = useState<number | null>(null)
@@ -172,7 +173,7 @@ export function PhotoEditor({ files, onResult, onUnsavedEditsChange }: ToolProps
       <div className="grid gap-5 md:grid-cols-[minmax(0,1fr)_260px]">
         {/* The picture stays left to right on an Arabic page. */}
         <div dir="ltr" className="flex justify-center">
-          {picture ? <canvas id="photo-editor-preview" ref={previewRef} role="img" aria-label={t('tools.image.previewLabel')} className="image-tool-preview touch-none" onPointerDown={startDrag} onPointerUp={endDrag} /> : <p className="text-ink-soft">{t('tools.pdf.reading')}</p>}
+          {picture ? <canvas id="photo-editor-preview" ref={previewRef} role="img" aria-label={t('tools.image.previewLabel')} className="image-tool-preview touch-none" onPointerDown={startDrag} onPointerUp={endDrag} /> : <p id="photo-editor-status" className="text-ink-soft">{readingMessage}</p>}
         </div>
         <div className="space-y-4">
           {sliders.map(([key, labelKey]) => (
@@ -271,6 +272,7 @@ export function MemeGenerator({ files, onResult, onUnsavedEditsChange }: ToolPro
   const readByFile = useReadImages(files)
   const read = readByFile.get(file)
   const picture = read && 'picture' in read ? read.picture : null
+  const readingMessage = read && 'problem' in read ? t(read.problem === 'heic' ? 'tools.image.heicFailed' : 'tools.image.unreadable') : t('tools.pdf.reading')
   const [topText, setTopText] = useState('')
   const [bottomText, setBottomText] = useState('')
   const [sizeShare, setSizeShare] = useState(0.1)
@@ -346,7 +348,7 @@ export function MemeGenerator({ files, onResult, onUnsavedEditsChange }: ToolPro
         <OutputFields idPrefix="meme" format={format} onFormatChange={setFormat} quality={quality} onQualityChange={setQuality} formats={['jpg', 'png']} withKeep={false} />
       </div>
       <div dir="ltr" className="flex justify-center">
-        {picture ? <canvas id="meme-preview" ref={previewRef} role="img" aria-label={t('tools.image.previewLabel')} className="image-tool-preview" /> : <p className="text-ink-soft">{t('tools.pdf.reading')}</p>}
+        {picture ? <canvas id="meme-preview" ref={previewRef} role="img" aria-label={t('tools.image.previewLabel')} className="image-tool-preview" /> : <p id="meme-status" className="text-ink-soft">{readingMessage}</p>}
       </div>
       <p className="text-center text-sm text-ink-soft">{t('tools.image.meme.fontNote')}</p>
       <div className="flex justify-center">

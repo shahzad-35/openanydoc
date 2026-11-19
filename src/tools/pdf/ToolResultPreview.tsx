@@ -14,6 +14,13 @@ const PREVIEW_ZIP_ENTRY_COUNT = 30
 function PdfPreview({ file }: { file: File }) {
   const { t, tp } = useT()
   const opened = useOpenedPdfs([file]).get(file)
+  if (opened && 'problem' in opened && opened.problem === 'encrypted') {
+    return (
+      <p id="tool-result-summary" className="text-sm text-ink-soft">
+        {t('tools.preview.protected')}
+      </p>
+    )
+  }
   if (!opened || !('document' in opened)) return null
   const cards: GridCard[] = Array.from({ length: Math.min(PREVIEW_PAGE_COUNT, opened.document.numPages) }, (_, pageIndex) => ({ key: `preview-${pageIndex}`, caption: String(pageIndex + 1), document: opened.document, pageIndex }))
   return (

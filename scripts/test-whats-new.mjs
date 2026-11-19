@@ -29,7 +29,12 @@ const SAVED_TEST_YEAR_START = Date.UTC(2027, 0, 1)
 
 // The built _headers (the build adds the inline theme script's hash to the policy), _redirects, and the nearest 404.html for an
 // unknown address with status 404: the same behaviour as Cloudflare's static assets.
-const contentSecurityPolicy = fs.readFileSync(path.join(distFolder, '_headers'), 'utf8').match(/Content-Security-Policy:\s*(.*)/i)?.[1]
+const builtHeaders = fs.readFileSync(path.join(distFolder, '_headers'), 'utf8')
+const contentSecurityPolicy = builtHeaders.match(/Content-Security-Policy:\s*(.*)/i)?.[1]
+// Paths whose rule detaches the site-wide policy ("! Content-Security-Policy"), as Cloudflare does: the JSON URL frame.
+const pathsWithoutSitePolicy = [...builtHeaders.matchAll(/^(\/\S*)\n {2}! Content-Security-Policy$/gm)].map((match) => match[1])
+// Hashed scripts are kept for good (/assets/*), so a worker started again later loads from the cache, offline too.
+const assetsCacheControl = builtHeaders.match(/^\/assets\/\*\n\s+Cache-Control:\s*(.*)$/m)?.[1]
 const contentTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain' }
 const redirects = Object.fromEntries(
   fs
@@ -63,7 +68,8 @@ const server = http.createServer((request, response) => {
     return
   }
   const filePath = resolveFile(pathname)
-  const headers = { 'content-type': filePath ? (contentTypes[path.extname(filePath)] ?? 'application/octet-stream') : contentTypes['.html'], 'content-security-policy': contentSecurityPolicy ?? '' }
+  const headers = { 'content-type': filePath ? (contentTypes[path.extname(filePath)] ?? 'application/octet-stream') : contentTypes['.html'], ...(pathsWithoutSitePolicy.includes(pathname) ? {} : { 'content-security-policy': contentSecurityPolicy ?? '' }) }
+  if (filePath && pathname.startsWith('/assets/') && assetsCacheControl) headers['cache-control'] = assetsCacheControl
   response.writeHead(filePath ? 200 : 404, headers)
   fs.createReadStream(filePath ?? nearestNotFoundPage(pathname)).pipe(response)
 })
@@ -202,7 +208,7 @@ const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/c
 const toolPages = ['/mask-data']
 const landingPages = ['/json-formatter', '/json-validator', '/json-escape-unescape', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
 // Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
-const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator']
+const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/crop-pdf', '/redact-pdf', '/compare-pdf', '/pdf-to-markdown', '/repair-pdf', '/scan-to-pdf', '/pdf-forms', '/protect-pdf', '/unlock-pdf', '/pdf-to-word', '/pdf-to-excel', '/pdf-to-powerpoint', '/word-to-pdf', '/excel-to-pdf', '/ocr-pdf', '/translate-pdf', '/blur-face', '/remove-background', '/upscale-image', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator']
 const hubPages = ['/pdf-tools', '/image-tools', '/data-tools', '/office-tools', '/all-tools']
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
@@ -253,7 +259,8 @@ await test('home page shows the banner, the badges and takes no focus', async ()
   expect(text?.includes('New') && /^You can now open (and edit )?.+ files\.$/.test(message), `banner text was: ${text} / ${message}`)
   expect(await evaluate(`document.activeElement === document.body`), 'the banner took focus')
   expect(await evaluate(`document.querySelectorAll('footer nav [data-file-type]').length >= 4`), 'footer badges are missing')
-  expect(await evaluate(`[...document.querySelectorAll('footer nav li')].some((item) => item.innerText.includes('JSON viewer') && item.innerText.includes('New'))`), 'the JSON nav link has no New badge')
+  // Like the banner, the badges follow the release dates (NEW_WINDOW_DAYS), so any format still in its window carries one.
+  expect(await evaluate(`[...document.querySelectorAll('footer nav li')].some((item) => item.innerText.includes('New'))`), 'no footer nav link has a New badge')
 })
 
 await test('the banner closes with the keyboard and stays closed while navigating in the tab', async () => {
@@ -405,7 +412,8 @@ await test('home, format and landing pages carry their own title, h1, intro, que
       const sharedQuestions = isArabic
         ? ['هل يُرفع ملفي؟', 'هل يمكنني تعديله وحفظه؟', 'هل يتغير الملف الأصلي؟', 'هل هناك حد لحجم الملف؟', 'هل يعمل على الجوال؟', 'هل يعمل بدون إنترنت؟', 'هل يمكن لشركتي استضافة نسخة خاصة بها؟']
         : ['Is my file uploaded?', 'Can I edit and save it?', 'Is the original changed?', 'Is there a file size limit?', 'Does it work on mobile?', 'Does it work offline?', 'Can my company host its own copy?']
-      if (!isLandingPage) expect(faq.mainEntity.slice(0, 7).map((item) => item.name).join('|') === sharedQuestions.join('|'), `${address}: the seven shared questions are not first`)
+      // The PDF and image viewers open files read-only, so their questions are their own ("Can I edit and save it?" does not apply).
+      if (!isLandingPage && !['/pdf-viewer', '/image-viewer'].includes(address.slice(3))) expect(faq.mainEntity.slice(0, 7).map((item) => item.name).join('|') === sharedQuestions.join('|'), `${address}: the seven shared questions are not first`)
     }
   }
   expect(new Set(questionLists.values()).size === questionLists.size, 'two pages share the same questions: each page needs its own')
@@ -527,8 +535,11 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
   expect(headers.includes('Strict-Transport-Security: max-age=31536000; includeSubDomains'), 'HSTS is missing from _headers')
   // 'wasm-unsafe-eval' lets the CSV page's query mode compile SQLite's WebAssembly; it does not allow JavaScript eval.
   expect(/script-src 'self' 'sha256-[A-Za-z0-9+/=]+' 'wasm-unsafe-eval';/.test(headers) && !headers.includes('unsafe-inline') && !/'unsafe-eval'/.test(headers), 'the CSP does not allow the theme script by hash alone')
-  // https: lets the JSON page's "Open from a URL" read a file from an address the visitor types; nothing wider (no http:, no *).
-  expect(/connect-src 'self' https:;/.test(headers), 'connect-src must be exactly self and https: (the JSON page\'s Open from a URL)')
+  // Pages contact only the site itself. The JSON page's "Open from a URL" reads from a hidden frame with its own policy
+  // (connect-src https: in a meta tag; nothing wider, no http: or *), and only that frame's paths drop the site-wide policy.
+  const framePolicy = fs.readFileSync(path.join(distFolder, 'json-url-frame.html'), 'utf8').match(/http-equiv="Content-Security-Policy" content="([^"]*)"/)?.[1] ?? ''
+  expect(/connect-src 'self';/.test(headers) && pathsWithoutSitePolicy.join(',') === '/json-url-frame.html,/json-url-frame', 'connect-src must be exactly self, and only the JSON URL frame may drop the site policy')
+  expect(/connect-src https:;/.test(framePolicy) && /default-src 'none'/.test(framePolicy), 'the JSON URL frame must allow only https: requests and nothing else')
   expect(/^\/en\n  Link: <\/assets\/fredoka-latin-700[^>]+>; rel=preload; as=font; crossorigin/m.test(headers) && /^\/ar\/\*\n  Link: <\/assets\/ibm-plex-sans-arabic/m.test(headers), 'the Early Hints Link headers for the fonts are missing')
   const html = await (await fetch(`${siteOrigin}/en`)).text()
   expect(/<link rel="preload" as="font" type="font\/woff2" crossorigin href="\/assets\/fredoka-latin-700/.test(html) && !html.includes('theme-init.js'), 'English pages should preload the display font and have no theme-init.js request')
@@ -577,12 +588,13 @@ await test('every sitemap address has a lastmod date and is a built page without
 
 // The upper bound was 900 before the home page gained its stats row, shortcut keycaps, privacy comparison and the note on how
 // the demo works (2026-10-19), and 1000 before the five conversion pages joined the home page's tool links (2026-10-29), and 1050 before the Word viewer
-// added its nav and footer links, home card and format group (2026-11-02), and 1100 before the PowerPoint viewer did the same (2026-11-02).
-await test('the home page has 600 to 1150 words in its server HTML, eight questions and a card linking to each tool page', async () => {
+// added its nav and footer links, home card and format group (2026-11-02), 1100 before the PowerPoint viewer did the same (2026-11-02), and 1150
+// before the PDF and image viewers and the PDF and image tool hubs joined the format groups and the footer (2026-11-19).
+await test('the home page has 600 to 1350 words in its server HTML, eight questions and a card linking to each tool page', async () => {
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
     const wordCount = prerenderedText(html).split(/\s+/).filter(Boolean).length
-    expect(wordCount >= 600 && wordCount <= 1150, `/${locale}: ${wordCount} words`)
+    expect(wordCount >= 600 && wordCount <= 1350, `/${locale}: ${wordCount} words`)
     expect((html.match(/id="faq-item-\d+"/g) ?? []).length === 8, `/${locale}: the FAQ does not have eight questions`)
     for (const page of ['csv-viewer', 'excel-viewer', 'json-viewer', 'txt-viewer', 'word-viewer', 'powerpoint-viewer']) {
       expect(new RegExp(`id="tool-card-link-${page}" href="/${locale}/${page}"`).test(html), `/${locale}: no card links to /${locale}/${page}`)
@@ -648,8 +660,14 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           expect(block.author?.['@type'] === 'Person' && block.author['@id'] === entityIds[2] && block.author.name?.length > 0 && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
         } else if (type === 'CollectionPage') {
           const items = block.mainEntity?.itemListElement ?? []
-          expect(block.url === canonical && block.mainEntity?.['@type'] === 'ItemList' && items.length === guidePagesList.length, problem(`url is wrong or the list does not hold the ${guidePagesList.length} guides`))
-          items.forEach((item, index) => expect(item.position === index + 1 && item.name?.length > 0 && item.url === `https://www.openanydoc.com/${locale}${guidePagesList[index]}`, problem(`item ${index + 1} is not ${guidePagesList[index]}`)))
+          if (page === '/guides') {
+            expect(block.url === canonical && block.mainEntity?.['@type'] === 'ItemList' && items.length === guidePagesList.length, problem(`url is wrong or the list does not hold the ${guidePagesList.length} guides`))
+            items.forEach((item, index) => expect(item.position === index + 1 && item.name?.length > 0 && item.url === `https://www.openanydoc.com/${locale}${guidePagesList[index]}`, problem(`item ${index + 1} is not ${guidePagesList[index]}`)))
+          } else {
+            // A hub lists its tools.
+            expect(block.url === canonical && block.mainEntity?.['@type'] === 'ItemList' && items.length > 0, problem('url is wrong or the hub lists no tools'))
+            items.forEach((item, index) => expect(item.position === index + 1 && item.name?.length > 0 && item.url?.startsWith(`https://www.openanydoc.com/${locale}/`), problem(`item ${index + 1} needs position, name and a page address`)))
+          }
         } else if (type === 'ProfilePage') {
           expect(block.mainEntity?.['@type'] === 'Person' && block.mainEntity['@id'] === entityIds[2] && block.mainEntity.name === 'Shahzad Ali' && block.url === canonical, problem('mainEntity or url is wrong'))
         } else if (type === 'BreadcrumbList') {
@@ -776,7 +794,7 @@ await test('the footer has About, Privacy and Terms links and the Microsoft disc
     expect(html.includes('id="footer-disclaimer"') && html.includes(`id="footer-link-privacy" href="/${locale}/privacy"`), `${locale}: the static changelog has no footer`)
   }
   await openPage('/en')
-  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === 6 && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
+  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === ${formatPages.length} && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
   await openPage('/ar')
   const arabicFooterFits = await evaluate(`(() => {
     const width = document.documentElement.clientWidth
@@ -844,6 +862,8 @@ await test('one drop zone opens every format with its tools, PDF included', asyn
     await waitFor(`document.querySelector('#pdf-pages .page[data-loaded] canvas')`, `${locale}: the PDF opened in the viewer`, 20000)
     expect((await evaluate('location.pathname')) === `/${locale}/pdf-viewer`, `${locale}: the PDF did not open on the PDF viewer page`)
   }
+  // The note sits in the drop panel, which an open file replaces.
+  await openPage('/en')
   expect(await evaluate(`document.querySelector('#privacy-note').innerText.length > 40`), 'the privacy note is missing')
 })
 
@@ -979,8 +999,9 @@ await test('on a phone a toast goes away by itself', async () => {
     await chooseFile(unknownFile)
     await waitFor(`document.querySelector('#toast-region:popover-open')`, 'the toast')
     const shownAt = Date.now()
-    await waitFor(`!document.querySelector('#toast-region:popover-open')`, 'the toast to go away by itself', 6000)
-    expect(Date.now() - shownAt < 5200, `the toast stayed ${Date.now() - shownAt} ms; it should go after about 3 seconds`)
+    // It says which files to try instead, so it stays as long as an error (REJECTED_FILE_ADVICE_TOAST_SECONDS, 8 s).
+    await waitFor(`!document.querySelector('#toast-region:popover-open')`, 'the toast to go away by itself', 11000)
+    expect(Date.now() - shownAt > 6500 && Date.now() - shownAt < 10200, `the toast stayed ${Date.now() - shownAt} ms; it should go after about 8 seconds`)
   })
 })
 
@@ -1108,6 +1129,9 @@ await test('JSON: Repair fixes a broken file, and the cursor in the text selects
   await waitFor(`document.querySelector('#editor-notice.error #notice-repair-button')`, 'the error message with Repair')
   expect(await evaluate(`document.querySelector('#mode-edit-button') === null && document.querySelector('.hl-line.err-line') !== null`), 'a View / Edit switch shows, or the error line is not marked')
   await evaluate(`document.querySelector('#repair-button').click()`)
+  // Repair shows the changed lines first; Apply makes them.
+  await waitFor(`document.querySelector('#repair-preview') && document.querySelector('#repair-apply-button')`, 'the repair preview')
+  await evaluate(`document.querySelector('#repair-apply-button').click()`)
   await waitFor(`document.querySelector('#editor-notice.info')?.innerText.includes('Repaired:')`, 'the repair message')
   const note = await evaluate(`document.querySelector('#editor-notice').innerText`)
   expect(note.includes('removed 1 comment') && note.includes('quoted 1 key') && note.includes('trailing comma'), `the repair message was: ${note}`)
@@ -1278,7 +1302,7 @@ await test('the header nav, related tools, footer and home links point at built 
       const navLinks = linksIn(html, '<nav id="site-nav"', '</nav>')
       expect(navLinks?.length === 0 && html.includes('id="site-search-button"'), `${address}: the header should hold the search box and no links`)
       const relatedLinks = linksIn(html, '<section id="related-tools"', '</section>')
-      if (formatPages.includes(page) || landingPages.includes(page)) expect(relatedLinks?.length >= 2, `${address}: no related tools`)
+      if (formatPages.includes(page) || landingPages.includes(page) || registryToolPages.includes(page)) expect(relatedLinks?.length >= 2, `${address}: no related tools`)
       else expect(relatedLinks === null, `${address}: related tools on a page that is not a tool page`)
       const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
       // The social logos have no text, so linksIn skips them: each needs its address and a spoken name.
@@ -1824,6 +1848,8 @@ await test('once a tool page is idle, its file opens with no network; code that 
     ['/en/excel-viewer', sampleWorkbook, `document.querySelector('#excel-workbench #data-table')`],
     ['/en', sampleCsv, `document.querySelector('#csv-workbench #data-table tbody td')`],
     ['/en/mask-data', maskWorkbook, `document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length === 4`],
+    ['/en/pdf-viewer', samplePdf, `document.querySelector('#pdf-pages .page[data-loaded] canvas')`],
+    ['/en/image-viewer', path.join(projectRoot, 'src', 'samples', 'phone-photo-gps.jpg'), `document.querySelector('#image-canvas')?.width === 900 && document.querySelector('#image-gps')`],
   ]
   try {
     for (const [address, file, openedCheck] of offlineCases) {
@@ -1873,8 +1899,8 @@ await test('a sample file opens with no network once its page is idle, with the 
     ['/en/json-viewer', 'records-json', `document.querySelector('#json-workbench .file-tab')?.innerText === 'customers.json' && !document.querySelector('#json-workbench [role="alert"]')`, 'format,to-csv,mask'],
     ['/en/txt-viewer', 'release-notes-txt', `document.querySelector('#txt-workbench #file-name')`, 'find,sort-lines,remove-duplicates'],
     ['/en/excel-viewer', 'sales-xlsx', `document.querySelector('#excel-workbench #data-table') && document.querySelectorAll('#sheet-tabs [role="tab"], [id^="sheet-tab-"]').length >= 3`, 'to-csv,to-json,mask'],
-    ['/en/word-viewer', 'quarterly-docx', `document.querySelector('#word-document section, #word-document .docx')`, 'print,fit-width'],
-    ['/en/powerpoint-viewer', 'review-pptx', `document.querySelector('#slide-stage svg, #slide-stage div')`, ''],
+    ['/en/word-viewer', 'quarterly-docx', `document.querySelector('#word-document section, #word-document .docx')`, 'print,export-text,reading-mode'],
+    ['/en/powerpoint-viewer', 'review-pptx', `document.querySelector('#slide-stage svg, #slide-stage div')`, 'presenter-view,save-png,export-outline'],
     ['/en/mask-data', 'people-xlsx', `document.querySelectorAll('#mask-chosen-fields .mw-row[data-category]').length > 0`, null],
   ]
   try {
@@ -1887,8 +1913,8 @@ await test('a sample file opens with no network once its page is idle, with the 
       await waitFor(openedCheck, `${address}: the ${sampleId} sample to open offline`)
       if (nextSteps === null) continue
       const strip = await evaluate(`[...document.querySelectorAll('#next-steps .next-step-button')].map((button) => button.id.replace('next-step-', '')).join(',')`)
-      // PowerPoint offers full screen only where the browser allows it, so only its last step is fixed.
-      expect(nextSteps ? strip === nextSteps : strip.endsWith('open-another'), `${address}: the Next strip was "${strip}"`)
+      // PowerPoint offers full screen only where the browser allows it, so that step is left out of the comparison.
+      expect(strip.split(',').filter((step) => step !== 'fullscreen').join(',') === nextSteps, `${address}: the Next strip was "${strip}"`)
       await goOffline(false)
     }
   } finally {

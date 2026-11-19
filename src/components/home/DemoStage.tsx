@@ -103,7 +103,8 @@ function SampleViewerBody({ sample }: { sample: SampleFile }) {
 }
 
 // The hero demo: three made-up files to drag into a box, which then shows a small read-only viewer. Works with a mouse (drag),
-// a keyboard (Enter picks a file up, Enter on the box drops it, arrows switch files, Escape puts it back) and touch (tap, tap).
+// a keyboard (Enter picks a file up, Enter again or Enter on the box drops it, arrows switch files, Escape puts it back) and touch
+// (tap, tap).
 // Everything in it is simulated; a real file dropped anywhere on the page, the box included, opens the real viewer.
 export default function DemoStage() {
   const { t } = useT()
@@ -136,6 +137,8 @@ export default function DemoStage() {
     setIsOverTarget(false)
     setOpenedSample(sample)
     setAnnouncement(t('demo.opened', { name: sample.name, summary: summaryFor(sample) }))
+    // The box that had focus is replaced by the viewer, so focus moves to the viewer's Reset button instead of the page top.
+    if (targetRef.current?.contains(document.activeElement)) requestAnimationFrame(() => document.getElementById('demo-reset-button')?.focus())
   }
 
   function resetDemo() {
@@ -145,8 +148,14 @@ export default function DemoStage() {
     if (sample) requestAnimationFrame(() => chipRefs.current.get(sample.id)?.focus())
   }
 
-  // Arrows move between the chips (and move the picked-up file with them); Escape puts a picked-up file back.
+  // Arrows move between the chips (and move the picked-up file with them); Escape puts a picked-up file back; Enter or Space on the
+  // picked-up file drops it into the box (a click on it, by mouse or touch, still puts it back).
   function handleChipKeyDown(event: KeyboardEvent<HTMLButtonElement>, sample: SampleFile) {
+    if ((event.key === 'Enter' || event.key === ' ') && liftedSample?.id === sample.id) {
+      event.preventDefault()
+      openSample(sample)
+      return
+    }
     if (event.key === 'Escape') {
       if (liftedSample) {
         event.preventDefault()
@@ -223,7 +232,8 @@ export default function DemoStage() {
                   aria-pressed={liftedSample?.id === sample.id}
                   aria-describedby="demo-chip-hint"
                   className="demo-chip press"
-                  onClick={() => (liftedSample?.id === sample.id ? putBack() : liftSample(sample))}
+                  // With a sample already open there is no box to drop on, so a click opens this file in its place.
+                  onClick={() => (openedSample ? openSample(sample) : liftedSample?.id === sample.id ? putBack() : liftSample(sample))}
                   onKeyDown={(event) => handleChipKeyDown(event, sample)}
                   onDragStart={(event) => {
                     event.dataTransfer.setData(SAMPLE_DRAG_TYPE, sample.id)
@@ -246,7 +256,7 @@ export default function DemoStage() {
 
         <div className="min-w-0">
           {openedSample ? (
-            <div id="demo-viewer" className="demo-viewer">
+            <div id="demo-viewer" className="demo-viewer" onDragOver={handleTargetDragOver} onDragLeave={handleTargetDragLeave} onDrop={handleTargetDrop}>
               <div className="demo-viewer-head">
                 <MiniFormatIcon format={openedSample.format} />
                 <span dir="ltr" className="font-mono text-sm font-semibold">{openedSample.name}</span>

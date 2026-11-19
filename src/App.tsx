@@ -86,6 +86,20 @@ function resolveAddress(pathname: string) {
   return localizePath(path === '/' ? getBrowserLocale() : 'en', path)
 }
 
+// After moving to another page in the app, focus goes to its heading, so a screen reader announces the new page and Tab starts
+// from there. Lazily loaded pages may take a few frames to appear.
+function focusNewPageHeading(oldHeading = document.querySelector('h1'), framesLeft = 30) {
+  requestAnimationFrame(() => {
+    const heading = document.querySelector<HTMLElement>('h1')
+    if (!heading || heading === oldHeading) {
+      if (framesLeft > 0) focusNewPageHeading(oldHeading, framesLeft - 1)
+      return
+    }
+    heading.tabIndex = -1
+    heading.focus({ preventScroll: true })
+  })
+}
+
 // What a page needs before it is drawn: its language file and, on a tool page, that tool's words (fetched per page, src/seo.ts).
 function loadAddressWords(address: string) {
   const { locale, path } = splitLocalePath(address)
@@ -110,6 +124,8 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   const [isBannerDismissed, setIsBannerDismissed] = useState(false)
   // A file another page asked to open here (the wrong-file redirect); React state only, never in the URL.
   const [handoffFile, setHandoffFile] = useState<File | null>(null)
+  // A page's words could not be fetched (offline, or the site was updated): the reload message instead of a click that does nothing.
+  const [hasPageLoadFailed, setHasPageLoadFailed] = useState(false)
   const { locale: addressLocale, path } = splitLocalePath(pathname)
   const locale: Locale = addressLocale ?? 'en'
   const toolPage = findLiveToolPage(path)
@@ -194,17 +210,28 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
       if (!(await confirmDiscardEdits())) return
       hasUnsavedEditsRef.current = false
     }
-    await loadAddressWords(newAddress)
+    try {
+      await loadAddressWords(newAddress)
+    } catch {
+      setHasPageLoadFailed(true)
+      return
+    }
     window.history.pushState(null, '', newAddress)
     setPathname(newAddress)
     window.scrollTo(0, 0)
+    focusNewPageHeading()
   }
 
   // The same page in the other language. With a file open the entry is replaced (not added) so Back still closes the file and
   // the edits stay where they are; otherwise it is a normal visit.
   async function switchLanguage(newLocale: Locale) {
     const newAddress = localizePath(newLocale, path)
-    await loadAddressWords(newAddress)
+    try {
+      await loadAddressWords(newAddress)
+    } catch {
+      setHasPageLoadFailed(true)
+      return
+    }
     if (openedFile) {
       window.history.replaceState(window.history.state, '', newAddress)
       openedFilePathRef.current = newAddress
@@ -233,10 +260,11 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   }
 
   // The open file handed to a tool page (the image viewer's Compress, Resize ...): the file page closes and the tool gets the file.
+  // The file closes only after navigating: closed first, App would draw the page under it, whose words may never have loaded.
   async function openFileInTool(file: File, toolPath: string) {
     hasUnsavedEditsRef.current = false
-    setOpenedFile(null)
     await navigateTo(toolPath)
+    setOpenedFile(null)
     setHandoffFile(file)
   }
 
@@ -258,7 +286,9 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
         <PagePathContext.Provider value={path}>
           <ToastProvider>
             <LoadFailedBoundary key={openedFile ? `file-${fileKey}` : 'page'}>
-              {openedFile ? (
+              {hasPageLoadFailed ? (
+                <LoadFailedMessage />
+              ) : openedFile ? (
                 <Suspense fallback={null}>
                   <FileViewPage
                     key={fileKey}

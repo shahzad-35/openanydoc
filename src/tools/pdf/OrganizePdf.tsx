@@ -17,7 +17,7 @@ const A4_SIZE: [number, number] = [595.28, 841.89]
 let nextPageKey = 0
 const newPageKey = () => `organized-${nextPageKey++}`
 
-export default function OrganizePdf({ files, onAddFiles, onResult }: ToolProps) {
+export default function OrganizePdf({ files, onAddFiles, onResult, onUnsavedEditsChange }: ToolProps) {
   const { t } = useT()
   const openedByFile = useOpenedPdfs(files)
   const [history, setHistory] = useState<{ pages: OrganizedPage[][]; position: number }>({ pages: [[]], position: 0 })
@@ -25,6 +25,12 @@ export default function OrganizePdf({ files, onAddFiles, onResult }: ToolProps) 
   const [addedFiles, setAddedFiles] = useState<File[]>([])
   const [isWorking, setIsWorking] = useState(false)
   const [error, setError] = useState('')
+
+  // Any change after the first file's pages arrived (moved, turned, added, deleted) is work the page asks about before leaving.
+  const hasChanges = history.position > 0
+  useEffect(() => {
+    onUnsavedEditsChange?.(hasChanges)
+  }, [hasChanges, onUnsavedEditsChange])
 
   function changePages(nextPages: OrganizedPage[]) {
     setHistory((previous) => ({ pages: [...previous.pages.slice(0, previous.position + 1), nextPages], position: previous.position + 1 }))

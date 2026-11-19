@@ -1,0 +1,84 @@
+{
+  "title": "OCR PDF – Make a Scanned PDF Searchable, Free, No Upload",
+  "description": "Make a scanned PDF searchable in your browser: English and Arabic text is read and laid over the pages, which stay as they are. Free, no upload.",
+  "heading": "OCR PDF",
+  "subtitle": "Turn a scanned PDF into one you can search, select and copy, in English or Arabic; nothing is uploaded.",
+  "intro": "OCR a PDF online without sending it anywhere: pages that are pictures, from a scanner or a phone, are read by text recognition running in your browser, and the words found are laid over each page as invisible text. The pages look exactly as before, but Ctrl+F finds words, text can be copied, and PDF to text or PDF to Word can now read it. English, Arabic or both. The first time, the text reader (about 10 MB) is loaded from this site and kept by your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The text is read on your device; your file never goes to a server."
+    },
+    {
+      "title": "Pages unchanged",
+      "text": "The scan stays as sharp as it was; only an invisible text layer is added."
+    },
+    {
+      "title": "English and Arabic",
+      "text": "Reads English, Arabic or both on the same page."
+    }
+  ],
+  "stepsTitle": "How to make a scanned PDF searchable",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a scanned PDF on the page."
+    },
+    {
+      "title": "Pick the language",
+      "text": "Choose English, Arabic or both."
+    },
+    {
+      "title": "Make it searchable",
+      "text": "Click Make searchable; each page is read in turn."
+    },
+    {
+      "title": "Download",
+      "text": "Download the searchable PDF and search it in any reader."
+    }
+  ],
+  "handlesTitle": "What OCR PDF handles",
+  "handles": [
+    "Scanned pages and photos of paper, in English, Arabic or both.",
+    "Pages that already have text: left as they are, unless you choose otherwise.",
+    "Slightly tilted scans: words follow their line's slope.",
+    "Any number of pages, read one at a time on your device."
+  ],
+  "limits": [
+    "Text recognition makes mistakes, more so on blurry, small or handwritten text; check what matters.",
+    "The first use loads the text reader (about 10 MB) from this site; after that it works offline.",
+    "Reading takes a few seconds a page, depending on your device.",
+    "Tables and columns are read as lines of words, not as a table."
+  ],
+  "faqTitle": "OCR PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Does the scan change?",
+      "answer": "No. The pages stay exactly as they were; the recognised words are added as invisible text over them."
+    },
+    {
+      "question": "What does the first use download?",
+      "answer": "The text reader and the English and Arabic language data, about 10 MB, from this site itself. Your browser keeps them, so later uses start at once and work offline."
+    },
+    {
+      "question": "Does it read handwriting?",
+      "answer": "Not reliably. It is made for printed text; handwriting usually comes out wrong."
+    },
+    {
+      "question": "How do I get the text out afterwards?",
+      "answer": "Open the searchable PDF in PDF to text or PDF to Word.",
+      "link": {
+        "text": "PDF to text",
+        "path": "/pdf-to-text"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

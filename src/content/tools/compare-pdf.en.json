@@ -1,0 +1,75 @@
+{
+  "title": "Compare PDF – Find Differences Between Two PDFs, No Upload",
+  "description": "Compare two PDF versions in your browser: added and removed lines page by page, and changed areas painted red on each page. Free, nothing is uploaded.",
+  "heading": "Compare PDF",
+  "subtitle": "See what changed between two versions of a PDF, line by line and on the page itself; nothing is uploaded.",
+  "intro": "Compare two PDF files online, such as two drafts of a contract or a report: the text view lists the lines added and removed on each page, and the picture view draws the two versions side by side with every changed area painted red, which also catches changes in pictures and layout. Download the differences as a text file. Both files stay on your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Two views",
+      "text": "Text differences line by line, and a picture of each page with the changes painted red."
+    },
+    {
+      "title": "A report to share",
+      "text": "Download the added and removed lines, page by page, as a plain text file."
+    }
+  ],
+  "stepsTitle": "How to compare two PDFs",
+  "steps": [
+    {
+      "title": "Choose the older PDF",
+      "text": "Click Choose a file, or drop the older version on the page."
+    },
+    {
+      "title": "Add the newer PDF",
+      "text": "Click Choose the second PDF and pick the newer version."
+    },
+    {
+      "title": "Compare",
+      "text": "Click Compare text, or open Pictures to see the changes on each page."
+    }
+  ],
+  "handlesTitle": "What Compare PDF handles",
+  "handles": [
+    "Text: lines added and removed on each page, in reading order, Arabic included.",
+    "Pictures: changed areas painted red, so moved pictures, new stamps and layout changes show.",
+    "Different lengths: pages only one version has are listed as added or removed."
+  ],
+  "limits": [
+    "Pages are compared by their number, so a page inserted near the start makes the later pages differ too.",
+    "A line that changed by one word shows as one removed and one added line.",
+    "Scanned PDFs have no text to compare; use the picture view.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faqTitle": "Compare PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Which file is the older one?",
+      "answer": "The first PDF you choose. Its lines count as removed when they are missing from the second, newer one."
+    },
+    {
+      "question": "Does it find changes in pictures?",
+      "answer": "Yes, in the picture view: each page is drawn from both files and every area that differs is painted red."
+    },
+    {
+      "question": "Can I compare scanned PDFs?",
+      "answer": "Use the picture view. A scanned PDF holds pictures of pages, so the text view has nothing to compare."
+    },
+    {
+      "question": "Can I save the result?",
+      "answer": "Yes. Download the differences as a text file with the added and removed lines of each page."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

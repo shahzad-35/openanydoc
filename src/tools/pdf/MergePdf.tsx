@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { isolateText, useT } from '../../i18n'
 import { Notice } from '../../components/Messages'
 import type { ToolProps } from '../registry'
@@ -8,7 +8,7 @@ import { PdfThumbnailGrid, ProgressBar, baseNameOf, pdfResultFile, problemMessag
 import type { GridCard } from './PdfToolParts'
 
 // Merge PDF: the chosen PDFs, shown by their first page and reordered by dragging (or the arrow buttons), become one PDF.
-export default function MergePdf({ files, onFilesChange, onAddFiles, onResult }: ToolProps) {
+export default function MergePdf({ files, onFilesChange, onAddFiles, onResult, onUnsavedEditsChange }: ToolProps) {
   const { t, tp } = useT()
   const openedByFile = useOpenedPdfs(files)
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
@@ -28,7 +28,14 @@ export default function MergePdf({ files, onFilesChange, onAddFiles, onResult }:
   })
   const isEveryFileReady = files.every((file) => { const opened = openedByFile.get(file); return opened && 'document' in opened })
 
+  // A changed order is work the page asks about before leaving.
+  const [hasReordered, setHasReordered] = useState(false)
+  useEffect(() => {
+    onUnsavedEditsChange?.(hasReordered)
+  }, [hasReordered, onUnsavedEditsChange])
+
   function moveFile(fromIndex: number, toIndex: number) {
+    setHasReordered(true)
     const reorderedFiles = [...files]
     const [movedFile] = reorderedFiles.splice(fromIndex, 1)
     reorderedFiles.splice(toIndex, 0, movedFile)

@@ -1,0 +1,83 @@
+{
+  "title": "Blur Faces in a Photo Online – Free, Private, No Upload",
+  "description": "Blur or pixelate faces in a photo in your browser: faces are found automatically, and you can add or skip any area. Free, nothing is uploaded.",
+  "heading": "Blur faces",
+  "subtitle": "Hide the faces in a photo with blur or large squares, found automatically on your device; nothing is uploaded.",
+  "intro": "Blur faces in a photo before you share it: a small face detector runs in your browser and marks every face it finds. Click a face to leave it clear, drag over anything it missed (a face in the crowd, a name badge, a number plate), choose blur or pixelate and the strength, then save. The first time, the detector (about 16 MB with its runtime) is loaded from this site and kept by your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Faces are found on your device; the photo never goes to a server, which matters most for photos of people."
+    },
+    {
+      "title": "Automatic, then yours",
+      "text": "Faces are marked for you; leave any of them clear or add areas by hand."
+    },
+    {
+      "title": "Blur or pixelate",
+      "text": "A soft blur or large squares, as strong as you need."
+    }
+  ],
+  "stepsTitle": "How to blur faces in a photo",
+  "steps": [
+    {
+      "title": "Choose your photo",
+      "text": "Click Choose a file, or drop a JPG, PNG, WebP or HEIC photo on the page."
+    },
+    {
+      "title": "Check the faces",
+      "text": "Found faces are marked; click one to leave it clear, or drag to hide another area."
+    },
+    {
+      "title": "Choose the look",
+      "text": "Pick blur or pixelate and the strength."
+    },
+    {
+      "title": "Save",
+      "text": "Click Hide and download the photo."
+    }
+  ],
+  "handlesTitle": "What Blur faces handles",
+  "handles": [
+    "Faces found automatically, small faces in large photos included.",
+    "Any area hidden by hand: badges, number plates, screens.",
+    "Blur or pixelate, at the strength you choose.",
+    "JPG, PNG, WebP and HEIC photos; saved in the same format (HEIC as JPG)."
+  ],
+  "limits": [
+    "Face detection misses some faces (side views, masks, very small or dark faces); check the photo and add areas by hand.",
+    "The first use loads the detector (about 16 MB) from this site; after that it works offline.",
+    "Blurring hides a face from people, but a strong blur is safer than a light one."
+  ],
+  "faqTitle": "Blur faces: questions",
+  "faq": [
+    {
+      "question": "Is my photo uploaded?",
+      "answer": "No. Your photo is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will it find every face?",
+      "answer": "Most front-facing faces, but not all: side views, masks and very small faces can be missed. Check the preview and drag over anything it missed."
+    },
+    {
+      "question": "Can I keep one face clear?",
+      "answer": "Yes. Click its box and it is left as it is."
+    },
+    {
+      "question": "Is the photo's location data removed too?",
+      "answer": "No, this tool only changes the pixels. Remove image metadata takes out GPS, camera and date data.",
+      "link": {
+        "text": "Remove image metadata",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "What does the first use download?",
+      "answer": "The face detector and the runtime that runs it, about 16 MB, from this site itself. Your browser keeps them, so later uses start at once and work offline."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

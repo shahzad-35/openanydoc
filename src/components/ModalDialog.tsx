@@ -17,7 +17,7 @@ type ModalDialogProps = {
   children: ReactNode
 }
 
-const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href]'
+export const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href]'
 
 // A native modal <dialog>. It is drawn in the browser's top layer, so nothing on the page can cover it or clip it, and the
 // page behind is inert. Tab stays inside, Esc and a click on the backdrop close it, and focus goes back to what opened it.

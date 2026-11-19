@@ -1,0 +1,80 @@
+{
+  "title": "PDF to Excel – Convert PDF Tables to XLSX Free, No Upload",
+  "description": "Convert PDF tables to an Excel spreadsheet in your browser: one sheet per page, text in columns goes into cells, numbers stay numbers. No upload.",
+  "heading": "PDF to Excel",
+  "subtitle": "Get the tables of a PDF into an Excel spreadsheet, one sheet per page, with numbers you can add up; nothing is uploaded.",
+  "intro": "Convert PDF to Excel online for invoices, statements and reports: each page becomes a sheet, every line of the page a row, and text that sits in columns goes into separate cells, lined up across the page. Numbers like 1,240 or (35.00) become real numbers you can sum and sort. Arabic pages give right-to-left sheets. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Cells, not text",
+      "text": "Columns of the page become columns of the sheet, row by row."
+    },
+    {
+      "title": "Real numbers",
+      "text": "Thousands separators and brackets are read, so totals and sorting work at once."
+    }
+  ],
+  "stepsTitle": "How to convert PDF to Excel",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to Excel."
+    },
+    {
+      "title": "Download",
+      "text": "Download the .xlsx file and open it in Excel, Numbers or Google Sheets."
+    }
+  ],
+  "handlesTitle": "What PDF to Excel handles",
+  "handles": [
+    "Tables laid out in columns, row by row.",
+    "Numbers with thousands separators, decimals and negative numbers in brackets.",
+    "Bold rows, such as headings and totals.",
+    "Arabic pages, as right-to-left sheets."
+  ],
+  "limits": [
+    "Columns are found from where text starts; cells that span several columns or wrap onto two lines may land in the wrong cell.",
+    "Every page becomes its own sheet, even when a table continues on the next page.",
+    "Scanned PDFs hold pictures of pages, so there is no text to read (that needs OCR).",
+    "PDFs that need a password to open must be unlocked first, with Unlock PDF."
+  ],
+  "faqTitle": "PDF to Excel: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How are the columns found?",
+      "answer": "From where pieces of text start across the page: text that starts in the same place on different lines goes into the same column."
+    },
+    {
+      "question": "Are numbers kept as numbers?",
+      "answer": "Yes. Numbers like 1,240, 35.50 and (35.00) become numbers, so you can add them up and sort them."
+    },
+    {
+      "question": "Does it work with scanned PDFs?",
+      "answer": "No. A scanned PDF holds pictures of pages, so there is no text to convert; that needs text recognition (OCR), which this tool does not do."
+    },
+    {
+      "question": "Can I check the result before opening Excel?",
+      "answer": "Yes. Open the downloaded file in the Excel viewer here.",
+      "link": {
+        "text": "Excel viewer",
+        "path": "/excel-viewer"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

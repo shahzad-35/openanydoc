@@ -1,6 +1,4 @@
 import { Suspense, lazy, useEffect, useRef, useState } from 'react'
-import { defaultOptions, renderAsync } from 'docx-preview'
-import type { HElement, Options as DocxPreviewOptions } from 'docx-preview'
 import MenuBar from '../../components/MenuBar'
 import type { MenuDefinition } from '../../components/MenuBar'
 import { FatalFileError, Notice, useToast } from '../../components/Messages'
@@ -11,7 +9,7 @@ import { getFormatCapabilities } from '../../whatsNew'
 import { downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import { DropOverlay, Icon, SheetIconSprite, Sidebar, Toolbar, ToolbarButton, ToolbarSeparator, TopBar, useIsNarrowScreen, useThemeToggle } from '../sheet/SheetChrome'
-import { FIELD_MARK, exportDocument, insertDocumentHtml, isOpenDocumentFile, prepareOpenDocument, prepareWordDocument, readFlowingHtml } from './wordDocument'
+import { exportDocument, insertDocumentHtml, isOpenDocumentFile, prepareOpenDocument, readFlowingHtml, renderWordPages } from './wordDocument'
 import type { ExportKind, WordDocumentFacts } from './wordDocument'
 import type { WordHeading, WordNote } from './WordPanels'
 import '../sheet/sheetChrome.css'
@@ -38,54 +36,6 @@ const MIME_TYPE_BY_EXTENSION: Record<string, string> = {
   odt: 'application/vnd.oasis.opendocument.text',
 }
 const PAGE_SELECTOR = 'section.docx, .odt-page'
-
-// Documents name their fonts without carrying them, and a missing one (Calibri on a Mac) would fall back to the browser's
-// serif font, and Arabic text to a decorative one with lines that collide. The site's Arabic font (loaded for Arabic letters
-// only) and a generic family at the end keep the look close.
-function addGenericFontFamily(fontFamily: string) {
-  if (/(^|,)\s*(sans-serif|serif|monospace)\s*$/i.test(fontFamily)) return fontFamily
-  return `${fontFamily}, "IBM Plex Sans Arabic", ${/times|georgia|garamond|cambria|roman|serif/i.test(fontFamily) ? 'serif' : 'sans-serif'}`
-}
-
-// docx-preview builds every element through this function. Two changes on the way: a style given as a string (a few shapes)
-// is set through CSSOM, because the site's CSP refuses style attributes; and font names get a generic fallback.
-function createDocumentElement(element: HElement | Node | string): Node {
-  if (typeof element !== 'object' || element instanceof Node || !element.style) return defaultOptions.h(element)
-  const { style, ...elementWithoutStyle } = element
-  const node = defaultOptions.h(elementWithoutStyle) as HTMLElement
-  if (typeof style === 'string') node.style.cssText = style
-  else Object.assign(node.style, style)
-  if (node.style.fontFamily) node.style.fontFamily = addGenericFontFamily(node.style.fontFamily)
-  return node
-}
-
-const renderOptions: Partial<DocxPreviewOptions> = {
-  className: 'docx',
-  inWrapper: true,
-  hideWrapperOnPrint: true,
-  breakPages: true,
-  // Word saves where its pages ended; following those marks gives the same pages as Word.
-  ignoreLastRenderedPageBreak: false,
-  useBase64URL: false,
-  // Comments come as a mark (its popover is hidden by CSS; the margin shows them) and tracked changes as <ins>/<del>.
-  renderComments: true,
-  renderChanges: true,
-  h: createDocumentElement,
-}
-
-function finishRenderedPages(pagesElement: HTMLElement, isTableRightToLeft: boolean[]) {
-  pagesElement.querySelectorAll<HTMLTableElement>('section.docx > article table').forEach((table, tableIndex) => {
-    if (isTableRightToLeft[tableIndex]) table.dir = 'rtl'
-  })
-  const pages = pagesElement.querySelectorAll('section.docx')
-  pages.forEach((page, pageIndex) => {
-    const textWalker = document.createTreeWalker(page, NodeFilter.SHOW_TEXT)
-    for (let textNode = textWalker.nextNode(); textNode; textNode = textWalker.nextNode()) {
-      if (!textNode.nodeValue?.includes(FIELD_MARK)) continue
-      textNode.nodeValue = textNode.nodeValue.replaceAll(`${FIELD_MARK}PAGE${FIELD_MARK}`, String(pageIndex + 1)).replaceAll(`${FIELD_MARK}NUMPAGES${FIELD_MARK}`, String(pages.length))
-    }
-  })
-}
 
 // Marks the rendered heading paragraphs (by their style class) and lists the comment marks and tracked changes with what the file
 // says about them, in document order. Changes are matched to the file's list by position.
@@ -200,16 +150,10 @@ export default function WordViewer({ openedFile, onOpenAnotherFile, onClose }: F
         setPageCount(null)
         return
       }
-      const { documentBytes, isTableRightToLeft, facts: fileFacts } = await prepareWordDocument(openedFile.contents)
-      await renderAsync(documentBytes, pagesHolder, detachedStyleHolder, renderOptions)
+      const rendered = await renderWordPages(openedFile.contents, pagesHolder, detachedStyleHolder)
+      adoptedSheets = rendered.adoptedSheets
+      const fileFacts = rendered.facts
       if (isCancelled) return
-      adoptedSheets = Array.from(detachedStyleHolder.querySelectorAll('style'), (styleElement) => {
-        const sheet = new CSSStyleSheet()
-        sheet.replaceSync((styleElement.textContent ?? '').replace(/font-family:\s*([^;}]+)/g, (_, fontFamily: string) => `font-family: ${addGenericFontFamily(fontFamily.trim())}`))
-        return sheet
-      })
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, ...adoptedSheets]
-      finishRenderedPages(pagesHolder, isTableRightToLeft)
       setNotes(markHeadingsAndNotes(pagesHolder, fileFacts))
       setFacts(fileFacts)
       setPageCount(pagesHolder.querySelectorAll('section.docx').length)

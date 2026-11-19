@@ -2,7 +2,7 @@ import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChangeCounter, downloadEditedFile } from '../components/EditControls'
 import MenuBar from '../components/MenuBar'
 import type { MenuDefinition } from '../components/MenuBar'
-import { Notice, REJECTED_FILE_TOAST_SECONDS, useToast } from '../components/Messages'
+import { Notice, REJECTED_FILE_ADVICE_TOAST_SECONDS, REJECTED_FILE_TOAST_SECONDS, useToast } from '../components/Messages'
 import NextSteps from '../components/NextSteps'
 import { findFormatForFileName } from '../formats/registry'
 import type { EditingModule } from '../formats/registry'
@@ -128,7 +128,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         id="another-file-error"
         kind={anotherFileIntake.errorDetail ? 'info' : 'error'}
         alwaysToast
-        seconds={REJECTED_FILE_TOAST_SECONDS}
+        seconds={anotherFileIntake.errorDetail ? REJECTED_FILE_ADVICE_TOAST_SECONDS : REJECTED_FILE_TOAST_SECONDS}
         attempt={anotherFileIntake.attemptCount}
         message={anotherFileIntake.errorMessage ?? ''}
         detail={anotherFileIntake.errorDetail ?? undefined}
@@ -137,7 +137,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
         id="another-file-coming-soon"
         kind="info"
         alwaysToast
-        seconds={REJECTED_FILE_TOAST_SECONDS}
+        seconds={REJECTED_FILE_ADVICE_TOAST_SECONDS}
         attempt={anotherFileIntake.attemptCount}
         message={anotherFileIntake.comingSoonViewer ? t('intake.comingSoon', { format: anotherFileIntake.comingSoonViewer.label }) : ''}
         detail={t('intake.tryThese')}

@@ -159,6 +159,18 @@ test('tables round trip: mask then restore gives back every value with its type'
   assert.equal(restoredCount, 8)
 })
 
+test('a removed column is also removed inside free text, and is not written to the key', () => {
+  const document = { kind: 'tables', sourceFormat: 'csv', tables: [{ sheetName: '', header: ['name', 'notes'], rows: [['Sara Example', 'Call Sara Example tomorrow please']] }] }
+  const choices = [
+    { fieldId: '[0,0]', category: 'name', strategy: 'remove' },
+    { fieldId: '[0,1]', category: 'freeText', strategy: 'token' },
+  ]
+  const { document: masked, tokens } = maskDocument(document, choices)
+  assert.deepEqual(masked.tables[0].header, ['notes'])
+  assert.deepEqual(masked.tables[0].rows, [['Call [removed] tomorrow please']])
+  assert.equal(JSON.stringify(tokens).includes('Sara'), false)
+})
+
 test('key files: refuses other JSON and counts unknown tokens', () => {
   assert.equal(parseKeyFile('{"tokens":{}}'), null)
   assert.equal(parseKeyFile('not json'), null)

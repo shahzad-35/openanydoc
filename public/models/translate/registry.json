@@ -1,0 +1,24 @@
+{
+  "enar": {
+    "model": {
+      "name": "/models/translate/enar/model.enar.intgemm.alphas.bin.gz"
+    },
+    "lex": {
+      "name": "/models/translate/enar/lex.50.50.enar.s2t.bin.gz"
+    },
+    "vocab": {
+      "name": "/models/translate/enar/vocab.enar.spm.gz"
+    }
+  },
+  "aren": {
+    "model": {
+      "name": "/models/translate/aren/model.aren.intgemm.alphas.bin.gz"
+    },
+    "lex": {
+      "name": "/models/translate/aren/lex.50.50.aren.s2t.bin.gz"
+    },
+    "vocab": {
+      "name": "/models/translate/aren/vocab.aren.spm.gz"
+    }
+  }
+}

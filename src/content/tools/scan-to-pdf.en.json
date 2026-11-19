@@ -1,0 +1,83 @@
+{
+  "title": "Scan to PDF – Phone Photos to a Straight PDF, No Upload",
+  "description": "Scan paper to PDF with your phone: take photos, drag the corners to straighten each page, clean it up in black and white and save one PDF. No upload.",
+  "heading": "Scan to PDF",
+  "subtitle": "Photograph paper pages with your phone, straighten them and save one clean PDF; nothing is uploaded.",
+  "intro": "Scan documents to PDF without a scanner app: take a photo of each page with your phone's camera, or choose photos you already have, drag the four corners onto the paper's corners and each page is straightened as if it had been scanned flat. The Document look turns the paper white and the ink dark, evening out shadows. Put the pages in order and save them as one PDF. The photos never leave your phone.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Straight pages",
+      "text": "Four corners per page undo the angle of the photo, so the page comes out square."
+    },
+    {
+      "title": "Clean scans",
+      "text": "The Document look evens out shadows and makes the paper white; grayscale and original colours are there too."
+    }
+  ],
+  "stepsTitle": "How to scan a document to PDF",
+  "steps": [
+    {
+      "title": "Take or choose photos",
+      "text": "Tap Take a photo for each page, or choose photos you already have."
+    },
+    {
+      "title": "Set the corners",
+      "text": "Drag the four round handles onto the corners of the paper, and turn the page if needed."
+    },
+    {
+      "title": "Choose the look",
+      "text": "Keep Document for black-and-white pages, or pick grayscale or the original colours."
+    },
+    {
+      "title": "Make the PDF",
+      "text": "Put the pages in order, click Make PDF and download it."
+    }
+  ],
+  "handlesTitle": "What Scan to PDF handles",
+  "handles": [
+    "Photos from the phone camera, and JPG, PNG, WebP, HEIC and TIFF pictures.",
+    "Pages photographed at an angle: straightened from their four corners.",
+    "Shadows and yellowish paper: evened out by the Document look.",
+    "Any number of pages, in the order you set, on A4, Letter or page-size sheets."
+  ],
+  "limits": [
+    "The corners are set by hand; the page's edges are not found automatically.",
+    "The scan is a picture: its text can't be selected or searched (that needs text recognition, OCR).",
+    "Very large photos are reduced to 2,000 pixels on the long side of each page."
+  ],
+  "faqTitle": "Scan to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Do I need a scanner app?",
+      "answer": "No. On a phone, Take a photo opens the camera from this page; on a computer you choose photos you already have."
+    },
+    {
+      "question": "Are the page edges found automatically?",
+      "answer": "Not yet. You drag the four corners onto the paper; it takes a few seconds per page and works on any background."
+    },
+    {
+      "question": "Can I search the text of the scan?",
+      "answer": "No. The pages are pictures, so the text can't be selected or searched; that needs text recognition (OCR), which this tool does not do."
+    },
+    {
+      "question": "Can I add the scan to another PDF?",
+      "answer": "Yes. After downloading, Merge PDF joins it with other PDFs.",
+      "link": {
+        "text": "Merge PDF",
+        "path": "/merge-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

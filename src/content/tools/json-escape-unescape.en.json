@@ -9,7 +9,7 @@
     { "title": "Free with no limits", "text": "No account, no watermark and no daily cap on files." },
     { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
   ],
-  "stepsTitle": "How to escape or unescape JSON online",
+  "stepsTitle": "How it works: escape or unescape JSON online",
   "steps": [
     { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, or paste the text. An escaped string (it starts with a quote) can be pasted as it is." },
     { "title": "Escape or unescape", "text": "The page offers the right step for what you opened: Escape for a JSON document, Unescape for an escaped string. Both are also in the More menu, and Undo takes either back." },

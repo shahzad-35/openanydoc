@@ -1,0 +1,76 @@
+{
+  "title": "Excel to PDF – Convert XLSX Sheets to PDF Free, No Upload",
+  "description": "Convert Excel sheets to PDF in your browser: each sheet fitted to the page, colours and borders kept, text you can still search. Free, no upload.",
+  "heading": "Excel to PDF",
+  "subtitle": "Save the sheets of a workbook as PDF pages, fitted to the page width, with text you can still search; nothing is uploaded.",
+  "intro": "Convert Excel to PDF online for an invoice, a report or a price list: every visible sheet is laid out with its column widths, merged cells, colours, borders and bold text, fitted to the page width, and split between rows onto as many pages as it needs. Choose A4 or Letter, portrait or landscape, and gridlines. Each page carries its text, so the PDF can be searched, Arabic included. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "The pages carry their text, so it can be selected, searched and copied in any PDF reader."
+    },
+    {
+      "title": "Fits the page",
+      "text": "Each sheet is fitted to the page width and cut between rows, never through one."
+    }
+  ],
+  "stepsTitle": "How to convert Excel to PDF",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Click Choose a file, or drop an .xlsx, .xls or .ods file on the page."
+    },
+    {
+      "title": "Set the pages",
+      "text": "Choose the sheets, the page size, the orientation and whether to show gridlines."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to PDF, check the preview and download it."
+    }
+  ],
+  "handlesTitle": "What Excel to PDF handles",
+  "handles": [
+    "Workbooks: .xlsx, .xlsm, .xls and .ods.",
+    "Column widths, row heights, merged cells and hidden rows and columns.",
+    "Colours, borders, bold and alignment from .xlsx and .xlsm files.",
+    "Right-to-left Arabic sheets, set against the right margin."
+  ],
+  "limits": [
+    "Charts, pictures and conditional formatting are not drawn.",
+    "Excel's own print settings (print area, page breaks, repeated titles) are not read; sheets are fitted to the page width instead.",
+    "Formulas show the value saved in the file.",
+    "Colours and borders are read from .xlsx and .xlsm files only; other formats keep their values and layout."
+  ],
+  "faqTitle": "Excel to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "What happens to a very wide sheet?",
+      "answer": "It is shrunk to fit the page width, down to half size; anything wider continues on further pages, cut between columns."
+    },
+    {
+      "question": "Are colours and borders kept?",
+      "answer": "Yes, for .xlsx and .xlsm files: fills, font colours, bold, borders and alignment. Other formats keep their values and layout."
+    },
+    {
+      "question": "Can I convert only one sheet?",
+      "answer": "Yes. Choose The first sheet only, or hide the other sheets in the file before converting."
+    },
+    {
+      "question": "Are charts included?",
+      "answer": "Not yet. Charts and pictures in the sheet are not drawn; the cells are."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

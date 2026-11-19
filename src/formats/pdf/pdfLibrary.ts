@@ -27,9 +27,10 @@ export async function loadPdfLibrary() {
   return { pdfjs, viewer }
 }
 
-// Loads the library and starts the worker once, so its script is cached and a PDF opens without the network later.
+// Loads the library (core and viewer components) and starts the worker once, so their scripts are cached and a PDF opens without the
+// network later.
 export async function warmUpPdfWorker() {
-  const pdfjs = await loadPdfCore()
+  const { pdfjs } = await loadPdfLibrary()
   const worker = new pdfjs.PDFWorker()
   await worker.promise
   worker.destroy()

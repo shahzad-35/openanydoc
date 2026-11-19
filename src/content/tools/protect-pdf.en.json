@@ -1,0 +1,82 @@
+{
+  "title": "Protect PDF – Add a Password to a PDF Free, No Upload",
+  "description": "Password-protect a PDF in your browser with AES-256 encryption, and choose whether people may print, copy or change it. Free, nothing is uploaded.",
+  "heading": "Protect PDF",
+  "subtitle": "Lock a PDF with a password and AES-256 encryption, and decide what people may do with it; nothing is uploaded.",
+  "intro": "Add a password to a PDF online without sending it anywhere: the file is encrypted with AES-256 by qpdf, a well-known PDF library, running in your browser. Anyone who opens the copy needs the password, and you can ask PDF readers to block printing, copying or changes. Your file and your password never leave your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file and your password are handled by your own browser and never sent to a server."
+    },
+    {
+      "title": "Strong encryption",
+      "text": "AES-256, the strongest encryption PDF readers support, made by qpdf."
+    },
+    {
+      "title": "Permissions",
+      "text": "Allow or block printing, copying text and pictures, and changes."
+    }
+  ],
+  "stepsTitle": "How to password-protect a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Type a password",
+      "text": "Type it twice; choose one you can remember, because it can't be recovered."
+    },
+    {
+      "title": "Choose the permissions",
+      "text": "Untick what people may not do once it's open: print, copy or change it."
+    },
+    {
+      "title": "Protect and download",
+      "text": "Click Protect PDF and download the locked copy."
+    }
+  ],
+  "handlesTitle": "What Protect PDF handles",
+  "handles": [
+    "AES-256 encryption with a password to open.",
+    "Printing, copying and changes allowed or blocked, with a permissions password.",
+    "Any PDF that opens without a password; text, pictures, links and form fields stay as they are."
+  ],
+  "limits": [
+    "A forgotten password can't be recovered, here or anywhere else.",
+    "Permissions are honoured by PDF readers; they are not a lock on what someone who can open the file sees.",
+    "A PDF that already has a password must be unlocked first."
+  ],
+  "faqTitle": "Protect PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How strong is the protection?",
+      "answer": "The copy is encrypted with AES-256, the strongest encryption PDF readers support. Its strength depends on the password: use a long one."
+    },
+    {
+      "question": "What if I forget the password?",
+      "answer": "It can't be recovered. Keep the original file, which stays unchanged on your device."
+    },
+    {
+      "question": "What is the permissions password for?",
+      "answer": "It lets a PDF reader allow printing, copying and changes again. The restrictions are honoured by most readers, but they are not a lock: anyone who has the password to open the file can remove them, for example with Unlock PDF. Only the password to open keeps the file private."
+    },
+    {
+      "question": "How do I remove the password later?",
+      "answer": "With Unlock PDF and the password.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

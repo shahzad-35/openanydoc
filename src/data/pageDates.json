@@ -1,15 +1,15 @@
 {
   "/en": {
-    "hash": "b576c1d92467cedb801e8b0b63fd7c374b29f372",
-    "date": "2026-11-17"
+    "hash": "f9deebe9d259f28968ad99fac00a05ea573dbc09",
+    "date": "2026-11-18"
   },
   "/en/about": {
-    "hash": "bbd7992c043757d85fe4c72f54c4f3a132cc863b",
-    "date": "2026-11-12"
+    "hash": "6027d10216f6707780f462e2a64f373cb1485845",
+    "date": "2026-11-19"
   },
   "/en/privacy": {
-    "hash": "b179b105dfdc6e303c653c5ed53aad430d57693c",
-    "date": "2026-11-12"
+    "hash": "636822708c8ff2d1ee5842875f7a3879517e6ea9",
+    "date": "2026-11-19"
   },
   "/en/terms": {
     "hash": "be664fa0bcd86c2c594b602808dc34f1d5977421",
@@ -68,12 +68,12 @@
     "date": "2026-11-17"
   },
   "/en/pdf-tools": {
-    "hash": "1762a499cda1ea5819e41d1666079131a2dcb6e9",
-    "date": "2026-11-17"
+    "hash": "286deb13c917f820194136b240e71326b434aa24",
+    "date": "2026-11-18"
   },
   "/en/image-tools": {
-    "hash": "fc5b5915c6c2e0324f02eadd7a76488e8b79a3d2",
-    "date": "2026-11-17"
+    "hash": "c140c8a67e526bc6d501b3ade6eb057a07c53b4e",
+    "date": "2026-11-18"
   },
   "/en/data-tools": {
     "hash": "160005306bd8e56fa42a1474b686c3a89e791251",
@@ -84,40 +84,64 @@
     "date": "2026-11-17"
   },
   "/en/all-tools": {
-    "hash": "4936ff302fe328d8ab2e9e676aa03509a3f4d65a",
-    "date": "2026-11-17"
+    "hash": "61d2434042b1f752112565bd92497d7da83df29b",
+    "date": "2026-11-18"
   },
   "/en/pdf-viewer": {
     "hash": "795e01bad10fba1c70e90c3e47f2bc5efdb65451",
     "date": "2026-11-17"
   },
   "/en/merge-pdf": {
-    "hash": "038dcc82258249c69456c5db346054cfdd9d0ef6",
-    "date": "2026-11-17"
+    "hash": "9f64a62897c604f98254e1304149ecb2bf120d88",
+    "date": "2026-11-18"
   },
   "/en/split-pdf": {
-    "hash": "6139781dd2f923fa77550bd9b44f8aeb2e2049b8",
-    "date": "2026-11-17"
+    "hash": "7939ae8a32cbc132eecd7a7ffa1ee5ba45a7fe96",
+    "date": "2026-11-18"
   },
   "/en/remove-pdf-pages": {
-    "hash": "0b5e69877902b45d01c1aa1d20588e5f23d7ae1d",
-    "date": "2026-11-17"
+    "hash": "b328c32aca8536b960c12fb70b34cebe5fe3ae09",
+    "date": "2026-11-18"
   },
   "/en/extract-pdf-pages": {
-    "hash": "3d7edb6bebc902775f228184feb6a04c5c3fcf2f",
-    "date": "2026-11-17"
+    "hash": "9bc9399e03e77055d14a6b3d0bf3534f56f3aaa9",
+    "date": "2026-11-18"
   },
   "/en/organize-pdf": {
-    "hash": "db56baf989ea2d26855a0824845a19fd894c4855",
-    "date": "2026-11-17"
+    "hash": "d6c634926ff843fae6629cb8d968b2f41c057538",
+    "date": "2026-11-18"
+  },
+  "/en/scan-to-pdf": {
+    "hash": "875f3cd8d854c8b36fbcb9644b1c77ed79e88aa0",
+    "date": "2026-11-18"
   },
   "/en/rotate-pdf": {
     "hash": "47ef78deb55d5dbc401b7c0379fbfc8ffabbc075",
     "date": "2026-11-17"
   },
+  "/en/crop-pdf": {
+    "hash": "1d842373e3ab88aa17f4c9fccbb22e556d798797",
+    "date": "2026-11-18"
+  },
+  "/en/ocr-pdf": {
+    "hash": "7672f39e910fa6b168751614406559a275dc2ecd",
+    "date": "2026-11-18"
+  },
+  "/en/repair-pdf": {
+    "hash": "9f7bbe0524444d2122200899117e8900630adaf6",
+    "date": "2026-11-18"
+  },
   "/en/jpg-to-pdf": {
     "hash": "b2be481a9221f80b0b8482956b2bc4fba28e5c1a",
     "date": "2026-11-17"
+  },
+  "/en/word-to-pdf": {
+    "hash": "5df3d0cd50a4a00e30ba2471f233bf506de3af0e",
+    "date": "2026-11-18"
+  },
+  "/en/excel-to-pdf": {
+    "hash": "023e771681a7762dc4f92bd7ab3a5e126b6884b6",
+    "date": "2026-11-18"
   },
   "/en/pdf-to-jpg": {
     "hash": "f667edb9493e0b37d8480deac816422ec59d3a0f",
@@ -126,6 +150,22 @@
   "/en/pdf-to-text": {
     "hash": "fcf481b7533c9a0a8830167afeeaad50d68b3684",
     "date": "2026-11-17"
+  },
+  "/en/pdf-to-word": {
+    "hash": "c74b01363d830439dfdaebe89ed17238fc482a54",
+    "date": "2026-11-18"
+  },
+  "/en/pdf-to-excel": {
+    "hash": "083ca2e3da05a97d7fbbb6cc9f373252dee90aa3",
+    "date": "2026-11-18"
+  },
+  "/en/pdf-to-powerpoint": {
+    "hash": "623fecad6421908e97a6dc4d72e3f74f9285053b",
+    "date": "2026-11-18"
+  },
+  "/en/pdf-to-markdown": {
+    "hash": "3a11e0250c28c20c96d78be6d51ce231dbbed915",
+    "date": "2026-11-18"
   },
   "/en/extract-pdf-images": {
     "hash": "a1bd2040e426702ad05b6c1d083de61faac16759",
@@ -143,6 +183,10 @@
     "hash": "91e69b710f9e8fa220c61033235647783bfd8657",
     "date": "2026-11-17"
   },
+  "/en/pdf-forms": {
+    "hash": "052f8e0a0e34a3fa0f7ceb186714dcb1d0b79fb2",
+    "date": "2026-11-19"
+  },
   "/en/watermark-pdf": {
     "hash": "f7142c6803a85b5d10b73f9fff1f6f819eb891a9",
     "date": "2026-11-17"
@@ -155,9 +199,29 @@
     "hash": "a8f7087b005708b9dcf4af7a3b95d37bd481ce2e",
     "date": "2026-11-17"
   },
+  "/en/redact-pdf": {
+    "hash": "91ffc0dbac15c1e6973118c62706fdcf04060f3f",
+    "date": "2026-11-19"
+  },
+  "/en/compare-pdf": {
+    "hash": "9c10d93bcaa64579944bcb0428d476a774d5c73f",
+    "date": "2026-11-18"
+  },
+  "/en/protect-pdf": {
+    "hash": "b331a8d2040c81f848caecc16a9be5d6b41234ac",
+    "date": "2026-11-19"
+  },
+  "/en/unlock-pdf": {
+    "hash": "2adf47e34f9071024fef34312f6b505a119f0050",
+    "date": "2026-11-18"
+  },
+  "/en/translate-pdf": {
+    "hash": "eb2c5b93bfc391dbd7042e37a48fc048c011d764",
+    "date": "2026-11-18"
+  },
   "/en/image-viewer": {
-    "hash": "2b0ae130d1dbfddc0e51f0dfd452166366a01ed6",
-    "date": "2026-11-17"
+    "hash": "23776f8b0eda10b9e6cbce5a8cb9598b6fc734ae",
+    "date": "2026-11-19"
   },
   "/en/compress-image": {
     "hash": "79f7dd4d994e0e3dfc62903e76e57e5cc46a916e",
@@ -178,6 +242,18 @@
   "/en/watermark-image": {
     "hash": "ad61d4d1cfef50abb76a44e07cf300890a6a59f8",
     "date": "2026-11-17"
+  },
+  "/en/blur-face": {
+    "hash": "aaa90e1f0bd2b7a28f326b09fc746f41efefde1c",
+    "date": "2026-11-18"
+  },
+  "/en/remove-background": {
+    "hash": "7928a3f19c60eaa887f3ecddecec422c386ff9b4",
+    "date": "2026-11-18"
+  },
+  "/en/upscale-image": {
+    "hash": "e6fc6415acea925e489cb60296a24e3da45bf8fd",
+    "date": "2026-11-18"
   },
   "/en/remove-image-metadata": {
     "hash": "3fc392a854d276c435652ca24e492c2717ed815f",
@@ -232,8 +308,8 @@
     "date": "2026-11-17"
   },
   "/en/json-viewer": {
-    "hash": "d6f22f69d509e7c592c772603a90e766ef39cf16",
-    "date": "2026-11-17"
+    "hash": "d1a1cf9064b6b268347a31a5e6d095b72b6dfecb",
+    "date": "2026-11-19"
   },
   "/en/json-formatter": {
     "hash": "3de63bb10a4d67e779e10b00ac327b772e4b9c3b",
@@ -244,8 +320,8 @@
     "date": "2026-11-17"
   },
   "/en/json-escape-unescape": {
-    "hash": "c0ad3466b690ff52fd24ce82fcc2e61de7865503",
-    "date": "2026-11-17"
+    "hash": "b4bfd11454edf228c0314b946e15fc6969990db4",
+    "date": "2026-11-19"
   },
   "/en/mask-data": {
     "hash": "af7f64fbdd09854a129286b75efc3165bad7a35c",
@@ -292,16 +368,16 @@
     "date": "2026-11-17"
   },
   "/ar": {
-    "hash": "5e8ae1a83b20c30c70ea90628b49a9747f15fe5c",
-    "date": "2026-11-17"
+    "hash": "2fdc689ab65102919985afc3080478ee752acdaa",
+    "date": "2026-11-18"
   },
   "/ar/about": {
-    "hash": "1f34fce14e1efb952757903f96e74d27df9f317e",
-    "date": "2026-11-12"
+    "hash": "c2e8babc5ad2b104881904922391a4041d3c8221",
+    "date": "2026-11-19"
   },
   "/ar/privacy": {
-    "hash": "0260ca31ef74ece37b193b33f0414782c375a019",
-    "date": "2026-11-12"
+    "hash": "e282a60582bbdeb976f1d8a7383d79032cd26bf0",
+    "date": "2026-11-19"
   },
   "/ar/terms": {
     "hash": "43556c2e8e197f4d9346ebf683e4c0c6e912e809",
@@ -360,12 +436,12 @@
     "date": "2026-11-17"
   },
   "/ar/pdf-tools": {
-    "hash": "e0d0be113b00effcfcf7113576610b7d726cacfe",
-    "date": "2026-11-17"
+    "hash": "c5519f10db69bc50972ddc80e734bc7221cde219",
+    "date": "2026-11-18"
   },
   "/ar/image-tools": {
-    "hash": "59e0b1cd2da21cbada82b4759503489cf17f26f2",
-    "date": "2026-11-17"
+    "hash": "b494e0794413ba323d2da63ca44fc2462b533cd0",
+    "date": "2026-11-18"
   },
   "/ar/data-tools": {
     "hash": "7868406adab8800d176d7767b045fc08014629b0",
@@ -376,40 +452,64 @@
     "date": "2026-11-17"
   },
   "/ar/all-tools": {
-    "hash": "a33a72cb4f5bb8746a8e3c7cb235e05795d157c5",
-    "date": "2026-11-17"
+    "hash": "2565e809a8ba052adfb2c3af4f31fc7b875e8c54",
+    "date": "2026-11-18"
   },
   "/ar/pdf-viewer": {
-    "hash": "07341d603f7180c4b3b3df3678afa444f39e06e2",
-    "date": "2026-11-17"
+    "hash": "152afdd21d0b0fe7abcd00b00caafb631f964b44",
+    "date": "2026-11-19"
   },
   "/ar/merge-pdf": {
-    "hash": "515765ee07a5a93513d502aaa5432f2c15d4cc39",
-    "date": "2026-11-17"
+    "hash": "54a374bd15a42d649666cd764ef2c6102cab06b1",
+    "date": "2026-11-18"
   },
   "/ar/split-pdf": {
-    "hash": "c4239d5a7bc0432714415c488084cc80ade25565",
-    "date": "2026-11-17"
+    "hash": "81cf845dedc7a081d247c41c780ab9ae1e96aa03",
+    "date": "2026-11-18"
   },
   "/ar/remove-pdf-pages": {
-    "hash": "4f44d5796ed6c09537e42c1b5ff75897c7f4b9e4",
-    "date": "2026-11-17"
+    "hash": "565eed4bbcbc71af612cbde750aeea0d51b6f7cd",
+    "date": "2026-11-18"
   },
   "/ar/extract-pdf-pages": {
-    "hash": "a0e8702fd11f04eb555c5b0c04cca60ef9c9b82a",
-    "date": "2026-11-17"
+    "hash": "b384e4a2df582ae262890227086a462914d6d727",
+    "date": "2026-11-18"
   },
   "/ar/organize-pdf": {
-    "hash": "fede8db267d04643d319cc3981e9189849cb2469",
-    "date": "2026-11-17"
+    "hash": "b339acd9e492678d251c33200434e0b406235343",
+    "date": "2026-11-18"
+  },
+  "/ar/scan-to-pdf": {
+    "hash": "7c44701122f73847fae47033941b4249755955e0",
+    "date": "2026-11-18"
   },
   "/ar/rotate-pdf": {
     "hash": "51359dc3e74c199786f87e098866478121bd831b",
     "date": "2026-11-17"
   },
+  "/ar/crop-pdf": {
+    "hash": "925e3abd64a5e4cbbb7e045c691a444c96dffe33",
+    "date": "2026-11-18"
+  },
+  "/ar/ocr-pdf": {
+    "hash": "ac14a2af5af641f09c98e9382728998e87f9f7fc",
+    "date": "2026-11-18"
+  },
+  "/ar/repair-pdf": {
+    "hash": "ddc09b019673697309d74772acd9785f28626584",
+    "date": "2026-11-18"
+  },
   "/ar/jpg-to-pdf": {
     "hash": "f49a5ed1bece2ac783e0a155845f6f7e4eb13846",
     "date": "2026-11-17"
+  },
+  "/ar/word-to-pdf": {
+    "hash": "afda8c784ed3df59e453d3082a7be0863aa928f2",
+    "date": "2026-11-18"
+  },
+  "/ar/excel-to-pdf": {
+    "hash": "1c92e36780b7a28116df249b3987d426d1636b70",
+    "date": "2026-11-18"
   },
   "/ar/pdf-to-jpg": {
     "hash": "46c0b3a7370065aa9ca5a6da493134538ccfba07",
@@ -418,6 +518,22 @@
   "/ar/pdf-to-text": {
     "hash": "f80bf0e20ee696668bbfc26e46d7115c3ab0ef2c",
     "date": "2026-11-17"
+  },
+  "/ar/pdf-to-word": {
+    "hash": "61f3acbe6561c8a402afaa8700b78423809ea69b",
+    "date": "2026-11-18"
+  },
+  "/ar/pdf-to-excel": {
+    "hash": "11ec35c6ed24cc9f51e3d2489e22ca4fd857379d",
+    "date": "2026-11-18"
+  },
+  "/ar/pdf-to-powerpoint": {
+    "hash": "c43c3a9eea9c6e3ed579bee5e96326eb72e47881",
+    "date": "2026-11-18"
+  },
+  "/ar/pdf-to-markdown": {
+    "hash": "f3e4c8533230c0ca7c7b06f39ce11ea880db8176",
+    "date": "2026-11-18"
   },
   "/ar/extract-pdf-images": {
     "hash": "893f436ea3d6b285c62fb8711d8f82582bf699f7",
@@ -435,6 +551,10 @@
     "hash": "9ef3ae6be6890805814e7596857f101ae453ad24",
     "date": "2026-11-17"
   },
+  "/ar/pdf-forms": {
+    "hash": "cf05bb34d3b3c03613e8de84227a8214d13ebe45",
+    "date": "2026-11-19"
+  },
   "/ar/watermark-pdf": {
     "hash": "d3f8c763db39622ced53fbb109901643b6f13711",
     "date": "2026-11-17"
@@ -447,9 +567,29 @@
     "hash": "159b23ad5455e870026bca7c3dd65e63c726ba44",
     "date": "2026-11-17"
   },
+  "/ar/redact-pdf": {
+    "hash": "f05d294f0c7893ac574f67f6fd245880a9faecd4",
+    "date": "2026-11-19"
+  },
+  "/ar/compare-pdf": {
+    "hash": "67409e49ca6ab934518894843ae06865b0bf9c6c",
+    "date": "2026-11-18"
+  },
+  "/ar/protect-pdf": {
+    "hash": "2d8d8a487cc7438ba649cb56dca42a6e31691c7d",
+    "date": "2026-11-19"
+  },
+  "/ar/unlock-pdf": {
+    "hash": "6438de89371368a5b06a564437b8b1e9c6b5eb83",
+    "date": "2026-11-18"
+  },
+  "/ar/translate-pdf": {
+    "hash": "1442f385cdda1b92e22a06176d4d94c8f1659280",
+    "date": "2026-11-18"
+  },
   "/ar/image-viewer": {
-    "hash": "a0e8e8ca49f22e977a8afea0140aa5d3bb5b214d",
-    "date": "2026-11-17"
+    "hash": "eac8e2ce15503b050483a134aed12ba332e76223",
+    "date": "2026-11-19"
   },
   "/ar/compress-image": {
     "hash": "95f60abc5368fac9e271ec6eb8117f1368b6d2b5",
@@ -470,6 +610,18 @@
   "/ar/watermark-image": {
     "hash": "59b13e0d05e16bc543f042bb031f6fb8a97c349f",
     "date": "2026-11-17"
+  },
+  "/ar/blur-face": {
+    "hash": "e8407d73eaf8610dffa994e7dcb10a3dcfc2f727",
+    "date": "2026-11-18"
+  },
+  "/ar/remove-background": {
+    "hash": "493416f5cfee1ba7654db92daa03d709db9aa936",
+    "date": "2026-11-18"
+  },
+  "/ar/upscale-image": {
+    "hash": "3ce2c970fc523b62b0fb8b44bbc9ab3739ea88f7",
+    "date": "2026-11-18"
   },
   "/ar/remove-image-metadata": {
     "hash": "30c9b82b41abba8bcdfd9143fc7f2962b03173c5",
@@ -536,8 +688,8 @@
     "date": "2026-11-17"
   },
   "/ar/json-escape-unescape": {
-    "hash": "45e1b75adfa5593eadb766c87ac30ca4b6ec6cbf",
-    "date": "2026-11-17"
+    "hash": "27976d4b1c0d609ce29317ff78ba613685775306",
+    "date": "2026-11-19"
   },
   "/ar/mask-data": {
     "hash": "1b71b84bec498d8c6e0cd8a14af3dc605756e4c2",

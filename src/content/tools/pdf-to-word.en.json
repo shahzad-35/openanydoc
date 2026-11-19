@@ -1,0 +1,80 @@
+{
+  "title": "PDF to Word – Convert PDF to Editable DOCX Free, No Upload",
+  "description": "Convert a PDF to an editable Word document in your browser: paragraphs, headings, lists and pictures, Arabic included. Free, nothing is uploaded.",
+  "heading": "PDF to Word",
+  "subtitle": "Turn a PDF into an editable Word document with its paragraphs, headings, lists and pictures; nothing is uploaded.",
+  "intro": "Convert PDF to Word online and edit the text in Word, Pages, LibreOffice or Google Docs: lines are joined back into paragraphs, larger text becomes headings, bulleted lines become lists, columns of a line are kept apart with tab stops, and pictures go where they were. Arabic paragraphs come out right to left. The layout is close to the PDF, not an exact copy. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Editable text",
+      "text": "Real Word paragraphs, headings and lists, not pictures of pages."
+    },
+    {
+      "title": "Arabic too",
+      "text": "Arabic paragraphs are written right to left, in reading order."
+    }
+  ],
+  "stepsTitle": "How to convert PDF to Word",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to Word."
+    },
+    {
+      "title": "Download",
+      "text": "Download the .docx file and open it in Word or any word processor."
+    }
+  ],
+  "handlesTitle": "What PDF to Word handles",
+  "handles": [
+    "Paragraphs rebuilt from lines, with their size, bold and italic.",
+    "Headings from larger text, and bulleted lists.",
+    "Pictures, placed in the flow where they sat on the page.",
+    "Arabic and English, each in its own direction."
+  ],
+  "limits": [
+    "The layout is close, not exact: drawn shapes, colours, backgrounds and multi-column page layouts are not kept.",
+    "Tables come out as lines with tab stops, not Word tables; PDF to Excel reads tables into cells.",
+    "Scanned PDFs hold pictures of pages, so there is no text to convert (that needs OCR).",
+    "PDFs that need a password to open must be unlocked first, with Unlock PDF."
+  ],
+  "faqTitle": "PDF to Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will it look exactly like the PDF?",
+      "answer": "Close, not exact. The text, headings, lists and pictures come through as editable Word content; shapes, colours and page backgrounds are left out."
+    },
+    {
+      "question": "Does it work with Arabic PDFs?",
+      "answer": "Yes. Arabic paragraphs are written right to left in reading order."
+    },
+    {
+      "question": "Does it work with scanned PDFs?",
+      "answer": "No. A scanned PDF holds pictures of pages, so there is no text to convert; that needs text recognition (OCR), which this tool does not do."
+    },
+    {
+      "question": "What about tables?",
+      "answer": "They come out as lines with tab stops. To get a table into cells, use PDF to Excel.",
+      "link": {
+        "text": "PDF to Excel",
+        "path": "/pdf-to-excel"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

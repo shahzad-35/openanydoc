@@ -16,12 +16,23 @@ const inlineLinkClassName = 'underline underline-offset-2 hover:text-accent'
 
 // The contact address inside a sentence becomes a mailto link, and a section's `links` phrases become links to their pages (or to an
 // outside address when the path is a full https address). Longer phrases are matched first, so "large CSV viewer" is not cut at "CSV viewer".
-function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavigate: (path: string) => void) {
+// A phrase becomes a link once per section (`linkedPhrases` is shared by its paragraphs and list). A link id already used on the page
+// (the same page linked from another section, or two sites whose names start alike) gets a number, so every id stays unique.
+function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavigate: (path: string) => void, linkedPhrases: Set<string>, usedLinkIds: Map<string, number>) {
+  const uniqueId = (id: string) => {
+    const timesUsed = (usedLinkIds.get(id) ?? 0) + 1
+    usedLinkIds.set(id, timesUsed)
+    return timesUsed === 1 ? id : `${id}-${timesUsed}`
+  }
   const phrases = [CONTACT_EMAIL, ...links.map((link) => link.text)].sort((a, b) => b.length - a.length)
   return text.split(new RegExp(`(${phrases.map(escapeForRegExp).join('|')})`)).map((part, position) => {
+    if (phrases.includes(part)) {
+      if (linkedPhrases.has(part)) return part
+      linkedPhrases.add(part)
+    }
     if (part === CONTACT_EMAIL) {
       return (
-        <a key={position} id="contact-email-link" href={`mailto:${CONTACT_EMAIL}`} className={inlineLinkClassName}>
+        <a key={position} id={uniqueId('contact-email-link')} href={`mailto:${CONTACT_EMAIL}`} className={inlineLinkClassName}>
           <bdi dir="ltr">{CONTACT_EMAIL}</bdi>
         </a>
       )
@@ -30,13 +41,13 @@ function withInlineLinks(text: string, links: InfoSection['links'] = [], onNavig
     if (!link) return part
     if (link.path.startsWith('https://')) {
       return (
-        <a key={position} id={`info-link-${new URL(link.path).hostname.replace(/^www\./, '').split('.')[0]}`} href={link.path} target="_blank" rel="noopener" className={inlineLinkClassName}>
+        <a key={position} id={uniqueId(`info-link-${new URL(link.path).hostname.replace(/^www\./, '').split('.')[0]}`)} href={link.path} target="_blank" rel="noopener" className={inlineLinkClassName}>
           {part}
         </a>
       )
     }
     return (
-      <PageLink key={position} id={`info-link-${link.path.slice(1)}`} path={link.path} onNavigate={onNavigate} className={inlineLinkClassName}>
+      <PageLink key={position} id={uniqueId(`info-link-${link.path.slice(1)}`)} path={link.path} onNavigate={onNavigate} className={inlineLinkClassName}>
         {part}
       </PageLink>
     )
@@ -50,6 +61,8 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
   const seo = pageSeo[locale][address]
   const content = infoPages[locale][address] ?? guidePages[locale][address]
   usePageHead(address, seo.title, seo.description)
+  // Filled while drawing, in page order, so the server and the browser give the same ids.
+  const usedLinkIds = new Map<string, number>()
 
   return (
     <div id="info-page" className="toy-page min-h-dvh text-[17px] leading-normal text-ink">
@@ -98,21 +111,24 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
           )}
         </div>
         <div id="info-sections" className="space-y-10 rounded-[22px] border-2 border-rule bg-paper-raised p-6 md:p-10">
-          {content.sections.map((section, position) => (
-            <section key={section.heading} id={`info-section-${position + 1}`}>
-              <h2 className="type-h3">{section.heading}</h2>
-              {section.paragraphs.map((paragraph) => (
-                <p key={paragraph} className="mt-2">{withInlineLinks(paragraph, section.links, onNavigate)}</p>
-              ))}
-              {section.list && (
-                <ul className="mt-2 list-disc space-y-1 ps-6">
-                  {section.list.map((item) => (
-                    <li key={item}>{withInlineLinks(item, section.links, onNavigate)}</li>
-                  ))}
-                </ul>
-              )}
-            </section>
-          ))}
+          {content.sections.map((section, position) => {
+            const linkedPhrases = new Set<string>()
+            return (
+              <section key={section.heading} id={`info-section-${position + 1}`}>
+                <h2 className="type-h3">{section.heading}</h2>
+                {section.paragraphs.map((paragraph) => (
+                  <p key={paragraph} className="mt-2">{withInlineLinks(paragraph, section.links, onNavigate, linkedPhrases, usedLinkIds)}</p>
+                ))}
+                {section.list && (
+                  <ul className="mt-2 list-disc space-y-1 ps-6">
+                    {section.list.map((item) => (
+                      <li key={item}>{withInlineLinks(item, section.links, onNavigate, linkedPhrases, usedLinkIds)}</li>
+                    ))}
+                  </ul>
+                )}
+              </section>
+            )
+          })}
         </div>
       </main>
 

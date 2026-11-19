@@ -1,0 +1,24 @@
+On-device models and runtimes used by OpenAnyDoc's OCR PDF, Translate PDF, Blur faces, Remove background and Upscale image tools. Each is a file of
+this site, read by the browser on first use; pictures and documents never leave the device.
+
+Runtimes
+- tesseract.js 7.0.0 and tesseract.js-core 6.1.2 (OCR PDF). Apache License 2.0. https://github.com/naptha/tesseract.js
+- onnxruntime-web 1.31.1 (the image tools). MIT License, Copyright (c) Microsoft Corporation. https://github.com/microsoft/onnxruntime
+- @browsermt/bergamot-translator 0.4.9 (Translate PDF; translator.js and translate/runtime/, unmodified except the worker's address).
+  Mozilla Public License 2.0. Source: https://github.com/browsermt/bergamot-translator
+
+Models (in /models/)
+- tessdata/eng.traineddata, tessdata/ara.traineddata: tessdata_fast. Apache License 2.0. https://github.com/tesseract-ocr/tessdata_fast
+- ultraface-rfb-320.onnx: Ultra-Light-Fast-Generic-Face-Detector-1MB (version RFB-320, from the ONNX Model Zoo). MIT License,
+  Copyright (c) 2019 linzai. https://github.com/Linzaer/Ultra-Light-Fast-Generic-Face-Detector-1MB
+- u2netp.onnx: U²-Net (small), as distributed by rembg. Apache License 2.0. https://github.com/xuebinqin/U-2-Net
+- modnet-quantized.onnx: MODNet, ONNX conversion by Xenova. Apache License 2.0. https://github.com/ZHKKKe/MODNet
+- swin2sr-lightweight-x2-quantized.onnx: Swin2SR lightweight x2, ONNX conversion by Xenova of caidas/swin2SR-lightweight-x2-64.
+  Apache License 2.0. https://github.com/mv-lab/swin2sr
+- translate/enar/, translate/aren/: Firefox Translations models, base-memory, English to Arabic and Arabic to English (model,
+  lexical shortlist and vocabulary, gzipped). Mozilla Public License 2.0. https://github.com/mozilla/firefox-translations-models
+
+Apache License 2.0: https://www.apache.org/licenses/LICENSE-2.0
+Mozilla Public License 2.0: https://www.mozilla.org/MPL/2.0/ (the covered files are used unmodified; their source is linked above)
+MIT License: permission is granted free of charge to use, copy, modify, merge, publish, distribute, sublicense and sell copies,
+provided the copyright notice and permission notice are included; the software is provided "as is", without warranty of any kind.

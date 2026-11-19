@@ -198,7 +198,8 @@ export const formatDefinitions: FormatDefinition[] = [
     viewerId: 'image',
     addedOn: '2026-11-18',
     ViewerComponent: lazy(loadImageViewer),
-    preloadViewer: loadImageViewer,
+    // The image worker is started once (an empty task) and the metadata reader loaded, so a picture opens offline later.
+    preloadViewer: () => Promise.all([loadImageViewer(), import('exifr'), import('../tools/image/imageTasks').then((imageTasks) => imageTasks.runImageTask({ type: 'zip', files: [] }))]),
     ownsWholePage: true,
   },
   {

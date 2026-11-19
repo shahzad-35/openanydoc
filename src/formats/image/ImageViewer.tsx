@@ -11,7 +11,8 @@ import { formatFileSize } from '../../useFileIntake'
 import { downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import { Icon, SheetIconSprite, Toolbar, ToolbarButton, ToolbarSeparator, TopBar, useIsNarrowScreen, useThemeToggle } from '../sheet/SheetChrome'
-import { ImageReadError, decodeImage, readImageMetadata } from './imageFiles'
+import { findLiveTool } from '../../tools/registry'
+import { ImageReadError, decodeImage, extensionOf, readImageMetadata } from './imageFiles'
 import type { ImageMetadata } from './imageFiles'
 import '../sheet/sheetChrome.css'
 import './imageViewer.css'
@@ -32,15 +33,22 @@ export default function ImageViewer({ openedFile, onOpenAnotherFile, onClose, on
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const stageRef = useRef<HTMLDivElement>(null)
 
+  // The decoded picture is freed when another file opens or the viewer closes.
   useEffect(() => {
     let isCurrent = true
+    let decodedPicture: ImageBitmap | null = null
     decodeImage(openedFile.file).then(
-      (decoded) => isCurrent && setPicture(decoded),
+      (decoded) => {
+        decodedPicture = decoded
+        if (isCurrent) setPicture(decoded)
+        else decoded.close()
+      },
       (error) => isCurrent && setProblem(error instanceof ImageReadError ? error.reason : 'unreadable'),
     )
     void readImageMetadata(openedFile.file).then((found) => isCurrent && setMetadata(found))
     return () => {
       isCurrent = false
+      decodedPicture?.close()
     }
   }, [openedFile.file])
 
@@ -77,6 +85,8 @@ export default function ImageViewer({ openedFile, onOpenAnotherFile, onClose, on
   }
 
   const isReady = picture !== null
+  // JPG to PDF takes fewer formats than the viewer opens (no AVIF, GIF or BMP).
+  const isTakenByJpgToPdf = findLiveTool('jpg-to-pdf')?.inputFormats.includes(`.${extensionOf(fileName)}`) ?? false
   const openIn = (toolPath: string) => onOpenInTool(openedFile.file, localizePath(locale, toolPath))
   const hasGps = metadata?.latitude !== undefined && metadata.longitude !== undefined
   const menus: MenuDefinition[] = [
@@ -161,7 +171,7 @@ export default function ImageViewer({ openedFile, onOpenAnotherFile, onClose, on
             { id: 'compress-image', label: t('image.next.compress'), onSelect: () => openIn('/compress-image') },
             { id: 'resize-image', label: t('image.next.resize'), onSelect: () => openIn('/resize-image') },
             { id: 'remove-image-metadata', label: t('image.next.removeMetadata'), onSelect: () => openIn('/remove-image-metadata') },
-            { id: 'jpg-to-pdf', label: t('image.next.toPdf'), onSelect: () => openIn('/jpg-to-pdf') },
+            ...(isTakenByJpgToPdf ? [{ id: 'jpg-to-pdf', label: t('image.next.toPdf'), onSelect: () => openIn('/jpg-to-pdf') }] : []),
           ]}
         />
       )}

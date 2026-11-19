@@ -548,5 +548,13 @@ const pdfjsFolder = path.join(projectRoot, 'node_modules', 'pdfjs-dist')
 for (const [from, to] of [['cmaps', 'cmaps'], ['standard_fonts', 'standard_fonts'], ['iccs', 'iccs'], ['wasm', 'wasm'], [path.join('web', 'images'), path.join('web', 'images')]]) {
   fs.cpSync(path.join(pdfjsFolder, from), path.join(distFolder, 'pdfjs', to), { recursive: true, filter: (source) => !/quickjs/i.test(path.basename(source)) })
 }
+// OCR PDF's tesseract.js worker and its WebAssembly cores (the browser picks one by its SIMD support), read from the site itself
+// on first use; the language data and the image models are in public/models/ (DECISIONS.md, Batch 6).
+const tesseractFolder = path.join(distFolder, 'models', 'tesseract')
+fs.mkdirSync(tesseractFolder, { recursive: true })
+fs.copyFileSync(path.join(projectRoot, 'node_modules', 'tesseract.js', 'dist', 'worker.min.js'), path.join(tesseractFolder, 'worker.min.js'))
+for (const coreName of fs.readdirSync(path.join(projectRoot, 'node_modules', 'tesseract.js-core')).filter((name) => name.endsWith('lstm.wasm.js'))) {
+  fs.copyFileSync(path.join(projectRoot, 'node_modules', 'tesseract.js-core', coreName), path.join(tesseractFolder, coreName))
+}
 fs.rmSync(serverBuildFolder, { recursive: true, force: true })
 console.log(`Wrote ${seoAddresses.length * locales.length} prerendered pages, ${locales.length} changelog pages, sitemap.xml (lastmod from src/data/pageDates.json) and robots.txt into dist/`)

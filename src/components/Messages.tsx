@@ -18,6 +18,9 @@ const PHONE_QUERY = '(max-width: 639px)'
 // A rejected file's toast is only a nudge: it goes away by itself after 3 seconds (or when dismissed).
 // oxlint-disable-next-line react/only-export-components
 export const REJECTED_FILE_TOAST_SECONDS = 3
+// One that also says what to do instead (save as .docx, the formats this page takes) stays as long as an error, so it can be read.
+// oxlint-disable-next-line react/only-export-components
+export const REJECTED_FILE_ADVICE_TOAST_SECONDS = 8
 // After its time is up a toast fades out over this long before it is removed (no animation under reduced motion).
 const TOAST_FADE_MILLISECONDS = 1000
 const MAX_VISIBLE_TOASTS = 3

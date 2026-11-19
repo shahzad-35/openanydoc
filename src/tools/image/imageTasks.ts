@@ -65,10 +65,11 @@ export function adjustPixels(pixels: ImageData, brightness: number, contrast: nu
 
 export const IMAGE_MIME_TYPES: Record<ImageFormat, string> = { jpg: 'image/jpeg', png: 'image/png', webp: 'image/webp', avif: 'image/avif' }
 
-// Pictures, ImageBitmaps included, are moved to the worker rather than copied.
+// Pictures, ImageBitmaps included, are moved to the worker rather than copied. Each is listed once: steps share a picture (a tiled
+// watermark), and listing one twice throws.
 function transferablesOf(request: ImageTaskRequest): Transferable[] {
   if (request.type !== 'process') return []
-  return request.jobs.flatMap((job) => [job.picture, ...job.steps.flatMap((step) => (step.type === 'overlay' ? [step.picture] : []))])
+  return [...new Set(request.jobs.flatMap((job) => [job.picture, ...job.steps.flatMap((step) => (step.type === 'overlay' ? [step.picture] : []))]))]
 }
 
 export function runImageTask(request: ImageTaskRequest, onProgress?: (done: number, total: number) => void) {

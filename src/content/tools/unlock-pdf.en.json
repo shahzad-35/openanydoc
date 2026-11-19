@@ -1,0 +1,78 @@
+{
+  "title": "Unlock PDF – Remove a PDF Password Online Free, No Upload",
+  "description": "Remove the password from a PDF you can open, or lift printing and copying restrictions, in your browser. Free, and nothing is uploaded.",
+  "heading": "Unlock PDF",
+  "subtitle": "Take the password off a PDF you know the password for, or lift its printing and copying restrictions; nothing is uploaded.",
+  "intro": "Remove a PDF password online when you know it and are tired of typing it: enter it once and the new copy opens without one. A PDF that opens freely but won't print or copy is unlocked without any password. The work is done by qpdf, a well-known PDF library, running in your browser; your file and password stay on your device. This tool does not guess or crack passwords.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file and your password are handled by your own browser and never sent to a server."
+    },
+    {
+      "title": "No more typing it",
+      "text": "The copy opens with no password, in any reader."
+    },
+    {
+      "title": "Restrictions lifted",
+      "text": "Printing, copying and changes are allowed again."
+    }
+  ],
+  "stepsTitle": "How to remove a password from a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop the locked PDF on the page."
+    },
+    {
+      "title": "Type the password",
+      "text": "Type the password that opens it; leave it empty if only printing or copying is locked."
+    },
+    {
+      "title": "Unlock and download",
+      "text": "Click Unlock PDF and download the unlocked copy."
+    }
+  ],
+  "handlesTitle": "What Unlock PDF handles",
+  "handles": [
+    "PDFs with a password to open, when you type it.",
+    "PDFs that open freely but block printing, copying or changes: no password needed.",
+    "Every common PDF encryption: AES-256, AES-128 and RC4."
+  ],
+  "limits": [
+    "The password to open is needed; this tool does not guess or crack passwords.",
+    "Use it only for files you're allowed to unlock.",
+    "A PDF that isn't protected is left as it is, with a message."
+  ],
+  "faqTitle": "Unlock PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Can it open a PDF if I don't know the password?",
+      "answer": "No. It needs the password to open. It does not guess or crack passwords."
+    },
+    {
+      "question": "Why can't I print a PDF that opens without a password?",
+      "answer": "Its author restricted printing or copying. Unlock PDF lifts those restrictions with no password; use it only when you're allowed to."
+    },
+    {
+      "question": "Does unlocking change the content?",
+      "answer": "No. Only the encryption is taken off; pages, text, pictures and form fields stay the same."
+    },
+    {
+      "question": "Can I lock it again later?",
+      "answer": "Yes, with Protect PDF.",
+      "link": {
+        "text": "Protect PDF",
+        "path": "/protect-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

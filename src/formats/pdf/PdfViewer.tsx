@@ -45,6 +45,10 @@ export default function PdfViewer({ openedFile, onOpenAnotherFile, onClose }: Fo
   const isNarrow = useIsNarrowScreen()
   const fileName = openedFile.file.name
   const [loadState, setLoadState] = useState<LoadState>('loading')
+  // pdf.js's own code could not be fetched (offline before it was cached, or an older page after a release): thrown while drawing,
+  // so App's LoadFailedBoundary shows the reload message rather than calling the file damaged.
+  const [codeLoadError, setCodeLoadError] = useState<unknown>(null)
+  if (codeLoadError) throw codeLoadError
   const [passwordPrompt, setPasswordPrompt] = useState<'needed' | 'wrong' | null>(null)
   const [password, setPassword] = useState('')
   const [pdfDocument, setPdfDocument] = useState<PDFDocumentProxy | null>(null)
@@ -85,8 +89,10 @@ export default function PdfViewer({ openedFile, onOpenAnotherFile, onClose }: Fo
     setRotation(0)
     setMatches({ current: 0, total: 0 })
 
+    let isLibraryLoaded = false
     loadPdfLibrary()
       .then(async ({ pdfjs, viewer }) => {
+        isLibraryLoaded = true
         if (isCancelled) return
         const eventBus = new viewer.EventBus()
         const linkService = new viewer.PDFLinkService({ eventBus, externalLinkTarget: viewer.LinkTarget.BLANK, externalLinkRel: 'noopener noreferrer nofollow' })
@@ -140,8 +146,10 @@ export default function PdfViewer({ openedFile, onOpenAnotherFile, onClose }: Fo
         setPageCount(openedDocument.numPages)
         setLoadState('ready')
       })
-      .catch(() => {
-        if (!isCancelled) setLoadState((state) => (state === 'locked' ? 'locked' : 'failed'))
+      .catch((error) => {
+        if (isCancelled) return
+        if (!isLibraryLoaded) setCodeLoadError(error)
+        else setLoadState((state) => (state === 'locked' ? 'locked' : 'failed'))
       })
 
     return () => {

@@ -1,0 +1,93 @@
+{
+  "title": "Translate PDF – English to Arabic and Back, Free, No Upload",
+  "description": "Translate a PDF between English and Arabic in your browser and get an editable Word document, headings and pictures kept. Free, nothing is uploaded.",
+  "heading": "Translate PDF",
+  "subtitle": "Translate a PDF from English to Arabic or Arabic to English into an editable Word document; nothing is uploaded.",
+  "intro": "Translate a PDF online without sending it anywhere: the text is read from each page, translated on your device by the same English–Arabic language models Firefox uses, and written into a Word document you can edit. Headings, lists and pictures stay where they were, and Arabic comes out right to left. Machine translation makes mistakes, so the result is a Word file you can fix, not a locked PDF. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The translation runs in your own browser; neither the file nor its text is sent to a translation service."
+    },
+    {
+      "title": "Editable result",
+      "text": "A Word document with headings, lists and pictures, so a wrong word is easy to fix."
+    },
+    {
+      "title": "Both directions",
+      "text": "English to Arabic and Arabic to English, picked for you from the file's text."
+    }
+  ],
+  "stepsTitle": "How to translate a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Check the direction",
+      "text": "English to Arabic or Arabic to English is chosen from the file's text; change it if needed."
+    },
+    {
+      "title": "Translate",
+      "text": "Click Translate to Word. The first time, the language model loads once."
+    },
+    {
+      "title": "Download",
+      "text": "Download the .docx file and open it in Word or any word processor."
+    }
+  ],
+  "handlesTitle": "What Translate PDF handles",
+  "handles": [
+    "English to Arabic and Arabic to English.",
+    "Headings, paragraphs and bulleted lists, each translated as a whole.",
+    "Pictures, placed in the flow where they sat on the page.",
+    "Numbers and codes without letters, kept as they are."
+  ],
+  "limits": [
+    "Machine translation makes mistakes, more so with names, terms and short fragments; check what matters before you share it.",
+    "The first translation loads the language model (about 25 MB) from this site; after that it works offline.",
+    "The layout is close, not exact: drawn shapes, colours and backgrounds are left out, and tables come out as lines with tab stops.",
+    "Scanned PDFs hold pictures of pages, so make them searchable with OCR PDF first.",
+    "Only English and Arabic for now."
+  ],
+  "faqTitle": "Translate PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read, translated and written by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload, only the language model loading from this site the first time."
+    },
+    {
+      "question": "How good is the translation?",
+      "answer": "It is machine translation by the same English–Arabic models Firefox uses for its built-in translation. It gets the meaning of most sentences across but makes mistakes with names, terms and very short lines, which is why the result is an editable Word document."
+    },
+    {
+      "question": "Why is the result a Word document and not a PDF?",
+      "answer": "Translated text is longer or shorter than the original, and Arabic reads the other way, so it would not fit the PDF's boxes. A Word document flows the text and lets you correct it. Word to PDF turns it back into a PDF.",
+      "link": {
+        "text": "Word to PDF",
+        "path": "/word-to-pdf"
+      }
+    },
+    {
+      "question": "Does it work with scanned PDFs?",
+      "answer": "Not directly. A scanned PDF holds pictures of pages; run OCR PDF on it first to add its text, then translate it.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
+    },
+    {
+      "question": "Does it work offline?",
+      "answer": "Yes, after the first translation in each direction. The language model is loaded once from this site and kept by your browser."
+    },
+    {
+      "question": "Which languages can it translate?",
+      "answer": "English to Arabic and Arabic to English. Other languages may come later."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

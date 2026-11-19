@@ -147,7 +147,9 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
         return
       }
       setErrorMessage(t('intake.cannotOpen'))
-      setErrorDetail(t('intake.tryThese'))
+      // A page that takes every format (home) names them all; a viewer or tool page names only the files it takes.
+      const isEveryFormatAccepted = [...releasedExtensions].every((extension) => acceptedExtensions.includes(extension))
+      setErrorDetail(isEveryFormatAccepted ? t('intake.tryThese') : t('intake.pageTakes', { extensions: isolateLeftToRight(choosableExtensions.join(', ')) }))
       return
     }
 

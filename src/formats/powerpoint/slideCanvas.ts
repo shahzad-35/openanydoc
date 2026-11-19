@@ -7,17 +7,21 @@ import type { PptxViewer } from '@aiden0z/pptx-renderer'
 
 export type SlideCanvasOptions = { width?: number }
 
+// An empty picture: modern-screenshot treats a false answer as "not handled" and fetches the address itself.
+const BLANK_PICTURE = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='
+
 // modern-screenshot inlines every picture of the slide as a data: address. It is handed the pictures by drawing them onto a canvas
-// (they are blob: addresses the renderer made), so nothing is fetched: the site's CSP allows no fetch of blob: addresses.
-async function readImageAsDataUrl(address: string): Promise<string | false> {
+// (they are blob: addresses the renderer made), so nothing is fetched: the site's CSP allows no fetch of blob: addresses. Any
+// other address (one a document's author wrote) becomes an empty picture, never a request.
+export async function readImageAsDataUrl(address: string): Promise<string> {
   if (address.startsWith('data:')) return address
-  if (!address.startsWith('blob:')) return false
+  if (!address.startsWith('blob:')) return BLANK_PICTURE
   const image = new Image()
   image.src = address
   try {
     await image.decode()
   } catch {
-    return false
+    return BLANK_PICTURE
   }
   const canvas = document.createElement('canvas')
   canvas.width = image.naturalWidth || 1

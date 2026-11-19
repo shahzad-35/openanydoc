@@ -2,6 +2,8 @@
 // tracked changes, properties, macros and images; the CSP-safe insertion of an HTML string; and the exports (text, Markdown, HTML,
 // images). mammoth (BSD-2) and odf-kit (Apache-2.0) are imported only when needed.
 import JSZip from 'jszip'
+import { defaultOptions, renderAsync } from 'docx-preview'
+import type { HElement, Options as DocxPreviewOptions } from 'docx-preview'
 
 export type WordComment = { id: string; author: string; date: string; text: string }
 export type WordChange = { kind: 'inserted' | 'deleted'; author: string; date: string; text: string }
@@ -150,10 +152,10 @@ export async function prepareOpenDocument(fileContents: ArrayBuffer) {
   return { html, facts }
 }
 
-// Puts an HTML string made from the file into the page. The file is not trusted: scripts, frames, event attributes and
-// script addresses are dropped. Inline styles are renamed before parsing (a style attribute is refused by the CSP even in a
-// DOMParser document) and set through CSSOM afterwards. Headings get data-heading-level, and every block reads its own direction.
-export function insertDocumentHtml(container: HTMLElement, html: string) {
+// Parses an HTML string made from the file. The file is not trusted: scripts, frames, event attributes and addresses of any
+// scheme but web, mail, phone, data: pictures and blob: are dropped. Inline styles are renamed before parsing (a style attribute is
+// refused by the CSP even in a DOMParser document) to data-inline-style. Every block reads its own direction.
+function parseUntrustedDocumentHtml(html: string) {
   // Attribute values are escaped in the HTML (a quote inside is &quot;), so ' style="' only ever starts an attribute.
   const parsed = new DOMParser().parseFromString(html.replace(/(<[^>]*?\s)style="/g, '$1data-inline-style="'), 'text/html')
   parsed.querySelectorAll('script, iframe, object, embed, link, meta, style, base, form').forEach((element) => element.remove())
@@ -161,13 +163,23 @@ export function insertDocumentHtml(container: HTMLElement, html: string) {
     for (const attribute of Array.from(element.attributes)) {
       const name = attribute.name.toLowerCase()
       if (name.startsWith('on')) element.removeAttribute(attribute.name)
-      if ((name === 'href' || name === 'src' || name === 'xlink:href') && /^\s*(javascript|vbscript|file):/i.test(attribute.value)) element.removeAttribute(attribute.name)
+      const hasUnsafeScheme = /^\s*[a-z][a-z\d+.-]*:/i.test(attribute.value) && !/^\s*(https?:|mailto:|tel:|blob:|data:image\/)/i.test(attribute.value)
+      if ((name === 'href' || name === 'src' || name === 'xlink:href') && hasUnsafeScheme) element.removeAttribute(attribute.name)
     }
+    if (/^(P|LI|H[1-6]|TD|TH|BLOCKQUOTE)$/.test(element.tagName)) element.setAttribute('dir', 'auto')
+  }
+  return parsed
+}
+
+// Puts an HTML string made from the file into the page: cleaned, links open in a new tab, headings get data-heading-level, and
+// inline styles are set through CSSOM.
+export function insertDocumentHtml(container: HTMLElement, html: string) {
+  const parsed = parseUntrustedDocumentHtml(html)
+  for (const element of Array.from(parsed.body.querySelectorAll('*'))) {
     if (element instanceof HTMLAnchorElement) {
       element.target = '_blank'
       element.rel = 'noopener noreferrer'
     }
-    if (/^(P|LI|H[1-6]|TD|TH|BLOCKQUOTE)$/.test(element.tagName)) element.setAttribute('dir', 'auto')
     if (/^H[1-6]$/.test(element.tagName)) element.setAttribute('data-heading-level', element.tagName[1])
   }
   container.replaceChildren(...Array.from(document.importNode(parsed.body, true).childNodes))
@@ -213,9 +225,94 @@ export async function exportDocument(kind: ExportKind, fileName: string, fileCon
     const markdown = (await mammoth.convertToMarkdown({ arrayBuffer: fileContents })).value
     return { name: `${baseName(fileName)}.md`, blob: new Blob([markdown], { type: 'text/markdown;charset=utf-8' }) }
   }
-  const bodyHtml = (await readFlowingHtml(fileName, fileContents)).replace(/<(p|li|h[1-6]|td|th)(?=[\s>])/g, '<$1 dir="auto"')
+  // The exported page is cleaned like the viewer's and has its own CSP, since it is opened outside this site.
+  const bodyHtml = parseUntrustedDocumentHtml(await readFlowingHtml(fileName, fileContents)).body.innerHTML.replace(/(<[^>]*?\s)data-inline-style="/g, '$1style="')
   const title = facts.properties.title || baseName(fileName)
   const escapedTitle = title.replace(/[&<>"]/g, (character) => `&#${character.charCodeAt(0)};`)
-  const page = `<!doctype html>\n<html>\n<head>\n<meta charset="utf-8">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${escapedTitle}</title>\n<style>body{max-width:46rem;margin:2rem auto;padding:0 1rem;font:16px/1.6 system-ui,sans-serif}img{max-width:100%;height:auto}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:4px 8px}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`
+  const page = `<!doctype html>\n<html>\n<head>\n<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${escapedTitle}</title>\n<style>body{max-width:46rem;margin:2rem auto;padding:0 1rem;font:16px/1.6 system-ui,sans-serif}img{max-width:100%;height:auto}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:4px 8px}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`
   return { name: `${baseName(fileName)}.html`, blob: new Blob([page], { type: 'text/html;charset=utf-8' }) }
+}
+
+// ---------------------------------------------------------------- rendering Word pages (the Word viewer and Word to PDF)
+
+// Documents name their fonts without carrying them, and a missing one (Calibri on a Mac) would fall back to the browser's
+// serif font, and Arabic text to a decorative one with lines that collide. The site's Arabic font (loaded for Arabic letters
+// only) and a generic family at the end keep the look close.
+export function addGenericFontFamily(fontFamily: string) {
+  if (/(^|,)\s*(sans-serif|serif|monospace)\s*$/i.test(fontFamily)) return fontFamily
+  return `${fontFamily}, "IBM Plex Sans Arabic", ${/times|georgia|garamond|cambria|roman|serif/i.test(fontFamily) ? 'serif' : 'sans-serif'}`
+}
+
+// docx-preview builds every element through this function. Two changes on the way: a style given as a string (a few shapes)
+// is set through CSSOM, because the site's CSP refuses style attributes; and font names get a generic fallback.
+function createDocumentElement(element: HElement | Node | string): Node {
+  if (typeof element !== 'object' || element instanceof Node || !element.style) return defaultOptions.h(element)
+  const { style, ...elementWithoutStyle } = element
+  const node = defaultOptions.h(elementWithoutStyle) as HTMLElement
+  if (typeof style === 'string') node.style.cssText = style
+  else Object.assign(node.style, style)
+  if (node.style.fontFamily) node.style.fontFamily = addGenericFontFamily(node.style.fontFamily)
+  return node
+}
+
+const renderOptions: Partial<DocxPreviewOptions> = {
+  className: 'docx',
+  inWrapper: true,
+  hideWrapperOnPrint: true,
+  breakPages: true,
+  // Word saves where its pages ended; following those marks gives the same pages as Word.
+  ignoreLastRenderedPageBreak: false,
+  useBase64URL: false,
+  // Comments come as a mark (its popover is hidden by CSS; the margin shows them) and tracked changes as <ins>/<del>.
+  renderComments: true,
+  renderChanges: true,
+  // An altChunk is HTML from the file's author, which docx-preview shows in an unsandboxed frame of this site.
+  renderAltChunks: false,
+  h: createDocumentElement,
+}
+
+function finishRenderedPages(pagesElement: HTMLElement, isTableRightToLeft: boolean[]) {
+  pagesElement.querySelectorAll<HTMLTableElement>('section.docx > article table').forEach((table, tableIndex) => {
+    if (isTableRightToLeft[tableIndex]) table.dir = 'rtl'
+  })
+  const pages = pagesElement.querySelectorAll('section.docx')
+  pages.forEach((page, pageIndex) => {
+    const textWalker = document.createTreeWalker(page, NodeFilter.SHOW_TEXT)
+    for (let textNode = textWalker.nextNode(); textNode; textNode = textWalker.nextNode()) {
+      if (!textNode.nodeValue?.includes(FIELD_MARK)) continue
+      textNode.nodeValue = textNode.nodeValue.replaceAll(`${FIELD_MARK}PAGE${FIELD_MARK}`, String(pageIndex + 1)).replaceAll(`${FIELD_MARK}NUMPAGES${FIELD_MARK}`, String(pages.length))
+    }
+  })
+}
+
+// The document's CSS is built from the file: docx-preview pastes style names and values into it unescaped, so a crafted file can
+// close a rule and add its own, such as one that hides the site's navigation. Each parsed rule is kept only inside
+// @scope (:has(> .docx-wrapper)), the element holding the pages (scoped selectors match inside the root, and the document's own
+// rules start at .docx-wrapper), so they cannot reach the rest of the page; a browser without @scope gets the rule as it is.
+function documentCssSheet(cssText: string) {
+  const parsedSheet = new CSSStyleSheet()
+  parsedSheet.replaceSync(cssText)
+  const scopedSheet = new CSSStyleSheet()
+  for (const rule of Array.from(parsedSheet.cssRules)) {
+    try {
+      scopedSheet.insertRule(rule instanceof CSSFontFaceRule ? rule.cssText : `@scope (:has(> .docx-wrapper)) { ${rule.cssText} }`, scopedSheet.cssRules.length)
+    } catch {
+      scopedSheet.insertRule(rule.cssText, scopedSheet.cssRules.length)
+    }
+  }
+  return scopedSheet
+}
+
+// Renders a Word file as pages into `pagesHolder` with docx-preview. The document's CSS comes out as <style> elements, which the
+// CSP blocks; they stay in `detachedStyleHolder` (unattached) and their text is adopted as constructed stylesheets, returned so
+// the caller can drop them with the pages.
+export async function renderWordPages(fileContents: ArrayBuffer, pagesHolder: HTMLElement, detachedStyleHolder: HTMLElement) {
+  const { documentBytes, isTableRightToLeft, facts } = await prepareWordDocument(fileContents)
+  await renderAsync(documentBytes, pagesHolder, detachedStyleHolder, renderOptions)
+  const adoptedSheets = Array.from(detachedStyleHolder.querySelectorAll('style'), (styleElement) =>
+    documentCssSheet((styleElement.textContent ?? '').replace(/font-family:\s*([^;}]+)/g, (_, fontFamily: string) => `font-family: ${addGenericFontFamily(fontFamily.trim())}`)),
+  )
+  document.adoptedStyleSheets = [...document.adoptedStyleSheets, ...adoptedSheets]
+  finishRenderedPages(pagesHolder, isTableRightToLeft)
+  return { facts, adoptedSheets }
 }

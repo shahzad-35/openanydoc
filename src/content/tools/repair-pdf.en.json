@@ -1,0 +1,79 @@
+{
+  "title": "Repair PDF – Fix a Damaged or Corrupt PDF Online, No Upload",
+  "description": "Repair a damaged PDF in your browser: its parts are read again and rewritten, or each readable page is rebuilt as a picture. Free, nothing is uploaded.",
+  "heading": "Repair PDF",
+  "subtitle": "Rebuild a PDF that won't open or shows errors, page by page if needed; nothing is uploaded.",
+  "intro": "Repair a corrupt PDF online when a reader says the file is damaged, pages are missing or it stopped opening after a download broke off. First the file is read leniently and written again with a new index of its parts, which keeps its text and pictures. If that copy still fails, every page that can still be read is drawn and rebuilt as a picture. All of it happens in your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Two ways to repair",
+      "text": "A rewritten copy that keeps text when possible, and a picture of every readable page when not."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How to repair a PDF",
+  "steps": [
+    {
+      "title": "Choose the damaged PDF",
+      "text": "Click Choose a file, or drop the PDF on the page."
+    },
+    {
+      "title": "Repair",
+      "text": "Click Repair PDF and wait while the file is read and rebuilt."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the repaired copy; download it. A name ending in -as-pictures means the pages were rebuilt as pictures."
+    }
+  ],
+  "handlesTitle": "What Repair PDF handles",
+  "handles": [
+    "Broken index: a file whose table of parts is wrong or missing is written again with a new one.",
+    "Cut-off downloads: pages that arrived whole are saved; the name says when some were lost.",
+    "Unreadable objects: a part that can't be read is skipped instead of stopping the repair."
+  ],
+  "limits": [
+    "A page that is missing from the file can't be brought back.",
+    "When pages are rebuilt as pictures, their text stays selectable and searchable through an invisible layer, but it can't be edited.",
+    "Bookmarks and form fields are not kept in a copy rebuilt from pictures.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faqTitle": "Repair PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will my text stay selectable?",
+      "answer": "Yes. The first repair rewrites the file and keeps its text as it is. When pages have to be rebuilt as pictures, an invisible text layer keeps their text selectable, and the file name then ends in -as-pictures."
+    },
+    {
+      "question": "Can it bring back missing pages?",
+      "answer": "No. Pages that are not in the file, for example after a download that stopped early, can't be rebuilt; the pages that are there are saved."
+    },
+    {
+      "question": "The repaired file opens here but not in my old reader. Why?",
+      "answer": "Some readers stop at the first error. Try the repaired copy, which is written fresh; if it still fails there, open it in the PDF viewer here.",
+      "link": {
+        "text": "PDF viewer",
+        "path": "/pdf-viewer"
+      }
+    },
+    {
+      "question": "Can I repair a password-protected PDF?",
+      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

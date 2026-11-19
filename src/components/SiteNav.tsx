@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent } from 'react'
 import { localizePath, useT } from '../i18n'
+import { FOCUSABLE_SELECTOR } from './ModalDialog'
 import type { Locale, MessageKey } from '../i18n'
 import { SEARCH_ICON_PATH, navClasses, searchBoxFormats } from '../pages/changelogMarkup'
 import { guideAddresses, pageSeo } from '../seo'
@@ -98,6 +99,33 @@ export default function SiteNav({ currentPath, onNavigate }: { currentPath: stri
     if (isOpen) searchInputRef.current?.focus()
   }, [isOpen])
 
+  // The header (sticky in index.css) goes away while the page scrolls down past it and comes back on any scroll up.
+  useEffect(() => {
+    const header = navRef.current?.closest('header')
+    if (!header) return
+    const pageHeader = header
+    let lastScrollY = window.scrollY
+    function revealHeaderOnScrollUp() {
+      const scrollY = window.scrollY
+      if (Math.abs(scrollY - lastScrollY) < 4) return
+      pageHeader.classList.toggle('is-scrolled-away', scrollY > lastScrollY && scrollY > pageHeader.offsetHeight)
+      lastScrollY = scrollY
+    }
+    window.addEventListener('scroll', revealHeaderOnScrollUp, { passive: true })
+    return () => window.removeEventListener('scroll', revealHeaderOnScrollUp)
+  }, [])
+
+  // Below the xl breakpoint the panel covers the whole screen: the page behind stops scrolling while it is open.
+  useEffect(() => {
+    if (!isOpen || window.matchMedia('(min-width: 80rem)').matches) return
+    const pageStyle = document.documentElement.style
+    const previousOverflow = pageStyle.overflow
+    pageStyle.overflow = 'hidden'
+    return () => {
+      pageStyle.overflow = previousOverflow
+    }
+  }, [isOpen])
+
   // ⌘K or Ctrl K opens the search from anywhere on the page, and closes it again; a click outside the box closes it.
   useEffect(() => {
     function toggleSearchOnShortcut(event: KeyboardEvent) {
@@ -121,13 +149,36 @@ export default function SiteNav({ currentPath, onNavigate }: { currentPath: stri
     if (event.key === 'ArrowDown') setActiveIndex((index) => (matchingEntries.length === 0 ? 0 : (index + 1) % matchingEntries.length))
     else if (event.key === 'ArrowUp') setActiveIndex((index) => (matchingEntries.length === 0 ? 0 : (index - 1 + matchingEntries.length) % matchingEntries.length))
     else if (event.key === 'Enter' && matchingEntries[activeIndex]) openEntry(matchingEntries[activeIndex])
-    else if (event.key === 'Escape') closeSearch(true)
     else return
     event.preventDefault()
   }
 
+  // Anywhere in the panel: Escape closes it, and on the full-screen (phone) panel Tab stays inside it.
+  function keepKeysInPanel(event: ReactKeyboardEvent<HTMLDivElement>) {
+    if (event.key === 'Escape') {
+      event.preventDefault()
+      closeSearch(true)
+      return
+    }
+    if (event.key !== 'Tab' || window.matchMedia('(min-width: 80rem)').matches) return
+    const focusableElements = Array.from(event.currentTarget.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR))
+    const firstElement = focusableElements[0]
+    const lastElement = focusableElements[focusableElements.length - 1]
+    if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault()
+      lastElement.focus()
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault()
+      firstElement.focus()
+    }
+  }
+
   const optionId = (entry: SearchEntry) => `site-search-option-${entry.path.slice(1)}`
   const activeEntry = matchingEntries[activeIndex]
+  // The highlighted result stays in view while the arrow keys move it.
+  useEffect(() => {
+    if (activeEntry) document.getElementById(optionId(activeEntry))?.scrollIntoView({ block: 'nearest' })
+  }, [activeEntry])
   return (
     <nav id="site-nav" ref={navRef} aria-label={t('search.label')} className={navClasses.nav}>
       <button id="site-search-button" ref={searchButtonRef} type="button" className={navClasses.searchButton} aria-haspopup="dialog" aria-expanded={isOpen} onClick={() => (isOpen ? closeSearch(false) : openSearch())}>
@@ -142,7 +193,7 @@ export default function SiteNav({ currentPath, onNavigate }: { currentPath: stri
         </span>
       </button>
       {isOpen && (
-        <div id="site-search-panel" role="dialog" aria-label={t('search.label')} className="fixed inset-0 z-40 flex flex-col bg-paper-raised p-3 xl:absolute xl:inset-auto xl:start-1/2 xl:top-full xl:mt-2 xl:max-h-[min(70vh,480px)] xl:w-[540px] xl:-translate-x-1/2 xl:rounded-[20px] xl:border-2 xl:border-line xl:p-2.5 xl:shadow-lg xl:rtl:translate-x-1/2">
+        <div id="site-search-panel" role="dialog" aria-label={t('search.label')} onKeyDown={keepKeysInPanel} className="fixed inset-0 z-40 flex flex-col bg-paper-raised p-3 xl:absolute xl:inset-auto xl:start-1/2 xl:top-full xl:mt-2 xl:max-h-[min(70vh,480px)] xl:w-[540px] xl:-translate-x-1/2 xl:rounded-[20px] xl:border-2 xl:border-line xl:p-2.5 xl:shadow-lg xl:rtl:translate-x-1/2">
           <div className="site-search-input-row flex h-12 flex-none items-center gap-2.5 rounded-2xl bg-surface ps-3.5 pe-1.5">
             <svg aria-hidden="true" viewBox="0 0 24 24" className="size-[18px] flex-none text-ink-soft" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
               <path d={SEARCH_ICON_PATH} />

@@ -1,6 +1,7 @@
 // Generates synthetic CSV, Word, PowerPoint, PDF and photo test files into test-files/, and the binary sample files the tool pages bundle
 // ("Try a sample file") into src/samples/ (commit those). Run: node scripts/generate-test-files.mjs
 import { execFileSync } from 'node:child_process'
+import { createRequire } from 'node:module'
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
@@ -899,6 +900,72 @@ writeSampleFile(
     ['Invoice 2026-118', '12 x Notebook, A5     58.80', 'Shipping               4.90', 'Total                 63.70'],
   ]),
 )
+// Compare PDF's samples: two versions of a made-up contract (a changed fee, a new clause, a removed line).
+writeSampleFile(
+  'contract-v1.pdf',
+  await buildSamplePdf('Service contract, version 1 (synthetic sample)', [
+    ['Service contract', 'Between Example Studio and Example Shop.', 'Start date: 1 December 2026.', 'Monthly fee: 400.00', 'Either side may end it with 30 days notice.'],
+    ['Terms', 'Work is delivered every Friday.', 'Invoices are paid within 14 days.', 'Contact: studio@example.com'],
+  ]),
+)
+writeSampleFile(
+  'contract-v2.pdf',
+  await buildSamplePdf('Service contract, version 2 (synthetic sample)', [
+    ['Service contract', 'Between Example Studio and Example Shop.', 'Start date: 1 December 2026.', 'Monthly fee: 450.00', 'Either side may end it with 60 days notice.'],
+    ['Terms', 'Work is delivered every Friday.', 'Invoices are paid within 30 days.', 'Weekend support is not included.'],
+  ]),
+)
+// PDF to Excel's sample: a table of made-up sales, with a heading, column headings and numbers right-aligned in columns.
+{
+  const tablePdf = await PDFDocument.create()
+  tablePdf.setTitle('Sales by region (synthetic sample)')
+  tablePdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+  tablePdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+  const headingFont = await tablePdf.embedFont(StandardFonts.HelveticaBold)
+  const bodyFont = await tablePdf.embedFont(StandardFonts.Helvetica)
+  const page = tablePdf.addPage([595, 842])
+  page.drawText('Sales by region, 2026', { x: 60, y: 760, size: 20, font: headingFont })
+  const rows = [['Region', 'Q1', 'Q2', 'Q3', 'Q4'], ['North', '1,240', '1,380', '1,410', '1,520'], ['South', '980', '1,105', '1,060', '1,190'], ['West', '1,105', '1,240', '1,300', '1,355'], ['East', '870', '910', '1,020', '1,095'], ['Total', '4,195', '4,635', '4,790', '5,160']]
+  rows.forEach((cells, rowIndex) => {
+    const font = rowIndex === 0 || rowIndex === rows.length - 1 ? headingFont : bodyFont
+    cells.forEach((text, columnIndex) => {
+      const width = font.widthOfTextAtSize(text, 12)
+      page.drawText(text, { x: columnIndex === 0 ? 60 : 200 + columnIndex * 80 - width, y: 710 - rowIndex * 24, size: 12, font })
+    })
+  })
+  writeSampleFile('sales-table.pdf', await tablePdf.save())
+}
+// PDF Forms' sample: a form printed as text and lines only, with no fields yet.
+writeSampleFile(
+  'blank-form-layout.pdf',
+  await buildSamplePdf('Workshop registration, no fields (synthetic sample)', [
+    ['Workshop registration', 'Full name:  ________________________________', 'Email:  ____________________________________', 'Date of birth:  ______________', 'Workshop:  [ Morning ]  [ Afternoon ]', 'I agree to the terms  [   ]', 'Signature:  ________________________'],
+  ]),
+)
+// Unlock PDF's samples, locked by qpdf (the library the tool uses): the report with a password to open ("openanydoc", shown on the
+// sample button) and the letter with printing and copying locked but no password to open. AES-128 with qpdf's fixed id and IV, so
+// every run writes the same bytes (AES-256 salts its keys at random).
+{
+  const createQpdf = createRequire(import.meta.url)('@neslinesli93/qpdf-wasm')
+  const qpdfWasmPath = new URL('../node_modules/@neslinesli93/qpdf-wasm/dist/qpdf.wasm', import.meta.url).pathname
+  const lockWithQpdf = async (inputName, outputName, encryptArguments) => {
+    const qpdf = await createQpdf({ locateFile: () => qpdfWasmPath })
+    qpdf.FS.writeFile('/input.pdf', readFileSync(new URL(inputName, sampleDirectory)))
+    const exitCode = qpdf.callMain(['--static-id', '--static-aes-iv', '--encrypt', ...encryptArguments, '--', '/input.pdf', '/output.pdf'])
+    if (exitCode !== 0) throw new Error(`qpdf could not lock ${inputName}`)
+    writeSampleFile(outputName, qpdf.FS.readFile('/output.pdf'))
+  }
+  // qpdf's positional form (user password, owner password, key length), the only one that takes an empty password to open.
+  await lockWithQpdf('report-3-pages.pdf', 'report-locked.pdf', ['openanydoc', 'openanydoc-owner', '128', '--use-aes=y'])
+  await lockWithQpdf('letter-2-pages.pdf', 'letter-no-printing.pdf', ['', 'openanydoc-owner', '128', '--use-aes=y', '--print=none', '--extract=n'])
+}
+// Repair PDF's sample: the report with a wrong cross-reference offset and its end cut off (no %%EOF), as after a broken download.
+{
+  const reportPdf = await PDFDocument.load(readFileSync(new URL('report-3-pages.pdf', sampleDirectory)), { updateMetadata: false })
+  const reportText = Buffer.from(await reportPdf.save({ useObjectStreams: false })).toString('latin1')
+  const damagedText = reportText.replace(/startxref\s+\d+/, 'startxref\n999999')
+  writeSampleFile('damaged-report.pdf', Buffer.from(damagedText.slice(0, damagedText.lastIndexOf('%%EOF')), 'latin1'))
+}
 
 // ---------------------------------------------------------------- PDF and photo test files (macOS: Chrome, sips, cwebp, Swift)
 // Long, scanned, Arabic, Urdu, password-protected and fillable-form PDFs, and synthetic photos as JPG, PNG, WebP and HEIC.
@@ -1005,6 +1072,28 @@ for (const [pageNumber, tilt] of [[1, -0.8], [2, 0.6]]) {
   rmSync(scanJpgPath)
 }
 writeFileSync(testFilePath('pdf-scanned-2-pages.pdf'), await scannedPdf.save())
+// OCR PDF's samples: one scanned page each, English and Arabic, pictures of paper with no text layer (small enough to bundle).
+for (const [fileName, direction, pageHtml] of [
+  ['scanned-letter.pdf', 'ltr', '<h1 style="font-size:40px">Scanned letter</h1><p>Dear customer,</p><p>This page is a picture of paper, made for testing. Search and copy find nothing until it is read with OCR.</p><p>Invoice 2026-118: 12 notebooks, total 63.70.</p><p>Kind regards,<br>The synthetic team</p>'],
+  ['scanned-arabic-notice.pdf', 'rtl', '<h1 style="font-size:40px">إشعار ممسوح ضوئيًا</h1><p>عزيزي العميل،</p><p>هذه الصفحة صورة لورقة، صُنعت للتجربة. لا يجد البحث والنسخ شيئًا حتى تُقرأ بالتعرّف الضوئي على النص.</p><p>الفاتورة رقم 118: اثنا عشر دفترًا، المجموع 63.70.</p><p>مع التحية،<br>فريق العينات</p>'],
+]) {
+  const samplePngPath = join(tmpdir(), 'openanydoc-ocr-sample.png')
+  const sampleJpgPath = join(tmpdir(), 'openanydoc-ocr-sample.jpg')
+  screenshotHtml(
+    `<!doctype html><meta charset="utf-8"><body style="margin:0;background:#cfccc4"><div dir="${direction}" style="margin:20px;padding:60px;height:1100px;background:#f1eee6;transform:rotate(-0.5deg);filter:blur(0.4px) contrast(1.1);font:24px/1.7 Georgia,'Geeza Pro',serif;color:#333">${pageHtml}</div></body>`,
+    900,
+    1273,
+    samplePngPath,
+  )
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '55', samplePngPath, '--out', sampleJpgPath], { stdio: 'ignore' })
+  const samplePdf = await PDFDocument.create()
+  samplePdf.setCreationDate(new Date('2026-11-01T00:00:00Z'))
+  samplePdf.setModificationDate(new Date('2026-11-01T00:00:00Z'))
+  samplePdf.addPage([595, 842]).drawImage(await samplePdf.embedJpg(readFileSync(sampleJpgPath)), { x: 0, y: 0, width: 595, height: 842 })
+  writeSampleFile(fileName, await samplePdf.save())
+  rmSync(samplePngPath)
+  rmSync(sampleJpgPath)
+}
 
 // Synthetic photos: a landscape and a portrait scene, each saved as PNG, JPG, WebP and HEIC.
 for (const [photoName, width, height] of [['photo-landscape', 1600, 1200], ['photo-portrait', 1200, 1600]]) {
@@ -1247,6 +1336,8 @@ ${[['North', 280, '#2f6fd6'], ['South', 220, '#e8833a'], ['West', 250, '#3a9a5b'
   new URL('sales-chart.png', sampleDirectory).pathname,
 )
 console.log('Wrote the JPG to PDF samples landscape-photo.jpg and sales-chart.png.')
+// Upscale image's sample: the landscape photo at 400 pixels wide, small enough to enlarge in a few seconds.
+execFileSync('sips', ['--resampleWidth', '400', '-s', 'format', 'jpeg', '-s', 'formatOptions', '80', new URL('landscape-photo.jpg', sampleDirectory).pathname, '--out', new URL('small-landscape.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
 
 // The image pages' samples, small enough to bundle: a phone photo with the made-up camera, date and GPS point above (JPG and
 // HEIC), a beach photo as HEIC, the landscape photo as WebP, a transparent badge (PNG and WebP) and two meme templates.
@@ -1275,6 +1366,59 @@ const deskPngPath = join(tmpdir(), 'openanydoc-desk.png')
 screenshotHtml(deskSceneHtml, 800, 600, deskPngPath)
 execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', deskPngPath, '--out', new URL('meme-desk.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
 rmSync(deskPngPath)
+// Scan to PDF's samples: phone photos of paper on a desk, taken at an angle and lit unevenly, as a camera would (portrait).
+const paperPhotoHtml = (paperHtml, tilt) => `<!doctype html><body style="margin:0;height:100vh;overflow:hidden;background:radial-gradient(circle at 30% 20%,#b58a5c,#7a5534 70%,#5a3d24)">
+<div style="position:absolute;left:14%;top:12%;width:72%;height:74%;padding:5% 6%;box-sizing:border-box;background:linear-gradient(115deg,#ffffff,#f1ede4 55%,#d9d2c3);font:22px Helvetica,Arial,sans-serif;color:#262626;box-shadow:0 18px 40px rgba(0,0,0,.45);transform:perspective(1100px) ${tilt}">${paperHtml}</div>
+<div style="position:absolute;inset:0;background:linear-gradient(200deg,rgba(255,255,240,.18),rgba(0,0,0,.28))"></div></body>`
+const scanSamples = [
+  ['scan-receipt.jpg', 'rotateX(16deg) rotateZ(-5deg)', `<div style="font-weight:bold;font-size:34px;margin-bottom:28px">Example Café</div><div>Receipt 0412 · 14 Nov 2026</div><hr style="margin:24px 0"><div>2 × Coffee ............ 7.00</div><div style="margin-top:12px">1 × Croissant ........ 3.20</div><div style="margin-top:12px">1 × Orange juice ..... 4.50</div><hr style="margin:24px 0"><div style="font-weight:bold">Total ................ 14.70</div><div style="margin-top:40px;font-size:18px">Synthetic sample · no real shop</div>`],
+  ['scan-letter.jpg', 'rotateX(10deg) rotateY(-12deg) rotateZ(4deg)', `<div style="font-weight:bold;font-size:30px;margin-bottom:30px">Dear neighbour,</div><p style="line-height:1.6">The street party is on Saturday at 3 pm in the square. Please bring a chair and something to share.</p><p style="line-height:1.6">Children's games start at 4 pm, music at 6 pm.</p><p style="margin-top:40px">— The residents' committee</p><p style="margin-top:40px;font-size:18px">Synthetic sample for OpenAnyDoc</p>`],
+]
+for (const [fileName, tilt, paperHtml] of scanSamples) {
+  const scanPhotoPngPath = join(tmpdir(), 'openanydoc-scan-photo.png')
+  screenshotHtml(paperPhotoHtml(paperHtml, tilt), 900, 1200, scanPhotoPngPath)
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '72', scanPhotoPngPath, '--out', new URL(fileName, sampleDirectory).pathname], { stdio: 'ignore' })
+  rmSync(scanPhotoPngPath)
+}
+console.log('Wrote the Scan to PDF samples scan-receipt.jpg and scan-letter.jpg.')
+// Blur face and Remove background's samples: drawn, made-up people and a mug (no real person in any of them).
+const drawnFace = (left, top, size, skin, hair) => `<div style="position:absolute;left:${left}px;top:${top}px;width:${size}px;height:${size * 1.3}px">
+<div style="position:absolute;left:-6%;top:-12%;width:112%;height:62%;border-radius:50% 50% 40% 40%;background:${hair}"></div>
+<div style="position:absolute;inset:0;border-radius:46% 46% 50% 50%/40% 40% 60% 60%;background:radial-gradient(circle at 50% 38%,${skin},color-mix(in srgb,${skin} 78%,#5a3a28))"></div>
+<div style="position:absolute;left:-6%;top:-10%;width:112%;height:30%;border-radius:50% 50% 30% 30%;background:${hair}"></div>
+${[24, 58].map((x) => `<div style="position:absolute;left:${x}%;top:36%;width:18%;height:4%;border-radius:40%;background:#3b2a20"></div><div style="position:absolute;left:${x}%;top:42%;width:18%;height:8%;border-radius:50%;background:#fff"></div><div style="position:absolute;left:${x + 5}%;top:42.5%;width:8%;height:7%;border-radius:50%;background:#2a1b12"></div>`).join('')}
+<div style="position:absolute;left:44%;top:50%;width:12%;height:18%;border-radius:40% 40% 50% 50%;background:color-mix(in srgb,${skin} 82%,#6b4230)"></div>
+<div style="position:absolute;left:33%;top:74%;width:34%;height:8%;border-radius:0 0 50% 50%;background:#a5524f"></div></div>`
+const faceSamples = [
+  ['faces-team.jpg', 1200, 800, `background:linear-gradient(#cfe0ee,#e9eef2 60%,#b8a48c 60%)`, [[180, 220, 190, '#e8b897', '#2b1d14'], [520, 190, 200, '#c68a62', '#111'], [860, 230, 185, '#f1c8a8', '#7a4b26']]],
+  ['face-portrait.jpg', 800, 1000, `background:linear-gradient(135deg,#d9c8b4,#a99a88)`, [[230, 230, 340, '#d9a37e', '#2a1a10']]],
+]
+for (const [fileName, width, height, backdrop, faces] of faceSamples) {
+  const facesPngPath = join(tmpdir(), 'openanydoc-faces.png')
+  screenshotHtml(`<!doctype html><body style="margin:0;height:100vh;overflow:hidden;position:relative;${backdrop}">${faces.map((face) => drawnFace(...face)).join('')}</body>`, width, height, facesPngPath)
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', facesPngPath, '--out', new URL(fileName, sampleDirectory).pathname], { stdio: 'ignore' })
+  rmSync(facesPngPath)
+}
+{
+  const mugPngPath = join(tmpdir(), 'openanydoc-mug.png')
+  screenshotHtml(`<!doctype html><body style="margin:0;height:100vh;overflow:hidden;position:relative;background:linear-gradient(#e7dfd3,#d6cab9 62%,#8c6a4b 62%,#6e523a)">
+<div style="position:absolute;left:300px;top:250px;width:260px;height:300px;border-radius:12px 12px 40px 40px;background:linear-gradient(90deg,#1f5fa8,#3d86d6 45%,#1a4f8e)"></div>
+<div style="position:absolute;left:520px;top:310px;width:120px;height:150px;border:28px solid #2a6dbd;border-radius:50%;border-left-color:transparent"></div>
+<div style="position:absolute;left:300px;top:236px;width:260px;height:40px;border-radius:50%;background:#174a85"></div>
+<div style="position:absolute;left:310px;top:244px;width:240px;height:26px;border-radius:50%;background:#4a2c18"></div></body>`, 900, 700, mugPngPath)
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', mugPngPath, '--out', new URL('mug-on-desk.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
+  rmSync(mugPngPath)
+}
+{
+  const plantPngPath = join(tmpdir(), 'openanydoc-plant.png')
+  screenshotHtml(`<!doctype html><body style="margin:0;height:100vh;overflow:hidden;position:relative;background:linear-gradient(#f3eadf,#e6d8c6 70%,#a07d5c 70%,#80603f)">
+${[[350, 130, -25], [420, 90, 5], [480, 140, 30], [300, 200, -50], [520, 210, 55]].map(([left, top, turn]) => `<div style="position:absolute;left:${left}px;top:${top}px;width:90px;height:230px;border-radius:50% 50% 50% 50%/80% 80% 20% 20%;background:linear-gradient(90deg,#2f7d3a,#4fa55a);transform:rotate(${turn}deg);transform-origin:50% 100%"></div>`).join('')}
+<div style="position:absolute;left:330px;top:390px;width:240px;height:200px;border-radius:0 0 40px 40px;background:linear-gradient(90deg,#c0623c,#d98057 50%,#a8512f)"></div>
+<div style="position:absolute;left:316px;top:380px;width:268px;height:36px;border-radius:8px;background:#b5593a"></div></body>`, 900, 700, plantPngPath)
+  execFileSync('sips', ['-s', 'format', 'jpeg', '-s', 'formatOptions', '75', plantPngPath, '--out', new URL('plant-on-shelf.jpg', sampleDirectory).pathname], { stdio: 'ignore' })
+  rmSync(plantPngPath)
+}
+console.log('Wrote the Blur face and Remove background samples faces-team.jpg, face-portrait.jpg, mug-on-desk.jpg and plant-on-shelf.jpg.')
 const badgeSampleSize = 400
 writeFileSync(
   new URL('badge-transparent.png', sampleDirectory),

@@ -28,35 +28,59 @@ export async function previewAddressOf(picture: ImageBitmap | HTMLCanvasElement,
   return blob ? URL.createObjectURL(blob) : ''
 }
 
-// Every chosen picture read once, in the order chosen; thumbnails are freed when the tool closes.
+const freeRead = (read: ReadImage) => {
+  if ('picture' in read) {
+    read.picture.close()
+    URL.revokeObjectURL(read.previewUrl)
+  }
+}
+
+// Every chosen picture read once, one after another (each read starts a worker; a big batch at once would exhaust memory), in the
+// order chosen. A picture is freed when its file is removed, when SVGs are redrawn at another size, and when the tool closes.
 export function useReadImages(files: File[], svgLongSide?: number) {
   const [readByFile, setReadByFile] = useState(new Map<File, ReadImage>())
   const readRef = useRef(readByFile)
+  const svgLongSideRef = useRef(svgLongSide)
   useEffect(() => {
     readRef.current = readByFile
   }, [readByFile])
   useEffect(() => {
     let isCurrent = true
-    for (const file of files) {
-      if (readRef.current.has(file)) continue
-      void (async (): Promise<ReadImage> => {
+    // SVGs are drawn at a size, so a new size means reading them again; files no longer chosen are let go.
+    const isSizeChanged = svgLongSideRef.current !== svgLongSide
+    svgLongSideRef.current = svgLongSide
+    const kept = new Map<File, ReadImage>()
+    for (const [file, read] of readRef.current) {
+      if (files.includes(file) && !(isSizeChanged && extensionOf(file.name) === 'svg')) kept.set(file, read)
+      else freeRead(read)
+    }
+    readRef.current = kept
+    setReadByFile(kept)
+    void (async () => {
+      for (const file of files) {
+        if (readRef.current.has(file)) continue
+        let read: ReadImage
         try {
           const picture = await decodeImage(file, svgLongSide)
-          return { picture, previewUrl: await previewAddressOf(picture), metadata: await readImageMetadata(file) }
+          read = { picture, previewUrl: await previewAddressOf(picture), metadata: await readImageMetadata(file) }
         } catch (error) {
-          return { problem: error instanceof ImageReadError ? error.reason : 'unreadable' }
+          read = { problem: error instanceof ImageReadError ? error.reason : 'unreadable' }
         }
-      })().then((read) => {
-        if (isCurrent) setReadByFile((previous) => new Map(previous).set(file, read))
-      })
-    }
+        if (!isCurrent) {
+          freeRead(read)
+          return
+        }
+        readRef.current = new Map(readRef.current).set(file, read)
+        setReadByFile(readRef.current)
+      }
+    })()
     return () => {
       isCurrent = false
     }
   }, [files, svgLongSide])
   useEffect(
     () => () => {
-      for (const read of readRef.current.values()) if ('previewUrl' in read) URL.revokeObjectURL(read.previewUrl)
+      for (const read of readRef.current.values()) freeRead(read)
     },
     [],
   )
@@ -149,8 +173,11 @@ export async function runImageBatch(jobs: Omit<ImageJob, 'picture'>[], pictures:
 }
 
 // The steps' overlays are copied for every job (the worker takes ownership of what it is sent).
+// Each distinct picture is copied once per job, so a tiled watermark's hundreds of overlays share one copy.
 export async function copySteps(steps: ImageStep[]) {
-  return Promise.all(steps.map(async (step) => (step.type === 'overlay' ? { ...step, picture: await createImageBitmap(step.picture) } : step)))
+  const copies = new Map<ImageBitmap, ImageBitmap>()
+  for (const step of steps) if (step.type === 'overlay' && !copies.has(step.picture)) copies.set(step.picture, await createImageBitmap(step.picture))
+  return steps.map((step) => (step.type === 'overlay' ? { ...step, picture: copies.get(step.picture)! } : step))
 }
 
 // Two pictures one over the other, with a handle to compare them: before on the start side, after on the end side.

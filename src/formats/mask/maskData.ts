@@ -73,7 +73,9 @@ export function partiallyMaskValue(value: unknown, category: TokenCategory) {
   return text.length > 4 ? `****${text.slice(-4)}` : '****'
 }
 
-// The exact values of the token and partial fields, matched inside free text as whole words, longest first.
+// The exact values of the chosen fields, matched inside free text as whole words, longest first. A removed field's values become
+// REMOVED_IN_TEXT there, not a token, so they are not kept in the key file either.
+const REMOVED_IN_TEXT = '[removed]'
 type KnownValue = { category: TokenCategory; strategy: MaskStrategy }
 
 function escapeForPattern(text: string) {
@@ -95,7 +97,7 @@ function createFreeTextMasker(knownValues: Map<string, KnownValue>, registry: To
     if (knownValuePattern) {
       for (const match of text.matchAll(knownValuePattern)) {
         const known = knownValues.get(match[0]) as KnownValue
-        spans.push({ start: match.index, end: match.index + match[0].length, category: known.category, strategy: known.strategy === 'partial' ? 'partial' : strategy })
+        spans.push({ start: match.index, end: match.index + match[0].length, category: known.category, strategy: known.strategy === 'token' ? strategy : known.strategy })
       }
     }
     if (spans.length === 0) return text
@@ -103,7 +105,8 @@ function createFreeTextMasker(knownValues: Map<string, KnownValue>, registry: To
     let position = 0
     for (const span of resolveOverlappingSpans(spans)) {
       const original = text.slice(span.start, span.end)
-      maskedText += text.slice(position, span.start) + (span.strategy === 'partial' ? partiallyMaskValue(original, span.category) : registry.getToken(span.category, original))
+      const replacement = span.strategy === 'remove' ? REMOVED_IN_TEXT : span.strategy === 'partial' ? partiallyMaskValue(original, span.category) : registry.getToken(span.category, original)
+      maskedText += text.slice(position, span.start) + replacement
       position = span.end
     }
     return maskedText + text.slice(position)
@@ -118,7 +121,7 @@ function maskValue(value: unknown, choice: MaskChoice, registry: TokenRegistry, 
 
 function collectKnownValue(knownValues: Map<string, KnownValue>, value: unknown, choice: MaskChoice) {
   const text = getValueText(value)
-  if (choice.category !== 'freeText' && choice.strategy !== 'remove' && text.trim() !== '' && !knownValues.has(text)) knownValues.set(text, { category: choice.category, strategy: choice.strategy })
+  if (choice.category !== 'freeText' && text.trim() !== '' && !knownValues.has(text)) knownValues.set(text, { category: choice.category, strategy: choice.strategy })
 }
 
 function collectKnownTableValues(tables: MaskTable[], choicesById: Map<string, MaskChoice>, knownValues: Map<string, KnownValue>) {

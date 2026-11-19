@@ -89,14 +89,21 @@ export default function ToolPage({
     onFileLoaded(result.file, await result.file.arrayBuffer())
   }
 
-  function keepChosenFile(file: File) {
+  // A one-file tool replaces its file: with unsaved edits it asks first, and the tool starts afresh (key) so no edit carries over.
+  async function keepChosenFile(file: File) {
+    if (!tool.takesSeveralFiles && hasUnsavedEdits && !(await confirmDiscardEdits())) return
     setResultFile(null)
+    setIsDownloaded(false)
+    if (!tool.takesSeveralFiles) {
+      setToolHasEdits(false)
+      setToolSessionKey((key) => key + 1)
+    }
     setChosenFiles((files) => (tool.takesSeveralFiles ? [...files, file] : [file]))
   }
 
   const intake = useFileIntake({
     acceptedExtensions: toolViewer?.extensions ?? tool.inputFormats,
-    onFileLoaded: hasToolComponent || isMaskTool ? keepChosenFile : convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
+    onFileLoaded: hasToolComponent || isMaskTool ? (file) => void keepChosenFile(file) : convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
     handoffFile,
     onHandoffConsumed,
     allowsSeveralFiles: tool.takesSeveralFiles,
@@ -105,6 +112,7 @@ export default function ToolPage({
 
   // An editing tool's edits count as saved once their copy is downloaded; going back to edit makes them unsaved again.
   const [toolHasEdits, setToolHasEdits] = useState(false)
+  const [toolSessionKey, setToolSessionKey] = useState(0)
   const hasUnsavedEdits = toolHasEdits && !(resultFile && isDownloaded)
   useEffect(() => {
     onUnsavedEditsChange(hasUnsavedEdits)
@@ -173,7 +181,7 @@ export default function ToolPage({
             <h1 id="page-heading" className="type-display hero-in text-balance">{content.heading}</h1>
             <p id="page-answer" className="type-lead hero-in mt-3 text-ink-soft sm:mt-5">{content.subtitle}</p>
             <p id="page-proof" className="hero-in mt-3 flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-sm">
-              <span id="tool-privacy-badge" className="control-shape inline-flex items-center gap-1.5 bg-surface px-3 py-1 font-semibold text-ink">
+              <span id="tool-privacy-badge" className="control-shape inline-flex items-center gap-1.5 bg-surface px-3 py-1 text-xs font-semibold text-ink sm:text-sm">
                 <svg aria-hidden="true" viewBox="0 0 24 24" className="size-4 text-accent" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20 6 9 17l-5-5" />
                 </svg>
@@ -231,6 +239,7 @@ export default function ToolPage({
             <div id="tool-workspace" hidden={resultFile !== null} className={`mx-auto mt-8 ${tool.isEditor ? 'max-w-[1100px]' : 'max-w-[760px]'}`}>
               <Suspense fallback={null}>
                 <ToolComponent
+                  key={toolSessionKey}
                   files={chosenFiles}
                   onFilesChange={setChosenFiles}
                   onAddFiles={intake.openFilePicker}

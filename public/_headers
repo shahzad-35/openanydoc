@@ -1,5 +1,5 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' blob:; connect-src 'self' https:; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
@@ -7,3 +7,16 @@
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
+
+# The AI tools' runtimes and models (OCR PDF, Blur faces, Remove background, Upscale, Translate PDF) are read on first use and
+# kept, so the tools work offline afterwards. Their names carry no hash, so they are kept 30 days, not for good.
+/models/*
+  Cache-Control: public, max-age=2592000
+
+# The JSON page's "Open from a URL" reads the typed address from this hidden frame, under the frame's own policy (a meta tag in
+# json-url-frame.html allows connect-src https:), so every page keeps connect-src 'self'. Cloudflare serves it at both addresses.
+/json-url-frame.html
+  ! Content-Security-Policy
+
+/json-url-frame
+  ! Content-Security-Policy

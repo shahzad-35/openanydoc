@@ -1,0 +1,83 @@
+{
+  "title": "Remove Background from Image Online – Free, No Upload",
+  "description": "Remove the background from a photo in your browser: cut out a person or an object as a transparent PNG or on white. Free, nothing is uploaded.",
+  "heading": "Remove background",
+  "subtitle": "Cut a person or an object out of a photo, on a transparent or white background; nothing is uploaded.",
+  "intro": "Remove the background from a photo without sending it anywhere: a small model running in your browser finds the subject and makes everything else transparent, or white. Choose A person for portraits (clean edges around hair and shoulders) or An object or animal for products and pets, compare before and after, and save a PNG. The first time, the model (5 to 7 MB, plus its 15 MB runtime) is loaded from this site and kept by your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The cut-out is made on your device; the photo never goes to a server."
+    },
+    {
+      "title": "People and objects",
+      "text": "A model made for portraits, and one for products, pets and other subjects."
+    },
+    {
+      "title": "Transparent or white",
+      "text": "A transparent PNG for designs, or a white background for listings."
+    }
+  ],
+  "stepsTitle": "How to remove the background from a photo",
+  "steps": [
+    {
+      "title": "Choose your photo",
+      "text": "Click Choose a file, or drop a JPG, PNG, WebP or HEIC photo on the page."
+    },
+    {
+      "title": "Say what it shows",
+      "text": "Choose A person or An object or animal."
+    },
+    {
+      "title": "Check the cut-out",
+      "text": "Slide across the before-and-after preview."
+    },
+    {
+      "title": "Save",
+      "text": "Choose transparent or white and click Remove background."
+    }
+  ],
+  "handlesTitle": "What Remove background handles",
+  "handles": [
+    "Portraits and photos of people, with soft edges around hair.",
+    "Products, objects and pets on a plain or busy background.",
+    "Transparent PNG, or a white background in the photo's own format.",
+    "JPG, PNG, WebP and HEIC photos."
+  ],
+  "limits": [
+    "The models are small, so they run on your device: fine hair, glass, smoke and busy backgrounds can come out rough. Big commercial tools do better on hard photos.",
+    "One photo at a time.",
+    "The first use loads the model and its runtime (up to about 22 MB) from this site; after that it works offline."
+  ],
+  "faqTitle": "Remove background: questions",
+  "faq": [
+    {
+      "question": "Is my photo uploaded?",
+      "answer": "No. Your photo is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Which choice should I pick?",
+      "answer": "A person for portraits and people; An object or animal for products, pets and anything else."
+    },
+    {
+      "question": "Why are some edges rough?",
+      "answer": "The models are small enough to run on your device. Fine hair, glass and busy backgrounds are hard for them; a plain background gives the cleanest result."
+    },
+    {
+      "question": "Can I put the subject on another background?",
+      "answer": "Save a transparent PNG and place it on any background in the Photo editor or a design app.",
+      "link": {
+        "text": "Photo editor",
+        "path": "/photo-editor"
+      }
+    },
+    {
+      "question": "What does the first use download?",
+      "answer": "The model and the runtime that runs it, up to about 22 MB, from this site itself. Your browser keeps them, so later uses start at once and work offline."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

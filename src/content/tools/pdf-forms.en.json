@@ -1,0 +1,84 @@
+{
+  "title": "PDF Forms – Make a Fillable PDF Form Online, No Upload",
+  "description": "Make a PDF fillable in your browser: add text boxes, checkboxes, drop-downs, choice buttons, dates and a signature box, then save. Free, no upload.",
+  "heading": "PDF Forms",
+  "subtitle": "Turn any PDF into a fillable form with text boxes, checkboxes, drop-downs and more; nothing is uploaded.",
+  "intro": "Create a fillable PDF form online from a form you already have as a PDF: pick a field type, click or drag where it goes, give it a name and set it up, with choices, a starting value or Required. The saved copy works in Acrobat, Preview, browsers and Fill PDF here. Fields the PDF already has are kept. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Seven field types",
+      "text": "Text, long text, checkbox, drop-down, choice buttons, date and a signature box."
+    },
+    {
+      "title": "Works everywhere",
+      "text": "Standard PDF form fields, filled in by any PDF reader, including Fill PDF on this site."
+    }
+  ],
+  "stepsTitle": "How to make a fillable PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop the PDF of your form on the page."
+    },
+    {
+      "title": "Place the fields",
+      "text": "Pick a field type, then click or drag on the page where it should go."
+    },
+    {
+      "title": "Set each field up",
+      "text": "Select a field to name it, add choices, a starting value or mark it as required."
+    },
+    {
+      "title": "Save a copy",
+      "text": "Click Save a copy, check the preview and download the fillable PDF."
+    }
+  ],
+  "handlesTitle": "What PDF Forms handles",
+  "handles": [
+    "Text and long text boxes, with a starting value.",
+    "Checkboxes, drop-downs and choice buttons, with their choices and a starting choice.",
+    "Date fields that Acrobat keeps in the yyyy-mm-dd format, and an empty signature box readers can sign in.",
+    "PDFs that already have fields: they are kept, and new names can't clash with them."
+  ],
+  "limits": [
+    "Starting values and drop-down choices can use Latin letters only for now; Arabic can still be typed into the fields when the form is filled.",
+    "No calculations or scripts, apart from the date format.",
+    "The signature box is an empty field; signing it with a certificate needs a reader such as Acrobat.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faqTitle": "PDF Forms: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "Will the form work in Acrobat and on phones?",
+      "answer": "Yes. The fields are standard PDF form fields, so Acrobat, Preview, browsers and phone PDF apps can fill them in."
+    },
+    {
+      "question": "How do I fill in the form afterwards?",
+      "answer": "In any PDF reader, or here with Fill PDF, which also flattens the answers into the page.",
+      "link": {
+        "text": "Fill PDF",
+        "path": "/fill-pdf"
+      }
+    },
+    {
+      "question": "Can a field have Arabic text?",
+      "answer": "People can type Arabic into the fields when they fill the form. Starting values and drop-down choices need Latin letters for now."
+    },
+    {
+      "question": "What happens to fields the PDF already has?",
+      "answer": "They are kept as they are. A new field can't take the name of an existing one, because two fields with one name share their answer."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

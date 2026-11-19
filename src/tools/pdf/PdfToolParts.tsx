@@ -3,12 +3,12 @@
 /* oxlint-disable react/only-export-components */
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
-import type { PDFDocumentProxy } from 'pdfjs-dist'
+import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 import { isolateLeftToRight, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { formatFileSize } from '../../useFileIntake'
 import { PdfPasswordError, openPdfForReading } from '../../formats/pdf/pdfLibrary'
-import type { PageBox } from './pdfTasks'
+import type { LayerWord, PageBox, PagePicture, PdfTaskProblem } from './pdfTasks'
 
 const THUMBNAIL_WIDTH = 132
 const DRAG_THRESHOLD_PX = 6
@@ -67,7 +67,8 @@ export function useOpenedPdfs(files: File[]) {
   return openedByFile
 }
 
-export const problemMessageKey = (problem: 'encrypted' | 'unreadable'): MessageKey => (problem === 'encrypted' ? 'tools.pdf.encrypted' : 'tools.pdf.unreadable')
+const PROBLEM_MESSAGES: Record<PdfTaskProblem, MessageKey> = { encrypted: 'tools.pdf.encrypted', unreadable: 'tools.pdf.unreadable', 'wrong-password': 'tools.unlock.wrongPassword', 'not-encrypted': 'tools.unlock.notEncrypted' }
+export const problemMessageKey = (problem: PdfTaskProblem): MessageKey => PROBLEM_MESSAGES[problem]
 
 // ---------------------------------------------------------------- the thumbnail grid
 
@@ -397,6 +398,82 @@ export async function pngBytesOf(canvas: HTMLCanvasElement) {
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/png'))
   if (!blob) throw new Error('The picture could not be made')
   return blob.arrayBuffer()
+}
+
+// ---------------------------------------------------------------- pages rebuilt as pictures with a text layer
+
+let measuringContext: CanvasRenderingContext2D | null = null
+
+// The text runs of a page as shown (points from its top-left corner), for the invisible text layer over its picture: each run's
+// box (from ascenders to descenders, wider by a third of the font size on each side) and its words, placed by their widths measured in a similar font, right to left for a right-to-left run. Turned text is
+// left out. Each run's words come in visual order, left to right, as the layer writes them.
+async function readPageRuns(page: PDFPageProxy): Promise<{ box: PageBox; words: LayerWord[] }[]> {
+  const context = (measuringContext ??= document.createElement('canvas').getContext('2d'))
+  const viewport = page.getViewport({ scale: 1 })
+  const content = await page.getTextContent()
+  const runs: { box: PageBox; words: LayerWord[] }[] = []
+  for (const item of content.items) {
+    if (!('str' in item) || !item.str.trim() || !context) continue
+    const [scaleX, skewY, skewX, scaleY, baselineX, baselineY] = item.transform as number[]
+    const directionLength = Math.hypot(scaleX, skewY) || 1
+    const [startX, startY] = viewport.convertToViewportPoint(baselineX, baselineY)
+    const [endX, endY] = viewport.convertToViewportPoint(baselineX + (scaleX / directionLength) * item.width, baselineY + (skewY / directionLength) * item.width)
+    const fontSize = Math.hypot(skewX, scaleY)
+    if (Math.abs(endY - startY) > 1 || fontSize === 0) continue
+    context.font = `${fontSize}px sans-serif`
+    const pieces = item.str.split(/(\s+)/).filter(Boolean)
+    const measuredWidths = pieces.map((piece) => context.measureText(piece).width)
+    const pointsPerMeasuredWidth = Math.abs(endX - startX) / (measuredWidths.reduce((sum, width) => sum + width, 0) || 1)
+    const isRightToLeft = item.dir === 'rtl'
+    let cursor = isRightToLeft ? Math.max(startX, endX) : Math.min(startX, endX)
+    const runWords: LayerWord[] = []
+    pieces.forEach((piece, index) => {
+      const width = measuredWidths[index] * pointsPerMeasuredWidth
+      const left = isRightToLeft ? cursor - width : cursor
+      cursor = isRightToLeft ? cursor - width : cursor + width
+      if (piece.trim()) runWords.push({ text: piece, x: left, baselineY: startY, width, fontSize })
+    })
+    const box = { x: Math.min(startX, endX) - fontSize / 3, y: startY - fontSize, width: Math.abs(endX - startX) + (2 * fontSize) / 3, height: fontSize * 1.25 }
+    runs.push({ box, words: isRightToLeft ? runWords.reverse() : runWords })
+  }
+  return runs
+}
+
+const boxesOverlap = (first: PageBox, second: PageBox) => first.x < second.x + second.width && second.x < first.x + first.width && first.y < second.y + second.height && second.y < first.y + first.height
+
+// A page drawn by pdf.js as a JPEG at 200 dpi on white, with its words for the text layer: what Redact PDF, Crop PDF (when what is
+// outside is removed) and the repair of a damaged PDF put in place of the page. `blackBoxes` (points, as shown) are filled in and
+// their words left out; with `keptBox` only that part of the page is kept, with the words inside it.
+const PAGE_PICTURE_SCALE = 200 / 72
+export async function drawPagePicture(document: PDFDocumentProxy, pageIndex: number, { blackBoxes = [], keptBox }: { blackBoxes?: PageBox[]; keptBox?: PageBox } = {}): Promise<PagePicture> {
+  const page = await document.getPage(pageIndex + 1)
+  const viewport = page.getViewport({ scale: PAGE_PICTURE_SCALE })
+  const shownSize = { width: viewport.width / PAGE_PICTURE_SCALE, height: viewport.height / PAGE_PICTURE_SCALE }
+  const area = keptBox ?? { x: 0, y: 0, ...shownSize }
+  const pageCanvas = window.document.createElement('canvas')
+  pageCanvas.width = Math.floor(viewport.width)
+  pageCanvas.height = Math.floor(viewport.height)
+  await page.render({ canvas: pageCanvas, viewport, background: '#ffffff' }).promise
+  const pageContext = pageCanvas.getContext('2d')!
+  pageContext.fillStyle = '#000000'
+  for (const box of blackBoxes) pageContext.fillRect(box.x * PAGE_PICTURE_SCALE, box.y * PAGE_PICTURE_SCALE, box.width * PAGE_PICTURE_SCALE, box.height * PAGE_PICTURE_SCALE)
+  const canvas = window.document.createElement('canvas')
+  canvas.width = Math.max(1, Math.round(area.width * PAGE_PICTURE_SCALE))
+  canvas.height = Math.max(1, Math.round(area.height * PAGE_PICTURE_SCALE))
+  canvas.getContext('2d')!.drawImage(pageCanvas, -area.x * PAGE_PICTURE_SCALE, -area.y * PAGE_PICTURE_SCALE)
+  pageCanvas.width = 0
+  const words = (await readPageRuns(page))
+    // A word's place inside its run is only estimated (the PDF's font can be much wider or narrower than the measuring font), so a
+    // run that a black box even touches is left out of the text layer whole.
+    .filter((run) => !blackBoxes.some((box) => boxesOverlap(run.box, box)))
+    .flatMap((run) => run.words)
+    .filter((word) => !keptBox || (word.x >= area.x && word.x + word.width <= area.x + area.width && word.baselineY - word.fontSize >= area.y && word.baselineY <= area.y + area.height))
+    .map((word) => ({ ...word, x: word.x - area.x, baselineY: word.baselineY - area.y }))
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, 'image/jpeg', 0.92))
+  canvas.width = 0
+  page.cleanup()
+  if (!blob) throw new Error('The page picture could not be made')
+  return { pageIndex, jpg: await blob.arrayBuffer(), widthPoints: area.width, heightPoints: area.height, words }
 }
 
 // Every page's size as shown (after its rotation), in points: the frame stamps and shapes are placed in.

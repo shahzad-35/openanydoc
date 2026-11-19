@@ -1,3 +1,4 @@
+/* oxlint-disable react/only-export-components */
 // JPG to PDF: pictures (JPG, PNG, WebP, HEIC, TIFF, SVG) in the order shown become one PDF, or one PDF per picture in a ZIP, with
 // a page size, orientation and margin. JPG and PNG go into the PDF as they are; the other formats are read by the browser (HEIC
 // by libheif-js where the browser can't), TIFF by utif2 (MIT, loaded only for a TIFF), and drawn once on a canvas.
@@ -11,7 +12,7 @@ import type { EmbeddableImage, PageOrientation, PageSize } from './pdfTasks'
 import { PdfThumbnailGrid, ProgressBar, baseNameOf, pdfResultFile, zipResultFile } from './PdfToolParts'
 import type { GridCard } from './PdfToolParts'
 
-type ReadPicture = { image: EmbeddableImage; previewUrl: string } | { problem: 'heic' | 'unreadable' }
+export type ReadPicture = { image: EmbeddableImage; previewUrl: string } | { problem: 'heic' | 'unreadable' }
 type Margin = 'none' | 'small' | 'large'
 
 const MARGIN_POINTS: Record<Margin, number> = { none: 0, small: 18, large: 36 }
@@ -66,7 +67,7 @@ async function readHeicWithLibheif(file: File): Promise<ReadPicture> {
   }
 }
 
-async function readPicture(file: File): Promise<ReadPicture> {
+export async function readPicture(file: File): Promise<ReadPicture> {
   const extension = extensionOf(file.name)
   const bytes = await file.arrayBuffer()
   if (extension === 'tif' || extension === 'tiff') {
