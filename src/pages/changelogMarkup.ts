@@ -107,6 +107,12 @@ export const footerClasses = {
   bottom: 'mt-10 border-t border-line pt-5',
   disclaimer: 'text-[13px] leading-relaxed text-ink-soft',
   socialList: 'mt-5 flex items-center gap-2',
+  // The installed app (src/pwa.ts): Install app or, on iPhone and iPad, the Add to Home Screen steps, and "Available offline".
+  // Drawn only in the browser, so the changelog's static footer leaves them out.
+  appStatus: 'mt-5 flex flex-col items-start gap-3',
+  installButton: 'inline-flex min-h-9 cursor-pointer items-center gap-2 rounded-full border border-line px-4 text-[14px] text-ink-soft transition-colors duration-150 hover:border-accent hover:text-accent pointer-coarse:min-h-11',
+  installSteps: 'mt-2 max-w-[36ch] text-[14px] leading-relaxed text-ink-soft',
+  offlineReady: 'flex items-center gap-1.5 text-[14px] text-ink-soft',
   socialLink: 'inline-flex size-10 items-center justify-center rounded-full border border-line text-ink-soft transition-colors duration-150 hover:border-accent hover:text-accent pointer-coarse:size-11',
 } as const
 

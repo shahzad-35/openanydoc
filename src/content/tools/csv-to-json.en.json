@@ -74,6 +74,10 @@
     {
       "question": "Is the CSV uploaded?",
       "answer": "No. Your browser reads the CSV and writes the JSON on your device; nothing is sent to a server."
+    },
+    {
+      "question": "How do I convert a CSV file to JSON?",
+      "answer": "Open or paste the CSV and each row becomes a JSON object keyed by the header row; copy the JSON or download it as a .json file. OpenAnyDoc converts it in your browser, without uploading the file."
     }
   ]
 }

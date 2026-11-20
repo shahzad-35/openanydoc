@@ -1,0 +1,84 @@
+{
+  "title": "Test Data Generator – Fake CSV, Excel, JSON | OpenAnyDoc",
+  "description": "Generate fake test data with names in English and Arabic, emails, phones, dates and numbers, as CSV, Excel or JSON. Free, made in your browser.",
+  "heading": "Test Data Generator",
+  "subtitle": "Make up to 100,000 rows of synthetic data as CSV, Excel or JSON, with no real people in it.",
+  "intro": "Generate test data online for imports, demos, training and screenshots without touching real customer data. Choose how many rows you need and which columns: IDs, full names in English or Arabic, emails, phone numbers, dates and numbers in the ranges you set. Every value is made up by your browser, emails always end in @example.com and phone numbers come from reserved fictional ranges, so nothing can reach a real person.",
+  "features": [
+    {
+      "title": "Synthetic by design",
+      "text": "No real names, national IDs, IBANs or card numbers: every value is invented, and emails and phones are clearly fake."
+    },
+    {
+      "title": "English and Arabic names",
+      "text": "Full names in English and in Arabic, so you can test right-to-left text in your forms, reports and imports."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, generating keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: generate test data",
+  "steps": [
+    {
+      "title": "Choose the rows and columns",
+      "text": "Set the number of rows, from 1 to 100,000, and add the columns you need: ID, name in English or Arabic, email, phone, date, whole number or decimal number."
+    },
+    {
+      "title": "Set the ranges",
+      "text": "Give dates a start and an end, and numbers a lowest and highest value."
+    },
+    {
+      "title": "Choose the format",
+      "text": "Pick CSV, Excel (.xlsx) or JSON. Click Generate again for a new random set at any time."
+    },
+    {
+      "title": "Open or download",
+      "text": "Open the result in the matching viewer to look through it, or download it."
+    }
+  ],
+  "handlesTitle": "What the test data generator makes",
+  "handles": [
+    "Rows: from 1 to 100,000 per file.",
+    "Columns: ID, full name in English, full name in Arabic, email, phone number, date, whole number and decimal number.",
+    "Ranges: dates between two days you set, numbers between a lowest and highest value.",
+    "Safe values: emails always @example.com, phone numbers in reserved fictional ranges.",
+    "Formats: CSV, Excel (.xlsx) and JSON, opened in the matching viewer or downloaded."
+  ],
+  "limits": [
+    "Up to 100,000 rows per file; generate several files for more.",
+    "Values are random and independent: a name and an email in the same row are not related, and no column depends on another.",
+    "There are no national IDs, IBANs or card numbers, on purpose; this tool never makes data that looks like real identity or payment details."
+  ],
+  "faqTitle": "Test data generator: questions",
+  "faq": [
+    {
+      "question": "Is any real data used?",
+      "answer": "No. Every value is made up by your browser from scratch. Names are random combinations, emails always end in @example.com, a domain reserved for examples, and phone numbers come from ranges set aside for fiction, so none of them belongs to a real person."
+    },
+    {
+      "question": "Is anything sent to a server?",
+      "answer": "No. The data is generated on your device and never leaves it. Nothing is saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "How many rows can I generate?",
+      "answer": "From 1 to 100,000 rows per file. For more, generate several files and join them with Merge CSV."
+    },
+    {
+      "question": "Can it make national IDs, IBANs or card numbers?",
+      "answer": "No, on purpose. Values shaped like real identity or payment details can be mistaken for real ones, so the generator leaves them out. Use the ID column for a unique number per row."
+    },
+    {
+      "question": "Which formats can I download?",
+      "answer": "CSV, Excel (.xlsx) and JSON. You can also open the result straight in the CSV, Excel or JSON viewer to check it first."
+    },
+    {
+      "question": "Can I get a different set of data?",
+      "answer": "Yes. Click Generate again for a new random set with the same columns and ranges."
+    },
+    {
+      "question": "How do I generate fake data for testing?",
+      "answer": "Generate fake test data with a tool that makes up names, emails, dates and numbers instead of copying real customer records. In OpenAnyDoc, choose the columns and the number of rows, press Generate and download CSV, Excel or JSON; every value is made up in your browser, so no real person's data is involved."
+    }
+  ]
+}

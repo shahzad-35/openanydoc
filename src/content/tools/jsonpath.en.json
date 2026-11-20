@@ -1,0 +1,85 @@
+{
+  "title": "JSONPath Tester Online – Query JSON Live | OpenAnyDoc",
+  "description": "Test JSONPath queries on your JSON as you type, filters like $..book[?(@.price < 10)] included, with matches marked in the tree. Free, no upload.",
+  "heading": "JSONPath Tester: Query Your JSON Live",
+  "subtitle": "Type a JSONPath expression and see the matching values from your JSON as you type; nothing is uploaded.",
+  "intro": "A free JSONPath tester: open a .json file, drop it or paste the text, and the page opens with the query box ready, starting from $..*. Type an expression and the results update as you type, while the matching nodes are marked in the tree so you see where each one lives. The syntax is the common JSONPath one, filters such as $..book[?(@.price < 10)] included, run by a safe evaluator that never executes code from the query. Copy the results when they look right. Your JSON is queried in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Results as you type",
+      "text": "Every change to the expression runs the query again after a short pause, so you can try ideas quickly."
+    },
+    {
+      "title": "Private and free",
+      "text": "Your JSON is queried by your own browser and never sent to a server. No account, no watermark."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: test a JSONPath query",
+  "steps": [
+    {
+      "title": "Open or paste your JSON",
+      "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples."
+    },
+    {
+      "title": "Type an expression",
+      "text": "The query box opens with $..*, which matches every value. Change it, for example to $.store.book[*].title, and the results follow."
+    },
+    {
+      "title": "See the matches",
+      "text": "Matching values are listed and marked in the tree, so you can check that the query picks what you meant."
+    },
+    {
+      "title": "Copy the results",
+      "text": "Copy the matching values to use them elsewhere."
+    }
+  ],
+  "handlesTitle": "What the JSONPath tester handles",
+  "handles": [
+    "Standard JSONPath syntax: $ for the root, . and [] for children, .. for any depth, * for every item, slices such as [0:3].",
+    "Filters such as $..book[?(@.price < 10)], run by a safe evaluator with no access to code or the page.",
+    "Results that update about 150 ms after you stop typing.",
+    "Matching nodes marked in the tree.",
+    "Copy the results; big integer IDs keep every digit."
+  ],
+  "limits": [
+    "Filters are evaluated safely, so they cannot call arbitrary JavaScript; comparisons, && and || and the usual operators work.",
+    "Files up to 10 MB.",
+    "The query runs on valid JSON; a file with a syntax error shows where the error is first.",
+    "Queries are not saved between visits; keep the ones you use in your own notes."
+  ],
+  "faqTitle": "Questions about JSONPath",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your JSON is read and queried by your browser, on your device, and is never sent anywhere. Pasted text and your queries stay in this tab."
+    },
+    {
+      "question": "What is JSONPath?",
+      "answer": "JSONPath is a short way to pick values out of a JSON document, the way XPath does for XML. $.store.book[0].title, for example, means the title of the first book in the store."
+    },
+    {
+      "question": "How do I filter by a value?",
+      "answer": "Use a filter in brackets: $..book[?(@.price < 10)] returns every book whose price is below 10. @ stands for the item being tested."
+    },
+    {
+      "question": "Can a filter run code?",
+      "answer": "No. Filters are read by a safe evaluator that understands comparisons and logic, not by JavaScript's eval, so a query cannot run arbitrary code in your browser."
+    },
+    {
+      "question": "Why does $..* return so many results?",
+      "answer": "$..* means every value at every depth, which is a good first look. Narrow it with key names, such as $..price, to get only what you need."
+    },
+    {
+      "question": "Can I keep my queries for next time?",
+      "answer": "No. Nothing is saved on the site and there is no history. Copy a query you want to reuse into your own notes."
+    },
+    {
+      "question": "How do I extract values from a JSON file with JSONPath?",
+      "answer": "Write a JSONPath expression that starts at the root $, such as $.store.book[*].title, and run it against the JSON: every matching value is returned. The OpenAnyDoc JSONPath tester runs it in your browser as you type, marks the matches in the tree and lets you copy them, without uploading the file."
+    }
+  ]
+}

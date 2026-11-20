@@ -61,11 +61,19 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I rotate a PDF and save it?",
+      "answer": "Rotate the pages in a PDF tool that saves a new file, because turning a page in a PDF viewer usually changes only the view and is lost when you close it. In OpenAnyDoc, choose the PDF, turn every page or only the selected ones, and download the new PDF; it is turned in your browser and never uploaded."
     }
   ]
 }

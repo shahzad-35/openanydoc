@@ -25,7 +25,7 @@ function withPageLink(item: ToolQuestion, onNavigate: (path: string) => void) {
 // table, what it can't do, the questions and answers, related pages, then the privacy note. Read from the tool's
 // src/content/tools/<slug>.<locale>.json, which the build also uses for the page's static HTML and FAQ data. `fileType` colours the
 // step numbers (data-file-type in index.css).
-export default function FormatGuide({ content, fileType, relatedPages, onNavigate }: { content: ToolContent; fileType: Viewer['id']; relatedPages: string[]; onNavigate: (path: string) => void }) {
+export default function FormatGuide({ content, toolName, fileType, relatedPages, onNavigate }: { content: ToolContent; toolName: string; fileType: Viewer['id']; relatedPages: string[]; onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
   return (
     <div id="format-guide" data-file-type={fileType} className="mx-auto max-w-3xl space-y-12">
@@ -89,7 +89,7 @@ export default function FormatGuide({ content, fileType, relatedPages, onNavigat
         </section>
       )}
       <section id="tool-limits-section">
-        <h2 id="tool-limits-heading" className="type-h3">{t('tools.limitsHeading')}</h2>
+        <h2 id="tool-limits-heading" className="type-h3">{t('tools.limitsHeading', { tool: toolName })}</h2>
         <ul id="tool-limits-list" className="mt-4 list-disc space-y-2 ps-6">
           {content.limits.map((limit, position) => (
             <li key={limit} id={`tool-limit-${position + 1}`}>{limit}</li>

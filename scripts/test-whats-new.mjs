@@ -3,8 +3,9 @@
 // It serves dist/ with the site's Content-Security-Policy and drives headless Chrome over the DevTools protocol, with no
 // dependency. While it runs, every page records any write to cookies, localStorage, sessionStorage, IndexedDB, the Cache API
 // or a service worker, and any network call (fetch, XHR, beacon, WebSocket, EventSource, or any request to another origin).
-// The only storage the site writes is the two keys that existed before this feature (the theme and the file-type colours);
-// anything else fails the test, and so does a Content-Security-Policy violation. Set CHROME_PATH if Chrome is not in its usual macOS place.
+// The only storage the site writes is the two keys that existed before this feature (the theme and the file-type colours), the
+// installable app's own service worker (/sw.js, whose caches hold the site's code) and its shared-files cache (a file shared to the
+// app on Android, read once and deleted); anything else fails the test, and so does a Content-Security-Policy violation. Set CHROME_PATH if Chrome is not in its usual macOS place.
 
 import { spawn } from 'node:child_process'
 import fs from 'node:fs'
@@ -35,7 +36,7 @@ const contentSecurityPolicy = builtHeaders.match(/Content-Security-Policy:\s*(.*
 const pathsWithoutSitePolicy = [...builtHeaders.matchAll(/^(\/\S*)\n {2}! Content-Security-Policy$/gm)].map((match) => match[1])
 // Hashed scripts are kept for good (/assets/*), so a worker started again later loads from the cache, offline too.
 const assetsCacheControl = builtHeaders.match(/^\/assets\/\*\n\s+Cache-Control:\s*(.*)$/m)?.[1]
-const contentTypes = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain' }
+const contentTypes = { '.webmanifest': 'application/manifest+json', '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.svg': 'image/svg+xml', '.xml': 'application/xml', '.txt': 'text/plain' }
 const redirects = Object.fromEntries(
   fs
     .readFileSync(path.join(distFolder, '_redirects'), 'utf8')
@@ -182,8 +183,13 @@ const recorderScript = `(() => {
     owner[name] = function (...args) { violations.push(label); return original.apply(this, args) }
   }
   watch(window.indexedDB, 'open', 'indexedDB.open')
-  watch(window.caches, 'open', 'caches.open')
-  watch(navigator.serviceWorker, 'register', 'serviceWorker.register')
+  const watchUnless = (owner, name, allowedFirstArgument) => {
+    if (!owner || typeof owner[name] !== 'function') return
+    const original = owner[name]
+    owner[name] = function (...args) { if (args[0] !== allowedFirstArgument) violations.push(name + '(' + args[0] + ')'); return original.apply(this, args) }
+  }
+  watchUnless(window.caches, 'open', 'shared-files')
+  watchUnless(navigator.serviceWorker, 'register', '/sw.js')
   watch(window, 'fetch', 'fetch')
   watch(XMLHttpRequest.prototype, 'open', 'XMLHttpRequest.open')
   watch(navigator, 'sendBeacon', 'sendBeacon')
@@ -206,10 +212,16 @@ const formatPages = ['/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewe
 const conversionPages = ['/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv']
 // Tools for several formats: last in the header's Convert menu, under Home only in the breadcrumb.
 const toolPages = ['/mask-data']
-const landingPages = ['/json-formatter', '/json-validator', '/json-escape-unescape', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
+// The JSON viewer's landing pages, each opening the viewer in its own mode (jsonPageModes in JsonViewer.tsx).
+const jsonLandingPages = ['/json-formatter', '/json-validator', '/json-escape', '/json-minify', '/json-sort', '/json-tree-viewer', '/json-graph', '/json-compare', '/json-schema', '/jsonpath', '/json-to-yaml', '/yaml-to-json', '/json-to-xml', '/xml-to-json', '/json-to-typescript', '/json-to-python', '/json-to-go', '/json-to-java', '/json-to-csharp']
+// The CSV viewer's landing pages: other formats read as a table, and the viewer opened on one job (csvPageModes in CsvViewer.tsx).
+const csvLandingPages = ['/xml-to-csv', '/yaml-to-csv', '/html-table-to-csv', '/sql-to-csv', '/csv-validator', '/split-csv', '/sql-on-csv', '/pivot-table', '/chart-maker', '/remove-duplicates', '/transpose', '/change-case']
+const landingPages = [...jsonLandingPages, ...csvLandingPages, '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', ...conversionPages, ...toolPages]
+// The CSV and Excel to SQL, XML, YAML, Markdown, HTML, LaTeX and fixed-width pages (src/tools/data/TableToText.tsx).
+const tableTextPages = ['csv', 'excel'].flatMap((source) => ['sql', 'xml', 'yaml', 'markdown', 'html', 'latex', 'fixed-width'].map((format) => `/${source}-to-${format}`))
 // Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
-const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/crop-pdf', '/redact-pdf', '/compare-pdf', '/pdf-to-markdown', '/repair-pdf', '/scan-to-pdf', '/pdf-forms', '/protect-pdf', '/unlock-pdf', '/pdf-to-word', '/pdf-to-excel', '/pdf-to-powerpoint', '/word-to-pdf', '/excel-to-pdf', '/ocr-pdf', '/translate-pdf', '/blur-face', '/remove-background', '/upscale-image', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator']
-const hubPages = ['/pdf-tools', '/image-tools', '/data-tools', '/office-tools', '/all-tools']
+const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/crop-pdf', '/redact-pdf', '/compare-pdf', '/pdf-to-markdown', '/repair-pdf', '/scan-to-pdf', '/pdf-forms', '/protect-pdf', '/unlock-pdf', '/pdf-to-word', '/pdf-to-excel', '/pdf-to-powerpoint', '/word-to-pdf', '/excel-to-pdf', '/ocr-pdf', '/translate-pdf', '/blur-face', '/remove-background', '/upscale-image', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator', '/xml-viewer', '/yaml-formatter', '/base64-encode-decode', '/url-encode-decode', '/jwt-decoder', ...tableTextPages, '/merge-csv', '/compare-csv', '/change-csv-encoding', '/change-csv-delimiter', '/test-data-generator', '/word-to-markdown', '/pptx-to-markdown', '/token-counter', '/json-to-toon']
+const hubPages = ['/pdf-tools', '/image-tools', '/data-tools', '/office-tools', '/ai-tools', '/all-tools']
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
 fs.writeFileSync(sampleJson, '{"a":1,"b":[1,2,3]}')
@@ -547,7 +559,7 @@ await test('security headers: HSTS, the inline theme script allowed by its hash 
   expect((await evaluate(`document.documentElement.style.getPropertyValue('--ext-pill-1')`)) !== '', 'the inline theme script did not run (blocked by the CSP?)')
 })
 
-const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload']
+const guidePagesList = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload', '/open-txt-file', '/open-csv-without-excel', '/open-pptx-without-powerpoint', '/open-pdf-without-adobe', '/fix-arabic-text-copied-from-pdf', '/cant-edit-text-in-pdf', '/fill-pdf-form-without-acrobat', '/stirling-pdf-alternative', '/jsonformatter-alternative', '/pdf-to-ai-chat-with-tables', '/how-many-tokens-is-my-pdf', '/word-document-to-ai-chat', '/powerpoint-to-ai-chat', '/spreadsheet-to-ai-chat', '/make-markdown-table-from-csv', '/what-is-toon-format', '/how-to-merge-pdf-files', '/how-to-split-a-pdf', '/photos-to-one-pdf', '/password-protect-pdf-free', '/make-scanned-pdf-searchable', '/reduce-photo-file-size', '/open-heic-on-windows', '/remove-location-from-photo', '/remove-background-without-upload', '/convert-excel-to-json-for-api']
 const contentPages = ['', ...formatPages, ...landingPages, ...registryToolPages, ...hubPages, '/about', '/privacy', '/terms', '/guides', ...guidePagesList, '/changelog']
 
 await test('every page: hreflang en, ar and x-default match the canonical addresses, lang and dir are right, no link ends with a slash', async () => {
@@ -612,10 +624,10 @@ await test('every JSON-LD block is valid data with the fields search engines nee
       const canonical = /<link rel="canonical" href="([^"]+)"/.exec(html)?.[1]
       const blocks = [...html.matchAll(/<script type="application\/ld\+json">([^<]+)<\/script>/g)].map((match) => JSON.parse(match[1]))
       const types = blocks.flatMap((block) => [block['@type']].flat())
-      const expectedTypes = { '': ['WebSite', 'Organization', 'SoftwareApplication', 'FAQPage'], '/about': ['ProfilePage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['CollectionPage', 'BreadcrumbList'], '/changelog': ['BreadcrumbList'], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])), ...Object.fromEntries(registryToolPages.map((tool) => [tool, ['WebApplication', 'FAQPage', 'BreadcrumbList']])), ...Object.fromEntries(hubPages.map((hub) => [hub, ['CollectionPage', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
+      const expectedTypes = { '': ['WebSite', 'Organization', 'SoftwareApplication', 'FAQPage'], '/about': ['AboutPage', 'BreadcrumbList'], '/privacy': [], '/terms': [], '/guides': ['CollectionPage', 'BreadcrumbList'], '/changelog': ['BreadcrumbList'], ...Object.fromEntries(guidePagesList.map((guide) => [guide, ['Article', 'BreadcrumbList']])), ...Object.fromEntries(registryToolPages.map((tool) => [tool, ['WebApplication', 'FAQPage', 'BreadcrumbList']])), ...Object.fromEntries(hubPages.map((hub) => [hub, ['CollectionPage', 'BreadcrumbList']])) }[page] ?? ['SoftwareApplication', 'FAQPage', 'BreadcrumbList']
       expect(expectedTypes.every((type) => types.includes(type)), `${address}: has ${types.join(', ')}, expected ${expectedTypes.join(', ')}`)
       // Every reference to the organisation or website points at the one id the home page defines.
-      const entityIds = ['https://www.openanydoc.com/#organization', 'https://www.openanydoc.com/#website', 'https://www.openanydoc.com/#founder']
+      const entityIds = ['https://www.openanydoc.com/#organization', 'https://www.openanydoc.com/#website']
       // No rating or review markup: there are no real reviews on the page.
       expect(!/"(aggregateRating|review)"/.test(JSON.stringify(blocks)), `${address}: rating or review markup must not be published`)
       const references = [...JSON.stringify(blocks).matchAll(/"@id":"([^"]+)"/g)].map((match) => match[1])
@@ -630,7 +642,8 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           expect(JSON.stringify(block.alternateName) === JSON.stringify(['Open Any Doc', 'OpenAnyDoc.com']), problem('alternateName is wrong'))
         } else if (type === 'Organization') {
           expect(block.name === 'OpenAnyDoc' && block.url === 'https://www.openanydoc.com', problem('name or url is wrong'))
-          expect(block.founder?.['@type'] === 'Person' && block.founder['@id'] === entityIds[2] && block.founder.name === 'Shahzad Ali' && block.email === 'support@openanydoc.com', problem('founder or email is wrong'))
+          // The site is presented as the brand only: no person is named anywhere in its data.
+          expect(!('founder' in block) && block.email === 'support@openanydoc.com', problem('a founder is named or the email is wrong'))
           expect(block.sameAs.includes('https://www.saashub.com/openanydoc'), problem('sameAs lacks the SaaSHub listing'))
           expect(Array.isArray(block.sameAs) && block.sameAs.every((profile) => /^https:\/\//.test(profile)), problem('sameAs must list the public profiles as absolute URLs'))
           expect(socialProfileUrls.every((profileUrl) => block.sameAs.includes(profileUrl)), problem('sameAs lacks a social profile'))
@@ -657,7 +670,7 @@ await test('every JSON-LD block is valid data with the fields search engines nee
           }
         } else if (type === 'Article') {
           expect(block.headline?.length > 0 && isAbsoluteUrl(block.image) && /^\d{4}-\d{2}-\d{2}T00:00:00\+00:00$/.test(block.datePublished) && /^\d{4}-\d{2}-\d{2}T/.test(block.dateModified), problem('headline, image or dates are wrong'))
-          expect(block.author?.['@type'] === 'Person' && block.author['@id'] === entityIds[2] && block.author.name?.length > 0 && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
+          expect(block.author?.['@type'] === 'Organization' && block.author['@id'] === entityIds[0] && block.author.name === 'OpenAnyDoc' && isAbsoluteUrl(block.author.url) && block.mainEntityOfPage === canonical, problem('author or mainEntityOfPage is wrong'))
         } else if (type === 'CollectionPage') {
           const items = block.mainEntity?.itemListElement ?? []
           if (page === '/guides') {
@@ -668,8 +681,8 @@ await test('every JSON-LD block is valid data with the fields search engines nee
             expect(block.url === canonical && block.mainEntity?.['@type'] === 'ItemList' && items.length > 0, problem('url is wrong or the hub lists no tools'))
             items.forEach((item, index) => expect(item.position === index + 1 && item.name?.length > 0 && item.url?.startsWith(`https://www.openanydoc.com/${locale}/`), problem(`item ${index + 1} needs position, name and a page address`)))
           }
-        } else if (type === 'ProfilePage') {
-          expect(block.mainEntity?.['@type'] === 'Person' && block.mainEntity['@id'] === entityIds[2] && block.mainEntity.name === 'Shahzad Ali' && block.url === canonical, problem('mainEntity or url is wrong'))
+        } else if (type === 'AboutPage') {
+          expect(block.mainEntity?.['@id'] === entityIds[0] && block.url === canonical, problem('mainEntity or url is wrong'))
         } else if (type === 'BreadcrumbList') {
           const items = block.itemListElement ?? []
           expect(items.length >= 2, problem('fewer than two items'))
@@ -794,7 +807,7 @@ await test('the footer has About, Privacy and Terms links and the Microsoft disc
     expect(html.includes('id="footer-disclaimer"') && html.includes(`id="footer-link-privacy" href="/${locale}/privacy"`), `${locale}: the static changelog has no footer`)
   }
   await openPage('/en')
-  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === ${formatPages.length} && document.querySelector('#footer-more #footer-link-json-formatter') !== null`), 'the footer should show a glyph per viewer and the landing pages under More file tools')
+  expect(await evaluate(`document.querySelectorAll('#footer-viewers li svg').length === ${formatPages.length} && document.querySelector('#footer-more #footer-link-data-tools') !== null`), 'the footer should show a glyph per viewer and the data tools hub under More file tools')
   await openPage('/ar')
   const arabicFooterFits = await evaluate(`(() => {
     const width = document.documentElement.clientWidth
@@ -1307,7 +1320,8 @@ await test('the header nav, related tools, footer and home links point at built 
       const footerLinks = linksIn(html, '<footer id="site-footer"', '</footer>')
       // The social logos have no text, so linksIn skips them: each needs its address and a spoken name.
       for (const profileUrl of socialProfileUrls) expect(new RegExp(`<a [^>]*href="${profileUrl}"[^>]*aria-label="OpenAnyDoc [^"]+"`).test(html), `${address}: the footer lacks the ${profileUrl} logo link`)
-      expect(landingPages.every((landingPage) => landingPage === page || footerLinks.some((link) => link.href === `/${locale}${landingPage}`)), `${address}: the footer lacks a landing page`)
+      // The landing pages are listed by the data tools hub, which every footer links.
+      expect(page === '/data-tools' || footerLinks.some((link) => link.href === `/${locale}/data-tools`), `${address}: the footer lacks the data tools hub`)
       for (const link of [...(relatedLinks ?? []), ...footerLinks]) {
         // The footer's Contact link (mailto:) and the brand's social profiles are the only links that are not pages.
         expect(link.href.startsWith('mailto:') || socialProfileUrls.includes(link.href) || builtPage(link.href), `${address}: ${link.href} is not a built page`)
@@ -1319,7 +1333,7 @@ await test('the header nav, related tools, footer and home links point at built 
   }
   for (const locale of ['en', 'ar']) {
     const html = await (await fetch(`${siteOrigin}/${locale}`)).text()
-    for (const landingPage of landingPages) expect(html.includes(`id="landing-link-${landingPage.slice(1)}" href="/${locale}${landingPage}"`), `/${locale}: the home page does not link ${landingPage}`)
+    for (const hubPath of ['/data-tools', '/pdf-tools', '/image-tools', '/all-tools']) expect(html.includes(`id="hub-link-${hubPath.slice(1)}" href="/${locale}${hubPath}"`), `/${locale}: the home page does not link ${hubPath}`)
   }
 })
 
@@ -1839,9 +1853,11 @@ await test('the CSV, JSON and Excel viewers open Mask data in a drawer over the 
   })
 })
 
-// The tool pages say the site works without a network once loaded: each page fetches its viewer while idle (App.tsx).
+// The tool pages say the site works without a network once loaded: each page fetches its viewer while idle (App.tsx). The service
+// worker is bypassed here (network emulation does not reach it), so this checks the browser cache; the next test checks the worker.
 const goOffline = (offline) => send('Network.emulateNetworkConditions', { offline, latency: 0, downloadThroughput: -1, uploadThroughput: -1 })
 await test('once a tool page is idle, its file opens with no network; code that cannot load shows a reload message, not a blank page', async () => {
+  await send('Network.setBypassServiceWorker', { bypass: true })
   const offlineCases = [
     ['/en/csv-viewer', sampleCsv, `document.querySelector('#csv-workbench #data-table tbody td')`],
     ['/en/json-viewer', sampleJson, `document.querySelector('#json-workbench .file-tab')?.innerText === 'sample.json' && !document.querySelector('#json-workbench [role="alert"]')`],
@@ -1869,12 +1885,38 @@ await test('once a tool page is idle, its file opens with no network; code that 
     await waitFor(`document.querySelector('#load-failed-message') && document.querySelector('#reload-page-button')`, 'the reload message')
   } finally {
     await goOffline(false)
+    await send('Network.setBypassServiceWorker', { bypass: false })
   }
+})
+
+// The installable app (src/pwa.ts, src/sw.ts): both manifests list every format of src/viewers.ts, every page links its language's
+// manifest, and once a tool page is idle the service worker holds the page and its viewer and the footer says so.
+await test('the app installs, opens every format from the desktop, and keeps a visited tool page for offline use', async () => {
+  // The extension lists of src/viewers.ts (this script runs without TypeScript): the only strings there that start with a dot.
+  const viewersSource = fs.readFileSync(path.join(projectRoot, 'src', 'viewers.ts'), 'utf8').match(/^export const viewers[\s\S]*?^\]/m)[0]
+  const registryExtensions = [...viewersSource.matchAll(/'(\.[a-z0-9]+)'/g)].map((match) => match[1])
+  for (const locale of ['en', 'ar']) {
+    const manifest = JSON.parse(fs.readFileSync(path.join(distFolder, `manifest.${locale}.webmanifest`), 'utf8'))
+    const handledExtensions = manifest.file_handlers.flatMap((handler) => Object.values(handler.accept).flat())
+    const missingExtensions = registryExtensions.filter((extension) => !handledExtensions.includes(extension))
+    expect(missingExtensions.length === 0, `manifest.${locale}.webmanifest does not open ${missingExtensions.join(', ')}`)
+    expect(manifest.start_url === `/${locale}` && manifest.share_target?.action === `/${locale}/share`, `manifest.${locale}.webmanifest: wrong start_url or share_target`)
+    expect(fs.readFileSync(path.join(distFolder, locale, 'csv-viewer', 'index.html'), 'utf8').includes(`<link rel="manifest" href="/manifest.${locale}.webmanifest"`), `/${locale}/csv-viewer has no manifest link`)
+  }
+  await openPage('/en/csv-viewer')
+  await waitFor(`document.querySelector('#offline-ready')`, 'the Available offline line', 20000)
+  const cachedViewer = await evaluate(`caches.keys().then(async (cacheNames) => {
+    const pageCached = await caches.match('/en/csv-viewer')
+    const viewerScripts = performance.getEntriesByType('resource').map((entry) => entry.name).filter((url) => /\/assets\/CsvViewer-/.test(url))
+    return Boolean(pageCached) && viewerScripts.length > 0 && Boolean(await caches.match(viewerScripts[0])) && cacheNames.includes('tool-libraries')
+  })`)
+  expect(cachedViewer, 'the service worker did not keep /en/csv-viewer and its viewer')
 })
 
 // ---------------------------------------------------------------- first screen of the tool pages (Step 17C)
 
-const formatPagesWithSamples = ['/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', '/image-viewer', ...landingPages]
+// The test data generator needs no file, so it has no drop zone or samples.
+const formatPagesWithSamples = ['/xml-viewer', '/yaml-formatter', '/base64-encode-decode', '/url-encode-decode', '/jwt-decoder', ...tableTextPages, '/merge-csv', '/compare-csv', '/change-csv-encoding', '/change-csv-delimiter', '/word-to-markdown', '/pptx-to-markdown', '/token-counter', '/json-to-toon', '/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', '/image-viewer', ...landingPages]
 
 await test('every tool page shows its choose button and two sample files on the first screen of a 375 x 667 phone, in both languages', async () => {
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true })

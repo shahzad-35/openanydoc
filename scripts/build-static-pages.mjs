@@ -15,8 +15,8 @@ import { faqItems } from '../src/content.ts'
 import { guidePages } from '../src/guides.ts'
 import { CONTACT_EMAIL, infoPages } from '../src/legalContent.ts'
 import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SEARCH_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, headerRowBreak, changelogClasses, changelogIds, footerClasses, legalFooterLinks, navClasses, searchBoxFormats } from '../src/pages/changelogMarkup.ts'
-import { ALL_PROFILE_URLS, AUTHOR_NAME, REPOSITORY_URL, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, setToolPageWords, openGraphLocales, pageSeo } from '../src/seo.ts'
-import { findBreadcrumbParent, findViewerByToolPath, landingPages, viewers } from '../src/viewers.ts'
+import { ALL_PROFILE_URLS, AUTHOR_NAME, SITE_DESCRIPTION, SITE_NAME, SOCIAL_PROFILES, X_HANDLE, SITE_ORIGIN, getShareImage, setToolPageWords, openGraphLocales, pageSeo } from '../src/seo.ts'
+import { findBreadcrumbParent, findViewerByToolPath, landingPages, mimeTypeByExtension, viewers } from '../src/viewers.ts'
 import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage, hubs, liveHubs, liveTools, toolContent, toolPath } from '../src/tools/registry.ts'
 const projectRoot = path.join(path.dirname(fileURLToPath(import.meta.url)), '..')
 const distFolder = path.join(projectRoot, 'dist')
@@ -63,10 +63,7 @@ function renderChangelogFooter(locale) {
     .map((viewer) => item(link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))))
     .join('')
   const moreItems =
-    landingPages
-      .map((page) => item(link(`footer-link-${page.path.slice(1)}`, page.path, escapeHtml(pageSeo[locale][page.path].linkText))))
-      .join('') +
-    [ALL_TOOLS_PATH, '/pdf-tools', '/image-tools', '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
+    [ALL_TOOLS_PATH, '/data-tools', '/pdf-tools', '/image-tools', '/office-tools', '/ai-tools', '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
     item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =
     legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
@@ -207,9 +204,52 @@ fs.writeFileSync(
 // dist/index.html in a language. Only "/" needs /locale-redirect.js (it picks /en or /ar); a page with a language skips that
 // render-blocking request.
 function pageShell(locale, { keepLocaleRedirect = false } = {}) {
-  const page = indexHtml.replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`).replace(stylesheetTag[0], () => `<style>${stylesheetText}</style>`)
+  const page = indexHtml
+    .replace(/<html lang="en">/, `<html lang="${locale}" dir="${locale === 'ar' ? 'rtl' : 'ltr'}">`)
+    .replace(stylesheetTag[0], () => `<style>${stylesheetText}</style>`)
+    .replace('</head>', `  <link rel="manifest" href="/manifest.${locale}.webmanifest" />\n  </head>`)
   if (keepLocaleRedirect) return page
   return page.replace('<script src="/locale-redirect.js"></script>', preloadTags[locale])
+}
+
+// The installable app (src/pwa.ts, src/sw.ts), one manifest per language so the installed app starts in it. Every format of
+// src/viewers.ts opens from the desktop (file_handlers, Chrome and Edge) and can be shared to the app on Android (share_target);
+// the service worker answers the share, and both land on the home page, which sends the file to its viewer.
+const extensionsWithoutMimeType = viewers.flatMap((viewer) => viewer.extensions).filter((extension) => !mimeTypeByExtension[extension])
+if (extensionsWithoutMimeType.length) throw new Error(`mimeTypeByExtension in src/viewers.ts has no media type for ${extensionsWithoutMimeType.join(', ')}.`)
+function acceptedFileTypes(extensions) {
+  const accepted = {}
+  for (const extension of extensions) (accepted[mimeTypeByExtension[extension]] ??= []).push(extension)
+  return accepted
+}
+for (const locale of locales) {
+  const manifest = {
+    id: `/${locale}`,
+    name: SITE_NAME,
+    short_name: SITE_NAME,
+    description: translate(locale, 'footer.text'),
+    lang: locale,
+    dir: locale === 'ar' ? 'rtl' : 'ltr',
+    start_url: `/${locale}`,
+    scope: '/',
+    display: 'standalone',
+    theme_color: '#eef3fb',
+    background_color: '#eef3fb',
+    icons: [
+      { src: '/icons/icon-192.png', sizes: '192x192', type: 'image/png' },
+      { src: '/icons/icon-512.png', sizes: '512x512', type: 'image/png' },
+      { src: '/icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
+    ],
+    // XML has no viewer, so the home page would refuse it: it opens on the XML viewer page, which takes the launched file.
+    file_handlers: [...viewers.map((viewer) => ({ action: `/${locale}`, name: viewer.label, accept: acceptedFileTypes(viewer.extensions) })), { action: `/${locale}/xml-viewer`, name: 'XML', accept: acceptedFileTypes(['.xml']) }],
+    share_target: {
+      action: `/${locale}/share`,
+      method: 'POST',
+      enctype: 'multipart/form-data',
+      params: { files: [{ name: 'file', accept: [...new Set(viewers.flatMap((viewer) => viewer.extensions.map((extension) => mimeTypeByExtension[extension]))), ...viewers.flatMap((viewer) => viewer.extensions)] }] },
+    },
+  }
+  fs.writeFileSync(path.join(distFolder, `manifest.${locale}.webmanifest`), `${JSON.stringify(manifest, null, 2)}\n`)
 }
 
 // A real "not found" page in each language: Cloudflare serves the nearest 404.html with status 404 (wrangler.jsonc). It is static
@@ -242,14 +282,16 @@ fs.writeFileSync(path.join(distFolder, 'ar', '404.html'), renderNotFoundPage('ar
 // The site's entities, named once by @id so every page's data points at the same organisation and website.
 const organizationId = `${SITE_ORIGIN}/#organization`
 const websiteId = `${SITE_ORIGIN}/#website`
-// The founder, named once: the Organization's founder, the About page's person and every guide's author share this @id.
-const founderPerson = {
-  '@type': 'Person',
-  '@id': `${SITE_ORIGIN}/#founder`,
-  name: AUTHOR_NAME,
-  url: `${SITE_ORIGIN}/en/about`,
-  sameAs: [REPOSITORY_URL, SOCIAL_PROFILES.find((profile) => profile.id === 'linkedin').url],
-}
+// The site is presented as the brand only (no person): every guide's author and the About page's subject is the Organization.
+// A page's last content change is known only after every page is rendered (src/data/pageDates.json, below), so its JSON-LD carries
+// this mark, followed by a floor date for guides (their `updated`), and the dates are filled in once they are known.
+const PAGE_DATE_MARK = '__PAGE_DATE__'
+const organizationReference = { '@type': 'Organization', '@id': organizationId, name: AUTHOR_NAME, url: `${SITE_ORIGIN}/en/about` }
+
+// The day each page's content last changed (the sitemap's lastmod, worked out at the end of this script); read here too, so a
+// guide's Article dateModified is never older than its lastmod.
+const pageDatesFile = path.join(projectRoot, 'src', 'data', 'pageDates.json')
+const storedPageDates = fs.existsSync(pageDatesFile) ? JSON.parse(fs.readFileSync(pageDatesFile, 'utf8')) : {}
 
 const jsonLdScript = (data) => `<script type="application/ld+json">${JSON.stringify(data).replace(/</g, '\\u003c')}</script>`
 
@@ -306,7 +348,6 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
         email: CONTACT_EMAIL,
         contactPoint: { '@type': 'ContactPoint', contactType: 'customer support', email: CONTACT_EMAIL, availableLanguage: ['en', 'ar'] },
         foundingDate: '2026-10',
-        founder: founderPerson,
         sameAs: ALL_PROFILE_URLS,
       },
       // The product as a whole; its features are the tools it links to, by their page names.
@@ -347,10 +388,12 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
   if (address === '/about') {
     structuredData.push({
       '@context': 'https://schema.org',
-      '@type': 'ProfilePage',
+      '@type': 'AboutPage',
+      name: seo.title,
+      description: seo.description,
       url: pageUrl,
       inLanguage: locale,
-      mainEntity: { ...founderPerson, email: CONTACT_EMAIL, knowsAbout: ['CSV files', 'Excel workbooks', 'JSON', 'text encodings', 'Arabic and right-to-left text'] },
+      mainEntity: { '@id': organizationId },
       about: { '@id': organizationId },
       isPartOf: { '@id': websiteId },
     })
@@ -365,8 +408,8 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       description: seo.description,
       image: `${SITE_ORIGIN}${shareImage.path}`,
       datePublished: `${guidePage.published}T00:00:00+00:00`,
-      dateModified: `${guidePage.updated ?? guidePage.published}T00:00:00+00:00`,
-      author: founderPerson,
+      dateModified: `${PAGE_DATE_MARK}${guidePage.updated ?? guidePage.published}`,
+      author: organizationReference,
       publisher: { '@type': 'Organization', '@id': organizationId, name: SITE_NAME, logo: { '@type': 'ImageObject', url: `${SITE_ORIGIN}/logo.png` } },
       mainEntityOfPage: pageUrl,
       isPartOf: { '@id': websiteId },
@@ -390,6 +433,8 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: viewerFeatures ?? content.handles ?? content.features.map((feature) => feature.title),
+      ...(content.screenshot && { screenshot: `${SITE_ORIGIN}/screenshots/${locale}-${viewer.id}.webp` }),
+      dateModified: PAGE_DATE_MARK,
       isPartOf: { '@id': websiteId },
       publisher: { '@id': organizationId },
     })
@@ -501,8 +546,6 @@ const changelogLastChange = lastChangeDate(['src/data/changelog.json', 'src/page
 // The day each page's content last changed, kept with its content hash in src/data/pageDates.json; commit that file with the
 // change. A page whose hash differs from the stored one gets today's date; a page new to the file starts from its git date. So a
 // copy edit in a shared file (src/seo.ts) moves only the pages whose words changed, and a shallow clone keeps the real dates.
-const pageDatesFile = path.join(projectRoot, 'src', 'data', 'pageDates.json')
-const storedPageDates = fs.existsSync(pageDatesFile) ? JSON.parse(fs.readFileSync(pageDatesFile, 'utf8')) : {}
 const today = new Date().toISOString().slice(0, 10)
 const pageDates = {}
 const pagesWithNewDate = []
@@ -518,6 +561,13 @@ for (const locale of locales) {
     pageDates[localizedAddress] = { hash, date: stored ? today : lastChangeDate(pageSourceFiles(address)) }
     pagesWithNewDate.push(localizedAddress)
   }
+}
+for (const [localizedAddress, { date }] of Object.entries(pageDates)) {
+  const pageFile = path.join(distFolder, localizedAddress, 'index.html')
+  const page = fs.readFileSync(pageFile, 'utf8')
+  if (!page.includes(PAGE_DATE_MARK)) continue
+  const datedPage = page.replace(new RegExp(`${PAGE_DATE_MARK}(\\d{4}-\\d{2}-\\d{2})?`, 'g'), (mark, floorDate = '') => `${[floorDate, date].sort().at(-1)}T00:00:00+00:00`)
+  fs.writeFileSync(pageFile, datedPage)
 }
 if (pagesWithNewDate.length > 0) {
   fs.writeFileSync(pageDatesFile, `${JSON.stringify(pageDates, null, 2)}\n`)

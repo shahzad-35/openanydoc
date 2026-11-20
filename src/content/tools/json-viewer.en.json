@@ -147,11 +147,11 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Once the page and its JSON viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first."
+      "answer": "Yes. After your first visit, the page and its JSON viewer are kept on your device, so opening and editing files need no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
-      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+      "answer": "Yes. The source code is public on GitHub. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
     },
     {
       "question": "How do I format, beautify or pretty print JSON online?",
@@ -176,6 +176,18 @@
         "text": "Mask data",
         "path": "/mask-data"
       }
+    },
+    {
+      "question": "What program opens a .json file?",
+      "answer": "Any text editor opens a .json file: Notepad on Windows, TextEdit on a Mac, a code editor such as Visual Studio Code, or any web browser. To read it as a tree you can fold instead of one long line, open it in the OpenAnyDoc JSON viewer, which works in your browser and uploads nothing. More ways are in how to open a JSON file.",
+      "link": {
+        "text": "how to open a JSON file",
+        "path": "/open-json-file"
+      }
+    },
+    {
+      "question": "How do I open a JSON file on my phone?",
+      "answer": "A phone opens a .json file in its web browser or in a text-editor app, and on iPhone the Files app previews its text. For a readable tree, open it in OpenAnyDoc in your phone's browser: it shows Text, Tree and Inspector tabs, and the file is never uploaded."
     }
   ]
 }

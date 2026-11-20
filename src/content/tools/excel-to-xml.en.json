@@ -1,0 +1,84 @@
+{
+  "title": "Excel to XML Converter – Sheet Rows to XML | OpenAnyDoc",
+  "description": "Excel to XML converter: turn a sheet of an XLSX, XLS or ODS workbook into XML with one element per row, named after your headers. Free, no upload.",
+  "heading": "Excel to XML Converter",
+  "subtitle": "Pick a sheet and every row becomes an XML element named after your headers; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into XML in your browser: each row becomes a row element inside a root element, and each cell an element named after its column header. Rename the root and row elements to match the format you need, then copy the XML or download an .xml file. Special characters are escaped for you.",
+  "features": [
+    {
+      "title": "Your element names",
+      "text": "Rename the root and row elements; header cells become valid element names on their own."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to XML",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet is converted at once; choose another from the sheet list."
+    },
+    {
+      "title": "Name the elements",
+      "text": "Change the root element (rows) and the row element (row), and the XML updates."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the XML, or download it as an .xml file."
+    }
+  ],
+  "handlesTitle": "What the Excel to XML converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Shape: <rows><row><Name>Pen</Name>…</row></rows>, one row element per sheet row; empty rows are skipped.",
+    "Names: header cells are turned into valid XML element names, so a header such as Unit price still works.",
+    "Text: &, < and > in cells are escaped, so the XML stays well formed.",
+    "Values: each cell as Excel shows it, so formulas give their result and dates keep their displayed format.",
+    "Merged cells: the value goes to the first cell of the range; the others stay empty."
+  ],
+  "limits": [
+    "Every value is written as element text; no attributes and no schema are produced.",
+    "Formatting, charts and images are not carried over, and password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to XML: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the XML on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "What does the XML look like?",
+      "answer": "A root element holds one row element per sheet row, and each cell is an element named after its header: <rows><row><Name>Pen</Name><Price>2.50</Price></row></rows>."
+    },
+    {
+      "question": "What happens to headers with spaces or symbols?",
+      "answer": "XML element names cannot hold spaces or start with a digit, so each header cell is turned into a valid name automatically. The values themselves are not changed."
+    },
+    {
+      "question": "Can I change rows and row to other names?",
+      "answer": "Yes. Type new names for the root and row elements, for example products and product, and the XML updates at once."
+    },
+    {
+      "question": "Are formulas or formatting kept?",
+      "answer": "No. Each formula becomes the result Excel shows, and colours, fonts and borders are left out. XML here holds values only."
+    },
+    {
+      "question": "Is there a size limit?",
+      "answer": "The preview shows the first 5,000 lines. Copy and Download take the whole XML, however long it is."
+    },
+    {
+      "question": "How do I convert an Excel spreadsheet to XML?",
+      "answer": "Open the workbook in OpenAnyDoc's Excel to XML converter, pick the sheet, and copy the XML or download it as an .xml file. Each row becomes a row element and each cell an element named after its column header, all made in your browser without uploading the file."
+    }
+  ]
+}

@@ -1,71 +1,86 @@
 {
-  "title": "PDF to Markdown – Convert PDF to .md Online Free, No Upload",
-  "description": "Convert a PDF to Markdown in your browser: headings from larger text, lists from bullets and numbers, clean paragraphs, Arabic included. Free, no upload.",
+  "title": "PDF to Markdown – Convert PDF to .md, No Upload | OpenAnyDoc",
+  "description": "Convert a PDF to Markdown in your browser: headings, lists, paragraphs and simple tables, ready to paste into an AI chat. Free, nothing is uploaded.",
   "heading": "PDF to Markdown",
-  "subtitle": "Turn a PDF into a clean Markdown file with headings, lists and paragraphs; nothing is uploaded.",
-  "intro": "Convert PDF to Markdown online for notes, documentation, a wiki or an AI assistant: larger text becomes #, ## and ### headings, lines that start with a bullet or a number become lists, and lines of a paragraph are joined into one. Arabic text keeps its reading order. The file is read by your browser and never uploaded.",
+  "subtitle": "Turn a PDF into clean Markdown with headings, lists and tables to paste into an AI chat; no upload.",
+  "intro": "Convert a PDF to Markdown when you want to paste it into ChatGPT, Claude or Gemini, a wiki or your notes with its structure intact. The largest font sizes above the body text become #, ## and ### headings, lines that start with a bullet or a number become lists, the lines of a paragraph are joined into one, and rows of text spaced into columns become Markdown tables. Arabic text keeps its reading order. The result appears in a text box with its token count, ready to copy or download as .md, .txt or .html. The file is read by your browser and never uploaded, and nothing is sent to any AI service.",
   "features": [
     {
       "title": "Private",
-      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+      "text": "Your PDF is converted by your own browser and never sent to a server or to an AI service."
     },
     {
       "title": "Structure kept",
-      "text": "Headings, bulleted and numbered lists and paragraphs come out as Markdown, ready to paste."
+      "text": "Headings, bulleted and numbered lists, paragraphs and simple tables come out as Markdown, with the token count shown."
     },
     {
       "title": "Works offline",
       "text": "Once this page has loaded, the tool keeps working without an internet connection."
     }
   ],
-  "stepsTitle": "How to convert PDF to Markdown",
+  "stepsTitle": "How it works: convert PDF to Markdown",
   "steps": [
     {
-      "title": "Choose your PDF",
-      "text": "Click Choose a file, or drop a PDF on the page."
+      "title": "Open your PDF",
+      "text": "Choose or drop a PDF, or try a sample."
     },
     {
-      "title": "Convert",
-      "text": "Click Convert to Markdown."
+      "title": "Read the Markdown",
+      "text": "The Markdown appears in a text box, with its token count."
     },
     {
-      "title": "Check and download",
-      "text": "The preview shows the first lines; download the .md file."
+      "title": "Copy or download",
+      "text": "Click Copy to paste it into an AI chat or a note, or download it as .md, .txt or .html."
     }
   ],
   "handlesTitle": "What PDF to Markdown handles",
   "handles": [
-    "Headings: the three largest text sizes above the body text become #, ## and ###.",
-    "Lists: lines starting with •, -, * or 1. become list items.",
+    "Headings: the largest font sizes above the body text become #, ## and ###.",
+    "Lists: lines starting with •, -, * or 1. become bulleted or numbered list items.",
+    "Tables: three or more lines in a row with the same number of columns become a Markdown table.",
+    "Paragraphs: the lines of one paragraph are joined into one.",
+    "Downloads: .md, .txt or .html, with Copy for pasting.",
     "Arabic: words come out in reading order."
   ],
   "limits": [
-    "Tables come out as lines of text, not Markdown tables.",
-    "Pictures are left out; Extract images from PDF saves them.",
-    "Scanned PDFs hold pictures of pages, so there is no text to convert; that needs text recognition (OCR).",
-    "PDFs that need a password to open can't be read; remove the password first."
+    "Scanned PDFs hold pictures of pages and have no text; run OCR PDF first.",
+    "Complex tables with merged cells may come out as plain lines of text.",
+    "Pictures are left out; only the text is converted.",
+    "Pages in several columns may need a check of the reading order."
   ],
   "faqTitle": "PDF to Markdown: questions",
   "faq": [
     {
       "question": "Is my file uploaded?",
-      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+      "answer": "No. Your PDF is read and converted by your own browser, on your device, and is never sent anywhere. Nothing is sent to any AI service either: you choose where to paste the result."
     },
     {
       "question": "How are headings found?",
       "answer": "By size: text clearly larger than the body text becomes a heading, the largest size #, the next ## and the next ###."
     },
     {
-      "question": "Are tables and pictures kept?",
-      "answer": "Tables come out as lines of text, and pictures are left out. Extract images from PDF saves the pictures as PNG files.",
+      "question": "Are tables kept?",
+      "answer": "Simple ones are. When three or more lines in a row are spaced into the same number of columns, they become a Markdown table. Tables with merged cells may come out as plain lines."
+    },
+    {
+      "question": "Why does my PDF come out empty?",
+      "answer": "The PDF is probably scanned: its pages are pictures. OCR PDF adds a text layer, then you can convert it here.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
+    },
+    {
+      "question": "What about pictures in the PDF?",
+      "answer": "They are left out of the Markdown. Extract images from PDF saves them as separate files.",
       "link": {
         "text": "Extract images from PDF",
         "path": "/extract-pdf-images"
       }
     },
     {
-      "question": "Why is no text found?",
-      "answer": "The PDF is probably scanned: its pages are pictures. Getting text from them needs OCR, which this tool does not do."
+      "question": "Why is the text of a two-column page out of order?",
+      "answer": "Pages laid out in columns are read line by line, and some PDFs store their text in an order that mixes the columns. Check the reading order before you paste, and move the parts that are out of place."
     },
     {
       "question": "I only need plain text. Is there a simpler tool?",
@@ -76,8 +91,8 @@
       }
     },
     {
-      "question": "Is it really free?",
-      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+      "question": "How do I convert a PDF to Markdown?",
+      "answer": "Turn the PDF's text into Markdown, with headings, lists and tables marked, so it keeps its structure when pasted into an AI chat, a wiki or your notes. OpenAnyDoc's PDF to Markdown does it in your browser: open the PDF, then copy the Markdown or download it as .md; nothing is uploaded or sent to an AI service."
     }
   ]
 }

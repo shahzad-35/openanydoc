@@ -1,0 +1,83 @@
+{
+  "title": "Excel to Fixed-Width Text Converter – Free | OpenAnyDoc",
+  "description": "Excel to fixed-width text: turn a sheet of an XLSX, XLS or ODS workbook into plain text with aligned columns for emails, logs and terminals. No upload.",
+  "heading": "Excel to Fixed-Width Text Converter",
+  "subtitle": "Pick a sheet and get plain text with every column lined up; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into fixed-width plain text in your browser: each column is padded to its widest cell, columns are separated by a gap of 1 to 4 spaces, and the header is underlined with dashes. Paste it into an email, a code comment, a ticket or a terminal, or download a .txt file.",
+  "features": [
+    {
+      "title": "Lined up",
+      "text": "Each column is padded to its widest cell, and wide characters count as two, so columns stay straight."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to fixed-width text",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet becomes aligned text at once; choose another from the sheet list."
+    },
+    {
+      "title": "Set the gap",
+      "text": "Choose 1 to 4 spaces between columns, and the text updates."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the text, or download it as a .txt file."
+    }
+  ],
+  "handlesTitle": "What the Excel to fixed-width converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Layout: every column padded to its widest cell, with a gap of 1 to 4 spaces; empty rows are skipped.",
+    "Header: the first row, underlined with a line of dashes.",
+    "Wide characters: Chinese, Japanese and Korean characters count as two columns, as a monospaced font draws them.",
+    "Values: each cell as Excel shows it, so formulas give their result and dates and prices keep their format."
+  ],
+  "limits": [
+    "Columns line up only in a monospaced font, such as a terminal, code editor or plain-text email.",
+    "One very long cell makes its whole column that wide, and password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to fixed-width text: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the text on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "Why do the columns not line up where I pasted them?",
+      "answer": "Fixed-width text needs a monospaced font, where every character has the same width. In a proportional font, such as most email defaults, the columns drift."
+    },
+    {
+      "question": "How wide is each column?",
+      "answer": "As wide as its widest cell, header included, plus the gap you choose between columns: 1 to 4 spaces."
+    },
+    {
+      "question": "Do Chinese or Japanese characters break the alignment?",
+      "answer": "No. Wide characters are counted as two columns, as monospaced fonts draw them, so the next column still starts in the right place."
+    },
+    {
+      "question": "Can I turn it back into a spreadsheet?",
+      "answer": "Excel can split fixed-width text with Data > Text to Columns and the Fixed width option, using the gaps between columns."
+    },
+    {
+      "question": "Is a long sheet converted in full?",
+      "answer": "Yes. The preview shows the first 5,000 lines, but Copy and Download take the whole text."
+    },
+    {
+      "question": "How do I convert an Excel sheet to fixed-width text?",
+      "answer": "Open the workbook, pick the sheet and the gap between columns, then copy the aligned text or download it as a .txt file. OpenAnyDoc pads each column in your browser, so the workbook is never uploaded."
+    }
+  ]
+}

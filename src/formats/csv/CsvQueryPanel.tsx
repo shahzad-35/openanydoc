@@ -1,22 +1,51 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useT } from '../../i18n'
-import { buildCsvText } from '../conversion'
+import { buildCsvText, buildXlsxBlob, readNumberOrText } from '../conversion'
+import DataTable, { getRowNumberColumnWidthPx, measureColumnWidthsPx, useVisibleRowIds } from '../DataTable'
+import type { DataTableHandle, SortState } from '../DataTable'
 import { downloadTextFile } from '../registry'
 import type { SqlQueryRequest, SqlQueryResponse } from './sqlQuery.worker'
-// SQLite's WebAssembly (sql.js), bundled as a data: address (vite.config.ts inlines this one file), so it is decoded here and never
-// fetched; sent to the worker with the first table.
-import sqliteWasmDataUrl from 'sql.js/dist/sql-wasm-browser.wasm?url'
-
-// The built site gets a data: address and decodes it (no request). Only the dev server (npm run dev) gives a file address, and
-// there it is read from the dev server; that branch is removed from the build.
-async function readSqliteWasm(): Promise<ArrayBuffer> {
-  if (import.meta.env.DEV && !sqliteWasmDataUrl.startsWith('data:')) return (await fetch(sqliteWasmDataUrl)).arrayBuffer()
-  return Uint8Array.from(atob(sqliteWasmDataUrl.slice(sqliteWasmDataUrl.indexOf(',') + 1)), (character) => character.charCodeAt(0)).buffer
-}
-
-const MAX_SHOWN_RESULT_ROWS = 200
-
+import { readSqliteWasm } from './sqliteWasm'
 type QueryResult = { columns: string[]; rows: string[][] }
+
+// The result in the shared table (read-only, sortable by its headers, every row: the table draws only the rows on screen). Its
+// ids carry "query-" so they never clash with the viewer's own grid.
+function QueryResultTable({ result }: { result: QueryResult }) {
+  const tableRef = useRef<DataTableHandle>(null)
+  const [sort, setSort] = useState<SortState>(null)
+  const columnIds = useMemo(() => result.columns.map((_, position) => position), [result])
+  const rowIds = useMemo(() => result.rows.map((_, position) => position), [result])
+  const readText = (rowId: number, columnId: number) => result.rows[rowId]?.[columnId] ?? ''
+  const visibleRowIds = useVisibleRowIds({ rowIds, columnIds, searchText: '', sort, readText, dataKey: result })
+  const columnWidthsPx = useMemo(() => measureColumnWidthsPx(columnIds, result.columns, 0, result.rows.length, (rowId, columnId) => result.rows[rowId]?.[columnId] ?? ''), [columnIds, result])
+  return (
+    <div className="query-result" dir="ltr">
+      <DataTable
+        tableRef={tableRef}
+        idPrefix="query-"
+        label="SQL"
+        columnIds={columnIds}
+        columnNames={result.columns}
+        columnWidthsPx={columnWidthsPx}
+        rowNumberWidthPx={getRowNumberColumnWidthPx(result.rows.length)}
+        rowIds={visibleRowIds}
+        getCellText={readText}
+        getOriginalText={readText}
+        dataKey={result}
+        isCellEdited={() => false}
+        showColumnLetters={false}
+        selectedCell={null}
+        sort={sort}
+        onCycleSort={(columnId) => setSort((currentSort) => (currentSort?.columnId !== columnId ? { columnId, direction: 'asc' } : currentSort.direction === 'asc' ? { columnId, direction: 'desc' } : null))}
+        isEditable={false}
+        onCellClick={() => {}}
+        onCellDoubleClick={() => {}}
+        onKeyDown={() => {}}
+        emptyMessage={null}
+      />
+    </div>
+  )
+}
 
 // The CSV page's query mode: SQL on the open table, run by SQLite in a worker (sqlQuery.worker.ts). The table goes to the worker
 // on the first run and again whenever it changed (`tableKey`). Loaded when its panel opens; a future "Query CSV with SQL" page can
@@ -80,10 +109,15 @@ export default function CsvQueryPanel({ tableKey, readTable, isNumberColumn, def
     }
   }
 
-  function downloadResult() {
+  async function downloadResult(format: 'csv' | 'xlsx') {
     if (!result) return
     const baseName = fileName.replace(/\.[^.]+$/, '')
-    downloadTextFile(`${baseName}-query.csv`, buildCsvText([result.columns, ...result.rows], ',', true), 'text/csv')
+    if (format === 'csv') {
+      downloadTextFile(`${baseName}-query.csv`, buildCsvText([result.columns, ...result.rows], ',', true), 'text/csv')
+      return
+    }
+    const typedRows = result.rows.map((row) => row.map(readNumberOrText))
+    downloadTextFile(`${baseName}-query.xlsx`, await buildXlsxBlob([{ sheetName: 'query', rows: [result.columns, ...typedRows] }]), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
   }
 
   return (
@@ -115,8 +149,11 @@ export default function CsvQueryPanel({ tableKey, readTable, isNumberColumn, def
           <button className="btn sm primary" id="query-run-button" type="button" disabled={isRunning || sql.trim() === ''} onClick={() => void runQuery()}>
             {isRunning ? t('csv.query.running') : t('csv.query.run')}
           </button>
-          <button className="btn sm outline" id="query-download-button" type="button" disabled={!result || result.columns.length === 0} onClick={downloadResult}>
+          <button className="btn sm outline" id="query-download-button" type="button" disabled={!result || result.columns.length === 0} onClick={() => void downloadResult('csv')}>
             {t('csv.query.download')}
+          </button>
+          <button className="btn sm outline" id="query-download-excel-button" type="button" disabled={!result || result.columns.length === 0} onClick={() => void downloadResult('xlsx')}>
+            {t('csv.query.downloadExcel')}
           </button>
         </div>
         <div className="small-note" style={{ marginTop: 8 }}>
@@ -132,30 +169,9 @@ export default function CsvQueryPanel({ tableKey, readTable, isNumberColumn, def
         {result && !errorMessage && (
           <>
             <div className="small-note" id="query-result-count">
-              {t('csv.query.resultCount', { rows: result.rows.length, shown: Math.min(result.rows.length, MAX_SHOWN_RESULT_ROWS) })}
+              {t('csv.query.rowCount', { rows: result.rows.length })}
             </div>
-            <div className="query-result" dir="ltr">
-              <table id="query-result-table">
-                <thead>
-                  <tr>
-                    {result.columns.map((column, position) => (
-                      <th key={position}>{column}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {result.rows.slice(0, MAX_SHOWN_RESULT_ROWS).map((row, rowPosition) => (
-                    <tr key={rowPosition}>
-                      {row.map((cell, position) => (
-                        <td key={position} dir="auto">
-                          {cell}
-                        </td>
-                      ))}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            <QueryResultTable result={result} />
           </>
         )}
       </div>

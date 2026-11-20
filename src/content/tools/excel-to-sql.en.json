@@ -1,0 +1,85 @@
+{
+  "title": "Excel to SQL Converter – INSERT Statements | OpenAnyDoc",
+  "description": "Excel to SQL converter: turn a sheet of an XLSX, XLS or ODS workbook into CREATE TABLE and INSERT statements in your browser. Nothing is uploaded.",
+  "heading": "Excel to SQL Converter",
+  "subtitle": "Pick a sheet and get a CREATE TABLE plus one INSERT per row, ready to run; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into SQL in your browser: choose a workbook, pick the sheet, and get a CREATE TABLE statement followed by one INSERT per row. The table name starts as the sheet name and you can change it. A column that holds only numbers becomes REAL, and text is quoted safely. Copy the script or download a .sql file.",
+  "features": [
+    {
+      "title": "Ready for your database",
+      "text": "Names are in double quotes, standard SQL that PostgreSQL runs as it is."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to SQL",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet is converted at once. Choose another from the sheet list; one sheet becomes one table."
+    },
+    {
+      "title": "Name the table",
+      "text": "The table name starts as the sheet name. Type another and the SQL updates as you type."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the whole script, or download it as a .sql file to run in your database."
+    }
+  ],
+  "handlesTitle": "What the Excel to SQL converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Statements: one CREATE TABLE, then one INSERT per row; empty rows are skipped.",
+    "Types: a column whose filled cells are all numbers becomes REAL with unquoted values, and an empty cell in it becomes NULL.",
+    "Text: wrapped in single quotes, with any ' inside doubled, so names like O'Brien stay intact.",
+    "Values: each cell as Excel shows it, so formulas give their result and dates keep their displayed format.",
+    "Merged cells: the value goes to the first cell of the range; the others stay empty."
+  ],
+  "limits": [
+    "Names are in double quotes, which MySQL reads only with the ANSI_QUOTES mode on.",
+    "Dates are written as the text Excel shows, not as DATE values.",
+    "Password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to SQL: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the SQL on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "Which databases can run the SQL?",
+      "answer": "PostgreSQL runs it as it is. Table and column names are in double quotes, as standard SQL writes them; in MySQL turn on the ANSI_QUOTES SQL mode first."
+    },
+    {
+      "question": "How are the column types chosen?",
+      "answer": "A column whose filled cells are all numbers becomes REAL, its values are written without quotes and its empty cells become NULL. Any other column keeps its values as quoted text."
+    },
+    {
+      "question": "Are formulas copied into the SQL?",
+      "answer": "No. Each cell gives the value Excel shows, so a formula becomes its result. Keep the workbook if you still need the formulas."
+    },
+    {
+      "question": "How do I turn several sheets into several tables?",
+      "answer": "Convert one sheet at a time: pick a sheet, copy or download its SQL, then pick the next. Each sheet name gives its own table name."
+    },
+    {
+      "question": "Why does the preview stop partway through?",
+      "answer": "The preview shows the first 5,000 lines to stay fast. Copy and Download always take the whole script."
+    },
+    {
+      "question": "How do I convert an Excel file to SQL INSERT statements?",
+      "answer": "Open the workbook in OpenAnyDoc's Excel to SQL converter, pick the sheet, and copy the INSERT statements or download them as a .sql file. One sheet becomes one table named after the sheet, and the workbook is read in your browser without being uploaded."
+    }
+  ]
+}

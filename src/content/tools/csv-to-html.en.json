@@ -1,0 +1,40 @@
+{
+  "title": "CSV to HTML Table Converter – Free, Private | OpenAnyDoc",
+  "description": "Convert CSV to an HTML table with thead and tbody: a full UTF-8 page that opens in any browser, or just the table to paste into your site. No upload.",
+  "heading": "CSV to HTML Table",
+  "subtitle": "Drop a CSV and get an HTML table at once: a full page or just the table, ready to copy or download.",
+  "intro": "Publish a spreadsheet on a web page, in an email template or in a CMS without hand-writing table tags. Choose, drop or paste a CSV or TSV file and the HTML appears at once: a <table> with the header row in <thead> and the data in <tbody>. Pick Full page for a complete UTF-8 HTML file that opens in any browser, with each cell set to dir=\"auto\" so Arabic reads right to left, or Table only to paste the <table> into a page you already have. Text is escaped, so <, > and & in your data show as written. The file is read in your browser and never uploaded.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is turned into HTML by your own browser and never sent to a server." },
+    { "title": "Full page or table only", "text": "Download a standalone page that opens in any browser, or copy just the <table> for your own site or template." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to an HTML table",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample." },
+    { "title": "Choose the output", "text": "Full page writes a complete HTML file; Table only writes just the <table> element." },
+    { "title": "Copy or download", "text": "Copy the HTML to your clipboard or download it as a .html file with the CSV's name." }
+  ],
+  "handlesTitle": "What the CSV to HTML converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, written as a UTF-8 page.",
+    "Structure: <table> with the header row in <thead> and every other row in <tbody>.",
+    "Arabic and mixed text: in a full page each cell has dir=\"auto\", so each cell reads in its own direction.",
+    "Escaping: <, > and & in cells are written as entities, so data is never read as markup."
+  ],
+  "limits": [
+    "The table carries no styling; add your own CSS for borders, colours and widths.",
+    "The preview shows the first 5,000 lines; Copy and Download always take the whole HTML."
+  ],
+  "faqTitle": "CSV to HTML: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your browser reads the CSV and writes the HTML on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "What is the difference between Full page and Table only?", "answer": "Full page writes a complete HTML file with a UTF-8 declaration that you can open in a browser on its own. Table only writes just the <table>…</table> to paste into an existing page, a CMS or an email template." },
+    { "question": "Will Arabic text display correctly?", "answer": "Yes. The page is UTF-8 and, in Full page, each cell has dir=\"auto\", so Arabic cells read right to left while English and number cells stay left to right." },
+    { "question": "Is it safe if my data contains < or & characters?", "answer": "Yes. Those characters are escaped, so a cell such as <b>5 & 6</b> shows as that text instead of being read as HTML." },
+    { "question": "Why does the table look plain?", "answer": "The converter writes clean table markup with no styling, so it fits your site's look. Add CSS for borders, padding and colours." },
+    { "question": "Can I view the CSV as a table without converting?", "answer": "Yes. The CSV viewer opens the file as a sortable, searchable table in your browser.", "link": { "text": "CSV viewer", "path": "/csv-viewer" } },
+    { "question": "How do I convert a CSV file to an HTML table?", "answer": "Open or paste the CSV, choose Full page or Table only, then copy the HTML or download it as a .html file. OpenAnyDoc writes the table in your browser, so the data is never uploaded." }
+  ]
+}

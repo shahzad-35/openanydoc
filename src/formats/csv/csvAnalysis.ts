@@ -254,6 +254,49 @@ export function groupRows(
     .sort((first, second) => second.value - first.value)
 }
 
+// A pivot table: one row per value of the row field, one column per value of the "across" field, each cell the count, sum or
+// average of the rows with both values (null where there are none). Groups in natural order (2 before 10), as Excel lists them.
+export type PivotTable = { rowGroups: string[]; columnGroups: string[]; cells: (number | null)[][] }
+
+export function pivotRows(
+  rowIds: readonly number[],
+  readRowGroup: (rowId: number) => string,
+  readColumnGroup: (rowId: number) => string,
+  readNumber: (rowId: number) => number | null,
+  aggregate: GroupAggregate,
+): PivotTable {
+  const totalsByCell = new Map<string, Map<string, { count: number; sum: number; numberCount: number }>>()
+  const columnGroupSet = new Set<string>()
+  for (const rowId of rowIds) {
+    const rowGroup = readRowGroup(rowId)
+    const columnGroup = readColumnGroup(rowId)
+    columnGroupSet.add(columnGroup)
+    const rowTotals = totalsByCell.get(rowGroup) ?? new Map()
+    const totals = rowTotals.get(columnGroup) ?? { count: 0, sum: 0, numberCount: 0 }
+    totals.count++
+    const number = aggregate === 'count' ? null : readNumber(rowId)
+    if (number !== null) {
+      totals.sum += number
+      totals.numberCount++
+    }
+    rowTotals.set(columnGroup, totals)
+    totalsByCell.set(rowGroup, rowTotals)
+  }
+  const naturalOrder = new Intl.Collator(undefined, { numeric: true, sensitivity: 'base' }).compare
+  const rowGroups = [...totalsByCell.keys()].sort(naturalOrder)
+  const columnGroups = [...columnGroupSet].sort(naturalOrder)
+  const cells = rowGroups.map((rowGroup) =>
+    columnGroups.map((columnGroup) => {
+      const totals = totalsByCell.get(rowGroup)?.get(columnGroup)
+      if (!totals) return null
+      if (aggregate === 'count') return totals.count
+      if (aggregate === 'sum') return totals.sum
+      return totals.numberCount ? totals.sum / totals.numberCount : null
+    }),
+  )
+  return { rowGroups, columnGroups, cells }
+}
+
 // A regular expression for find and replace, or null when the text is empty or the expression is not valid.
 export function buildFindPattern(findText: string, options: { matchCase: boolean; wholeCell: boolean; isRegularExpression: boolean }) {
   if (findText === '') return null

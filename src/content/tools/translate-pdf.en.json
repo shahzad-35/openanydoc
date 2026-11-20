@@ -79,7 +79,7 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Yes, after the first translation in each direction. The language model is loaded once from this site and kept by your browser."
+      "answer": "Yes, after the first translation in each direction. The language model is loaded once from this site and kept by your browser. Install OpenAnyDoc as an app (Install app, at the bottom of the page) to open it like any other program."
     },
     {
       "question": "Which languages can it translate?",
@@ -88,6 +88,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I translate a PDF from English to Arabic?",
+      "answer": "Translate a PDF by reading its text, translating it and writing it into an editable document, because Arabic text does not fit the boxes of an English PDF. In OpenAnyDoc, choose the PDF and the direction, and the text is translated on your device into a Word document you can correct; the file is never uploaded."
     }
   ]
 }

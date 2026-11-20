@@ -57,7 +57,7 @@
     },
     {
       "question": "How do I open a TSV file online?",
-      "answer": "Drop the .tsv file on this page or choose it with the button. It opens as a table in your browser, without Excel and without uploading it."
+      "answer": "A TSV file opens online in a browser-based TSV viewer, which shows it as a table without Excel and without uploading it. In OpenAnyDoc, drop the .tsv file on the page or choose it with the button, and it opens as a table in your browser."
     },
     {
       "question": "What is the difference between TSV and CSV?",
@@ -74,6 +74,10 @@
     {
       "question": "Does the TSV viewer handle large files?",
       "answer": "Yes. It uses the same table as the CSV viewer, where a 120,000-row file opened in under a second in our tests. Files over 50 MB show a warning first."
+    },
+    {
+      "question": "What program opens a .tsv file?",
+      "answer": "Excel, Google Sheets and LibreOffice Calc open a .tsv file as a table, and any text editor, such as Notepad on Windows or TextEdit on a Mac, shows it as plain text. OpenAnyDoc opens it as a table in your browser, on a computer or a phone, without installing anything or uploading the file."
     }
   ]
 }

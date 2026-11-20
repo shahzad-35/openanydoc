@@ -162,6 +162,27 @@ try {
   fs.writeFileSync(path.join(projectRoot, 'public/logo.png'), Buffer.from(logoData, 'base64'))
   console.log('public/logo.png')
 
+  // The installed app's icons (manifests written by scripts/build-static-pages.mjs) and the iPhone/iPad home-screen icon: the mark
+  // on the light page colour. The maskable one keeps the mark inside the middle 80%, which every icon shape leaves visible.
+  fs.mkdirSync(path.join(projectRoot, 'public/icons'), { recursive: true })
+  const appIcons = [
+    { file: 'public/icons/icon-192.png', size: 192, markShare: 0.86 },
+    { file: 'public/icons/icon-512.png', size: 512, markShare: 0.86 },
+    { file: 'public/icons/icon-maskable-512.png', size: 512, markShare: 0.62 },
+    { file: 'public/apple-touch-icon.png', size: 180, markShare: 0.8 },
+  ]
+  for (const { file, size, markShare } of appIcons) {
+    await send('Emulation.setDeviceMetricsOverride', { width: size, height: size, deviceScaleFactor: 1, mobile: false })
+    const markSize = Math.round(size * markShare)
+    const iconCardFile = path.join(scratchFolder, `${path.basename(file, '.png')}.html`)
+    fs.writeFileSync(iconCardFile, `<!doctype html><style>* { margin: 0; } body { width: ${size}px; height: ${size}px; display: grid; place-items: center; background: #eef3fb; } svg { display: block; width: ${markSize}px; height: ${markSize}px; }</style>${markSvg}`)
+    await send('Page.navigate', { url: pathToFileURL(iconCardFile).href })
+    await sleep(300)
+    const { data: iconData } = await send('Page.captureScreenshot', { format: 'png', clip: { x: 0, y: 0, width: size, height: size, scale: 1 } })
+    fs.writeFileSync(path.join(projectRoot, file), Buffer.from(iconData, 'base64'))
+    console.log(file)
+  }
+
   // LinkedIn: the profile logo (400 x 400, the mark on white) and the company page cover (1128 x 191). Written into the launch kit,
   // which is not committed. LinkedIn lays the logo over the cover's bottom left, so the cover keeps its content to the right.
   const linkedinFolder = path.join(projectRoot, '.claude/launch-kit/brand')

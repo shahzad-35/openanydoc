@@ -3,7 +3,7 @@
   "description": "Remove the password from a PDF you can open, or lift printing and copying restrictions, in your browser. Free, and nothing is uploaded.",
   "heading": "Unlock PDF",
   "subtitle": "Take the password off a PDF you know the password for, or lift its printing and copying restrictions; nothing is uploaded.",
-  "intro": "Remove a PDF password online when you know it and are tired of typing it: enter it once and the new copy opens without one. A PDF that opens freely but won't print or copy is unlocked without any password. The work is done by qpdf, a well-known PDF library, running in your browser; your file and password stay on your device. This tool does not guess or crack passwords.",
+  "intro": "Remove a PDF password online when you know it and are tired of typing it: enter it once and the new copy opens without one. A PDF that opens freely but won't print or copy is unlocked without any password. The work is done in your browser; your file and password stay on your device. This tool does not guess or crack passwords.",
   "features": [
     {
       "title": "Private",
@@ -73,6 +73,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I remove a password from a PDF?",
+      "answer": "Open the PDF with its password and save a copy without encryption; this needs the password, unless the PDF only restricts printing or copying. In OpenAnyDoc, choose the PDF, type its password once and download the unlocked copy; the work is done in your browser and the file is never uploaded."
     }
   ]
 }

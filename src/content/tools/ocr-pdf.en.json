@@ -79,6 +79,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I make a scanned PDF searchable?",
+      "answer": "Run text recognition (OCR) on it: the words in the page pictures are read and added as invisible text, so search and copy work. OpenAnyDoc's OCR PDF does this in your browser for English and Arabic: choose the PDF, pick the language, click Make searchable and download the copy, with nothing uploaded."
     }
   ]
 }

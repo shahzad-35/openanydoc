@@ -71,6 +71,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert an Excel file to PDF without Excel?",
+      "answer": "Open the .xlsx, .xls or .ods file, choose the sheets, page size and orientation, then click Convert to PDF and download it. OpenAnyDoc converts it in your browser, so neither Excel nor an upload is needed, and .xlsx colours and borders are kept."
     }
   ]
 }

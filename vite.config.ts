@@ -1,6 +1,7 @@
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import type { Plugin } from 'vite'
 
 // pdf.js joins a text run's glyphs, then reverses an Arabic run character by character to reading order. A glyph that stands for
@@ -78,7 +79,27 @@ function keepLibheifLicenceNotice(): Plugin {
 const inlinedWasmFiles = ['sql-wasm-browser.wasm', 'mozjpeg_enc.wasm', 'squoosh_png_bg.wasm', 'pkg/squoosh_oxipng_bg.wasm', 'webp_enc.wasm', 'webp_enc_simd.wasm', 'avif_enc.wasm', 'squoosh_resize_bg.wasm', 'qpdf.wasm']
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), startBergamotWorkerFromModels()],
+  plugins: [
+    react(),
+    tailwindcss(),
+    startBergamotWorkerFromModels(),
+    // The service worker (src/sw.ts) precaches only the app shell; each tool's code, pdf.js data and AI models are cached on first
+    // use. The two home pages are prerendered after this build, so they are listed by address with the build time as revision.
+    // The manifests are per language and written by scripts/build-static-pages.mjs.
+    VitePWA({
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.ts',
+      injectRegister: false,
+      manifest: false,
+      injectManifest: {
+        // The 8 question marks are the hash: index-browser-esm-*.js is a library chunk, not the entry.
+        globPatterns: ['assets/index-????????.{js,css}', 'assets/ar-????????.js', 'assets/*.woff2'],
+        additionalManifestEntries: ['/en', '/ar'].map((url) => ({ url, revision: String(Date.now()) })),
+      },
+      devOptions: { enabled: false },
+    }),
+  ],
   // Pre-bundled, the translator would skip startBergamotWorkerFromModels in dev and start its worker from node_modules.
   optimizeDeps: { exclude: ['@browsermt/bergamot-translator'] },
   // The tool pages' sample files (src/samples/) are imported with ?inline, so they arrive as data inside a script: no fetch.

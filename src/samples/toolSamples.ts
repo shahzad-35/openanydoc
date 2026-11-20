@@ -133,6 +133,230 @@ function buildLargeCsvText() {
   return `${lines.join('\n')}\n`
 }
 
+// The developer tools' samples: an API response for the type generators, a config to sort, convert and compare, XML and YAML
+// files, and short texts and tokens for the encoders. Made-up data only.
+const API_RESPONSE_JSON = `{
+  "id": 4102,
+  "username": "sara.k",
+  "email": "sara@example.com",
+  "isActive": true,
+  "score": 87.5,
+  "createdAt": "2026-03-14T09:30:00Z",
+  "roles": ["editor", "reviewer"],
+  "address": { "city": "Riyadh", "postalCode": "12271" },
+  "projects": [
+    { "id": 1, "name": "Website", "dueDate": "2026-12-01", "budget": 12000 },
+    { "id": 2, "name": "Mobile app", "budget": 30500.75, "archived": false }
+  ],
+  "manager": null
+}
+`
+const UNSORTED_CONFIG_JSON = `{
+  "version": 3,
+  "name": "orders-service",
+  "logging": { "level": "info", "format": "json", "destination": "stdout" },
+  "database": { "port": 5432, "host": "db.example.com", "name": "orders", "pool": { "min": 2, "max": 10 } },
+  "features": { "newCheckout": true, "betaReports": false },
+  "allowedOrigins": ["https://example.com", "https://app.example.com"]
+}
+`
+const CONFIG_YAML = `# Service settings (synthetic sample)
+name: orders-service
+version: 3
+database:
+  host: db.example.com
+  port: 5432
+  pool: { min: 2, max: 10 }
+features:
+  newCheckout: true
+  betaReports: false
+allowedOrigins:
+  - https://example.com
+  - https://app.example.com
+`
+const DEPLOYMENT_YAML = `apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  labels:
+    app: web
+spec:
+  replicas: 3
+  template:
+    spec:
+      containers:
+        - name: web
+          image: example/web:1.4.2
+          ports:
+            - containerPort: 8080
+          env:
+            - name: GREETING
+              value: "مرحبا"
+`
+// Valid YAML whose indentation is mixed (2 and 4 spaces), so Format has something to tidy.
+const UNTIDY_YAML = `invoice: 1042
+customer:
+    name: Example Trading Co.
+    city:   Jeddah
+items:
+- sku: A-100
+  qty: 2
+  price:   45.5
+-   sku: B-220
+    qty: 1
+    price: 120
+paid: false
+`
+const CATALOG_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<catalog updated="2026-11-01">
+  <book id="b1" lang="en">
+    <title>Learning Data Formats</title>
+    <author>Example Author</author>
+    <price currency="SAR">89.00</price>
+  </book>
+  <book id="b2" lang="ar">
+    <title>مقدمة في البيانات</title>
+    <author>مؤلف تجريبي</author>
+    <price currency="SAR">65.50</price>
+  </book>
+</catalog>
+`
+const FEED_XML = `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0"><channel><title>Example news</title><link>https://example.com/</link><item><title>Release 2.1 is out</title><pubDate>Mon, 03 Nov 2026 08:00:00 GMT</pubDate></item><item><title>Maintenance window</title><pubDate>Fri, 07 Nov 2026 22:00:00 GMT</pubDate></item></channel></rss>
+`
+const GREETING_TEXT = 'Hello from OpenAnyDoc! مرحبا بكم 👋\n'
+const ENCODED_URL_TEXT = 'https://example.com/search?q=%D9%85%D9%84%D9%81%20csv&sort=newest&page=2\n'
+// A JSON Web Token from made-up claims; the signature is random bytes, as nothing here verifies it.
+const toBase64Url = (text: string) => btoa(String.fromCharCode(...new TextEncoder().encode(text))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '')
+const buildSampleJwt = (payload: object) => `${toBase64Url(JSON.stringify({ alg: 'HS256', typ: 'JWT' }))}.${toBase64Url(JSON.stringify(payload))}.c2FtcGxlLXNpZ25hdHVyZS1ub3QtcmVhbA`
+const EXPIRED_JWT = buildSampleJwt({ sub: '4102', name: 'Sara K.', role: 'editor', iat: 1767225600, exp: 1767229200 })
+const LONG_LIVED_JWT = buildSampleJwt({ sub: 'service-42', scope: 'reports:read', iss: 'https://auth.example.com', iat: 1795000000, nbf: 1795000000, exp: 4102444800 })
+
+// Step 19's data tools: orders to pivot and chart, files with problems to validate, repeated rows, mixed case, two months to
+// merge (columns in another order), two price lists to compare, a semicolon file, a Windows-1256 Arabic file, YAML, HTML and SQL
+// tables. Made-up data only.
+const ORDERS_CSV = `order_id,region,product,month,quantity,amount
+1001,North,Laptop,2026-01,2,2400
+1002,South,Phone,2026-01,5,3250
+1003,East,Laptop,2026-01,1,1200
+1004,North,Tablet,2026-02,3,1350
+1005,West,Phone,2026-02,4,2600
+1006,South,Laptop,2026-02,2,2400
+1007,East,Tablet,2026-03,6,2700
+1008,North,Phone,2026-03,2,1300
+1009,West,Laptop,2026-03,3,3600
+1010,South,Tablet,2026-03,1,450
+1011,East,Phone,2026-04,3,1950
+1012,North,Laptop,2026-04,1,1200
+`
+const BROKEN_CSV = `id,name,city,amount
+1,Chloé Martin,Lyon,182.50
+2,"Jonas Weber,Graz,39.90
+3, Inês Costa ,Porto,410.00
+4,Hugo Bernard,Bilbao
+5,Greta Ito,Turin,233.15,extra
+6,Farid Haddad,Leeds,n/a
+6,Farid Haddad,Leeds,n/a
+`
+const DUPLICATES_CSV = `email,name,plan
+ana@example.com,Ana Silva,Pro
+ben@example.com,Ben Okafor,Free
+ana@example.com,Ana Silva,Pro
+cara@example.com,Cara Lind,Team
+ben@example.com,Ben Okafor,Free
+dev@example.com,Dev Patel,Pro
+ana@example.com,Ana Silva,Pro
+`
+const QUARTERLY_CSV = `metric,Q1,Q2,Q3,Q4
+Revenue,120,135,128,160
+Costs,80,82,85,90
+Customers,410,455,470,520
+`
+const MIXED_CASE_CSV = `name,city,status
+sara AHMED,riyadh,ACTIVE
+JOHN smith,LONDON,inactive
+maría garcía,Madrid,Active
+li WEI,beijing,ACTIVE
+`
+const JANUARY_CSV = `date,product,quantity,amount
+2026-01-05,Laptop,2,2400
+2026-01-12,Phone,5,3250
+2026-01-20,Tablet,1,450
+`
+const FEBRUARY_CSV = `product,date,amount,quantity
+Phone,2026-02-02,1300,2
+Laptop,2026-02-14,3600,3
+`
+const OLD_PRICES_CSV = `sku,name,price,stock
+A-100,Desk lamp,25.00,40
+A-101,Office chair,149.00,12
+A-102,Monitor stand,39.00,25
+A-103,Keyboard,59.00,30
+`
+const NEW_PRICES_CSV = `sku,name,price,stock
+A-100,Desk lamp,27.50,40
+A-101,Office chair,149.00,8
+A-103,Keyboard,59.00,30
+A-104,Webcam,79.00,15
+`
+const SEMICOLON_CSV = `artikel;menge;preis;datum
+Lampe;2;25,00;05.01.2026
+Stuhl;1;149,00;12.01.2026
+Monitor;3;189,90;20.01.2026
+`
+const STAFF_YAML = `# Team list (synthetic sample)
+- name: Sara Ahmed
+  role: Engineer
+  office: { city: Riyadh, floor: 3 }
+  start: 2024-03-01
+- name: John Smith
+  role: Designer
+  office: { city: London, floor: 1 }
+  start: 2023-09-15
+- name: Maria Garcia
+  role: Manager
+  office: { city: Madrid, floor: 2 }
+  start: 2022-01-10
+`
+const PRICES_HTML = `<!doctype html>
+<html><head><meta charset="utf-8"><title>Plans</title></head><body>
+<h1>Plans (synthetic sample)</h1>
+<table>
+  <thead><tr><th>Plan</th><th>Monthly</th><th>Yearly</th><th>Users</th></tr></thead>
+  <tbody>
+    <tr><td>Starter</td><td>$9</td><td>$90</td><td>1</td></tr>
+    <tr><td>Team</td><td>$29</td><td>$290</td><td>10</td></tr>
+    <tr><td>Business</td><td colspan="2">Contact us</td><td>Unlimited</td></tr>
+  </tbody>
+</table>
+</body></html>
+`
+const SCHEDULE_HTML = `<table>
+  <tr><th>Day</th><th>Time</th><th>Session</th></tr>
+  <tr><td rowspan="2">Monday</td><td>09:00</td><td>Welcome</td></tr>
+  <tr><td>11:00</td><td>Data formats</td></tr>
+  <tr><td>Tuesday</td><td>10:00</td><td>Workshop</td></tr>
+</table>
+`
+const MYSQL_DUMP_SQL = `-- MySQL dump (synthetic sample)
+/*!40101 SET NAMES utf8mb4 */;
+DROP TABLE IF EXISTS \`customers\`;
+CREATE TABLE \`customers\` (
+  \`id\` int unsigned NOT NULL AUTO_INCREMENT,
+  \`name\` varchar(100) NOT NULL,
+  \`city\` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (\`id\`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4;
+LOCK TABLES \`customers\` WRITE;
+INSERT INTO \`customers\` VALUES (1,'Sara Ahmed','Riyadh'),(2,'John Smith','London'),(3,'O''Brien Ltd','Dublin');
+UNLOCK TABLES;
+`
+const ORDERS_SQL = `CREATE TABLE orders (id INTEGER PRIMARY KEY, product TEXT, quantity INTEGER, amount REAL);
+INSERT INTO orders VALUES (1, 'Laptop', 2, 2400.0);
+INSERT INTO orders VALUES (2, 'Phone', 5, 3250.0);
+INSERT INTO orders VALUES (3, 'Tablet', 1, 450.0);
+`
+
 const CSV = 'text/csv'
 const XLSX_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 const samples = {
@@ -192,6 +416,36 @@ const samples = {
   badgeWebp: bundledSample('badge-webp', 'badge-transparent.webp', 'image/webp', () => import('./badge-transparent.webp?inline')),
   memeDesk: bundledSample('meme-desk', 'meme-desk.jpg', 'image/jpeg', () => import('./meme-desk.jpg?inline')),
   memeBeach: bundledSample('meme-beach', 'meme-beach.jpg', 'image/jpeg', () => import('./meme-beach.jpg?inline')),
+  apiResponseJson: { id: 'api-response-json', buildFile: textFile('user-response.json', API_RESPONSE_JSON, 'application/json') },
+  unsortedConfigJson: { id: 'unsorted-config-json', buildFile: textFile('service-config.json', UNSORTED_CONFIG_JSON, 'application/json') },
+  configYaml: { id: 'config-yaml', buildFile: textFile('service-config.yaml', CONFIG_YAML, 'application/yaml') },
+  deploymentYaml: { id: 'deployment-yaml', buildFile: textFile('deployment.yaml', DEPLOYMENT_YAML, 'application/yaml') },
+  untidyYaml: { id: 'untidy-yaml', buildFile: textFile('invoice.yaml', UNTIDY_YAML, 'application/yaml') },
+  catalogXml: { id: 'catalog-xml', buildFile: textFile('catalog.xml', CATALOG_XML, 'application/xml') },
+  feedXml: { id: 'feed-xml', buildFile: textFile('news-feed.xml', FEED_XML, 'application/xml') },
+  greetingTxt: { id: 'greeting-txt', buildFile: textFile('greeting.txt', GREETING_TEXT, 'text/plain') },
+  greetingBase64Txt: { id: 'greeting-base64-txt', buildFile: async () => new File([btoa(String.fromCharCode(...new TextEncoder().encode(GREETING_TEXT)))], 'greeting-base64.txt', { type: 'text/plain' }) },
+  encodedUrlTxt: { id: 'encoded-url-txt', buildFile: textFile('encoded-link.txt', ENCODED_URL_TEXT, 'text/plain') },
+  plainUrlTxt: { id: 'plain-url-txt', buildFile: textFile('search-link.txt', 'https://example.com/search?q=ملف csv&sort=newest\n', 'text/plain') },
+  expiredJwt: { id: 'expired-jwt', buildFile: async () => new File([EXPIRED_JWT], 'expired-token.txt', { type: 'text/plain' }) },
+  longLivedJwt: { id: 'long-lived-jwt', buildFile: async () => new File([LONG_LIVED_JWT], 'service-token.txt', { type: 'text/plain' }) },
+  ordersCsv: { id: 'orders-csv', buildFile: textFile('orders.csv', ORDERS_CSV, CSV) },
+  brokenCsv: { id: 'broken-csv', buildFile: textFile('broken.csv', BROKEN_CSV, CSV) },
+  duplicatesCsv: { id: 'duplicates-csv', buildFile: textFile('sign-ups.csv', DUPLICATES_CSV, CSV) },
+  quarterlyCsv: { id: 'quarterly-csv', buildFile: textFile('quarterly.csv', QUARTERLY_CSV, CSV) },
+  mixedCaseCsv: { id: 'mixed-case-csv', buildFile: textFile('contacts.csv', MIXED_CASE_CSV, CSV) },
+  januaryCsv: { id: 'january-csv', buildFile: textFile('sales-january.csv', JANUARY_CSV, CSV) },
+  februaryCsv: { id: 'february-csv', buildFile: textFile('sales-february.csv', FEBRUARY_CSV, CSV) },
+  oldPricesCsv: { id: 'old-prices-csv', buildFile: textFile('prices-old.csv', OLD_PRICES_CSV, CSV) },
+  newPricesCsv: { id: 'new-prices-csv', buildFile: textFile('prices-new.csv', NEW_PRICES_CSV, CSV) },
+  semicolonCsv: { id: 'semicolon-csv', buildFile: textFile('bestellung.csv', SEMICOLON_CSV, CSV) },
+  // The Arabic customer list saved as Windows-1256, as old Arabic Windows programs write it.
+  windows1256Csv: { id: 'windows-1256-csv', buildFile: async () => new File([(await import('../formats/text/textEditing')).encodeText(ARABIC_CSV, 'windows-1256').bytes], 'arabic-windows-1256.csv', { type: CSV }) },
+  staffYaml: { id: 'staff-yaml', buildFile: textFile('team.yaml', STAFF_YAML, 'application/yaml') },
+  pricesHtml: { id: 'prices-html', buildFile: textFile('plans.html', PRICES_HTML, 'text/html') },
+  scheduleHtml: { id: 'schedule-html', buildFile: textFile('schedule.html', SCHEDULE_HTML, 'text/html') },
+  mysqlDumpSql: { id: 'mysql-dump-sql', buildFile: textFile('customers-dump.sql', MYSQL_DUMP_SQL, 'application/sql') },
+  ordersSql: { id: 'orders-sql', buildFile: textFile('orders.sql', ORDERS_SQL, 'application/sql') },
   diagramSvg: { id: 'diagram-svg', buildFile: textFile('diagram.svg', DIAGRAM_SVG, 'image/svg+xml') },
   iconSvg: { id: 'icon-svg', buildFile: textFile('picture-icon.svg', ICON_SVG, 'image/svg+xml') },
 } satisfies Record<string, ToolSample>
@@ -207,7 +461,62 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/json-viewer': [samples.nestedJson, samples.recordsJson],
   '/json-formatter': [samples.nestedJson, samples.recordsJson],
   '/json-validator': [samples.brokenJson, samples.nestedJson],
-  '/json-escape-unescape': [samples.escapedJson, samples.payloadJson],
+  '/json-escape': [samples.escapedJson, samples.payloadJson],
+  '/json-minify': [samples.nestedJson, samples.recordsJson],
+  '/json-sort': [samples.unsortedConfigJson, samples.nestedJson],
+  '/json-tree-viewer': [samples.nestedOrdersJson, samples.apiResponseJson],
+  '/json-graph': [samples.nestedJson, samples.apiResponseJson],
+  '/json-compare': [samples.unsortedConfigJson, samples.recordsJson],
+  '/json-schema': [samples.apiResponseJson, samples.recordsJson],
+  '/jsonpath': [samples.nestedJson, samples.nestedOrdersJson],
+  '/json-to-yaml': [samples.unsortedConfigJson, samples.apiResponseJson],
+  '/yaml-to-json': [samples.configYaml, samples.deploymentYaml],
+  '/json-to-xml': [samples.recordsJson, samples.apiResponseJson],
+  '/xml-to-json': [samples.catalogXml, samples.feedXml],
+  '/json-to-typescript': [samples.apiResponseJson, samples.nestedOrdersJson],
+  '/json-to-python': [samples.apiResponseJson, samples.nestedOrdersJson],
+  '/json-to-go': [samples.apiResponseJson, samples.nestedOrdersJson],
+  '/json-to-java': [samples.apiResponseJson, samples.nestedOrdersJson],
+  '/json-to-csharp': [samples.apiResponseJson, samples.nestedOrdersJson],
+  '/xml-viewer': [samples.catalogXml, samples.feedXml],
+  '/yaml-formatter': [samples.untidyYaml, samples.deploymentYaml],
+  '/base64-encode-decode': [samples.greetingTxt, samples.greetingBase64Txt],
+  '/url-encode-decode': [samples.encodedUrlTxt, samples.plainUrlTxt],
+  '/jwt-decoder': [samples.expiredJwt, samples.longLivedJwt],
+  '/word-to-markdown': [samples.quarterlyDocx, samples.arabicDocx],
+  '/pptx-to-markdown': [samples.reviewPptx, samples.arabicPptx],
+  '/token-counter': [samples.reportPdf, samples.quarterlyDocx],
+  '/json-to-toon': [samples.recordsJson, samples.apiResponseJson],
+  '/csv-to-sql': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-sql': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-xml': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-xml': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-yaml': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-yaml': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-markdown': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-markdown': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-html': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-html': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-latex': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-latex': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-fixed-width': [samples.customersCsv, samples.arabicCsv],
+  '/excel-to-fixed-width': [samples.salesXlsx, samples.arabicXlsx],
+  '/xml-to-csv': [samples.catalogXml, samples.feedXml],
+  '/yaml-to-csv': [samples.staffYaml, samples.deploymentYaml],
+  '/html-table-to-csv': [samples.pricesHtml, samples.scheduleHtml],
+  '/sql-to-csv': [samples.mysqlDumpSql, samples.ordersSql],
+  '/csv-validator': [samples.brokenCsv, samples.customersCsv],
+  '/split-csv': [samples.largeCsv, samples.customersCsv],
+  '/sql-on-csv': [samples.ordersCsv, samples.salesXlsx],
+  '/pivot-table': [samples.ordersCsv, samples.salesXlsx],
+  '/chart-maker': [samples.ordersCsv, samples.arabicCsv],
+  '/remove-duplicates': [samples.duplicatesCsv, samples.brokenCsv],
+  '/transpose': [samples.quarterlyCsv, samples.customersCsv],
+  '/change-case': [samples.mixedCaseCsv, samples.customersCsv],
+  '/merge-csv': [samples.januaryCsv, samples.februaryCsv],
+  '/compare-csv': [samples.oldPricesCsv, samples.newPricesCsv],
+  '/change-csv-encoding': [samples.windows1256Csv, samples.arabicCsv],
+  '/change-csv-delimiter': [samples.semicolonCsv, samples.customersCsv],
   '/json-to-csv': [samples.recordsJson, samples.nestedOrdersJson],
   '/excel-viewer': [samples.salesXlsx, samples.arabicXlsx],
   '/excel-to-csv': [samples.salesXlsx, samples.arabicXlsx],

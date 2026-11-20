@@ -66,11 +66,11 @@
     },
     {
       "question": "What is the private key file, and who should have it?",
-      "answer": "It lists each token with the value it replaced, so the masked file can be turned back later. Keep it to yourself: never send it with the masked file, because anyone with both can undo the masking."
+      "answer": "It lists each token with the value it replaced, so the masked file can be turned back later. Keep it to yourself: never send it with the masked file, because anyone with both can undo the masking. Only tokens can be put back; a partly hidden or removed field can't, so choose tokens for any field you may need again."
     },
     {
-      "question": "Can a partly hidden or removed field be restored?",
-      "answer": "No. Only tokens can be put back, because only they are in the key. Choose tokens for any field you may need again."
+      "question": "How do I anonymize a CSV or Excel file before sharing it?",
+      "answer": "Replace the personal values, such as names, emails, phone numbers and ID numbers, with tokens or partial masks, or remove those columns, then share the copy and keep the original. OpenAnyDoc's Mask data scans a CSV, Excel, JSON or text file in your browser, ticks the columns that look sensitive and saves the masked copy, without uploading the file."
     },
     {
       "question": "How does the scan decide a column is sensitive?",

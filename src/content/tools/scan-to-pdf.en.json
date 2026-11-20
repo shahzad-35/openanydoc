@@ -78,6 +78,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I scan a document to PDF with my phone?",
+      "answer": "Photograph each page with the phone's camera, straighten it to the paper's edges and save the pages as one PDF; on an iPhone the Notes app can scan documents, and on Android Google Drive can. In OpenAnyDoc, Take a photo opens the camera in the browser, you drag the four corners onto the paper, and the pages are saved as a PDF without leaving your phone."
     }
   ]
 }

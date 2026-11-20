@@ -1,0 +1,79 @@
+{
+  "title": "Change Case in CSV – UPPER, lower, Capitalize | OpenAnyDoc",
+  "description": "Change the text case of a CSV or Excel column in your browser: UPPER, lower or Capitalize Each Word, one column at a time, with Undo. No upload.",
+  "heading": "Change Case: UPPER, lower or Capitalized",
+  "subtitle": "Drop a CSV or Excel file and change one column's letter case in a click; nothing is uploaded.",
+  "intro": "Change text case in a CSV file in your browser: a bar above the table lets you pick a column and turn it into UPPER CASE, lower case or Capitalize Each Word. One column changes at a time, Undo puts it back, and download saves the result. Arabic and other scripts without letter case stay as they are. Excel files open their first sheet. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "One column at a time",
+      "text": "Only the column you pick changes, so codes, IDs and other columns stay as they were."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: change text case in a CSV",
+  "steps": [
+    {
+      "title": "Open your file",
+      "text": "Drop a CSV or Excel file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Pick a column and a case",
+      "text": "In the bar above the table, choose the column, then UPPER, lower or Capitalize Each Word."
+    },
+    {
+      "title": "Check it",
+      "text": "The column changes at once. Undo puts it back; repeat for other columns."
+    },
+    {
+      "title": "Download",
+      "text": "Save the result as CSV, or as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the case changer handles",
+  "handles": [
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Cases: UPPER CASE, lower case and Capitalize Each Word.",
+    "Scope: one column at a time.",
+    "Scripts without case: Arabic and similar text stays unchanged.",
+    "Undo: restores the column as it was."
+  ],
+  "limits": [
+    "One column at a time.",
+    "Excel files: only the first sheet is opened."
+  ],
+  "faqTitle": "Change case: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser changes the text on your device; nothing is sent to a server."
+    },
+    {
+      "question": "Which cases can I choose?",
+      "answer": "UPPER CASE, lower case, and Capitalize Each Word, which turns \"sara al-harbi\" into \"Sara Al-Harbi\"."
+    },
+    {
+      "question": "Can I change several columns at once?",
+      "answer": "No, one column at a time. Pick the next column in the bar and apply the case again."
+    },
+    {
+      "question": "What happens to Arabic text?",
+      "answer": "Nothing. Arabic and other scripts have no capital letters, so their cells stay unchanged; Latin words in the same column still change."
+    },
+    {
+      "question": "Can I undo a change?",
+      "answer": "Yes. Undo puts the column back as it was."
+    },
+    {
+      "question": "How do I change a column to uppercase in a CSV or Excel file?",
+      "answer": "Open the file, pick the column, and choose UPPER, lower or Capitalize Each Word; the whole column changes at once. OpenAnyDoc does this in your browser without uploading the file, and you can download the result as CSV or Excel."
+    }
+  ]
+}

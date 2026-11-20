@@ -62,7 +62,7 @@ export default function WhatsNewBanner({ onNavigate, onDismiss }: WhatsNewBanner
   }, [hasAnnouncement, isPaused, onDismiss])
   if (!hasAnnouncement) return null
 
-  const canEditAll = announcedFormats.every(({ definition }) => definition.editing)
+  const canEditAll = announcedFormats.every(({ definition }) => definition.isEditable)
   const formatLinks = announcedFormats.map(({ viewer }) => (
     <BannerLink key={viewer.id} id={`banner-link-${viewer.id}`} path={localizePath(locale, viewer.toolPath as string)} onNavigate={onNavigate} fileType={viewer.id} className="font-semibold text-(--file-color) underline-offset-2 hover:underline">
       {viewer.label}

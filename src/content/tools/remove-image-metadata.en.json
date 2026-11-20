@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I remove the location from a photo?",
+      "answer": "Remove the photo's metadata, which is where the GPS location is kept: on iPhone, Options in the share sheet can leave the location out, and a metadata remover saves a clean copy of any photo. OpenAnyDoc lists what each photo reveals and saves clean copies in your browser, without uploading them."
     }
   ]
 }

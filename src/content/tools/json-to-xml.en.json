@@ -1,0 +1,41 @@
+{
+  "title": "JSON to XML Converter – Keys to XML Elements | OpenAnyDoc",
+  "description": "Convert JSON to XML in your browser: objects become elements and arrays repeated elements, ready to copy or download as an .xml file.",
+  "heading": "JSON to XML Converter",
+  "subtitle": "Open or paste JSON and its XML appears at once, wrapped in a root element, ready to copy or download; nothing is uploaded.",
+  "intro": "Need XML for an older SOAP service, an import screen or a feed that will not take JSON? Open, drop or paste your JSON and the XML is shown straight away in a dialog. Each key becomes an element, each array item a repeated element with the same name, and everything sits inside one <root> element so the result is a well-formed document. Copy it or download it as an .xml file; the JSON stays open in the viewer, so you can change it and convert again.",
+  "features": [
+    { "title": "Private", "text": "Your JSON is converted by your own browser and never sent to a server, so nobody else sees it." },
+    { "title": "Well-formed every time", "text": "One <root> element, escaped text and valid element names, so any XML parser can read the result." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert JSON to XML",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste it into the box, or try a sample." },
+    { "title": "Read the XML", "text": "The XML is shown at once in a dialog, indented, with the whole document inside <root>." },
+    { "title": "Copy or download", "text": "Copy the XML or download it as an .xml file with the JSON file's name." }
+  ],
+  "handlesTitle": "How JSON becomes XML",
+  "handles": [
+    "Objects: each key becomes a child element, in the JSON's order.",
+    "Arrays: each item becomes a repeated element named after the array's key, so \"tags\": [\"a\", \"b\"] gives two <tags> elements.",
+    "null becomes an empty element; numbers and true/false become element text.",
+    "Keys that are not valid element names (spaces, a leading digit, symbols) are changed into valid names.",
+    "Text with <, > or & is escaped, and Arabic and other non-Latin text is kept as it is."
+  ],
+  "limits": [
+    "No attributes are written: every value becomes an element, so XML that needs attributes must be adjusted by hand.",
+    "Keys that had to be renamed do not convert back to their original spelling.",
+    "Files up to 10 MB."
+  ],
+  "faqTitle": "JSON to XML: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. The JSON is read and turned into XML by your browser, on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "Why is everything inside a <root> element?", "answer": "An XML document must have exactly one top element, while JSON can have several keys at the top or be an array. Wrapping the result in <root> makes it a well-formed document every time." },
+    { "question": "How are JSON arrays written in XML?", "answer": "XML has no arrays, so each item becomes its own element with the array's key as its name. A list of three users under \"user\" becomes three <user> elements in a row." },
+    { "question": "What happens to a key like \"first name\" or \"2fa\"?", "answer": "Element names cannot contain spaces or start with a digit, so such keys are changed into valid names. Check the result if a program expects exact names." },
+    { "question": "Can I get attributes instead of elements?", "answer": "No. The JSON to XML converter writes every value as an element and creates no attributes. That is the limit to plan for if your target format uses attributes." },
+    { "question": "Can I convert XML to JSON as well?", "answer": "Yes, on the XML to JSON page.", "link": { "text": "XML to JSON", "path": "/xml-to-json" } },
+    { "question": "How do I convert a JSON file to XML?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON to XML converter and the XML appears at once, wrapped in one <root> element. Copy it or download it as an .xml file; the JSON is converted in your browser without being uploaded." }
+  ]
+}

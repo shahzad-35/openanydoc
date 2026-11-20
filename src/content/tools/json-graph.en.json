@@ -1,0 +1,41 @@
+{
+  "title": "JSON Graph Viewer – Visualize JSON as a Diagram | OpenAnyDoc",
+  "description": "Visualize JSON as a graph of connected boxes, zoom and pan around it, and export the picture as PNG or SVG. Free, runs in your browser, no upload.",
+  "heading": "JSON Graph: See the Structure as Connected Boxes",
+  "subtitle": "Open or paste JSON to draw it as a graph of connected boxes you can zoom, pan and export; nothing is uploaded.",
+  "intro": "A free JSON graph viewer: open a .json file, drop it or paste the text, and the page opens on the Graph tab. Every object and array becomes a box joined to its parent by a line, so you can see at a glance how the data is nested and where the lists are. Zoom and pan to move around, and export the picture as PNG for a message or SVG for documentation. For a big file, start the graph from a node you select in the tree. It all runs in your browser and nothing is uploaded.",
+  "features": [
+    { "title": "PNG or SVG", "text": "Export the drawn graph as a PNG picture or a sharp SVG for slides and documentation." },
+    { "title": "Private and free", "text": "Your JSON is drawn by your own browser and never sent to a server. No account, no watermark." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: draw JSON as a graph",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples." },
+    { "title": "Look at the graph", "text": "The Graph tab draws each object and array as a box linked to its parent. Scroll or pinch to zoom and drag to pan." },
+    { "title": "Narrow it down if it is big", "text": "Select a node in the tree and choose Graph from the selected node to draw only that branch." },
+    { "title": "Export the picture", "text": "Download the graph as PNG or SVG to drop into a ticket, a slide or your docs." }
+  ],
+  "handlesTitle": "What the JSON graph handles",
+  "handles": [
+    "Objects and arrays drawn as boxes, with their keys and values, linked to their parents.",
+    "Up to 1,500 boxes in one graph.",
+    "Graph from the selected node, for files whose whole graph would be bigger than that.",
+    "Zoom and pan with the mouse, trackpad or touch.",
+    "Export as PNG or SVG."
+  ],
+  "limits": [
+    "One graph shows up to 1,500 boxes; for larger documents, draw the graph from a selected node.",
+    "Files up to 10 MB.",
+    "The graph needs valid JSON; a file with a syntax error opens in the text pane with the error marked."
+  ],
+  "faqTitle": "Questions about the JSON graph",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON is read and drawn by your browser, on your device, and is never sent anywhere. Pasted text stays in this tab. Your browser's network panel shows no upload." },
+    { "question": "Why draw JSON as a graph instead of a tree?", "answer": "A graph shows the shape of the whole document at once: which objects hold lists, how deep the nesting goes and which branches are large. It helps when you explain an API response to someone or find your way around an unfamiliar file." },
+    { "question": "My file is too big for the graph. What can I do?", "answer": "A graph holds up to 1,500 boxes. Select the part you care about in the tree and choose Graph from the selected node; only that branch is drawn." },
+    { "question": "Can I put the graph in a document or slide?", "answer": "Yes. Export it as PNG for chats and tickets, or as SVG, which stays sharp at any size, for documentation and slides." },
+    { "question": "Can I edit the data in the graph?", "answer": "The graph is for looking. Edit values in the tree or the text pane; the graph is drawn from the document as it is." },
+    { "question": "How do I visualize JSON as a diagram?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON graph viewer and choose the Graph tab: each object and array is drawn as a box linked to its parent. Zoom, pan, draw one branch only and export it as PNG or SVG, all in your browser without uploading." }
+  ]
+}

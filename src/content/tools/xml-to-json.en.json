@@ -1,0 +1,86 @@
+{
+  "title": "XML to JSON – Convert Sitemaps and RSS Feeds | OpenAnyDoc",
+  "description": "Convert an XML file to JSON in your browser: attributes, text and repeated elements mapped clearly, then browse and download the .json.",
+  "heading": "XML to JSON Converter",
+  "subtitle": "Open or paste XML and it opens as JSON you can browse, search and download; nothing is uploaded.",
+  "intro": "Turn an XML file, such as a sitemap, an RSS feed, a SOAP response or an export from an older system, into JSON you can work with. Open, drop or paste it and your browser's own XML parser reads it; the result opens in the JSON viewer as a tree and as text. Attributes become keys starting with @, element text goes under #text, repeated child elements become arrays, and an element that holds only text becomes a plain string. If the XML is malformed, the parser's message tells you the line to fix.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your XML is read by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Clear mapping",
+      "text": "@ for attributes, #text for text and arrays for repeated elements, the same rule everywhere in the file."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert XML to JSON",
+  "steps": [
+    {
+      "title": "Open or paste your XML",
+      "text": "Choose an .xml file, drop it on the page, paste the text into the box, or try a sample."
+    },
+    {
+      "title": "It opens as JSON",
+      "text": "The XML is parsed by the browser and shown in the JSON viewer. Malformed XML shows the parser's error with its line."
+    },
+    {
+      "title": "Browse and download",
+      "text": "Expand the tree, search it, then download a .json file with the XML file's name."
+    }
+  ],
+  "handlesTitle": "How XML becomes JSON",
+  "handles": [
+    "Attributes: <book id=\"7\"> gives {\"book\": {\"@id\": \"7\"}}.",
+    "Text next to attributes or child elements is stored under \"#text\".",
+    "Repeated child elements with the same name become an array; a single child stays an object.",
+    "An element with only text, such as <title>Hello</title>, becomes the string \"Hello\".",
+    "Namespace prefixes stay in the names, such as \"soap:Body\" or \"@xmlns:xsi\".",
+    "Input from an .xml file, a drop, the paste box or a sample, up to 10 MB."
+  ],
+  "limits": [
+    "No DTD or XSD validation: the file is checked for being well-formed, not against a schema.",
+    "Comments and processing instructions are dropped.",
+    "All values come out as strings; \"42\" in XML stays \"42\", because XML text has no types.",
+    "Files up to 10 MB."
+  ],
+  "faqTitle": "XML to JSON: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your XML is parsed by your browser's own XML parser, on your device. Pasted text stays in this tab and is never sent anywhere."
+    },
+    {
+      "question": "Why do some keys start with @?",
+      "answer": "Those were attributes in the XML. The @ keeps them apart from child elements with the same name, so <item id=\"1\"><id>9</id></item> gives both \"@id\" and \"id\"."
+    },
+    {
+      "question": "Why is one element an array and another an object?",
+      "answer": "A child element that appears more than once under its parent becomes an array; one that appears once stays a single value. If a list sometimes has one item, its JSON shape changes with it."
+    },
+    {
+      "question": "My XML will not open. What is wrong?",
+      "answer": "It is not well-formed: a tag is not closed, an & is not escaped, or there are two top elements. The page shows the parser's message with the line number, so you can fix it in the file and open it again."
+    },
+    {
+      "question": "Is the XML checked against my XSD schema?",
+      "answer": "No. Only well-formedness is checked; DTD and XSD validation are not done. Use a schema validator if the structure has to match a contract."
+    },
+    {
+      "question": "Can I convert JSON back to XML?",
+      "answer": "Yes, on the JSON to XML page. The two pages follow different rules, so a round trip may not give the same file.",
+      "link": {
+        "text": "JSON to XML",
+        "path": "/json-to-xml"
+      }
+    },
+    {
+      "question": "How do I convert XML to JSON?",
+      "answer": "Convert XML to JSON by turning elements into keys, attributes into keys that start with @ and repeated elements into arrays. In OpenAnyDoc, open, drop or paste the XML and the JSON opens in the JSON viewer as a tree and as text, ready to download; the XML is read in your browser and never uploaded."
+    }
+  ]
+}

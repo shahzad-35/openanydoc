@@ -346,7 +346,16 @@ html[lang="ar"] #csv-workbench{--ui:"IBM Plex Sans Arabic",system-ui,"Segoe UI",
 #csv-workbench .chart-box{position:relative;height:280px}
 #csv-workbench .query-sql{width:100%;min-height:96px;border:1px solid var(--line);border-radius:6px;background:var(--panel-2);font:12px var(--mono);padding:6px;color:var(--text);resize:vertical}
 #csv-workbench .query-error{margin:0;padding:8px;border-radius:6px;background:var(--err-soft);color:var(--err);font:12px var(--mono);white-space:pre-wrap}
-#csv-workbench .query-result{margin-top:8px;max-height:360px;overflow:auto;border:1px solid var(--line);border-radius:6px}
+#csv-workbench .query-result{margin-top:8px;height:360px;display:flex;flex-direction:column;overflow:hidden;border:1px solid var(--line);border-radius:6px}
 #csv-workbench .query-result table{border-collapse:collapse;font-size:12px;width:max-content;min-width:100%}
 #csv-workbench .query-result th,#csv-workbench .query-result td{border-bottom:1px solid var(--grid-line);padding:4px 8px;text-align:start;white-space:nowrap}
 #csv-workbench .query-result th{position:sticky;top:0;background:var(--head);font-weight:500}
+/* The Change case page's bar (a column and UPPER / lower / Capitalize), and the Pivot table page's matrix in the Group panel. */
+#csv-workbench #change-case-bar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:8px 12px;background:var(--accent-soft);border-bottom:1px solid var(--line);flex:none}
+#csv-workbench #change-case-bar select{height:28px;border:1px solid var(--line-strong);border-radius:7px;background:var(--panel);color:var(--text);padding-inline:6px;max-width:220px}
+#csv-workbench .pivot-scroll{overflow:auto;max-height:52vh;border:1px solid var(--line);border-radius:8px}
+#csv-workbench #pivot-table{border-collapse:collapse;font:12px var(--mono);min-width:100%}
+#csv-workbench #pivot-table th,#csv-workbench #pivot-table td{padding:4px 8px;border-bottom:1px solid var(--line);white-space:nowrap;text-align:end}
+#csv-workbench #pivot-table th{font-family:var(--ui);font-weight:600;text-align:start;background:var(--panel-2);position:sticky;top:0}
+#csv-workbench #pivot-table tbody th{position:static}
+@media (pointer:coarse){#csv-workbench #change-case-bar select{height:44px}}

@@ -111,7 +111,7 @@
   },
   "limits": [
     "View only: PDFs can't be edited or filled in here.",
-    "Scanned PDFs show their pictures; with no text layer there is nothing to select or search (no OCR).",
+    "Scanned PDFs show their pictures; with no text layer there is nothing to select or search until you run OCR PDF.",
     "Very large PDFs are limited by your device's memory."
   ],
   "faqTitle": "PDF viewer online: common questions",
@@ -130,15 +130,35 @@
     },
     {
       "question": "Why can't I select or search the text of a scanned PDF?",
-      "answer": "A scanned PDF is a picture of each page, with no text inside. The viewer shows the pictures, but there is no text to find or copy, because it does not run text recognition (OCR)."
+      "answer": "A scanned PDF is a picture of each page, with no text inside, so there is nothing to find or copy. OCR PDF reads the words on each page, in English or Arabic, and saves a copy you can search and select.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
     },
     {
       "question": "Can I fill in or edit the PDF?",
-      "answer": "Not here: the viewer shows the PDF, with any form fields and their values, but does not change it. To combine PDFs or number their pages, use Merge PDF or Add page numbers."
+      "answer": "The OpenAnyDoc PDF viewer only shows the PDF, with any form fields and their values, and does not change it. To combine PDFs or number their pages, use Merge PDF or Add page numbers."
     },
     {
       "question": "Does it work on my phone?",
       "answer": "Yes. It works in any modern browser on Android, iPhone, Windows, Mac and Linux, with no app to install. On a phone, the thumbnails open from the toolbar."
+    },
+    {
+      "question": "What program opens a PDF file?",
+      "answer": "Every web browser opens a PDF file, on a computer or a phone, so no extra program is needed: Edge or Chrome on Windows, Preview or Safari on a Mac, and the Files or Books app on iPhone; Adobe Acrobat Reader is optional. OpenAnyDoc also opens PDFs in your browser, with thumbnails and search, without uploading them. More options are in how to open a PDF without Adobe.",
+      "link": {
+        "text": "how to open a PDF without Adobe",
+        "path": "/open-pdf-without-adobe"
+      }
+    },
+    {
+      "question": "Why won't my PDF open?",
+      "answer": "A PDF usually won't open because it needs a password or because the file is damaged, often after a download or attachment that broke off. A password-protected PDF opens in the OpenAnyDoc viewer once you type the password, and Unlock PDF saves a copy without it; a damaged file can often be fixed with Repair PDF. If it opens but its text can't be searched, it is a scan, and OCR PDF adds the text.",
+      "link": {
+        "text": "Repair PDF",
+        "path": "/repair-pdf"
+      }
     }
   ]
 }

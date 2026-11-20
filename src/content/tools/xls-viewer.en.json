@@ -57,7 +57,7 @@
     },
     {
       "question": "How do I open an XLS file without Excel?",
-      "answer": "Drop it on this page. It opens in your browser with all its sheets, and you can read, edit and save it without installing Excel or creating an account."
+      "answer": "An XLS file opens without Excel in Google Sheets, LibreOffice Calc or an XLS viewer in your browser. In OpenAnyDoc it opens with all its sheets, and you can read, edit and save it without installing Excel or creating an account."
     },
     {
       "question": "Why don't I see the colours and fonts of my .xls file?",
@@ -74,6 +74,10 @@
     {
       "question": "Do the formulas in an XLS file still work?",
       "answer": "Yes. Formulas show their saved results, and after you edit a cell the formulas that depend on it are recalculated, for common functions such as SUM, IF, VLOOKUP and INDEX/MATCH. A formula with a function that is not supported keeps its saved result."
+    },
+    {
+      "question": "How do I open an XLS file on my phone?",
+      "answer": "On a phone, an .xls file opens in Google Sheets or the Microsoft Excel app, and on an iPhone the Files app also shows a preview. OpenAnyDoc opens it in the phone's browser with all its sheets, with nothing to install and no upload."
     }
   ]
 }

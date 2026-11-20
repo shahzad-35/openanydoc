@@ -1,0 +1,17 @@
+Libraries used by OpenAnyDoc's "JSON to TypeScript / Python / Go / Java / C#" pages and the JSON viewer's Convert menu, loaded
+only when types are written. Unmodified.
+
+quicktype-core 26.0.0
+  https://github.com/glideapps/quicktype
+  Copyright (c) 2017 Glide Apps. Licensed under the Apache License, Version 2.0:
+  https://www.apache.org/licenses/LICENSE-2.0
+  Distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+
+collection-utils 1.0.1 (Apache-2.0, https://github.com/glideapps/collection-utils), Copyright (c) Glide Apps.
+
+Bundled with it, MIT License (https://opensource.org/license/mit) unless stated:
+  @glideapps/ts-necessities 2.2.3, browser-or-node 3.0.0, is-url 1.2.4, lodash 4.18.1, pluralize 8.0.0, readable-stream 3.6.2,
+  unicode-properties 1.4.1, unicode-trie 2.0.0, urijs 1.19.11, wordwrap 1.0.0; yaml 2.9.1 (ISC License,
+  https://github.com/eemeli/yaml).
+  Each is the copyright of its authors as listed in its package; the MIT and ISC licences permit use, copying, modification and
+  distribution provided the copyright notice and permission notice are kept, and come without warranty.

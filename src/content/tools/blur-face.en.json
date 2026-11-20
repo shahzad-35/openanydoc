@@ -78,6 +78,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I blur a face in a photo?",
+      "answer": "Open the photo, check that each face is marked, choose blur or pixelate and the strength, then click Hide and download the result. OpenAnyDoc finds the faces in your browser, so the photo is never uploaded, and you can drag a box over any face it missed."
     }
   ]
 }

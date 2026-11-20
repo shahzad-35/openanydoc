@@ -77,11 +77,19 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    },
+    {
+      "question": "How do I sign a PDF without printing it?",
+      "answer": "Place a picture of your signature on the page in a PDF signing tool and save a copy, so there is no need to print, sign and scan the document. In OpenAnyDoc, draw, type or upload your signature, place it on the page and download the signed PDF; the file is signed in your browser and never uploaded."
     }
   ]
 }

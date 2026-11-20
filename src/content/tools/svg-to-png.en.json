@@ -70,6 +70,14 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "What is an SVG file?",
+      "answer": "An SVG file is a picture described as shapes, lines and text in code, so it stays sharp at any size; logos and icons are often SVG files. Every web browser opens one, but many apps, slides and social sites accept only pictures such as PNG, which is when converting helps."
+    },
+    {
+      "question": "How do I convert an SVG to PNG?",
+      "answer": "Open the SVG in a design app or a converter and export it as PNG at the size you need. In OpenAnyDoc, choose the SVG files, pick 1000, 2000 or 4000 pixels and download the PNGs with their transparent background; your browser draws them and nothing is uploaded."
     }
   ]
 }

@@ -45,7 +45,7 @@
     "Saving: a new PDF; text boxes, highlights and drawings stay editable in other PDF apps."
   ],
   "limits": [
-    "Text already in the PDF can't be rewritten; cover it with a white rectangle and add a text box on top.",
+    "Text already in the PDF can't be rewritten; cover it with a plain white picture (Picture tool) and add a text box on top.",
     "PDFs that need a password to open can't be edited; remove the password first.",
     "Shapes and pictures become part of the page; text boxes, highlights and drawings stay editable in other PDF apps."
   ],
@@ -57,7 +57,7 @@
     },
     {
       "question": "Can I change the text that is already in the PDF?",
-      "answer": "No. A PDF stores its text as placed letters, not as paragraphs, so it can't be rewritten here. To change a word, cover it with a white rectangle and type over it with a text box."
+      "answer": "No. A PDF stores its text as placed letters, not as paragraphs, so it can't be rewritten here. To change a word, cover it with a plain white picture using the Picture tool and type over it with a text box. The old words stay in the file underneath; to remove them, use Redact PDF."
     },
     {
       "question": "Is my original file changed?",
@@ -69,11 +69,19 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    },
+    {
+      "question": "How do I add text to a PDF?",
+      "answer": "Choose Text box, click where the text should go on the page, type it, then save a copy of the PDF. OpenAnyDoc does this in your browser, so the file is never uploaded, and the same editor adds highlights, drawings, shapes and pictures."
     }
   ]
 }

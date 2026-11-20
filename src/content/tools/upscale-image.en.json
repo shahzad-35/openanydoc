@@ -3,7 +3,7 @@
   "description": "Upscale a picture 2× or 4× in your browser with a model that adds detail instead of blurring it. JPG, PNG, WebP and HEIC. Free, nothing is uploaded.",
   "heading": "Upscale image",
   "subtitle": "Make a small picture two or four times larger with sharper detail than a plain resize; nothing is uploaded.",
-  "intro": "Upscale an image online without sending it anywhere: Swin2SR, a super-resolution model, runs in your browser and redraws the picture at twice the size, guessing fine detail where a normal resize only blurs. Choose 4× to run it twice. It works best on small photos, logos and screenshots. The first time, the model (7 MB, plus its 15 MB runtime) is loaded from this site and kept by your browser.",
+  "intro": "Upscale an image online without sending it anywhere: a super-resolution AI model runs in your browser and redraws the picture at twice the size, guessing fine detail where a normal resize only blurs. Choose 4× to run it twice. It works best on small photos, logos and screenshots. The first time, the model (7 MB, plus its 15 MB runtime) is loaded from this site and kept by your browser.",
   "features": [
     {
       "title": "Private",
@@ -74,6 +74,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I make a picture bigger without losing quality?",
+      "answer": "Enlarge a small picture with an AI upscaler, which redraws edges and fine detail, instead of a plain resize, which only stretches the pixels and blurs them. In OpenAnyDoc, choose the picture and 2× or 4×; the model runs in your browser and the picture is never uploaded."
     }
   ]
 }

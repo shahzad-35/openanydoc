@@ -57,6 +57,7 @@ import './jsonWorkbench.css'
 import NextSteps from '../../components/NextSteps'
 import { WorkbenchDialog } from '../sheet/SheetChrome'
 import { buildJsonLines, findJsonSourceFormat, isGeoJson } from './jsonFormats'
+import type { CodeLanguage } from './jsonConvert'
 import type { EmptyValueKinds } from './jsonModel'
 import { diffLines } from './jsonDiff'
 import type { LineChange } from './jsonDiff'
@@ -108,11 +109,39 @@ type WorkbenchNotice =
   // A JSON Lines, JSON5 or YAML file: shown and edited as JSON.
   | { kind: 'convertedSource'; format: 'jsonLines' | 'json5' | 'yaml' }
   | { kind: 'done'; title: string; detail: string }
-  // Opened from /json-escape-unescape: the step that fits what was opened (Unescape for a string, else Escape), one click away.
+  // Opened from /json-escape: the step that fits what was opened (Unescape for a string, else Escape), and Stringify.
   | { kind: 'escapeMode' }
+  // Opened from /json-minify or /json-sort: that page's step, one click away.
+  | { kind: 'minifyMode' }
+  | { kind: 'sortMode' }
   | null
 
 type StructureView = 'tree' | 'table' | 'graph' | 'compare' | 'schema' | 'geo'
+type TextTarget = 'yaml' | 'xml' | CodeLanguage
+
+// What each landing page of the JSON viewer (src/viewers.ts, `openedFrom`) opens on: its notice, its tab, an open JSONPath query,
+// or a step taken as soon as the file is read (validate, expand the tree, show a conversion). Keeps each page's mode its own.
+type JsonPageMode = { notice?: 'formatterHint' | 'escapeMode' | 'minifyMode' | 'sortMode'; view?: StructureView; query?: string; onOpen?: 'validate' | 'expandTwoLevels' | TextTarget }
+const jsonPageModes: Record<string, JsonPageMode> = {
+  '/json-formatter': { notice: 'formatterHint' },
+  '/json-validator': { onOpen: 'validate' },
+  '/json-escape': { notice: 'escapeMode' },
+  '/json-minify': { notice: 'minifyMode' },
+  '/json-sort': { notice: 'sortMode' },
+  '/json-tree-viewer': { onOpen: 'expandTwoLevels' },
+  '/json-graph': { view: 'graph' },
+  '/json-compare': { view: 'compare' },
+  '/json-schema': { view: 'schema' },
+  '/jsonpath': { query: '$..*' },
+  '/json-to-yaml': { onOpen: 'yaml' },
+  '/json-to-xml': { onOpen: 'xml' },
+  '/json-to-typescript': { onOpen: 'typescript' },
+  '/json-to-python': { onOpen: 'python' },
+  '/json-to-go': { onOpen: 'go' },
+  '/json-to-java': { onOpen: 'java' },
+  '/json-to-csharp': { onOpen: 'csharp' },
+}
+const codeLanguageLabels: Record<CodeLanguage, string> = { typescript: 'TypeScript', python: 'Python', go: 'Go', java: 'Java', csharp: 'C#' }
 // The dialogs: Repair's preview, "Remove empty values", a converted text (YAML, XML, TypeScript) and "Open from a URL".
 type JsonDialog =
   | { kind: 'repair'; repairedText: string; fixes: RepairFixes; changes: LineChange[] }
@@ -301,7 +330,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   const originalText = convertedText ?? decodedText
 
   const [parseResult, setParseResult] = useState<JsonParseResult | null>(null)
-  const [structureView, setStructureView] = useState<StructureView>('tree')
+  const pageMode = jsonPageModes[openedFile.openedFrom ?? ''] ?? {}
+  const [structureView, setStructureView] = useState<StructureView>(pageMode.view ?? 'tree')
   const [openDialog, setOpenDialog] = useState<JsonDialog>(null)
   const [emptyKinds, setEmptyKinds] = useState<EmptyValueKinds>({ nulls: true, emptyStrings: true, emptyObjects: true, emptyArrays: true })
   const [queryOutcome, setQueryOutcome] = useState<{ query: string; root: JsonValue; paths: JsonPath[] | null; error: string } | null>(null)
@@ -324,14 +354,13 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
     if (largeFileWarning) return { kind: 'largeFile', message: largeFileWarning }
     if (sourceFormat !== 'json') return { kind: 'convertedSource', format: sourceFormat }
-    if (openedFile.openedFrom === '/json-escape-unescape') return { kind: 'escapeMode' }
-    return openedFile.openedFrom === '/json-formatter' ? { kind: 'formatterHint' } : { kind: 'opened' }
+    return pageMode.notice ? { kind: pageMode.notice } : { kind: 'opened' }
   })
-  // Opened from the validator page: validate once as soon as the file is read, so the result is the first thing shown.
-  const hasValidatedOnOpenRef = useRef(false)
+  // The page's step on open (validate, expand, convert) runs once, as soon as the file is read, so its result is shown first.
+  const hasRunPageStepRef = useRef(false)
   const [validityPulseCount, setValidityPulseCount] = useState(0)
-  const [pathQuery, setPathQuery] = useState('')
-  const [isQueryOpen, setIsQueryOpen] = useState(false)
+  const [pathQuery, setPathQuery] = useState(pageMode.query ?? '')
+  const [isQueryOpen, setIsQueryOpen] = useState(pageMode.query !== undefined)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const [isFindOpen, setIsFindOpen] = useState(false)
   const [findText, setFindText] = useState('')
@@ -601,12 +630,14 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   }
 
   useEffect(() => {
-    if (openedFile.openedFrom !== '/json-validator' || parseResult === null || hasValidatedOnOpenRef.current) return
-    hasValidatedOnOpenRef.current = true
-    void validateNow()
-    // validateNow reads the latest draft through refs; it is not a dependency.
+    if (pageMode.onOpen === undefined || parseResult === null || hasRunPageStepRef.current) return
+    hasRunPageStepRef.current = true
+    if (pageMode.onOpen === 'validate') void validateNow()
+    else if (pageMode.onOpen === 'expandTwoLevels') expandToLevel(2)
+    else void convertToText(pageMode.onOpen)
+    // The steps read the latest document through refs and state; only the file being read starts this.
     // oxlint-disable-next-line react-hooks/exhaustive-deps
-  }, [openedFile.openedFrom, parseResult])
+  }, [parseResult])
 
   // Repair: fix the usual hand-written mistakes. A preview of the changed lines comes first; Apply makes them (one undo step).
   function repairText() {
@@ -685,6 +716,13 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     setNotice({ kind: 'done', title: t('json.escape.doneTitle'), detail: t('json.escape.doneDetail') })
   }
 
+  // Stringify: the document as one quoted line, ready to paste into source code or a test; the document itself is not changed.
+  async function copyAsStringLiteral() {
+    const documentText = await buildDocumentText()
+    if (!documentText) return
+    await copyText(JSON.stringify(JSON.stringify(parseValueExactly(documentText.fileText))), t('json.escape.stringifyCopied'))
+  }
+
   async function unescapeDocument() {
     setOpenMenu(null)
     if (!(await commitTypingFirst()) || root === null) return
@@ -703,8 +741,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     setNotice({ kind: 'done', title: t('json.escape.unescapedTitle'), detail: t('json.escape.unescapedDetail') })
   }
 
-  // YAML, XML or TypeScript interfaces from the document as Download would save it, shown to copy or download.
-  async function convertToText(target: 'yaml' | 'xml' | 'typescript') {
+  // YAML, XML or the types in a programming language from the document as Download would save it, shown to copy or download.
+  async function convertToText(target: TextTarget) {
     setOpenMenu(null)
     const documentText = await buildDocumentText()
     if (!documentText || root === null) return
@@ -714,9 +752,17 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
       setOpenDialog({ kind: 'text', title: t('convert.toYaml'), fileName: `${baseName}.yaml`, text: dump(JSON.parse(documentText.fileText), { lineWidth: -1 }), mimeType: 'application/yaml;charset=utf-8' })
       return
     }
-    const { jsonToTypeScript, jsonToXml } = await import('./jsonConvert')
-    if (target === 'xml') setOpenDialog({ kind: 'text', title: t('convert.toXml'), fileName: `${baseName}.xml`, text: jsonToXml(root), mimeType: 'application/xml;charset=utf-8' })
-    else setOpenDialog({ kind: 'text', title: t('convert.toTypeScript'), fileName: `${baseName}.ts`, text: jsonToTypeScript(root), mimeType: 'text/plain;charset=utf-8' })
+    const { codeFileExtensions, jsonToCode, jsonToXml } = await import('./jsonConvert')
+    if (target === 'xml') {
+      setOpenDialog({ kind: 'text', title: t('convert.toXml'), fileName: `${baseName}.xml`, text: jsonToXml(root), mimeType: 'application/xml;charset=utf-8' })
+      return
+    }
+    try {
+      const codeText = await jsonToCode(documentText.fileText, target)
+      setOpenDialog({ kind: 'text', title: t('convert.toCode', { language: codeLanguageLabels[target] }), fileName: `${baseName}${codeFileExtensions[target]}`, text: codeText, mimeType: 'text/plain;charset=utf-8' })
+    } catch {
+      showToast(t('convert.codeFailed'))
+    }
   }
 
   async function undoLastChange() {
@@ -1082,6 +1128,40 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
               {t(typeof root === 'string' ? 'json.escapeMode.isString' : 'json.escapeMode.isDocument')}{' '}
               <button className="btn sm primary" type="button" id="escape-mode-button" disabled={root === null} onClick={() => void (typeof root === 'string' ? unescapeDocument() : escapeDocument())}>
                 {t(typeof root === 'string' ? 'json.escape.unescapeButton' : 'json.escape.escapeButton')}
+              </button>{' '}
+              <button className="btn sm" type="button" id="stringify-button" disabled={root === null} onClick={() => void copyAsStringLiteral()}>
+                {t('json.escape.stringifyButton')}
+              </button>
+            </>
+          ),
+        }
+      case 'minifyMode':
+        return {
+          className: 'info',
+          icon: 'sparkle',
+          canUndo: false,
+          content: (
+            <>
+              {t('json.minifyMode.text')}{' '}
+              <button className="btn sm primary" type="button" id="minify-mode-button" disabled={root === null} onClick={() => void minifyDocument()}>
+                {t('json.minifyMode.button')}
+              </button>
+            </>
+          ),
+        }
+      case 'sortMode':
+        return {
+          className: 'info',
+          icon: 'sparkle',
+          canUndo: false,
+          content: (
+            <>
+              {t('json.sortMode.text')}{' '}
+              <button className="btn sm primary" type="button" id="sort-mode-ascending-button" disabled={root === null} onClick={() => void sortDocumentKeys('asc')}>
+                {t('json.sortMode.ascending')}
+              </button>{' '}
+              <button className="btn sm" type="button" id="sort-mode-descending-button" disabled={root === null} onClick={() => void sortDocumentKeys('desc')}>
+                {t('json.sortMode.descending')}
               </button>
             </>
           ),
@@ -1732,10 +1812,16 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
                 <SpriteIcon name="file" isSmall />
                 {t('convert.toExcel')}
               </button>
-              {(['yaml', 'xml', 'typescript'] as const).map((target) => (
+              {(['yaml', 'xml'] as const).map((target) => (
                 <button key={target} role="menuitem" type="button" id={`convert-button-menu-to-${target}`} onClick={() => void convertToText(target)}>
                   <SpriteIcon name="file" isSmall />
-                  {t(target === 'yaml' ? 'convert.toYaml' : target === 'xml' ? 'convert.toXml' : 'convert.toTypeScript')}
+                  {t(target === 'yaml' ? 'convert.toYaml' : 'convert.toXml')}
+                </button>
+              ))}
+              {(Object.keys(codeLanguageLabels) as CodeLanguage[]).map((language) => (
+                <button key={language} role="menuitem" type="button" id={`convert-button-menu-to-${language}`} onClick={() => void convertToText(language)}>
+                  <SpriteIcon name="file" isSmall />
+                  {t('convert.toCode', { language: codeLanguageLabels[language] })}
                 </button>
               ))}
             </div>

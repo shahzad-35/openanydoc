@@ -3,6 +3,7 @@ import { createRoot, hydrateRoot } from 'react-dom/client'
 import App from './App.tsx'
 import { getBrowserLocale, loadLocale, splitLocalePath } from './i18n'
 import { loadToolPageWords } from './seo'
+import { registerServiceWorker } from './pwa'
 import './index.css'
 
 const rootElement = document.getElementById('root')!
@@ -22,3 +23,5 @@ void Promise.all([loadLocale(locale), loadToolPageWords(locale, path)]).then(() 
   if (rootElement.hasAttribute('data-prerendered')) hydrateRoot(rootElement, app)
   else createRoot(rootElement).render(app)
 })
+
+if (import.meta.env.PROD) registerServiceWorker()

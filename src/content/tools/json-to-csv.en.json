@@ -78,6 +78,10 @@
     {
       "question": "Is my JSON uploaded?",
       "answer": "No. The JSON is parsed and converted by your browser on your device; nothing is sent to a server."
+    },
+    {
+      "question": "How do I convert a JSON file to CSV for Excel?",
+      "answer": "Open the .json file in OpenAnyDoc's JSON to CSV converter: each object becomes a row and nested keys become columns joined with dots. Download saves a .csv file that Excel and Google Sheets open, and the JSON is converted in your browser without being uploaded."
     }
   ]
 }

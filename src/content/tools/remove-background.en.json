@@ -78,6 +78,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I remove the background from a picture for free?",
+      "answer": "Use a background remover that finds the subject and makes the rest transparent; on iPhone and Mac you can also touch and hold, or right-click, the subject of a photo to lift it out. OpenAnyDoc does it in your browser with a small model on your device and saves a PNG, transparent or white, without uploading the photo."
     }
   ]
 }

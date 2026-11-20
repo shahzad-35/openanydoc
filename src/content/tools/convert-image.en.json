@@ -36,7 +36,7 @@
   "handlesTitle": "What the image converter handles",
   "handles": [
     "From: JPG, PNG, WebP, AVIF, GIF (first frame), BMP, TIFF (first page), SVG, HEIC and HEIF.",
-    "To: JPG (MozJPEG), PNG, WebP and AVIF.",
+    "To: JPG (high-quality encoder), PNG, WebP and AVIF.",
     "Transparency: kept in PNG, WebP and AVIF; white in JPG.",
     "Phone photos: turned upright from their orientation tag."
   ],
@@ -66,6 +66,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a picture to WebP or AVIF?",
+      "answer": "Add the picture, choose WebP or AVIF and the quality, then click Convert and download the new file. OpenAnyDoc converts one picture or many at once in your browser, without uploading them."
     }
   ]
 }

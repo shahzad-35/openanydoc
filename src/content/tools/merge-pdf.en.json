@@ -61,7 +61,11 @@
     },
     {
       "question": "Can I merge password-protected PDFs?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then merge it."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then merge it.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Does it work on my phone?",
@@ -70,6 +74,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I merge PDF files without uploading them?",
+      "answer": "Use a PDF tool that runs on your own device: Preview on a Mac combines PDFs when you drag pages between their thumbnails, and OpenAnyDoc merges them in your web browser on any device. Add the PDFs, drag them into order and click Merge PDF; the files never leave your device."
     }
   ]
 }

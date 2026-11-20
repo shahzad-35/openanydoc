@@ -1,0 +1,78 @@
+{
+  "title": "Transpose CSV Online – Swap Rows and Columns | OpenAnyDoc",
+  "description": "Transpose a CSV or Excel file in your browser: rows become columns and columns become rows, for the whole table or only the filtered rows. No upload.",
+  "heading": "Transpose CSV: Swap Rows and Columns",
+  "subtitle": "Drop a CSV or Excel file and flip its rows and columns in one step; nothing is uploaded.",
+  "intro": "Transpose a CSV file in your browser: the file opens with the transpose dialog, and one click turns its rows into columns and its columns into rows. Transpose the whole table, or only the rows your filters show. Undo puts it back, and download saves the result. Excel files open their first sheet. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Filtered rows only",
+      "text": "Transpose just the rows your filters show, or the whole table."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: transpose a CSV file",
+  "steps": [
+    {
+      "title": "Open your file",
+      "text": "Drop a CSV or Excel file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Transpose it",
+      "text": "In the transpose dialog, choose the whole table or only the shown rows, then confirm."
+    },
+    {
+      "title": "Check the result",
+      "text": "Rows are now columns and columns rows. Undo restores the original layout."
+    },
+    {
+      "title": "Download",
+      "text": "Save the result as CSV, or as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the transpose tool handles",
+  "handles": [
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Transpose: rows become columns and columns become rows.",
+    "Scope: the whole table, or only the filtered rows.",
+    "Undo: restores the table as it was."
+  ],
+  "limits": [
+    "Excel files: only the first sheet is opened.",
+    "The result is plain data; formulas and formatting from an Excel file are not carried over."
+  ],
+  "faqTitle": "Transpose CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser transposes the table on your device; nothing is sent to a server."
+    },
+    {
+      "question": "What does transposing do?",
+      "answer": "It turns the table on its side: the first row becomes the first column, the second row the second column, and so on."
+    },
+    {
+      "question": "Can I transpose only some rows?",
+      "answer": "Yes. Filter the table, then choose to transpose only the shown rows."
+    },
+    {
+      "question": "Can I undo a transpose?",
+      "answer": "Yes. Undo puts the rows and columns back as they were."
+    },
+    {
+      "question": "Can I transpose an Excel file?",
+      "answer": "Yes, its first sheet. Other sheets are not opened, so save them as separate files to transpose them."
+    },
+    {
+      "question": "How do I swap rows and columns in a CSV file?",
+      "answer": "Swap rows and columns by transposing the table, so the first row becomes the first column; in Excel the same is done with Paste Special and Transpose. In OpenAnyDoc, open the CSV and press Transpose; it runs in your browser without uploading the file, and Undo puts the table back."
+    }
+  ]
+}

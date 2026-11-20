@@ -1,5 +1,5 @@
 {
-  "title": "Crop PDF – Cut PDF Margins Online Free, No Upload",
+  "title": "Crop PDF – Trim PDF Margins Online for Free, No Upload",
   "description": "Crop PDF pages in your browser: drag a box over the part to keep and cut the same margins from every page or chosen pages. Free, nothing is uploaded.",
   "heading": "Crop PDF",
   "subtitle": "Drag a box over the part of the page to keep and cut the rest off every page you choose; nothing is uploaded.",
@@ -69,11 +69,19 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I crop the margins of a PDF?",
+      "answer": "Open the PDF, drag the box over the part of the page to keep, choose all pages or only some, then click Crop PDF and download the new file. OpenAnyDoc crops it in your browser, so the PDF is never uploaded, and what lies outside the box is removed."
     }
   ]
 }

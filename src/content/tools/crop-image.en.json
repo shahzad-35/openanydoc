@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I crop a photo to a square?",
+      "answer": "Choose the square 1:1 shape, drag the box over the part to keep, then click Crop pictures and download it. OpenAnyDoc crops the original picture in your browser at full quality, without uploading it."
     }
   ]
 }

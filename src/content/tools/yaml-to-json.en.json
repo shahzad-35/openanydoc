@@ -1,0 +1,89 @@
+{
+  "title": "YAML to JSON – Read YAML Config Files as JSON | OpenAnyDoc",
+  "description": "Convert a YAML or YML file to JSON in your browser, then browse it as a tree, validate it and download the .json. Nothing is uploaded.",
+  "heading": "YAML to JSON Converter",
+  "subtitle": "Open a .yaml or .yml file, or paste YAML, and it opens as JSON you can browse, check and download; nothing is uploaded.",
+  "intro": "Read a YAML config as JSON: open a .yaml or .yml file, drop it or paste the text, and it is read in your browser and opened in the JSON viewer. There you see it as a collapsible tree or as formatted text, check it, search it and download it as a .json file. Anchors and aliases are written out as the values they point to, so the JSON holds everything the YAML meant. It is a quick way to see what a Helm values file, a CI workflow or an OpenAPI spec really contains.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your YAML is read by your own browser and never sent to a server, so configs with secrets stay on your device."
+    },
+    {
+      "title": "A full JSON viewer",
+      "text": "The result opens as a tree and as text, with search, validation and the other JSON tools."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert YAML to JSON",
+  "steps": [
+    {
+      "title": "Open or paste your YAML",
+      "text": "Choose a .yaml or .yml file, drop it on the page, paste the text into the box, or try a sample."
+    },
+    {
+      "title": "It opens as JSON",
+      "text": "The YAML is read and shown in the JSON viewer as a tree and as formatted text. A YAML error shows its line."
+    },
+    {
+      "title": "Check and edit",
+      "text": "Expand the tree, search keys and values, edit the text and validate the result."
+    },
+    {
+      "title": "Download the JSON",
+      "text": "Download saves a .json file with the YAML file's name. The site keeps no copy, so download what you need."
+    }
+  ],
+  "handlesTitle": "What the YAML to JSON converter handles",
+  "handles": [
+    ".yaml and .yml files, a drop, the paste box or a sample, up to 10 MB.",
+    "Mappings become objects and sequences become arrays, in the order they were written.",
+    "Anchors (&), aliases (*) and merge keys (<<) are resolved into plain values.",
+    "Multi-line strings with | and > become ordinary JSON strings with \\n where the lines break.",
+    "Numbers, booleans and null become JSON numbers, true/false and null; quoted values stay strings."
+  ],
+  "limits": [
+    "Comments are not kept, because JSON has no place for them.",
+    "One document per file: a file with several documents separated by --- is not supported.",
+    "Custom tags such as !Ref or !Sub (CloudFormation) are not read.",
+    "Files up to 10 MB."
+  ],
+  "faqTitle": "YAML to JSON: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your YAML is read and turned into JSON by your browser, on your device. Pasted text stays in this tab and is never sent anywhere."
+    },
+    {
+      "question": "What happens to my YAML comments?",
+      "answer": "They are dropped. JSON has no comments, so lines starting with # do not appear in the result. Keep your .yaml file if you need them."
+    },
+    {
+      "question": "How are anchors and aliases converted?",
+      "answer": "Each alias is replaced by the value its anchor points to, and merge keys (<<) are merged into their mapping. The JSON shows the full values, with no references left."
+    },
+    {
+      "question": "My file has several documents separated by ---. Can I convert it?",
+      "answer": "Not as one file: only a single document is supported. Paste each document into the box on its own and convert them one at a time."
+    },
+    {
+      "question": "Why does my CloudFormation template fail?",
+      "answer": "CloudFormation uses custom tags such as !Ref and !GetAtt, which plain YAML readers do not know. Write them in their long form (Ref:, Fn::GetAtt:) and the file converts."
+    },
+    {
+      "question": "Can I turn JSON back into YAML?",
+      "answer": "Yes, on the JSON to YAML page.",
+      "link": {
+        "text": "JSON to YAML",
+        "path": "/json-to-yaml"
+      }
+    },
+    {
+      "question": "How do I convert a YAML file to JSON?",
+      "answer": "Convert YAML to JSON by reading the YAML into data and writing the same data as JSON, where indentation becomes braces and brackets and comments are dropped. In OpenAnyDoc, open, drop or paste the .yaml or .yml file and the JSON opens in the JSON viewer to check and download; the file is read in your browser and never uploaded."
+    }
+  ]
+}

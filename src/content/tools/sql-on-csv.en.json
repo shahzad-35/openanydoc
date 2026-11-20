@@ -1,0 +1,84 @@
+{
+  "title": "Run SQL on CSV Online – Query CSV and Excel | OpenAnyDoc",
+  "description": "Run SQL queries on a CSV or Excel file in your browser: SELECT, WHERE, GROUP BY and joins on a table named data, on your device. Free, no upload.",
+  "heading": "SQL on CSV: Query a File Like a Table",
+  "subtitle": "Drop a CSV or Excel file and query it with SQL as a table named data; nothing is uploaded.",
+  "intro": "Run SQL on a CSV file in your browser: the file is loaded into a SQL engine on your device as a table named data, and you write SELECT queries with WHERE, GROUP BY, ORDER BY, aggregates and joins of the table with itself. Results appear in a grid and download as CSV or Excel. Excel files open their first sheet. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Real SQL",
+      "text": "Queries run in a SQL engine inside the page, so standard SQL works: SELECT, WHERE, GROUP BY, ORDER BY, JOIN and aggregates."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: run SQL on a CSV file",
+  "steps": [
+    {
+      "title": "Open your file",
+      "text": "Drop a CSV or Excel file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Write a query",
+      "text": "Query the table named data, for example SELECT city, COUNT(*) FROM data GROUP BY city."
+    },
+    {
+      "title": "Read the results",
+      "text": "The result appears in a grid under the query; change the query and run it again as often as you like."
+    },
+    {
+      "title": "Download the result",
+      "text": "Save the result as a CSV or Excel file."
+    }
+  ],
+  "handlesTitle": "What SQL on CSV handles",
+  "handles": [
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Table: one table per file, named data.",
+    "Queries: SELECT with WHERE, GROUP BY, ORDER BY, aggregates and joins of data with itself (standard SQL, run in your browser).",
+    "Types: columns of numbers are stored as REAL, so sums and comparisons work on numbers.",
+    "Results: shown in a grid, downloadable as CSV or Excel."
+  ],
+  "limits": [
+    "One table per file; two files can't be joined.",
+    "Standard SQL only; extensions specific to one database may not work.",
+    "Excel files: only the first sheet is loaded."
+  ],
+  "faqTitle": "SQL on CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. The file is loaded into a SQL engine inside your browser, and queries run on your device; nothing is sent to a server."
+    },
+    {
+      "question": "What is the table called?",
+      "answer": "data. Write queries such as SELECT * FROM data WHERE amount > 100 ORDER BY amount DESC."
+    },
+    {
+      "question": "Which SQL dialect is used?",
+      "answer": "Standard SQL, run by a SQL engine in your browser. SELECT, WHERE, GROUP BY, ORDER BY, aggregates such as COUNT, SUM and AVG, and joins of the table with itself all work."
+    },
+    {
+      "question": "Can I join two CSV files?",
+      "answer": "No. Each file is one table named data, so joins are only of that table with itself."
+    },
+    {
+      "question": "Can I query an Excel file?",
+      "answer": "Yes. Its first sheet is loaded as the table data, and a notice says so."
+    },
+    {
+      "question": "How are number columns typed?",
+      "answer": "A column of numbers is stored as REAL, so SUM, AVG and comparisons such as amount > 100 treat its values as numbers, not text."
+    },
+    {
+      "question": "How do I query a CSV file with SQL?",
+      "answer": "Load the CSV into a SQL engine as a table and run SELECT queries on it, the same way you would query a database. In OpenAnyDoc, open the CSV and write a query such as SELECT * FROM data WHERE amount > 100; it runs in your browser without uploading the file, and the results download as CSV or Excel."
+    }
+  ]
+}

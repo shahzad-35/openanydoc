@@ -1,0 +1,80 @@
+{
+  "title": "JWT Decoder Online – Decode JSON Web Tokens | OpenAnyDoc",
+  "description": "Paste a JWT to read its header and payload as JSON and see when it expires in your own time zone. The token never leaves this tab. Free, no sign-up.",
+  "heading": "JWT Decoder: Read a JSON Web Token",
+  "subtitle": "Paste a JSON Web Token to see its header, payload and expiry in plain words; the token is never sent anywhere.",
+  "intro": "A free JWT decoder online: paste a JSON Web Token and its header and payload appear as formatted JSON, with the algorithm (alg) shown and the exp, iat and nbf claims turned into dates in your time zone, such as \"expired\" or \"valid for another 2 hours\". Decoding needs no key, so the token is never sent to a server; the signature is shown but not verified. The text you paste stays in this tab; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "features": [
+    {
+      "title": "Claims in plain words",
+      "text": "exp, iat and nbf are shown as dates in your time zone, with whether the token has expired or how long it is still valid. The algorithm is shown beside the header."
+    },
+    {
+      "title": "Private, free, no account",
+      "text": "The token is decoded by your own browser and stays in this tab. It is never sent to any server or saved, there are no share links or history, and there is nothing to sign up for."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, decoding keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: decode a JWT",
+  "steps": [
+    {
+      "title": "Paste the token",
+      "text": "Paste a JWT, the three dot-separated parts that start with eyJ, into the box. Try a sample if you just want to see it work."
+    },
+    {
+      "title": "Read the header and payload",
+      "text": "Both parts appear at once as formatted JSON, with the algorithm and every claim."
+    },
+    {
+      "title": "Check the dates",
+      "text": "exp, iat and nbf are shown as dates and times in your time zone, with \"expired\" or how long the token is still valid."
+    }
+  ],
+  "handlesTitle": "What the JWT decoder handles",
+  "handles": [
+    "Tokens: signed JWTs (JWS) with three parts, with or without a signature.",
+    "Header and payload: decoded from Base64URL and shown as formatted JSON.",
+    "Dates: exp, iat and nbf shown in your time zone, with expired or the time left.",
+    "Algorithm: the alg value from the header, such as HS256 or RS256.",
+    "Signature: shown as it is, never checked."
+  ],
+  "limits": [
+    "The signature is not verified; a decoded token is not proof that it is genuine.",
+    "Encrypted tokens (JWE, with five parts) can't be decoded, because they need the key.",
+    "Dates are read from the payload and compared with your device's clock."
+  ],
+  "faqTitle": "JWT decoder: questions and answers",
+  "faq": [
+    {
+      "question": "Is my text uploaded?",
+      "answer": "No. The token is decoded by your browser, on your device, and stays in this tab. It is never sent to any server or saved on the site, and there are no share links or history. Decoding needs no key, so there is nothing to send."
+    },
+    {
+      "question": "Does it verify the signature?",
+      "answer": "No, it only decodes. Verifying a signature needs the secret or the public key the token was signed with, and must be done by your own code on your server. Never trust a token's contents just because they decode."
+    },
+    {
+      "question": "Is it safe to paste a real token here?",
+      "answer": "The token stays in this tab and is never sent anywhere. Still, a valid token works like a password until it expires, so treat it with the same care wherever you paste it."
+    },
+    {
+      "question": "What do exp, iat and nbf mean?",
+      "answer": "exp is when the token expires, iat is when it was issued, and nbf is the time before which it must not be accepted. They are stored as seconds since 1970, and the page shows them as dates in your time zone."
+    },
+    {
+      "question": "Why can't it decode my token?",
+      "answer": "A token with five parts is an encrypted JWT (JWE), whose contents can only be read with the key. Otherwise a part may have been cut off or changed when it was copied; the page says which part could not be read."
+    },
+    {
+      "question": "Is it free, and does it work offline?",
+      "answer": "Yes to both. There is no account or limit, and once the page has loaded it keeps working without an internet connection."
+    },
+    {
+      "question": "How do I decode a JWT token?",
+      "answer": "A JWT is decoded by splitting it at the dots and Base64URL-decoding the first two parts, the header and the payload, which are plain JSON; no key is needed. The OpenAnyDoc JWT decoder does this in your browser as you paste the token, shows both parts as formatted JSON and turns exp, iat and nbf into dates, without sending the token anywhere."
+    }
+  ]
+}

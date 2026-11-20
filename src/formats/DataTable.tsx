@@ -299,6 +299,8 @@ type DataTableProps = {
   getCellNote?: (rowId: number, columnId: number) => string | null
   // A filter box under each column name.
   filterRow?: { getText: (columnId: number) => string; onChange: (columnId: number, text: string) => void; onBlur: (columnId: number) => void } | null
+  // Put before every id, when the table shares a page with another grid (the CSV viewer's SQL results).
+  idPrefix?: string
 }
 
 const FILTER_ROW_HEIGHT_PX = window.matchMedia('(pointer: coarse)').matches ? 48 : 30
@@ -337,6 +339,7 @@ export default function DataTable({
   onKeyDown,
   emptyMessage,
   tableRef,
+  idPrefix = '',
   pinnedRowCount = 0,
   frozenColumnCount = 0,
   getColumnLetter,
@@ -455,14 +458,14 @@ export default function DataTable({
     return (
       <div
         key={rowKey}
-        id={`row-${rowId}`}
+        id={`${idPrefix}row-${rowId}`}
         role="row"
         aria-rowindex={rowPosition + 2}
         className={`${isPinned ? 'relative border-b-2 border-b-rule' : 'absolute inset-x-0 border-b border-rule/70'} flex bg-paper-raised ${isHiddenLine?.('row', rowId) ? 'hidden-line' : ''}`}
         style={{ top: top ?? undefined, height: rowHeightPx }}
       >
         <div
-          id={`row-header-${rowId}`}
+          id={`${idPrefix}row-header-${rowId}`}
           role="rowheader"
           onClick={onRowHeaderClick ? (event) => onRowHeaderClick(rowId, event) : undefined}
           className={`sticky left-0 z-10 flex shrink-0 items-center justify-end border-r border-rule px-3 text-xs tabular-nums ${
@@ -494,7 +497,7 @@ export default function DataTable({
           return (
             <div
               key={columnId}
-              id={`cell-${rowId}-${columnId}`}
+              id={`${idPrefix}cell-${rowId}-${columnId}`}
               role="gridcell"
               aria-selected={isSelected}
               dir="auto"
@@ -566,7 +569,7 @@ export default function DataTable({
 
   return (
     <div
-      id="data-table"
+      id={`${idPrefix}data-table`}
       dir="ltr"
       ref={scrollContainerRef}
       tabIndex={0}
@@ -576,7 +579,7 @@ export default function DataTable({
       style={{ scrollPaddingTop: headerHeightPx + pinnedRowsHeightPx, scrollPaddingLeft: frozenColumnCount > 0 ? frozenColumnStartsPx[frozenColumnCount - 1] + (shownColumnWidthsPx[frozenColumnCount - 1] ?? 0) : rowNumberWidthPx }}
     >
       <div
-        id="data-grid"
+        id={`${idPrefix}data-grid`}
         role="grid"
         aria-label={t('table.label', { label })}
         aria-rowcount={rowIds.length + 1}
@@ -584,7 +587,7 @@ export default function DataTable({
         style={{ minWidth: tableMinWidthPx }}
       >
         <div className="sticky top-0 z-20">
-          <div id="data-grid-header" role="row" aria-rowindex={1} className="flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
+          <div id={`${idPrefix}data-grid-header`} role="row" aria-rowindex={1} className="flex overflow-x-clip border-b-2 border-(--file-color) bg-paper">
             <div
               role="columnheader"
               className="sticky left-0 z-10 flex shrink-0 items-start justify-end border-r border-rule bg-paper px-3 text-xs text-ink-soft"
@@ -601,7 +604,7 @@ export default function DataTable({
               return (
                 <div
                   key={columnId}
-                  id={`column-header-${columnId}`}
+                  id={`${idPrefix}column-header-${columnId}`}
                   role="columnheader"
                   aria-sort={columnDirection === 'asc' ? 'ascending' : columnDirection === 'desc' ? 'descending' : 'none'}
                   className={`group min-w-0 border-r border-rule/60 ${isFrozenColumn ? `sticky z-[6] bg-paper ${columnPosition === frozenColumnCount - 1 ? 'border-r-2 border-r-rule' : ''}` : 'relative'} ${isSelectedColumn ? selectedCellTint : ''} ${isHiddenLine?.('column', columnId) ? 'hidden-line' : ''} ${hasHiddenLineBefore?.('column', columnId) ? 'after-hidden-column' : ''}`}
@@ -620,7 +623,7 @@ export default function DataTable({
                     )}
                     {onColumnNameClick ? (
                       <button
-                        id={`column-menu-button-${columnId}`}
+                        id={`${idPrefix}column-menu-button-${columnId}`}
                         type="button"
                         dir="auto"
                         aria-haspopup="menu"
@@ -637,7 +640,7 @@ export default function DataTable({
                       </span>
                     )}
                     <button
-                      id={`sort-column-${columnId}`}
+                      id={`${idPrefix}sort-column-${columnId}`}
                       type="button"
                       onClick={() => onCycleSort(columnId)}
                       aria-label={t('table.sortBy', { name: isolateText(columnName) })}
@@ -649,7 +652,7 @@ export default function DataTable({
                   </div>
                   {filterRow && (
                     <input
-                      id={`filter-row-input-${columnId}`}
+                      id={`${idPrefix}filter-row-input-${columnId}`}
                       type="text"
                       dir="auto"
                       autoComplete="off"
@@ -672,7 +675,7 @@ export default function DataTable({
           {pinnedRowIds.map((rowId, rowPosition) => renderRow(rowId, rowPosition, measureRowHeight(rowId), null, `pinned-${rowId}`))}
         </div>
 
-        <div id="data-grid-body" role="rowgroup" className="relative" style={{ height: rowVirtualizer.getTotalSize() }}>
+        <div id={`${idPrefix}data-grid-body`} role="rowgroup" className="relative" style={{ height: rowVirtualizer.getTotalSize() }}>
           {rowVirtualizer.getVirtualItems().map((virtualRow) => renderRow(bodyRowIds[virtualRow.index], virtualRow.index + pinnedRowCount, virtualRow.size, virtualRow.start, virtualRow.key))}
         </div>
       </div>

@@ -43,7 +43,7 @@
   "limits": [
     "The layout is close, not exact: drawn shapes, colours, backgrounds and multi-column page layouts are not kept.",
     "Tables come out as lines with tab stops, not Word tables; PDF to Excel reads tables into cells.",
-    "Scanned PDFs hold pictures of pages, so there is no text to convert (that needs OCR).",
+    "Scanned PDFs hold pictures of pages, so there is no text to convert; run OCR PDF first.",
     "PDFs that need a password to open must be unlocked first, with Unlock PDF."
   ],
   "faqTitle": "PDF to Word: questions",
@@ -62,7 +62,11 @@
     },
     {
       "question": "Does it work with scanned PDFs?",
-      "answer": "No. A scanned PDF holds pictures of pages, so there is no text to convert; that needs text recognition (OCR), which this tool does not do."
+      "answer": "Not directly. A scanned PDF holds pictures of pages, so there is no text to convert. Run OCR PDF first, which adds a text layer in your browser, then convert the new copy here.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
     },
     {
       "question": "What about tables?",
@@ -75,6 +79,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a PDF to Word without uploading it?",
+      "answer": "Use a converter that runs on your own device: desktop Word can open a PDF and convert it, and OpenAnyDoc converts it to an editable .docx in your web browser, so the file never leaves your device. Choose the PDF, click Convert to Word and download the file."
     }
   ]
 }

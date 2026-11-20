@@ -142,15 +142,15 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Once the page and its Word viewer have loaded, opening documents needs no network. It is not an installable offline app, though: the page has to be loaded online first."
+      "answer": "Yes. After your first visit, the page and its Word viewer are kept on your device, so opening documents needs no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
-      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+      "answer": "Yes. The source code is public on GitHub. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
     },
     {
       "question": "How do I open a DOCX file without Microsoft Word?",
-      "answer": "Drop the .docx file on this page. It opens in your browser as pages, with its formatting, on Windows, macOS, Linux, ChromeOS, Android or iPhone, with no Word licence, no Office install and no account. For the other free options, see how to open a DOCX file without Word.",
+      "answer": "Without Microsoft Word, a .docx file opens in Google Docs, LibreOffice Writer, Pages on a Mac, or a Word viewer in your browser. In OpenAnyDoc, drop the .docx file on the page and it opens as pages, with its formatting, on Windows, macOS, Linux, ChromeOS, Android or iPhone, with no Word licence, no Office install and no account. For the other free options, see how to open a DOCX file without Word.",
       "link": {
         "text": "how to open a DOCX file without Word",
         "path": "/open-docx-without-word"
@@ -175,6 +175,14 @@
     {
       "question": "Why does my document look a little different from Word?",
       "answer": "The pages are drawn by your browser, not by Word. Fonts that are not installed on your device are replaced by similar ones, so lines can break in other places, and charts, text boxes and some drawing shapes may be simplified."
+    },
+    {
+      "question": "What is a .docx file?",
+      "answer": "A .docx file is a Word document: the format Microsoft Word saves by default, holding text, formatting, tables and pictures in a zipped package. Google Docs, LibreOffice, Pages on a Mac and OpenAnyDoc's Word viewer all open it."
+    },
+    {
+      "question": "How do I open a Word document on my phone?",
+      "answer": "On an iPhone or iPad, tap the .docx file in the Files app or in Mail to preview it; on Android, open it with Google Docs or the Microsoft Word app. OpenAnyDoc also opens it in the phone's browser, fitted to the screen width, with no app to install and no upload."
     }
   ]
 }

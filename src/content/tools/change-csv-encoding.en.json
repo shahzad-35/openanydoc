@@ -1,0 +1,84 @@
+{
+  "title": "Change CSV Encoding – Fix Arabic in Excel, Free | OpenAnyDoc",
+  "description": "Convert a CSV file to UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256 and fix Arabic that shows as question marks in Excel. Free, no upload.",
+  "heading": "Change CSV Encoding",
+  "subtitle": "Save a CSV as UTF-8 with BOM, UTF-16 or Windows-1256 so Arabic letters show correctly in Excel.",
+  "intro": "Change the encoding of a CSV file online without uploading it. When Arabic text opens in Excel as question marks or gibberish, the file's encoding is usually the cause: the encoding of your file is detected, a preview shows whether the letters read right, and you save a copy as UTF-8 with BOM, which Excel reads correctly, or as UTF-8, UTF-16 LE or Windows-1256 for the system that imports it.",
+  "features": [
+    {
+      "title": "See it before you save",
+      "text": "A preview of the first rows shows whether the letters read right with the encoding you picked."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, converting keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: change the encoding of a CSV file",
+  "steps": [
+    {
+      "title": "Open your CSV",
+      "text": "Choose or drop a CSV file. Its encoding is detected: UTF-8 with or without a BOM, UTF-16, or Windows-1256 when the file is not valid UTF-8."
+    },
+    {
+      "title": "Check the preview",
+      "text": "Look at the first rows. If the letters still look wrong, choose the file's encoding yourself."
+    },
+    {
+      "title": "Choose the output encoding",
+      "text": "Pick UTF-8 with BOM for Excel, plain UTF-8, UTF-16 LE, or Windows-1256 for older Arabic systems."
+    },
+    {
+      "title": "Download",
+      "text": "Download the converted copy. The original file on your device is not changed."
+    }
+  ],
+  "handlesTitle": "What Change CSV Encoding handles",
+  "handles": [
+    "Reads: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for Arabic files that are not valid UTF-8.",
+    "Override: choose the input encoding yourself when detection is wrong.",
+    "Writes: UTF-8, UTF-8 with BOM, UTF-16 LE and Windows-1256.",
+    "Preview: the first rows as they will read, before you download.",
+    "Content: cells, delimiters and quotes stay exactly as they are; only the encoding changes."
+  ],
+  "limits": [
+    "Detection covers UTF-8, UTF-16 and Windows-1256; files in other encodings may need the input encoding picked by hand.",
+    "Windows-1256 has no room for emoji or for letters outside Arabic and English, so such characters can't be saved in it.",
+    "A file that was already saved with question marks in place of letters can't be repaired; the original letters are gone."
+  ],
+  "faqTitle": "Change CSV Encoding: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your CSV is read and converted by your browser, on your device, and is never sent anywhere. Nothing is saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "Why does Arabic show as question marks or gibberish in Excel?",
+      "answer": "Excel guesses a CSV file's encoding when it opens it, and without a BOM it often guesses wrong for UTF-8. Save the file here as UTF-8 with BOM and Excel shows the Arabic letters correctly."
+    },
+    {
+      "question": "Which encoding should I choose?",
+      "answer": "UTF-8 with BOM for Excel, plain UTF-8 for most websites, databases and code, and Windows-1256 only when an older Arabic system asks for it. UTF-16 LE suits programs that expect Unicode text from Windows."
+    },
+    {
+      "question": "What if the encoding is detected wrong?",
+      "answer": "Choose the input encoding yourself and watch the preview. When the letters read right, the encoding is correct."
+    },
+    {
+      "question": "Can it fix a file that already shows question marks?",
+      "answer": "Only if the letters are still in the file. If a program saved it with question marks in their place, the original letters are lost and no encoding can bring them back; export the data again from its source."
+    },
+    {
+      "question": "Does it change my data?",
+      "answer": "No. Cells, delimiters and quotes stay as they are; only the way the letters are stored changes."
+    },
+    {
+      "question": "How do I save a CSV as UTF-8 with BOM so Excel shows Arabic?",
+      "answer": "Open the CSV, check that the letters read correctly in the preview, choose UTF-8 with BOM and download the copy; Excel then opens it with the Arabic intact. OpenAnyDoc converts the file in your browser without uploading it."
+    }
+  ]
+}

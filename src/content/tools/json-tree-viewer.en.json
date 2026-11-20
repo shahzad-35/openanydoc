@@ -1,0 +1,43 @@
+{
+  "title": "JSON Tree Viewer Online – Collapsible JSON Tree | OpenAnyDoc",
+  "description": "JSON tree viewer: open JSON as a collapsible tree, search it, see each value's type and copy a node's path such as data.items[3].price. No upload.",
+  "heading": "JSON Tree Viewer: Explore JSON Node by Node",
+  "subtitle": "Open or paste JSON to browse it as a collapsible tree with types, array indexes and copyable paths; nothing is uploaded.",
+  "intro": "A free JSON tree viewer: open a .json file, drop it or paste the text, and it opens as a tree with the top two levels expanded. Fold and unfold any object or array, search keys and values, and copy the path of any node, such as data.items[3].price, to use in your code. Arrays of objects can be shown as a table, and on a wide screen the formatted text sits beside the tree. The file is read in your browser and never leaves your device.",
+  "features": [
+    { "title": "Paths in one click", "text": "Copy the path of any node, written the way code reads it: data.items[3].price." },
+    { "title": "Private and free", "text": "Your JSON is opened by your own browser and never sent to a server. No account, no watermark." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: view JSON as a tree",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples." },
+    { "title": "Browse the tree", "text": "The top two levels open expanded. Click an object or array to fold or unfold it, or use Expand all and Collapse all." },
+    { "title": "Find and copy", "text": "Search for a key or value to jump to it, then copy the node's path. Arrays of objects can switch to a table." }
+  ],
+  "handlesTitle": "What the JSON tree viewer handles",
+  "handles": [
+    "A collapsible tree with the top two levels expanded, plus Expand all and Collapse all.",
+    "The type of every value (string, number, boolean, null, object, array) and the index of every array item.",
+    "Search across keys and values, with each match shown in the tree.",
+    "Copy a node's path, such as data.items[3].price.",
+    "A table view for arrays of objects, and the formatted text beside the tree on wide screens.",
+    "Big integer IDs shown with every digit."
+  ],
+  "limits": [
+    "Files up to 10 MB.",
+    "The tree needs valid JSON; a file with a syntax error opens in the text pane with the error marked.",
+    "The table view is for arrays of objects; other arrays stay in the tree."
+  ],
+  "faqTitle": "Questions about the JSON tree viewer",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON is read and drawn as a tree by your browser, on your device, and is never sent anywhere. Pasted text stays in this tab. Your browser's network panel shows no upload." },
+    { "question": "How do I get the path to a value?", "answer": "Select the node in the tree and choose Copy path. You get a path such as data.items[3].price, with dots for keys and brackets for array indexes, ready to paste into your code." },
+    { "question": "Why are only two levels open?", "answer": "So a large document stays readable when it opens. Click any node to go deeper, or press Expand all to open everything at once." },
+    { "question": "Can I see an array of records as a table?", "answer": "Yes. An array whose items are objects can be shown as a table, one row per item and one column per key." },
+    { "question": "How large a file can the tree show?", "answer": "Files up to 10 MB. Larger files are refused before they are read, so the page stays responsive." },
+    { "question": "Will long numbers be shown correctly?", "answer": "Yes. Integers too long for JavaScript, such as 64-bit IDs, are shown and copied with every digit, not rounded." },
+    { "question": "How do I view a JSON file as a tree?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON tree viewer: objects and arrays fold and unfold, the top two levels start open, and search jumps to any key or value. The file is read in your browser without being uploaded." },
+    { "question": "Which app can open a JSON file?", "answer": "Any text editor opens a .json file: Notepad on Windows, TextEdit on a Mac, or a code editor, and every web browser shows it as text. A tree viewer makes a large or nested one easier to read. More ways are in the guide on how to open a JSON file.", "link": { "text": "how to open a JSON file", "path": "/open-json-file" } }
+  ]
+}

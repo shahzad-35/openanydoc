@@ -7,6 +7,8 @@ import type { Database, SqlJsStatic } from 'sql.js'
 export type SqlQueryRequest =
   | { kind: 'load'; sqliteWasm: ArrayBuffer | null; tableName: string; header: string[]; isNumberColumn: boolean[]; rows: string[][] }
   | { kind: 'run'; sql: string }
+  // SQL to CSV: a .sql file (CREATE TABLE and INSERT statements) run in an empty database; the answer is its largest table.
+  | { kind: 'script'; sqliteWasm: ArrayBuffer | null; sql: string }
 export type SqlQueryResponse = { kind: 'loaded' } | { kind: 'result'; columns: string[]; rows: string[][] } | { kind: 'error'; message: string }
 
 let sqlJsReady: Promise<SqlJsStatic> | null = null
@@ -36,9 +38,31 @@ async function loadTable({ sqliteWasm, tableName, header, isNumberColumn, rows }
   insert.free()
 }
 
+const toCellText = (value: unknown) => (value === null ? '' : value instanceof Uint8Array ? `[${value.length} bytes]` : String(value))
+
+async function runScript({ sqliteWasm, sql }: Extract<SqlQueryRequest, { kind: 'script' }>): Promise<SqlQueryResponse> {
+  if (!sqlJsReady && sqliteWasm) sqlJsReady = initSqlJs({ wasmBinary: sqliteWasm })
+  if (!sqlJsReady) throw new Error('SQLite is not loaded')
+  const SQL = await sqlJsReady
+  database?.close()
+  database = new SQL.Database()
+  database.exec(sql)
+  const tableNames = (database.exec("SELECT name FROM sqlite_master WHERE type = 'table' AND name NOT LIKE 'sqlite_%'")[0]?.values ?? []).map((row) => String(row[0]))
+  if (tableNames.length === 0) throw new Error('The SQL makes no table (CREATE TABLE ... and INSERT INTO ...).')
+  const rowCount = (tableName: string) => Number(database?.exec(`SELECT COUNT(*) FROM ${quoteName(tableName)}`)[0]?.values[0][0] ?? 0)
+  const largestTableName = tableNames.reduce((largest, tableName) => (rowCount(tableName) > rowCount(largest) ? tableName : largest))
+  const result = database.exec(`SELECT * FROM ${quoteName(largestTableName)}`)[0]
+  const columns = result?.columns ?? (database.exec(`PRAGMA table_info(${quoteName(largestTableName)})`)[0]?.values ?? []).map((row) => String(row[1]))
+  return { kind: 'result', columns, rows: (result?.values ?? []).map((row) => row.map(toCellText)) }
+}
+
 self.onmessage = async (event: MessageEvent<SqlQueryRequest>) => {
   const request = event.data
   try {
+    if (request.kind === 'script') {
+      self.postMessage(await runScript(request))
+      return
+    }
     if (request.kind === 'load') {
       await loadTable(request)
       self.postMessage({ kind: 'loaded' } satisfies SqlQueryResponse)
@@ -48,7 +72,7 @@ self.onmessage = async (event: MessageEvent<SqlQueryRequest>) => {
     // The last statement's result is the answer; statements without rows (UPDATE ...) give an empty result.
     const results = database.exec(request.sql)
     const lastResult = results.at(-1)
-    const rows = (lastResult?.values ?? []).map((row) => row.map((value) => (value === null ? '' : value instanceof Uint8Array ? `[${value.length} bytes]` : String(value))))
+    const rows = (lastResult?.values ?? []).map((row) => row.map(toCellText))
     self.postMessage({ kind: 'result', columns: lastResult?.columns ?? [], rows } satisfies SqlQueryResponse)
   } catch (error) {
     self.postMessage({ kind: 'error', message: error instanceof Error ? error.message : String(error) } satisfies SqlQueryResponse)

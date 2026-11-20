@@ -61,8 +61,77 @@ export function readJsonRecordsAsTable(value: JsonValue): CellValue[][] | null {
   return [columnKeys, ...flatRecords.map((flatRecord) => columnKeys.map((key) => flatRecord.get(key) ?? ''))]
 }
 
+// The first list of objects in a document (depth first: every <book> of a <catalog>, the items of a YAML list), or the document
+// itself as one record when it holds no list.
+function findFirstRecordList(value: JsonValue): JsonValue {
+  if (Array.isArray(value)) return value
+  if (!isPlainObject(value)) return value
+  for (const child of Object.values(value)) {
+    if (Array.isArray(child) && child.some(isPlainObject)) return child
+    if (isPlainObject(child)) {
+      const nested = findFirstRecordList(child)
+      if (Array.isArray(nested)) return nested
+    }
+  }
+  return value
+}
+
+// The largest <table> of an HTML page (most cells), as rows of text; a cell spanning rows or columns repeats its text in each
+// cell it covers. Read with the browser's parser into a detached document: nothing runs and nothing is fetched.
+function readLargestHtmlTable(htmlText: string): string[][] | null {
+  const tables = Array.from(new DOMParser().parseFromString(htmlText, 'text/html').querySelectorAll('table'))
+  const largestTable = tables.sort((first, second) => second.querySelectorAll('td, th').length - first.querySelectorAll('td, th').length)[0]
+  if (!largestTable) return null
+  const grid: string[][] = []
+  Array.from(largestTable.rows).forEach((tableRow, rowPosition) => {
+    grid[rowPosition] ??= []
+    let columnPosition = 0
+    for (const cell of Array.from(tableRow.cells)) {
+      while (grid[rowPosition][columnPosition] !== undefined) columnPosition++
+      const cellText = (cell.textContent ?? '').replace(/\s+/g, ' ').trim()
+      for (let rowOffset = 0; rowOffset < Math.max(1, cell.rowSpan); rowOffset++) {
+        grid[rowPosition + rowOffset] ??= []
+        for (let columnOffset = 0; columnOffset < Math.max(1, cell.colSpan); columnOffset++) grid[rowPosition + rowOffset][columnPosition + columnOffset] = cellText
+      }
+      columnPosition += Math.max(1, cell.colSpan)
+    }
+  })
+  const columnCount = Math.max(0, ...grid.map((row) => row.length))
+  return grid.filter((row) => row.length > 0).map((row) => Array.from({ length: columnCount }, (_, position) => row[position] ?? ''))
+}
+
+// XML, YAML, an HTML table or a SQL script as one table (XML to CSV, YAML to CSV, HTML table to CSV, SQL to CSV).
+async function readMarkupTable(file: File, convertTo: ConversionTarget, locale: Locale): Promise<ReadResult> {
+  const lowerCaseName = file.name.toLowerCase()
+  const text = await file.text()
+  const asCells = (rows: string[][]) => (convertTo === 'csv' ? rows : rows.map((row, position) => (position === 0 ? row : row.map(readNumberOrText))))
+  try {
+    if (lowerCaseName.endsWith('.html') || lowerCaseName.endsWith('.htm')) {
+      const rows = readLargestHtmlTable(text)
+      return rows && rows.length > 0 ? { status: 'ok', tables: [{ sheetName: '', rows: asCells(rows) }] } : { status: 'error', message: translate(locale, 'convert.noHtmlTable') }
+    }
+    if (lowerCaseName.endsWith('.sql')) {
+      const { readTableFromSqlScript } = await import('./csv/sqliteWasm')
+      const { columns, rows } = await readTableFromSqlScript(text)
+      return { status: 'ok', tables: [{ sheetName: '', rows: asCells([columns, ...rows]) }] }
+    }
+    let value: JsonValue
+    if (lowerCaseName.endsWith('.xml')) {
+      value = (await import('./json/jsonConvert')).xmlToJsonValue(text)
+    } else {
+      const { CORE_SCHEMA, load } = await import('js-yaml')
+      value = (load(text, { schema: CORE_SCHEMA }) ?? null) as JsonValue
+    }
+    const rows = readJsonRecordsAsTable(findFirstRecordList(value))
+    return rows ? { status: 'ok', tables: [{ sheetName: '', rows }] } : { status: 'error', message: translate(locale, 'convert.notATable') }
+  } catch (error) {
+    return { status: 'error', message: translate(locale, 'convert.markupUnreadable', { reason: error instanceof Error ? error.message : '' }) }
+  }
+}
+
 // For JSON output, cells keep their type (numbers stay numbers); for CSV and Excel output they are the text the sheet shows.
 export async function readInputTables(file: File, contents: ArrayBuffer, inputViewerId: Viewer['id'], convertTo: ConversionTarget, locale: Locale): Promise<ReadResult> {
+  if (/\.(xml|ya?ml|html?|sql)$/i.test(file.name)) return readMarkupTable(file, convertTo, locale)
   if (inputViewerId === 'excel') {
     try {
       // UTC: a date cell is a calendar day, not a moment, so it must not move by the visitor's time zone in the ISO text.
@@ -158,6 +227,16 @@ async function buildConvertedFile(table: InputTable, convertTo: ConversionTarget
 // ready to open in that format's viewer. `sheetName` picks a workbook's sheet (the one on screen in the Excel viewer); without
 // it, the first sheet is converted. An error is the message to show.
 export async function convertForViewer(file: File, inputViewerId: Viewer['id'], convertTo: ConversionTarget, locale: Locale, sheetName = ''): Promise<{ file: File } | { error: string }> {
+  // XML to JSON (/xml-to-json): the whole document, read by the browser's own parser, the parser's message when it is not well-formed.
+  if (file.name.toLowerCase().endsWith('.xml') && convertTo === 'json') {
+    const { xmlToJsonValue } = await import('./json/jsonConvert')
+    try {
+      const jsonText = JSON.stringify(xmlToJsonValue(await file.text()), null, 2)
+      return { file: new File([jsonText], buildDownloadName(file.name, false, '.json'), { type: OUTPUT_FORMATS.json.mimeType }) }
+    } catch (error) {
+      return { error: translate(locale, 'convert.xmlNotWellFormed', { reason: error instanceof Error ? error.message : '' }) }
+    }
+  }
   const readResult = await readInputTables(file, await file.arrayBuffer(), inputViewerId, convertTo, locale)
   if (readResult.status === 'error') return { error: readResult.message }
   const { tables } = readResult

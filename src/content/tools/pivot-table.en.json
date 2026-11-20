@@ -1,0 +1,85 @@
+{
+  "title": "Pivot Table Online – Summarize CSV or Excel | OpenAnyDoc",
+  "description": "Make a pivot table from a CSV or Excel file in your browser: pick a row field, an optional column field and a count, sum or average. No upload.",
+  "heading": "Pivot Table Maker: Summarize a CSV Fast",
+  "subtitle": "Drop a CSV or Excel file, pick the fields and see the totals at once; nothing is uploaded.",
+  "intro": "Make a pivot table in your browser: open a CSV or Excel file, choose a row field, optionally a field across the top, and the count, sum or average of a number column. The matrix of totals updates as soon as you change a choice, counts only the rows your filters show, and downloads as CSV. Excel files open their first sheet. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Updates at once",
+      "text": "Change a field or the calculation and the totals are redrawn straight away."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: make a pivot table",
+  "steps": [
+    {
+      "title": "Open your file",
+      "text": "Drop a CSV or Excel file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Choose the fields",
+      "text": "Pick the row field, optionally a column field across the top, and count, sum or average of a number column."
+    },
+    {
+      "title": "Filter to narrow it",
+      "text": "Filter the table and the pivot uses only the rows that are shown."
+    },
+    {
+      "title": "Download the pivot",
+      "text": "Save the matrix of totals as a CSV file."
+    }
+  ],
+  "handlesTitle": "What the pivot table handles",
+  "handles": [
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Rows: one field down the side.",
+    "Columns: an optional field across the top.",
+    "Values: count of rows, or sum or average of a number column.",
+    "Filters: only the filtered rows are counted.",
+    "Download: the pivot as a CSV file."
+  ],
+  "limits": [
+    "One row field and one column field; no nested levels.",
+    "Count, sum and average only.",
+    "The pivot downloads as CSV, not as an Excel pivot table."
+  ],
+  "faqTitle": "Pivot table: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the file and adds up the totals on your device; nothing is sent to a server."
+    },
+    {
+      "question": "How do I make a pivot table from a CSV?",
+      "answer": "Open the file, choose the field for the rows, optionally one for the columns, then the calculation and the number column. The matrix appears at once."
+    },
+    {
+      "question": "What can the pivot calculate?",
+      "answer": "The count of rows, or the sum or average of a number column. Minimums, maximums and percentages are not offered."
+    },
+    {
+      "question": "Can I pivot only part of the data?",
+      "answer": "Yes. Filter the table first; the pivot counts only the rows your filters show and updates when they change."
+    },
+    {
+      "question": "Can I use an Excel file?",
+      "answer": "Yes. Its first sheet opens as the table, and a notice says so."
+    },
+    {
+      "question": "How do I save the pivot table?",
+      "answer": "Download it as a CSV file, which opens in Excel, Google Sheets or any spreadsheet."
+    },
+    {
+      "question": "How do I make a pivot table without Excel?",
+      "answer": "Google Sheets and LibreOffice Calc both make pivot tables for free, and OpenAnyDoc makes one in your browser from a CSV or Excel file. Choose the row field, an optional column field and a count, sum or average, then download the totals as CSV; nothing is uploaded."
+    }
+  ]
+}

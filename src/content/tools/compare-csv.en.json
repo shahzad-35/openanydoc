@@ -1,0 +1,84 @@
+{
+  "title": "Compare CSV Files – See Row Differences Free | OpenAnyDoc",
+  "description": "Compare two CSV files by a key column and see added, removed and changed rows, with old and new values marked. Free, and nothing is uploaded.",
+  "heading": "Compare Two CSV Files",
+  "subtitle": "See which rows were added, removed or changed between an old and a new CSV file.",
+  "intro": "Compare CSV files online without uploading them: choose the old and the new version of an export, pick the key column that identifies each row, and see every added, removed and changed row. Changed cells are marked with their old and new values, columns found in only one file are named, and the differences can be downloaded as a CSV with a change column for your records or a report.",
+  "features": [
+    {
+      "title": "Matched by key, not by line",
+      "text": "Rows are paired by a key column such as an ID, so a sorted or reordered file doesn't show false changes."
+    },
+    {
+      "title": "Private",
+      "text": "Both files are compared by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, comparing keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: compare two CSV files",
+  "steps": [
+    {
+      "title": "Choose the old and new files",
+      "text": "Choose or drop the older CSV first, then the newer one. Each file's delimiter and encoding are detected for you."
+    },
+    {
+      "title": "Pick the key column",
+      "text": "Choose the column that identifies each row in both files. An ID column is picked for you when one is found."
+    },
+    {
+      "title": "Review the differences",
+      "text": "See the added, removed and changed rows. In a changed row, each changed cell shows its old value and its new value."
+    },
+    {
+      "title": "Download the differences",
+      "text": "Download a CSV of the differences, with a change column that says added, removed or changed for every row."
+    }
+  ],
+  "handlesTitle": "What Compare CSV handles",
+  "handles": [
+    "Files: two .csv files, old and new, with comma, semicolon, tab or pipe delimiters.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16 and Windows-1256 for older Arabic files.",
+    "Rows: added, removed and changed rows, paired by the key column in any order.",
+    "Columns: columns that exist in only one of the files are named.",
+    "Problems: rows with an empty key or a key that appears more than once are reported."
+  ],
+  "limits": [
+    "Both files need a header row and a key column they share; without a key, rows can't be paired.",
+    "Rows with an empty or repeated key are reported but not compared.",
+    "Values are compared as text, so 1.0 and 1 count as different."
+  ],
+  "faqTitle": "Compare CSV: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Both CSV files are read and compared by your browser, on your device, and are never sent anywhere. Nothing is saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "What is a key column?",
+      "answer": "It is the column that names each row uniquely in both files, such as a customer ID, an order number or a product code. Rows with the same key are compared with each other, wherever they sit in the file."
+    },
+    {
+      "question": "Does the order of the rows matter?",
+      "answer": "No. Rows are paired by their key, so a file that was sorted differently shows only the real changes."
+    },
+    {
+      "question": "What if a key is empty or appears twice?",
+      "answer": "Those rows can't be paired safely, so they are listed separately and left out of the comparison. Fix the key in the file and compare again."
+    },
+    {
+      "question": "What if the files have different columns?",
+      "answer": "The columns found in only one file are named above the results, and the columns both files share are compared."
+    },
+    {
+      "question": "Can I save the differences?",
+      "answer": "Yes. Download them as a CSV with a change column (added, removed or changed) and open it in Excel or the CSV viewer."
+    },
+    {
+      "question": "How do I compare two CSV files to find the differences?",
+      "answer": "Open the older CSV, then the newer one, and pick the column that identifies each row, such as an ID: the added, removed and changed rows are listed. OpenAnyDoc compares them in your browser without uploading either file, and you can download the differences as a CSV."
+    }
+  ]
+}

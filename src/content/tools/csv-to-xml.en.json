@@ -1,0 +1,41 @@
+{
+  "title": "CSV to XML – Name Your Root and Row Elements | OpenAnyDoc",
+  "description": "Convert CSV to XML in your browser: one element per row, headers turned into valid tags, and <, > and & escaped. Copy it or download a .xml file.",
+  "heading": "CSV to XML Converter",
+  "subtitle": "Drop a CSV and its XML appears at once, one element per row, ready to copy or download as .xml.",
+  "intro": "Turn a CSV export into XML for a system that only imports XML, a feed or a config file. Choose, drop or paste a CSV or TSV file and the XML is written at once: a root element holding one row element per line, with a child element per column named after its header. You can rename the root and row elements. Header names with spaces or symbols are turned into valid element names, and <, > and & in your data are escaped. The delimiter and encoding, Arabic Windows-1256 included, are detected for you, and the file is read in your browser, never uploaded.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is turned into XML by your own browser and never sent to a server, so nobody else sees your data." },
+    { "title": "Valid XML every time", "text": "Header names become legal element names and special characters are escaped, so the file parses in any XML reader." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to XML",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample." },
+    { "title": "Name the elements", "text": "Keep <rows> and <row> or type the names your importer expects; the XML updates as you type." },
+    { "title": "Copy or download", "text": "Copy the XML to your clipboard or download it as a .xml file with the CSV's name." }
+  ],
+  "handlesTitle": "What the CSV to XML converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters detected.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, written out as UTF-8 XML.",
+    "Shape: <rows><row><column>value</column></row></rows>, with root and row names you choose.",
+    "Headers such as \"Order ID\" or \"2024 total\" turned into valid element names.",
+    "Escaping: <, > and & in cells written as &lt;, &gt; and &amp;.",
+    "Quoted fields with commas or line breaks inside, as Excel and Google Sheets export them."
+  ],
+  "limits": [
+    "Every value is written as text; the XML has no types, attributes or schema.",
+    "The preview shows the first 5,000 lines; Copy and Download always take the whole file."
+  ],
+  "faqTitle": "CSV to XML: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. The CSV is read and written as XML by your browser, on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "What does the XML look like?", "answer": "A root element (rows by default) with one row element per CSV line; inside each row, one element per column named after its header, holding the cell's value." },
+    { "question": "What happens to headers with spaces or symbols?", "answer": "XML element names cannot contain spaces or start with a digit, so such headers are turned into valid names. The values under them are unchanged." },
+    { "question": "Can I choose the element names?", "answer": "Yes. Type a root name and a row name, for example products and product, and the XML is rewritten at once." },
+    { "question": "Are numbers written as numbers?", "answer": "XML has no number type of its own, so every value is written as text. A schema or the importing program decides how to read it." },
+    { "question": "Does it work with large files?", "answer": "Yes, though very large files can take a few seconds. The preview shows the first 5,000 lines; Copy and Download always take the whole XML." },
+    { "question": "How do I convert a CSV file to XML?", "answer": "Open or paste the CSV, type the root and row element names your importer expects, then copy the XML or download it as a .xml file. OpenAnyDoc writes the XML in your browser, so the file is never uploaded." }
+  ]
+}

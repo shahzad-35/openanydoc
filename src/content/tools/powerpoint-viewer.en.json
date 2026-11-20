@@ -145,11 +145,11 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Once the page and its PowerPoint viewer have loaded, opening presentations needs no network. It is not an installable offline app, though: the page has to be loaded online first."
+      "answer": "Yes. After your first visit, the page and its PowerPoint viewer are kept on your device, so opening presentations needs no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
-      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+      "answer": "Yes. The source code is public on GitHub. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
     },
     {
       "question": "Why is it called beta?",
@@ -178,6 +178,18 @@
     {
       "question": "Does it show Arabic slides correctly?",
       "answer": "Arabic text in a slide is shown right to left, as PowerPoint saved it. Fonts that are not installed on your device are replaced by similar ones, so lines can break in other places."
+    },
+    {
+      "question": "How do I open a PPTX file without PowerPoint?",
+      "answer": "A PPTX file opens without PowerPoint in Google Slides, Keynote on a Mac, LibreOffice Impress on any computer, or a viewer in your web browser. OpenAnyDoc opens it in your browser, with thumbnails and full screen, without uploading it; the guide on how to open a PPTX file without PowerPoint compares the options.",
+      "link": {
+        "text": "how to open a PPTX file without PowerPoint",
+        "path": "/open-pptx-without-powerpoint"
+      }
+    },
+    {
+      "question": "What is a .pptx file?",
+      "answer": "A .pptx file is a PowerPoint presentation: a zipped package of the slides with their text, pictures, tables and speaker notes. A .ppsx file is the same presentation set to start as a slide show, and a .potx file is a template. OpenAnyDoc shows all three in your browser."
     }
   ]
 }

@@ -440,3 +440,27 @@
 #json-dialog .url-loader .url-error { color: var(--err) }
 #json-workbench .cmp-col { min-width: 0 }
 #json-workbench .cmp-col-title { margin: 0 0 4px; font-size: 12px; font-weight: 600; color: var(--muted) }
+
+/* The XML viewer and YAML formatter pages (src/tools/data/MarkupWorkbench.tsx): the same studio look in a box on the tool page,
+   the code editor beside the tree (one above the other on phones). Only "Copy path" is offered in the tree: the text is edited
+   in the code pane. */
+#json-workbench.markup-workbench { height: min(78dvh, 680px); grid-template-rows: auto auto minmax(0, 1fr); border: 1px solid var(--line-strong); border-radius: 16px; text-align: start }
+#json-workbench.markup-workbench .mw-sprite { position: absolute }
+#json-workbench.markup-workbench .mw-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 10px 12px; border-bottom: 1px solid var(--line); background: var(--panel) }
+#json-workbench.markup-workbench .mw-group { display: inline-flex; align-items: center; gap: 4px }
+#json-workbench.markup-workbench select { height: 26px; border: 1px solid var(--line-strong); border-radius: 7px; background: var(--panel); color: var(--text); font-size: 12px; padding-inline: 6px }
+#json-workbench.markup-workbench .mw-status { margin: 0; padding: 7px 12px; font-size: 12.5px; color: var(--muted); border-bottom: 1px solid var(--line) }
+#json-workbench.markup-workbench .mw-status.valid { color: var(--ok); background: var(--ok-soft) }
+#json-workbench.markup-workbench .mw-status.invalid { color: var(--err); background: var(--err-soft); overflow-wrap: anywhere }
+#json-workbench.markup-workbench .mw-panes { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); min-height: 0 }
+#json-workbench.markup-workbench .mw-text-pane { display: flex; flex-direction: column; min-height: 0; border-inline-end: 1px solid var(--line) }
+#json-workbench.markup-workbench .mw-text-pane .editor { margin-top: 0; border-top: 0 }
+#json-workbench.markup-workbench .mw-tree-pane { display: flex; flex-direction: column; min-height: 0; background: var(--panel) }
+#json-workbench.markup-workbench .mw-tree-empty { margin: 0; padding: 16px; color: var(--muted); font-size: 12.5px }
+#json-workbench.markup-workbench .acts button:not([id^="tree-copy-path-"]) { display: none }
+@media (max-width: 760px) {
+  #json-workbench.markup-workbench { height: auto }
+  #json-workbench.markup-workbench .mw-panes { grid-template-columns: minmax(0, 1fr); grid-template-rows: 340px 300px }
+  #json-workbench.markup-workbench .mw-text-pane { border-inline-end: 0; border-bottom: 1px solid var(--line) }
+  #json-workbench.markup-workbench select { height: 44px }
+}

@@ -1,0 +1,88 @@
+{
+  "title": "Token Counter – Count Tokens in Files and Text | OpenAnyDoc",
+  "description": "Count the tokens, words and characters in a PDF, Word, PowerPoint, Excel, CSV or JSON file, or in pasted text, before you paste it into an AI chat.",
+  "heading": "Token Counter",
+  "subtitle": "See how many tokens a file or text uses before you paste it into an AI chat; nothing is uploaded.",
+  "intro": "Check whether a document will fit in an AI chat before you paste it into ChatGPT, Claude or Gemini. Drop a PDF, Word, PowerPoint, Excel, CSV, JSON, TXT or Markdown file, or paste text, and see its tokens, words and characters. Files are first turned into text the way the AI-ready converters do it: a PDF's or Word document's text, a deck's slide outline, tables as Markdown. Tokens are counted with a standard tokenizer, the same one GPT-4o models use; other models split text their own way, so for them the count is an estimate. Everything is counted in your browser and nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Files and pasted text are counted by your own browser and never sent to a server or to an AI service."
+    },
+    {
+      "title": "Any document",
+      "text": "PDF, Word, PowerPoint, Excel, CSV, JSON, TXT and Markdown are counted as the text you would actually paste."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the counter keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: count tokens in a file or text",
+  "steps": [
+    {
+      "title": "Add a file or text",
+      "text": "Choose or drop a file, paste text into the box, or try a sample."
+    },
+    {
+      "title": "Read the counts",
+      "text": "The number of tokens, words and characters appears at once."
+    },
+    {
+      "title": "Decide what to paste",
+      "text": "If the text is too long for your chat, split it or keep only the parts you need."
+    }
+  ],
+  "handlesTitle": "What the token counter handles",
+  "handles": [
+    "Files: PDF, Word (.docx), PowerPoint (.pptx), Excel, CSV, JSON, TXT and Markdown.",
+    "Pasted text in any language, Arabic included.",
+    "Counts: tokens, words and characters.",
+    "Tokenizer: a standard tokenizer, the same one GPT-4o models use.",
+    "Tables from Excel and CSV are counted as Markdown tables, the form they take when pasted."
+  ],
+  "limits": [
+    "Counts for Claude, Gemini and other models are estimates, because each model uses its own tokenizer.",
+    "Scanned PDFs hold pictures of pages and have no text to count; run OCR PDF first.",
+    "Pictures are not counted, and very large files take a few seconds to read."
+  ],
+  "faqTitle": "Token counter: questions",
+  "faq": [
+    {
+      "question": "Is my text uploaded?",
+      "answer": "No. Files are read and counted by your own browser, on your device. Pasted text stays in this tab and is never sent anywhere, not to a server and not to any AI service. Nothing is saved on the site: no share links and no history."
+    },
+    {
+      "question": "What is a token?",
+      "answer": "A piece of text that an AI model reads as one unit: often a whole short word, part of a longer word, or a punctuation mark. Chat limits and prices are counted in tokens, not words."
+    },
+    {
+      "question": "Is the count exact for ChatGPT, Claude and Gemini?",
+      "answer": "It is counted with a standard tokenizer, the same one GPT-4o models use. Claude, Gemini and other models use their own tokenizers, so for them the number is an estimate that is usually close but not exact."
+    },
+    {
+      "question": "Why does my PDF show 0 tokens?",
+      "answer": "It is probably scanned: its pages are pictures, so there is no text to count. OCR PDF adds a text layer, then you can count it here.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
+    },
+    {
+      "question": "Why do Arabic texts use more tokens?",
+      "answer": "Tokenizers learn from text, and most of that text is English, so Arabic words are often split into more pieces. The same meaning in Arabic can take more tokens than in English."
+    },
+    {
+      "question": "How can I make a file use fewer tokens?",
+      "answer": "Paste only the part you need, and for data try JSON to TOON, which writes lists of records in a shorter form.",
+      "link": {
+        "text": "JSON to TOON",
+        "path": "/json-to-toon"
+      }
+    },
+    {
+      "question": "How do I count the tokens in a PDF or Word file?",
+      "answer": "Turn the file into plain text and run it through a tokenizer, the tool an AI model uses to split text into tokens. In OpenAnyDoc, drop the PDF, Word or other file and its tokens, words and characters appear at once, counted in your browser without uploading the file."
+    }
+  ]
+}

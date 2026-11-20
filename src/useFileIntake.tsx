@@ -97,7 +97,9 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
   const [isReading, setIsReading] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const acceptsPastedJson = acceptedExtensions.includes('.json')
-  const acceptsPastedText = allowPaste && (acceptedExtensions.includes('.csv') || acceptsPastedJson)
+  // YAML, XML, HTML and SQL pages (YAML to JSON, XML to CSV, HTML table to CSV, SQL to CSV ...) take pasted text as their own format.
+  const pastedMarkupExtension = acceptedExtensions.find((extension) => ['.yaml', '.yml', '.xml', '.html', '.htm', '.sql'].includes(extension))
+  const acceptsPastedText = allowPaste && (acceptedExtensions.includes('.csv') || acceptsPastedJson || pastedMarkupExtension !== undefined)
 
   function hasAcceptedExtension(fileName: string) {
     const lowerCaseFileName = fileName.toLowerCase()
@@ -198,6 +200,8 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     if (!acceptsPastedText) return
 
     function handlePaste(event: ClipboardEvent) {
+      // Pasting into a text box (the page's paste box, a tool's own text) is that box's; only a paste on the page opens a file.
+      if (event.target instanceof HTMLElement && event.target.closest('input, textarea, [contenteditable="true"]')) return
       const pastedFiles = Array.from(event.clipboardData?.files ?? [])
       const pastedText = event.clipboardData?.getData('text/plain') ?? ''
       if (pastedFiles.length > 0) {
@@ -205,7 +209,9 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       } else if (pastedText.trim() !== '') {
         // Text that starts like JSON (or any text on the JSON page) opens as JSON; other text as CSV.
         const isJson = acceptsPastedJson && (/^\s*[[{]/.test(pastedText) || !acceptedExtensions.includes('.csv'))
-        loadFile(isJson ? new File([pastedText], 'pasted.json', { type: 'application/json' }) : new File([pastedText], 'pasted.csv', { type: 'text/csv' }))
+        if (isJson) loadFile(new File([pastedText], 'pasted.json', { type: 'application/json' }))
+        else if (pastedMarkupExtension) loadFile(new File([pastedText], `pasted${pastedMarkupExtension}`, { type: 'text/plain' }))
+        else loadFile(new File([pastedText], 'pasted.csv', { type: 'text/csv' }))
       }
     }
 

@@ -1,5 +1,5 @@
 {
-  "title": "WebP to JPG – Convert WebP Images Free, No Upload",
+  "title": "WebP to JPG – Convert WebP Images to JPG Free, No Upload",
   "description": "Convert WebP pictures saved from websites to JPG in your browser, so they open in every app. Many at once, transparency on white. Free, nothing uploaded.",
   "heading": "Convert WebP to JPG",
   "subtitle": "Turn WebP pictures from the web into JPG that every app opens; nothing is uploaded.",
@@ -70,6 +70,14 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "What is a WebP file?",
+      "answer": "A WebP file is a picture format made for the web: it is smaller than JPG or PNG at the same look and can keep transparency. Every modern browser opens it, but some photo apps, printers and upload forms do not, which is when converting to JPG helps."
+    },
+    {
+      "question": "How do I convert WebP to JPG?",
+      "answer": "Open the WebP picture in an image app that can export JPEG, such as Preview on a Mac, and save it as JPG, or use a WebP to JPG converter for many pictures at once. In OpenAnyDoc, choose the WebP files, set the quality and download the JPGs; they are converted in your browser and never uploaded."
     }
   ]
 }

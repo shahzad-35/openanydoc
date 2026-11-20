@@ -4,7 +4,8 @@ import { isolateLeftToRight, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { pageSeo } from '../../seo'
 import { LARGE_FILE_WARNING_BYTES } from '../../useFileIntake'
-import { landingPages, viewers } from '../../viewers'
+import { ALL_TOOLS_PATH } from '../../tools/registry'
+import { viewers } from '../../viewers'
 import type { Viewer } from '../../viewers'
 import { getReleasedFormats } from '../../whatsNew'
 import { FormatCapabilities } from '../DropPanel'
@@ -123,10 +124,11 @@ export function FormatGrid({ onNavigate }: { onNavigate: (path: string) => void 
           </div>
         ))}
       <ul id="landing-links-list" aria-label={t('about.moreFileTools')} className="mt-6 flex flex-wrap gap-2">
-        {landingPages.map((page) => (
-          <li key={page.path}>
-            <PageLink id={`landing-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className="pill-link border-2 border-line text-sm">
-              {pageSeo[locale][page.path].linkText}
+        {/* The hubs, which list every landing page, converter and tool (too many to show here one by one). */}
+        {['/data-tools', '/pdf-tools', '/image-tools', ALL_TOOLS_PATH].map((hubPath) => (
+          <li key={hubPath}>
+            <PageLink id={`hub-link-${hubPath.slice(1)}`} path={hubPath} onNavigate={onNavigate} className="pill-link border-2 border-line text-sm">
+              {pageSeo[locale][hubPath].linkText}
             </PageLink>
           </li>
         ))}

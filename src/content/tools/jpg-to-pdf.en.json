@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert JPG pictures into one PDF?",
+      "answer": "Add the pictures to OpenAnyDoc's JPG to PDF tool, drag them into order, choose the page size and click Make PDF to download one PDF. PNG and iPhone HEIC photos work too, and the pictures never leave your browser."
     }
   ]
 }

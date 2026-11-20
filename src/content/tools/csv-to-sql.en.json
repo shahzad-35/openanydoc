@@ -1,0 +1,42 @@
+{
+  "title": "CSV to SQL Converter – INSERT Statements Free | OpenAnyDoc",
+  "description": "Convert a CSV file to SQL: a CREATE TABLE plus one INSERT per row, with number columns typed as REAL and text safely quoted. Free, nothing uploaded.",
+  "heading": "CSV to SQL Converter",
+  "subtitle": "Drop a CSV and get CREATE TABLE and INSERT statements at once, ready to copy or download as .sql.",
+  "intro": "Load a CSV export into a database without writing the statements by hand. Choose, drop or paste a CSV or TSV file and the SQL appears at once: a CREATE TABLE with one column per header, then one INSERT per row. The delimiter and encoding (UTF-8, UTF-16 or Windows-1256 Arabic) are detected for you. The table name comes from the file name and you can change it. Identifiers are in double quotes, as standard SQL writes them, so the script runs in PostgreSQL as it is. Copy the result or download it as a .sql file; the file is read in your browser and never uploaded.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is read and turned into SQL by your own browser and never sent to a server, so customer exports stay on your device." },
+    { "title": "Typed columns", "text": "A column whose filled cells are all numbers becomes REAL with unquoted values; everything else is text with quotes escaped." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to SQL",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample. The delimiter and encoding are detected for you." },
+    { "title": "Name the table", "text": "The table name starts from the file name; type another one and the SQL updates." },
+    { "title": "Copy or download", "text": "Copy the whole script to your clipboard or download it as a .sql file, then run it in your database." }
+  ],
+  "handlesTitle": "What the CSV to SQL converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Output: one CREATE TABLE with a column per header, then one INSERT per row.",
+    "Types: all-number columns become REAL with unquoted values, and an empty number becomes NULL.",
+    "Text: wrapped in single quotes, with any ' inside doubled, so names like O'Brien load safely.",
+    "Quoted CSV fields with commas or line breaks inside, as Excel and Google Sheets write them."
+  ],
+  "limits": [
+    "Identifiers use double quotes (standard SQL). MySQL reads them only with ANSI_QUOTES on; otherwise replace them with backticks.",
+    "Only two types are written, REAL and TEXT: dates, booleans and keys are left for you to set after import.",
+    "The preview shows the first 5,000 lines; Copy and Download always take the whole script."
+  ],
+  "faqTitle": "CSV to SQL: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your browser reads the CSV and writes the SQL on your device. Pasted text stays in this tab and is never sent anywhere, and nothing is saved on the site." },
+    { "question": "Which databases can run the script?", "answer": "PostgreSQL runs it as it is, because identifiers are in standard double quotes. MySQL and MariaDB need the ANSI_QUOTES SQL mode, or you can replace the double quotes with backticks." },
+    { "question": "How are column types chosen?", "answer": "A column becomes REAL when every filled cell in it is a number; its values are written without quotes and an empty cell becomes NULL. Any other column is TEXT." },
+    { "question": "Are apostrophes and quotes in my data safe?", "answer": "Yes. Text values are wrapped in single quotes and any single quote inside is doubled, so O'Brien is written as 'O''Brien' and the statement stays valid." },
+    { "question": "Where does the table name come from?", "answer": "From the CSV file's name. Type another name in the table name field and the CREATE TABLE and every INSERT update at once." },
+    { "question": "Is there a size limit?", "answer": "There is no fixed limit, but very large files can take a few seconds and are limited by your device's memory. The preview shows the first 5,000 lines; Copy and Download take everything." },
+    { "question": "How do I convert a CSV file to SQL INSERT statements?", "answer": "Open or paste the CSV, check the table name, then copy the CREATE TABLE and INSERT script or download it as a .sql file to run in your database. OpenAnyDoc writes the SQL in your browser, so the data is never uploaded." }
+  ]
+}

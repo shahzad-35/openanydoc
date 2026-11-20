@@ -14,6 +14,7 @@ import type { ConversionTarget, Viewer } from './viewers'
 import { preloadPageSamples } from './samples/toolSamples'
 import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage } from './tools/registry'
 import { loadToolPageWords } from './seo'
+import { keepPageForOffline, takeLaunchedFiles, takeSharedFile } from './pwa'
 
 const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 // The file page (viewers, editing, menus) is its own chunk, so content pages load only what they show.
@@ -22,7 +23,8 @@ const FileViewPage = lazy(loadFileViewPage)
 const viewerIdForConversion: Record<ConversionTarget, Viewer['id']> = { csv: 'csv', xlsx: 'excel', json: 'json' }
 
 // Once a page is idle it fetches the file page and the viewer its visitors are about to need (the page's own format, the result's
-// format on a conversion page, CSV on the home page), so a file then opens with no network and no wait.
+// format on a conversion page, CSV on the home page), so a file then opens with no network and no wait. Offline or after a new
+// release the fetch fails; the file then fails to open with LoadFailedMessage, not here.
 function preloadFileOpening(path: string) {
   // The page's bundled sample files ("Try a sample file"), so they also open offline.
   void preloadPageSamples(path).catch(() => {})
@@ -31,20 +33,17 @@ function preloadFileOpening(path: string) {
   if (toolPage?.loadComponent) {
     const preloads: Promise<unknown>[] = [toolPage.loadComponent?.() ?? Promise.resolve()]
     if (toolPage.category === 'pdf') preloads.push(import('./tools/pdf/pdfTasks').then(({ runPdfTask }) => runPdfTask({ type: 'warm-up' })))
-    void Promise.all(preloads).catch(() => {})
-    return
+    return Promise.all(preloads)
   }
   const toolViewer = findViewerByToolPath(path)
   // The Mask Data page keeps the file on the page: it needs its tool and the Excel writer, not a viewer.
   if (toolViewer?.tool === 'mask') {
-    void Promise.all([import('./formats/mask/MaskWorkbench'), import('./formats/excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]).catch(() => {})
-    return
+    return Promise.all([import('./formats/mask/MaskWorkbench'), import('./formats/excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())])
   }
   const viewerId = toolViewer?.convertTo ? viewerIdForConversion[toolViewer.convertTo] : (toolViewer?.id ?? (path === '/' ? 'csv' : undefined))
   const preloads = [loadFileViewPage(), formatDefinitions.find((definition) => definition.viewerId === viewerId)?.preloadViewer?.()]
   if (toolViewer?.convertTo) preloads.push(import('./formats/conversion'))
-  // Offline or after a new release the fetch fails; the file then fails to open with LoadFailedMessage, not here.
-  void Promise.all(preloads).catch(() => {})
+  return Promise.all(preloads)
 }
 
 // A part of the app that throws while drawing (most often code that could not be fetched: offline, or the page is older than the
@@ -243,9 +242,23 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
 
   useEffect(() => {
     if (openedFile) return
-    const preloadTimer = window.setTimeout(() => preloadFileOpening(path), 1500)
+    // Once fetched, the service worker keeps the page and what it loaded (src/pwa.ts), and the footer says it is available offline.
+    const preloadTimer = window.setTimeout(() => void preloadFileOpening(path).then(keepPageForOffline).catch(() => {}), 1500)
     return () => window.clearTimeout(preloadTimer)
   }, [path, openedFile])
+
+  // A file opened with the installed app from the desktop, or shared to it on Android (?shared=1), opens as if dropped on home,
+  // which sends it to its viewer. The manifests start both on the home page (scripts/build-static-pages.mjs).
+  useEffect(() => {
+    function openFileFromOutside(file: File) {
+      setOpenedFile(null)
+      setHandoffFile(file)
+    }
+    takeLaunchedFiles(openFileFromOutside)
+    if (!new URLSearchParams(window.location.search).has('shared')) return
+    window.history.replaceState(window.history.state, '', window.location.pathname)
+    void takeSharedFile().then((sharedFile) => sharedFile && openFileFromOutside(sharedFile))
+  }, [])
 
   // The page language follows the address (/ar/... is right-to-left Arabic).
   useEffect(() => {

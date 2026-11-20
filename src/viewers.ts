@@ -46,6 +46,50 @@ export function findTableFormat(fileName: string): TableFormat {
 
 export const supportedExtensions = viewers.flatMap((viewer) => viewer.extensions)
 
+// The media type of each extension above, for the installed app's manifests (file_handlers and share_target, written by
+// scripts/build-static-pages.mjs). The build stops if an extension is missing here.
+export const mimeTypeByExtension: Record<string, string> = {
+  '.csv': 'text/csv',
+  '.tsv': 'text/tab-separated-values',
+  '.tab': 'text/tab-separated-values',
+  '.parquet': 'application/vnd.apache.parquet',
+  '.txt': 'text/plain',
+  '.json': 'application/json',
+  '.jsonl': 'application/jsonl',
+  '.ndjson': 'application/x-ndjson',
+  '.json5': 'application/json5',
+  '.geojson': 'application/geo+json',
+  '.yaml': 'application/yaml',
+  '.yml': 'application/yaml',
+  '.xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  '.xls': 'application/vnd.ms-excel',
+  '.xlsm': 'application/vnd.ms-excel.sheet.macroenabled.12',
+  '.ods': 'application/vnd.oasis.opendocument.spreadsheet',
+  '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  '.dotx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.template',
+  '.docm': 'application/vnd.ms-word.document.macroenabled.12',
+  '.odt': 'application/vnd.oasis.opendocument.text',
+  '.pdf': 'application/pdf',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.png': 'image/png',
+  '.webp': 'image/webp',
+  '.avif': 'image/avif',
+  '.gif': 'image/gif',
+  '.bmp': 'image/bmp',
+  '.heic': 'image/heic',
+  '.heif': 'image/heif',
+  '.tif': 'image/tiff',
+  '.tiff': 'image/tiff',
+  '.svg': 'image/svg+xml',
+  '.pptx': 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  '.ppsx': 'application/vnd.openxmlformats-officedocument.presentationml.slideshow',
+  '.potx': 'application/vnd.openxmlformats-officedocument.presentationml.template',
+  '.pptm': 'application/vnd.ms-powerpoint.presentation.macroenabled.12',
+  // Not a viewer's format: the installed app opens it on the XML viewer page (its own file handler).
+  '.xml': 'application/xml',
+}
+
 // Pages for one job of a live viewer (/json-formatter is the JSON viewer's page with its own words in src/content/tools/json-formatter.<locale>.json),
 // served like a format page at /en/json-formatter and /ar/json-formatter. `extensions` narrows what their drop zone accepts.
 // Only jobs the viewer really does. A page with `convertTo` is a converter: `viewerId` is the format it reads, and the file is
@@ -57,7 +101,24 @@ export type LandingPage = { path: string; viewerId: Viewer['id']; extensions?: s
 export const landingPages: LandingPage[] = [
   { path: '/json-formatter', viewerId: 'json' },
   { path: '/json-validator', viewerId: 'json' },
-  { path: '/json-escape-unescape', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-escape', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-minify', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-sort', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-tree-viewer', viewerId: 'json' },
+  { path: '/json-graph', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-compare', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-schema', viewerId: 'json', extensions: ['.json'] },
+  { path: '/jsonpath', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-to-yaml', viewerId: 'json', extensions: ['.json'] },
+  { path: '/yaml-to-json', viewerId: 'json', extensions: ['.yaml', '.yml'] },
+  { path: '/json-to-xml', viewerId: 'json', extensions: ['.json'] },
+  // XML is converted on the page (the browser's parser, conversion.ts) and opens in the JSON viewer.
+  { path: '/xml-to-json', viewerId: 'json', extensions: ['.xml'], convertTo: 'json' },
+  { path: '/json-to-typescript', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-to-python', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-to-go', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-to-java', viewerId: 'json', extensions: ['.json'] },
+  { path: '/json-to-csharp', viewerId: 'json', extensions: ['.json'] },
   { path: '/tsv-viewer', viewerId: 'csv', extensions: ['.tsv', '.tab'] },
   { path: '/large-csv-viewer', viewerId: 'csv' },
   { path: '/xls-viewer', viewerId: 'excel', extensions: ['.xls'] },
@@ -66,6 +127,20 @@ export const landingPages: LandingPage[] = [
   { path: '/excel-to-json', viewerId: 'excel', convertTo: 'json' },
   { path: '/csv-to-json', viewerId: 'csv', convertTo: 'json' },
   { path: '/json-to-csv', viewerId: 'json', extensions: ['.json'], convertTo: 'csv' },
+  // Step 19: other formats read as a table (conversion.ts), and the CSV viewer opened on one job (csvPageModes in CsvViewer.tsx);
+  // an Excel file on those pages is read as a table (its first sheet) and opens in the CSV viewer.
+  { path: '/xml-to-csv', viewerId: 'csv', extensions: ['.xml'], convertTo: 'csv' },
+  { path: '/yaml-to-csv', viewerId: 'csv', extensions: ['.yaml', '.yml'], convertTo: 'csv' },
+  { path: '/html-table-to-csv', viewerId: 'csv', extensions: ['.html', '.htm'], convertTo: 'csv' },
+  { path: '/sql-to-csv', viewerId: 'csv', extensions: ['.sql'], convertTo: 'csv' },
+  { path: '/csv-validator', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab'] },
+  { path: '/split-csv', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab'] },
+  { path: '/sql-on-csv', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.xlsx', '.xls', '.xlsm', '.ods'], convertTo: 'csv' },
+  { path: '/pivot-table', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.xlsx', '.xls', '.xlsm', '.ods'], convertTo: 'csv' },
+  { path: '/chart-maker', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.xlsx', '.xls', '.xlsm', '.ods'], convertTo: 'csv' },
+  { path: '/remove-duplicates', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.xlsx', '.xls', '.xlsm', '.ods'], convertTo: 'csv' },
+  { path: '/transpose', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.xlsx', '.xls', '.xlsm', '.ods'], convertTo: 'csv' },
+  { path: '/change-case', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.xlsx', '.xls', '.xlsm', '.ods'], convertTo: 'csv' },
   { path: '/mask-data', viewerId: 'csv', extensions: ['.csv', '.tsv', '.tab', '.json', '.xlsx', '.xls', '.xlsm', '.ods', '.txt'], tool: 'mask' },
 ]
 

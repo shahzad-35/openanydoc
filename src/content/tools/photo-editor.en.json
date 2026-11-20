@@ -66,6 +66,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I brighten a dark photo?",
+      "answer": "Raise the brightness, and the contrast if it then looks flat, in any photo editor, such as the Photos app on a phone or a computer. The OpenAnyDoc photo editor does it in your browser with sliders and a live preview, then saves a full-size copy, and the photo is never uploaded."
     }
   ]
 }

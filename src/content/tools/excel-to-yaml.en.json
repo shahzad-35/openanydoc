@@ -1,0 +1,79 @@
+{
+  "title": "Excel to YAML Converter – Rows as a YAML List | OpenAnyDoc",
+  "description": "Excel to YAML converter: turn a sheet of an XLSX, XLS or ODS workbook into a YAML list with one mapping per row, keyed by your headers. No upload.",
+  "heading": "Excel to YAML Converter",
+  "subtitle": "Pick a sheet and each row becomes a YAML mapping keyed by your headers; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into YAML in your browser: each row becomes one item in a YAML list, with the header row as keys. Plain decimal numbers stay numbers and everything else is text, quoted where YAML needs it. Use it for config files, test fixtures or static-site data, and copy it or download a .yaml file.",
+  "features": [
+    {
+      "title": "Valid YAML",
+      "text": "Values that YAML could misread are quoted for you, so the file reads back as you meant it."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to YAML",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet becomes YAML at once; choose another from the sheet list."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the YAML, or download it as a .yaml file."
+    }
+  ],
+  "handlesTitle": "What the Excel to YAML converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Shape: a list with one mapping per row, keyed by the header row; empty rows are skipped.",
+    "Numbers: plain decimals such as 42 or 3.5 become YAML numbers; every other value stays text.",
+    "Values: each cell as Excel shows it, so formulas give their result and dates keep their displayed format.",
+    "Merged cells: the value goes to the first cell of the range; the others stay empty."
+  ],
+  "limits": [
+    "A number Excel shows with a currency sign, percent sign or thousands separator, such as $1,200, stays text.",
+    "Dates are written as the text Excel shows, not as YAML dates, and password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to YAML: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the YAML on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "What does the YAML look like?",
+      "answer": "A list with one item per row. A sheet with Name and Price columns becomes \"- Name: Pen\" followed by \"  Price: 2.5\", then the next row."
+    },
+    {
+      "question": "Why is my price written as text?",
+      "answer": "Cells are read as Excel shows them. A plain 2.5 becomes a number, but $2.50 or 1,200 keeps its sign or separator, so it is written as text to avoid changing it."
+    },
+    {
+      "question": "Are values like yes, no or 001 kept as text?",
+      "answer": "Yes. Values such as yes, no or 001, which YAML would otherwise read as a true/false value or a number, are put in quotes, so they stay text when the file is read back."
+    },
+    {
+      "question": "Can I convert every sheet at once?",
+      "answer": "No, one sheet at a time. Pick each sheet from the sheet list and copy or download its YAML in turn."
+    },
+    {
+      "question": "Is the whole sheet converted if the preview is cut short?",
+      "answer": "Yes. The preview shows the first 5,000 lines, but Copy and Download take the whole YAML."
+    },
+    {
+      "question": "How do I convert an Excel sheet to YAML?",
+      "answer": "Open the workbook in OpenAnyDoc's Excel to YAML converter, pick the sheet, and copy the YAML or download it as a .yaml file. Each row becomes one item in a YAML list with the column headers as keys, and the file never leaves your browser."
+    }
+  ]
+}

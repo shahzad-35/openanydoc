@@ -1,0 +1,97 @@
+{
+  "title": "Word to Markdown – Convert DOCX to .md Free | OpenAnyDoc",
+  "description": "Convert a Word document to Markdown in your browser: headings, bold, lists, links and simple tables, ready to paste into an AI chat. Free, no upload.",
+  "heading": "Word to Markdown",
+  "subtitle": "Turn a .docx file into clean Markdown you can paste into an AI chat; nothing is uploaded.",
+  "intro": "Convert a Word document to Markdown when you want to paste it into ChatGPT, Claude or Gemini, a wiki or your notes without the clutter of copied formatting. Open a .docx, .dotx or .docm file and its headings become #, ## and ###, bold and italic text keeps its marks, lists stay lists, links keep their address and simple tables become Markdown tables. The result appears in a text box with its token count, so you can see how much of a chat it will fill before you paste. The file is read by your browser and never uploaded, and nothing is sent to any AI service.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is converted by your own browser and never sent to a server or to an AI service."
+    },
+    {
+      "title": "Ready to paste",
+      "text": "Copy the Markdown in one click or download it as a .md file, with the token count shown beside it."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Word to Markdown",
+  "steps": [
+    {
+      "title": "Open your document",
+      "text": "Choose or drop a .docx, .dotx or .docm file, or try a sample."
+    },
+    {
+      "title": "Read the Markdown",
+      "text": "The Markdown appears in a text box, with its token count."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Click Copy to paste it into an AI chat or a note, or download the .md file."
+    }
+  ],
+  "handlesTitle": "What Word to Markdown handles",
+  "handles": [
+    "Files: .docx, .dotx and .docm Word documents.",
+    "Headings: Word's Heading 1, 2 and 3 styles become #, ## and ###.",
+    "Text: bold and italic, bulleted and numbered lists, and links with their address.",
+    "Tables: simple tables become Markdown tables with a header row.",
+    "Arabic and other right-to-left text, kept in its reading order."
+  ],
+  "limits": [
+    "Pictures, charts and shapes are left out; only the text is converted.",
+    "Old .doc files and OpenDocument .odt files are not read here; save them as .docx in Word or LibreOffice first.",
+    "Tables with merged cells or tables inside tables may come out flattened.",
+    "Headings are found from Word's heading styles, so text that only looks like a heading stays a paragraph."
+  ],
+  "faqTitle": "Word to Markdown: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your document is read and converted by your own browser, on your device, and is never sent anywhere. Nothing is sent to any AI service either: you choose where to paste the result."
+    },
+    {
+      "question": "Why convert Word to Markdown before pasting into an AI chat?",
+      "answer": "Markdown keeps the structure (headings, lists, tables) as plain text, so ChatGPT, Claude or Gemini can follow the document's outline, and the text uses fewer tokens than a copy full of hidden formatting."
+    },
+    {
+      "question": "What happens to pictures?",
+      "answer": "They are left out, because Markdown here carries only the text. Charts and shapes are left out too."
+    },
+    {
+      "question": "Can I convert an old .doc or an .odt file?",
+      "answer": "Not directly: only .docx, .dotx and .docm files are converted. Open the file in Word or LibreOffice and save it as .docx, then drop the new file here. You can still read an .odt file in the Word viewer.",
+      "link": {
+        "text": "Word viewer",
+        "path": "/word-viewer"
+      }
+    },
+    {
+      "question": "What is the token count?",
+      "answer": "An estimate of how much room the text takes in an AI chat. The token counter explains how it is counted.",
+      "link": {
+        "text": "token counter",
+        "path": "/token-counter"
+      }
+    },
+    {
+      "question": "Should I hide personal details before pasting?",
+      "answer": "If the document holds names, emails or phone numbers, check them first. Mask data hides names, emails, phone numbers and IDs in CSV, Excel, JSON and text files.",
+      "link": {
+        "text": "Mask data",
+        "path": "/mask-data"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no limit on how often you use it, and nothing is saved on the site: no share links and no history."
+    },
+    {
+      "question": "How do I convert a Word document to Markdown?",
+      "answer": "Convert a Word document to Markdown by turning its headings into #, its lists into Markdown lists and its tables into Markdown tables, keeping the text and dropping the formatting. In OpenAnyDoc, open the .docx file and the Markdown appears at once with its token count, ready to copy; the file is converted in your browser and never uploaded."
+    }
+  ]
+}

@@ -70,6 +70,18 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "What is a .heic file?",
+      "answer": "A .heic file is a photo saved in the HEIF format, which iPhones use by default because it takes less space than a JPG at similar quality. Many Windows PCs, websites and older apps cannot open it, so converting it to JPG lets it open everywhere."
+    },
+    {
+      "question": "What program opens a .heic file?",
+      "answer": "Photos and Preview open .heic files on a Mac, the Photos app opens them on an iPhone, Google Photos opens them on most Android phones, and Windows opens them in Photos once the HEIF Image Extensions from the Microsoft Store are installed. OpenAnyDoc's image viewer opens them in any browser without uploading them.",
+      "link": {
+        "text": "image viewer",
+        "path": "/image-viewer"
+      }
     }
   ]
 }

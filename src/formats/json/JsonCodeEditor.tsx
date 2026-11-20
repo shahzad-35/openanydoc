@@ -22,21 +22,41 @@ type JsonCodeEditorProps = {
   error: TextPosition | null
   cursorLine: number | null
   selectedStart: TextPosition | null
+  // The colours: JSON (the JSON viewer), or XML and YAML (the XML viewer and YAML formatter pages).
+  language?: CodeLanguage
 }
 
-// Keys, strings, true / false / null and numbers, found one line at a time (formatted JSON has few tokens per line).
-const codeTokenPattern = /("(?:[^"\\]|\\.)*")(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g
+type CodeLanguage = 'json' | 'xml' | 'yaml'
+type CodeToken = { start: number; text: string; className: string }
 
-function getTokenClassName(token: RegExpMatchArray) {
-  if (token[1] !== undefined) return token[2] !== undefined ? 't-k' : 't-s'
-  if (token[3] !== undefined) return token[3] === 'null' ? 't-z' : 't-b'
-  const isBigNumber = /^-?\d{16,}$/.test(token[0]) && !Number.isSafeInteger(Number(token[0]))
-  return isBigNumber ? 't-n t-big' : 't-n'
+// Keys, strings, true / false / null and numbers, found one line at a time (formatted JSON has few tokens per line).
+const jsonTokenPattern = /("(?:[^"\\]|\\.)*")(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?/g
+// XML: tag names, attribute names, quoted values and comments.
+const xmlTokenPattern = /(<\/?[\w:.-]+|\/?>)|([\w:.-]+)(?==)|("[^"]*"|'[^']*')|(<!--.*?-->)/g
+// YAML: comments, keys (before ": "), quoted strings, true / false / null and numbers.
+const yamlTokenPattern = /(#.*$)|([^\s#:'"-][^#:]*?|"[^"]*"|'[^']*')(?=:(?:\s|$))|("(?:[^"\\]|\\.)*"|'[^']*')|\b(true|false|null|~)\b|-?\b\d+(?:\.\d+)?\b/g
+
+function findJsonTokens(lineText: string): CodeToken[] {
+  return Array.from(lineText.matchAll(jsonTokenPattern), (token) => {
+    let className = 't-n'
+    if (token[1] !== undefined) className = token[2] !== undefined ? 't-k' : 't-s'
+    else if (token[3] !== undefined) className = token[3] === 'null' ? 't-z' : 't-b'
+    else if (/^-?\d{16,}$/.test(token[0]) && !Number.isSafeInteger(Number(token[0]))) className = 't-n t-big'
+    return { start: token.index, text: token[1] ?? token[0], className }
+  })
+}
+
+function findMarkupTokens(lineText: string, language: 'xml' | 'yaml'): CodeToken[] {
+  const pattern = language === 'xml' ? xmlTokenPattern : yamlTokenPattern
+  return Array.from(lineText.matchAll(pattern), (token) => {
+    const className = token[1] !== undefined ? (language === 'xml' ? 't-k' : 't-z') : token[2] !== undefined ? (language === 'xml' ? 't-b' : 't-k') : token[3] !== undefined ? 't-s' : token[4] !== undefined ? (language === 'xml' ? 't-z' : 't-b') : 't-n'
+    return { start: token.index, text: token[0], className }
+  })
 }
 
 // One line in colour. `selectedColumn` boxes the token that starts there; `errorColumn` puts a wavy line under the token (or the
 // character) it falls in.
-function HighlightedLine({ lineText, selectedColumn, errorColumn }: { lineText: string; selectedColumn: number | null; errorColumn: number | null }) {
+function HighlightedLine({ lineText, selectedColumn, errorColumn, language }: { lineText: string; selectedColumn: number | null; errorColumn: number | null; language: CodeLanguage }) {
   if (lineText === '') return <> </>
   const errorAt = errorColumn === null ? -1 : errorColumn - 1
   const parts: ReactNode[] = []
@@ -51,11 +71,11 @@ function HighlightedLine({ lineText, selectedColumn, errorColumn }: { lineText: 
     }
   }
 
-  for (const token of lineText.matchAll(codeTokenPattern)) {
-    const tokenStart = token.index
-    const tokenText = token[1] ?? token[0]
+  for (const token of language === 'json' ? findJsonTokens(lineText) : findMarkupTokens(lineText, language)) {
+    const tokenStart = token.start
+    const tokenText = token.text
     pushPlainText(tokenStart)
-    let className = getTokenClassName(token)
+    let className = token.className
     if (tokenStart === (selectedColumn ?? 0) - 1) className += ' t-sel'
     if (errorAt >= tokenStart && errorAt < tokenStart + tokenText.length) className += ' t-err'
     parts.push(
@@ -71,7 +91,7 @@ function HighlightedLine({ lineText, selectedColumn, errorColumn }: { lineText: 
 
 // The text pane's editor: line numbers, coloured text and a real <textarea> on top with transparent text (so typing, selection,
 // undo and the caret are the browser's own). Only the lines on screen are drawn, moved with the box's scroll position.
-export default function JsonCodeEditor({ textareaRef, value, placeholder, ariaLabel, onChange, onBlur, onCursorMove, error, cursorLine, selectedStart }: JsonCodeEditorProps) {
+export default function JsonCodeEditor({ textareaRef, value, placeholder, ariaLabel, onChange, onBlur, onCursorMove, error, cursorLine, selectedStart, language = 'json' }: JsonCodeEditorProps) {
   const [scroll, setScroll] = useState({ top: 0, left: 0, height: 600 })
   const lines = useMemo(() => (value.length <= HIGHLIGHT_MAX_CHARACTERS ? value.split('\n') : null), [value])
 
@@ -114,6 +134,7 @@ export default function JsonCodeEditor({ textareaRef, value, placeholder, ariaLa
                     lineText={lines[lineIndex]}
                     selectedColumn={lineNumber === selectedStart?.line ? selectedStart.column : null}
                     errorColumn={isErrorLine ? error.column : null}
+                    language={language}
                   />
                 </div>
               )

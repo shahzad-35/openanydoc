@@ -53,7 +53,7 @@
   "faq": [
     {
       "question": "How do I convert an Excel file with several sheets to CSV?",
-      "answer": "This page converts the first sheet. For another sheet, open the workbook in the Excel viewer, click the sheet's tab, then click Convert at the top and choose Convert to CSV: the sheet on screen opens as a CSV.",
+      "answer": "OpenAnyDoc's Excel to CSV converter takes the first sheet of the workbook. For another sheet, open the workbook in the Excel viewer, click the sheet's tab, then click Convert at the top and choose Convert to CSV: the sheet on screen opens as a CSV.",
       "link": {
         "text": "Excel viewer",
         "path": "/excel-viewer"
@@ -86,6 +86,14 @@
     {
       "question": "Is my workbook uploaded to convert it?",
       "answer": "No. The workbook is read and converted by your browser on your device; nothing is sent to a server."
+    },
+    {
+      "question": "How do I convert XLSX to CSV without Excel?",
+      "answer": "Open the .xlsx, .xls, .xlsm or .ods file in a browser-based converter such as OpenAnyDoc and download the CSV: the first sheet is written with commas between the columns and Arabic text intact. Nothing is uploaded and no copy of Excel is needed. To only read the workbook, see how to open an XLSX file without Excel.",
+      "link": {
+        "text": "open an XLSX file without Excel",
+        "path": "/open-xlsx-without-excel"
+      }
     }
   ]
 }

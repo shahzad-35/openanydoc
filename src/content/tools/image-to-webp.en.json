@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a JPG or PNG to WebP?",
+      "answer": "Add the JPG or PNG pictures to OpenAnyDoc's WebP converter, pick a quality (75 to 85 suits photos on a website) and click Convert to download the WebP files. The pictures are converted in your browser and never uploaded."
     }
   ]
 }

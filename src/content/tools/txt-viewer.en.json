@@ -3,7 +3,7 @@
   "description": "Open TXT file online and edit it: find and replace, sort lines, remove duplicates and count words, with Arabic and old encodings read. Nothing uploaded.",
   "heading": "Open TXT File Online: Free Text Viewer and Editor",
   "subtitle": "Drop a text file to read, search and edit it instantly; nothing is uploaded.",
-  "intro": "Open TXT file online in your browser and read or edit it like a notepad online: search, line numbers, and tools for lines, whitespace and case, with Arabic text shown right to left. Your file never leaves your device.",
+  "intro": "Open TXT file online in your browser, on Windows, a Mac, an iPhone or an Android phone, and read or edit it like a notepad online: search, line numbers, and tools for lines, whitespace and case, with Arabic text shown right to left. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -143,11 +143,11 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Once the page and its text viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first."
+      "answer": "Yes. After your first visit, the page and its text viewer are kept on your device, so opening and editing files need no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
-      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+      "answer": "Yes. The source code is public on GitHub. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
     },
     {
       "question": "How do I change line endings (LF to CRLF) in a text file?",
@@ -168,6 +168,22 @@
     {
       "question": "Can I open text files with Arabic or other non-English characters?",
       "answer": "Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it."
+    },
+    {
+      "question": "What program opens a .txt file?",
+      "answer": "Any text editor opens a .txt file: Notepad on Windows, TextEdit on a Mac, the Files app on iPhone and iPad, Google Docs or a file manager on Android, and any web browser. OpenAnyDoc opens it in your browser as an editor with search, line numbers and Arabic shown right to left, without uploading it. For each system step by step, see how to open a TXT file.",
+      "link": {
+        "text": "how to open a TXT file",
+        "path": "/open-txt-file"
+      }
+    },
+    {
+      "question": "How do I open a .txt file on my phone?",
+      "answer": "On an iPhone or iPad, tap the .txt file in the Files app to read it; on Android, open it from your file manager with Google Docs, a text editor app or the browser. To search or edit it too, open it with OpenAnyDoc in the phone's browser: the text fills the screen, the tools move into a sheet, and the file stays on your phone."
+    },
+    {
+      "question": "What is a .txt file?",
+      "answer": "A .txt file is a plain text file: letters, numbers and line breaks with no fonts, colours or pictures, so every computer and phone can read it. Notes, logs, readme files and exported lists are often .txt files, and OpenAnyDoc reads them in UTF-8, UTF-16 or the old Arabic Windows-1256 encoding."
     }
   ]
 }

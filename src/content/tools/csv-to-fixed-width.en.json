@@ -1,0 +1,41 @@
+{
+  "title": "CSV to Fixed Width Text – Free, No Upload | OpenAnyDoc",
+  "description": "Convert CSV to fixed-width text: every column padded to its widest cell and the header underlined, for legacy imports, READMEs or a terminal. No upload.",
+  "heading": "CSV to Fixed Width Text",
+  "subtitle": "Drop a CSV and get aligned plain-text columns at once, ready to copy or download as .txt.",
+  "intro": "Some systems still want fixed-width records, and plain text reads best when its columns line up. Choose, drop or paste a CSV or TSV file and the aligned text appears at once: each column padded to its widest cell, columns separated by a gap of 1 to 4 spaces that you choose, and the header underlined with dashes. Widths are counted per character, and wide characters such as Chinese, Japanese or Korean count as two, so columns stay straight in a monospaced font. Use it for mainframe and legacy imports, README files, emails or a terminal. The file is read in your browser, never uploaded.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is turned into aligned text by your own browser and never sent to a server." },
+    { "title": "Columns that line up", "text": "Each column is padded to its widest cell, and wide CJK characters count as two, so the layout holds in any monospaced font." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to fixed-width text",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample." },
+    { "title": "Choose the gap", "text": "Pick 1, 2, 3 or 4 spaces between columns; the text is re-aligned at once." },
+    { "title": "Copy or download", "text": "Copy the text to your clipboard or download it as a .txt file with the CSV's name." }
+  ],
+  "handlesTitle": "What the CSV to fixed-width converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Layout: each column padded to its widest cell, with a gap of 1 to 4 spaces between columns.",
+    "Header row underlined with dashes as wide as each column.",
+    "Wide characters (Chinese, Japanese, Korean) counted as two columns so alignment holds."
+  ],
+  "limits": [
+    "Columns line up only in a monospaced font, such as a terminal, a code editor or a <pre> block.",
+    "Widths come from your data; the page does not pad to a record layout you specify, so check it against your importer's spec.",
+    "Arabic and other right-to-left text may look out of line in editors that reorder it, even though the character counts are right."
+  ],
+  "faqTitle": "CSV to fixed-width text: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your browser reads the CSV and writes the aligned text on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "How wide is each column?", "answer": "As wide as its longest cell, header included. Shorter cells are padded with spaces, then the gap you chose separates it from the next column." },
+    { "question": "Why do Chinese or Japanese characters count as two?", "answer": "In a monospaced font these characters take two cells of width. Counting them as two keeps every column straight below them." },
+    { "question": "Can I set exact column widths for a mainframe import?", "answer": "No. Widths come from the widest value in each column. If your import needs set positions, compare the output with its record layout before loading it." },
+    { "question": "Why do the columns look crooked?", "answer": "The text is aligned for a monospaced font. In a proportional font, such as in a word processor or most email bodies, letters have different widths; switch to a font like Courier or Consolas." },
+    { "question": "Is there a size limit?", "answer": "No fixed limit, but very large files can take a few seconds. The preview shows the first 5,000 lines; Copy and Download always take the whole text." },
+    { "question": "How do I convert a CSV to a fixed-width text file?", "answer": "Open or paste the CSV, choose the gap between columns, then copy the aligned text or download it as a .txt file. OpenAnyDoc pads each column to its widest cell in your browser, without uploading the file." }
+  ]
+}

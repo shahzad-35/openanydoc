@@ -3,7 +3,7 @@
   "description": "Password-protect a PDF in your browser with AES-256 encryption, and choose whether people may print, copy or change it. Free, nothing is uploaded.",
   "heading": "Protect PDF",
   "subtitle": "Lock a PDF with a password and AES-256 encryption, and decide what people may do with it; nothing is uploaded.",
-  "intro": "Add a password to a PDF online without sending it anywhere: the file is encrypted with AES-256 by qpdf, a well-known PDF library, running in your browser. Anyone who opens the copy needs the password, and you can ask PDF readers to block printing, copying or changes. Your file and your password never leave your device.",
+  "intro": "Add a password to a PDF online without sending it anywhere: the file is encrypted with AES-256 right in your browser. Anyone who opens the copy needs the password, and you can ask PDF readers to block printing, copying or changes. Your file and your password never leave your device.",
   "features": [
     {
       "title": "Private",
@@ -11,7 +11,7 @@
     },
     {
       "title": "Strong encryption",
-      "text": "AES-256, the strongest encryption PDF readers support, made by qpdf."
+      "text": "AES-256, the strongest encryption PDF readers support, applied in your browser."
     },
     {
       "title": "Permissions",
@@ -77,6 +77,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I put a password on a PDF?",
+      "answer": "Encrypt the PDF with a password, so anyone who opens it must type the password first; Preview on a Mac can do it when exporting. OpenAnyDoc's Protect PDF does it in your browser with AES-256: choose the PDF, type the password twice and download the locked copy, and neither the file nor the password is uploaded."
     }
   ]
 }

@@ -1,0 +1,88 @@
+{
+  "title": "PowerPoint to Markdown – Convert PPTX to .md | OpenAnyDoc",
+  "description": "Turn PowerPoint slides into a Markdown outline: slide titles, bullet points and speaker notes, ready to paste into an AI chat. Free, nothing uploaded.",
+  "heading": "PowerPoint to Markdown",
+  "subtitle": "Turn a slide deck into a Markdown outline with titles, bullets and notes; nothing is uploaded.",
+  "intro": "Convert a PowerPoint deck to Markdown when you want to paste its words into ChatGPT, Claude or Gemini to summarise, rewrite or check them. Open a .pptx, .ppsx, .potx or .pptm file and it becomes an outline: the deck's name as # heading, each slide as ## Slide N with its title, the slide's text as bullet points, and the speaker notes as a quote under the slide. The outline appears in a text box with its token count. The file is read by your browser and never uploaded, and nothing is sent to any AI service.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your slides are read by your own browser and never sent to a server or to an AI service."
+    },
+    {
+      "title": "Notes included",
+      "text": "Speaker notes come out as a quote under their slide, so the full talk goes with the slides."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert PowerPoint to Markdown",
+  "steps": [
+    {
+      "title": "Open your deck",
+      "text": "Choose or drop a .pptx, .ppsx, .potx or .pptm file, or try a sample."
+    },
+    {
+      "title": "Read the outline",
+      "text": "Each slide appears as a ## heading with its text and notes, with the token count shown."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Click Copy to paste the outline into an AI chat or a document, or download the .md file."
+    }
+  ],
+  "handlesTitle": "What PowerPoint to Markdown handles",
+  "handles": [
+    "Files: .pptx, .ppsx, .potx and .pptm.",
+    "Structure: # for the deck's name, ## Slide N: title for each slide.",
+    "Slide text: the words in text boxes and placeholders, as bullet points.",
+    "Speaker notes: written as a > quote under their slide.",
+    "Arabic and other right-to-left text, kept in its reading order."
+  ],
+  "limits": [
+    "Pictures, charts, SmartArt and the slide layout are left out; only the words are kept.",
+    "Old .ppt files are not read; save them as .pptx in PowerPoint first.",
+    "Text inside pictures and charts can't be read, because it is part of the picture."
+  ],
+  "faqTitle": "PowerPoint to Markdown: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your deck is read and converted by your own browser, on your device, and is never sent anywhere. Nothing is sent to any AI service either: you choose where to paste the outline."
+    },
+    {
+      "question": "What does the outline look like?",
+      "answer": "The deck's name as a # heading, then ## Slide 1: and the slide's title, the slide's text as - bullet points, and the speaker notes as a > quote. The same pattern repeats for every slide."
+    },
+    {
+      "question": "Are speaker notes included?",
+      "answer": "Yes. They are often where the real explanation is, so they come out as a quote under their slide."
+    },
+    {
+      "question": "Why are charts and pictures missing?",
+      "answer": "The outline carries only the words. A chart's numbers and the text inside a picture are not text in the slide file, so they can't be taken out."
+    },
+    {
+      "question": "Can I see the slides themselves?",
+      "answer": "Yes. The PowerPoint viewer shows every slide as it was designed, in your browser.",
+      "link": {
+        "text": "PowerPoint viewer",
+        "path": "/powerpoint-viewer"
+      }
+    },
+    {
+      "question": "Should I check the slides for personal details first?",
+      "answer": "If the slides hold customer names, emails or phone numbers, check them first. Mask data hides names, emails, phone numbers and IDs in CSV, Excel, JSON and text files.",
+      "link": {
+        "text": "Mask data",
+        "path": "/mask-data"
+      }
+    },
+    {
+      "question": "How do I get the text out of a PowerPoint file?",
+      "answer": "Copy the text from each slide by hand, or turn the whole deck into an outline at once with a PowerPoint to Markdown converter. OpenAnyDoc does it in your browser, with slide titles, bullet points and speaker notes, ready to copy or download as .md, and nothing is uploaded."
+    }
+  ]
+}

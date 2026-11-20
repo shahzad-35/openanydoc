@@ -1,0 +1,41 @@
+{
+  "title": "CSV to Markdown Table Converter – Free, Online | OpenAnyDoc",
+  "description": "Turn a CSV file into a Markdown table for a README, issue or Notion page, with pipes in cells escaped so it renders right. Copy or download a .md file.",
+  "heading": "CSV to Markdown Table",
+  "subtitle": "Drop a CSV and get a Markdown table at once, ready to paste into GitHub, Notion or Obsidian.",
+  "intro": "Put a spreadsheet into a README, a pull request, a wiki page or your notes without lining up pipes by hand. Choose, drop or paste a CSV or TSV file and a GitHub-flavoured Markdown table appears at once: the header row, the --- separator line, then one line per row. A | inside a cell is escaped so it does not split the column. The table renders in GitHub, GitLab, Notion and Obsidian. The delimiter and encoding are detected for you, and the file is read in your browser, never uploaded.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is turned into Markdown by your own browser and never sent to a server." },
+    { "title": "Renders everywhere", "text": "Standard GitHub-flavoured table syntax, so the same table shows in GitHub, GitLab, Notion and Obsidian." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to a Markdown table",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample." },
+    { "title": "Get the table", "text": "The first row becomes the table header, followed by the --- separator and one Markdown line per row." },
+    { "title": "Paste it where you need it", "text": "Copy the table into your README, issue or note, or download it as a .md file." }
+  ],
+  "handlesTitle": "What the CSV to Markdown converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Output: a GitHub-flavoured table with a header row and a --- separator line.",
+    "A | inside a cell escaped as \\|, so it stays in its column.",
+    "Tables that render in GitHub, GitLab, Notion, Obsidian and other Markdown editors."
+  ],
+  "limits": [
+    "Markdown tables have no merged cells, so complex layouts flatten into simple rows; a line break inside a cell is written as <br>, which most Markdown viewers show as a new line.",
+    "The first row always becomes the header, because a Markdown table needs one.",
+    "The preview shows the first 5,000 lines; Copy and Download always take the whole table."
+  ],
+  "faqTitle": "CSV to Markdown: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. The CSV is read and turned into a Markdown table by your browser, on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "Where does the table render?", "answer": "Anywhere that reads GitHub-flavoured Markdown tables: GitHub and GitLab READMEs, issues and pull requests, Notion, Obsidian and most Markdown editors." },
+    { "question": "What happens to a | inside a cell?", "answer": "It is written as \\| so the table reader sees it as text, not as a column border, and the row keeps its columns." },
+    { "question": "Can a cell hold several lines?", "answer": "Not in a Markdown table, which has one line per row. Keep each cell's text short, or put long text below the table." },
+    { "question": "My CSV uses semicolons. Will it work?", "answer": "Yes. The delimiter is detected from the file, whether it is a comma, semicolon, tab or pipe, so CSV files saved by Excel in Europe convert too." },
+    { "question": "Can I edit the CSV before converting?", "answer": "Yes: open it in the CSV viewer, edit the cells and save, then convert the saved file to Markdown.", "link": { "text": "CSV viewer", "path": "/csv-viewer" } },
+    { "question": "How do I convert a CSV file to a Markdown table?", "answer": "Open or paste the CSV: the first row becomes the header, followed by one Markdown line per row, ready to copy into a README or download as a .md file. OpenAnyDoc converts it in your browser, without uploading the data." }
+  ]
+}

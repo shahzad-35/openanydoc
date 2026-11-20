@@ -1,0 +1,84 @@
+{
+  "title": "Chart Maker from CSV – Bar, Line and Pie Charts | OpenAnyDoc",
+  "description": "Make a bar, line or pie chart from a CSV or Excel file in your browser: pick a category and a count, sum or average, then save a PNG. No upload.",
+  "heading": "Chart Maker: Turn a CSV into a Chart",
+  "subtitle": "Drop a CSV or Excel file, pick two columns and save the chart as a PNG; nothing is uploaded.",
+  "intro": "Make a chart from a CSV file in your browser: choose a bar, line or pie chart, a category column for the labels, and the count, sum or average of a number column for the values. The chart is drawn in your browser from the rows your filters show, and downloads as a PNG image. Excel files open their first sheet. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "PNG download",
+      "text": "Save the chart as a PNG image to put in a slide, a document or an email."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: make a chart from a CSV",
+  "steps": [
+    {
+      "title": "Open your file",
+      "text": "Drop a CSV or Excel file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Pick the chart",
+      "text": "Choose bar, line or pie, the category column, and count, sum or average of a number column."
+    },
+    {
+      "title": "Filter if needed",
+      "text": "Filter the table and the chart uses only the rows that are shown."
+    },
+    {
+      "title": "Download the PNG",
+      "text": "Save the chart as a PNG image."
+    }
+  ],
+  "handlesTitle": "What the chart maker handles",
+  "handles": [
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Charts: bar, line and pie, drawn in your browser.",
+    "Labels: one category column.",
+    "Values: count of rows, or sum or average of a number column.",
+    "Filters: only the filtered rows are charted.",
+    "Download: the chart as a PNG image."
+  ],
+  "limits": [
+    "One category column and one value per chart.",
+    "The chart downloads as a PNG image only."
+  ],
+  "faqTitle": "Chart maker: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the file and draws the chart on your device; nothing is sent to a server."
+    },
+    {
+      "question": "Which charts can I make?",
+      "answer": "Bar, line and pie charts, drawn from the rows your filters show."
+    },
+    {
+      "question": "How are the values worked out?",
+      "answer": "Rows are grouped by the category column, and each group gets the count of its rows, or the sum or average of the number column you choose."
+    },
+    {
+      "question": "Can I chart only part of the data?",
+      "answer": "Yes. Filter the table first; the chart uses only the rows your filters show."
+    },
+    {
+      "question": "Can I make a chart from an Excel file?",
+      "answer": "Yes. Its first sheet opens as the table, and a notice says so."
+    },
+    {
+      "question": "In what format can I save the chart?",
+      "answer": "As a PNG image only; SVG and editable chart files are not offered."
+    },
+    {
+      "question": "How do I make a chart from a CSV file?",
+      "answer": "Open the CSV, choose bar, line or pie, pick the category column and whether to count rows or sum or average a number column, then download the chart as a PNG. OpenAnyDoc draws it in your browser, so the data is never uploaded."
+    }
+  ]
+}

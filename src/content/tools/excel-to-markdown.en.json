@@ -1,0 +1,79 @@
+{
+  "title": "Excel to Markdown Table Converter – Free | OpenAnyDoc",
+  "description": "Excel to Markdown converter: turn a sheet of an XLSX, XLS or ODS workbook into a GitHub-flavoured Markdown table for READMEs and docs. No upload.",
+  "heading": "Excel to Markdown Table Converter",
+  "subtitle": "Pick a sheet and get a Markdown table to paste into GitHub, docs or notes; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into a Markdown table in your browser: the header row becomes the table head and every other row a table row, in the GitHub-flavoured syntax that GitHub, GitLab and most note apps show as a table. Pipes inside cells are escaped so columns stay in place. Copy it or download an .md file.",
+  "features": [
+    {
+      "title": "Paste-ready",
+      "text": "A GitHub-flavoured Markdown table, with | inside cells escaped so no column shifts."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to Markdown",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet becomes a Markdown table at once; choose another from the sheet list."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the table into your README, issue or notes, or download it as an .md file."
+    }
+  ],
+  "handlesTitle": "What the Excel to Markdown converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Table: the first row as the header, a separator line, then one line per row; empty rows are skipped.",
+    "Pipes: a | inside a cell is written as \\| so the columns stay in place.",
+    "Values: each cell as Excel shows it, so formulas give their result and dates, percentages and prices keep their format.",
+    "Merged cells: the value goes to the first cell of the range; the others stay empty."
+  ],
+  "limits": [
+    "Markdown tables have no merged cells, colours or fonts, so only the values are kept.",
+    "Password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to Markdown: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the Markdown on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "Where will the table show as a table?",
+      "answer": "Anywhere that reads GitHub-flavoured Markdown: GitHub and GitLab READMEs, issues and wikis, and most Markdown editors and note apps."
+    },
+    {
+      "question": "What if a cell contains a | character?",
+      "answer": "It is written as \\|, so Markdown reads it as text instead of a column break and the row keeps its shape."
+    },
+    {
+      "question": "Are bold text, colours and merged cells kept?",
+      "answer": "No. Markdown tables cannot hold them, so each cell keeps only its value, and a merged range gives its value to its first cell."
+    },
+    {
+      "question": "Do formulas show in the table?",
+      "answer": "No. Each cell shows the value Excel shows, so a formula appears as its result, formatted as in the sheet."
+    },
+    {
+      "question": "Why can I see only part of a long table?",
+      "answer": "The preview shows the first 5,000 lines. Copy and Download take the whole table."
+    },
+    {
+      "question": "How do I convert an Excel table to Markdown?",
+      "answer": "Open the workbook, pick the sheet, then copy the Markdown table into your README, issue or notes, or download it as an .md file. OpenAnyDoc writes the table in your browser, so the workbook is never uploaded."
+    }
+  ]
+}

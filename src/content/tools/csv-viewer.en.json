@@ -50,7 +50,7 @@
     "Saving: a CSV with the file's own delimiter, or your choice of delimiter, quotes and line endings; leading zeros and long numbers stay as written.",
     "Parquet: a .parquet file opens as a table (read only from Parquet) and can be saved as CSV or any format below.",
     "Analysis: a filter row under the headers (text, =exact, empty, 10..50, >5, date ranges), a health check (mixed types, spaces at either end, repeated rows), group-by totals you can download, and a bar, line or pie chart of the rows shown.",
-    "SQL: run SQLite queries on the table in your browser, and download the result.",
+    "SQL: run standard SQL queries (SELECT, WHERE, GROUP BY, ORDER BY, JOIN, aggregates) on the table in your browser, and download the result.",
     "More formats: save what you see as Excel (.xlsx), a Markdown or HTML table, or SQL INSERT statements; split a large CSV into a zip of smaller files; add the rows of other CSV files with the same header."
   ],
   "screenshot": {
@@ -147,11 +147,11 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Once the page and its CSV viewer have loaded, opening and editing files need no network. It is not an installable offline app, though: the page has to be loaded online first."
+      "answer": "Yes. After your first visit, the page and its CSV viewer are kept on your device, so opening and editing files need no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
-      "answer": "Yes. The source code is public on GitHub under the MIT licence. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
+      "answer": "Yes. The source code is public on GitHub. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
     },
     {
       "question": "Why does my CSV file open in a single column?",
@@ -188,6 +188,18 @@
         "text": "Mask data",
         "path": "/mask-data"
       }
+    },
+    {
+      "question": "What program opens a .csv file?",
+      "answer": "Any spreadsheet or text program opens a .csv file: Excel or Notepad on Windows, Numbers or TextEdit on a Mac, Google Sheets or LibreOffice Calc on any computer, and the Files app on an iPhone. OpenAnyDoc opens it as a table in any web browser without uploading it, and keeps leading zeros and Arabic text as they are. See how to open a CSV without Excel.",
+      "link": {
+        "text": "open a CSV without Excel",
+        "path": "/open-csv-without-excel"
+      }
+    },
+    {
+      "question": "What is a .csv file?",
+      "answer": "A .csv file is a plain-text table: each line is a row, and commas, or sometimes semicolons, tabs or pipes, separate the columns. Spreadsheets, databases and online stores use it to move data, and OpenAnyDoc shows it as a sortable, searchable table in your browser."
     }
   ]
 }

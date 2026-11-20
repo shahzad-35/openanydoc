@@ -1,3 +1,4 @@
+import { formatEditingByViewer } from '../formats/formatEditing'
 import { Suspense, useCallback, useEffect, useMemo, useState } from 'react'
 import { ChangeCounter, downloadEditedFile } from '../components/EditControls'
 import MenuBar from '../components/MenuBar'
@@ -39,7 +40,7 @@ export default function FileViewPage({ openedFile, onClose, onReplaceFile, confi
   const { showToast } = useToast()
   const viewer = findViewerForFileName(openedFile.file.name)
   const format = findFormatForFileName(openedFile.file.name)
-  const editing = format?.editing
+  const editing = format ? formatEditingByViewer[format.viewerId] : undefined
   const session = useEditSession<unknown>(editing?.createEmptyEdits ?? noEdits, editing?.countChanges ?? countNoEdits)
   // Every editable format opens ready to edit; one that cannot be edited yet only shows the file.
   const mode = editing ? 'edit' : 'view'

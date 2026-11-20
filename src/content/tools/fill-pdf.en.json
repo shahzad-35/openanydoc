@@ -1,5 +1,5 @@
 {
-  "title": "Fill PDF Form – Fill In PDF Forms Free, No Upload",
+  "title": "Fill PDF Form Online – Fill In PDF Forms Free, No Upload",
   "description": "Fill in a PDF form in your browser: type in text fields, tick boxes, pick options, and flatten the answers on save if you want. Free, nothing uploaded.",
   "heading": "Fill a PDF form",
   "subtitle": "Type into a PDF form's fields, tick its boxes and save a filled copy; nothing is uploaded.",
@@ -65,11 +65,23 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    },
+    {
+      "question": "How do I fill out a PDF form without Adobe Acrobat?",
+      "answer": "A PDF form with fillable fields can be filled in any browser: open it in OpenAnyDoc's Fill PDF form tool, click each field, type your answers and save a copy. Nothing is uploaded, and Flatten on save fixes the answers so they can't be changed. To only read a PDF, see how to open a PDF without Adobe.",
+      "link": {
+        "text": "how to open a PDF without Adobe",
+        "path": "/open-pdf-without-adobe"
+      }
     }
   ]
 }

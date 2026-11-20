@@ -1,0 +1,80 @@
+{
+  "title": "Base64 Encode and Decode Online – Text, Files | OpenAnyDoc",
+  "description": "Encode text or any file to Base64, or decode Base64 back to text or a file. UTF-8 safe, with a URL-safe option. Free, in your browser, nothing is uploaded.",
+  "heading": "Base64 Encoder and Decoder",
+  "subtitle": "Type or paste text and press Encode to turn it into Base64, or Decode to turn Base64 back into text; nothing is uploaded.",
+  "intro": "A free Base64 encoder and decoder online: type or paste text and press Encode or Decode, or drop any file to get its Base64. Text is read as UTF-8, so Arabic, accents and emoji come back exactly, and the URL-safe option writes - and _ instead of + and / with no = padding. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "features": [
+    {
+      "title": "Text and files",
+      "text": "Encode or decode text in any language, or drop a file up to 10 MB to get its Base64. Decoded data that isn't text can be downloaded as a file."
+    },
+    {
+      "title": "Private, free, no account",
+      "text": "Encoding and decoding run in your own browser and your text stays in this tab. Nothing is uploaded or saved, there are no share links or history, and there is nothing to sign up for."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, encoding and decoding keep working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: encode or decode Base64",
+  "steps": [
+    {
+      "title": "Type, paste or drop",
+      "text": "Type or paste text into the box, or drop a file on the page to get its Base64. Try a sample if you just want to see it work."
+    },
+    {
+      "title": "Encode or Decode",
+      "text": "Press Encode to turn text into Base64, or Decode to turn Base64 back into text. Tick URL-safe if the result goes into an address or a file name."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the result to your clipboard. If decoded data is not text, such as a picture, download it as a file instead."
+    }
+  ],
+  "handlesTitle": "What the Base64 tool handles",
+  "handles": [
+    "Text: read and written as UTF-8, so Arabic, accented letters and emoji round-trip exactly.",
+    "Files: any file up to 10 MB, opened or dropped, turned into Base64.",
+    "URL-safe Base64: - and _ instead of + and /, with no = padding; both forms are decoded.",
+    "Binary results: decoded bytes that are not text can be downloaded as a file.",
+    "Errors: Base64 with invalid characters or a broken length is reported, not silently decoded."
+  ],
+  "limits": [
+    "Files up to 10 MB.",
+    "Base64 is an encoding, not encryption: anyone can decode it, so it does not protect secrets.",
+    "The file type of downloaded binary data is not guessed; rename the file if it needs an extension."
+  ],
+  "faqTitle": "Base64 encode and decode: questions",
+  "faq": [
+    {
+      "question": "Is my text uploaded?",
+      "answer": "No. Encoding and decoding run in your browser, on your device, and your text stays in this tab. It is never sent anywhere or saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "Why does my Arabic or emoji text decode correctly here?",
+      "answer": "Text is turned into UTF-8 bytes before it is encoded, and decoded bytes are read back as UTF-8. Tools that skip this step break on any character outside basic English."
+    },
+    {
+      "question": "What is URL-safe Base64?",
+      "answer": "A variant that uses - and _ instead of + and /, and drops the = padding at the end, so the result can go into an address or a file name without being changed. Decode accepts both forms."
+    },
+    {
+      "question": "Can I decode Base64 into a file, such as a picture?",
+      "answer": "Yes. If the decoded bytes are not readable text, the page offers them as a file to download instead of showing unreadable characters."
+    },
+    {
+      "question": "Is Base64 a way to encrypt data?",
+      "answer": "No. Base64 only changes how data is written so it can travel as plain text. Anyone can decode it, so never use it to hide passwords or keys."
+    },
+    {
+      "question": "How large a file can I encode?",
+      "answer": "Up to 10 MB. Base64 is about a third larger than the original, so bigger files would make the page slow."
+    },
+    {
+      "question": "How do I decode a Base64 string?",
+      "answer": "Paste the Base64 text and press Decode: the original text appears, or a file to download when the data is a picture or another file. OpenAnyDoc decodes it in your browser, so the string never leaves your device."
+    }
+  ]
+}

@@ -36,10 +36,11 @@ function buildSearchEntries(locale: Locale, translate: (key: MessageKey) => stri
     const icon = page.tool ? 'mask' : page.convertTo ? 'convert' : viewerIcons[page.viewerId]
     return entry(page.path, icon, isConversionOrTool ? 'convert' : 'tools', page.extensions ?? viewer.extensions)
   })
-  // The tools drawn by ToolPage (src/tools/registry.ts), in their category's group: the PDF tools and the image tools.
+  // The tools drawn by ToolPage (src/tools/registry.ts), in their category's group: the PDF tools and the image tools; the data
+  // tools that are not a viewer's page (XML viewer, Base64, JWT ...) go with the other tools.
   const toolPageEntries = liveTools
-    .filter((tool) => (tool.category === 'pdf' || tool.category === 'image') && !viewers.some((viewer) => viewer.toolPath === toolPath(tool)))
-    .map((tool) => entry(toolPath(tool), findToolIcon(tool), tool.category === 'image' ? 'image' : 'pdf', tool.inputFormats))
+    .filter((tool) => ['pdf', 'image', 'data'].includes(tool.category) && !viewers.some((viewer) => viewer.toolPath === toolPath(tool)) && !landingPages.some((page) => page.path === toolPath(tool)))
+    .map((tool) => entry(toolPath(tool), findToolIcon(tool), tool.category === 'image' ? 'image' : tool.category === 'pdf' ? 'pdf' : 'tools', tool.inputFormats))
   const guideEntries = guideAddresses.map((path) => entry(path, 'guide', 'guides', []))
   return [...viewerEntries, ...landingEntries, ...toolPageEntries, ...guideEntries]
 }
@@ -109,6 +110,7 @@ export default function SiteNav({ currentPath, onNavigate }: { currentPath: stri
       const scrollY = window.scrollY
       if (Math.abs(scrollY - lastScrollY) < 4) return
       pageHeader.classList.toggle('is-scrolled-away', scrollY > lastScrollY && scrollY > pageHeader.offsetHeight)
+      pageHeader.classList.toggle('is-floating', scrollY > 0)
       lastScrollY = scrollY
     }
     window.addEventListener('scroll', revealHeaderOnScrollUp, { passive: true })

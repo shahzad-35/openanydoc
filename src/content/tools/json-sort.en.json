@@ -1,0 +1,42 @@
+{
+  "title": "Sort JSON Keys Online – Alphabetize JSON A to Z | OpenAnyDoc",
+  "description": "Sort JSON keys A–Z or Z–A on every level, with item2 before item10 and arrays left in their order. One click, Undo, free, and nothing is uploaded.",
+  "heading": "Sort JSON Keys Alphabetically",
+  "subtitle": "Open or paste JSON and press Sort A–Z to put the keys of every object in order; nothing is uploaded.",
+  "intro": "A free tool to sort JSON keys: open a .json file, drop it or paste the text, and the page offers Sort A–Z and Sort Z–A. One click orders the keys of every object, nested ones too, while arrays keep their items exactly where they were. Numbers inside keys are read as numbers, so item2 comes before item10. Sorted files are easier to read and to compare, and Undo puts the original order back. The JSON is sorted in your browser and never uploaded.",
+  "features": [
+    { "title": "Natural order", "text": "Keys with numbers sort the way people expect: item2, item9, item10, not item10 before item2." },
+    { "title": "Private and free", "text": "Your JSON is sorted by your own browser and never sent to a server. No account, no watermark." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: sort JSON keys in one click",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples." },
+    { "title": "Choose Sort A–Z or Z–A", "text": "The notice at the top offers both. The keys of every object on every level are put in order; arrays keep their order." },
+    { "title": "Sort one object only if you prefer", "text": "Select an object in the tree and choose Sort only the selected object in the More menu. Undo takes back any sort." },
+    { "title": "Copy or download", "text": "Copy the sorted JSON or download it as a .json file to keep it." }
+  ],
+  "handlesTitle": "What the JSON key sorter handles",
+  "handles": [
+    "Sort A–Z and Sort Z–A of object keys on every level, nested objects included.",
+    "Natural number order inside keys: item2 before item10.",
+    "Arrays keep their items in the original order; objects inside them have their keys sorted.",
+    "Sort only the selected object, from the More menu.",
+    "Undo after any sort, and big integer IDs kept with every digit."
+  ],
+  "limits": [
+    "Only keys are sorted; the items of an array are never reordered.",
+    "Files up to 10 MB.",
+    "The JSON must be valid to be sorted; a file with a syntax error shows where the error is first."
+  ],
+  "faqTitle": "Questions about sorting JSON keys",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON is read and sorted by your browser, on your device, and is never sent anywhere. Pasted text stays in this tab. Your browser's network panel shows no upload." },
+    { "question": "Why sort the keys of a JSON file?", "answer": "Keys in a fixed order make a file easier to scan, and two files with sorted keys line up when you compare them, so you see real changes instead of keys that only moved." },
+    { "question": "Are arrays sorted too?", "answer": "No. The order of items in an array is part of the data, so it is kept. Objects inside arrays still have their own keys sorted." },
+    { "question": "Why does item2 come before item10?", "answer": "Numbers inside keys are compared as numbers, which is the order people expect. A plain character-by-character sort would put item10 before item2." },
+    { "question": "Can I sort just one object?", "answer": "Yes. Select it in the tree, open the More menu and choose Sort only the selected object. The rest of the document stays as it was." },
+    { "question": "How big a file can I sort?", "answer": "Up to 10 MB. Larger files are refused before they are read." },
+    { "question": "How do I sort JSON keys alphabetically?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON sort tool and choose Sort A–Z or Z–A: the keys of every object on every level are put in order, while arrays keep theirs. Copy the result or download it as a .json file; nothing is uploaded." }
+  ]
+}

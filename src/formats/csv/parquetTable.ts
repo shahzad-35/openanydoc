@@ -25,5 +25,5 @@ export async function readParquetTable(contents: ArrayBuffer): Promise<ParsedCsv
     for (const row of rows as unknown[][]) dataRows.push(row.map(toCellText))
   } })
   if (dataRows.length === 0) return { status: 'error', reason: 'noRows' }
-  return { status: 'ok', rows: [header, ...dataRows], columnCount: header.length, detectedDelimiter: ',', encodingLabel: 'Parquet', hasUtf8Bom: false, usesCrlf: false, notices: [] }
+  return { status: 'ok', rows: [header, ...dataRows], columnCount: header.length, detectedDelimiter: ',', encodingLabel: 'Parquet', hasUtf8Bom: false, usesCrlf: false, notices: [], quoteErrors: [] }
 }

@@ -1,0 +1,84 @@
+{
+  "title": "Split CSV File Online – By Rows or Size, Free | OpenAnyDoc",
+  "description": "Split a CSV file into smaller files in your browser: by rows per file or by size in MB, each part with the header row, all in one ZIP. No upload.",
+  "heading": "Split CSV: Cut a Big File into Parts",
+  "subtitle": "Drop a CSV and download it as smaller files, each with the header row; nothing is uploaded.",
+  "intro": "Split a CSV file in your browser: it opens with the download dialog set to split, by a number of rows per file (for example 10,000) or by a size per file in MB. Every part keeps the header row, and all the parts download together as one ZIP. Filter rows or hide columns first to split only what you need. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Header in every part",
+      "text": "Each file starts with the original header row, so every part opens on its own."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: split a CSV file",
+  "steps": [
+    {
+      "title": "Open your CSV",
+      "text": "Drop a .csv file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Choose how to split",
+      "text": "The download dialog opens set to split: enter rows per file, such as 10,000, or a size per file in MB."
+    },
+    {
+      "title": "Narrow it down first",
+      "text": "Optionally filter rows or hide columns before splitting, so the parts hold only what you need."
+    },
+    {
+      "title": "Download the ZIP",
+      "text": "All the parts download together as one ZIP file, each with the header row."
+    }
+  ],
+  "handlesTitle": "What the CSV splitter handles",
+  "handles": [
+    "By rows: a number of rows per file, such as 10,000.",
+    "By size: a size per file in MB.",
+    "Header: repeated at the top of every part.",
+    "Output: all the parts in one ZIP file.",
+    "Before splitting: filters and hidden columns can be applied.",
+    "Big files: the CSV viewer handles 100,000+ rows."
+  ],
+  "limits": [
+    "Parts are cut by rows or by size, not by the values in a column.",
+    "The parts come as one ZIP; unzip it to get the separate files."
+  ],
+  "faqTitle": "Split CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads and splits the file on your device; nothing is sent to a server."
+    },
+    {
+      "question": "Does each part keep the header row?",
+      "answer": "Yes. Every file starts with the original header row, so each part can be opened or imported on its own."
+    },
+    {
+      "question": "How do I split a CSV by size?",
+      "answer": "In the split options, choose a size per file in MB instead of a number of rows. Each part is cut at a row boundary, so no row is broken in two."
+    },
+    {
+      "question": "Why do the parts come as a ZIP?",
+      "answer": "So they download in one go instead of one file at a time. Unzip it to get the separate CSV files."
+    },
+    {
+      "question": "Can I split only some rows or columns?",
+      "answer": "Yes. Filter the rows or hide the columns you don't want first; the split then uses only what is shown."
+    },
+    {
+      "question": "Can I split a CSV by the values of a column?",
+      "answer": "Not in one step. Filter the rows for one value, download them, and repeat for each value."
+    },
+    {
+      "question": "How do I split a large CSV file into smaller files?",
+      "answer": "Split a large CSV file into parts with a set number of rows each, and keep the header row at the top of every part so each one opens on its own. In OpenAnyDoc, open the file, choose rows per file (for example 10,000) or a size in MB, and download all the parts as one ZIP; the file is split in your browser and never uploaded."
+    }
+  ]
+}

@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I resize a picture?",
+      "answer": "Set a new width and height, or a percentage, in an image app and save a copy: the Photos app on Windows and Preview on a Mac both can. OpenAnyDoc resizes one or many pictures in your browser on any device, by pixels, percent or a ready size, without uploading them."
     }
   ]
 }

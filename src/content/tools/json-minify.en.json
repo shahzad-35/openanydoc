@@ -1,0 +1,41 @@
+{
+  "title": "Minify JSON Online – Compress JSON Free | OpenAnyDoc",
+  "description": "Minify JSON online in one click: every space and line break outside strings goes, and you see how many bytes were saved. Free, nothing is uploaded.",
+  "heading": "Minify JSON: Compress It to One Line",
+  "subtitle": "Open or paste JSON and press Minify to put it on one line and see the bytes saved; nothing is uploaded.",
+  "intro": "A free JSON minifier: open a .json file, drop it here or paste the text, and the page offers a one-click Minify button. The whole document is written on a single line with no spaces or line breaks outside strings, and the notice tells you how many bytes it saved. Changed your mind? Undo brings back the original, and Format puts indentation back with 2 or 4 spaces or a tab. Everything happens in your browser, so the JSON stays on your device.",
+  "features": [
+    { "title": "See the saving", "text": "After Minify the page shows the size before and after and how many bytes came off." },
+    { "title": "Private and free", "text": "Your JSON is minified by your own browser and never sent to a server. No account, no watermark." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: minify JSON in three steps",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples." },
+    { "title": "Press Minify", "text": "The notice at the top offers Minify. One click puts the document on one line and shows how many bytes were saved; Undo takes it back." },
+    { "title": "Copy or download", "text": "Copy the minified JSON or download it as a .json file to keep it. Format restores the indentation if you need it readable again." }
+  ],
+  "handlesTitle": "What the JSON minifier handles",
+  "handles": [
+    "Spaces, tabs and line breaks between values are removed; text inside strings is left exactly as it is.",
+    "The size before and after, and the bytes saved, are shown after each Minify.",
+    "Big integer IDs keep every digit; nothing is rounded on the way.",
+    "Format puts indentation back with 2 spaces, 4 spaces or a tab.",
+    "Undo returns to the document as it was before Minify."
+  ],
+  "limits": [
+    "Files up to 10 MB.",
+    "The JSON must be valid to be minified; a file with a syntax error shows where the error is first.",
+    "Minifying only removes whitespace; it does not shorten keys or drop values."
+  ],
+  "faqTitle": "Questions about minifying JSON",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON is read and minified by your browser, on your device, and is never sent anywhere. Pasted text stays in this tab. You can check it in your browser's network panel." },
+    { "question": "Does minifying change my data?", "answer": "No. Only the whitespace between keys and values is removed. Keys, values, their order and every digit of long numbers stay the same, so any program reads the minified file exactly as before." },
+    { "question": "How much smaller will my file get?", "answer": "It depends on how much indentation it had. Deeply nested files indented with spaces shrink the most; the page shows the exact bytes saved after you press Minify." },
+    { "question": "Can I turn minified JSON back into readable JSON?", "answer": "Yes. Press Format and choose 2 spaces, 4 spaces or a tab, or press Undo to get back the exact layout you opened." },
+    { "question": "Is there a size limit?", "answer": "Files up to 10 MB. Larger files are refused before they are read, because every step on them would be slow in a browser tab." },
+    { "question": "Where is the minified file kept?", "answer": "Nowhere on the site: there is no saving, history or share link. Download the result or copy it before you close the tab." },
+    { "question": "How do I minify JSON to one line?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON minifier and press Minify: every space and line break outside strings is removed, and the bytes saved are shown. Copy the result or download it as a .json file; the JSON stays in your browser." }
+  ]
+}

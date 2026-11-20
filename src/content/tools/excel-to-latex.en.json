@@ -1,0 +1,80 @@
+{
+  "title": "Excel to LaTeX Table Converter – Tabular Code | OpenAnyDoc",
+  "description": "Excel to LaTeX converter: turn a sheet of an XLSX, XLS or ODS workbook into tabular code with special characters escaped, ready to paste. No upload.",
+  "heading": "Excel to LaTeX Table Converter",
+  "subtitle": "Pick a sheet and get tabular code with & % $ # _ escaped, ready to paste; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into a LaTeX table in your browser: you get a tabular environment with one column per sheet column, \\hline rules and the header row on top. Characters LaTeX treats as commands, such as & % $ # _, are escaped, so results like 15% compile without edits. Paste it into your paper or thesis, or download it.",
+  "features": [
+    {
+      "title": "Compiles first time",
+      "text": "Every special LaTeX character in your cells is escaped, so no stray % or & breaks the build."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to LaTeX",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet becomes a tabular at once; choose another from the sheet list."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the code into your .tex document, or download it."
+    }
+  ],
+  "handlesTitle": "What the Excel to LaTeX converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Table: a tabular with an l column for each sheet column, \\hline rules and the header row first; empty rows are skipped.",
+    "Escaping: & % $ # _ { } ~ ^ and \\ are escaped, so cell text is printed, not run as commands.",
+    "Values: each cell as Excel shows it, so formulas give their result and 15% or $2.50 print as in the sheet.",
+    "Merged cells: the value goes to the first cell of the range; the others stay empty."
+  ],
+  "limits": [
+    "Arabic text needs XeLaTeX or LuaLaTeX with an Arabic font; pdfLaTeX cannot typeset it.",
+    "Merged cells (\\multicolumn), bold, colours and number alignment are not written; every column is left-aligned.",
+    "Password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to LaTeX: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the LaTeX code on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "How do I add a caption to the table?",
+      "answer": "Paste the tabular inside a table environment, then add \\caption and \\label around it as you would for any LaTeX table."
+    },
+    {
+      "question": "Which characters are escaped?",
+      "answer": "The ten that LaTeX reads as commands: & % $ # _ { } ~ ^ and the backslash. A cell such as R&D 15% prints exactly as written."
+    },
+    {
+      "question": "Can I use it with Arabic text?",
+      "answer": "Yes, but compile with XeLaTeX or LuaLaTeX and load an Arabic font, for example through polyglossia or babel. pdfLaTeX cannot typeset Arabic."
+    },
+    {
+      "question": "Are merged cells turned into \\multicolumn?",
+      "answer": "No. A merged range gives its value to its first cell and the rest stay empty. Add \\multicolumn by hand where you need it."
+    },
+    {
+      "question": "Can I right-align number columns?",
+      "answer": "Every column is written as l. Change the letters in the column spec, for example {lrr}, to right-align the columns you choose."
+    },
+    {
+      "question": "How do I convert an Excel table to LaTeX?",
+      "answer": "Open the workbook, pick the sheet, then copy the tabular code into your .tex document or download it. OpenAnyDoc escapes the characters LaTeX treats as commands and works in your browser, so the workbook is never uploaded."
+    }
+  ]
+}

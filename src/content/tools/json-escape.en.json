@@ -1,0 +1,43 @@
+{
+  "title": "JSON Escape, Unescape & Stringify Online, Free | OpenAnyDoc",
+  "description": "Escape JSON into one string, unescape a log string back into JSON, or copy it stringified for code. Runs in your browser; nothing is uploaded.",
+  "heading": "JSON Escape, Unescape and Stringify",
+  "subtitle": "Escape JSON into one string, unescape it back, or copy it stringified for your code; nothing is uploaded.",
+  "intro": "Three ways to move JSON in and out of a string. Escape turns the whole document into one JSON string, with every quote, backslash and line break written as \\\", \\\\ and \\n, so it fits inside another JSON field or a log line. Unescape does the reverse for a string copied from a log or an API response, and gives you JSON you can read, format and check. Stringify copies the document as a one-line quoted string to paste into JavaScript, Python or a test, and leaves the document as it is. Your file never leaves your device.",
+  "features": [
+    { "title": "Private", "text": "Your JSON is escaped, unescaped and stringified by your own browser and never sent to a server, so nobody else sees it." },
+    { "title": "Three steps, one page", "text": "Escape, Unescape and Stringify sit together in the page's notice; Escape and Unescape are each one undo step." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: escape, unescape or stringify JSON",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste it into the box, or try one of the two samples. An escaped string (it starts with a quote) can be pasted as it is." },
+    { "title": "Pick Escape, Unescape or Stringify", "text": "Escape makes the document one JSON string. Unescape turns a string that holds JSON back into that JSON. Stringify copies a one-line quoted string and changes nothing." },
+    { "title": "Undo if needed", "text": "Escape and Unescape are one step each, so Undo takes either back. Unescape again if the string was escaped twice." },
+    { "title": "Copy or download", "text": "Copy the result from the text pane or download it as a .json file. The site keeps nothing, so download what you want to keep." }
+  ],
+  "handlesTitle": "What the JSON escape, unescape and stringify tool handles",
+  "handles": [
+    "Escape: the whole document becomes one JSON string, with quotes, backslashes, tabs and line breaks escaped and non-ASCII text kept as it is.",
+    "Unescape: a document that is a single string holding JSON becomes that JSON again, shown as a tree and as formatted text.",
+    "Stringify: a one-line quoted string on your clipboard, ready for JavaScript, Python, a curl body or a unit test fixture.",
+    "Strings escaped twice or more: unescape once per layer, with undo after each step.",
+    "Long numbers such as IDs keep every digit through all three steps.",
+    "Input from a .json file, a drop, the paste box or a sample, up to 10 MB."
+  ],
+  "limits": [
+    "All three steps work on the whole document; a single string field inside a larger document is not unescaped on its own.",
+    "Unescape needs the string to hold valid JSON; plain text inside quotes stays a string.",
+    "Files up to 10 MB."
+  ],
+  "faqTitle": "JSON escape, unescape and stringify: questions",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON is read and changed by your browser, on your device, and is never sent anywhere. Text you paste stays in this tab. Open your browser's network panel and you will see no upload." },
+    { "question": "What is the difference between Escape and Stringify?", "answer": "Escape changes the document: it becomes one JSON string, and you can keep working on it or download it. Stringify leaves the document alone and only copies a one-line quoted version to your clipboard, ready to paste into code." },
+    { "question": "Can I paste the stringified text straight into JavaScript or Python?", "answer": "Yes. It is a double-quoted string with JSON escapes, which both languages read as a string literal. Pass it to JSON.parse in JavaScript or json.loads in Python to get the data back." },
+    { "question": "How do I unescape a string copied from a log?", "answer": "Paste it with its surrounding quotes into the box, or save it as a .json file and open it, then choose Unescape. If it was escaped twice, choose Unescape again." },
+    { "question": "Can I unescape just one field of a larger document?", "answer": "No, all three steps work on the whole document. Copy the field's value from the tree, paste it here on its own and unescape it." },
+    { "question": "Does the site keep my result?", "answer": "No. There is no saving on the site, no share link and no history. Download a copy or copy the text before you close the tab." },
+    { "question": "How do I escape JSON to put it inside a string?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON escape tool and pick Escape to turn the whole document into one JSON string, or Stringify to copy it as a one-line quoted string. Quotes and line breaks get backslashes, and the text never leaves your browser." }
+  ]
+}

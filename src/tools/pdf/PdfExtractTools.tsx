@@ -8,7 +8,8 @@ import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
 import { useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { Notice } from '../../components/Messages'
-import { loadPdfCore } from '../../formats/pdf/pdfLibrary'
+import { loadPdfCore, openPdfForReading } from '../../formats/pdf/pdfLibrary'
+import TextResultPanel from '../ai/TextResultPanel'
 import type { ToolProps } from '../registry'
 import { runPdfTask } from './pdfTasks'
 import { PdfFileList, PdfThumbnailGrid, ProgressBar, SelectionBar, baseNameOf, describePageNumbers, problemMessageKey, useOpenedPdfs, zipResultFile } from './PdfToolParts'
@@ -288,25 +289,40 @@ export function ExtractPdfImages({ files, onResult }: ToolProps) {
 
 // ---------------------------------------------------------------- the lines of a page (PDF to Markdown, Compare PDF)
 
-// A line of a page as pdf.js reads it: its text, its largest font size and its baseline (PDF units, from the bottom).
-type TextLine = { text: string; fontSize: number; baselineY: number }
+// A line of a page as pdf.js reads it: its text, its largest font size, its baseline (PDF units, from the bottom), and its cells:
+// the line cut where two pieces of text are further apart than 1.2 text heights (as pdfTextOrder.ts splits a table row).
+type TextLine = { text: string; fontSize: number; baselineY: number; cells: string[] }
+const CELL_GAP_HEIGHTS = 1.2
 
 async function readPageLines(page: PDFPageProxy) {
   const content = await page.getTextContent()
   const lines: TextLine[] = []
   let current: TextLine | null = null
+  let previousBox: { start: number; end: number } | null = null
   for (const item of content.items) {
     if (!('str' in item)) continue
-    current ??= { text: '', fontSize: 0, baselineY: item.transform[5] }
+    current ??= { text: '', fontSize: 0, baselineY: item.transform[5], cells: [''] }
+    const textHeight = Math.hypot(item.transform[2], item.transform[3])
+    const box = { start: item.transform[4], end: item.transform[4] + item.width }
+    // The gap to the previous piece, whichever way the line runs (Arabic lines run right to left).
+    const gap = previousBox ? Math.max(box.start - previousBox.end, previousBox.start - box.end) : 0
+    if (item.str.trim() && previousBox && gap > CELL_GAP_HEIGHTS * (textHeight || current.fontSize)) current.cells.push('')
     current.text += item.str
-    if (item.str.trim()) current.fontSize = Math.max(current.fontSize, Math.hypot(item.transform[2], item.transform[3]))
+    current.cells[current.cells.length - 1] += item.str
+    if (item.str.trim()) {
+      current.fontSize = Math.max(current.fontSize, textHeight)
+      previousBox = box
+    }
     if (item.hasEOL) {
       lines.push(current)
       current = null
+      previousBox = null
     }
   }
   if (current) lines.push(current)
-  return lines.map((line) => ({ ...line, text: line.text.trimEnd() })).filter((line) => line.text.trim() !== '')
+  return lines
+    .map((line) => ({ ...line, text: line.text.trimEnd(), cells: line.cells.map((cell) => cell.trim()).filter((cell) => cell !== '') }))
+    .filter((line) => line.text.trim() !== '')
 }
 
 // ---------------------------------------------------------------- PDF to Markdown
@@ -318,69 +334,154 @@ const HEADING_SIZE_RATIO = 1.2
 const LONGEST_HEADING = 120
 // A gap between two lines larger than this many line heights starts a new paragraph.
 const PARAGRAPH_GAP_LINES = 1.6
+// A table: at least this many lines in a row, each cut into the same number (2 or more) of cells.
+const SHORTEST_TABLE_LINES = 3
 const roundedSize = (fontSize: number) => Math.round(fontSize * 2) / 2
 
-// Headings come from font sizes (the three largest sizes above the body text become #, ## and ###), lists from bullets and
-// numbers at the start of a line, paragraphs from the gaps between lines.
-function linesToMarkdown(pages: TextLine[][]) {
+type DocumentBlock =
+  | { kind: 'heading'; level: number; text: string }
+  | { kind: 'bullet'; text: string }
+  | { kind: 'numbered'; number: string; text: string }
+  | { kind: 'paragraph'; text: string }
+  | { kind: 'table'; rows: string[][] }
+
+// The lines from `start` that form a table (same cell count, 2 or more, for at least three lines), or 0.
+function countTableLines(lines: TextLine[], start: number) {
+  const cellCount = lines[start].cells.length
+  if (cellCount < 2) return 0
+  let end = start
+  while (end < lines.length && lines[end].cells.length === cellCount) end++
+  return end - start >= SHORTEST_TABLE_LINES ? end - start : 0
+}
+
+// Headings come from font sizes (the three largest sizes above the body text become levels 1 to 3), lists from bullets and
+// numbers at the start of a line, tables from lines cut into the same columns, paragraphs from the gaps between lines.
+function linesToBlocks(pages: TextLine[][]): DocumentBlock[] {
   const characterCountBySize = new Map<number, number>()
   for (const line of pages.flat()) characterCountBySize.set(roundedSize(line.fontSize), (characterCountBySize.get(roundedSize(line.fontSize)) ?? 0) + line.text.length)
   const bodySize = [...characterCountBySize].sort((first, second) => second[1] - first[1])[0]?.[0] ?? 0
   const headingSizes = [...characterCountBySize.keys()].filter((size) => size >= bodySize * HEADING_SIZE_RATIO).sort((first, second) => second - first)
-  const blocks: string[] = []
+  const blocks: DocumentBlock[] = []
   for (const lines of pages) {
     let paragraph: string[] = []
     const endParagraph = () => {
-      if (paragraph.length) blocks.push(paragraph.join(' '))
+      if (paragraph.length) blocks.push({ kind: 'paragraph', text: paragraph.join(' ') })
       paragraph = []
     }
-    for (const [index, line] of lines.entries()) {
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index]
       const text = line.text.trim()
       const headingLevel = headingSizes.indexOf(roundedSize(line.fontSize)) + 1
       const previous = lines[index - 1]
       if (previous && previous.baselineY - line.baselineY > PARAGRAPH_GAP_LINES * previous.fontSize * 1.2) endParagraph()
-      if (headingLevel > 0 && text.length <= LONGEST_HEADING) {
+      const tableLineCount = countTableLines(lines, index)
+      if (tableLineCount > 0) {
         endParagraph()
-        blocks.push(`${'#'.repeat(Math.min(headingLevel, 3))} ${text}`)
+        blocks.push({ kind: 'table', rows: lines.slice(index, index + tableLineCount).map((tableLine) => tableLine.cells) })
+        index += tableLineCount - 1
+      } else if (headingLevel > 0 && text.length <= LONGEST_HEADING) {
+        endParagraph()
+        blocks.push({ kind: 'heading', level: Math.min(headingLevel, 3), text })
       } else if (BULLET_START.test(text)) {
         endParagraph()
-        blocks.push(`- ${text.replace(BULLET_START, '')}`)
+        blocks.push({ kind: 'bullet', text: text.replace(BULLET_START, '') })
       } else if (NUMBER_START.test(text)) {
         endParagraph()
-        blocks.push(text.replace(NUMBER_START, '$1. '))
-      } else paragraph.push(/^[#>+]/.test(text) ? `\\${text}` : text)
+        blocks.push({ kind: 'numbered', number: NUMBER_START.exec(text)?.[1] ?? '1', text: text.replace(NUMBER_START, '') })
+      } else paragraph.push(text)
     }
     endParagraph()
   }
-  // List items stay together; everything else is separated by a blank line.
-  return blocks.reduce((markdown, block, index) => {
-    const isListItem = (candidate: string | undefined) => candidate !== undefined && /^(- |\d+\. )/.test(candidate)
-    return markdown + (index === 0 ? '' : isListItem(block) && isListItem(blocks[index - 1]) ? '\n' : '\n\n') + block
-  }, '')
+  return blocks
 }
 
-export function PdfToMarkdown({ files, onResult }: ToolProps) {
+const isListBlock = (block: DocumentBlock | undefined) => block?.kind === 'bullet' || block?.kind === 'numbered'
+
+// List items stay together; everything else is separated by a blank line.
+function joinBlocks(blocks: DocumentBlock[], writeBlock: (block: DocumentBlock) => string) {
+  return blocks.reduce((written, block, index) => written + (index === 0 ? '' : isListBlock(block) && isListBlock(blocks[index - 1]) ? '\n' : '\n\n') + writeBlock(block), '') + '\n'
+}
+
+function blocksToMarkdown(blocks: DocumentBlock[]) {
+  const escapeLineStart = (text: string) => (/^[#>+|]/.test(text) ? `\\${text}` : text)
+  const tableCell = (text: string) => text.replace(/\|/g, '\\|')
+  return joinBlocks(blocks, (block) => {
+    if (block.kind === 'heading') return `${'#'.repeat(block.level)} ${block.text}`
+    if (block.kind === 'bullet') return `- ${block.text}`
+    if (block.kind === 'numbered') return `${block.number}. ${block.text}`
+    if (block.kind === 'paragraph') return escapeLineStart(block.text)
+    const [header, ...rows] = block.rows
+    return [`| ${header.map(tableCell).join(' | ')} |`, `| ${header.map(() => '---').join(' | ')} |`, ...rows.map((row) => `| ${row.map(tableCell).join(' | ')} |`)].join('\n')
+  })
+}
+
+function blocksToText(blocks: DocumentBlock[]) {
+  return joinBlocks(blocks, (block) => {
+    if (block.kind === 'bullet') return `• ${block.text}`
+    if (block.kind === 'numbered') return `${block.number}. ${block.text}`
+    if (block.kind === 'table') return block.rows.map((row) => row.join('\t')).join('\n')
+    return block.text
+  })
+}
+
+// A whole HTML page; lists become <ul>/<ol>, and every block follows its own text direction (dir="auto").
+function blocksToHtml(blocks: DocumentBlock[], title: string) {
+  const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  const parts: string[] = []
+  blocks.forEach((block, index) => {
+    const previous = blocks[index - 1]
+    const next = blocks[index + 1]
+    if (block.kind === 'bullet' || block.kind === 'numbered') {
+      const listTag = block.kind === 'bullet' ? 'ul' : 'ol'
+      if (previous?.kind !== block.kind) parts.push(`<${listTag} dir="auto">`)
+      parts.push(`<li>${escapeHtml(block.text)}</li>`)
+      if (next?.kind !== block.kind) parts.push(`</${listTag}>`)
+    } else if (block.kind === 'heading') parts.push(`<h${block.level} dir="auto">${escapeHtml(block.text)}</h${block.level}>`)
+    else if (block.kind === 'paragraph') parts.push(`<p dir="auto">${escapeHtml(block.text)}</p>`)
+    else {
+      const [header, ...rows] = block.rows
+      parts.push(`<table>\n<thead><tr>${header.map((cell) => `<th dir="auto">${escapeHtml(cell)}</th>`).join('')}</tr></thead>\n<tbody>\n${rows.map((row) => `<tr>${row.map((cell) => `<td dir="auto">${escapeHtml(cell)}</td>`).join('')}</tr>`).join('\n')}\n</tbody>\n</table>`)
+    }
+  })
+  return `<!doctype html>\n<html>\n<head>\n<meta charset="utf-8">\n<title>${escapeHtml(title)}</title>\n</head>\n<body>\n${parts.join('\n')}\n</body>\n</html>\n`
+}
+
+// Every page's lines, read one page at a time (a frame every ten pages so the progress bar moves).
+async function readDocumentLines(pdfDocument: PDFDocumentProxy, onProgress?: (done: number, total: number) => void) {
+  const pages: TextLine[][] = []
+  for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
+    onProgress?.(pageNumber - 1, pdfDocument.numPages)
+    if (pageNumber % 10 === 1) await nextFrame()
+    const page = await pdfDocument.getPage(pageNumber)
+    pages.push(await readPageLines(page))
+    page.cleanup()
+  }
+  return pages
+}
+
+// A PDF's text as Markdown, for the token counter (src/tools/ai/AiReadyTools.tsx); empty when the PDF has no text (a scan).
+export async function readPdfAsMarkdown(fileContents: ArrayBuffer) {
+  const pdfDocument = await openPdfForReading(fileContents)
+  return blocksToMarkdown(linesToBlocks(await readDocumentLines(pdfDocument))).trim()
+}
+
+export function PdfToMarkdown({ files }: ToolProps) {
   const { t } = useT()
   const pdf = useReadPdf(files)
+  const [outputs, setOutputs] = useState<{ markdown: string; text: string; html: string } | null>(null)
 
   async function makeMarkdown() {
     const pdfDocument = pdf.pdfDocument
     if (!pdfDocument) return
     pdf.clearMessage()
-    const pages: TextLine[][] = []
     try {
-      for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
-        pdf.setProgress({ done: pageNumber - 1, total: pdfDocument.numPages })
-        if (pageNumber % 10 === 1) await nextFrame()
-        const page = await pdfDocument.getPage(pageNumber)
-        pages.push(await readPageLines(page))
-        page.cleanup()
-      }
+      const pages = await readDocumentLines(pdfDocument, (done, total) => pdf.setProgress({ done, total }))
       if (pages.every((lines) => lines.length === 0)) {
         pdf.showMessage('tools.text.noText')
         return
       }
-      onResult(new File([`${linesToMarkdown(pages)}\n`], `${pdf.baseName}.md`, { type: 'text/markdown;charset=utf-8' }))
+      const blocks = linesToBlocks(pages)
+      setOutputs({ markdown: blocksToMarkdown(blocks), text: blocksToText(blocks), html: blocksToHtml(blocks, pdf.baseName) })
     } catch {
       pdf.showMessage('tools.text.failed')
     } finally {
@@ -397,6 +498,18 @@ export function PdfToMarkdown({ files, onResult }: ToolProps) {
         </button>
       </div>
       {pdf.status}
+      {outputs && (
+        <TextResultPanel
+          id="pdf-markdown-result"
+          label={t('aiReady.markdownResult')}
+          text={outputs.markdown}
+          downloads={[
+            { id: 'md', label: '.md', fileName: `${pdf.baseName}.md`, text: outputs.markdown, mimeType: 'text/markdown;charset=utf-8' },
+            { id: 'txt', label: '.txt', fileName: `${pdf.baseName}.txt`, text: outputs.text, mimeType: 'text/plain;charset=utf-8' },
+            { id: 'html', label: '.html', fileName: `${pdf.baseName}.html`, text: outputs.html, mimeType: 'text/html;charset=utf-8' },
+          ]}
+        />
+      )}
       <PdfThumbnailGrid id="pdf-to-markdown-grid" label={t('tools.grid.pagesLabel')} cards={pdf.cards} />
     </div>
   )

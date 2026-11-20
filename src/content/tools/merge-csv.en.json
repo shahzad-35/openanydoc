@@ -1,0 +1,84 @@
+{
+  "title": "Merge CSV Files – Combine CSV Online, No Upload | OpenAnyDoc",
+  "description": "Merge CSV files into one with a single header row. Columns are matched by name, in any order. Free, no account, and your files are never uploaded.",
+  "heading": "Merge CSV Files",
+  "subtitle": "Join the rows of several CSV files into one CSV with one header, right in your browser.",
+  "intro": "Combine CSV files online without uploading them: add monthly exports, branch reports or split downloads, put them in order and get one CSV with a single header row. Columns are matched by their names, so they may sit in a different order in each file, and the delimiter and encoding of every file are detected on its own. Open the merged file in the CSV viewer to check and edit it, or download it straight away.",
+  "features": [
+    {
+      "title": "Columns matched by name",
+      "text": "Files whose columns are in a different order still merge correctly, and a file whose columns differ is named so you can fix it."
+    },
+    {
+      "title": "Private",
+      "text": "Your CSV files are joined by your own browser. They are never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, merging keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: merge CSV files into one",
+  "steps": [
+    {
+      "title": "Add your CSV files",
+      "text": "Click Choose a file, or drop two or more CSV files on the page. You can add more files later."
+    },
+    {
+      "title": "Put them in order",
+      "text": "Move files up or down in the list, or remove one. The rows of the merged file follow this order."
+    },
+    {
+      "title": "Check the columns",
+      "text": "Every file must have the same column names in its header row. If one doesn't, it is named with the columns that differ, so you can remove or fix it."
+    },
+    {
+      "title": "Download or open",
+      "text": "Download the merged CSV, or open it in the CSV viewer to search, sort and edit it first."
+    }
+  ],
+  "handlesTitle": "What Merge CSV handles",
+  "handles": [
+    "Files: any number of .csv files, added at once or a few at a time.",
+    "Columns: matched by header name, in any order; the result keeps the first file's column order.",
+    "Delimiters: comma, semicolon, tab or pipe, detected in each file.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16 and Windows-1256 for older Arabic files, detected in each file.",
+    "Result: one CSV with one header row, ready to download or open in the CSV viewer."
+  ],
+  "limits": [
+    "Every file needs a header row with the same column names; files with extra or missing columns are not merged until you fix or remove them.",
+    "Duplicate rows are kept as they are; remove them afterwards with Clean up in the CSV viewer.",
+    "Very large sets of files are limited by your device's memory."
+  ],
+  "faqTitle": "Merge CSV: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your CSV files are read and merged by your browser, on your device, and are never sent anywhere. Nothing is saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "Do the columns have to be in the same order?",
+      "answer": "No. Columns are matched by their names in the header row, so they can be in a different order in each file. The merged CSV uses the column order of the first file."
+    },
+    {
+      "question": "What happens if one file has different columns?",
+      "answer": "That file is named, with the columns that are missing or extra, and nothing is merged until you remove it or fix its header. This keeps values from landing in the wrong column."
+    },
+    {
+      "question": "Can I merge files with different delimiters or encodings?",
+      "answer": "Yes. The delimiter and encoding are detected for each file on its own, so a semicolon file in Windows-1256 and a comma file in UTF-8 merge into one clean CSV."
+    },
+    {
+      "question": "Are duplicate rows removed?",
+      "answer": "No. Every row is kept. To remove duplicates, open the merged file in the CSV viewer and use Clean up, then download it."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I combine multiple CSV files into one?",
+      "answer": "Put the rows of every file under a single header row, matching the columns by name; copying and pasting in a spreadsheet works for a few small files. OpenAnyDoc's Merge CSV does it in your browser: add the files, put them in order and download one CSV, with nothing uploaded."
+    }
+  ]
+}

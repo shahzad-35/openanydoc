@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I compare two PDF files for differences?",
+      "answer": "Open the older PDF, add the newer one, then compare the text line by line or the pages as pictures, with every changed area marked in red. OpenAnyDoc does this in your browser, so neither file is uploaded."
     }
   ]
 }

@@ -53,7 +53,7 @@
   "faq": [
     {
       "question": "How do I check if my JSON is valid?",
-      "answer": "Paste it on this page or open the file, then press Validate. \"Valid JSON\" means any standard parser can read it; otherwise the message, line and column show what to fix."
+      "answer": "Run it through a JSON validator: in OpenAnyDoc's, paste the JSON or open the file, then press Validate. \"Valid JSON\" means any standard parser can read it; otherwise the message, line and column show what to fix."
     },
     {
       "question": "Why is my JSON invalid?",
@@ -78,6 +78,10 @@
     {
       "question": "Can it validate large JSON files?",
       "answer": "Yes, up to 10 MB. Larger files are refused before they are read."
+    },
+    {
+      "question": "How do I fix a JSON syntax error?",
+      "answer": "Go to the line and column in the error message and look for the usual causes: a comma after the last item, a missing comma, single quotes or a key without quotes. In OpenAnyDoc's JSON validator, Go to error selects that place, and Repair fixes those common mistakes and lists what it changed."
     }
   ]
 }

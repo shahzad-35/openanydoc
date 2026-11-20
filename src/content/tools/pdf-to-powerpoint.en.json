@@ -75,6 +75,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a PDF to an editable PowerPoint?",
+      "answer": "Turn each PDF page into a slide whose text sits in editable text boxes, then open the .pptx in PowerPoint, Keynote or Google Slides. OpenAnyDoc's PDF to PowerPoint does it in your browser: choose the PDF, click Convert to PowerPoint and download, with nothing uploaded."
     }
   ]
 }

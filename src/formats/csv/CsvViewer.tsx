@@ -32,6 +32,7 @@ import {
   detectColumnInfo,
   formatFilterRowText,
   groupRows,
+  pivotRows,
   parseFilterRowText,
   parseNumber,
   passesFilter,
@@ -68,7 +69,7 @@ import {
 } from './csvCells'
 import type { CellTextTransform, CsvEdits } from './csvCells'
 import { appendTables } from './csvCombine'
-import { buildHtmlTable, buildMarkdownTable, buildSqlInserts, splitIntoParts, toSqlTableName } from './csvExport'
+import { buildHtmlTable, buildMarkdownTable, buildSqlInserts, splitIntoParts, splitIntoPartsBySize, toSqlTableName } from './csvExport'
 import { findHealthIssues } from './csvHealth'
 import './csvWorkbench.css'
 
@@ -172,7 +173,8 @@ type FindState = { text: string; replacement: string; matchCase: boolean; wholeC
 // `format`: the file type saved (csv uses the CSV options; the others read the same rows and columns). `splitRowsPerPart`: a CSV
 // saved as a zip of parts of that many rows each, or null for one file. `tableName`: the SQL statements' table.
 type ExportFormat = 'csv' | 'xlsx' | 'markdown' | 'html' | 'sql'
-type DownloadSettings = { fileName: string; onlyShownRows: boolean; delimiter: string; lineEnding: '\n' | '\r\n'; includeHeaderRow: boolean; quoteAllFields: boolean; byteOrderMark: boolean; format: ExportFormat; splitRowsPerPart: number | null; tableName: string }
+// `splitMegabytesPerPart`: the parts are cut by size instead (the Split CSV page offers both).
+type DownloadSettings = { fileName: string; onlyShownRows: boolean; delimiter: string; lineEnding: '\n' | '\r\n'; includeHeaderRow: boolean; quoteAllFields: boolean; byteOrderMark: boolean; format: ExportFormat; splitRowsPerPart: number | null; splitMegabytesPerPart: number | null; tableName: string }
 const EXPORT_EXTENSIONS: Record<ExportFormat, string> = { csv: '', xlsx: '.xlsx', markdown: '.md', html: '.html', sql: '.sql' }
 const EXPORT_MIME_TYPES: Record<ExportFormat, string> = { csv: 'text/csv;charset=utf-8', xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', markdown: 'text/markdown;charset=utf-8', html: 'text/html;charset=utf-8', sql: 'application/sql;charset=utf-8' }
 type ColumnDraft = {
@@ -187,6 +189,23 @@ type ColumnDraft = {
   toDate: string
   boolValue: '' | 'true' | 'false'
 }
+// A column name that says it holds identifiers (id, order_id, Customer ID, رقم), not amounts.
+const ID_COLUMN_NAME_PATTERN = /(^|[\s_-])(id|no|number|code|رقم)$|^(id|رقم)([\s_-]|$)/i
+
+// What each landing page of the CSV viewer (src/viewers.ts, `openedFrom`) opens on: a side panel tab, or a step taken as soon as
+// the file is read (the split download, the duplicates or transpose dialog, the change-case bar). Keeps each page's mode its own.
+type CsvPageMode = { dockTab?: DockTab; onOpen?: 'split' | 'dupes' | 'transpose' | 'changeCase' }
+const csvPageModes: Record<string, CsvPageMode> = {
+  '/csv-validator': { dockTab: 'issues' },
+  '/split-csv': { onOpen: 'split' },
+  '/sql-on-csv': { dockTab: 'query' },
+  '/pivot-table': { dockTab: 'group' },
+  '/chart-maker': { dockTab: 'chart' },
+  '/remove-duplicates': { onOpen: 'dupes' },
+  '/transpose': { onOpen: 'transpose' },
+  '/change-case': { onOpen: 'changeCase' },
+}
+
 // `action`: a fix the issue offers instead of Go to (trim a column, remove duplicate rows).
 type Issue = { kind: 'warn' | 'info'; title: string; detail: string; goTo?: { rowId: number; columnId: number }; showBlanksOf?: number; action?: { id: string; label: string; run: () => void } }
 
@@ -260,9 +279,11 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   const [active, setActive] = useState<{ r: number; c: number } | null>(null)
   const [editingCell, setEditingCell] = useState<{ r: number; c: number; draft: string } | null>(null)
   const [valueDraft, setValueDraft] = useState<string | null>(null)
-  const [dockTab, setDockTab] = useState<DockTab>('profile')
+  const pageMode = csvPageModes[openedFile.openedFrom ?? ''] ?? {}
+  const [dockTab, setDockTab] = useState<DockTab>(pageMode.dockTab ?? 'profile')
   const [isDockOpen, setIsDockOpen] = useState(true)
-  const [isSheetOpen, setIsSheetOpen] = useState(false)
+  // On a phone the panel is a sheet: a page that opens on a panel shows it.
+  const [isSheetOpen, setIsSheetOpen] = useState(() => pageMode.dockTab !== undefined && isNarrow)
   const [dockWidthPx, setDockWidthPx] = useState(316)
   const [popover, setPopover] = useState<Popover | null>(null)
   const [columnDraft, setColumnDraft] = useState<ColumnDraft | null>(null)
@@ -272,7 +293,8 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   const [openDialog, setOpenDialog] = useState<'download' | 'paste' | 'goTo' | 'clean' | null>(null)
   const [cleanTool, setCleanTool] = useState<CleanTool>('split')
   const [find, setFind] = useState<FindState>({ text: '', replacement: '', matchCase: false, wholeCell: false, isRegularExpression: false, columnId: null })
-  const [groupSettings, setGroupSettings] = useState<{ byColumnId: number | null; aggregate: GroupAggregate; ofColumnId: number | null }>({ byColumnId: null, aggregate: 'sum', ofColumnId: null })
+  // `acrossColumnId`: a second field across the top makes the totals a pivot table (the Pivot table page).
+  const [groupSettings, setGroupSettings] = useState<{ byColumnId: number | null; aggregate: GroupAggregate; ofColumnId: number | null; acrossColumnId: number | null }>({ byColumnId: null, aggregate: 'sum', ofColumnId: null, acrossColumnId: null })
   const [toast, setToast] = useState<Toast | null>(null)
   // The filter row under the headers: shown on wide screens to start with (a phone filters from the column menu). While a box is
   // being typed in, its own text is kept here, so ">100" is not rewritten as ">=100" under the cursor.
@@ -739,6 +761,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     byteOrderMark: (readableCsv?.hasUtf8Bom ?? false) || rows.some((row) => row.some((cellText) => /[^\p{ASCII}]/u.test(cellText))),
     format: 'csv',
     splitRowsPerPart: null,
+    splitMegabytesPerPart: null,
     tableName: toSqlTableName(fileName),
   })
 
@@ -763,17 +786,18 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   // Every format but plain CSV: the same rows and columns as the CSV would have, with the column names as the first row (Excel,
   // Markdown, HTML and SQL need one, so a table without a header row gets "Column 1" ...). A split CSV is a zip of parts.
   async function downloadTable(settings: DownloadSettings) {
-    if (settings.format === 'csv' && settings.splitRowsPerPart === null) {
+    const isSplit = settings.splitRowsPerPart !== null || settings.splitMegabytesPerPart !== null
+    if (settings.format === 'csv' && !isSplit) {
       downloadCsv(settings)
       return
     }
     const options = buildCsvFileOptions(settings)
     const table = [options.columnIds.map((columnId) => nameOf(columnId)), ...readTable(rows, edits, options.rowIds, options.columnIds)]
     const baseName = settings.fileName.replace(/\.[^.]+$/, '')
-    if (settings.format === 'csv' && settings.splitRowsPerPart !== null) {
+    if (settings.format === 'csv' && isSplit) {
       const JSZip = (await import('jszip')).default
       const zip = new JSZip()
-      const parts = splitIntoParts(table, settings.splitRowsPerPart)
+      const parts = settings.splitMegabytesPerPart !== null ? splitIntoPartsBySize(table, settings.splitMegabytesPerPart * 1024 * 1024) : splitIntoParts(table, settings.splitRowsPerPart ?? 10000)
       const extension = settings.fileName.match(/\.[^.]+$/)?.[0] ?? '.csv'
       parts.forEach((part, position) => {
         const partRows = options.includeHeaderRow ? part : part.slice(1)
@@ -797,8 +821,26 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   }
 
   // The group-by totals of the rows on screen as a CSV: the group, its row count, and the sum and average of the chosen number column.
+  function buildPivotTable(currentEdits: CsvEdits, byColumnId: number, acrossColumnId: number) {
+    return pivotRows(
+      visibleRowIds,
+      (rowId) => getCellText(rows, currentEdits, rowId, byColumnId) || t('csv.wb.blankGroup'),
+      (rowId) => getCellText(rows, currentEdits, rowId, acrossColumnId) || t('csv.wb.blankGroup'),
+      (rowId) => (groupOfColumnId === null ? null : parseNumber(getCellText(rows, currentEdits, rowId, groupOfColumnId))),
+      groupAggregate,
+    )
+  }
+
   function downloadGroupTotals() {
     if (groupByColumnId === null) return
+    if (groupAcrossColumnId !== null) {
+      const pivot = buildPivotTable(edits, groupByColumnId, groupAcrossColumnId)
+      const pivotRowsText = [[`${nameOf(groupByColumnId)} \\ ${nameOf(groupAcrossColumnId)}`, ...pivot.columnGroups], ...pivot.rowGroups.map((rowGroup, position) => [rowGroup, ...pivot.cells[position].map((value) => (value === null ? '' : String(Math.round(value * 1e6) / 1e6)))])]
+      const pivotName = `${fileName.replace(/\.[^.]+$/, '')}-pivot.csv`
+      downloadTextFile(pivotName, `\ufeff${Papa.unparse(pivotRowsText, { newline: '\r\n' })}\r\n`, 'text/csv;charset=utf-8')
+      showToast(tp('csv.wb.saved', pivot.rowGroups.length, { name: pivotName }))
+      return
+    }
     const readGroup = (rowId: number) => getCellText(rows, edits, rowId, groupByColumnId)
     const readValue = (rowId: number) => (groupOfColumnId === null ? null : parseNumber(getCellText(rows, edits, rowId, groupOfColumnId)))
     const counts = groupRows(visibleRowIds, readGroup, readValue, 'count')
@@ -1129,7 +1171,9 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
   }, [isProfileShown, profileColumnId, displayColumnIds, displayRowIds, rows, deferredEdits])
 
   const groupByColumnId = groupSettings.byColumnId !== null && displayColumnIds.includes(groupSettings.byColumnId) ? groupSettings.byColumnId : (displayColumnIds.find((columnId) => typeOf(columnId) !== 'number') ?? displayColumnIds[0] ?? null)
-  const groupOfColumnId = groupSettings.ofColumnId !== null && displayColumnIds.includes(groupSettings.ofColumnId) ? groupSettings.ofColumnId : (displayColumnIds.find((columnId) => typeOf(columnId) === 'number') ?? null)
+  // The number to add up: the first number column that is not an ID (summing order numbers means nothing).
+  const numberColumnIds = displayColumnIds.filter((columnId) => typeOf(columnId) === 'number')
+  const groupOfColumnId = groupSettings.ofColumnId !== null && displayColumnIds.includes(groupSettings.ofColumnId) ? groupSettings.ofColumnId : (numberColumnIds.find((columnId) => !ID_COLUMN_NAME_PATTERN.test(nameOf(columnId))) ?? numberColumnIds[0] ?? null)
   const groupAggregate: GroupAggregate = groupOfColumnId === null ? 'count' : groupSettings.aggregate
   const groupTotals = useMemo(() => {
     if (!((isDockOpen || isNarrow) && dockTab === 'group') || groupByColumnId === null) return []
@@ -1140,12 +1184,29 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
       groupAggregate,
     )
   }, [isDockOpen, isNarrow, dockTab, groupByColumnId, groupOfColumnId, groupAggregate, visibleRowIds, rows, deferredEdits, t])
+  const groupAcrossColumnId = groupSettings.acrossColumnId !== null && displayColumnIds.includes(groupSettings.acrossColumnId) && groupSettings.acrossColumnId !== groupByColumnId ? groupSettings.acrossColumnId : null
+  const pivotTable = useMemo(() => {
+    if (!((isDockOpen || isNarrow) && dockTab === 'group') || groupByColumnId === null || groupAcrossColumnId === null) return null
+    return buildPivotTable(deferredEdits, groupByColumnId, groupAcrossColumnId)
+    // buildPivotTable reads the rows and the aggregate chosen; the totals follow them.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [isDockOpen, isNarrow, dockTab, groupByColumnId, groupAcrossColumnId, groupOfColumnId, groupAggregate, visibleRowIds, rows, deferredEdits])
 
   const largeFileWarning = getLargeFileWarning(openedFile.file, locale)
   const parseNoticeTexts = (readableCsv?.notices ?? []).filter((notice) => notice.kind !== 'mismatchedRows').map((notice) => describeParseNotice(notice, locale))
   const issues = useMemo<Issue[]>(() => {
     if (!((isDockOpen || isNarrow) && dockTab === 'issues')) return []
     const found: Issue[] = []
+    // The file as read: delimiter, encoding, byte order mark, line endings and size (the CSV validator's report).
+    if (readableCsv) {
+      const delimiterLabel = t(DELIMITER_OPTIONS.find((option) => option.value === readableCsv.detectedDelimiter)?.labelKey ?? 'csv.delimiter.comma')
+      found.push({
+        kind: 'info',
+        title: t('csv.report.title'),
+        detail: t('csv.report.detail', { rows: displayRowIds.length, columns: displayColumnIds.length, delimiter: delimiterLabel, encoding: readableCsv.encodingLabel, bom: t(readableCsv.hasUtf8Bom ? 'csv.report.bomYes' : 'csv.report.bomNo'), lineEndings: readableCsv.usesCrlf ? 'CRLF' : 'LF' }),
+      })
+      for (const quoteError of readableCsv.quoteErrors) found.push({ kind: 'warn', title: t(quoteError.code === 'MissingQuotes' ? 'csv.report.missingQuote' : 'csv.report.invalidQuote', { row: quoteError.rowNumber }), detail: t('csv.report.quoteDetail') })
+    }
     if (largeFileWarning) found.push({ kind: 'info', title: largeFileWarning, detail: '' })
     for (const noticeText of parseNoticeTexts) found.push({ kind: 'warn', title: noticeText, detail: '' })
     for (const rowId of unevenRowIds.slice(0, 50)) {
@@ -2068,6 +2129,25 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     setOpenDialog('clean')
   }
 
+  // The page's step on open (Split CSV, Remove duplicates, Transpose, Change case) runs once, as soon as the table is on screen.
+  const hasRunPageStepRef = useRef(false)
+  const [isChangeCaseBarShown, setIsChangeCaseBarShown] = useState(false)
+  useEffect(() => {
+    if (pageMode.onOpen === undefined || readableCsv === null || hasRunPageStepRef.current) return
+    hasRunPageStepRef.current = true
+    if (pageMode.onOpen === 'split') {
+      setDownloadDraft({ ...defaultDownloadSettings(), splitRowsPerPart: 10000 })
+      setOpenDialog('download')
+    } else if (pageMode.onOpen === 'changeCase') {
+      setSelectedColumnId(displayColumnIds.find((columnId) => typeOf(columnId) === 'text') ?? displayColumnIds[0] ?? null)
+      setIsChangeCaseBarShown(true)
+    } else {
+      openCleanTool(pageMode.onOpen)
+    }
+    // Starts once when the table is read; the dialogs read the table as it is then.
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, [readableCsv])
+
   const duplicateCount = useMemo(() => {
     if (openDialog !== 'clean' || cleanTool !== 'dupes') return 0
     const chosen = displayColumnIds.filter((columnId) => duplicateColumnIds.has(columnId))
@@ -2234,8 +2314,59 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
                   ))}
               </select>
             </label>
+            <label className="field" style={{ gridColumn: '1/-1' }}>
+              {t('csv.pivot.across')}
+              <select id="group-across-select" value={groupAcrossColumnId ?? ''} onChange={(event) => setGroupSettings({ ...groupSettings, acrossColumnId: event.target.value === '' ? null : Number(event.target.value) })}>
+                <option value="">{t('csv.pivot.none')}</option>
+                {displayColumnIds
+                  .filter((columnId) => columnId !== groupByColumnId)
+                  .map((columnId) => (
+                    <option key={columnId} value={columnId}>
+                      {nameOf(columnId)}
+                    </option>
+                  ))}
+              </select>
+            </label>
           </div>
         </div>
+        {pivotTable && groupAcrossColumnId !== null ? (
+          <div className="sec">
+            <div className="sec-title">{t('csv.pivot.title', { by: nameOf(groupByColumnId), across: nameOf(groupAcrossColumnId) })}</div>
+            <div className="pivot-scroll">
+              <table id="pivot-table">
+                <thead>
+                  <tr>
+                    <th scope="col">{nameOf(groupByColumnId)}</th>
+                    {pivotTable.columnGroups.slice(0, 50).map((columnGroup) => (
+                      <th key={columnGroup} scope="col" dir="auto">
+                        {columnGroup}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {pivotTable.rowGroups.slice(0, 200).map((rowGroup, position) => (
+                    <tr key={rowGroup}>
+                      <th scope="row" dir="auto">
+                        {rowGroup}
+                      </th>
+                      {pivotTable.cells[position].slice(0, 50).map((value, columnPosition) => (
+                        <td key={columnPosition}>{value === null ? '' : formatNumber(value, decimals)}</td>
+                      ))}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <button className="btn sm outline" id="group-download-button" type="button" style={{ marginTop: 10 }} onClick={downloadGroupTotals}>
+              <Icon name="download" size="sm" />
+              {t('csv.pivot.download')}
+            </button>
+            <div className="small-note" style={{ marginTop: 8 }}>
+              {t('csv.pivot.note', { rows: pivotTable.rowGroups.length, columns: pivotTable.columnGroups.length, shown: shownRowCount })}
+            </div>
+          </div>
+        ) : (
         <div className="sec">
           <div className="sec-title">
             {groupAggregate === 'count' ? t('csv.wb.rowsBy', { by: nameOf(groupByColumnId) }) : groupAggregate === 'sum' ? t('csv.wb.sumBy', { of: ofName, by: nameOf(groupByColumnId) }) : t('csv.wb.averageBy', { of: ofName, by: nameOf(groupByColumnId) })}
@@ -2266,6 +2397,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             {groupAggregate === 'avg' ? tp('csv.wb.groupsNoteAverage', groupTotals.length, { rows: shownRowCount }) : tp('csv.wb.groupsNote', groupTotals.length, { total: formatNumber(total, decimals), rows: shownRowCount })}
           </div>
         </div>
+        )}
       </>
     )
   }
@@ -2472,6 +2604,31 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             { id: 'mask', label: t('nextSteps.mask'), onSelect: () => void openMaskDrawer() },
           ]}
         />
+      )}
+
+      {isChangeCaseBarShown && selectedColumnId !== null && (
+        <div id="change-case-bar" role="group" aria-label={t('csv.changeCase.label')}>
+          <label htmlFor="change-case-column-select">{t('csv.changeCase.column')}</label>
+          <select id="change-case-column-select" value={selectedColumnId} onChange={(event) => setSelectedColumnId(Number(event.target.value))}>
+            {displayColumnIds.map((columnId) => (
+              <option key={columnId} value={columnId}>
+                {nameOf(columnId)}
+              </option>
+            ))}
+          </select>
+          <button className="btn sm primary" type="button" id="change-case-upper-button" onClick={() => transformSelectedColumn('upper')}>
+            {t('csv.changeCase.upper')}
+          </button>
+          <button className="btn sm outline" type="button" id="change-case-lower-button" onClick={() => transformSelectedColumn('lower')}>
+            {t('csv.changeCase.lower')}
+          </button>
+          <button className="btn sm outline" type="button" id="change-case-capitalize-button" onClick={() => transformSelectedColumn('capitalize')}>
+            {t('csv.changeCase.capitalize')}
+          </button>
+          <button className="btn sm icon" type="button" id="change-case-close-button" aria-label={t('csv.changeCase.close')} onClick={() => setIsChangeCaseBarShown(false)}>
+            <Icon name="x" size="sm" />
+          </button>
+        </div>
       )}
 
       <MenuBar menus={menus} isCompact={isNarrow} label={t('menu.bar')} />
@@ -3269,9 +3426,29 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
             {t('csv.wb.byteOrderMark')}
           </label>
           <label className="toggle-row">
-            <input type="checkbox" id="download-split-checkbox" checked={settings.splitRowsPerPart !== null} onChange={(event) => setSettings({ ...settings, splitRowsPerPart: event.target.checked ? 10000 : null })} />
+            <input type="checkbox" id="download-split-checkbox" checked={settings.splitRowsPerPart !== null || settings.splitMegabytesPerPart !== null} onChange={(event) => setSettings({ ...settings, splitRowsPerPart: event.target.checked ? 10000 : null, splitMegabytesPerPart: null })} />
             {t('csv.export.split')}
           </label>
+          {(settings.splitRowsPerPart !== null || settings.splitMegabytesPerPart !== null) && (
+            <div className="field">
+              <label htmlFor="download-split-by-select">{t('csv.export.splitBy')}</label>
+              <select
+                id="download-split-by-select"
+                value={settings.splitMegabytesPerPart !== null ? 'size' : 'rows'}
+                onChange={(event) => setSettings({ ...settings, splitRowsPerPart: event.target.value === 'rows' ? 10000 : null, splitMegabytesPerPart: event.target.value === 'size' ? 10 : null })}
+              >
+                <option value="rows">{t('csv.export.splitByRows')}</option>
+                <option value="size">{t('csv.export.splitBySize')}</option>
+              </select>
+            </div>
+          )}
+          {settings.splitMegabytesPerPart !== null && (
+            <div className="field">
+              <label htmlFor="download-split-size-input">{t('csv.export.megabytesPerPart')}</label>
+              <input id="download-split-size-input" type="number" min="0.1" step="0.1" dir="ltr" value={settings.splitMegabytesPerPart} onChange={(event) => setSettings({ ...settings, splitMegabytesPerPart: Math.max(0.1, Number(event.target.value) || 0.1) })} />
+              <span className="small-note">{t('csv.export.sizeNote')}</span>
+            </div>
+          )}
           {settings.splitRowsPerPart !== null && (
             <div className="field">
               <label htmlFor="download-split-rows-input">{t('csv.export.rowsPerPart')}</label>

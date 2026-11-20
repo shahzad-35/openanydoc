@@ -1,0 +1,96 @@
+{
+  "title": "XML Viewer Online – View, Validate, Format XML | OpenAnyDoc",
+  "description": "Open or paste XML and see it as a tree beside an editable code pane. Validate it, format or minify it, then copy or download. Free, nothing is uploaded.",
+  "heading": "XML Viewer: See, Check and Tidy XML",
+  "subtitle": "Paste or open an XML file to see it as a collapsible tree, check it is well-formed and format it; nothing is uploaded.",
+  "intro": "A free XML viewer online: paste XML or open a .xml file and it appears twice, as code you can edit and as a tree you can fold, with elements, attributes (@name) and text (#text) labelled. Validate tells you whether the XML is well-formed and where the first error is, Format indents it and Minify packs it. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "features": [
+    {
+      "title": "Code and tree side by side",
+      "text": "Edit the XML on one side and fold or unfold its elements on the other. Attributes show as @name and text as #text, so the structure is clear at a glance."
+    },
+    {
+      "title": "Private, free, no account",
+      "text": "Your XML is read by your own browser and stays in this tab. It is never uploaded or saved, there are no share links or recent files, and there is nothing to sign up for."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, viewing, validating and formatting XML keep working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: view XML in a few steps",
+  "steps": [
+    {
+      "title": "Paste or open your XML",
+      "text": "Paste XML into the code pane, or click Choose a file or drop a .xml file on the page. Try a sample if you just want to see it work."
+    },
+    {
+      "title": "Explore the tree",
+      "text": "Fold and unfold elements in the tree to find the part you need. Changes you make in the code pane show in the tree."
+    },
+    {
+      "title": "Validate and format",
+      "text": "Validate checks the XML is well-formed and shows the error message with its line. Format indents it with 2 or 4 spaces; Minify puts it on as few characters as possible."
+    },
+    {
+      "title": "Copy, download or convert",
+      "text": "Copy puts the XML on your clipboard, Download saves a .xml file, and Open as JSON takes it to the XML to JSON page."
+    }
+  ],
+  "handlesTitle": "What the XML viewer handles",
+  "handles": [
+    "Input: pasted XML or a .xml file up to 10 MB.",
+    "Tree: elements, attributes shown as @name and text shown as #text, each element foldable.",
+    "Validation: well-formedness checked by your browser's own XML parser, with the error message and line.",
+    "Format: indentation of 2 or 4 spaces, or Minify.",
+    "Output: copy to the clipboard, download as .xml, or open the data as JSON."
+  ],
+  "limits": [
+    "Files up to 10 MB.",
+    "Validate checks that the XML is well-formed only; it does not check it against a DTD or an XSD schema.",
+    "XML that is not well-formed can't be shown as a tree or formatted until the error is fixed."
+  ],
+  "faqTitle": "XML viewer: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your XML is read by your browser, on your device, and stays in this tab. It is never sent anywhere or saved on the site, and there are no share links or history. You can check it in your browser's network panel."
+    },
+    {
+      "question": "What does \"well-formed\" mean?",
+      "answer": "Well-formed XML follows the basic rules of the format: one root element, every tag closed and nested correctly, attribute values in quotes and special characters escaped. If any rule is broken, Validate shows the parser's message and the line it stopped on."
+    },
+    {
+      "question": "Can it validate my XML against a schema?",
+      "answer": "No. It checks that the XML is well-formed, not that it matches a DTD or an XSD schema. For schema validation use your editor or your own build tools."
+    },
+    {
+      "question": "Why do some tree entries start with @ or #?",
+      "answer": "An entry that starts with @ is an attribute of the element above it, such as @id. An entry named #text is the text inside an element. Elements are shown by their tag name."
+    },
+    {
+      "question": "Can I turn XML into JSON?",
+      "answer": "Yes. Press Open as JSON and the XML is handed to the XML to JSON page, where you can view and download it as JSON."
+    },
+    {
+      "question": "How large an XML file can I open?",
+      "answer": "Up to 10 MB. Larger files are refused before they are read, because the tree and the editor would be too slow."
+    },
+    {
+      "question": "Is it free, and does it work offline?",
+      "answer": "Yes to both. There is no account or limit, and once the page has loaded it keeps working without an internet connection."
+    },
+    {
+      "question": "What is an XML file?",
+      "answer": "An XML file is a text file that stores data between named tags, such as <price>9</price>, nested inside one root element; sitemaps, RSS feeds, invoices and many exports are XML. Any web browser or text editor opens one, and OpenAnyDoc shows it as code and as a foldable tree in your browser."
+    },
+    {
+      "question": "How do I open an XML file in Excel?",
+      "answer": "In Excel, choose Data → Get Data → From File → From XML, pick the file and load the table Excel finds in it. Without Excel, XML to CSV turns the repeated elements into rows you can download as CSV or Excel, in your browser and without uploading.",
+      "link": {
+        "text": "XML to CSV",
+        "path": "/xml-to-csv"
+      }
+    }
+  ]
+}

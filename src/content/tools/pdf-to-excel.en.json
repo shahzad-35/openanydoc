@@ -66,7 +66,7 @@
     },
     {
       "question": "Can I check the result before opening Excel?",
-      "answer": "Yes. Open the downloaded file in the Excel viewer here.",
+      "answer": "Yes: open the downloaded file in the OpenAnyDoc Excel viewer, in your browser.",
       "link": {
         "text": "Excel viewer",
         "path": "/excel-viewer"
@@ -75,6 +75,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a PDF to Excel without uploading it?",
+      "answer": "Use a converter that runs on your own device: OpenAnyDoc turns a PDF into an Excel .xlsx file in your web browser, so the file is never uploaded. Choose the PDF, click Convert to Excel and download the file; each page becomes a sheet and text in columns goes into separate cells."
     }
   ]
 }

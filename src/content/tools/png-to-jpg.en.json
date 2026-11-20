@@ -37,7 +37,7 @@
   "handles": [
     "Files: PNG pictures of any size your device can open.",
     "Transparency: filled with white, because JPG has none.",
-    "Output: JPG with MozJPEG at the quality you choose.",
+    "Output: JPG at the quality you choose.",
     "Batch: many pictures in one ZIP."
   ],
   "limits": [
@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a PNG to JPG?",
+      "answer": "Open the PNG in an image app and save or export it as JPG: Paint on Windows and Preview on a Mac both can. OpenAnyDoc converts one or many PNGs in your browser with a quality slider, fills transparent parts with white and downloads the JPGs, or a ZIP, without uploading anything."
     }
   ]
 }

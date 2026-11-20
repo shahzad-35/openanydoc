@@ -38,10 +38,10 @@
     "Text: every page in order, lines rebuilt from the page layout.",
     "Arabic: words come out in reading order, ready to paste.",
     "Page markers: optional --- Page 3 --- headings between pages.",
-    "Scanned PDFs: detected and explained; reading them needs OCR, which this tool does not do."
+    "Scanned PDFs: detected and explained; run OCR PDF first to read them."
   ],
   "limits": [
-    "Scanned PDFs hold pictures of pages, so there is no text to get; that needs text recognition (OCR), which this tool does not do.",
+    "Scanned PDFs hold pictures of pages, so there is no text to get; run OCR PDF first.",
     "Tables and columns come out as lines of text, not as a table.",
     "PDFs that need a password to open can't be read; remove the password first."
   ],
@@ -53,7 +53,11 @@
     },
     {
       "question": "Why is no text found?",
-      "answer": "The PDF is probably scanned: its pages are pictures. Getting text from them needs OCR, which this tool does not do."
+      "answer": "The PDF is probably scanned: its pages are pictures, with no text inside. Run OCR PDF first, which reads the words in your browser, then convert the new copy here.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
     },
     {
       "question": "Does it work with Arabic PDFs?",
@@ -61,11 +65,19 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I copy text from a PDF?",
+      "answer": "Select the text in any PDF reader and copy it, or save all of it at once as a .txt file with a PDF to text converter; a scanned PDF needs text recognition (OCR) first. OpenAnyDoc's PDF to text saves every page's text in your browser, Arabic in reading order, without uploading the file."
     }
   ]
 }

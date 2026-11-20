@@ -1,0 +1,83 @@
+{
+  "title": "HTML Table to CSV Converter – Free, No Upload | OpenAnyDoc",
+  "description": "Convert an HTML table to CSV in your browser: open an .html file or paste HTML, and its largest table becomes an editable CSV. Scripts never run.",
+  "heading": "HTML Table to CSV: Web Tables to a Sheet",
+  "subtitle": "Drop an HTML file or paste HTML and its largest table opens as CSV; nothing is uploaded.",
+  "intro": "Convert an HTML table to CSV in your browser: drop an .html or .htm file, or paste HTML, and the largest table on the page (the one with the most cells) opens in the CSV viewer. Header cells become column names, merged cells are filled in, and links and formatting become plain text. Scripts in the HTML never run, and nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Merged cells filled",
+      "text": "A cell that spans rows or columns repeats its value in every cell it covers, so the table stays even."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert an HTML table to CSV",
+  "steps": [
+    {
+      "title": "Open or paste HTML",
+      "text": "Drop an .html or .htm file, choose it, paste HTML into the paste box, or try one of the samples."
+    },
+    {
+      "title": "The largest table is picked",
+      "text": "The table with the most cells is converted. Its <th> cells, or its first row when it has none, become the column names."
+    },
+    {
+      "title": "Check and edit",
+      "text": "The table opens in the CSV viewer: sort, filter, edit cells and undo before you save."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves a .csv file; the viewer can also save it as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the HTML table converter handles",
+  "handles": [
+    "Input: .html and .htm files, or pasted HTML.",
+    "Table: the largest <table> on the page, counted by cells.",
+    "Header: <th> cells, or the first row when there are none.",
+    "Merged cells: colspan and rowspan repeat the value in each cell they cover.",
+    "Content: links and formatting become plain text, and scripts never run."
+  ],
+  "limits": [
+    "Only one table is converted, the largest; to convert another, paste only that table's HTML.",
+    "Images, link addresses and formatting are not kept, only the text."
+  ],
+  "faqTitle": "HTML table to CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the HTML on your device and nothing is sent to a server. Scripts in the file never run."
+    },
+    {
+      "question": "Which table is converted when the page has several?",
+      "answer": "The largest one, counted by cells. To convert a different table, paste only that table's HTML, from <table> to </table>."
+    },
+    {
+      "question": "Where do the column names come from?",
+      "answer": "From the table's <th> header cells. When it has none, the first row is used as the header."
+    },
+    {
+      "question": "How are merged cells handled?",
+      "answer": "A cell with colspan or rowspan repeats its value in every cell it covers, so each row has the same number of columns."
+    },
+    {
+      "question": "Are links in the table kept?",
+      "answer": "The link text is kept as plain text; the address it points to is not."
+    },
+    {
+      "question": "Do scripts in the HTML run?",
+      "answer": "No. The HTML is read as data to find the table, so no script, style or picture in it is loaded or run."
+    },
+    {
+      "question": "How do I copy a table from a website into a CSV file?",
+      "answer": "Save the web page as an .html file, or copy the table's HTML, and open it in OpenAnyDoc's HTML table to CSV converter; the largest table becomes rows and columns you can download as a .csv file. Excel and Google Sheets open that file, and the HTML is read in your browser without being uploaded."
+    }
+  ]
+}

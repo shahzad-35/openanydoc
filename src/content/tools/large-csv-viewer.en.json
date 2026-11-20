@@ -53,7 +53,7 @@
   "faq": [
     {
       "question": "How do I open a CSV file that is too large for Excel?",
-      "answer": "Excel shows at most 1,048,576 rows per sheet and leaves out the rest. Drop the file here instead: this viewer has no row limit of its own, only your browser's memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning. The guide CSV too big for Excel covers the other options.",
+      "answer": "Open it in a viewer with no row limit, such as the OpenAnyDoc large CSV viewer in your browser: Excel shows at most 1,048,576 rows per sheet and leaves out the rest. This viewer has no row limit of its own, only your browser's memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning. The guide CSV too big for Excel covers the other options.",
       "link": {
         "text": "CSV too big for Excel",
         "path": "/csv-too-big-for-excel"
@@ -78,6 +78,14 @@
     {
       "question": "Is a large CSV file uploaded to a server to open it?",
       "answer": "No. Even a big file is read by your browser on your device, so there is no upload to wait for, and the limit is your device's memory."
+    },
+    {
+      "question": "What program opens a large CSV file?",
+      "answer": "A large CSV file needs a program without a spreadsheet's row limit: a text editor made for big files, a database tool, or a viewer that draws only the rows on screen; Excel stops at 1,048,576 rows. The OpenAnyDoc large CSV viewer opens it in your browser with search, filters and sorting, and nothing is uploaded. More ways are in how to open a CSV file without Excel.",
+      "link": {
+        "text": "how to open a CSV file without Excel",
+        "path": "/open-csv-without-excel"
+      }
     }
   ]
 }

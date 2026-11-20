@@ -57,7 +57,7 @@
     },
     {
       "question": "Which indentation should I use to pretty print JSON?",
-      "answer": "Two spaces is the most common choice and the default here. Four spaces is common in some code styles, and a tab lets each reader's editor choose the width. The formatter offers 1, 2, 3, 4 and 8 spaces and tab."
+      "answer": "Two spaces is the most common choice and the formatter's default. Four spaces is common in some code styles, and a tab lets each reader's editor choose the width. The formatter offers 1, 2, 3, 4 and 8 spaces and tab."
     },
     {
       "question": "Will formatting change my numbers or the order of keys?",
@@ -74,6 +74,14 @@
     {
       "question": "How large a JSON file can I format?",
       "answer": "Up to 10 MB. Larger files are refused before they are read, because every action on them would be slow."
+    },
+    {
+      "question": "How do I pretty print a JSON file?",
+      "answer": "Paste the JSON into OpenAnyDoc's JSON formatter, or drop the .json file, and press Format to put each key and value on its own indented line. The JSON is formatted in your browser and not uploaded. To read a file without changing it, see how to open a JSON file.",
+      "link": {
+        "text": "how to open a JSON file",
+        "path": "/open-json-file"
+      }
     }
   ]
 }

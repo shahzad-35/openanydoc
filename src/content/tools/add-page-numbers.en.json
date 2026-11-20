@@ -61,7 +61,11 @@
     },
     {
       "question": "Can I number a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then add the numbers."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then add the numbers.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Does the rest of my PDF change?",
@@ -70,6 +74,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I add page numbers to a PDF?",
+      "answer": "Choose the PDF, pick where the numbers go and how they look, then click Add page numbers and download the numbered file. OpenAnyDoc does this in your browser, so the PDF is never uploaded, and the preview shows the numbers before you save."
     }
   ]
 }

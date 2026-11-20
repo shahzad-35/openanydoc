@@ -8,6 +8,13 @@
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
+# The service worker (src/sw.ts) is checked for a new version on every visit; the app manifests change with the formats.
+/sw.js
+  Cache-Control: no-cache
+
+/manifest.*
+  Cache-Control: public, max-age=3600
+
 # The AI tools' runtimes and models (OCR PDF, Blur faces, Remove background, Upscale, Translate PDF) are read on first use and
 # kept, so the tools work offline afterwards. Their names carry no hash, so they are kept 30 days, not for good.
 /models/*

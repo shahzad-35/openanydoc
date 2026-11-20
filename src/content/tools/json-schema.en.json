@@ -1,0 +1,41 @@
+{
+  "title": "JSON Schema Generator and Validator Online | OpenAnyDoc",
+  "description": "Generate a JSON Schema (draft 2020-12) from your JSON, or validate JSON against a schema and jump to each error in the tree. Free, nothing uploaded.",
+  "heading": "JSON Schema Generator and Validator",
+  "subtitle": "Write a schema from your JSON, or check JSON against a schema; nothing is uploaded.",
+  "intro": "A free JSON Schema tool: open a .json file, drop it or paste the text, and the page opens on the Schema tab. Generate a schema writes a JSON Schema in draft 2020-12 from your document, describing its keys and their types, ready to copy or download as a starting point. Or paste a schema you already have and validate the document against it: each error says what failed and links to the node in the tree. Everything runs in your browser and nothing is uploaded.",
+  "features": [
+    { "title": "Errors you can find", "text": "Every validation error links to the node it is about, so you see the value in the tree at once." },
+    { "title": "Private and free", "text": "Your JSON and your schema are checked by your own browser and never sent to a server. No account, no watermark." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: generate or validate a JSON Schema",
+  "steps": [
+    { "title": "Open or paste your JSON", "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples." },
+    { "title": "Generate a schema", "text": "On the Schema tab, press Generate a schema to get a draft 2020-12 schema of the document. Copy it or download it as a .json file." },
+    { "title": "Or validate against your schema", "text": "Paste a schema into the Schema tab instead. The document is checked against it, and each error links to its node in the tree." }
+  ],
+  "handlesTitle": "What the JSON Schema tool handles",
+  "handles": [
+    "Schema generation in JSON Schema draft 2020-12, from the types and keys in your document.",
+    "Validation of the open document against a pasted schema, in your browser.",
+    "A list of errors, each linked to its node in the tree.",
+    "Copy or download the generated schema as a .json file.",
+    "Big integer IDs kept with every digit in the document."
+  ],
+  "limits": [
+    "A generated schema describes the one document it was made from; review it and loosen or tighten rules before you rely on it.",
+    "A schema that refers to other schemas by web address cannot fetch them; paste a schema that holds everything it needs.",
+    "Files up to 10 MB, and both the document and the schema must be valid JSON."
+  ],
+  "faqTitle": "Questions about JSON Schema",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your JSON and your schema are read, generated and validated by your browser, on your device, and are never sent anywhere. Pasted text stays in this tab." },
+    { "question": "What is a JSON Schema?", "answer": "A JSON Schema is a JSON document that describes what another JSON document should look like: which keys it needs, the type of each value and which values are allowed. Programs use it to check data before they accept it." },
+    { "question": "Which draft does the generated schema use?", "answer": "Draft 2020-12, the current version of JSON Schema. The schema's $schema key says so, so tools that read it know which rules apply." },
+    { "question": "Is the generated schema ready to use as it is?", "answer": "It is a starting point. It is written from one example, so it cannot know which keys are optional elsewhere or which values are allowed; read it and adjust it to your rules." },
+    { "question": "Can my schema use $ref to another file?", "answer": "Only references inside the pasted schema itself. Nothing is fetched from the internet, so a $ref to a web address cannot be followed; put the referenced definitions into the schema you paste." },
+    { "question": "How do I find the part of my JSON that failed?", "answer": "Every error is listed on the Schema tab, and each one links to its node in the tree, so you can jump straight to the value that broke the rule." },
+    { "question": "How do I generate a JSON Schema from a JSON sample?", "answer": "Open or paste a sample in OpenAnyDoc's JSON Schema tool and press Generate a schema on the Schema tab to get a draft 2020-12 schema you can copy or download. Treat it as a starting point, since it is written from one example; it is made in your browser without uploading." }
+  ]
+}

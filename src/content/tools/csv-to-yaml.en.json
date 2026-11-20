@@ -1,0 +1,42 @@
+{
+  "title": "CSV to YAML Converter – Rows as a YAML List | OpenAnyDoc",
+  "description": "Convert CSV to YAML in your browser: a list with one mapping per row, where codes such as 007 and phone numbers stay text. Copy or download a .yaml file.",
+  "heading": "CSV to YAML Converter",
+  "subtitle": "Drop a CSV and its YAML list appears at once, one mapping per row, ready to copy or download.",
+  "intro": "Turn a spreadsheet export into YAML for fixtures, seed data, a static site's data folder or an Ansible inventory. Choose, drop or paste a CSV or TSV file and the YAML appears at once: a list with one mapping per row, keyed by the header row. Plain decimals become YAML numbers; codes such as 007, phone numbers and long IDs stay text, so nothing loses a digit. Arabic is written as it is, not as escape codes. The delimiter and encoding are detected for you, and the conversion runs in your browser.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is turned into YAML by your own browser and never sent to a server." },
+    { "title": "Codes stay intact", "text": "Only plain decimals become numbers; 007, phone numbers and long IDs stay text, so the YAML reads back as your data." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to YAML",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample. The delimiter and encoding are detected for you." },
+    { "title": "Read the YAML", "text": "Each row becomes a list item starting with a dash, with one key per column from the header row." },
+    { "title": "Copy or download", "text": "Copy the YAML to your clipboard or download it as a .yaml file with the CSV's name." }
+  ],
+  "handlesTitle": "What the CSV to YAML converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Shape: a YAML list with one mapping per row, keyed by the header row.",
+    "Numbers: plain decimals such as 42 or 3.5 become numbers; 007, phone numbers and long IDs stay text.",
+    "Arabic and other non-Latin text written as it is, not as escape codes.",
+    "Quoted CSV fields with commas or line breaks inside, as Excel and Google Sheets write them."
+  ],
+  "limits": [
+    "The first row is read as the keys, so it should hold the column names.",
+    "Every row becomes a flat mapping; the converter does not build nested YAML from column names.",
+    "The preview shows the first 5,000 lines; Copy and Download always take the whole YAML."
+  ],
+  "faqTitle": "CSV to YAML: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your browser reads the CSV and writes the YAML on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "What shape does the YAML take?", "answer": "A list: each CSV row becomes one item that starts with a dash, and each column becomes a key from the header row with that row's value." },
+    { "question": "Why did 007 stay in quotes?", "answer": "Written as a number, 007 would become 7. Only plain decimals become YAML numbers; codes with leading zeros, phone numbers and long IDs stay text so they read back unchanged." },
+    { "question": "Can I get nested YAML from columns like address.city?", "answer": "No. Each row becomes a flat mapping and a header such as address.city stays one key. Nest it by hand after converting if your tool needs it." },
+    { "question": "Is Arabic text kept readable?", "answer": "Yes. Arabic and other non-Latin text is written as it is in UTF-8, not as \\u escape codes, so you can read and edit the YAML directly." },
+    { "question": "Can I convert YAML back to JSON?", "answer": "Yes, on the YAML to JSON page, which opens a .yaml or .yml file as JSON.", "link": { "text": "YAML to JSON", "path": "/yaml-to-json" } },
+    { "question": "How do I convert a CSV file to YAML?", "answer": "Open or paste the CSV and each row becomes a YAML list item with one key per column; copy it or download it as a .yaml file. OpenAnyDoc converts it in your browser, without uploading the data." }
+  ]
+}

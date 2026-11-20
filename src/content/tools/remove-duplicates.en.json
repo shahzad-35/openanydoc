@@ -1,0 +1,83 @@
+{
+  "title": "Remove Duplicate Rows from CSV or Excel Online | OpenAnyDoc",
+  "description": "Remove duplicate rows from a CSV or Excel file in your browser: choose the columns that must match, keep the first of each set, and download. No upload.",
+  "heading": "Remove Duplicate Rows Online",
+  "subtitle": "Drop a CSV or Excel file, pick the columns to compare and remove repeats; nothing is uploaded.",
+  "intro": "Remove duplicate rows in your browser: the file opens with the duplicates dialog, where you choose which columns must match (all of them by default). The first row of each set is kept, the others are removed, and the page shows how many went. Undo brings them back, and download saves the cleaned file. Excel files open their first sheet. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Undo any time",
+      "text": "Removed rows come back with Undo if the result is not what you expected."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: remove duplicate rows",
+  "steps": [
+    {
+      "title": "Open your file",
+      "text": "Drop a CSV or Excel file, choose it, paste CSV into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Choose the columns to match",
+      "text": "All columns are ticked by default; untick some to treat rows as duplicates when only the others match."
+    },
+    {
+      "title": "Remove the repeats",
+      "text": "The first row of each set is kept and the count of rows removed is shown. Undo brings them back."
+    },
+    {
+      "title": "Download",
+      "text": "Save the cleaned file as CSV, or as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the duplicate remover handles",
+  "handles": [
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Matching: all columns by default, or only the ones you choose.",
+    "Kept row: the first of each set of duplicates.",
+    "Result: the number of rows removed is shown, and Undo restores them.",
+    "Big files: the CSV viewer handles 100,000+ rows."
+  ],
+  "limits": [
+    "The first row of each set is always the one kept.",
+    "Excel files: only the first sheet is opened."
+  ],
+  "faqTitle": "Remove duplicates: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser finds and removes the duplicates on your device; nothing is sent to a server."
+    },
+    {
+      "question": "Which row is kept?",
+      "answer": "The first row of each set of duplicates, in the table's current order. The later copies are removed."
+    },
+    {
+      "question": "Can I find duplicates by one column only?",
+      "answer": "Yes. Untick the other columns, and rows count as duplicates when the ticked columns match, for example the same email."
+    },
+    {
+      "question": "How do I know how many rows were removed?",
+      "answer": "The page shows the count after removing them, and the row count in the table changes too."
+    },
+    {
+      "question": "Can I undo it?",
+      "answer": "Yes. Undo brings the removed rows back, as long as you haven't reloaded the page."
+    },
+    {
+      "question": "Can I remove duplicates across every sheet of an Excel file?",
+      "answer": "No. Only the first sheet is opened. Save the other sheets as separate files to clean them."
+    },
+    {
+      "question": "How do I remove duplicates from a CSV file without Excel?",
+      "answer": "Google Sheets has Remove duplicates in its Data menu, and OpenAnyDoc removes them in your browser from a CSV or Excel file. Choose which columns must match, remove the repeats, keeping the first row of each set, and download the cleaned file; nothing is uploaded."
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   "description": "Compress JPG, PNG, WebP and AVIF pictures in your browser with a quality slider and a before/after view. Many at once, free, and nothing is uploaded.",
   "heading": "Compress Images Online",
   "subtitle": "Make pictures smaller with a quality slider and compare before and after; nothing is uploaded.",
-  "intro": "Reduce the file size of JPG, PNG, WebP and AVIF pictures with the same encoders the Squoosh app uses (MozJPEG, OxiPNG, libwebp and libavif). Move the quality slider and the before/after view shows the first picture at that setting with the size saved. Keep each file's format or convert them all, and download one picture or a ZIP of many.",
+  "intro": "Reduce the file size of JPG, PNG, WebP and AVIF pictures with high-quality encoders that run in your browser. Move the quality slider and the before/after view shows the first picture at that setting with the size saved. Keep each file's format or convert them all, and download one picture or a ZIP of many.",
   "features": [
     {
       "title": "Private",
@@ -35,8 +35,8 @@
   ],
   "handlesTitle": "What Compress image handles",
   "handles": [
-    "JPG: MozJPEG, usually 40–80% smaller at quality 75 with little visible change.",
-    "PNG: OxiPNG lossless optimisation; the pixels stay exactly the same.",
+    "JPG: a high-quality JPEG encoder, usually 40–80% smaller at quality 75 with little visible change.",
+    "PNG: lossless optimisation; the pixels stay exactly the same.",
     "WebP and AVIF: modern formats that are often much smaller than JPG at the same look.",
     "Batch: every picture in one go, with progress, and the results as one ZIP."
   ],
@@ -74,6 +74,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I reduce the file size of a photo?",
+      "answer": "Save it again at a lower quality, or in a smaller format such as WebP or AVIF: at quality 75 a photo is usually less than half its size with little visible change. OpenAnyDoc does this in your browser for JPG, PNG, WebP and more, so the pictures are never uploaded."
     }
   ]
 }

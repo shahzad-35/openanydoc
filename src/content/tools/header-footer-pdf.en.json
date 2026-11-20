@@ -69,11 +69,19 @@
     },
     {
       "question": "Can I use a password-protected PDF?",
-      "answer": "Not yet. A PDF that needs a password to open can't be read here. Remove the password in the app you use to open it, then try again."
+      "answer": "Not directly: a PDF that needs a password to open can't be read by this tool. If you know the password, remove it with Unlock PDF, which also runs in your browser, then try again.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
     },
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark of ours and no limit on how often you use it."
+    },
+    {
+      "question": "How do I add a header and footer to a PDF?",
+      "answer": "Open the PDF in OpenAnyDoc's Header and footer tool, type into the header and footer boxes, choose the pages and click Add header and footer. The text can include the page number, page count or date, and the PDF is changed in your browser without being uploaded."
     }
   ]
 }

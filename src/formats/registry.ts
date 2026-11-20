@@ -5,12 +5,6 @@ import type { Locale } from '../i18n'
 import type { OpenedFile } from '../useFileIntake'
 import { viewers } from '../viewers'
 import type { Viewer } from '../viewers'
-import { countExcelEdits, createEmptyExcelEdits, describeExcelChanges } from './excel/excelEdits'
-import type { ExcelEdits } from './excel/excelEdits'
-import { countCsvEdits, createEmptyCsvEdits, describeCsvChanges } from './csv/csvCells'
-import type { CsvEdits } from './csv/csvCells'
-import { countJsonChanges, createEmptyJsonEdits, describeJsonChanges, parseJsonText } from './json/jsonModel'
-import { countTextChanges, createEmptyTextEdits, describeTextChanges } from './text/textEditing'
 import type { EditSession } from './useEditSession'
 
 export type ViewMode = 'view' | 'edit'
@@ -100,8 +94,9 @@ export type FormatDefinition = {
   ownsWholePage?: boolean
   // Larger files are refused before they are read, because the page would become slow with them.
   maxFileBytes?: number
-  // Absent while a format cannot be edited yet; the View / Edit toggle is then not shown.
-  editing?: FormatEditing
+  // The format can be edited (its edit model is in formatEditing.ts, loaded only with the file page, so the other pages never
+  // carry editing code). Absent while a format cannot be edited yet; the View / Edit toggle is then not shown.
+  isEditable?: boolean
   // The viewer offers Mask data (a button in its top bar and its menus) for this format's files: src/formats/mask.
   canMask?: boolean
 }
@@ -110,7 +105,7 @@ const loadCsvViewer = () => import('./csv/CsvViewer')
 const loadTextViewer = () => import('./text/TextViewer')
 const loadJsonViewer = () => import('./json/JsonViewer')
 const loadExcelViewer = () => import('./excel/ExcelViewer')
-const loadExcelEditing = () => import('./excel/excelEditing')
+export const loadExcelEditing = () => import('./excel/excelEditing')
 const loadWordViewer = () => import('./word/WordViewer')
 const loadPowerPointViewer = () => import('./powerpoint/PowerPointViewer')
 const loadPdfViewer = () => import('./pdf/PdfViewer')
@@ -127,12 +122,7 @@ export const formatDefinitions: FormatDefinition[] = [
     preloadViewer: () => loadCsvViewer().then((csvViewer) => csvViewer.parseCsvInWorker(new ArrayBuffer(0), 'auto', 'auto')),
     ownsWholePage: true,
     canMask: true,
-    editing: {
-      createEmptyEdits: createEmptyCsvEdits,
-      countChanges: (edits) => countCsvEdits(edits as CsvEdits),
-      describeChanges: (edits, locale) => describeCsvChanges(edits as CsvEdits, locale),
-      alwaysEditable: true,
-    },
+    isEditable: true,
   },
   {
     viewerId: 'text',
@@ -140,30 +130,20 @@ export const formatDefinitions: FormatDefinition[] = [
     ViewerComponent: lazy(loadTextViewer),
     preloadViewer: loadTextViewer,
     ownsWholePage: true,
-    editing: {
-      createEmptyEdits: createEmptyTextEdits,
-      countChanges: countTextChanges,
-      describeChanges: describeTextChanges,
-      alwaysEditable: true,
-    },
+    isEditable: true,
   },
   {
     viewerId: 'json',
     addedOn: '2026-10-14',
     ViewerComponent: lazy(loadJsonViewer),
     // Parsing a tiny document starts the parse worker once, so its file is cached too.
-    preloadViewer: () => Promise.all([loadJsonViewer(), parseJsonText('null', 'en')]),
+    preloadViewer: () => Promise.all([loadJsonViewer(), import('./json/jsonModel').then((jsonModel) => jsonModel.parseJsonText('null', 'en'))]),
     ownsWholePage: true,
     // Measured 2026-10-16: up to 10 MB every action takes a third of a second or less; at 50 MB a tree edit takes 1.6 s and the
     // page holds 1 GB of memory.
     maxFileBytes: 10 * 1024 * 1024,
     canMask: true,
-    editing: {
-      createEmptyEdits: createEmptyJsonEdits,
-      countChanges: countJsonChanges,
-      describeChanges: describeJsonChanges,
-      alwaysEditable: true,
-    },
+    isEditable: true,
   },
   {
     viewerId: 'excel',
@@ -172,13 +152,7 @@ export const formatDefinitions: FormatDefinition[] = [
     // The read worker is fetched too (an empty file, which it refuses), so a workbook opens with no network.
     preloadViewer: () => Promise.all([loadExcelViewer().then((excelViewer) => excelViewer.readWorkbookInWorker(new ArrayBuffer(0), 'empty.xlsx', 'en')), loadExcelEditing(), import('./excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())]),
     canMask: true,
-    editing: {
-      createEmptyEdits: createEmptyExcelEdits,
-      countChanges: (edits) => countExcelEdits(edits as ExcelEdits),
-      describeChanges: (edits, locale) => describeExcelChanges(edits as ExcelEdits, locale),
-      loadEditingModule: () => loadExcelEditing().then((editingFile) => editingFile.excelEditingModule),
-      alwaysEditable: true,
-    },
+    isEditable: true,
   },
   {
     viewerId: 'word',

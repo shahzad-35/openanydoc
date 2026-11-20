@@ -1,0 +1,85 @@
+{
+  "title": "Excel to HTML Table Converter – Free Online | OpenAnyDoc",
+  "description": "Excel to HTML converter: turn a sheet of an XLSX, XLS or ODS workbook into an HTML table, as a full web page or the table alone. Nothing is uploaded.",
+  "heading": "Excel to HTML Table Converter",
+  "subtitle": "Pick a sheet and get a clean HTML table, as a full page or the table alone; nothing is uploaded.",
+  "intro": "Turn an Excel sheet into an HTML table in your browser: the header row goes into <thead> and the other rows into <tbody>. Choose Full page for a UTF-8 file that opens in any browser, or Table only to paste into your site or email template. Text is escaped and Arabic cells read right to left. Copy it or download an .html file.",
+  "features": [
+    {
+      "title": "Clean markup",
+      "text": "A plain <table> with <thead> and <tbody>, no inline styles to strip out."
+    },
+    {
+      "title": "Private",
+      "text": "The workbook is read by your own browser and never sent to a server."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert Excel to HTML",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Drop an .xlsx, .xls, .xlsm or .ods file on this page, choose it, or try a sample. It is read in your browser and never uploaded."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "The first sheet becomes an HTML table at once; choose another from the sheet list."
+    },
+    {
+      "title": "Full page or table only",
+      "text": "Full page gives a complete UTF-8 document; Table only gives just the <table> to paste elsewhere."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the HTML, or download it as an .html file."
+    }
+  ],
+  "handlesTitle": "What the Excel to HTML converter handles",
+  "handles": [
+    "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
+    "Table: the header row in <thead>, every other row in <tbody>; empty rows are skipped.",
+    "Output: Full page (a UTF-8 HTML document) or Table only.",
+    "Arabic: in a full page each cell has dir=\"auto\", so Arabic text reads right to left beside English.",
+    "Text: <, > and & are escaped, so cell text never turns into markup.",
+    "Values: each cell as Excel shows it, so formulas give their result and dates and prices keep their format."
+  ],
+  "limits": [
+    "Values only: cell colours, fonts and borders are not carried over, so style the table with your own CSS.",
+    "Merged cells are not merged in the table: the value sits in the first cell and the others stay empty.",
+    "Password-protected workbooks cannot be opened."
+  ],
+  "faqTitle": "Excel to HTML: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads the workbook and writes the HTML on your device. Nothing is sent to a server, saved on the site or kept in a history."
+    },
+    {
+      "question": "What is the difference between Full page and Table only?",
+      "answer": "Full page is a complete HTML document saved as UTF-8 that opens on its own in a browser. Table only is just the <table> element, for pasting into a web page, CMS or email template."
+    },
+    {
+      "question": "Does Arabic text show correctly?",
+      "answer": "Yes. The full page is UTF-8 and each cell has dir=\"auto\", so Arabic cells read right to left and English cells left to right."
+    },
+    {
+      "question": "Why does the table look plain?",
+      "answer": "Only the values are converted; Excel colours, fonts and borders are left out. That keeps the markup clean, and you can style it with your own CSS."
+    },
+    {
+      "question": "Are formulas kept in the HTML?",
+      "answer": "No. Each cell shows the value Excel shows, so a formula appears as its result."
+    },
+    {
+      "question": "Is a long sheet converted in full?",
+      "answer": "Yes. The preview shows the first 5,000 lines, but Copy and Download take the whole HTML."
+    },
+    {
+      "question": "How do I convert an Excel sheet to an HTML table?",
+      "answer": "Open the workbook, pick the sheet, choose Full page or Table only, then copy the HTML or download it as an .html file. OpenAnyDoc writes the table in your browser, so the workbook is never uploaded."
+    }
+  ]
+}

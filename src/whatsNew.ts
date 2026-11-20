@@ -38,7 +38,7 @@ export function getReleasedFormats(): ReleasedFormat[] {
 export function getFormatCapabilities(viewerId: Viewer['id']) {
   const definition = formatDefinitions.find((candidate) => candidate.viewerId === viewerId)
   if (!definition) return undefined
-  return { canEdit: Boolean(definition.editing), isComingSoon: !definition.addedOn }
+  return { canEdit: Boolean(definition.isEditable), isComingSoon: !definition.addedOn }
 }
 
 export function getNewFormats(today = new Date()) {

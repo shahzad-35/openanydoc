@@ -82,6 +82,10 @@
     {
       "question": "Is my CSV uploaded to make the Excel file?",
       "answer": "No. The workbook is built by your browser on your device, and nothing is sent to a server."
+    },
+    {
+      "question": "How do I convert a CSV file to Excel?",
+      "answer": "Open the CSV and download it as an .xlsx workbook: the delimiter and encoding are detected, and leading zeros and Arabic text are kept. OpenAnyDoc builds the workbook in your browser, so the file is never uploaded."
     }
   ]
 }

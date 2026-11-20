@@ -1,0 +1,83 @@
+{
+  "title": "YAML to CSV – Turn a YAML List into a Table | OpenAnyDoc",
+  "description": "Convert YAML to CSV in your browser: a list of mappings becomes rows and nested keys become dot-named columns, ready to edit and download. No upload.",
+  "heading": "YAML to CSV Converter: YAML Lists to a Table",
+  "subtitle": "Drop or paste YAML and its list of records opens as a CSV table; nothing is uploaded.",
+  "intro": "Convert YAML to CSV in your browser: drop or paste a YAML list of mappings, or a mapping that holds one list, and each item becomes a row. Nested keys are flattened into columns such as address.city, and the table opens in the CSV viewer to check, edit and download. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Nested keys flattened",
+      "text": "Nested mappings become dot-named columns, so every value gets a cell of its own."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert YAML to CSV",
+  "steps": [
+    {
+      "title": "Open or paste your YAML",
+      "text": "Drop a YAML file, choose it, paste YAML into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Items become rows",
+      "text": "Your browser reads the text. Each item of the list becomes a row and each key a column; nested keys are joined with dots, as in address.city."
+    },
+    {
+      "title": "Check and edit",
+      "text": "The table opens in the CSV viewer: sort, filter, edit cells and undo before you save."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves a .csv file; the viewer can also save it as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the YAML to CSV converter handles",
+  "handles": [
+    "Input: a YAML file or pasted YAML text, read in your browser.",
+    "Shapes: a list of mappings, or a mapping that holds one list.",
+    "Nested keys: flattened into dot-named columns such as address.city.",
+    "Output: a table in the CSV viewer, saved as CSV, Excel, Markdown, HTML or SQL."
+  ],
+  "limits": [
+    "One YAML document per file.",
+    "Comments are not kept in the CSV.",
+    "The YAML must be a list of mappings, or a mapping that holds one list."
+  ],
+  "faqTitle": "YAML to CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser reads and converts the YAML on your device; nothing is sent to a server, and pasted YAML stays in this tab."
+    },
+    {
+      "question": "What YAML can be converted?",
+      "answer": "A list of mappings, where each item becomes a row, or a mapping that holds one such list, such as users: followed by the list of users."
+    },
+    {
+      "question": "How are nested keys turned into columns?",
+      "answer": "Each nested key is joined to its parent with a dot, so address: with city: Riyadh under it becomes a column address.city holding Riyadh."
+    },
+    {
+      "question": "Are YAML comments kept?",
+      "answer": "No. Comments are not data, so they are left out of the table."
+    },
+    {
+      "question": "Can one file hold several YAML documents?",
+      "answer": "No, one document per file is converted. Split a file with several documents at its --- lines and convert each part on its own."
+    },
+    {
+      "question": "What can I save the table as?",
+      "answer": "CSV by default, or Excel, Markdown, HTML or SQL from the CSV viewer's download options."
+    },
+    {
+      "question": "How do I convert a YAML file to CSV or Excel?",
+      "answer": "Convert YAML to a table by turning each item of a YAML list into a row and its keys into columns, with nested keys joined by dots. In OpenAnyDoc, drop or paste the YAML and the table opens in the CSV viewer, where you can download it as CSV or Excel; nothing is uploaded."
+    }
+  ]
+}

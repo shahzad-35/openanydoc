@@ -1,12 +1,13 @@
 import type { ReactNode } from 'react'
 import { localizePath, useT } from '../i18n'
 import { CONTACT_EMAIL } from '../legalContent'
-import { BREADCRUMB_CHEVRON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
+import { BREADCRUMB_CHEVRON_PATH, CHECK_ICON_PATH, SOCIAL_ICON_PATHS, breadcrumbClasses, footerClasses, legalFooterLinks } from '../pages/changelogMarkup'
 import { SOCIAL_PROFILES, guideAddresses, pageSeo } from '../seo'
 import { ALL_TOOLS_PATH } from '../tools/registry'
-import { findBreadcrumbParent, landingPages, viewers, type Viewer } from '../viewers'
+import { findBreadcrumbParent, viewers, type Viewer } from '../viewers'
 import { MiniFormatIcon, Wordmark, type MiniFormat } from './KitIcon'
 import NewBadge from './NewBadge'
+import { useInstallOption, useIsAvailableOffline } from '../pwa'
 
 const pagesWithOwnAddress = viewers.filter((viewer) => viewer.toolPath)
 const viewerGlyphs: Partial<Record<Viewer['id'], MiniFormat>> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx', word: 'docx', powerpoint: 'pptx', pdf: 'pdf', image: 'image' }
@@ -64,6 +65,40 @@ export function PageBreadcrumb({ address, onNavigate, className = '' }: { addres
   )
 }
 
+// Under the brand text: how to install the app (the browser's dialog, or Safari's steps on iPhone and iPad), and a line once the
+// page and its tool are kept for offline use. Nothing until the browser has said which applies.
+function InstallAppHint() {
+  const { t } = useT()
+  const { installOption, showInstallDialog } = useInstallOption()
+  const isAvailableOffline = useIsAvailableOffline()
+  if (installOption === 'none' && !isAvailableOffline) return null
+  return (
+    <div className={footerClasses.appStatus}>
+      {installOption === 'prompt' && (
+        <button id="install-app-button" type="button" onClick={() => void showInstallDialog()} className={footerClasses.installButton}>
+          {t('footer.installApp')}
+        </button>
+      )}
+      {installOption === 'apple' && (
+        <details id="install-app-apple">
+          <summary id="install-app-apple-summary" className={footerClasses.installButton}>
+            {t('footer.installApp')}
+          </summary>
+          <p className={footerClasses.installSteps}>{t('footer.installAppleSteps')}</p>
+        </details>
+      )}
+      {isAvailableOffline && (
+        <p id="offline-ready" className={footerClasses.offlineReady}>
+          <svg aria-hidden="true" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+            <path d={CHECK_ICON_PATH} />
+          </svg>
+          {t('footer.availableOffline')}
+        </p>
+      )}
+    </div>
+  )
+}
+
 // The footer of every content page (home, format pages, About, Privacy, Terms, guides, changelog). `currentPath` is the page's address
 // without its language. scripts/build-static-pages.mjs writes the same footer into the changelog pages: keep the two in step.
 // The glyph sits next to the link, not inside it, so the anchor stays plain text (the link test reads anchors with a regular expression).
@@ -92,6 +127,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
                 ))}
               </ul>
             </nav>
+            <InstallAppHint />
           </div>
           <nav id="footer-viewers" aria-label={t('footer.viewers')} className={footerClasses.viewersColumn}>
             <h2 className={footerClasses.heading}>{t('footer.viewers')}</h2>
@@ -115,17 +151,8 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
           <nav id="footer-more" aria-label={t('about.moreFileTools')}>
             <h2 className={footerClasses.heading}>{t('about.moreFileTools')}</h2>
             <ul className={footerClasses.list}>
-              {/* Every landing page, the converters too: the header has a search box, not links, so this is their site-wide link. */}
-              {landingPages
-                .filter((page) => page.path !== currentPath)
-                .map((page) => (
-                  <li key={page.path} className={footerClasses.item}>
-                    <PageLink id={`footer-link-${page.path.slice(1)}`} path={page.path} onNavigate={onNavigate} className={footerClasses.link}>
-                      {pageSeo[locale][page.path].linkText}
-                    </PageLink>
-                  </li>
-                ))}
-              {[ALL_TOOLS_PATH, '/pdf-tools', '/image-tools', '/guides']
+              {/* The hubs: the data hub lists every landing page, converter and developer tool (too many for the footer). */}
+              {[ALL_TOOLS_PATH, '/data-tools', '/pdf-tools', '/image-tools', '/office-tools', '/ai-tools', '/guides']
                 .filter((address) => address !== currentPath)
                 .map((address) => (
                   <li key={address} className={footerClasses.item}>

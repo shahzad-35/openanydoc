@@ -1,0 +1,83 @@
+{
+  "title": "SQL to CSV Converter – INSERT Statements to CSV | OpenAnyDoc",
+  "description": "Convert a SQL dump to CSV in your browser: CREATE TABLE and INSERT statements run in a SQL engine on your device, and the biggest table becomes a CSV.",
+  "heading": "SQL to CSV Converter: INSERT Rows to a Table",
+  "subtitle": "Drop a .sql file or paste SQL and its largest table opens as CSV; nothing is uploaded.",
+  "intro": "Convert SQL to CSV in your browser: drop a .sql file or paste CREATE TABLE and INSERT statements, and they run in a SQL engine inside this page. The table with the most rows opens in the CSV viewer to check, edit and download. MySQL dumps are tidied first: backtick quotes, ENGINE= and AUTO_INCREMENT. Nothing is uploaded, and no database server is involved.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "MySQL dumps tidied",
+      "text": "Backtick quotes, ENGINE= and AUTO_INCREMENT are adjusted before the statements run."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert SQL to CSV",
+  "steps": [
+    {
+      "title": "Open or paste your SQL",
+      "text": "Drop a .sql file, choose it, paste SQL into the paste box, or try one of the samples."
+    },
+    {
+      "title": "The statements run in your browser",
+      "text": "CREATE TABLE and INSERT statements run in a SQL engine inside your browser. The table with the most rows becomes the CSV."
+    },
+    {
+      "title": "Check and edit",
+      "text": "The table opens in the CSV viewer: sort, filter, edit cells and undo before you save."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves a .csv file; the viewer can also save it as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the SQL to CSV converter handles",
+  "handles": [
+    "Input: a .sql file or pasted SQL.",
+    "Statements: CREATE TABLE and INSERT, run by a SQL engine in your browser.",
+    "MySQL dumps: backtick quotes, ENGINE= and AUTO_INCREMENT tidied first.",
+    "Several tables: the one with the most rows becomes the CSV.",
+    "Output: a table in the CSV viewer, saved as CSV, Excel, Markdown, HTML or SQL."
+  ],
+  "limits": [
+    "Stored procedures, PostgreSQL COPY ... FROM stdin blocks and other dialect-specific syntax are not supported; an error is shown.",
+    "Only one table becomes the CSV: the one with the most rows."
+  ],
+  "faqTitle": "SQL to CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. The statements run inside your browser on your device; nothing is sent to a server, and pasted SQL stays in this tab."
+    },
+    {
+      "question": "Which table becomes the CSV?",
+      "answer": "The table with the most rows after all the statements have run. Its columns come from its CREATE TABLE statement."
+    },
+    {
+      "question": "Does it work with a MySQL dump?",
+      "answer": "Yes for tables and INSERT statements. Backtick quotes, ENGINE= and AUTO_INCREMENT are tidied before the dump runs."
+    },
+    {
+      "question": "Does it work with a PostgreSQL dump?",
+      "answer": "INSERT statements work, but COPY ... FROM stdin blocks are not supported and show an error. Export the data as INSERT statements instead (pg_dump --inserts)."
+    },
+    {
+      "question": "Is a database server needed?",
+      "answer": "No. A built-in SQL engine runs inside this page, so there is nothing to install or connect to."
+    },
+    {
+      "question": "What happens when a statement fails?",
+      "answer": "The page shows the error instead of a table. Stored procedures and other syntax specific to one database are the usual cause."
+    },
+    {
+      "question": "How do I convert a SQL file to CSV?",
+      "answer": "Run the SQL file's CREATE TABLE and INSERT statements in a database, then export the table as CSV. OpenAnyDoc does both in your browser: open the .sql file or paste the statements, and the table with the most rows opens in the CSV viewer, ready to download, with no database server and no upload."
+    }
+  ]
+}

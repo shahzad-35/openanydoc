@@ -1,0 +1,83 @@
+{
+  "title": "XML to CSV – Turn XML Elements into Table Rows | OpenAnyDoc",
+  "description": "Convert XML to CSV in your browser: repeated elements become rows, child elements and attributes become columns, nested tags are flattened. No upload.",
+  "heading": "XML to CSV Converter: XML Records to a Table",
+  "subtitle": "Drop or paste XML and its repeated elements open as a CSV table; nothing is uploaded.",
+  "intro": "Convert XML to CSV in your browser: drop or paste an XML file and the first list of repeated elements, such as every <book> in a <catalog>, becomes the rows. Child elements and attributes become columns, nested elements are flattened into names like author.name, and the table opens in the CSV viewer to check, edit and download. Nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Attributes kept",
+      "text": "Attributes get columns of their own, such as @id, next to the child elements."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert XML to CSV",
+  "steps": [
+    {
+      "title": "Open or paste your XML",
+      "text": "Drop an .xml file, choose it, paste XML into the paste box, or try one of the samples."
+    },
+    {
+      "title": "Repeated elements become rows",
+      "text": "Your browser's own XML parser reads the file. The first list of repeated elements becomes the rows; their children and attributes become the columns."
+    },
+    {
+      "title": "Check and edit",
+      "text": "The table opens in the CSV viewer: sort, filter, edit cells and undo before you save."
+    },
+    {
+      "title": "Download",
+      "text": "Download saves a .csv file; the viewer can also save it as Excel, Markdown, HTML or SQL."
+    }
+  ],
+  "handlesTitle": "What the XML to CSV converter handles",
+  "handles": [
+    "Input: an .xml file or pasted XML text.",
+    "Rows: the first list of repeated elements, for example every <book> inside <catalog>.",
+    "Columns: child elements by name, and attributes with an @ in front, such as @id.",
+    "Nested elements: flattened into dot-named columns such as author.name.",
+    "Errors: malformed XML shows the parser's message with its line number."
+  ],
+  "limits": [
+    "DTD and XSD schemas are not read or checked, and every value comes out as text.",
+    "Only the first list of repeated elements becomes the table."
+  ],
+  "faqTitle": "XML to CSV: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your browser parses and converts the XML on your device; nothing is sent to a server, and pasted XML stays in this tab."
+    },
+    {
+      "question": "Which elements become the rows?",
+      "answer": "The first list of repeated elements. In <catalog><book>…</book><book>…</book></catalog>, each <book> becomes one row."
+    },
+    {
+      "question": "What happens to attributes?",
+      "answer": "Each attribute gets a column named with an @ in front: <book id=\"7\"> puts 7 in a column called @id."
+    },
+    {
+      "question": "How are nested elements turned into columns?",
+      "answer": "They are flattened with dots. <author><name>Sara</name></author> inside a book becomes a column named author.name."
+    },
+    {
+      "question": "My XML has an error. What happens?",
+      "answer": "The page shows the browser parser's error with the line where it stopped. Fix that line and open the file again."
+    },
+    {
+      "question": "Is the XML checked against a DTD or XSD?",
+      "answer": "No. Schemas are not read, and every value comes out as text, so numbers and dates are not typed."
+    },
+    {
+      "question": "How do I convert an XML file to CSV or Excel?",
+      "answer": "Convert XML to a table by turning each repeated element into a row and its child elements and attributes into columns; Excel can also import XML with Data → Get Data → From File → From XML. In OpenAnyDoc, drop or paste the XML and the table opens in the CSV viewer, where you can download it as CSV or Excel; nothing is uploaded."
+    }
+  ]
+}

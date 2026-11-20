@@ -79,6 +79,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I black out text in a PDF permanently?",
+      "answer": "Use true redaction, which removes the words under each black box from the file; a black shape drawn on top leaves the text there to copy. OpenAnyDoc's Redact PDF rebuilds each marked page as a picture with the words under the boxes gone, in your browser, without uploading the file."
     }
   ]
 }

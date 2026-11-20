@@ -1,0 +1,88 @@
+{
+  "title": "YAML Formatter and Validator Online – Free | OpenAnyDoc",
+  "description": "Check YAML and see each error with its line and column, then reformat it with 2 or 4 spaces and copy or download it. Free, in your browser, no upload.",
+  "heading": "YAML Formatter and Validator",
+  "subtitle": "Paste or open a YAML file to find its errors by line and column and reformat it with clean indentation; nothing is uploaded.",
+  "intro": "A free YAML formatter and validator online: paste YAML or open a .yaml or .yml file, press Validate to see every error with its line and column, and Format to rewrite it with 2 or 4 spaces. A tree shows the data underneath, and Convert to JSON hands it to the JSON tools. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "features": [
+    {
+      "title": "Errors with line and column",
+      "text": "Validate reads the YAML and points to the exact line and column of each problem, such as a bad indent or a missing colon."
+    },
+    {
+      "title": "Private, free, no account",
+      "text": "Your YAML is read by your own browser and stays in this tab. It is never uploaded or saved, there are no share links or recent files, and there is nothing to sign up for."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, validating and formatting YAML keep working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: check and format YAML",
+  "steps": [
+    {
+      "title": "Paste or open your YAML",
+      "text": "Paste YAML into the editor, or click Choose a file or drop a .yaml or .yml file on the page. Try a sample if you just want to see it work."
+    },
+    {
+      "title": "Validate it",
+      "text": "Press Validate. If something is wrong, each error is listed with its line and column so you can fix it in the editor."
+    },
+    {
+      "title": "Format it",
+      "text": "Choose 2 or 4 spaces and press Format to rewrite the whole document with that indentation. The tree shows the data as it is read."
+    },
+    {
+      "title": "Copy, download or convert",
+      "text": "Copy puts the YAML on your clipboard, Download saves a .yaml file, and Convert to JSON opens the same data as JSON."
+    }
+  ],
+  "handlesTitle": "What the YAML formatter handles",
+  "handles": [
+    "Input: pasted YAML or a .yaml or .yml file.",
+    "Validation: each error with its line and column.",
+    "Format: indentation of 2 or 4 spaces for the whole document.",
+    "Tree: the data shown as foldable keys, lists and values.",
+    "Output: copy to the clipboard, download as .yaml, or convert to JSON."
+  ],
+  "limits": [
+    "Comments are not kept when you press Format; validate without formatting if you need them.",
+    "Anchors and aliases (&name and *name) are written out in full when the YAML is formatted.",
+    "One YAML document per file; files with several documents separated by --- are not supported."
+  ],
+  "faqTitle": "YAML formatter: questions and answers",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your YAML is read by your browser, on your device, and stays in this tab. It is never sent anywhere or saved on the site, and there are no share links or history. This matters for config files with passwords or keys in them."
+    },
+    {
+      "question": "Why did my comments disappear after formatting?",
+      "answer": "Format reads the YAML into data and writes that data back out, and comments are not part of the data, so they are lost. If you need to keep them, use Validate only and fix the indentation by hand."
+    },
+    {
+      "question": "What happens to anchors and aliases?",
+      "answer": "When you format, each alias (*name) is replaced by a full copy of what its anchor (&name) points to. The data stays the same, but the file gets longer and the anchor names are gone."
+    },
+    {
+      "question": "What errors does the validator find?",
+      "answer": "Anything that stops the YAML from being read: wrong indentation, tabs used for indentation, a missing colon, unclosed quotes or brackets, or a key used twice. Each one is shown with its line and column."
+    },
+    {
+      "question": "Can I convert YAML to JSON?",
+      "answer": "Yes. Press Convert to JSON and the same data opens as JSON, where you can view, format and download it."
+    },
+    {
+      "question": "Is it free, and does it work offline?",
+      "answer": "Yes to both. There is no account or limit, and once the page has loaded it keeps working without an internet connection."
+    },
+    {
+      "question": "What is a YAML file?",
+      "answer": "A YAML file (.yaml or .yml) is a plain text file that stores settings and data as key: value lines, with indentation showing what belongs to what; Docker Compose, Kubernetes, GitHub Actions and many apps use it for configuration. Any text editor opens one, and OpenAnyDoc checks and formats it in your browser without uploading it."
+    },
+    {
+      "question": "How do I validate a YAML file?",
+      "answer": "Validate a YAML file by reading it with a YAML parser, which stops at a wrong indent, a tab or a missing colon and reports the line. In OpenAnyDoc, paste the YAML or open the file and press Validate to see every error with its line and column; the text stays in your browser."
+    }
+  ]
+}

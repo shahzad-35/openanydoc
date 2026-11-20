@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { ArcElement, BarController, BarElement, CategoryScale, Chart, Legend, LineController, LineElement, LinearScale, PieController, PointElement, Tooltip } from 'chart.js'
 import { useT } from '../../i18n'
+import { downloadTextFile } from '../registry'
 import { compareCellTexts, groupRows, parseNumber } from './csvAnalysis'
 import type { ColumnType, GroupAggregate } from './csvAnalysis'
 
@@ -22,7 +23,8 @@ export default function CsvChartPanel({ columns, rowIds, readText }: { columns: 
   const [chartKind, setChartKind] = useState<ChartKind>('bar')
   const [categoryColumnId, setCategoryColumnId] = useState(() => (columns.find((column) => column.type !== 'number') ?? columns[0])?.id ?? 0)
   const [aggregate, setAggregate] = useState<GroupAggregate>('count')
-  const [valueColumnId, setValueColumnId] = useState(numberColumns[0]?.id ?? null)
+  // The first number column that is not an ID (order numbers make a meaningless sum).
+  const [valueColumnId, setValueColumnId] = useState(() => (numberColumns.find((column) => !/(^|[\s_-])(id|no|number|code|رقم)$|^(id|رقم)([\s_-]|$)/i.test(column.name)) ?? numberColumns[0])?.id ?? null)
   const categoryType = columns.find((column) => column.id === categoryColumnId)?.type ?? 'text'
   const effectiveAggregate = valueColumnId === null ? 'count' : aggregate
 
@@ -63,6 +65,21 @@ export default function CsvChartPanel({ columns, rowIds, readText }: { columns: 
     })
     return () => chart.destroy()
   }, [chartKind, points, locale, t])
+
+  // The chart as a PNG on the panel's own background (a transparent PNG shows black text on black in dark viewers).
+  function downloadChartPicture() {
+    const chartCanvas = canvasRef.current
+    if (!chartCanvas) return
+    const pictureCanvas = document.createElement('canvas')
+    pictureCanvas.width = chartCanvas.width
+    pictureCanvas.height = chartCanvas.height
+    const context = pictureCanvas.getContext('2d')
+    if (!context) return
+    context.fillStyle = getComputedStyle(chartCanvas).getPropertyValue('--panel').trim() || '#ffffff'
+    context.fillRect(0, 0, pictureCanvas.width, pictureCanvas.height)
+    context.drawImage(chartCanvas, 0, 0)
+    pictureCanvas.toBlob((pictureBlob) => pictureBlob && downloadTextFile('chart.png', pictureBlob, 'image/png'), 'image/png')
+  }
 
   if (columns.length === 0) return <div className="empty-note">{t('csv.wb.nothingToGroup')}</div>
   return (
@@ -111,6 +128,9 @@ export default function CsvChartPanel({ columns, rowIds, readText }: { columns: 
         <div className="chart-box">
           <canvas id="csv-chart-canvas" ref={canvasRef} role="img" aria-label={t('csv.chart.label', { by: columns.find((column) => column.id === categoryColumnId)?.name ?? '' })} />
         </div>
+        <button className="btn sm outline" id="chart-download-button" type="button" style={{ marginTop: 10 }} onClick={downloadChartPicture}>
+          {t('csv.chart.downloadPng')}
+        </button>
         <div className="small-note" style={{ marginTop: 8 }}>
           {t('csv.chart.note', { rows: rowIds.length })}
         </div>

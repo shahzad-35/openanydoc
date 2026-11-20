@@ -66,6 +66,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I add a watermark to a photo?",
+      "answer": "Add a watermark to a photo by placing your name or logo over it, partly transparent, in a corner or repeated across the picture. In OpenAnyDoc, choose the photos, type the text or pick a logo, set its size, opacity and position, and download them; the photos are changed in your browser and never uploaded."
     }
   ]
 }

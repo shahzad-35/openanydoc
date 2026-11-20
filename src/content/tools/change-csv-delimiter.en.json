@@ -1,0 +1,79 @@
+{
+  "title": "Change CSV Delimiter – Comma, Semicolon, Tab | OpenAnyDoc",
+  "description": "Change a CSV delimiter to comma, semicolon, tab or pipe, with quotes redone so every cell stays intact. Free, no account, and nothing is uploaded.",
+  "heading": "Change CSV Delimiter",
+  "subtitle": "Switch a CSV between comma, semicolon, tab and pipe without breaking cells that contain the new one.",
+  "intro": "Change the delimiter of a CSV file online without uploading it: turn a comma file into the semicolon file that European Excel expects, save it as tab-separated TSV, or use a pipe for a system that asks for one. The current delimiter is detected, quoting is redone so a cell that contains the new delimiter stays in one piece, and a preview shows the columns before you download.",
+  "features": [
+    {
+      "title": "Cells stay intact",
+      "text": "Quotes are redone for the new delimiter, so a cell like \"Riyadh; Jeddah\" doesn't split into two columns."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is rewritten by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, it keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: change the delimiter of a CSV file",
+  "steps": [
+    {
+      "title": "Open your CSV",
+      "text": "Choose or drop a CSV file. Its delimiter (comma, semicolon, tab or pipe) is detected; pick another one if the columns look wrong."
+    },
+    {
+      "title": "Choose the new delimiter",
+      "text": "Pick comma, semicolon for European Excel, tab for a TSV file, or pipe. Turn on the UTF-8 BOM if the file will be opened in Excel."
+    },
+    {
+      "title": "Check and download",
+      "text": "Look at the preview of the first rows, then download the new file. The original on your device is not changed."
+    }
+  ],
+  "handlesTitle": "What Change CSV Delimiter handles",
+  "handles": [
+    "Reads: comma, semicolon, tab and pipe, detected for you or picked by hand.",
+    "Writes: comma, semicolon, tab (TSV) or pipe.",
+    "Quoting: redone so cells that contain the new delimiter, quotes or line breaks stay correct.",
+    "Excel: an optional UTF-8 BOM so Arabic and other non-English text shows correctly.",
+    "Preview: the first rows split into columns with the new delimiter."
+  ],
+  "limits": [
+    "Only one delimiter is used per file; a file that mixes delimiters in different rows needs fixing by hand.",
+    "Values are not reformatted, so decimal commas such as 3,5 stay as they are."
+  ],
+  "faqTitle": "Change CSV Delimiter: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your CSV is read and rewritten by your browser, on your device, and is never sent anywhere. Nothing is saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "Why does Excel put everything in one column?",
+      "answer": "Excel splits a CSV with the list separator of your region: a comma in some countries, a semicolon in many European ones. Save the file here with the delimiter your Excel expects and the columns separate."
+    },
+    {
+      "question": "What happens to cells that contain the new delimiter?",
+      "answer": "They are put in quotes, as the CSV standard asks, so the cell stays whole. Quotes inside a cell are doubled for the same reason."
+    },
+    {
+      "question": "Can I turn a CSV into a TSV file?",
+      "answer": "Yes. Choose tab as the new delimiter and download; the file is a tab-separated TSV."
+    },
+    {
+      "question": "Are decimal numbers changed?",
+      "answer": "No. Only the delimiter and the quotes change. A number written with a decimal comma, such as 3,5, stays as it is."
+    },
+    {
+      "question": "Should I add a BOM?",
+      "answer": "Add it when the file will be opened in Excel and has Arabic or other non-English text; without it Excel may show the letters as gibberish. Leave it off for code and databases that don't expect one."
+    },
+    {
+      "question": "How do I change a CSV from commas to semicolons?",
+      "answer": "Open the CSV, choose semicolon as the new delimiter and download the new file; cells that contain a semicolon are put in quotes so they stay whole. OpenAnyDoc rewrites the file in your browser, and the original on your device is not changed."
+    }
+  ]
+}

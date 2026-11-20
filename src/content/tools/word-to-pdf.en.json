@@ -78,6 +78,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a Word document to PDF without Word?",
+      "answer": "Without Word, a .docx file can be saved as PDF by any app that opens Word documents, such as Google Docs, LibreOffice or Pages on a Mac. In OpenAnyDoc, choose the .docx file and download the PDF, with Word's page size, page breaks and searchable text; the file is converted in your browser and never uploaded."
     }
   ]
 }

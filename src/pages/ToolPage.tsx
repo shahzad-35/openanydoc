@@ -13,10 +13,11 @@ import { downloadTextFile } from '../formats/registry'
 import { localizePath, useT } from '../i18n'
 import { samplesByPage } from '../samples/toolSamples'
 import { pageSeo } from '../seo'
-import { findLiveTool, findRelatedPages, liveTools, toolContent, toolPath } from '../tools/registry'
+import { findLiveTool, findRelatedPages, hubs, liveTools, toolContent, toolPath } from '../tools/registry'
 import type { Tool } from '../tools/registry'
 import { useFileIntake } from '../useFileIntake'
-import { findViewerByToolPath, viewers } from '../viewers'
+import { findViewerByToolPath, findViewerForFileName, viewers } from '../viewers'
+import type { ConversionTarget, Viewer } from '../viewers'
 import { headerRowBreak } from './changelogMarkup'
 import { usePageHead } from './HomePage'
 
@@ -27,6 +28,7 @@ const toolComponents = new Map(liveTools.flatMap((tool) => (tool.loadComponent ?
 const ToolResultPreview = lazy(() => import('../tools/pdf/ToolResultPreview'))
 const MaskWorkbench = lazy(() => import('../formats/mask/MaskWorkbench'))
 const JsonUrlLoader = lazy(() => import('../formats/json/JsonUrlLoader'))
+const viewerIdByConversionTarget: Record<ConversionTarget, Viewer['id']> = { csv: 'csv', xlsx: 'excel', json: 'json' }
 // The formats the Mask Data page takes, for its list of extensions (only the extensions the page accepts are listed).
 const maskableViewers = viewers.filter((viewer) => ['csv', 'json', 'excel', 'text'].includes(viewer.id))
 
@@ -60,13 +62,24 @@ export default function ToolPage({
   const { locale, t } = useT()
   const address = toolPath(tool)
   const content = toolContent[locale][tool.slug]
+  const toolName = pageSeo[locale][toolPath(tool)].linkText ?? content.heading
   usePageHead(address, content.title, content.description)
+  // Every tool works offline (src/sw.ts); a tool whose own features don't say so gets the shared block.
+  const offlineFeature = { title: t('toolPage.offlineFeature.title'), text: t('toolPage.offlineFeature.text') }
+  const features = content.features.some((feature) => feature.title === offlineFeature.title) ? content.features : [...content.features, offlineFeature]
   const hasMounted = useHasMounted()
   const hasToolComponent = toolComponents.has(tool.slug)
   const ToolComponent = toolComponents.get(tool.slug) as NonNullable<ReturnType<typeof toolComponents.get>>
   const toolViewer = findViewerByToolPath(address)
   const convertTo = toolViewer?.convertTo
   const isMaskTool = toolViewer?.tool === 'mask'
+  const aiHub = hubs.find((hub) => hub.category === 'ai')
+  const isAiReadyTool = tool.category === 'ai' || Object.values(aiHub?.sharedTools ?? {}).some((slugs) => slugs.includes(tool.slug))
+  // Pasted text opens as a file of the page's first format: on the JSON and CSV viewers' pages (YAML, XML, HTML or SQL on the
+  // pages that read those), and on the CSV tools (CSV to SQL, Merge CSV ...). Not on Mask data, which takes the file itself.
+  const pastedTextExtension =
+    (toolViewer?.id === 'json' || toolViewer?.id === 'csv') && !isMaskTool ? toolViewer.extensions[0] : hasToolComponent && !tool.takesText && tool.inputFormats[0] === '.csv' ? '.csv' : undefined
+  const [pastedText, setPastedText] = useState('')
   const [chosenFiles, setChosenFiles] = useState<File[]>([])
   const [resultFile, setResultFile] = useState<File | null>(null)
   const [isDownloaded, setIsDownloaded] = useState(false)
@@ -75,12 +88,19 @@ export default function ToolPage({
   const [isConverting, setIsConverting] = useState(false)
   const [conversionError, setConversionError] = useState<string | null>(null)
 
-  async function convertAndOpen(file: File) {
+  // A file is read by its own format (an Excel file on a page that opens the CSV viewer); one already in the page's result format
+  // (a CSV on the Pivot table page) opens as it is.
+  async function convertAndOpen(file: File, fileContents: ArrayBuffer) {
     if (!toolViewer || !convertTo) return
+    const fileViewerId = findViewerForFileName(file.name)?.id
+    if (fileViewerId === viewerIdByConversionTarget[convertTo]) {
+      onFileLoaded(file, fileContents)
+      return
+    }
     setIsConverting(true)
     setConversionError(null)
     const { convertForViewer } = await import('../formats/conversion')
-    const result = await convertForViewer(file, toolViewer.id, convertTo, locale)
+    const result = await convertForViewer(file, fileViewerId ?? toolViewer.id, convertTo, locale)
     setIsConverting(false)
     if ('error' in result) {
       setConversionError(result.error)
@@ -103,7 +123,7 @@ export default function ToolPage({
 
   const intake = useFileIntake({
     acceptedExtensions: toolViewer?.extensions ?? tool.inputFormats,
-    onFileLoaded: hasToolComponent || isMaskTool ? (file) => void keepChosenFile(file) : convertTo ? (file) => void convertAndOpen(file) : onFileLoaded,
+    onFileLoaded: hasToolComponent || isMaskTool ? (file) => void keepChosenFile(file) : convertTo ? (file, fileContents) => void convertAndOpen(file, fileContents) : onFileLoaded,
     handoffFile,
     onHandoffConsumed,
     allowsSeveralFiles: tool.takesSeveralFiles,
@@ -192,7 +212,7 @@ export default function ToolPage({
               </PageLink>
             </p>
             <div className="hero-in mt-5 sm:mt-8">
-              <DropPanel
+              {!tool.needsNoFile && <DropPanel
                 intake={intake}
                 shownViewers={isMaskTool && toolViewer ? maskableViewers.map((viewer) => ({ ...viewer, extensions: viewer.extensions.filter((extension) => toolViewer.extensions.includes(extension)) })) : toolViewer ? [toolViewer] : viewers}
                 currentViewerId={isMaskTool ? undefined : toolViewer?.id}
@@ -201,7 +221,7 @@ export default function ToolPage({
                 showExtensions={Boolean(toolViewer)}
                 showOtherFormats={Boolean(toolViewer) && !convertTo}
                 samples={samplesByPage[address]}
-              />
+              />}
               {/* The JSON pages can also open a file from a web address the visitor types (their browser fetches it). */}
               {toolViewer?.id === 'json' && (
                 <div className="mt-4">
@@ -218,6 +238,39 @@ export default function ToolPage({
               )}
             </div>
           </div>
+          {pastedTextExtension && (
+            <details id="paste-text" className="mx-auto mt-4 max-w-[640px] text-center">
+              <summary id="paste-text-summary" className="btn btn--quiet btn--compact press list-none">
+                {t('tools.pasteText.summary')}
+              </summary>
+              <label htmlFor="paste-text-input" className="mt-3 block text-start text-sm font-semibold">
+                {t('tools.pasteText.label')}
+              </label>
+              <textarea
+                id="paste-text-input"
+                dir="ltr"
+                rows={6}
+                spellCheck={false}
+                value={pastedText}
+                onChange={(event) => setPastedText(event.target.value)}
+                className="mt-1 w-full rounded-[14px] border-2 border-rule bg-paper-raised p-3 text-start font-mono text-sm pointer-coarse:text-base"
+              />
+              <button
+                id="paste-text-open-button"
+                type="button"
+                disabled={pastedText.trim() === '' || intake.isReading}
+                onClick={() => void intake.openSampleFile(new File([pastedText], `pasted${pastedTextExtension}`, { type: 'text/plain' }))}
+                className="btn btn--primary btn--compact press mt-2"
+              >
+                {t('tools.pasteText.open')}
+              </button>
+            </details>
+          )}
+          {(pastedTextExtension || tool.takesText) && (
+            <p id="pasted-text-note" className="mx-auto mt-3 max-w-[640px] text-center text-sm text-ink-soft">
+              {t('tools.pastedTextNote')}
+            </p>
+          )}
           {(isConverting || conversionError) && (
             <div id="conversion-messages" aria-live="polite" className="mx-auto mt-6 max-w-[640px] text-center">
               {isConverting && (
@@ -235,7 +288,8 @@ export default function ToolPage({
             </Suspense>
           )}
           {/* Kept while the result shows (hidden), so an editing tool's edits are still there after "Back to the tool". */}
-          {hasToolComponent && chosenFiles.length > 0 && (
+          {/* A text tool (Base64, JWT, XML viewer) is drawn at once; the others once a file is chosen. */}
+          {hasToolComponent && (chosenFiles.length > 0 || (tool.takesText && hasMounted)) && (
             <div id="tool-workspace" hidden={resultFile !== null} className={`mx-auto mt-8 ${tool.isEditor ? 'max-w-[1100px]' : 'max-w-[760px]'}`}>
               <Suspense fallback={null}>
                 <ToolComponent
@@ -249,6 +303,7 @@ export default function ToolPage({
                   }}
                   onUnsavedEditsChange={setToolHasEdits}
                   confirmDiscardEdits={confirmDiscardEdits}
+                  onOpenInPage={(file, path) => onOpenInViewer(file, localizePath(locale, path))}
                 />
               </Suspense>
             </div>
@@ -287,14 +342,26 @@ export default function ToolPage({
               {isDownloaded && <NextSteps steps={nextSteps} isReady />}
             </div>
           )}
+          {/* The AI-ready pages (the /ai-tools hub's tools): a reminder to take personal data out first, with the way to do it. */}
+          {isAiReadyTool && (
+            <aside id="ai-paste-box" aria-labelledby="ai-paste-box-title" className="mx-auto mt-8 max-w-[760px] rounded-[22px] border-2 border-rule bg-surface p-5 text-start">
+              <h2 id="ai-paste-box-title" className="font-semibold">
+                {t('aiReady.box.title')}
+              </h2>
+              <p className="mt-1 text-[15px] text-ink-soft">{t('aiReady.box.text')}</p>
+              <PageLink id="ai-paste-box-link" path="/mask-data" onNavigate={onNavigate} className="mt-2 inline-flex min-h-8 items-center font-semibold text-accent underline underline-offset-2 pointer-coarse:min-h-11">
+                {t('aiReady.box.link')}
+              </PageLink>
+            </aside>
+          )}
         </section>
 
         <div id="about-content" className="section-gap">
           {content.intro && <p id="page-intro" className="type-lead mx-auto mb-12 max-w-3xl text-ink-soft">{content.intro}</p>}
           <section id="tool-features" className="mx-auto mb-12 max-w-3xl">
-            <h2 id="tool-features-heading" className="sr-only">{t('tools.featuresHeading')}</h2>
-            <ul className="grid gap-4 sm:grid-cols-3">
-              {content.features.map((feature, position) => (
+            <h2 id="tool-features-heading" className="sr-only">{t('tools.featuresHeading', { tool: toolName })}</h2>
+            <ul className={`grid gap-4 ${features.length === 4 ? 'sm:grid-cols-2' : 'sm:grid-cols-3'}`}>
+              {features.map((feature, position) => (
                 <li key={feature.title} id={`tool-feature-${position + 1}`} className="rounded-[22px] border-2 border-rule bg-paper-raised p-5">
                   <h3 className="font-semibold">{feature.title}</h3>
                   <p className="mt-1 text-[15px] text-ink-soft">{feature.text}</p>
@@ -302,7 +369,7 @@ export default function ToolPage({
               ))}
             </ul>
           </section>
-          <FormatGuide content={content} fileType={toolViewer?.id ?? 'pdf'} relatedPages={findRelatedPages(tool)} onNavigate={onNavigate} />
+          <FormatGuide content={content} toolName={toolName} fileType={toolViewer?.id ?? 'pdf'} relatedPages={findRelatedPages(tool)} onNavigate={onNavigate} />
         </div>
       </main>
 

@@ -1,0 +1,41 @@
+{
+  "title": "JSON Compare Online – Diff Two JSON Files Free | OpenAnyDoc",
+  "description": "Compare two JSON files side by side: added, removed and changed values listed with their paths, with key order ignored unless you choose. No upload.",
+  "heading": "Compare JSON: Find What Changed",
+  "subtitle": "See every added, removed and changed value between two JSON files; nothing is uploaded.",
+  "intro": "A free JSON diff tool: open, drop or paste your first JSON document and the page opens on the Compare tab. Paste or open the second one and the two are compared by key and by position, not line by line, so a change in indentation is not a difference. The open document stays on the left and the second one on the right, and every added, removed and changed value is listed with its path. Both documents are read in your browser and never uploaded.",
+  "features": [
+    { "title": "Differences by path", "text": "Each difference names where it is, such as users[2].email, and whether it was added, removed or changed." },
+    { "title": "Private and free", "text": "Both documents are compared by your own browser and never sent to a server. No account, no watermark." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: compare two JSON documents",
+  "steps": [
+    { "title": "Open the first document", "text": "Choose a .json file, drop it on the page, paste the text into the box, or try one of the two samples." },
+    { "title": "Add the second one", "text": "On the Compare tab, paste the other JSON or open its file. It appears on the right, beside the open document." },
+    { "title": "Read the differences", "text": "Added, removed and changed values are listed with their paths. Key order is ignored by default; turn Ignore key order off to report reordered objects too." }
+  ],
+  "handlesTitle": "What the JSON compare tool handles",
+  "handles": [
+    "Comparison by key in objects and by position in arrays, so whitespace and indentation never count as changes.",
+    "Ignore key order, on by default; turned off, objects whose keys moved are reported.",
+    "Added, removed and changed values, each with its path.",
+    "Side-by-side view with the open document on the left and the second one on the right.",
+    "Big integer IDs compared digit by digit, so two IDs that differ only in the last digits are told apart."
+  ],
+  "limits": [
+    "Arrays are compared by position: an item inserted near the start shows as changes to the items after it.",
+    "Each document up to 10 MB, and both must be valid JSON.",
+    "The comparison is not saved and has no share link; it lasts as long as the tab is open."
+  ],
+  "faqTitle": "Questions about comparing JSON",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Both documents are read and compared by your browser, on your device, and are never sent anywhere. Pasted text stays in this tab. Your browser's network panel shows no upload." },
+    { "question": "Why is this better than a text diff?", "answer": "A text diff shows every line that moved, so a change in indentation or key order looks like a big change. This compares the data itself, key by key, so you only see values that really differ." },
+    { "question": "What does Ignore key order do?", "answer": "In JSON, {\"a\":1,\"b\":2} and {\"b\":2,\"a\":1} hold the same data, so by default they count as equal. Turn the option off when order matters to you, and objects whose keys were reordered are reported." },
+    { "question": "Why does one inserted array item show many changes?", "answer": "Arrays are compared position by position. When an item is inserted, every item after it moves one place, and each of those positions is reported as changed." },
+    { "question": "Can I compare an API response with a saved copy?", "answer": "Yes. Open the saved .json file first, then paste the new response on the Compare tab, or the other way round." },
+    { "question": "Can I send someone a link to the comparison?", "answer": "No. Nothing is stored on the site, so there are no share links. Send both files, and the other person can compare them here." },
+    { "question": "How do I compare two JSON files online?", "answer": "Open the first JSON file in OpenAnyDoc's JSON compare tool, then paste or open the second on the Compare tab; added, removed and changed values are listed with their paths. Key order is ignored by default, and both files stay in your browser." }
+  ]
+}

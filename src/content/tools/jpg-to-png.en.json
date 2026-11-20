@@ -70,6 +70,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I convert a JPG to PNG?",
+      "answer": "Add the .jpg files to OpenAnyDoc's JPG to PNG converter, click Convert and download the PNG, or a ZIP when there are several. The conversion runs in your browser, so the pictures are never uploaded."
     }
   ]
 }

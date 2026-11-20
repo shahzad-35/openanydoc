@@ -34,7 +34,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Who makes it',
           paragraphs: [
-            'OpenAnyDoc is built and run by Shahzad Ali, a software developer. It started with a simple observation: people at work keep pasting customer files into online tools that upload them, because opening a CSV or a workbook without the right software is harder than it should be.',
+            'OpenAnyDoc is built and run by the OpenAnyDoc team. It started with a simple observation: people at work keep pasting customer files into online tools that upload them, because opening a CSV or a workbook without the right software is harder than it should be.',
             'Every viewer here is tested against synthetic files before it ships: a 120,000-row CSV, Arabic text saved as Windows-1256, a 100,000-row workbook, JSON files at the 10 MB limit.',
           ],
         },
@@ -53,7 +53,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'How you can check that nothing is uploaded',
           paragraphs: [
-            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So not even a mistake in the code could send your file anywhere else. An automated test opens every page and fails the build if any of them makes a network request, sets a cookie or stores anything beyond the theme choice. And the source code is public, so anyone can read it.",
+            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So not even a mistake in the code could send your file anywhere else. An automated test opens every page and fails the build if any of them makes a network request, sets a cookie or stores anything beyond the theme choice and the site's own offline copy. And the source code is public, so anyone can read it.",
             'You can check it yourself in a minute: open your browser\'s network panel, open a file here and see that no request carries it. The steps are in how to check that a website does not upload your file.',
           ],
           links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
@@ -120,10 +120,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'What your browser keeps',
-          paragraphs: ['Two small settings are kept in your browser and are never sent anywhere:'],
+          paragraphs: ['These are kept in your browser and are never sent anywhere:'],
           list: [
             'Your light or dark theme choice, kept until you clear your browser\'s site data.',
             'The order of the colours in the list of file types, kept only until you close the tab.',
+            'A copy of the site itself: its pages, code and fonts, and the AI models of the tools you have used, so the tools work offline and as an installed app. It holds nothing about you or your files, and it is replaced when the site is updated; clearing the site\'s data removes it.',
+            'A file you share to the installed app on Android, kept only until the page has opened it (a moment), then deleted.',
           ],
         },
         {
@@ -178,7 +180,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'من يقف وراءه',
           paragraphs: [
-            'يبني OpenAnyDoc ويديره شهزاد علي، وهو مطوّر برمجيات. بدأت الفكرة من ملاحظة بسيطة: كثيرون في العمل يلصقون ملفات العملاء في أدوات على الإنترنت ترفعها إلى خوادمها، لأن فتح ملف CSV أو مصنف من دون البرنامج المناسب أصعب مما ينبغي.',
+            'يبني OpenAnyDoc ويديره فريق OpenAnyDoc. بدأت الفكرة من ملاحظة بسيطة: كثيرون في العمل يلصقون ملفات العملاء في أدوات على الإنترنت ترفعها إلى خوادمها، لأن فتح ملف CSV أو مصنف من دون البرنامج المناسب أصعب مما ينبغي.',
             'كل عارض هنا يُختبر على ملفات اصطناعية قبل نشره: ملف CSV من 120,000 صف، ونص عربي محفوظ بترميز Windows-1256، ومصنف من 100,000 صف، وملفات JSON عند حد 10 ميغابايت.',
           ],
         },
@@ -197,7 +199,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'كيف تتحقق بنفسك من أن شيئًا لا يُرفع',
           paragraphs: [
-            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فحتى خطأ في الكود لا يستطيع إرسال ملفك إلى أي مكان آخر. واختبار آلي يفتح كل صفحة ويُفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
+            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فحتى خطأ في الكود لا يستطيع إرسال ملفك إلى أي مكان آخر. واختبار آلي يفتح كل صفحة ويُفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر ونسخة الموقع نفسه للعمل دون اتصال. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
             'ويمكنك التحقق بنفسك خلال دقيقة: افتح لوحة الشبكة في متصفحك، وافتح ملفًا هنا، وتأكد أن أي طلب لا يحمله. الخطوات في دليل كيف تتحقق من أن الموقع لا يرفع ملفك.',
           ],
           links: [{ text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' }],
@@ -264,10 +266,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ما يحفظه متصفحك',
-          paragraphs: ['يحفظ متصفحك إعدادين صغيرين، ولا يُرسلان إلى أي مكان:'],
+          paragraphs: ['يحفظ متصفحك ما يلي، ولا يُرسَل أيٌّ منه إلى أي مكان:'],
           list: [
             'اختيارك للمظهر الفاتح أو الداكن، ويبقى حتى تمسح بيانات الموقع من متصفحك.',
             'ترتيب الألوان في قائمة أنواع الملفات، ويبقى حتى تغلق التبويب فقط.',
+            'نسخة من الموقع نفسه: صفحاته وكوده وخطوطه، ونماذج الذكاء الاصطناعي للأدوات التي استخدمتها، لتعمل الأدوات دون اتصال وكتطبيق مثبَّت. لا تحتوي شيئًا عنك أو عن ملفاتك، وتُستبدَل عند تحديث الموقع، ويحذفها مسح بيانات الموقع.',
+            'ملف تشاركه مع التطبيق المثبَّت على Android، ويبقى فقط حتى تفتحه الصفحة (لحظة)، ثم يُحذَف.',
           ],
         },
         {

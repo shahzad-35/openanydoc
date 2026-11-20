@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I open a HEIC photo on Windows?",
-      "answer": "Drop it here. Chrome, Edge and Firefox can't show HEIC themselves, so a HEIC decoder loads the first time you open one; the photo is still read on your device."
+      "answer": "Windows opens HEIC photos in its Photos app once the HEIF Image Extensions from the Microsoft Store are installed. Without them, open the photo in OpenAnyDoc's image viewer: Chrome, Edge and Firefox can't show HEIC themselves, so a HEIC decoder loads the first time you open one, and the photo is still read on your device."
     },
     {
       "question": "Why does it say my photo contains my location?",
@@ -74,6 +74,18 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I open a HEIC photo on a Mac or an Android phone?",
+      "answer": "A Mac opens HEIC photos in Photos and Preview with nothing to install, and most Android phones open them in Google Photos or the phone's own gallery app. When an app or website still refuses one, open it in OpenAnyDoc's image viewer in any browser, or turn it into a JPG with the HEIC to JPG converter.",
+      "link": {
+        "text": "HEIC to JPG converter",
+        "path": "/heic-to-jpg"
+      }
+    },
+    {
+      "question": "What program opens a .webp file?",
+      "answer": "Every current web browser opens .webp pictures: Chrome, Edge, Firefox and Safari, and so do Photos on Windows and Preview on a Mac. OpenAnyDoc's image viewer shows a WebP file with zoom and its details, and the next steps can turn it into a JPG or PNG without uploading it."
     }
   ]
 }

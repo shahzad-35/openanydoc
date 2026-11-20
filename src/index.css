@@ -390,17 +390,33 @@ body {
 }
 
 /* The page header stays at the top while you scroll: SiteNav hides it while you scroll down and brings it back on any scroll
-   up. Its background runs the full width (the shadow, clipped to the header's height), and a transform is set only while it is
-   hidden, since a transformed header would hold the phone search panel (position: fixed) inside it. */
+   up. Its background is the page's own and runs the full width (the shadow, clipped to the header's height); over the page
+   (is-floating) a 1 px line and a soft shadow mark its edge. A transform is set only while it is hidden, since a transformed header would hold
+   the phone search panel (position: fixed) inside it. */
 #site-header,
 #changelog-header {
   position: sticky;
   top: 0;
   z-index: 30;
-  background: var(--color-paper);
-  box-shadow: 0 0 0 100vmax var(--color-paper);
+  background: var(--color-paper-raised);
+  box-shadow: 0 0 0 100vmax var(--color-paper-raised);
   clip-path: inset(0 -100vmax);
   transition: transform 0.2s ease;
+}
+#site-header.is-floating,
+#changelog-header.is-floating {
+  box-shadow: 0 0 0 100vmax var(--color-paper-raised), 0 1px 0 100vmax var(--color-line);
+  clip-path: inset(0 -100vmax -12px);
+}
+#site-header.is-floating::after,
+#changelog-header.is-floating::after {
+  content: '';
+  position: absolute;
+  inset-inline: -100vmax;
+  top: calc(100% + 1px);
+  height: 11px;
+  background: linear-gradient(rgb(16 24 40 / 0.07), transparent);
+  pointer-events: none;
 }
 #site-header.is-scrolled-away,
 #changelog-header.is-scrolled-away {
@@ -410,6 +426,8 @@ body {
 .toy-page {
   font-family: var(--font-body);
   background: var(--paper-raised);
+  /* The floating header's full-width shadow strip reaches past the page's sides; clip (unlike hidden) keeps the header sticky. */
+  overflow-x: clip;
 }
 
 html[lang="ar"] .toy-page {

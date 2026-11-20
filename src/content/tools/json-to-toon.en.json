@@ -1,0 +1,96 @@
+{
+  "title": "JSON to TOON Converter – Use Fewer Tokens | OpenAnyDoc",
+  "description": "Convert JSON to TOON and TOON back to JSON in your browser, and see how many tokens it saves before you paste data into an AI chat. Free, no upload.",
+  "heading": "JSON to TOON",
+  "subtitle": "Rewrite JSON as compact TOON to save tokens in an AI chat, or turn TOON back into JSON.",
+  "intro": "TOON (Token-Oriented Object Notation) is an open format that writes the same data as JSON with fewer tokens. It saves the most on lists of objects with the same keys: instead of repeating every key for every item, TOON writes one header line with the field names and then one row per item. Paste JSON or open a .json file to get TOON before you paste the data into ChatGPT, Claude or Gemini, or paste TOON to get JSON back. The token count before and after, and the saving in percent, are shown beside the result. The conversion runs in your browser; nothing is uploaded or sent to any AI service.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your data is converted by your own browser and never sent to a server or to an AI service."
+    },
+    {
+      "title": "Saving shown",
+      "text": "See the tokens before and after and the saving in percent, counted with the same tokenizer as the token counter."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, the converter keeps working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: convert JSON to TOON",
+  "steps": [
+    {
+      "title": "Paste or open your data",
+      "text": "Paste JSON or TOON into the box, choose a .json file, or try a sample."
+    },
+    {
+      "title": "Pick the direction",
+      "text": "Choose JSON to TOON, or TOON to JSON to turn TOON back into JSON."
+    },
+    {
+      "title": "Compare the tokens",
+      "text": "The result appears with the token count before and after and the saving in percent."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Click Copy to paste it into an AI chat, or download it as a .toon or .json file."
+    }
+  ],
+  "handlesTitle": "What JSON to TOON handles",
+  "handles": [
+    "Input: pasted JSON or TOON, or a .json file.",
+    "Both directions: JSON to TOON and TOON back to JSON.",
+    "Lists of objects with the same keys, written as a header line and one row per item.",
+    "Token counts before and after, counted the way recent GPT models count them.",
+    "Errors: invalid JSON or TOON shows its error instead of a result."
+  ],
+  "limits": [
+    "The saving depends on the data's shape: deeply nested or irregular data saves little, sometimes nothing.",
+    "TOON is new and not every tool reads it, so say it is TOON when you paste it into a chat.",
+    "Counts for Claude, Gemini and other models are estimates, because each model uses its own tokenizer."
+  ],
+  "faqTitle": "JSON to TOON: questions",
+  "faq": [
+    {
+      "question": "Is my text uploaded?",
+      "answer": "No. The JSON or TOON you paste stays in this tab and is converted by your own browser; it is never sent to a server or to any AI service. Nothing is saved on the site: no share links and no history."
+    },
+    {
+      "question": "What is TOON?",
+      "answer": "Token-Oriented Object Notation, an open format for the same data as JSON with less repetition. A list of objects with the same keys becomes one header line with the field names, then one row of values per item, so the keys are written once instead of for every item."
+    },
+    {
+      "question": "How much does TOON save?",
+      "answer": "It depends on the data. Long lists of records with the same keys often save a large share of the tokens; deeply nested or irregular data saves little, sometimes nothing. The page shows the counts before and after, so you can see the real saving for your data."
+    },
+    {
+      "question": "Will an AI chat understand TOON?",
+      "answer": "TOON is new, and not every tool reads it. When you paste it into ChatGPT, Claude or Gemini, say that the data is in TOON format; the header line with the field names makes it easy to follow."
+    },
+    {
+      "question": "Can I turn TOON back into JSON?",
+      "answer": "Yes. Choose TOON to JSON, paste the TOON and copy the JSON or download it as a .json file."
+    },
+    {
+      "question": "What if my JSON has a mistake?",
+      "answer": "The converter shows the error instead of a result. The JSON viewer points to the line with the problem so you can fix it.",
+      "link": {
+        "text": "JSON viewer",
+        "path": "/json-viewer"
+      }
+    },
+    {
+      "question": "Can I hide names and emails in the data first?",
+      "answer": "Yes. Mask data hides names, emails, phone numbers and IDs in CSV, Excel, JSON and text files, so you can mask the JSON before converting it.",
+      "link": {
+        "text": "Mask data",
+        "path": "/mask-data"
+      }
+    },
+    {
+      "question": "How do I convert JSON to TOON?",
+      "answer": "Paste the JSON into OpenAnyDoc's JSON to TOON converter, choose JSON to TOON, and copy the result or download a .toon file; the token count before and after is shown. The conversion runs in your browser, so the data is not uploaded."
+    }
+  ]
+}

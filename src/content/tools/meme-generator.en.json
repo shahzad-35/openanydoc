@@ -66,6 +66,10 @@
     {
       "question": "Is it really free?",
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "How do I make a meme with my own picture?",
+      "answer": "Put a top and a bottom caption on your picture in white letters with a black outline, then save it as an image. The OpenAnyDoc meme generator does it in your browser: drop your picture, type the captions, Arabic too, and save a full-size JPG or PNG, with no watermark and no upload."
     }
   ]
 }

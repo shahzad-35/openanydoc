@@ -36,6 +36,8 @@ export type ParsedCsv =
       // The file's lines end with CR LF (Windows), so a download keeps that.
       usesCrlf: boolean
       notices: ParseNotice[]
+      // Every quote problem PapaParse found (the CSV validator lists them), up to 200, rows counted from 1.
+      quoteErrors: { code: 'MissingQuotes' | 'InvalidQuotes'; rowNumber: number }[]
     }
 
 export function describeParseNotice(notice: ParseNotice, locale: Locale) {
@@ -107,6 +109,10 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
     hasUtf8Bom: new Uint8Array(fileContents, 0, Math.min(3, fileContents.byteLength)).join(',') === '239,187,191',
     usesCrlf: text.includes('\r\n'),
     notices,
+    quoteErrors: parseResult.errors
+      .filter((error) => error.code === 'MissingQuotes' || error.code === 'InvalidQuotes')
+      .slice(0, 200)
+      .map((error) => ({ code: error.code as 'MissingQuotes' | 'InvalidQuotes', rowNumber: (error.row ?? 0) + 1 })),
   }
 }
 

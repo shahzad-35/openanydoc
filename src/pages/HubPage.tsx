@@ -5,18 +5,19 @@ import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { useT } from '../i18n'
 import type { MessageKey } from '../i18n'
-import { pageSeo } from '../seo'
+import { guideAddresses, pageSeo } from '../seo'
 import { ALL_TOOLS_PATH, findToolIcon, liveHubs, liveTools, toolPath } from '../tools/registry'
 import type { Hub } from '../tools/registry'
 import { headerRowBreak } from './changelogMarkup'
 import { usePageHead } from './HomePage'
 
-// A grid of one hub's live tools, under one heading per task group (Organize, Convert ...).
-function HubToolGroups({ hub, groupHeadingLevel, onNavigate }: { hub: Hub; groupHeadingLevel: 'h2' | 'h3'; onNavigate: (path: string) => void }) {
+// A grid of one hub's live tools, under one heading per task group (Organize, Convert ...). /all-tools leaves out the tools a hub
+// borrows from another category (`sharedTools`), so each tool is listed once there.
+function HubToolGroups({ hub, groupHeadingLevel, showsSharedTools, onNavigate }: { hub: Hub; groupHeadingLevel: 'h2' | 'h3'; showsSharedTools: boolean; onNavigate: (path: string) => void }) {
   const { locale, t } = useT()
   const GroupHeading = groupHeadingLevel
   return hub.groups.map((group) => {
-    const groupTools = liveTools.filter((tool) => tool.category === hub.category && tool.group === group)
+    const groupTools = liveTools.filter((tool) => (tool.category === hub.category && tool.group === group) || (showsSharedTools && hub.sharedTools?.[group]?.includes(tool.slug)))
     if (groupTools.length === 0) return null
     return (
       <section key={group} id={`hub-group-${hub.category}-${group.toLowerCase()}`} className="mt-8">
@@ -51,7 +52,8 @@ export default function HubPage({ hub, onNavigate }: { hub?: Hub; onNavigate: (p
   const address = hub?.path ?? ALL_TOOLS_PATH
   const seo = pageSeo[locale][address]
   usePageHead(address, seo.title, seo.description)
-  const guideAddresses = hub ? hub.guides : ['/guides']
+  // A hub lists its own guides; All tools lists every guide (and the index), so each guide is one click from the tool list.
+  const hubGuideAddresses = hub ? hub.guides : ['/guides', ...guideAddresses]
 
   return (
     <div id="hub-page" className="toy-page min-h-dvh text-[17px] leading-normal text-ink">
@@ -83,7 +85,7 @@ export default function HubPage({ hub, onNavigate }: { hub?: Hub; onNavigate: (p
           <p id="page-intro" className="type-lead mt-4 text-ink-soft">{seo.intro}</p>
         </div>
         {hub ? (
-          <HubToolGroups hub={hub} groupHeadingLevel="h2" onNavigate={onNavigate} />
+          <HubToolGroups hub={hub} groupHeadingLevel="h2" showsSharedTools onNavigate={onNavigate} />
         ) : (
           liveHubs.map((liveHub) => (
             <section key={liveHub.category} id={`hub-section-${liveHub.category}`} className="mt-12">
@@ -92,15 +94,15 @@ export default function HubPage({ hub, onNavigate }: { hub?: Hub; onNavigate: (p
                   {pageSeo[locale][liveHub.path].heading}
                 </PageLink>
               </h2>
-              <HubToolGroups hub={liveHub} groupHeadingLevel="h3" onNavigate={onNavigate} />
+              <HubToolGroups hub={liveHub} groupHeadingLevel="h3" showsSharedTools={false} onNavigate={onNavigate} />
             </section>
           ))
         )}
-        {guideAddresses.length > 0 && (
+        {hubGuideAddresses.length > 0 && (
           <section id="hub-guides" className="mt-12">
             <h2 id="hub-guides-heading" className="type-h3">{t('tools.hub.guidesHeading')}</h2>
             <ul id="hub-guides-list" className="mt-4 flex flex-wrap gap-3">
-              {guideAddresses.map((guideAddress) => (
+              {hubGuideAddresses.map((guideAddress) => (
                 <li key={guideAddress}>
                   <PageLink
                     id={`hub-guide-link-${guideAddress.slice(1)}`}

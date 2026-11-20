@@ -1,0 +1,80 @@
+{
+  "title": "URL Encode and Decode Online – Percent-Encoding | OpenAnyDoc",
+  "description": "Percent-encode text for a query value or a whole URL, or decode %20 and friends back to readable text. UTF-8 safe. Free, in your browser, no upload.",
+  "heading": "URL Encoder and Decoder",
+  "subtitle": "Paste text or a link and press Encode to percent-encode it, or Decode to turn %XX sequences back into readable text; nothing is uploaded.",
+  "intro": "A free URL encoder and decoder online: paste text or a link, choose Part of a URL or Whole URL, and press Encode or Decode. Part of a URL encodes every reserved character, for a value in a query string; Whole URL keeps : / ? & = # so the address still works. Text is read as UTF-8, and broken % sequences are reported. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "features": [
+    {
+      "title": "Two encoding modes",
+      "text": "Part of a URL encodes everything except letters, digits and - _ . ! ~ * ' ( ), for a query value. Whole URL leaves the characters that hold an address together."
+    },
+    {
+      "title": "Private, free, no account",
+      "text": "Encoding and decoding run in your own browser and your text stays in this tab. Nothing is uploaded or saved, there are no share links or history, and there is nothing to sign up for."
+    },
+    {
+      "title": "Works offline",
+      "text": "Once this page has loaded, encoding and decoding keep working without an internet connection."
+    }
+  ],
+  "stepsTitle": "How it works: encode or decode a URL",
+  "steps": [
+    {
+      "title": "Paste your text or link",
+      "text": "Type or paste into the box. Try a sample if you just want to see it work."
+    },
+    {
+      "title": "Pick a mode",
+      "text": "Choose Part of a URL for a single value, such as a search term, or Whole URL for a complete address."
+    },
+    {
+      "title": "Encode or Decode, then copy",
+      "text": "Press Encode or Decode and copy the result. If the text holds a broken % sequence, the page says so instead of guessing."
+    }
+  ],
+  "handlesTitle": "What the URL encoder handles",
+  "handles": [
+    "Part of a URL: every reserved character encoded, the same as encodeURIComponent.",
+    "Whole URL: : / ? & = # and the other address characters kept, the same as encodeURI.",
+    "Spaces: encoded as %20.",
+    "Text: read as UTF-8, so Arabic letters and emoji become their %XX bytes and decode back exactly.",
+    "Errors: invalid percent sequences, such as %G1 or a lone %, are reported."
+  ],
+  "limits": [
+    "Spaces become %20; the + form used by some web forms is not offered.",
+    "Decode does not turn + into a space, because in a URL a + is a plus sign.",
+    "Text with a broken % sequence can't be decoded until the sequence is fixed."
+  ],
+  "faqTitle": "URL encode and decode: questions",
+  "faq": [
+    {
+      "question": "Is my text uploaded?",
+      "answer": "No. Encoding and decoding run in your browser, on your device, and your text stays in this tab. It is never sent anywhere or saved on the site, and there are no share links or history."
+    },
+    {
+      "question": "Which mode should I use?",
+      "answer": "Use Part of a URL when you are building one value, such as a search term or a redirect address that goes after ?q=. Use Whole URL when you have a complete link with spaces or Arabic letters in it and want it to stay a working address."
+    },
+    {
+      "question": "Why is a space %20 and not +?",
+      "answer": "%20 is how a space is written in any part of a URL. The + form only applies to data sent by HTML forms, and this tool does not offer it."
+    },
+    {
+      "question": "What does \"invalid percent sequence\" mean?",
+      "answer": "A % must be followed by two hexadecimal digits, and together they must form valid UTF-8. Something like %G1, a % at the end, or half of an Arabic letter's bytes can't be decoded, so the page reports it."
+    },
+    {
+      "question": "Does it work with Arabic and other languages?",
+      "answer": "Yes. Text is turned into UTF-8 bytes, and each byte is written as %XX. Decoding reads them back into the same letters."
+    },
+    {
+      "question": "Is it free, and does it work offline?",
+      "answer": "Yes to both. There is no account or limit, and once the page has loaded it keeps working without an internet connection."
+    },
+    {
+      "question": "How do I decode a URL?",
+      "answer": "Decode a URL by turning each %XX sequence back into the character it stands for, so %20 becomes a space and %D8%A7 becomes the Arabic letter ا. In OpenAnyDoc, paste the link and press Decode; the text stays in your browser and is never sent anywhere."
+    }
+  ]
+}

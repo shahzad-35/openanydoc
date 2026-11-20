@@ -1,0 +1,41 @@
+{
+  "title": "CSV to LaTeX Table Converter – Free, No Upload | OpenAnyDoc",
+  "description": "Convert a CSV file into a LaTeX tabular with \\hline rules and every special character escaped, ready to paste into a paper or thesis. Nothing uploaded.",
+  "heading": "CSV to LaTeX Table",
+  "subtitle": "Drop a CSV and get a LaTeX tabular at once, special characters escaped, ready to paste or download.",
+  "intro": "Put experiment results or survey data into a paper, thesis or report without typing ampersands and backslashes by hand. Choose, drop or paste a CSV or TSV file and a LaTeX tabular appears at once: one l column per CSV column, \\hline rules, the header row first, then one line per row. The characters LaTeX treats as commands, & % $ # _ { } ~ ^ and \\, are escaped so the table compiles. The delimiter and encoding are detected for you, and the file is read in your browser, never uploaded.",
+  "features": [
+    { "title": "Private", "text": "Your CSV is turned into LaTeX by your own browser and never sent to a server, so unpublished results stay on your device." },
+    { "title": "Compiles first time", "text": "& % $ # _ { } ~ ^ and \\ in your data are escaped, so a value such as 50% or R&D does not break the build." },
+    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+  ],
+  "stepsTitle": "How it works: convert CSV to a LaTeX table",
+  "steps": [
+    { "title": "Add your CSV", "text": "Choose or drop a .csv or .tsv file, paste CSV text into the box, or try a sample." },
+    { "title": "Get the tabular", "text": "The tabular environment is written at once, with an l column per CSV column and \\hline around the header." },
+    { "title": "Paste it into your document", "text": "Copy the code into your .tex file, inside a table environment if you want a caption, or download it as a .tex file." }
+  ],
+  "handlesTitle": "What the CSV to LaTeX converter handles",
+  "handles": [
+    "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
+    "Output: a tabular with column spec l per column, \\hline rules and the header row first.",
+    "Escaping: & % $ # _ { } ~ ^ and \\ written as LaTeX-safe commands.",
+    "Quoted CSV fields with commas inside, as Excel and Google Sheets export them.",
+    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically."
+  ],
+  "limits": [
+    "Arabic text needs XeLaTeX or LuaLaTeX with an Arabic font (polyglossia or babel); the page does not set that up for you.",
+    "Every column is left-aligned (l); change the spec to r or c, or to siunitx S columns, for numbers.",
+    "The output is the tabular only: add \\begin{table}, \\caption and \\label yourself."
+  ],
+  "faqTitle": "CSV to LaTeX: questions and answers",
+  "faq": [
+    { "question": "Is my file uploaded?", "answer": "No. Your browser reads the CSV and writes the LaTeX on your device. Pasted text stays in this tab and is never sent anywhere." },
+    { "question": "Which characters are escaped?", "answer": "The ten that LaTeX reads as commands: & % $ # _ { } ~ ^ and \\. Each is written in its LaTeX-safe form, so 50% prints as 50% instead of starting a comment." },
+    { "question": "Can I use it with Arabic data?", "answer": "The text is written as it is, but pdfLaTeX cannot typeset Arabic. Compile with XeLaTeX or LuaLaTeX and load an Arabic font through polyglossia or babel; the page does not add that setup." },
+    { "question": "How do I align number columns to the right?", "answer": "Every column is written as l. Change a letter in the column spec, for example {lrr}, to right-align those columns." },
+    { "question": "Does it add a caption and label?", "answer": "No. It writes the tabular only, so you can put it inside your own table environment with the caption, label and placement you use." },
+    { "question": "Does it work with semicolon-separated files?", "answer": "Yes. The delimiter is detected from the file, whether it is a comma, semicolon, tab or pipe." },
+    { "question": "How do I convert a CSV file to a LaTeX table?", "answer": "Open or paste the CSV, then copy the tabular code into your .tex document or download it as a .tex file. OpenAnyDoc escapes the characters LaTeX treats as commands and works in your browser, without uploading the data." }
+  ]
+}
