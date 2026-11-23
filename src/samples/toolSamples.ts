@@ -318,6 +318,50 @@ const STAFF_YAML = `# Team list (synthetic sample)
   office: { city: Madrid, floor: 2 }
   start: 2022-01-10
 `
+const README_MD = `# Project notes (synthetic sample)
+
+A short **Markdown** file with the usual parts: headings, lists, a table, code and a link.
+
+## Next steps
+
+1. Check the totals in the *summary* table.
+2. Send the report to [the team](https://example.com/team).
+   - Ask for comments by Friday.
+   - Keep the old version.
+
+| Region | Q1 | Q2 |
+| --- | ---: | ---: |
+| North | 1,240 | 1,385 |
+| South | 980 | 1,102 |
+
+> Numbers are made up for this example.
+
+\`\`\`
+total = north + south
+\`\`\`
+
+Contact: support@example.com
+`
+const ARABIC_MD = `# ملاحظات المشروع (عينة اصطناعية)
+
+ملف **Markdown** قصير فيه عناوين وقوائم وجدول.
+
+## الخطوات التالية
+
+1. راجع المجاميع في جدول *الملخص*.
+2. أرسل التقرير إلى الفريق.
+   - اطلب الملاحظات قبل يوم الخميس.
+   - احتفظ بالنسخة القديمة.
+
+| المنطقة | الربع الأول | الربع الثاني |
+| --- | ---: | ---: |
+| الرياض | 1,240 | 1,385 |
+| جدة | 980 | 1,102 |
+
+> الأرقام مختلقة لهذا المثال.
+
+للتواصل: support@example.com
+`
 const PRICES_HTML = `<!doctype html>
 <html><head><meta charset="utf-8"><title>Plans</title></head><body>
 <h1>Plans (synthetic sample)</h1>
@@ -382,6 +426,20 @@ const samples = {
   arabicDocx: bundledSample('arabic-docx', 'arabic-summary.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', () => import('./arabic-summary.docx?inline')),
   reviewPptx: bundledSample('review-pptx', 'quarterly-review-3-slides.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', () => import('./quarterly-review-3-slides.pptx?inline')),
   arabicPptx: bundledSample('arabic-pptx', 'arabic-review-3-slides.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', () => import('./arabic-review-3-slides.pptx?inline')),
+  summaryV2Docx: bundledSample('summary-v2-docx', 'quarterly-summary-v2.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', () => import('./quarterly-summary-v2.docx?inline')),
+  reviewedDocx: bundledSample('reviewed-docx', 'quarterly-summary-reviewed.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', () => import('./quarterly-summary-reviewed.docx?inline')),
+  letterTemplateDocx: bundledSample('letter-template-docx', 'letter-template.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', () => import('./letter-template.docx?inline')),
+  protectedXlsx: bundledSample('protected-xlsx', 'sales-protected.xlsx', XLSX_TYPE, () => import('./sales-protected.xlsx?inline')),
+  salesV2Xlsx: bundledSample('sales-v2-xlsx', 'sales-three-sheets-v2.xlsx', XLSX_TYPE, () => import('./sales-three-sheets-v2.xlsx?inline')),
+  macroPptm: bundledSample('macro-pptm', 'quarterly-review-macro.pptm', 'application/vnd.ms-powerpoint.presentation.macroEnabled.12', () => import('./quarterly-review-macro.pptm?inline')),
+  arabicProtectedXlsx: bundledSample('arabic-protected-xlsx', 'arabic-protected.xlsx', XLSX_TYPE, () => import('./arabic-protected.xlsx?inline')),
+  arabicMacroPptm: bundledSample('arabic-macro-pptm', 'arabic-review-macro.pptm', 'application/vnd.ms-powerpoint.presentation.macroEnabled.12', () => import('./arabic-review-macro.pptm?inline')),
+  detailsPdf: bundledSample('details-pdf', 'report-with-details.pdf', 'application/pdf', () => import('./report-with-details.pdf?inline')),
+  arabicDetailsPdf: bundledSample('arabic-details-pdf', 'arabic-guide-with-details.pdf', 'application/pdf', () => import('./arabic-guide-with-details.pdf?inline')),
+  detailsDocx: bundledSample('details-docx', 'summary-with-details.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', () => import('./summary-with-details.docx?inline')),
+  arabicDetailsDocx: bundledSample('arabic-details-docx', 'arabic-summary-with-details.docx', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', () => import('./arabic-summary-with-details.docx?inline')),
+  detailsPptx: bundledSample('details-pptx', 'review-with-details.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', () => import('./review-with-details.pptx?inline')),
+  arabicDetailsPptx: bundledSample('arabic-details-pptx', 'arabic-review-with-details.pptx', 'application/vnd.openxmlformats-officedocument.presentationml.presentation', () => import('./arabic-review-with-details.pptx?inline')),
   peopleCsv: { id: 'people-csv', buildFile: textFile('people.csv', PEOPLE_CSV, CSV) },
   peopleXlsx: bundledSample('people-xlsx', 'people-two-sheets.xlsx', XLSX_TYPE, () => import('./people-two-sheets.xlsx?inline')),
   reportPdf: bundledSample('report-pdf', 'report-3-pages.pdf', 'application/pdf', () => import('./report-3-pages.pdf?inline')),
@@ -444,6 +502,8 @@ const samples = {
   staffYaml: { id: 'staff-yaml', buildFile: textFile('team.yaml', STAFF_YAML, 'application/yaml') },
   pricesHtml: { id: 'prices-html', buildFile: textFile('plans.html', PRICES_HTML, 'text/html') },
   scheduleHtml: { id: 'schedule-html', buildFile: textFile('schedule.html', SCHEDULE_HTML, 'text/html') },
+  readmeMd: { id: 'readme-md', buildFile: textFile('project-notes.md', README_MD, 'text/markdown') },
+  arabicMd: { id: 'arabic-md', buildFile: textFile('arabic-notes.md', ARABIC_MD, 'text/markdown') },
   mysqlDumpSql: { id: 'mysql-dump-sql', buildFile: textFile('customers-dump.sql', MYSQL_DUMP_SQL, 'application/sql') },
   ordersSql: { id: 'orders-sql', buildFile: textFile('orders.sql', ORDERS_SQL, 'application/sql') },
   diagramSvg: { id: 'diagram-svg', buildFile: textFile('diagram.svg', DIAGRAM_SVG, 'image/svg+xml') },
@@ -486,6 +546,9 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/word-to-markdown': [samples.quarterlyDocx, samples.arabicDocx],
   '/pptx-to-markdown': [samples.reviewPptx, samples.arabicPptx],
   '/token-counter': [samples.reportPdf, samples.quarterlyDocx],
+  '/ai-summarizer': [samples.reportPdf, samples.arabicDocx],
+  '/translate-document': [samples.quarterlyDocx, samples.arabicNotesTxt],
+  '/chat-with-pdf': [samples.reportPdf, samples.guidePdf],
   '/json-to-toon': [samples.recordsJson, samples.apiResponseJson],
   '/csv-to-sql': [samples.customersCsv, samples.arabicCsv],
   '/excel-to-sql': [samples.salesXlsx, samples.arabicXlsx],
@@ -556,11 +619,52 @@ export const samplesByPage: Record<string, ToolSample[]> = {
   '/pdf-to-powerpoint': [samples.photoReportPdf, samples.reportPdf],
   '/word-to-pdf': [samples.quarterlyDocx, samples.arabicDocx],
   '/excel-to-pdf': [samples.salesXlsx, samples.arabicXlsx],
+  '/pptx-to-pdf': [samples.reviewPptx, samples.arabicPptx],
+  '/pptx-to-jpg': [samples.reviewPptx, samples.arabicPptx],
+  '/word-to-jpg': [samples.quarterlyDocx, samples.arabicDocx],
+  '/excel-to-jpg': [samples.salesXlsx, samples.arabicXlsx],
+  '/csv-to-pdf': [samples.customersCsv, samples.arabicCsv],
+  '/images-to-pptx': [samples.photoJpg, samples.chartPng],
+  '/merge-word': [samples.quarterlyDocx, samples.arabicDocx],
+  '/split-word': [samples.quarterlyDocx, samples.arabicDocx],
+  '/compare-word': [samples.quarterlyDocx, samples.summaryV2Docx],
+  '/word-counter': [samples.quarterlyDocx, samples.arabicNotesTxt],
+  '/word-find-replace': [samples.quarterlyDocx, samples.arabicDocx],
+  '/remove-word-comments': [samples.reviewedDocx, samples.quarterlyDocx],
+  '/word-metadata': [samples.detailsDocx, samples.arabicDetailsDocx],
+  '/extract-word-images': [samples.quarterlyDocx, samples.arabicDocx],
+  '/watermark-word': [samples.quarterlyDocx, samples.arabicDocx],
+  '/word-mail-merge': [samples.letterTemplateDocx, samples.customersCsv],
+  '/merge-excel': [samples.salesXlsx, samples.peopleXlsx],
+  '/split-excel': [samples.salesXlsx, samples.peopleXlsx],
+  '/compare-excel': [samples.salesXlsx, samples.salesV2Xlsx],
+  '/unprotect-excel': [samples.protectedXlsx, samples.arabicProtectedXlsx],
+  '/repair-excel': [samples.salesXlsx, samples.budgetXls],
+  '/excel-metadata': [samples.salesXlsx, samples.arabicXlsx],
+  '/excel-to-word': [samples.salesXlsx, samples.arabicXlsx],
+  '/merge-pptx': [samples.reviewPptx, samples.arabicPptx],
+  '/split-pptx': [samples.reviewPptx, samples.arabicPptx],
+  '/extract-pptx-media': [samples.reviewPptx, samples.macroPptm],
+  '/search-pptx': [samples.reviewPptx, samples.arabicPptx],
+  '/pptx-metadata': [samples.detailsPptx, samples.arabicDetailsPptx],
+  '/pptm-to-pptx': [samples.macroPptm, samples.arabicMacroPptm],
+  '/watermark-pptx': [samples.reviewPptx, samples.arabicPptx],
+  '/markdown-to-word': [samples.readmeMd, samples.arabicMd],
+  '/markdown-to-pdf': [samples.readmeMd, samples.arabicMd],
+  '/text-to-word': [samples.releaseNotesTxt, samples.arabicNotesTxt],
+  '/text-to-pdf': [samples.releaseNotesTxt, samples.arabicNotesTxt],
+  '/html-to-word': [samples.pricesHtml, samples.scheduleHtml],
+  '/html-to-pdf': [samples.pricesHtml, samples.scheduleHtml],
   '/ocr-pdf': [samples.scannedLetterPdf, samples.scannedArabicPdf],
   '/blur-face': [samples.facesTeamJpg, samples.facePortraitJpg],
   '/remove-background': [samples.mugJpg, samples.plantJpg],
   '/upscale-image': [samples.smallLandscapeJpg, samples.badgePng],
+  '/image-to-text': [samples.scanReceiptJpg, samples.scanLetterJpg],
   '/repair-pdf': [samples.damagedPdf, samples.letterPdf],
+  '/compress-pdf': [samples.photoReportPdf, samples.guidePdf],
+  '/pdf-to-grayscale': [samples.photoReportPdf, samples.guidePdf],
+  '/remove-pdf-metadata': [samples.detailsPdf, samples.arabicDetailsPdf],
+  '/flatten-pdf': [samples.feedbackFormPdf, samples.formPdf],
   '/image-viewer': [samples.phonePhotoJpg, samples.phonePhotoHeic],
   '/compress-image': [samples.photoJpg, samples.chartPng],
   '/resize-image': [samples.phonePhotoJpg, samples.chartPng],

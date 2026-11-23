@@ -1,0 +1,83 @@
+{
+  "title": "Word Metadata – View and Remove DOCX Author Info",
+  "description": "See the author, company, dates and revision hidden in a Word document, then download a clean copy without them. Text untouched. Free, no upload.",
+  "heading": "View and remove Word metadata",
+  "subtitle": "See who wrote, edited and saved a Word document, then remove it in one click; nothing is uploaded.",
+  "intro": "A DOCX file carries details that don't show on the page: title, subject, author, the last person who saved it, created and modified dates, revision number, the application, company and manager. This page lists them, and one click removes them, custom properties included, and downloads a clean copy. The text and layout are not touched. The file is read and cleaned in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is read by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "See before you share",
+      "text": "Author, company, dates and revision are listed before anything changes."
+    },
+    {
+      "title": "Text untouched",
+      "text": "Only the properties are removed; the text and layout stay exactly as they were."
+    }
+  ],
+  "stepsTitle": "How to remove metadata from a Word document",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx file on the page."
+    },
+    {
+      "title": "Read what it holds",
+      "text": "See the title, author, company, dates and other properties."
+    },
+    {
+      "title": "Remove and download",
+      "text": "Click Remove and download the clean copy."
+    }
+  ],
+  "handlesTitle": "What Word metadata handles",
+  "handles": [
+    "Files: .docx documents (Word 2007 and later).",
+    "Shown: title, subject, author, last modified by, created and modified dates, revision, application, company and manager.",
+    "Removed: all of the above and custom properties.",
+    "Kept: the text and layout, unchanged."
+  ],
+  "limits": [
+    "Names on comments and tracked changes are not removed here; use Remove Word comments for those.",
+    "Pictures inside the document keep their own metadata, such as camera and GPS location.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "faqTitle": "Word metadata: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I remove the author name from a Word document?",
+      "answer": "A Word document stores the author's name, the last person who saved it and its dates in its properties, apart from the text; Word's document inspector and LibreOffice's file properties can clear them. On this page, choose the .docx, see what it holds and click Remove to download a clean copy, cleaned in your browser."
+    },
+    {
+      "question": "Is my text changed?",
+      "answer": "No. Only the properties are removed; the text and layout are not touched."
+    },
+    {
+      "question": "What about names on comments and tracked changes?",
+      "answer": "They are not removed here. Remove Word comments deletes comments and settles tracked changes, and with them the names they carry.",
+      "link": {
+        "text": "Remove Word comments",
+        "path": "/remove-word-comments"
+      }
+    },
+    {
+      "question": "Are the pictures' camera and GPS details removed?",
+      "answer": "No. Pictures inside the document keep their own metadata. Clean a photo with Remove photo metadata before you put it in the document.",
+      "link": {
+        "text": "Remove photo metadata",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "What are custom properties?",
+      "answer": "Extra fields a company or an app adds to a file, such as a client or project name. They are removed together with the rest."
+    }
+  ]
+}

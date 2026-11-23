@@ -1,0 +1,100 @@
+{
+  "title": "HTML to PDF – Save an HTML File as PDF Pages, Free",
+  "description": "Convert an HTML file or pasted HTML to PDF in your browser: headings, tables and inline styles on A4 or Letter pages. Free, nothing is uploaded.",
+  "heading": "HTML to PDF",
+  "subtitle": "Paste HTML or open an .html file and download it as A4 or Letter PDF pages with searchable text; nothing is uploaded.",
+  "intro": "Convert HTML to PDF without a print dialog: paste HTML or open an .html or .htm file, and its headings, paragraphs, lists, tables (merged cells included), links, bold, italic, underline, strikethrough, code and quotes are laid out on A4 or Letter pages with 0.75-inch margins. Inline style attributes are kept, so colours and fonts set on the elements themselves show in the PDF. The HTML is cleaned first: scripts, frames, forms, style sheets and event handlers are removed. Each page carries its text, so the PDF can be searched and copied, Arabic included. The page never opens a web address, and nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your HTML is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Inline styles kept",
+      "text": "Colours, fonts and sizes set on the elements themselves show in the PDF; the HTML is cleaned of scripts first."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "The pages carry their text, so it can be selected, searched and copied in any PDF reader."
+    }
+  ],
+  "stepsTitle": "How to convert HTML to PDF",
+  "steps": [
+    {
+      "title": "Paste or open your HTML",
+      "text": "Paste HTML into the box, or choose or drop an .html or .htm file to fill it."
+    },
+    {
+      "title": "Choose the page size",
+      "text": "Pick A4 or Letter."
+    },
+    {
+      "title": "Convert",
+      "text": "Click the convert button to lay out the pages."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the first pages; download the PDF."
+    }
+  ],
+  "handlesTitle": "What HTML to PDF handles",
+  "handles": [
+    "Files: .html and .htm, or HTML you paste.",
+    "Headings, paragraphs, lists, links, tables with merged cells, code and quotes.",
+    "Inline style attributes: colours, fonts and sizes set on the elements.",
+    "Arabic and English, each paragraph in its own direction."
+  ],
+  "limits": [
+    "Style sheets (<style> and linked CSS) are removed; only inline style attributes are kept, so a designed web page may look plainer.",
+    "Pictures from web addresses are left out; only pictures embedded in the HTML as data are kept.",
+    "Pages are pictures at 200 dpi with their text laid over them; links are not clickable and there are no page numbers.",
+    "Files up to 10 MB are opened; a larger file shows a message instead."
+  ],
+  "worksBest": [
+    "HTML you wrote or exported yourself",
+    "Reports and invoices built with inline styles",
+    "Saved articles and help pages",
+    "Simple pages with headings and tables"
+  ],
+  "mayNotKeep": [
+    "Page styles from style sheets",
+    "Pictures linked from web addresses",
+    "Clickable links",
+    "Content drawn by scripts"
+  ],
+  "faqTitle": "HTML to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert HTML to PDF?",
+      "answer": "The quickest free way is to open the .html file in your browser and use Print, then Save as PDF. In OpenAnyDoc, paste the HTML or open the file, choose A4 or Letter, click convert and download a PDF with searchable text, cleaned of scripts and forms; the HTML is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Can I convert a web page from its address?",
+      "answer": "No. This page never fetches anything from the web. Open the page in your browser, save it as a file or copy its HTML source, then open or paste it here."
+    },
+    {
+      "question": "Why does the PDF look different from the web page?",
+      "answer": "Style sheets are removed and only inline style attributes are kept, scripts don't run and pictures from web addresses are left out. HTML written with inline styles keeps its look best."
+    },
+    {
+      "question": "Can I search the text of the PDF?",
+      "answer": "Yes. Each page carries its text, so it can be selected, searched and copied, Arabic included."
+    },
+    {
+      "question": "Can I get an editable document instead?",
+      "answer": "Yes. HTML to Word makes a .docx with Word's own headings, lists and tables that you can edit.",
+      "link": {
+        "text": "HTML to Word",
+        "path": "/html-to-word"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

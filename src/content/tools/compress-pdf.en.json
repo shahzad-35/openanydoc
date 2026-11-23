@@ -1,0 +1,96 @@
+{
+  "title": "Compress PDF – Make a PDF Smaller, Text Kept Sharp",
+  "description": "Compress a PDF in your browser: pictures are saved smaller, text stays sharp and searchable, and you see the size before and after. Nothing is uploaded.",
+  "heading": "Compress PDF",
+  "subtitle": "Make a PDF smaller by saving its pictures more compactly while text stays sharp and searchable; nothing is uploaded.",
+  "intro": "Reduce the size of a PDF before you email it or upload it to a form. Choose High quality, Balanced or Smallest: pictures inside the PDF are saved again as JPEG at that quality whenever that makes them smaller, everything else is compressed without loss, and parts that nothing uses are removed. Text and drawn shapes are not touched, so they stay sharp and searchable. The page shows the size before and after, and says so plainly when the saving is small. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Three levels",
+      "text": "High quality, Balanced or Smallest: choose how much picture quality to trade for size."
+    },
+    {
+      "title": "Honest result",
+      "text": "See the size before and after; if the copy isn't smaller, you keep the original."
+    }
+  ],
+  "stepsTitle": "How to compress a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Pick a level",
+      "text": "Balanced suits most files; choose High quality for photos you want crisp, Smallest for the lowest size."
+    },
+    {
+      "title": "Compress",
+      "text": "Click Compress PDF and compare the size before and after."
+    },
+    {
+      "title": "Download",
+      "text": "Check the preview and download the smaller copy."
+    }
+  ],
+  "handlesTitle": "What Compress PDF handles",
+  "handles": [
+    "Pictures: saved again as JPEG at the chosen quality when that makes them smaller.",
+    "Everything else: compressed without loss, and unused parts removed.",
+    "Text and drawn shapes: left as they are, sharp and searchable."
+  ],
+  "limits": [
+    "Pictures keep their resolution, so a scan saved at a very high resolution may stay large.",
+    "A PDF made mostly of text is often compact already, so the saving can be small.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "worksBest": [
+    "PDFs with photos or scanned pages",
+    "Reports and brochures with pictures",
+    "Files exported with no compression"
+  ],
+  "mayNotKeep": [
+    "Full picture quality at the Smallest level",
+    "Lossless pictures, saved as JPEG when that is smaller",
+    "Parts of the file that nothing uses"
+  ],
+  "faqTitle": "Compress PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I reduce the size of a PDF?",
+      "answer": "A PDF gets smaller when the pictures inside it are saved more compactly, because pictures usually take most of the space. On a Mac, Preview can do it with File, Export and the Reduce File Size Quartz filter; Word's Save As PDF has a minimum size option, and LibreOffice can lower picture quality when it exports a PDF. Here, choose the PDF, pick a level and click Compress PDF: the pictures are saved again in your browser, and the text stays sharp."
+    },
+    {
+      "question": "Will my text get blurry?",
+      "answer": "No. Text and drawn shapes are not changed, so they stay sharp and can still be selected and searched. Only pictures are saved again."
+    },
+    {
+      "question": "Why did my PDF hardly get smaller?",
+      "answer": "A PDF made mostly of text is often compact already, and pictures keep their resolution, so a very high-resolution scan may stay large. The page tells you when the saving is small, and if the copy isn't smaller you keep the original."
+    },
+    {
+      "question": "Which level should I choose?",
+      "answer": "Balanced suits most files. High quality keeps photos closer to the original; Smallest saves the most space and shows more softness in pictures. The three levels save pictures as JPEG at quality 85 (High quality), 70 (Balanced) and 50 (Smallest)."
+    },
+    {
+      "question": "Can I compress the pictures before I make the PDF?",
+      "answer": "Yes. Compress image makes photos smaller one by one, and you can then put them in a PDF.",
+      "link": {
+        "text": "Compress image",
+        "path": "/compress-image"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

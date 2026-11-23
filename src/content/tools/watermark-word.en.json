@@ -1,0 +1,85 @@
+{
+  "title": "Watermark Word Document – Add DRAFT or CONFIDENTIAL Text",
+  "description": "Add a text watermark like CONFIDENTIAL or DRAFT behind every page of a Word document, in your browser. A real Word watermark. Free, no upload.",
+  "heading": "Add a watermark to Word",
+  "subtitle": "Put CONFIDENTIAL, DRAFT or your own text behind every page of a Word document; nothing is uploaded.",
+  "intro": "Watermark a DOCX file without Word: pick CONFIDENTIAL or DRAFT, or type your own text, choose diagonal or horizontal, a colour and a size, and download. The watermark sits behind the text on every page and is a real Word watermark in the header, so it can be removed later in Word under Design → Watermark. Documents with a different first-page header get it on the first page too. The file is changed in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is changed by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "A real Word watermark",
+      "text": "It sits in the header like one made in Word, so it can be removed later in Word."
+    },
+    {
+      "title": "Your text, your look",
+      "text": "CONFIDENTIAL, DRAFT or your own words, diagonal or horizontal, in the colour and size you choose."
+    }
+  ],
+  "stepsTitle": "How to add a watermark to a Word document",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx file on the page."
+    },
+    {
+      "title": "Set the watermark",
+      "text": "Pick or type the text, then choose diagonal or horizontal, colour and size."
+    },
+    {
+      "title": "Download",
+      "text": "Click Add watermark and download the Word document."
+    }
+  ],
+  "handlesTitle": "What Watermark Word handles",
+  "handles": [
+    "Files: .docx documents (Word 2007 and later).",
+    "Text: CONFIDENTIAL, DRAFT or your own words.",
+    "Look: diagonal or horizontal, with colour and size choices.",
+    "Pages: every page, including a first page with its own header."
+  ],
+  "limits": [
+    "Text watermarks only: a picture or logo can't be used as a watermark.",
+    "The watermark is in the header, so anyone with Word can remove it under Design → Watermark.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "Drafts sent for review",
+    "Confidential reports and contracts",
+    "Sample or copy documents"
+  ],
+  "mayNotKeep": [
+    "Logo or picture watermarks",
+    "A watermark that can't be removed",
+    "Old .doc files"
+  ],
+  "faqTitle": "Watermark Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I add a watermark to a Word document?",
+      "answer": "A Word watermark is faint text behind the text on every page, kept in the document's header; in Word it is under Design → Watermark. On this page, choose the .docx, pick CONFIDENTIAL or DRAFT or type your own text, choose its angle, colour and size, and download the document, changed in your browser."
+    },
+    {
+      "question": "Can the watermark be removed later?",
+      "answer": "Yes. It is a real Word watermark, so it can be removed in Word under Design → Watermark."
+    },
+    {
+      "question": "Can I use a logo as a watermark?",
+      "answer": "No. Only text watermarks are supported; pictures can't be used."
+    },
+    {
+      "question": "Is the first page watermarked too?",
+      "answer": "Yes. Documents with a different first-page header get the watermark on the first page as well."
+    },
+    {
+      "question": "Does it work with .doc files?",
+      "answer": "No. Old .doc files can't be read; save them as .docx in Word or LibreOffice first."
+    }
+  ]
+}

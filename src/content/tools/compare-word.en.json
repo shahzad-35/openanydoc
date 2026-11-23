@@ -1,0 +1,79 @@
+{
+  "title": "Compare Word Documents – Find Changes Between Two DOCX",
+  "description": "Compare two versions of a Word document word by word in your browser: additions in green, deletions struck through in red. Free, nothing uploaded.",
+  "heading": "Compare Word documents",
+  "subtitle": "See every word added or removed between two versions of a Word document, marked on the page; nothing is uploaded.",
+  "intro": "Compare two DOCX files online, such as two drafts of a contract, a CV or a report: choose the old version and the new one, and the text is compared word by word. Added words are shown in green and removed words struck through in red, in the document's own reading order, Arabic included. Download the differences as a Word report to send or keep. Both files stay on your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Both documents are compared by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Word by word",
+      "text": "Every added word is shown in green and every removed word struck through in red."
+    },
+    {
+      "title": "Word report",
+      "text": "Download the differences as a Word document to share or keep."
+    }
+  ],
+  "stepsTitle": "How to compare two Word documents",
+  "steps": [
+    {
+      "title": "Choose the old version",
+      "text": "Choose or drop the earlier .docx file."
+    },
+    {
+      "title": "Choose the new version",
+      "text": "Choose or drop the later .docx file."
+    },
+    {
+      "title": "Read the changes",
+      "text": "Additions show in green and deletions in red; download the report if you need it."
+    }
+  ],
+  "handlesTitle": "What Compare Word handles",
+  "handles": [
+    "Files: two .docx documents (Word 2007 and later), an old and a new version.",
+    "Text: compared word by word, Arabic and English.",
+    "Display: additions in green, deletions struck through in red.",
+    "Result: a Word report of the differences."
+  ],
+  "limits": [
+    "Only the text is compared: changes to formatting alone, such as bold or a new font, are not detected.",
+    "Pictures that were moved or replaced are not detected.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "faqTitle": "Compare Word documents: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I compare two Word documents?",
+      "answer": "Comparing two Word documents means finding the words added or removed between an old and a new version. Word and LibreOffice both have a compare command for this. On this page, choose the old and the new .docx: additions show in green and deletions struck through in red, compared in your browser, and you can download the differences as a Word report."
+    },
+    {
+      "question": "Does it find formatting changes?",
+      "answer": "No. Only the text is compared, so a word that was only made bold or given another font is not marked, and moved pictures are not detected."
+    },
+    {
+      "question": "Does it work with Arabic documents?",
+      "answer": "Yes. Arabic text is compared word by word and shown in its own direction."
+    },
+    {
+      "question": "Can I save the differences?",
+      "answer": "Yes. Download them as a Word report that lists the additions and deletions."
+    },
+    {
+      "question": "Can I compare two PDFs instead?",
+      "answer": "Yes, with Compare PDF, which also marks changed areas on the pages.",
+      "link": {
+        "text": "Compare PDF",
+        "path": "/compare-pdf"
+      }
+    }
+  ]
+}

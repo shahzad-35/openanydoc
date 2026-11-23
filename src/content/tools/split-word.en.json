@@ -1,0 +1,89 @@
+{
+  "title": "Split Word Document – Cut a DOCX by Headings, No Upload",
+  "description": "Split a Word document into separate .docx files at each Heading 1, Heading 2 or page break, in your browser, and get them in a ZIP. Free, no upload.",
+  "heading": "Split a Word document",
+  "subtitle": "Cut a Word document into separate .docx files at its headings or page breaks; nothing is uploaded.",
+  "intro": "Split a DOCX file online without Word: choose where to cut, at every Heading 1, at Heading 1 or 2, or at the page breaks and section breaks the author inserted, and download the parts as a ZIP of .docx files. Each part keeps the document's styles, headers and footers, and is named after its first heading, or numbered when it has none. The file is split in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is split by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Three ways to cut",
+      "text": "Split at every Heading 1, at Heading 1 or 2, or at the page breaks the author inserted."
+    },
+    {
+      "title": "Same look",
+      "text": "Every part keeps the document's styles, headers and footers, so it looks like the original."
+    }
+  ],
+  "stepsTitle": "How to split a Word document",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx file on the page."
+    },
+    {
+      "title": "Choose where to cut",
+      "text": "Pick Heading 1, Heading 1 or 2, or page breaks."
+    },
+    {
+      "title": "Split and download",
+      "text": "Click Split and download the ZIP with one .docx file per part."
+    }
+  ],
+  "handlesTitle": "What Split Word handles",
+  "handles": [
+    "Files: .docx documents (Word 2007 and later).",
+    "Split points: every Heading 1, Heading 1 or 2, or inserted page breaks and section breaks.",
+    "Each part: the document's styles, headers and footers.",
+    "Result: a ZIP of .docx files named after their first heading, or numbered."
+  ],
+  "limits": [
+    "Pages that end only because they are full are not split points; insert a page break in Word where you want a cut.",
+    "Headings are found by Word's Heading 1 and Heading 2 styles; text that only looks like a heading is not a split point.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "Books and theses with chapter headings",
+    "Reports with one section per heading",
+    "Letters separated by page breaks"
+  ],
+  "mayNotKeep": [
+    "Cuts where a page simply fills up",
+    "Headings typed as bold text",
+    "Old .doc files"
+  ],
+  "faqTitle": "Split Word document: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I split a Word document into separate files?",
+      "answer": "Splitting a Word document means saving each of its parts as a document of its own; in Word, LibreOffice or Google Docs you can do it by hand, copying each part into a new file. On this page, choose the .docx, pick Heading 1, Heading 1 or 2, or page breaks, and download a ZIP with one .docx per part, split in your browser."
+    },
+    {
+      "question": "Why didn't it split where my page ends?",
+      "answer": "Only page breaks and section breaks that the author inserted count. A page that ends because it is full has no mark in the file, so it is not a split point; insert a page break in Word there and split again."
+    },
+    {
+      "question": "What are the parts called?",
+      "answer": "Each part is named after its first heading; a part without a heading is numbered."
+    },
+    {
+      "question": "Do the parts keep headers and footers?",
+      "answer": "Yes. Every part keeps the document's styles, headers and footers."
+    },
+    {
+      "question": "Can I put the parts back together?",
+      "answer": "Yes. Merge Word joins .docx files in the order you choose, each starting on a new page.",
+      "link": {
+        "text": "Merge Word",
+        "path": "/merge-word"
+      }
+    }
+  ]
+}

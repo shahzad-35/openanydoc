@@ -1,0 +1,102 @@
+{
+  "title": "Word to JPG – Save DOCX Pages as Images Online Free",
+  "description": "Save each page of a Word document as a JPG image in your browser, with Word's page size, headers and pictures. Several pages in a ZIP. No upload.",
+  "heading": "Word to JPG",
+  "subtitle": "Turn each page of a Word document into a JPG picture, several at once in a ZIP; nothing is uploaded.",
+  "intro": "Convert DOCX to JPG online without Word: the document is laid out the way this site's Word viewer shows it, with Word's own page size and page breaks, headers, footers, tables and pictures, and each page is saved as a JPG at 200 dpi. One page gives one .jpg; a longer document gives a ZIP with the pages numbered in order. Handy for posting a page, adding it to slides or sending it as a picture. Works with .docx, .dotx, .docm and OpenDocument .odt files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Word's pages",
+      "text": "Word's page size and the page breaks it saved are kept, with headers, footers, tables and pictures."
+    },
+    {
+      "title": "Numbered in order",
+      "text": "Several pages come in one ZIP, named name-page-01.jpg, name-page-02.jpg and so on."
+    }
+  ],
+  "stepsTitle": "How to convert Word to JPG",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx or .odt file on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to JPG."
+    },
+    {
+      "title": "Download",
+      "text": "Check the preview and download the JPG, or the ZIP with every page."
+    }
+  ],
+  "handlesTitle": "What Word to JPG handles",
+  "handles": [
+    "Word files: .docx, .dotx and .docm; OpenDocument .odt.",
+    "Headers, footers, page numbers, tables, lists and pictures.",
+    "Arabic and English, each in its own direction.",
+    "Output: one .jpg for a single page, a ZIP for several."
+  ],
+  "limits": [
+    "The pages follow this site's Word viewer, which is close to Word but not identical; fonts your browser doesn't have are replaced.",
+    "The pictures hold no text: words in a JPG can't be selected or searched.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "One-page letters, flyers and certificates",
+    "CVs and forms to share as pictures",
+    "Pages to add to slides or a website"
+  ],
+  "mayNotKeep": [
+    "Fonts your browser doesn't have",
+    "Selectable and searchable text",
+    "Comments and tracked changes",
+    "Exact line breaks in complex layouts"
+  ],
+  "faqTitle": "Word to JPG: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert a Word document to JPG without Word?",
+      "answer": "Without Word, a common free way is to save the document as PDF in Google Docs, LibreOffice or Pages, then turn the PDF into pictures. In OpenAnyDoc, choose the .docx file and download a JPG of every page straight away; it is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Will it look exactly like Word?",
+      "answer": "Close, not identical: the layout follows this site's Word viewer, and fonts your browser doesn't have are replaced. Open the file in the Word viewer to see how it will come out.",
+      "link": {
+        "text": "Word viewer",
+        "path": "/word-viewer"
+      }
+    },
+    {
+      "question": "How sharp are the pictures?",
+      "answer": "Each page is drawn at 200 dpi, sharp enough to read on screen and to print. To make the files smaller, use Compress image.",
+      "link": {
+        "text": "Compress image",
+        "path": "/compress-image"
+      }
+    },
+    {
+      "question": "Can I copy the text from the JPG?",
+      "answer": "No. A JPG is only a picture. If you need text that can be searched and copied, use Word to PDF instead.",
+      "link": {
+        "text": "Word to PDF",
+        "path": "/word-to-pdf"
+      }
+    },
+    {
+      "question": "Does it work with .doc files?",
+      "answer": "No. Old .doc files can't be read; save them as .docx in Word or LibreOffice first."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

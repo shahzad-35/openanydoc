@@ -1,0 +1,89 @@
+{
+  "title": "PDF to Grayscale – Remove Colour From Every Page",
+  "description": "Make a PDF black and white in your browser: each page becomes a grey picture and its text stays selectable and searchable. Free, nothing is uploaded.",
+  "heading": "PDF to grayscale",
+  "subtitle": "Turn every page of a PDF grey, with its text still selectable and searchable; nothing is uploaded.",
+  "intro": "Convert a PDF to grayscale before printing it in black and white or sending a copy without colour. Each page is drawn again as a grey picture at about 200 dpi, and its text is kept as an invisible layer on top, so you can still select, copy and search it. Everything happens in your browser, so your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Text still searchable",
+      "text": "An invisible text layer keeps every page's words selectable and searchable."
+    },
+    {
+      "title": "Ready to print",
+      "text": "Grey pages print the way you see them on a black-and-white printer."
+    }
+  ],
+  "stepsTitle": "How to convert a PDF to grayscale",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to grayscale and wait while each page is drawn in grey."
+    },
+    {
+      "title": "Check and download",
+      "text": "Check the preview and download the grey copy."
+    }
+  ],
+  "handlesTitle": "What PDF to Grayscale handles",
+  "handles": [
+    "Every page, drawn as a grey picture at about 200 dpi.",
+    "The page's text, kept as an invisible layer you can select, copy and search.",
+    "Arabic and English text alike."
+  ],
+  "limits": [
+    "This tool is in beta.",
+    "Pages become pictures, so links, form fields and bookmarks are not kept, and zooming far in is less sharp.",
+    "The file can grow or shrink, depending on what the pages hold."
+  ],
+  "worksBest": [
+    "Documents to print in black and white",
+    "Colour scans and handouts",
+    "Copies to share without colour"
+  ],
+  "mayNotKeep": [
+    "Links and bookmarks",
+    "Form fields",
+    "Sharp lines when zoomed far in",
+    "The original file size"
+  ],
+  "faqTitle": "PDF to Grayscale: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I make a PDF black and white?",
+      "answer": "A black-and-white copy of a PDF is made by drawing every page again in shades of grey. Here, choose the PDF and click Convert to grayscale: each page becomes a grey picture in your browser, with its text still selectable and searchable."
+    },
+    {
+      "question": "Can I still search and copy the text?",
+      "answer": "Yes. Each page keeps its text as an invisible layer over the grey picture, so you can select, copy and search it as before."
+    },
+    {
+      "question": "Why are my links and form fields gone?",
+      "answer": "Each page is rebuilt as a picture, so links, form fields and bookmarks are not carried into the grey copy. Keep the original if you need them."
+    },
+    {
+      "question": "Will the file be smaller?",
+      "answer": "Not always. The grey copy can be larger or smaller than the original, depending on what the pages hold. To make a PDF smaller, use Compress PDF.",
+      "link": {
+        "text": "Compress PDF",
+        "path": "/compress-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

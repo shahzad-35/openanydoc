@@ -51,6 +51,17 @@
     "Merged cells are not merged in the table: the value sits in the first cell and the others stay empty.",
     "Password-protected workbooks cannot be opened."
   ],
+  "worksBest": [
+    "Simple tables for a web page or email",
+    "Lists with a header row",
+    "Arabic and English text"
+  ],
+  "mayNotKeep": [
+    "Cell colours, fonts and borders",
+    "Merged cells",
+    "Charts and pictures",
+    "Formulas (their values are written)"
+  ],
   "faqTitle": "Excel to HTML: questions and answers",
   "faq": [
     {

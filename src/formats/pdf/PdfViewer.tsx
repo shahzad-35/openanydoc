@@ -20,6 +20,7 @@ import { reorderRightToLeftTextOf } from './pdfTextOrder'
 import { DropOverlay, Icon, SheetIconSprite, Toolbar, ToolbarButton, ToolbarSeparator, TopBar, WorkbenchDialog, useIsNarrowScreen, useThemeToggle } from '../sheet/SheetChrome'
 import '../sheet/sheetChrome.css'
 import './pdfViewer.css'
+import { ViewerAiButtons } from '../../tools/ai/onDeviceAi'
 
 const ZOOM_STEPS = [0.5, 0.75, 1, 1.25, 1.5, 2, 3, 4]
 const THUMBNAIL_WIDTH = 120
@@ -360,6 +361,7 @@ export default function PdfViewer({ openedFile, onOpenAnotherFile, onClose }: Fo
         <ToolbarButton id="pdf-rotate-button" label={t('pdf.rotate')} icon="convert" isDisabled={!isReady} onClick={rotate} />
         <ToolbarSeparator />
         <ToolbarButton id="pdf-search-button" label={t('pdf.search.open')} icon="search" isPressed={isSearchOpen} isDisabled={!isReady} onClick={() => (isSearchOpen ? closeSearch() : openSearch())} />
+        <ViewerAiButtons file={openedFile.file} idPrefix="pdf" isReady={isReady} />
       </Toolbar>
       {!isFailed && (
         <NextSteps

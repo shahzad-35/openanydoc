@@ -17,6 +17,22 @@ type ModalDialogProps = {
   children: ReactNode
 }
 
+// The two design systems a control can live in: the site's pages (index.css: .btn--primary, rounded fields), and the file
+// viewers' workbench (sheetChrome.css under #csv-workbench, #excel-workbench, #docs-workbench, which restyles .btn). A dialog or
+// panel shown in both takes its classes from here, so nothing renders unstyled in the other system.
+export type ControlLook = 'page' | 'workbench'
+export const CONTROL_CLASSES: Record<ControlLook, { box: string; label: string; select: string; textarea: string; primaryButton: string; secondaryButton: string }> = {
+  page: {
+    box: 'space-y-4 rounded-[22px] border-2 border-rule bg-paper-raised p-5 text-start',
+    label: 'block text-sm font-semibold',
+    select: 'mt-1 block w-full rounded-[12px] border-2 border-rule bg-paper-raised px-3 py-2 text-sm pointer-coarse:min-h-11',
+    textarea: 'w-full rounded-[14px] border-2 border-rule bg-surface p-3 font-mono text-sm',
+    primaryButton: 'btn btn--primary btn--compact press',
+    secondaryButton: 'btn btn--quiet btn--compact press',
+  },
+  workbench: { box: 'grid gap-3 text-start', label: 'field', select: '', textarea: '', primaryButton: 'btn primary', secondaryButton: 'btn outline' },
+}
+
 export const FOCUSABLE_SELECTOR = 'button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [href]'
 
 // A native modal <dialog>. It is drawn in the browser's top layer, so nothing on the page can cover it or clip it, and the

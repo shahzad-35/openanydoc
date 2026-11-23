@@ -1,5 +1,5 @@
 /* oxlint-disable react/only-export-components */
-// The PDF tools that read a PDF with pdf.js (Apache-2.0): PDF to JPG (pages drawn as pictures), PDF to text, PDF to Markdown,
+// The PDF tools that read a PDF with pdf.js (Apache-2.0): PDF to JPG (pages drawn as pictures), PDF to grayscale, PDF to text, PDF to Markdown,
 // Extract images (the pictures a PDF holds) and Compare PDF (two versions, line by line and picture by picture). pdf.js parses in
 // its own worker; pages are drawn one at a time with a progress bar, and the ZIP is made in pdfTools.worker.ts (fflate), so the
 // page keeps responding.
@@ -12,7 +12,7 @@ import { loadPdfCore, openPdfForReading } from '../../formats/pdf/pdfLibrary'
 import TextResultPanel from '../ai/TextResultPanel'
 import type { ToolProps } from '../registry'
 import { runPdfTask } from './pdfTasks'
-import { PdfFileList, PdfThumbnailGrid, ProgressBar, SelectionBar, baseNameOf, describePageNumbers, problemMessageKey, useOpenedPdfs, zipResultFile } from './PdfToolParts'
+import { PdfFileList, PdfThumbnailGrid, ProgressBar, SelectionBar, baseNameOf, describePageNumbers, drawPagePicture, pdfResultFile, problemMessageKey, useOpenedPdfs, zipResultFile } from './PdfToolParts'
 import type { GridCard } from './PdfToolParts'
 
 const fieldClass = 'control-shape min-h-11 border-2 border-rule bg-paper-raised px-3 text-ink'
@@ -130,6 +130,52 @@ export function PdfToImages({ files, onResult }: ToolProps) {
       </p>
       {pdf.status}
       <PdfThumbnailGrid id="pdf-to-jpg-grid" label={t('tools.grid.pagesLabel')} cards={pdf.cards} selectedKeys={selectedKeys} onSelectionChange={setSelectedKeys} />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- PDF to grayscale (beta)
+
+// Every page drawn grey as a picture (drawPagePicture) and put together in pdfTools.worker.ts (`picture-pages`) with an invisible
+// text layer, so the text can still be selected and searched.
+export function PdfToGrayscale({ files, onResult }: ToolProps) {
+  const { t } = useT()
+  const pdf = useReadPdf(files)
+
+  async function makeGrayscale() {
+    const pdfDocument = pdf.pdfDocument
+    if (!pdfDocument) return
+    pdf.clearMessage()
+    const pageCount = pdfDocument.numPages
+    const pictures = []
+    try {
+      for (let pageIndex = 0; pageIndex < pageCount; pageIndex++) {
+        pdf.setProgress({ done: pageIndex, total: pageCount })
+        await nextFrame()
+        pictures.push(await drawPagePicture(pdfDocument, pageIndex, { isGrayscale: true }))
+      }
+      pdf.setProgress({ done: pageCount, total: pageCount })
+      const response = await runPdfTask({ type: 'picture-pages', pdf: null, pageCount, pictures })
+      if (response.status !== 'ok' || !response.pdf) throw new Error('The grey copy could not be made')
+      onResult(pdfResultFile(response.pdf, `${pdf.baseName}-grayscale.pdf`))
+    } catch {
+      pdf.showMessage('tools.pdfGrayscale.failed')
+    } finally {
+      pdf.setProgress(null)
+    }
+  }
+
+  return (
+    <div id="pdf-to-grayscale-tool" className="space-y-4">
+      <p className="text-center text-sm text-ink-soft">{t('tools.pdfGrayscale.hint')}</p>
+      <p id="pdf-to-grayscale-note" className="text-center text-sm text-ink-soft">{t('tools.pdfGrayscale.note')}</p>
+      <div className="flex justify-center">
+        <button id="pdf-to-grayscale-button" type="button" disabled={!pdf.pdfDocument || pdf.progress !== null} onClick={() => void makeGrayscale()} className="btn btn--primary press">
+          {pdf.progress ? t('tools.working') : t('tools.pdfGrayscale.button')}
+        </button>
+      </div>
+      {pdf.status}
+      <PdfThumbnailGrid id="pdf-to-grayscale-grid" label={t('tools.grid.pagesLabel')} cards={pdf.cards} />
     </div>
   )
 }

@@ -1,0 +1,83 @@
+{
+  "title": "PowerPoint Metadata – View and Remove PPTX Author Info",
+  "description": "See a PowerPoint file's author, company, dates and revision in your browser, then remove them in one click and download a clean copy. No upload.",
+  "heading": "View and remove PowerPoint metadata",
+  "subtitle": "See who wrote and last changed a PowerPoint presentation, and remove those details in one click; nothing is uploaded.",
+  "intro": "Check PPTX properties without PowerPoint: choose a presentation to see its title, subject, author, last modified by, created and modified dates, revision number, application and company. One click removes them, with any custom properties, and downloads a clean copy; the slides are not touched. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Every property shown",
+      "text": "Author, last modified by, company, dates, revision and more, before you share the file."
+    },
+    {
+      "title": "One-click clean copy",
+      "text": "Remove the properties, custom ones included, and download a copy with the slides unchanged."
+    }
+  ],
+  "stepsTitle": "How to remove metadata from PowerPoint",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
+    },
+    {
+      "title": "Check the properties",
+      "text": "See the title, subject, author, last modified by, dates, revision, application and company."
+    },
+    {
+      "title": "Remove and download",
+      "text": "Remove them in one click and download the clean copy."
+    }
+  ],
+  "handlesTitle": "What PowerPoint metadata handles",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
+    "Properties: title, subject, author, last modified by, created and modified dates, revision, application and company.",
+    "Custom properties, removed with the rest.",
+    "Result: a clean copy with the slides unchanged."
+  ],
+  "limits": [
+    "Names of the people who wrote comments are not removed.",
+    "Camera and location data inside the pictures on the slides is not changed.",
+    "Old .ppt files can't be read; save them as .pptx first."
+  ],
+  "faqTitle": "PowerPoint metadata: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I remove my name from a PowerPoint file?",
+      "answer": "In PowerPoint for Windows, Inspect Document (File, Info, Check for Issues) removes the author and other document properties. On this page, choose the file, check the properties and remove them in one click; the clean copy is made in your browser and the slides are not touched."
+    },
+    {
+      "question": "What does PowerPoint metadata show?",
+      "answer": "The title, subject, author, the person who last changed the file, the created and modified dates, the revision number, the application that saved it and the company."
+    },
+    {
+      "question": "Are names in comments removed?",
+      "answer": "No. The names of people who wrote comments stay in the file; only the document properties are removed."
+    },
+    {
+      "question": "Does it remove location data from the pictures?",
+      "answer": "No. Pictures on the slides keep their own camera and location data. To clean a photo, use Remove image metadata before you put it on a slide.",
+      "link": {
+        "text": "Remove image metadata",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "Are my slides changed?",
+      "answer": "No. Only the document properties are removed; every slide, note and picture stays as it was."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

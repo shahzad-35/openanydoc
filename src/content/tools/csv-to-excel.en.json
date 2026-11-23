@@ -69,7 +69,7 @@
     },
     {
       "question": "How many rows can the Excel file hold?",
-      "answer": "Excel shows up to 1,048,576 rows per sheet. A CSV with more rows converts, but Excel will not show the rows past that limit.",
+      "answer": "Excel shows up to 1,048,576 rows per sheet. A CSV with more rows converts, but Excel will not show the rows past that limit. For a CSV with more rows, see CSV too big for Excel.",
       "link": {
         "text": "CSV too big for Excel",
         "path": "/csv-too-big-for-excel"

@@ -1,0 +1,79 @@
+{
+  "title": "Translate Document – Word or Text in 39 Languages, On Device",
+  "description": "Translate a PDF, Word or text file into Arabic, English and 37 other languages with the AI built into Chrome, on your device. Download text or Word.",
+  "heading": "Translate a document on your device",
+  "subtitle": "Translate a PDF, Word or text file into 39 languages with desktop Chrome's built-in translator; nothing is uploaded.",
+  "intro": "Translate the text of a PDF, Word document or text file into another language without sending it anywhere. The document's language is detected, you choose the language to translate into (Arabic, English, French, Spanish, Hindi, Turkish and more), and the translator built into desktop Chrome does the work on your computer. Download the translation as plain text, Markdown or a Word document. To keep a PDF's page layout, English to Arabic and back, use Translate PDF instead, which works in any browser.",
+  "features": [
+    {
+      "title": "Runs on your device",
+      "text": "The translator built into Chrome works on your computer; the document is never sent to a server or a translation service."
+    },
+    {
+      "title": "39 languages",
+      "text": "Arabic, English, French, Spanish, German, Hindi, Turkish, Chinese and more, in any direction Chrome supports."
+    },
+    {
+      "title": "Text, Markdown or Word",
+      "text": "Download the translation as .txt, .md or a .docx document, right to left for Arabic and Hebrew."
+    }
+  ],
+  "stepsTitle": "How it works: translate a document on your device",
+  "steps": [
+    {
+      "title": "Choose a file",
+      "text": "Drop a PDF, Word, TXT or Markdown file, or try a sample. Its language is detected."
+    },
+    {
+      "title": "Choose the language",
+      "text": "Pick the language to translate into and click Translate. The first time, Chrome downloads the language pack and the page shows the progress."
+    },
+    {
+      "title": "Download",
+      "text": "Copy the translation or download it as text, Markdown or Word."
+    }
+  ],
+  "handlesTitle": "What Translate document handles",
+  "handles": [
+    "Files: PDF, Word (.docx, .dotx, .docm), TXT and Markdown.",
+    "Languages: the 39 that Chrome's translator supports, Arabic included; Urdu is not among them.",
+    "The text is translated line by line, so headings, lists and paragraphs stay in their order.",
+    "Downloads: plain text (.txt), Markdown (.md) and Word (.docx)."
+  ],
+  "limits": [
+    "Works only in a recent desktop Chrome with its on-device translator; not on phones or in other browsers.",
+    "The translation is of the text only: pictures, table layout and page design are not kept. Translate PDF keeps a PDF's layout for English and Arabic.",
+    "Machine translation can be wrong; have important documents checked by a person."
+  ],
+  "faqTitle": "Translate document: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. The file is read by your browser and translated by the translator built into Chrome on your own computer. Nothing is sent to a server or to a translation service, and nothing is saved on the site."
+    },
+    {
+      "question": "Which browsers can translate documents?",
+      "answer": "A recent desktop Chrome on Windows, macOS, Linux or ChromeOS. In other browsers and on phones the page tells you the feature isn't available and offers no upload instead."
+    },
+    {
+      "question": "Why doesn't it work on my phone?",
+      "answer": "Chrome's on-device translator is only on desktop computers for now. Open the page in Chrome on a computer."
+    },
+    {
+      "question": "Can it translate into Urdu?",
+      "answer": "No. Chrome's on-device translator does not include Urdu, so the page doesn't offer it. Arabic, Hindi and 37 other languages are available."
+    },
+    {
+      "question": "What is the difference from Translate PDF?",
+      "answer": "Translate PDF works in any browser and translates between English and Arabic with models loaded from this site, giving you a Word document that keeps the PDF's pages and layout, while this page uses the AI built into desktop Chrome to translate the text of a PDF, Word or text file between 39 languages.",
+      "link": {
+        "text": "Translate PDF",
+        "path": "/translate-pdf"
+      }
+    },
+    {
+      "question": "Why does the first translation take longer?",
+      "answer": "The first time you translate between two languages, Chrome downloads that language pack to your computer, and the page shows the progress. After that it starts at once."
+    }
+  ]
+}

@@ -1,0 +1,79 @@
+{
+  "title": "Excel Metadata Remover – See and Remove Author, Company",
+  "description": "See who created an Excel file, its company and dates, then remove them and download a clean copy with the cells untouched. Free, no upload.",
+  "heading": "View and remove Excel metadata",
+  "subtitle": "See and remove the author, company and dates stored in an Excel file before you share it; nothing is uploaded.",
+  "intro": "Check an Excel file's metadata before you send it: the title, subject, author, last modified by, created and modified dates, application, company and manager are shown. One click removes them, together with any custom properties, and downloads a clean copy. The cells are not touched. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "See what it holds",
+      "text": "Author, last modified by, company, manager, dates and more, shown before you share the file."
+    },
+    {
+      "title": "Cells untouched",
+      "text": "Only the file's properties are removed; the data in the sheets stays as it is."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is read by your own browser and never sent to a server, so nobody else sees it."
+    }
+  ],
+  "stepsTitle": "How to remove metadata from an Excel file",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Click Choose a file, or drop an Excel workbook on the page."
+    },
+    {
+      "title": "Check the properties",
+      "text": "See the title, author, company, dates and the other properties stored in the file."
+    },
+    {
+      "title": "Remove and download",
+      "text": "Click Remove and download a clean copy without them."
+    }
+  ],
+  "handlesTitle": "What Excel Metadata handles",
+  "handles": [
+    "Title, subject, author and last modified by.",
+    "Created and modified dates.",
+    "Application, company and manager.",
+    "Custom properties, removed with the rest."
+  ],
+  "limits": [
+    "Names in comments and notes are not removed.",
+    "The cells are not changed, so a name typed into a cell stays there.",
+    "Your original file is not changed; the clean copy is a new download."
+  ],
+  "faqTitle": "Excel metadata: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I remove the author name from an Excel file?",
+      "answer": "The author's name is stored in the file's properties, not in the cells, so it has to be removed from the properties. In Excel, Inspect Document under File, Info and Check for Issues can remove it, and LibreOffice Calc shows them under File, Properties. On this page, open the file, check what it holds and click Remove to download a clean copy."
+    },
+    {
+      "question": "What metadata is shown?",
+      "answer": "The title, subject, author, last modified by, created and modified dates, application, company and manager."
+    },
+    {
+      "question": "Are the cells changed?",
+      "answer": "No. Only the properties are removed; the sheets, values and formulas stay as they are."
+    },
+    {
+      "question": "Are names in comments removed?",
+      "answer": "No. Names in comments and notes are not removed. Check them in your spreadsheet app before you share the file."
+    },
+    {
+      "question": "Are custom properties removed too?",
+      "answer": "Yes. Custom properties are removed with the others in the same click."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

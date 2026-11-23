@@ -1,0 +1,75 @@
+{
+  "title": "Word Counter – Count Words in Text or a DOCX File Free",
+  "description": "Count words, characters, sentences and paragraphs in pasted text or a Word file, with reading and speaking time. Arabic counted right. No upload.",
+  "heading": "Word counter",
+  "subtitle": "Paste text or open a Word file to see its words, characters, sentences and reading time at once; nothing is uploaded.",
+  "intro": "Count words online in an essay, an article or a whole Word document: paste text, or choose a .docx, .odt or .txt file, and see the words, characters with and without spaces, paragraphs, sentences and estimated pages. Words are split by each language's own rules, not only at spaces, so Arabic is counted correctly. Reading time assumes about 200 words a minute and speaking time about 130. Everything is counted in your browser and nothing is downloaded or uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your text is counted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Arabic counted right",
+      "text": "Words are split by each language's rules, not only at spaces, so Arabic counts are correct."
+    },
+    {
+      "title": "Reading and speaking time",
+      "text": "See how long the text takes to read and to say aloud, for talks and videos."
+    }
+  ],
+  "stepsTitle": "How to count the words in a document",
+  "steps": [
+    {
+      "title": "Paste or choose",
+      "text": "Paste your text in the box, or choose a .docx, .odt or .txt file."
+    },
+    {
+      "title": "Read the counts",
+      "text": "Words, characters, paragraphs, sentences, pages and times appear at once."
+    },
+    {
+      "title": "Edit and recount",
+      "text": "Change the text in the box and the counts follow."
+    }
+  ],
+  "handlesTitle": "What Word Counter handles",
+  "handles": [
+    "Input: pasted text, or .docx, .odt and .txt files.",
+    "Counts: words, characters with and without spaces, paragraphs, sentences and estimated pages.",
+    "Times: reading time at about 200 words a minute, speaking time at about 130.",
+    "Languages: Arabic, English and others, split by each language's rules."
+  ],
+  "limits": [
+    "Only the document's body text is counted: text boxes and footnotes may not be included.",
+    "Pages and times are estimates; a real page count depends on fonts, margins and pictures.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "faqTitle": "Word counter: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I count the words in a Word document?",
+      "answer": "Word shows a document's word count in its status bar, and LibreOffice and Google Docs also have a word count. On this page, choose the .docx, .odt or .txt file, or paste the text, and the words, characters, sentences, pages and reading time appear at once, counted in your browser."
+    },
+    {
+      "question": "Are Arabic words counted correctly?",
+      "answer": "Yes. Words are split by each language's own rules, not only at spaces, so Arabic text is counted as Arabic readers count it."
+    },
+    {
+      "question": "Why is my count different from Word's?",
+      "answer": "Only the body text is counted here: text in text boxes and footnotes may not be included, and words are split by language rules, so totals can differ slightly from Word's."
+    },
+    {
+      "question": "How is reading time worked out?",
+      "answer": "Reading time assumes about 200 words a minute and speaking time about 130, so both are estimates."
+    },
+    {
+      "question": "Is anything saved or downloaded?",
+      "answer": "No. The counts are shown on the page only; nothing is downloaded and nothing is kept."
+    }
+  ]
+}

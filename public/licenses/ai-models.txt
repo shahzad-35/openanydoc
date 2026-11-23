@@ -1,4 +1,4 @@
-On-device models and runtimes used by OpenAnyDoc's OCR PDF, Translate PDF, Blur faces, Remove background and Upscale image tools. Each is a file of
+On-device models and runtimes used by OpenAnyDoc's OCR PDF, Image to text, Translate PDF, Blur faces, Remove background and Upscale image tools. Each is a file of
 this site, read by the browser on first use; pictures and documents never leave the device.
 
 Runtimes

@@ -1,0 +1,104 @@
+{
+  "title": "Text to PDF – Convert TXT Files to PDF Free, No Upload",
+  "description": "Turn plain text or a .txt file into PDF pages in your browser: every line kept, Arabic right to left, text you can search. Free, no upload.",
+  "heading": "Text to PDF",
+  "subtitle": "Paste text or open a .txt file and download it as A4 or Letter PDF pages, line for line; nothing is uploaded.",
+  "intro": "Convert TXT to PDF: type or paste text, or open a .txt file, and every line is laid out on A4 or Letter pages with 0.75-inch margins, blank lines included. Each line keeps its own direction, so Arabic reads right to left and English left to right. Pages are cut between lines, so no line is split, and each page carries its text, so the PDF can be selected, searched and copied, Arabic included. The text is converted in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your text is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Every line kept",
+      "text": "Each line of your text is a line on the page, blank lines included, in its own direction."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "The pages carry their text, so it can be selected, searched and copied in any PDF reader."
+    }
+  ],
+  "stepsTitle": "How to convert text to PDF",
+  "steps": [
+    {
+      "title": "Paste or open your text",
+      "text": "Type or paste text into the box, or choose or drop a .txt file to fill it."
+    },
+    {
+      "title": "Choose the page size",
+      "text": "Pick A4 or Letter."
+    },
+    {
+      "title": "Convert",
+      "text": "Click the convert button to lay out the pages."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the first pages; download the PDF."
+    }
+  ],
+  "handlesTitle": "What Text to PDF handles",
+  "handles": [
+    "Files: .txt, or text you type or paste.",
+    "Every line, blank lines included, on A4 or Letter pages.",
+    "Arabic and English lines, each in its own direction.",
+    "Long texts: cut into pages between lines."
+  ],
+  "limits": [
+    "Pages are pictures at 200 dpi with their text laid over them: the text can be selected and searched, but zooming in far is less sharp than type.",
+    "No formatting is guessed: lines that look like headings or lists stay plain lines. For formatting, write Markdown and use Markdown to PDF.",
+    "Links are not clickable, and the pages have no page numbers.",
+    "Files up to 10 MB are opened; a larger file shows a message instead."
+  ],
+  "worksBest": [
+    "Notes and drafts to print",
+    "Text copied from an email or chat",
+    "Lists and logs to share",
+    "Arabic and mixed-language text"
+  ],
+  "mayNotKeep": [
+    "Columns lined up with spaces",
+    "Headings and lists (they stay plain lines)",
+    "Clickable links",
+    "Page numbers"
+  ],
+  "faqTitle": "Text to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert a text file to PDF?",
+      "answer": "On a computer, open the .txt file in Notepad or TextEdit and print it, choosing Save as PDF (Microsoft Print to PDF on Windows) as the printer. In OpenAnyDoc, paste the text or open the .txt file, choose A4 or Letter, click convert and download the PDF with every line kept; the text is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Does Arabic text come out right to left?",
+      "answer": "Yes. Each line is set in its own direction, and the text in the PDF can be selected, searched and copied, Arabic included."
+    },
+    {
+      "question": "What happens to very long lines?",
+      "answer": "They wrap onto the next line inside the margins, and pages are cut between lines, so no line is split across two pages."
+    },
+    {
+      "question": "Can I add page numbers?",
+      "answer": "Not on this page; the PDF has none. You can add them afterwards with the site's PDF tools, or join several PDFs into one with Merge PDF.",
+      "link": {
+        "text": "Merge PDF",
+        "path": "/merge-pdf"
+      }
+    },
+    {
+      "question": "I only want to read a text file. Do I need a PDF?",
+      "answer": "No. The TXT viewer opens a .txt file in your browser so you can read and search it, without making a PDF.",
+      "link": {
+        "text": "TXT viewer",
+        "path": "/txt-viewer"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

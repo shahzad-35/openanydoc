@@ -1,0 +1,98 @@
+{
+  "title": "Text to Word – Convert TXT to DOCX in Your Browser, Free",
+  "description": "Turn plain text or a .txt file into a Word document in your browser: every line kept, Arabic set right to left. Free, and nothing is uploaded.",
+  "heading": "Text to Word",
+  "subtitle": "Paste text or open a .txt file and download it as a Word document, line for line; nothing is uploaded.",
+  "intro": "Convert TXT to DOCX: type or paste text, or open a .txt file, and every line becomes a line in a Word document, blank lines included. Each line keeps its own direction, so Arabic reads right to left and English left to right in the same document. The document uses Word's default Calibri 11 and opens in Word, LibreOffice, Google Docs and Pages, ready to format. The text is converted in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your text is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Every line kept",
+      "text": "Each line of your text is a line in the document, and blank lines stay where they were."
+    },
+    {
+      "title": "Arabic and English",
+      "text": "Each line is set in its own direction, so mixed Arabic and English text reads correctly."
+    }
+  ],
+  "stepsTitle": "How to convert text to Word",
+  "steps": [
+    {
+      "title": "Paste or open your text",
+      "text": "Type or paste text into the box, or choose or drop a .txt file to fill it."
+    },
+    {
+      "title": "Convert",
+      "text": "Click the convert button to make the Word document."
+    },
+    {
+      "title": "Download",
+      "text": "Download the .docx file and format it in Word, LibreOffice, Google Docs or Pages."
+    }
+  ],
+  "handlesTitle": "What Text to Word handles",
+  "handles": [
+    "Files: .txt, or text you type or paste.",
+    "Every line, blank lines included.",
+    "Arabic and English lines, each in its own direction."
+  ],
+  "limits": [
+    "No formatting is guessed: lines that look like headings or lists stay plain lines. For headings and lists, write Markdown and use Markdown to Word.",
+    "Columns lined up with spaces or tabs may not line up in the document, because Calibri letters are not all the same width.",
+    "The document uses Calibri 11; change the font and size in Word afterwards.",
+    "Files up to 10 MB are opened; a larger file shows a message instead."
+  ],
+  "worksBest": [
+    "Notes and drafts",
+    "Text copied from an email or chat",
+    "Lists and logs to share or print",
+    "Arabic and mixed-language text"
+  ],
+  "mayNotKeep": [
+    "Columns lined up with spaces",
+    "Headings and lists (they stay plain lines)",
+    "Your text editor's font"
+  ],
+  "faqTitle": "Text to Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert a text file to Word?",
+      "answer": "Word, LibreOffice and Google Docs can each open a .txt file and save it as .docx. In OpenAnyDoc, paste the text or open the .txt file, click convert and download the .docx with every line kept and each line in its own direction; the text is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Does Arabic text come out right to left?",
+      "answer": "Yes. Each line is set in its own direction, so Arabic lines read right to left and English lines left to right, even in the same document."
+    },
+    {
+      "question": "Will lines that look like headings be formatted?",
+      "answer": "No. Every line stays a plain line in Calibri 11. If you want real headings, lists and tables, write the text as Markdown and use Markdown to Word.",
+      "link": {
+        "text": "Markdown to Word",
+        "path": "/markdown-to-word"
+      }
+    },
+    {
+      "question": "Are blank lines kept?",
+      "answer": "Yes. Every line of your text, blank ones included, is a line in the document."
+    },
+    {
+      "question": "Can I make a PDF instead?",
+      "answer": "Yes. Text to PDF lays the same lines out on A4 or Letter pages with text you can search.",
+      "link": {
+        "text": "Text to PDF",
+        "path": "/text-to-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

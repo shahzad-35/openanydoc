@@ -3,7 +3,7 @@
   "description": "Translate a PDF between English and Arabic in your browser and get an editable Word document, headings and pictures kept. Free, nothing is uploaded.",
   "heading": "Translate PDF",
   "subtitle": "Translate a PDF from English to Arabic or Arabic to English into an editable Word document; nothing is uploaded.",
-  "intro": "Translate a PDF online without sending it anywhere: the text is read from each page, translated on your device by the same English–Arabic language models Firefox uses, and written into a Word document you can edit. Headings, lists and pictures stay where they were, and Arabic comes out right to left. Machine translation makes mistakes, so the result is a Word file you can fix, not a locked PDF. Your file never leaves your device.",
+  "intro": "Translate a PDF online without sending it anywhere: the text is read from each page, translated on your device by an English–Arabic translation model that runs in your browser, and written into a Word document you can edit. Headings, lists and pictures stay where they were, and Arabic comes out right to left. Machine translation makes mistakes, so the result is a Word file you can fix, not a locked PDF. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -49,7 +49,7 @@
     "The first translation loads the language model (about 25 MB) from this site; after that it works offline.",
     "The layout is close, not exact: drawn shapes, colours and backgrounds are left out, and tables come out as lines with tab stops.",
     "Scanned PDFs hold pictures of pages, so make them searchable with OCR PDF first.",
-    "Only English and Arabic for now."
+    "English and Arabic only."
   ],
   "faqTitle": "Translate PDF: questions",
   "faq": [
@@ -59,7 +59,7 @@
     },
     {
       "question": "How good is the translation?",
-      "answer": "It is machine translation by the same English–Arabic models Firefox uses for its built-in translation. It gets the meaning of most sentences across but makes mistakes with names, terms and very short lines, which is why the result is an editable Word document."
+      "answer": "It is machine translation by an English–Arabic model that runs on your device. It gets the meaning of most sentences across but makes mistakes with names, terms and very short lines, which is why the result is an editable Word document."
     },
     {
       "question": "Why is the result a Word document and not a PDF?",
@@ -83,7 +83,11 @@
     },
     {
       "question": "Which languages can it translate?",
-      "answer": "English to Arabic and Arabic to English. Other languages may come later."
+      "answer": "English to Arabic and Arabic to English. Translate document is the other choice: this page works in any browser, translates between English and Arabic with models loaded from this site and gives you a Word document, while Translate document uses the AI built into desktop Chrome to translate the text of a PDF, Word or text file between 39 languages.",
+      "link": {
+        "text": "Translate document",
+        "path": "/translate-document"
+      }
     },
     {
       "question": "Is it really free?",

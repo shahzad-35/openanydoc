@@ -44,7 +44,19 @@
     "Charts, pictures and conditional formatting are not drawn.",
     "Excel's own print settings (print area, page breaks, repeated titles) are not read; sheets are fitted to the page width instead.",
     "Formulas show the value saved in the file.",
-    "Colours and borders are read from .xlsx and .xlsm files only; other formats keep their values and layout."
+    "Colours and borders are read from .xlsx and .xlsm files only; other formats keep their values and layout.",
+    "Pages are pictures at 200 dpi with their text laid over them: the text can be selected and searched, but zooming in far is less sharp than type."
+  ],
+  "worksBest": [
+    "Price lists, invoices and reports",
+    "Sheets with merged cells, colours and borders",
+    "Arabic sheets, right to left"
+  ],
+  "mayNotKeep": [
+    "Charts and pictures in the sheet",
+    "Conditional formatting",
+    "Print areas and page breaks set in Excel",
+    "Formulas (their saved values are shown)"
   ],
   "faqTitle": "Excel to PDF: questions",
   "faq": [
@@ -62,11 +74,11 @@
     },
     {
       "question": "Can I convert only one sheet?",
-      "answer": "Yes. Choose The first sheet only, or hide the other sheets in the file before converting."
+      "answer": "Yes. Choose that sheet by its name in the Sheets list; hidden sheets are never converted."
     },
     {
       "question": "Are charts included?",
-      "answer": "Not yet. Charts and pictures in the sheet are not drawn; the cells are."
+      "answer": "No. Charts and pictures in the sheet are not drawn; only the cells are."
     },
     {
       "question": "Is it really free?",

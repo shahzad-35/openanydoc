@@ -1,0 +1,79 @@
+{
+  "title": "Extract Images from Word – Save All DOCX Pictures in a ZIP",
+  "description": "Save every picture in a Word document at its original quality and format, JPG, PNG, GIF and more, in one ZIP, in your browser. Free, no upload.",
+  "heading": "Extract images from Word",
+  "subtitle": "Save every picture in a Word document at its original quality, all in one ZIP; nothing is uploaded.",
+  "intro": "Extract images from a DOCX file without opening Word: every picture stored in the document is saved as a file of its own, in its original format (JPG, PNG, GIF, EMF and others) and at its original quality, because nothing is re-compressed. They come in one ZIP. The file is read in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is read by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Original quality",
+      "text": "Pictures are saved exactly as they are stored; nothing is re-compressed."
+    },
+    {
+      "title": "All at once",
+      "text": "Every picture in the document comes in one ZIP."
+    }
+  ],
+  "stepsTitle": "How to extract images from a Word document",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx file on the page."
+    },
+    {
+      "title": "Check the pictures",
+      "text": "See the pictures found in the document."
+    },
+    {
+      "title": "Download",
+      "text": "Download the ZIP with every picture."
+    }
+  ],
+  "handlesTitle": "What Extract images handles",
+  "handles": [
+    "Files: .docx documents (Word 2007 and later).",
+    "Pictures: every picture stored in the document.",
+    "Formats: kept as stored, such as JPG, PNG, GIF and EMF.",
+    "Result: one ZIP; nothing re-compressed."
+  ],
+  "limits": [
+    "Pictures linked from the web are not stored in the file, so they can't be extracted.",
+    "Charts and SmartArt are drawings, not pictures, so they are not saved as image files.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "faqTitle": "Extract images from Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I extract images from a Word document?",
+      "answer": "A Word document keeps each picture as a separate file inside it, so the pictures can be saved at their original quality; in Word you can also save them one at a time from the picture's right-click menu. On this page, choose the .docx and download every picture in one ZIP, read in your browser."
+    },
+    {
+      "question": "Are the pictures compressed?",
+      "answer": "No. Each picture is saved exactly as it is stored in the document, in its original format and quality."
+    },
+    {
+      "question": "Why is a picture missing?",
+      "answer": "Pictures linked from the web are not stored in the file, so there is nothing to extract. Charts and SmartArt are drawings, not pictures, and are not saved either."
+    },
+    {
+      "question": "Which formats come out?",
+      "answer": "The ones stored in the document: usually JPG and PNG, sometimes GIF or EMF."
+    },
+    {
+      "question": "Can I see the document first?",
+      "answer": "Yes. Open it in the Word viewer to see where each picture sits.",
+      "link": {
+        "text": "Word viewer",
+        "path": "/word-viewer"
+      }
+    }
+  ]
+}

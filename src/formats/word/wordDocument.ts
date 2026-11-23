@@ -154,11 +154,19 @@ export async function prepareOpenDocument(fileContents: ArrayBuffer) {
 
 // Parses an HTML string made from the file. The file is not trusted: scripts, frames, event attributes and addresses of any
 // scheme but web, mail, phone, data: pictures and blob: are dropped. Inline styles are renamed before parsing (a style attribute is
-// refused by the CSP even in a DOMParser document) to data-inline-style. Every block reads its own direction.
-function parseUntrustedDocumentHtml(html: string) {
+// refused by the CSP even in a DOMParser document) to data-inline-style. Every block reads its own direction. With
+// `hasOnlyDataPictures` (HTML a visitor pasted), every picture or media not written into the text itself is dropped before the
+// document is imported, so nothing is requested.
+function parseUntrustedDocumentHtml(html: string, hasOnlyDataPictures: boolean) {
   // Attribute values are escaped in the HTML (a quote inside is &quot;), so ' style="' only ever starts an attribute.
   const parsed = new DOMParser().parseFromString(html.replace(/(<[^>]*?\s)style="/g, '$1data-inline-style="'), 'text/html')
   parsed.querySelectorAll('script, iframe, object, embed, link, meta, style, base, form').forEach((element) => element.remove())
+  if (hasOnlyDataPictures) {
+    parsed.querySelectorAll('video, audio, source, track, image, use').forEach((element) => element.remove())
+    parsed.querySelectorAll('img').forEach((image) => !/^\s*data:image\//i.test(image.getAttribute('src') ?? '') && image.remove())
+    parsed.querySelectorAll('[srcset]').forEach((element) => element.removeAttribute('srcset'))
+    parsed.querySelectorAll('[data-inline-style*="url("]').forEach((element) => element.removeAttribute('data-inline-style'))
+  }
   for (const element of Array.from(parsed.body.querySelectorAll('*'))) {
     for (const attribute of Array.from(element.attributes)) {
       const name = attribute.name.toLowerCase()
@@ -173,8 +181,8 @@ function parseUntrustedDocumentHtml(html: string) {
 
 // Puts an HTML string made from the file into the page: cleaned, links open in a new tab, headings get data-heading-level, and
 // inline styles are set through CSSOM.
-export function insertDocumentHtml(container: HTMLElement, html: string) {
-  const parsed = parseUntrustedDocumentHtml(html)
+export function insertDocumentHtml(container: HTMLElement, html: string, hasOnlyDataPictures = false) {
+  const parsed = parseUntrustedDocumentHtml(html, hasOnlyDataPictures)
   for (const element of Array.from(parsed.body.querySelectorAll('*'))) {
     if (element instanceof HTMLAnchorElement) {
       element.target = '_blank'
@@ -226,7 +234,7 @@ export async function exportDocument(kind: ExportKind, fileName: string, fileCon
     return { name: `${baseName(fileName)}.md`, blob: new Blob([markdown], { type: 'text/markdown;charset=utf-8' }) }
   }
   // The exported page is cleaned like the viewer's and has its own CSP, since it is opened outside this site.
-  const bodyHtml = parseUntrustedDocumentHtml(await readFlowingHtml(fileName, fileContents)).body.innerHTML.replace(/(<[^>]*?\s)data-inline-style="/g, '$1style="')
+  const bodyHtml = parseUntrustedDocumentHtml(await readFlowingHtml(fileName, fileContents), false).body.innerHTML.replace(/(<[^>]*?\s)data-inline-style="/g, '$1style="')
   const title = facts.properties.title || baseName(fileName)
   const escapedTitle = title.replace(/[&<>"]/g, (character) => `&#${character.charCodeAt(0)};`)
   const page = `<!doctype html>\n<html>\n<head>\n<meta charset="utf-8">\n<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'">\n<meta name="viewport" content="width=device-width, initial-scale=1">\n<title>${escapedTitle}</title>\n<style>body{max-width:46rem;margin:2rem auto;padding:0 1rem;font:16px/1.6 system-ui,sans-serif}img{max-width:100%;height:auto}table{border-collapse:collapse}td,th{border:1px solid #ccc;padding:4px 8px}</style>\n</head>\n<body>\n${bodyHtml}\n</body>\n</html>\n`

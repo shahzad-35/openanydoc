@@ -1,7 +1,7 @@
 // PDF to Word, PDF to Excel, PDF to PowerPoint and Translate PDF: each page is read with pdf.js as lines of text (position, size, bold, italic,
 // direction, and the gaps that split a line into columns) and pictures (where they sit), then written as editable content with
 // docx (MIT), ExcelJS (MIT) or pptxgenjs (MIT), each loaded only here. The layout is close, not exact: drawn shapes, colours and
-// backgrounds are left out, as the pages say.
+// backgrounds are left out, as the pages say. PDF to PowerPoint's default instead puts each page on its slide as a picture.
 import { useEffect, useState } from 'react'
 import type { ReactNode } from 'react'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
@@ -160,6 +160,8 @@ function groupIntoBlocks(pages: PageLayout[]) {
 
 // ---------------------------------------------------------------- the page shared by the three tools
 
+type WrittenFile = { bytes: BlobPart; extension: string; type: string }
+
 function useOfficeConversion(files: File[], onResult: ToolProps['onResult']) {
   const { t } = useT()
   const file = files[0]
@@ -169,13 +171,28 @@ function useOfficeConversion(files: File[], onResult: ToolProps['onResult']) {
   const [message, setMessage] = useState<{ file: File; key: MessageKey } | null>(null)
   const cards: GridCard[] = pdfDocument ? Array.from({ length: pdfDocument.numPages }, (_, pageIndex) => ({ key: `page-${pageIndex}`, caption: String(pageIndex + 1), document: pdfDocument, pageIndex })) : []
 
-  async function convert(writeFile: (pages: PageLayout[], showProgress: (done: number, total: number) => void) => Promise<{ bytes: BlobPart; extension: string; type: string }>, failedKey: MessageKey = 'tools.office.failed') {
+  const showPageProgress = (done: number, total: number) => setProgress({ done, total, labelKey: 'tools.progress.pages' })
+
+  // Writes the file from the opened PDF and hands it over; `writeFile` returns null when it has shown its own message.
+  async function writeResult(writeFile: (pdfDocument: PDFDocumentProxy) => Promise<WrittenFile | null>, failedKey: MessageKey) {
     if (!pdfDocument) return
     setMessage(null)
-    const pages: PageLayout[] = []
     try {
+      const written = await writeFile(pdfDocument)
+      if (written) onResult(new File([written.bytes], `${baseNameOf(file.name)}.${written.extension}`, { type: written.type }))
+    } catch {
+      setMessage({ file, key: failedKey })
+    } finally {
+      setProgress(null)
+    }
+  }
+
+  // Reads every page's text and pictures (readPageLayout) and writes the file from them.
+  function convert(writeFile: (pages: PageLayout[], showProgress: (done: number, total: number) => void) => Promise<WrittenFile>, failedKey: MessageKey = 'tools.office.failed') {
+    return writeResult(async (pdfDocument) => {
+      const pages: PageLayout[] = []
       for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
-        setProgress({ done: pageNumber - 1, total: pdfDocument.numPages, labelKey: 'tools.progress.pages' })
+        showPageProgress(pageNumber - 1, pdfDocument.numPages)
         await nextFrame()
         const page = await pdfDocument.getPage(pageNumber)
         pages.push(await readPageLayout(page))
@@ -183,16 +200,11 @@ function useOfficeConversion(files: File[], onResult: ToolProps['onResult']) {
       }
       if (pages.every((page) => page.lines.length === 0)) {
         setMessage({ file, key: 'tools.text.noText' })
-        return
+        return null
       }
-      setProgress({ done: pdfDocument.numPages, total: pdfDocument.numPages, labelKey: 'tools.progress.pages' })
-      const written = await writeFile(pages, (done, total) => setProgress({ done, total, labelKey: 'tools.translate.progress' }))
-      onResult(new File([written.bytes], `${baseNameOf(file.name)}.${written.extension}`, { type: written.type }))
-    } catch {
-      setMessage({ file, key: failedKey })
-    } finally {
-      setProgress(null)
-    }
+      showPageProgress(pdfDocument.numPages, pdfDocument.numPages)
+      return writeFile(pages, (done, total) => setProgress({ done, total, labelKey: 'tools.translate.progress' }))
+    }, failedKey)
   }
 
   const status = (
@@ -203,7 +215,7 @@ function useOfficeConversion(files: File[], onResult: ToolProps['onResult']) {
       <Notice id="tool-error" kind="error" role="alert" className="text-center font-medium text-danger" message={message?.file === file ? t(message.key) : ''} />
     </>
   )
-  return { pdfDocument, isReady: pdfDocument !== null && progress === null, isWorking: progress !== null, cards, convert, status }
+  return { pdfDocument, isReady: pdfDocument !== null && progress === null, isWorking: progress !== null, cards, convert, writeResult, showPageProgress, status }
 }
 
 function OfficeToolPage({ idPrefix, hintKey, buttonKey, conversion, options }: { idPrefix: string; hintKey: MessageKey; buttonKey: MessageKey; conversion: ReturnType<typeof useOfficeConversion> & { run: () => void }; options?: ReactNode }) {
@@ -478,10 +490,66 @@ async function writePresentation(pages: PageLayout[]) {
       })
     }
   }
-  return { bytes: (await presentation.write({ outputType: 'arraybuffer' })) as ArrayBuffer, extension: 'pptx', type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }
+  return savePresentation(presentation)
 }
 
+async function savePresentation(presentation: InstanceType<typeof import('pptxgenjs').default>): Promise<WrittenFile> {
+  const { removeTypesOfMissingParts } = await import('../office/officePackage')
+  return { bytes: await removeTypesOfMissingParts((await presentation.write({ outputType: 'arraybuffer' })) as ArrayBuffer), extension: 'pptx', type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' }
+}
+
+// Pages drawn at 200 dpi, at most 2000 pixels on the long side.
+const SLIDE_PICTURE_DPI = 200
+const LONGEST_SLIDE_PICTURE_PX = 2000
+
+// One slide per page, the size of the first page, each page drawn by pdf.js as a JPEG filling the slide: it looks exactly like
+// the PDF, but nothing on it can be edited. A page of another shape is fitted inside the slide and centred.
+async function writePicturePresentation(pdfDocument: PDFDocumentProxy, showProgress: (done: number, total: number) => void) {
+  const { default: PptxGenJS } = await import('pptxgenjs')
+  const presentation = new PptxGenJS()
+  const inches = (points: number) => points / POINTS_PER_INCH
+  const firstPageSize = (await pdfDocument.getPage(1)).getViewport({ scale: 1 })
+  presentation.defineLayout({ name: 'PDF', width: inches(firstPageSize.width), height: inches(firstPageSize.height) })
+  presentation.layout = 'PDF'
+  for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
+    showProgress(pageNumber - 1, pdfDocument.numPages)
+    await nextFrame()
+    const page = await pdfDocument.getPage(pageNumber)
+    const pageSize = page.getViewport({ scale: 1 })
+    const viewport = page.getViewport({ scale: Math.min(SLIDE_PICTURE_DPI / POINTS_PER_INCH, LONGEST_SLIDE_PICTURE_PX / Math.max(pageSize.width, pageSize.height)) })
+    const canvas = document.createElement('canvas')
+    canvas.width = Math.floor(viewport.width)
+    canvas.height = Math.floor(viewport.height)
+    await page.render({ canvas, viewport, background: '#ffffff' }).promise
+    const jpeg = await canvasToBytes(canvas, 'image/jpeg', 0.92)
+    canvas.width = 0
+    page.cleanup()
+    const fitScale = Math.min(firstPageSize.width / pageSize.width, firstPageSize.height / pageSize.height)
+    const [width, height] = [pageSize.width * fitScale, pageSize.height * fitScale]
+    const base64 = btoa(Array.from(new Uint8Array(jpeg), (byte) => String.fromCharCode(byte)).join(''))
+    presentation.addSlide().addImage({ data: `image/jpeg;base64,${base64}`, x: inches((firstPageSize.width - width) / 2), y: inches((firstPageSize.height - height) / 2), w: inches(width), h: inches(height) })
+  }
+  showProgress(pdfDocument.numPages, pdfDocument.numPages)
+  return savePresentation(presentation)
+}
+
+type SlidesMode = 'pictures' | 'editable'
+
 export function PdfToPowerPoint({ files, onResult }: ToolProps) {
+  const { t } = useT()
   const conversion = useOfficeConversion(files, onResult)
-  return <OfficeToolPage idPrefix="pdf-to-powerpoint" hintKey="tools.office.powerpointHint" buttonKey="tools.office.powerpointButton" conversion={{ ...conversion, run: () => void conversion.convert(writePresentation) }} />
+  const [slidesMode, setSlidesMode] = useState<SlidesMode>('pictures')
+  const options = (
+    <div className="flex justify-center">
+      <label className="flex flex-col gap-1 text-sm font-medium">
+        {t('tools.office.slidesMode')}
+        <select id="pdf-to-powerpoint-mode-select" value={slidesMode} onChange={(event) => setSlidesMode(event.target.value as SlidesMode)} className={fieldClass}>
+          <option value="pictures">{t('tools.office.slidesModePictures')}</option>
+          <option value="editable">{t('tools.office.slidesModeEditable')}</option>
+        </select>
+      </label>
+    </div>
+  )
+  const run = () => void (slidesMode === 'pictures' ? conversion.writeResult((pdfDocument) => writePicturePresentation(pdfDocument, conversion.showPageProgress), 'tools.office.failed') : conversion.convert(writePresentation))
+  return <OfficeToolPage idPrefix="pdf-to-powerpoint" hintKey={slidesMode === 'pictures' ? 'tools.office.powerpointPicturesHint' : 'tools.office.powerpointHint'} buttonKey="tools.office.powerpointButton" conversion={{ ...conversion, run }} options={options} />
 }

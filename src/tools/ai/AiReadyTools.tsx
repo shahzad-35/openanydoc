@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { useT } from '../../i18n'
+import { translate, useT } from '../../i18n'
 import { downloadTextFile } from '../../formats/registry'
 import { findViewerForFileName } from '../../viewers'
 import type { ToolProps } from '../registry'
@@ -109,7 +109,7 @@ export function PptxToMarkdown(props: ToolProps) {
 
 // A file's text the way the AI-ready pages make it: a PDF as Markdown, a Word document's text, a deck's outline with speaker
 // notes, every sheet of a workbook or a CSV as a Markdown table, anything else as its text.
-async function readFileAsText(file: File, labels: { slide: string; notes: string; sheet: string }, locale: 'en' | 'ar') {
+export async function readFileAsText(file: File, labels: { slide: string; notes: string; sheet: string }, locale: 'en' | 'ar') {
   const viewerId = findViewerForFileName(file.name)?.id
   if (viewerId === 'pdf') return (await import('../pdf/PdfExtractTools')).readPdfAsMarkdown(await file.arrayBuffer())
   if (viewerId === 'word') return (await (await import('mammoth')).extractRawText({ arrayBuffer: await file.arrayBuffer() })).value
@@ -133,17 +133,17 @@ export function TokenCounter({ files }: ToolProps) {
   useEffect(() => {
     if (!chosenFile) return
     let isCurrent = true
-    readFileAsText(chosenFile, { slide: t('powerpoint.export.slideLabel'), notes: t('powerpoint.notes.label'), sheet: t('aiReady.sheet') }, locale)
+    readFileAsText(chosenFile, { slide: translate(locale, 'powerpoint.export.slideLabel'), notes: translate(locale, 'powerpoint.notes.label'), sheet: translate(locale, 'aiReady.sheet') }, locale)
       .then((fileText) => {
         if (!isCurrent) return
-        setReadError(fileText.trim() === '' ? t('aiReady.noText') : '')
+        setReadError(fileText.trim() === '' ? translate(locale, 'aiReady.noText') : '')
         setText(fileText)
       })
-      .catch(() => isCurrent && setReadError(t('aiReady.unreadable')))
+      .catch(() => isCurrent && setReadError(translate(locale, 'aiReady.unreadable')))
     return () => {
       isCurrent = false
     }
-  }, [chosenFile, locale, t])
+  }, [chosenFile, locale])
 
   // Counted a moment after typing stops, so a long paste is counted once.
   useEffect(() => {

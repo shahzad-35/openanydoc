@@ -1,0 +1,100 @@
+{
+  "title": "HTML to Word – Turn HTML into an Editable DOCX Online",
+  "description": "Convert an HTML file or pasted HTML to a Word document in your browser: headings, lists, tables and links become Word's own. Free, no upload.",
+  "heading": "HTML to Word",
+  "subtitle": "Paste HTML or open an .html file and download a clean, editable Word document; nothing is uploaded.",
+  "intro": "Turn HTML into a DOCX you can edit: paste HTML or open an .html or .htm file, and its headings, paragraphs, lists, tables (merged cells included), links, bold, italic, underline, strikethrough, code and quotes become Word's own formatting. The HTML is cleaned first: scripts, frames, forms, style sheets and event handlers are removed. Headings become Word's Heading 1 to 6, so the navigation pane works, and Arabic paragraphs are set right to left. The page never opens a web address: paste the HTML itself or save the page as a file first. Everything runs in your browser and nothing is uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your HTML is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Cleaned first",
+      "text": "Scripts, frames, forms, style sheets and event handlers are removed before the document is made."
+    },
+    {
+      "title": "Word's own formatting",
+      "text": "Headings, lists with levels, tables with merged cells and clickable links become Word's own, ready to edit."
+    }
+  ],
+  "stepsTitle": "How to convert HTML to Word",
+  "steps": [
+    {
+      "title": "Paste or open your HTML",
+      "text": "Paste HTML into the box, or choose or drop an .html or .htm file to fill it."
+    },
+    {
+      "title": "Convert",
+      "text": "Click the convert button to make the Word document."
+    },
+    {
+      "title": "Download",
+      "text": "Download the .docx file and edit it in Word, LibreOffice, Google Docs or Pages."
+    }
+  ],
+  "handlesTitle": "What HTML to Word handles",
+  "handles": [
+    "Files: .html and .htm, or HTML you paste.",
+    "Headings, paragraphs, bulleted and numbered lists with levels, and links.",
+    "Tables, merged cells included.",
+    "Bold, italic, underline, strikethrough, code and quotes; Arabic set right to left."
+  ],
+  "limits": [
+    "Colours, fonts and widths set by CSS, inline styles included, are not carried into Word; the document uses Word's default look.",
+    "Pictures from web addresses are left out; only pictures embedded in the HTML as data are kept.",
+    "Scripts, forms and frames are removed, so anything a page builds with code after it loads is not in the result.",
+    "Files up to 10 MB are opened; a larger file shows a message instead."
+  ],
+  "worksBest": [
+    "Saved articles and help pages",
+    "Reports exported as HTML",
+    "Text from a website's editor",
+    "Simple pages with headings and tables"
+  ],
+  "mayNotKeep": [
+    "Page styles and colours from CSS",
+    "Pictures linked from web addresses",
+    "Forms and buttons",
+    "Content drawn by scripts"
+  ],
+  "faqTitle": "HTML to Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert HTML to Word?",
+      "answer": "Word and LibreOffice can each open an .html file and save it as .docx. In OpenAnyDoc, paste the HTML or open the file, click convert and download a cleaned .docx with Word's own headings, lists and tables; the HTML is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Can I convert a web page from its address?",
+      "answer": "No. This page never fetches anything from the web. Open the page in your browser, save it as a file or copy its HTML source, then open or paste it here."
+    },
+    {
+      "question": "Why does the Word file look plainer than the web page?",
+      "answer": "Colours, fonts and widths set by CSS are not carried into Word, so the document uses Word's default look with the page's structure kept. HTML to PDF keeps inline styles if the look matters more than editing.",
+      "link": {
+        "text": "HTML to PDF",
+        "path": "/html-to-pdf"
+      }
+    },
+    {
+      "question": "What is removed from the HTML?",
+      "answer": "Scripts, frames, forms, style sheets and event handlers are removed before converting, and pictures from web addresses are left out. Pictures embedded as data are kept."
+    },
+    {
+      "question": "Can I get just a table out of the HTML?",
+      "answer": "If you need the numbers rather than a document, HTML table to CSV turns the tables into rows and columns you can open in a spreadsheet.",
+      "link": {
+        "text": "HTML table to CSV",
+        "path": "/html-table-to-csv"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

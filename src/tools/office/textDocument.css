@@ -1,0 +1,31 @@
+/* A document made from Markdown, HTML or text, laid out off screen for Markdown/HTML/Text to PDF (TextToDocument.tsx). The site's
+   reset takes away headings' sizes and lists' bullets, so they are given back here, as a word processor would show them. */
+.text-document {
+  box-sizing: border-box;
+  background: #fff;
+  color: #111;
+  font: 15px/1.5 'Nunito Sans', 'IBM Plex Sans Arabic', Arial, sans-serif;
+  overflow-wrap: anywhere;
+}
+.text-document > :first-child { margin-top: 0; }
+.text-document h1 { font-size: 28px; font-weight: 700; margin: 24px 0 12px; line-height: 1.25; }
+.text-document h2 { font-size: 22px; font-weight: 700; margin: 22px 0 10px; line-height: 1.3; }
+.text-document h3 { font-size: 18px; font-weight: 700; margin: 18px 0 8px; }
+.text-document h4, .text-document h5, .text-document h6 { font-size: 15px; font-weight: 700; margin: 16px 0 6px; }
+.text-document p { margin: 0 0 10px; }
+.text-document ul { list-style: disc; padding-inline-start: 28px; margin: 0 0 10px; }
+.text-document ol { list-style: decimal; padding-inline-start: 28px; margin: 0 0 10px; }
+.text-document li > ul, .text-document li > ol { margin-bottom: 0; }
+.text-document a { color: #1a56c4; text-decoration: underline; }
+.text-document strong, .text-document b, .text-document th { font-weight: 700; }
+.text-document em, .text-document i { font-style: italic; }
+.text-document code { font-family: 'Courier New', monospace; font-size: 0.9em; background: #f3f3f3; padding: 1px 3px; border-radius: 3px; }
+.text-document pre { font-family: 'Courier New', monospace; font-size: 13px; background: #f3f3f3; padding: 10px 12px; margin: 0 0 10px; white-space: pre-wrap; direction: ltr; text-align: left; }
+.text-document pre code { background: none; padding: 0; }
+.text-document blockquote { border-inline-start: 3px solid #ccc; padding-inline-start: 12px; color: #444; margin: 0 0 10px; }
+.text-document table { border-collapse: collapse; margin: 0 0 12px; }
+.text-document th, .text-document td { border: 1px solid #bbb; padding: 4px 8px; text-align: start; vertical-align: top; }
+.text-document th { background: #f3f3f3; }
+.text-document hr { border: 0; border-top: 1px solid #bbb; margin: 16px 0; }
+.text-document img { max-width: 100%; height: auto; }
+.text-document.is-plain-text p { margin: 0; min-height: 1.5em; white-space: pre-wrap; }

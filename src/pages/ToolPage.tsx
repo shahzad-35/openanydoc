@@ -10,12 +10,12 @@ import SiteFooter, { PageBreadcrumb, PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
 import { downloadTextFile } from '../formats/registry'
-import { localizePath, useT } from '../i18n'
+import { isolateLeftToRight, localizePath, useT } from '../i18n'
 import { samplesByPage } from '../samples/toolSamples'
 import { pageSeo } from '../seo'
 import { findLiveTool, findRelatedPages, hubs, liveTools, toolContent, toolPath } from '../tools/registry'
 import type { Tool } from '../tools/registry'
-import { useFileIntake } from '../useFileIntake'
+import { formatFileSize, useFileIntake } from '../useFileIntake'
 import { findViewerByToolPath, findViewerForFileName, viewers } from '../viewers'
 import type { ConversionTarget, Viewer } from '../viewers'
 import { headerRowBreak } from './changelogMarkup'
@@ -74,7 +74,7 @@ export default function ToolPage({
   const convertTo = toolViewer?.convertTo
   const isMaskTool = toolViewer?.tool === 'mask'
   const aiHub = hubs.find((hub) => hub.category === 'ai')
-  const isAiReadyTool = tool.category === 'ai' || Object.values(aiHub?.sharedTools ?? {}).some((slugs) => slugs.includes(tool.slug))
+  const isAiReadyTool = tool.group === 'aiReady' || (aiHub?.sharedTools?.aiReady ?? []).includes(tool.slug)
   // Pasted text opens as a file of the page's first format: on the JSON and CSV viewers' pages (YAML, XML, HTML or SQL on the
   // pages that read those), and on the CSV tools (CSV to SQL, Merge CSV ...). Not on Mask data, which takes the file itself.
   const pastedTextExtension =
@@ -314,6 +314,19 @@ export default function ToolPage({
                 <p id="tool-result-message" role="status" className="font-semibold">
                   {t('tools.result.ready')} <bdi dir="ltr">{resultFile.name}</bdi>
                 </p>
+                {tool.showsSizeChange && chosenFiles[0] && (
+                  <>
+                    <p id="tool-result-size-change" className="mt-2 text-sm text-ink-soft">
+                      {t('tools.result.sizeChange', { original: isolateLeftToRight(formatFileSize(chosenFiles[0].size)), result: isolateLeftToRight(formatFileSize(resultFile.size)), percent: Math.round((1 - resultFile.size / chosenFiles[0].size) * 100) })}
+                    </p>
+                    {/* An honest word when the saving is small, so the percentage is not read as a promise for other files. */}
+                    {resultFile.size > chosenFiles[0].size * 0.9 && (
+                      <p id="tool-result-small-saving" className="mt-1 text-sm text-ink-soft">
+                        {t('tools.result.smallSaving')}
+                      </p>
+                    )}
+                  </>
+                )}
                 <Suspense fallback={null}>
                   <ToolResultPreview file={resultFile} />
                 </Suspense>

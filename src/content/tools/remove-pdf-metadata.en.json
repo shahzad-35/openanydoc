@@ -1,0 +1,90 @@
+{
+  "title": "Remove PDF Metadata – Clear Author, Title and Dates",
+  "description": "See the author, title, app and dates hidden in a PDF, then download a copy without them. The pages stay exactly as they were. Free, no upload.",
+  "heading": "Remove PDF metadata",
+  "subtitle": "See who made a PDF, with which app and when, then remove those details while the pages stay untouched; nothing is uploaded.",
+  "intro": "A PDF carries details that don't show on its pages: title, author, subject, keywords, the app that made it, and the dates it was created and changed. This page lists them, and one click removes them, together with the hidden XMP metadata block, and downloads a clean copy. The pages themselves are not touched. The file is read and cleaned in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is read by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "See before you share",
+      "text": "Author, title, app and dates are listed before anything changes."
+    },
+    {
+      "title": "Pages untouched",
+      "text": "Only the document's properties are removed; text, pictures and layout stay as they were."
+    }
+  ],
+  "stepsTitle": "How to remove metadata from a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Read what it holds",
+      "text": "See the title, author, subject, keywords, app and dates."
+    },
+    {
+      "title": "Remove and download",
+      "text": "Click Remove and download the clean copy."
+    }
+  ],
+  "handlesTitle": "What Remove PDF metadata handles",
+  "handles": [
+    "Shown: title, author, subject, keywords, the app that made the file, and created and modified dates.",
+    "Removed: all of the above and the XMP metadata block.",
+    "Kept: every page, unchanged."
+  ],
+  "limits": [
+    "Names on comments and annotations are not removed, nor is text on the pages.",
+    "Pictures inside the PDF keep their own metadata, such as camera and GPS location.",
+    "PDFs that need a password to open can't be read; remove the password first."
+  ],
+  "faqTitle": "Remove PDF metadata: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I remove the author name from a PDF?",
+      "answer": "A PDF stores its author, title, the app that made it and its dates in its document properties, apart from the pages. Here, choose the PDF, see what it holds and click Remove to download a copy without them, cleaned in your browser."
+    },
+    {
+      "question": "Are my pages changed?",
+      "answer": "No. Only the document's properties and its XMP metadata block are removed; the text, pictures and layout stay exactly as they were."
+    },
+    {
+      "question": "What about names in comments or on the pages?",
+      "answer": "They are not removed here, because they are part of the content. To remove a name from the pages for good, use Redact PDF.",
+      "link": {
+        "text": "Redact PDF",
+        "path": "/redact-pdf"
+      }
+    },
+    {
+      "question": "Are the pictures' camera and GPS details removed?",
+      "answer": "No. Pictures inside the PDF keep their own metadata. Clean a photo with Remove photo metadata before you put it in the PDF.",
+      "link": {
+        "text": "Remove photo metadata",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "Can I do the same for a Word document?",
+      "answer": "Yes. Word metadata shows and removes the author, company and dates of a .docx file.",
+      "link": {
+        "text": "Word metadata",
+        "path": "/word-metadata"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

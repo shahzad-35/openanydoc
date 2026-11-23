@@ -220,7 +220,7 @@ const landingPages = [...jsonLandingPages, ...csvLandingPages, '/tsv-viewer', '/
 // The CSV and Excel to SQL, XML, YAML, Markdown, HTML, LaTeX and fixed-width pages (src/tools/data/TableToText.tsx).
 const tableTextPages = ['csv', 'excel'].flatMap((source) => ['sql', 'xml', 'yaml', 'markdown', 'html', 'latex', 'fixed-width'].map((format) => `/${source}-to-${format}`))
 // Pages of the tool engine (src/tools/registry.ts): tools drawn by ToolPage, and the hubs.
-const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/crop-pdf', '/redact-pdf', '/compare-pdf', '/pdf-to-markdown', '/repair-pdf', '/scan-to-pdf', '/pdf-forms', '/protect-pdf', '/unlock-pdf', '/pdf-to-word', '/pdf-to-excel', '/pdf-to-powerpoint', '/word-to-pdf', '/excel-to-pdf', '/ocr-pdf', '/translate-pdf', '/blur-face', '/remove-background', '/upscale-image', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator', '/xml-viewer', '/yaml-formatter', '/base64-encode-decode', '/url-encode-decode', '/jwt-decoder', ...tableTextPages, '/merge-csv', '/compare-csv', '/change-csv-encoding', '/change-csv-delimiter', '/test-data-generator', '/word-to-markdown', '/pptx-to-markdown', '/token-counter', '/json-to-toon']
+const registryToolPages = ['/merge-pdf', '/add-page-numbers', '/split-pdf', '/remove-pdf-pages', '/extract-pdf-pages', '/organize-pdf', '/rotate-pdf', '/jpg-to-pdf', '/pdf-to-jpg', '/pdf-to-text', '/extract-pdf-images', '/edit-pdf', '/sign-pdf', '/fill-pdf', '/watermark-pdf', '/header-footer-pdf', '/crop-pdf', '/redact-pdf', '/compare-pdf', '/pdf-to-markdown', '/repair-pdf', '/scan-to-pdf', '/pdf-forms', '/protect-pdf', '/unlock-pdf', '/pdf-to-word', '/pdf-to-excel', '/pdf-to-powerpoint', '/word-to-pdf', '/excel-to-pdf', '/compress-pdf', '/pdf-to-grayscale', '/remove-pdf-metadata', '/flatten-pdf', '/pptx-to-pdf', '/markdown-to-pdf', '/text-to-pdf', '/csv-to-pdf', '/html-to-pdf', '/pptx-to-jpg', '/word-to-jpg', '/excel-to-jpg', '/markdown-to-word', '/html-to-word', '/text-to-word', '/images-to-pptx', '/merge-word', '/split-word', '/compare-word', '/word-counter', '/word-find-replace', '/remove-word-comments', '/word-metadata', '/extract-word-images', '/watermark-word', '/word-mail-merge', '/merge-excel', '/split-excel', '/compare-excel', '/unprotect-excel', '/repair-excel', '/excel-metadata', '/excel-to-word', '/merge-pptx', '/split-pptx', '/extract-pptx-media', '/search-pptx', '/pptx-metadata', '/pptm-to-pptx', '/watermark-pptx', '/ocr-pdf', '/translate-pdf', '/blur-face', '/remove-background', '/upscale-image', '/image-to-text', '/compress-image', '/resize-image', '/crop-image', '/rotate-image', '/watermark-image', '/remove-image-metadata', '/photo-editor', '/convert-image', '/heic-to-jpg', '/webp-to-jpg', '/png-to-jpg', '/jpg-to-png', '/svg-to-png', '/image-to-webp', '/meme-generator', '/xml-viewer', '/yaml-formatter', '/base64-encode-decode', '/url-encode-decode', '/jwt-decoder', ...tableTextPages, '/merge-csv', '/compare-csv', '/change-csv-encoding', '/change-csv-delimiter', '/test-data-generator', '/word-to-markdown', '/pptx-to-markdown', '/token-counter', '/json-to-toon', '/ai-summarizer', '/translate-document', '/chat-with-pdf']
 const hubPages = ['/pdf-tools', '/image-tools', '/data-tools', '/office-tools', '/ai-tools', '/all-tools']
 
 const sampleJson = path.join(scratchFolder, 'sample.json')
@@ -713,7 +713,7 @@ await test('tool pages and hubs: their own title and description, h1, the no-upl
     await openPage(`/${locale}/csv-viewer`)
     await evaluate(`document.querySelector('#site-search-button').click()`)
     await waitFor(`document.querySelector('#site-search-option-merge-pdf')`, 'the PDF tools in the search')
-    expect(await evaluate(`document.querySelector('#site-search-option-merge-pdf').getAttribute('href') === '/${locale}/merge-pdf' && !document.querySelector('#site-search-option-compress-pdf') && document.querySelector('#site-search-all-tools-link')?.getAttribute('href') === '/${locale}/all-tools'`), `/${locale}: the search lists a tool that is not live, or misses Merge PDF or the All tools link`)
+    expect(await evaluate(`document.querySelector('#site-search-option-merge-pdf').getAttribute('href') === '/${locale}/merge-pdf' && document.querySelector('#site-search-all-tools-link')?.getAttribute('href') === '/${locale}/all-tools'`), `/${locale}: the search misses Merge PDF or the All tools link`)
   }
 })
 
@@ -1916,7 +1916,7 @@ await test('the app installs, opens every format from the desktop, and keeps a v
 // ---------------------------------------------------------------- first screen of the tool pages (Step 17C)
 
 // The test data generator needs no file, so it has no drop zone or samples.
-const formatPagesWithSamples = ['/xml-viewer', '/yaml-formatter', '/base64-encode-decode', '/url-encode-decode', '/jwt-decoder', ...tableTextPages, '/merge-csv', '/compare-csv', '/change-csv-encoding', '/change-csv-delimiter', '/word-to-markdown', '/pptx-to-markdown', '/token-counter', '/json-to-toon', '/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', '/image-viewer', ...landingPages]
+const formatPagesWithSamples = ['/xml-viewer', '/yaml-formatter', '/base64-encode-decode', '/url-encode-decode', '/jwt-decoder', ...tableTextPages, '/merge-csv', '/compare-csv', '/change-csv-encoding', '/change-csv-delimiter', '/word-to-markdown', '/pptx-to-markdown', '/token-counter', '/json-to-toon', '/ai-summarizer', '/translate-document', '/chat-with-pdf', '/csv-viewer', '/txt-viewer', '/json-viewer', '/excel-viewer', '/word-viewer', '/powerpoint-viewer', '/pdf-viewer', '/image-viewer', ...landingPages]
 
 await test('every tool page shows its choose button and two sample files on the first screen of a 375 x 667 phone, in both languages', async () => {
   await send('Emulation.setDeviceMetricsOverride', { width: 375, height: 667, deviceScaleFactor: 2, mobile: true })
@@ -1968,6 +1968,116 @@ await test('a sample file opens with no network once its page is idle, with the 
   await expectCleanIds('/en/csv-viewer with a sample and the Next strip')
   await evaluate(`document.querySelector('#next-step-to-excel').click()`)
   await waitFor(`location.pathname === '/en/excel-viewer' && document.querySelector('#excel-workbench #data-table')`, 'Convert to Excel from the Next strip')
+})
+
+// ---------------------------------------------------------------- Word, Excel and PowerPoint utilities (EXAMINE round 2)
+
+// A result Office opens without a repair: every XML part well-formed (checked by the browser's parser), every relationship target
+// present, every part listed with a content type, no relationship id used twice. Returns the package's files for the tool's own
+// checks.
+async function expectOfficePackage(bytes, where) {
+  const zip = await JSZip.loadAsync(bytes)
+  const files = Object.keys(zip.files).filter((name) => !zip.files[name].dir)
+  const texts = Object.fromEntries(await Promise.all(files.filter((name) => /\.(xml|rels)$/i.test(name)).map(async (name) => [name, await zip.file(name).async('string')])))
+  const badParts = await evaluate(`(() => { const texts = ${JSON.stringify(texts)}; return Object.keys(texts).filter((name) => new DOMParser().parseFromString(texts[name], 'application/xml').getElementsByTagName('parsererror').length > 0) })()`)
+  expect(badParts.length === 0, `${where}: parts that are not well-formed: ${badParts.join(', ')}`)
+  const contentTypes = texts['[Content_Types].xml'] ?? ''
+  const overrides = [...contentTypes.matchAll(/PartName="\/([^"]+)"/g)].map((match) => match[1])
+  const defaults = [...contentTypes.matchAll(/Extension="([^"]+)"/g)].map((match) => match[1].toLowerCase())
+  const untyped = files.filter((name) => name !== '[Content_Types].xml' && !overrides.includes(name) && !defaults.includes(name.split('.').pop().toLowerCase()))
+  expect(untyped.length === 0, `${where}: parts without a content type: ${untyped.join(', ')}`)
+  for (const name of files.filter((file) => file.endsWith('.rels'))) {
+    const owner = name.replace(/_rels\/([^/]*)\.rels$/, '$1')
+    const folder = owner.slice(0, owner.lastIndexOf('/') + 1)
+    const ids = []
+    for (const match of texts[name].matchAll(/<Relationship\b([^>]*)\/>/g)) {
+      const attributes = Object.fromEntries([...match[1].matchAll(/(\w+)="([^"]*)"/g)].map((attribute) => [attribute[1], attribute[2]]))
+      ids.push(attributes.Id)
+      if (attributes.TargetMode === 'External') continue
+      const resolved = []
+      for (const part of (attributes.Target.startsWith('/') ? attributes.Target.slice(1) : folder + attributes.Target).split('/')) part === '..' ? resolved.pop() : part && part !== '.' && resolved.push(part)
+      expect(files.includes(resolved.join('/')), `${where}: ${name} points at a missing part ${resolved.join('/')}`)
+    }
+    expect(new Set(ids).size === ids.length, `${where}: ${name} uses a relationship id twice`)
+  }
+  return { zip, files, texts }
+}
+
+const officeToolRuns = [
+  ['/en/merge-word', ['quarterly-docx', 'arabic-docx'], [], ({ texts }) => (texts['word/document.xml'].match(/<w:p[ >]/g) ?? []).length > 60],
+  ['/ar/split-word', ['arabic-docx'], [], null],
+  ['/en/word-find-replace', ['quarterly-docx'], [['#word-find-input', 'synthetic'], ['#word-replace-input', 'SAMPLE']], ({ texts }) => texts['word/document.xml'].includes('SAMPLE') && !texts['word/document.xml'].includes('synthetic')],
+  ['/en/remove-word-comments', ['reviewed-docx'], [], ({ files, texts }) => !files.includes('word/comments.xml') && !/commentReference|<w:ins |<w:del /.test(texts['word/document.xml'])],
+  ['/ar/word-metadata', ['arabic-details-docx'], [], ({ texts }) => !/<dc:creator>|<cp:lastModifiedBy>|<Company>/.test((texts['docProps/core.xml'] ?? '') + (texts['docProps/app.xml'] ?? ''))],
+  ['/en/watermark-word', ['quarterly-docx'], [], ({ files, texts }) => files.some((name) => /header\d*\.xml$/.test(name) && texts[name].includes('PowerPlusWaterMarkObject'))],
+  ['/en/word-mail-merge', ['letter-template-docx', 'customers-csv'], [], null],
+  ['/en/merge-excel', ['sales-xlsx', 'people-xlsx'], [], ({ files }) => files.filter((name) => /^xl\/worksheets\/sheet\d+\.xml$/.test(name)).length === 5],
+  ['/ar/split-excel', ['people-xlsx'], [], null],
+  ['/en/unprotect-excel', ['protected-xlsx'], [], ({ texts }) => !Object.values(texts).some((text) => /<(sheetProtection|workbookProtection)\b/.test(text))],
+  ['/en/repair-excel', ['budget-xls'], [], null],
+  ['/en/excel-to-word', ['arabic-xlsx'], [], ({ texts }) => texts['word/document.xml'].includes('<w:bidiVisual')],
+  ['/en/merge-pptx', ['review-pptx', 'arabic-pptx'], [], ({ texts }) => (texts['ppt/presentation.xml'].match(/<p:sldId /g) ?? []).length === 6],
+  ['/ar/split-pptx', ['arabic-pptx'], [], null],
+  ['/en/pptm-to-pptx', ['macro-pptm'], [], ({ files, texts }) => !files.some((name) => /vbaProject/i.test(name)) && !texts['[Content_Types].xml'].includes('macroEnabled')],
+  ['/ar/watermark-pptx', ['arabic-pptx'], [], ({ files, texts }) => files.filter((name) => /^ppt\/slides\/slide\d+\.xml$/.test(name)).every((name) => texts[name].includes('name="Watermark'))],
+]
+
+await test('Word, Excel and PowerPoint tools: each result is a package Office opens without a repair, with the change made', async () => {
+  for (const [address, sampleIds, fields, checkChange] of officeToolRuns) {
+    const slug = address.split('/').pop()
+    await openPage(address)
+    await expectCleanIds(address)
+    for (const sampleId of sampleIds) {
+      await evaluate(`document.querySelector('#sample-button-${sampleId}').click()`)
+      await sleep(700)
+    }
+    await waitFor(`document.querySelector('#${slug}-button')`, `${address}: the tool`)
+    for (const [selector, value] of fields) await evaluate(`(() => { const input = document.querySelector('${selector}'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, ${JSON.stringify(value)}); input.dispatchEvent(new Event('input', { bubbles: true })) })()`)
+    await waitFor(`!document.querySelector('#${slug}-button').disabled`, `${address}: the button to be ready`, 20000)
+    await evaluate(`document.querySelector('#${slug}-button').click()`)
+    await waitFor(`document.querySelector('#tool-download-button') || document.querySelector('#tool-error')?.textContent`, `${address}: the result`, 60000)
+    expect(!(await evaluate(`document.querySelector('#tool-error')?.textContent ?? ''`)), `${address}: the tool reported an error`)
+    await evaluate(captureDownloads)
+    await evaluate(`document.querySelector('#tool-download-button').click()`)
+    await waitFor(`window.__blobs.length === 1`, `${address}: the download`)
+    const bytes = Buffer.from(await evaluate(`window.__blobs[0].arrayBuffer().then((buffer) => { let text = ''; for (const byte of new Uint8Array(buffer)) text += String.fromCharCode(byte); return btoa(text) })`), 'base64')
+    const isZipOfParts = (await evaluate(`document.querySelector('#tool-result-message bdi').textContent`)).endsWith('.zip')
+    if (isZipOfParts) {
+      const parts = await JSZip.loadAsync(bytes)
+      const partNames = Object.keys(parts.files).filter((name) => /\.(docx|xlsx|pptx)$/.test(name))
+      expect(partNames.length >= 2, `${address}: the ZIP holds ${partNames.length} files`)
+      for (const name of partNames) await expectOfficePackage(await parts.file(name).async('nodebuffer'), `${address} ${name}`)
+    } else {
+      const result = await expectOfficePackage(bytes, address)
+      if (checkChange) expect(checkChange(result), `${address}: the tool's change is not in the result`)
+    }
+  }
+})
+
+await test('Word counter, Compare Word, Compare Excel and Search PowerPoint show their answers on the page', async () => {
+  await openPage('/ar/word-counter')
+  await evaluate(`document.querySelector('#sample-button-arabic-notes-txt').click()`)
+  await waitFor(`document.querySelector('#word-counter-words dd')?.textContent === '39'`, 'the Arabic sample to count 39 words')
+  await openPage('/en/compare-word')
+  for (const sampleId of ['quarterly-docx', 'summary-v2-docx']) {
+    await evaluate(`document.querySelector('#sample-button-${sampleId}').click()`)
+    await sleep(700)
+  }
+  await waitFor(`!document.querySelector('#compare-word-button')?.disabled`, 'two versions to compare')
+  await evaluate(`document.querySelector('#compare-word-button').click()`)
+  await waitFor(`document.querySelector('#compare-word-text ins') && document.querySelector('#compare-word-text del')`, 'added and removed words')
+  await openPage('/en/compare-excel')
+  for (const sampleId of ['sales-xlsx', 'sales-v2-xlsx']) {
+    await evaluate(`document.querySelector('#sample-button-${sampleId}').click()`)
+    await sleep(700)
+  }
+  await waitFor(`document.querySelector('#compare-csv-summary')?.textContent.includes('1 changed')`, 'one changed row between the two workbooks')
+  await openPage('/en/search-pptx')
+  await evaluate(`document.querySelector('#sample-button-review-pptx').click()`)
+  await waitFor(`document.querySelector('#search-pptx-input')`, 'the search box')
+  await sleep(700)
+  await evaluate(`(() => { const input = document.querySelector('#search-pptx-input'); Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, 'review'); input.dispatchEvent(new Event('input', { bubbles: true })) })()`)
+  await waitFor(`document.querySelector('#search-pptx-result-1')`, 'a search result on slide 1')
 })
 
 // ---------------------------------------------------------------- report

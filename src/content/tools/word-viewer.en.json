@@ -78,7 +78,7 @@
       {
         "label": "Edit and save",
         "cells": [
-          "View only for now; editing is coming. Print or save as PDF works today.",
+          "View only; separate tools find and replace, merge, split and watermark a .docx. Print or save as PDF works.",
           "Yes, in the cloud copy.",
           "Often view only."
         ]
@@ -110,7 +110,7 @@
     ]
   },
   "limits": [
-    "View only: documents can't be edited.",
+    "View only: to change a document, use Find and replace in Word, Merge or Split Word, Watermark Word or Remove Word comments.",
     "Old .doc files are not supported; save them as .docx first.",
     "For .odt files the pages are shown as one flowing page, without the comments margin, and Markdown export is for Word files only."
   ],
@@ -126,7 +126,11 @@
     },
     {
       "question": "Can I edit and save it?",
-      "answer": "Not yet: the Word viewer shows documents, and editing is coming. Today you can zoom, print the document, save it as PDF with Print / Save as PDF, or download the original .docx again."
+      "answer": "The Word viewer shows documents. To change one, use Find and replace in Word, Merge or Split Word, Watermark Word or Remove Word comments; Word to PDF saves a copy as PDF.",
+      "link": {
+        "text": "Find and replace in Word",
+        "path": "/word-find-replace"
+      }
     },
     {
       "question": "Is the original changed?",

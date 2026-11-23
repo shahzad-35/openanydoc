@@ -1,0 +1,97 @@
+{
+  "title": "Watermark PowerPoint – Add CONFIDENTIAL to PPTX Slides",
+  "description": "Add a CONFIDENTIAL, DRAFT or custom text watermark to every PowerPoint slide in your browser: diagonal or straight, see-through. Free, no upload.",
+  "heading": "Add a watermark to PowerPoint",
+  "subtitle": "Put a text watermark such as CONFIDENTIAL or DRAFT on every slide of a PowerPoint presentation; nothing is uploaded.",
+  "intro": "Watermark a PPTX without PowerPoint: type CONFIDENTIAL, DRAFT or your own words, choose diagonal or horizontal and a colour, and the text is laid semi-transparent on top of every slide, hidden slides included. It is an ordinary text box on each slide, so it can still be moved or deleted in PowerPoint. Works with .pptx, .ppsx and .potx files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Your text, your colour",
+      "text": "CONFIDENTIAL, DRAFT or your own words, diagonal or horizontal, in the colour you choose."
+    },
+    {
+      "title": "Every slide",
+      "text": "The watermark goes on every slide, hidden slides included."
+    }
+  ],
+  "stepsTitle": "How to add a watermark to PowerPoint",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx or .potx file on the page."
+    },
+    {
+      "title": "Write the watermark",
+      "text": "Pick CONFIDENTIAL or DRAFT, or type your own text."
+    },
+    {
+      "title": "Choose the look",
+      "text": "Set it diagonal or horizontal and pick a colour; it is semi-transparent."
+    },
+    {
+      "title": "Add and download",
+      "text": "Add the watermark and download the presentation."
+    }
+  ],
+  "handlesTitle": "What Watermark PowerPoint handles",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx and .potx.",
+    "Text: CONFIDENTIAL, DRAFT or your own words.",
+    "Look: diagonal or horizontal, semi-transparent, in the colour you pick.",
+    "Every slide, hidden slides included."
+  ],
+  "limits": [
+    "A picture or logo can't be used as a watermark; only text.",
+    "The watermark is an ordinary text box, so anyone with the file can move or delete it in PowerPoint.",
+    "Old .ppt files can't be read; save them as .pptx first."
+  ],
+  "worksBest": [
+    "Draft decks sent for review",
+    "Confidential slides shared outside the team",
+    "Training material marked as a sample"
+  ],
+  "mayNotKeep": [
+    "Picture or logo watermarks",
+    "A watermark that can't be removed",
+    "Old .ppt presentations"
+  ],
+  "faqTitle": "Watermark PowerPoint: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I add a watermark to all slides in PowerPoint?",
+      "answer": "In PowerPoint, Keynote or LibreOffice Impress, a watermark on every slide is usually added as a text box on the slide master, which shows behind each slide. On this page, type the text, choose its look and download the presentation; the text box is put on top of every slide in one step, in your browser."
+    },
+    {
+      "question": "Can the watermark be removed?",
+      "answer": "Yes. It is an ordinary text box on each slide, so it can be moved, changed or deleted in PowerPoint."
+    },
+    {
+      "question": "Can I use a logo as the watermark?",
+      "answer": "No. Only a text watermark can be added."
+    },
+    {
+      "question": "Are hidden slides watermarked too?",
+      "answer": "Yes. The watermark is added to every slide, hidden ones included."
+    },
+    {
+      "question": "Can I watermark a PDF of the slides instead?",
+      "answer": "Yes. Save the presentation with PowerPoint to PDF, then add the watermark with Watermark PDF.",
+      "link": {
+        "text": "PowerPoint to PDF",
+        "path": "/pptx-to-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

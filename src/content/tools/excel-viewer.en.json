@@ -43,7 +43,7 @@
   ],
   "handlesTitle": "What the free XLSX viewer handles: XLSX, XLS, XLSM and ODS",
   "handles": [
-    "Files: .xlsx, .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument), with every sheet. Password-protected workbooks get a clear message; they cannot be opened yet.",
+    "Files: .xlsx, .xls (Excel 97 to 2003), .xlsm (macro-enabled) and .ods (OpenDocument), with every sheet. Workbooks encrypted with a password to open can't be opened; sheet protection alone can be removed with Unprotect Excel.",
     "Display: number, date, percentage and currency formats and merged cells; fonts, colours and fills in .xlsx and .xlsm files up to 8 MB; frozen panes, hidden rows and columns (with Show hidden), hidden sheets, notes and clickable links (Ctrl+click).",
     "Editing: values and formulas that recalculate, rows, columns and sheets, merged cells and number formats; in .xlsx files also bold, italic, colours, fills and alignment.",
     "Tools: column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compare two sheets or two workbooks, one file per sheet, merging sheets from several workbooks, every sheet as CSV in one ZIP, print or save as PDF, and Workbook info (macros are detected, never run).",
@@ -173,7 +173,11 @@
     },
     {
       "question": "Can I open a password-protected Excel file?",
-      "answer": "No. Encrypted workbooks cannot be opened, because the file has to be read in your browser without sending it anywhere. Remove the password in Excel first, then open the file here."
+      "answer": "No. Workbooks encrypted with a password to open can't be opened, because the file has to be read in your browser without sending it anywhere; remove the password in Excel first. Sheet protection alone can be removed with Unprotect Excel.",
+      "link": {
+        "text": "Unprotect Excel",
+        "path": "/unprotect-excel"
+      }
     },
     {
       "question": "Can I anonymize an Excel workbook before sending it?",

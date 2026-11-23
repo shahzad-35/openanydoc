@@ -42,8 +42,19 @@
   ],
   "limits": [
     "The pages follow this site's Word viewer, which is close to Word but not identical; fonts your browser doesn't have are replaced.",
-    "Pages are pictures with their text laid over them: the text can be selected and searched, but zooming in is less sharp than in Word's own PDF.",
+    "Pages are pictures at 200 dpi with their text laid over them: the text can be selected and searched, but zooming in is less sharp than in Word's own PDF.",
     "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "Letters, reports and CVs",
+    "Documents with tables and pictures",
+    "Arabic and English documents"
+  ],
+  "mayNotKeep": [
+    "Text boxes and shapes placed exactly",
+    "SmartArt and charts, drawn approximately",
+    "Tracked changes and comments",
+    "Fonts your browser doesn't have"
   ],
   "faqTitle": "Word to PDF: questions",
   "faq": [
@@ -65,7 +76,7 @@
     },
     {
       "question": "Does it work with .doc files?",
-      "answer": "Not yet. Old .doc files can't be read here; save them as .docx in Word or LibreOffice first."
+      "answer": "No. Old .doc files can't be read; save them as .docx in Word or LibreOffice first."
     },
     {
       "question": "Can I edit the PDF afterwards?",

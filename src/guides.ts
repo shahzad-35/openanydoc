@@ -283,7 +283,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-json-file': {
       published: '2026-10-30',
-      updated: '2026-10-30',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'What a JSON file is',
@@ -313,7 +313,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             '"Unexpected token" or "Unexpected end of JSON input" means the text breaks a JSON rule: a trailing comma, single quotes or a comment. The JSON validator shows the line and column and repairs the common mistakes, and the guide to unexpected token errors explains each message.',
             'A file that starts with < is an HTML page saved with a .json name, often an error page from a server.',
-            'A file with one JSON object per line (.jsonl or .ndjson) is JSON Lines: each line is a separate document, so an ordinary JSON parser rejects the file as a whole, and OpenAnyDoc does not open it yet.',
+            'A file with one JSON object per line (.jsonl or .ndjson) is JSON Lines: each line is a separate document, so an ordinary JSON parser rejects the file as a whole. The JSON viewer opens .jsonl and .ndjson files line by line.',
             'Above 10 MB OpenAnyDoc refuses the file to keep the page responsive; a code editor or a command-line tool such as jq handles larger ones.',
           ],
           links: [{ text: 'JSON validator', path: '/json-validator' }, { text: 'guide to unexpected token errors', path: '/json-unexpected-token' }],
@@ -331,7 +331,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-xlsx-without-excel': {
       published: '2026-10-30',
-      updated: '2026-10-30',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -364,6 +364,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }, { text: 'Excel to JSON', path: '/excel-to-json' }],
         },
         {
+          heading: 'Need to change the file, not just open it?',
+          paragraphs: ['Besides editing cells in the viewer, these tools work on whole workbooks in your browser, without uploading them:'],
+          list: [
+            'Excel to PDF saves the sheets as PDF pages, fitted to the page width, with text you can still search.',
+            'Merge Excel joins several workbooks into one .xlsx, every sheet as its own tab.',
+            'Split Excel cuts a workbook into smaller .xlsx files by sheet, by number of rows or by the values of a column.',
+            'Unprotect Excel removes sheet and workbook structure protection from a file you own, so you can edit it again. A file that needs a password to open stays locked without that password.',
+            'Repair Excel reads a damaged workbook leniently and saves its data into a new, clean .xlsx file.',
+            'Excel to Word turns one sheet into a table you can edit in a Word document.',
+          ],
+          links: [{ text: 'Excel to PDF', path: '/excel-to-pdf' }, { text: 'Merge Excel', path: '/merge-excel' }, { text: 'Split Excel', path: '/split-excel' }, { text: 'Unprotect Excel', path: '/unprotect-excel' }, { text: 'Repair Excel', path: '/repair-excel' }, { text: 'Excel to Word', path: '/excel-to-word' }],
+        },
+        {
           heading: 'Older and related formats',
           paragraphs: ['Three other extensions turn up next to .xlsx:'],
           list: [
@@ -385,7 +398,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-docx-without-word': {
       published: '2026-11-02',
-      updated: '2026-11-02',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -393,13 +406,25 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'In your browser, with nothing uploaded',
-          paragraphs: ['Drop the file on the Word viewer. The document opens as pages with its page size and margins, fonts, tables, pictures, lists, headers and footers with page numbers, and Arabic paragraphs and tables run right to left. You can zoom in, fit the page to your screen and download the original file again. The viewer reads documents but does not edit them yet. Password-protected documents cannot be opened.'],
+          paragraphs: ['Drop the file on the Word viewer. The document opens as pages with its page size and margins, fonts, tables, pictures, lists, headers and footers with page numbers, and Arabic paragraphs and tables run right to left. You can zoom in, fit the page to your screen and download the original file again. The viewer shows documents without editing them; the browser tools further down change them. Password-protected documents cannot be opened.'],
           links: [{ text: 'Word viewer', path: '/word-viewer' }],
         },
         {
           heading: 'Save it as a PDF',
-          paragraphs: ['To send or print the document, open it in the Word viewer and click Print / Save as PDF. Your browser\'s print dialog opens with only the document\'s pages; choose Save as PDF (Microsoft Print to PDF on Windows) as the printer. The PDF is made on your computer, so the document is not uploaded for this either.'],
-          links: [{ text: 'Print / Save as PDF', path: '/word-viewer' }],
+          paragraphs: ['To send or print the document, open it in the Word viewer and click Print / Save as PDF, or use Word to PDF to get a PDF with searchable text in one step. With Print / Save as PDF, your browser\'s print dialog opens with only the document\'s pages; choose Save as PDF (Microsoft Print to PDF on Windows) as the printer. Either way the PDF is made on your computer, so the document is not uploaded for this either.'],
+          links: [{ text: 'Print / Save as PDF', path: '/word-viewer' }, { text: 'Word to PDF', path: '/word-to-pdf' }],
+        },
+        {
+          heading: 'Need to change the file, not just open it?',
+          paragraphs: ['These tools change a Word document in your browser, without uploading it:'],
+          list: [
+            'Word to PDF saves the document as a PDF, page by page, with text you can still select and search.',
+            'Find and replace in Word replaces a word or phrase everywhere, headers and footnotes included, and keeps its formatting.',
+            'Merge Word (in beta) joins two or more documents into one .docx, each starting on a new page.',
+            'Remove Word comments deletes the comments and accepts or rejects every tracked change, for a clean copy to send.',
+            'Word metadata shows who wrote, edited and saved the document, and removes those details in one click.',
+          ],
+          links: [{ text: 'Word to PDF', path: '/word-to-pdf' }, { text: 'Find and replace in Word', path: '/word-find-replace' }, { text: 'Merge Word', path: '/merge-word' }, { text: 'Remove Word comments', path: '/remove-word-comments' }, { text: 'Word metadata', path: '/word-metadata' }],
         },
         {
           heading: 'Free desktop apps',
@@ -424,8 +449,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['A few other extensions turn up next to .docx:'],
           list: [
             '.doc is the Word 97 to 2003 format. OpenAnyDoc does not open it; LibreOffice, Pages and Word do, and can save it as .docx, which then opens here.',
-            '.docm is a document with macros and .dotx a template. Save either as a .docx first; the macros never run outside Word.',
-            '.odt is the OpenDocument text format that LibreOffice saves by default, and .rtf an older rich text format. Word, LibreOffice and Pages open both.',
+            '.docm is a document with macros and .dotx a template. The Word viewer opens both; the macros never run outside Word.',
+            '.odt is the OpenDocument text format that LibreOffice saves by default, and .rtf an older rich text format. Word, LibreOffice and Pages open both, and the Word viewer here opens .odt too.',
           ],
         },
         {
@@ -610,7 +635,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/pdf-tools-without-upload': {
       published: '2026-11-17',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -629,7 +654,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Where those services do more',
-          paragraphs: ['To be fair about the choice: these sites offer tools that OpenAnyDoc does not have yet, such as compressing a PDF. Several have desktop apps, accounts with cloud storage and batch processing. If you need one of those and the document is not sensitive, they are reasonable choices.'],
+          paragraphs: ['To be fair about the choice: several of these sites give more settings for compressing a PDF (resolution and picture quality), convert to PDF/A, and have desktop apps, accounts with cloud storage and batch processing. If you need one of those and the document is not sensitive, they are reasonable choices.'],
         },
         {
           heading: 'What OpenAnyDoc does differently',
@@ -647,15 +672,16 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'Make a scanned PDF searchable with OCR PDF, in English or Arabic.',
             'Convert Word and Excel files to PDF, and PDF to Word, Excel or PowerPoint.',
             'Protect PDF with a password, or Unlock PDF when you know its password.',
+            'Compress PDF, Flatten PDF, PDF to grayscale and Remove PDF metadata.',
           ],
-          links: [{ text: 'Merge', path: '/merge-pdf' }, { text: 'OCR PDF', path: '/ocr-pdf' }, { text: 'Word and Excel files to PDF', path: '/word-to-pdf' }, { text: 'Protect PDF', path: '/protect-pdf' }, { text: 'Unlock PDF', path: '/unlock-pdf' }, { text: 'Edit PDF', path: '/edit-pdf' }, { text: 'Sign PDF', path: '/sign-pdf' }, { text: 'Fill PDF form', path: '/fill-pdf' }, { text: 'Add page numbers', path: '/add-page-numbers' }, { text: 'JPG', path: '/jpg-to-pdf' }, { text: 'PDF to JPG', path: '/pdf-to-jpg' }],
+          links: [{ text: 'Merge', path: '/merge-pdf' }, { text: 'OCR PDF', path: '/ocr-pdf' }, { text: 'Word and Excel files to PDF', path: '/word-to-pdf' }, { text: 'Protect PDF', path: '/protect-pdf' }, { text: 'Unlock PDF', path: '/unlock-pdf' }, { text: 'Compress PDF', path: '/compress-pdf' }, { text: 'Edit PDF', path: '/edit-pdf' }, { text: 'Sign PDF', path: '/sign-pdf' }, { text: 'Fill PDF form', path: '/fill-pdf' }, { text: 'Add page numbers', path: '/add-page-numbers' }, { text: 'JPG', path: '/jpg-to-pdf' }, { text: 'PDF to JPG', path: '/pdf-to-jpg' }],
         },
         {
           heading: 'Which to choose',
           paragraphs: ['A simple rule of thumb:'],
           list: [
             'Contracts, payslips, IDs, medical or customer files: use a tool that keeps the file on your device.',
-            'You need to make a PDF smaller: use a desktop app, or an online service if the document is not sensitive.',
+            'You need to make a PDF smaller: Compress PDF re-saves its pictures in your browser and shows the size before and after; for resolution settings, use a desktop app.',
             'You are on a work computer where you cannot install software: a browser tool with no upload, such as OpenAnyDoc, avoids both problems.',
             'Your organisation has rules about where files may be processed: follow them, and ask your IT or compliance team when unsure.',
           ],
@@ -798,7 +824,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-pptx-without-powerpoint': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -843,6 +869,18 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Need the words, not the slides?',
           paragraphs: ['To quote a deck in a report, search it or paste it into an AI chat, turn it into text. PowerPoint to Markdown writes each slide\'s title and bullet points, with the speaker notes under them, as a clean outline; pictures, charts and the layout are left out. The viewer itself can also export an outline of titles, text and notes as Markdown or plain text.'],
           links: [{ text: 'PowerPoint to Markdown', path: '/pptx-to-markdown' }],
+        },
+        {
+          heading: 'Need to change the file, not just open it?',
+          paragraphs: ['The viewer does not edit slides, but these tools work on a whole presentation in your browser, without uploading it:'],
+          list: [
+            'PowerPoint to PDF saves the presentation as a PDF, one page per slide, with text you can still select and search.',
+            'Merge PowerPoint (in beta) joins two or more presentations into one .pptx file, in the order you choose.',
+            'Split PowerPoint cuts a presentation into several .pptx files, one per slide or by the slide ranges you type.',
+            'Search PowerPoint finds a word in every slide and speaker note, with the slide number of each match.',
+            'Watermark PowerPoint puts a text watermark such as CONFIDENTIAL or DRAFT on every slide.',
+          ],
+          links: [{ text: 'PowerPoint to PDF', path: '/pptx-to-pdf' }, { text: 'Merge PowerPoint', path: '/merge-pptx' }, { text: 'Split PowerPoint', path: '/split-pptx' }, { text: 'Search PowerPoint', path: '/search-pptx' }, { text: 'Watermark PowerPoint', path: '/watermark-pptx' }],
         },
         {
           heading: 'Which option to choose',
@@ -1158,7 +1196,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/stirling-pdf-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -1181,7 +1219,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Where Stirling-PDF does more',
           paragraphs: ['To be fair about the choice, Stirling-PDF covers ground that OpenAnyDoc does not:'],
           list: [
-            'Many more operations, including compressing a PDF, which OpenAnyDoc does not do.',
+            'Many more operations than OpenAnyDoc has.',
             'Pipelines that chain several steps and run on many files without anyone clicking through them.',
             'A REST API, so other systems in your company can send PDFs to it.',
             'Accounts, single sign-on and, on the paid plans, audit logging, which matter when you must show who did what.',
@@ -1204,7 +1242,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'What you run: Stirling-PDF, a Docker container or desktop app with 2 to 6 GB of memory suggested; OpenAnyDoc, nothing, or static files on any web server.',
             'Users and limits: Stirling-PDF Free, 5 users and 1,000 processing units a month; OpenAnyDoc, no accounts and no limits.',
             'Operations: Stirling-PDF, 50+ tools with pipelines and an API; OpenAnyDoc, more than 30 PDF tools with no API.',
-            'Compression: Stirling-PDF, yes; OpenAnyDoc, no.',
+            'Compression: both; OpenAnyDoc re-saves pictures at three quality levels in the browser and does not lower their resolution.',
             'Large batches: Stirling-PDF, handled by the server; OpenAnyDoc, limited by each device\'s memory.',
           ],
         },
@@ -1222,14 +1260,14 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Who should stay with Stirling-PDF',
-          paragraphs: ['Keep Stirling-PDF, or choose it, if you need to compress PDFs, run the same steps on thousands of files, call PDF tools from other software through an API, or log who processed which document. Those are server jobs, and a browser tool is not built for them. Many teams can use both: Stirling-PDF for automation, OpenAnyDoc for everyday tasks that should never reach a server.'],
+          paragraphs: ['Keep Stirling-PDF, or choose it, if you need to run the same steps on thousands of files, call PDF tools from other software through an API, or log who processed which document. Those are server jobs, and a browser tool is not built for them. Many teams can use both: Stirling-PDF for automation, OpenAnyDoc for everyday tasks that should never reach a server.'],
         },
         {
           heading: 'Which to choose',
           paragraphs: ['A simple rule of thumb:'],
           list: [
             'Staff need everyday PDF tasks and you do not want to run a server: OpenAnyDoc, hosted by us or on your own network.',
-            'You need automation, an API, compression or audit logs: Stirling-PDF.',
+            'You need automation, an API or audit logs: Stirling-PDF.',
             'Your rules say documents may not leave the employee\'s device at all: a tool that processes them locally.',
             'You are unsure what your rules allow: ask your IT or compliance team first. More options are in PDF tools that do not upload your file.',
           ],
@@ -2143,7 +2181,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/how-to-merge-pdf-files': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -2199,10 +2237,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'File size',
           paragraphs: [
-            'Merging copies the pages as they are, so text stays sharp and selectable, and the merged file is about as large as the files added together. Merging does not make anything smaller, and OpenAnyDoc cannot compress a PDF yet.',
+            'Merging copies the pages as they are, so text stays sharp and selectable, and the merged file is about as large as the files added together. Merging does not make anything smaller; to shrink the merged file afterwards, open it in Compress PDF.',
             'If the files are large because they are full of camera photos, make the photos smaller with Compress image before you turn them into a PDF. If the merged file is too big to email, cut it into parts again with Split PDF; the guide on how to split a PDF explains the page ranges. Very large sets of files are limited by your device\'s memory.',
           ],
-          links: [{ text: 'Compress image', path: '/compress-image' }, { text: 'Split PDF', path: '/split-pdf' }, { text: 'how to split a PDF', path: '/how-to-split-a-pdf' }],
+          links: [{ text: 'Compress PDF', path: '/compress-pdf' }, { text: 'Compress image', path: '/compress-image' }, { text: 'Split PDF', path: '/split-pdf' }, { text: 'how to split a PDF', path: '/how-to-split-a-pdf' }],
         },
         {
           heading: 'If a file will not merge',
@@ -2291,7 +2329,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/photos-to-one-pdf': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'The short answer',
@@ -2338,8 +2376,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'Resize image: a photo for a document rarely needs the full camera resolution.',
             'Screenshots saved as PNG shrink less; convert them to JPG while compressing.',
             'Scan to PDF already reduces very large photos to 2,000 pixels on the long side of each page.',
+            'Or make the finished PDF smaller with Compress PDF.',
           ],
-          links: [{ text: 'Compress image', path: '/compress-image' }, { text: 'Resize image', path: '/resize-image' }],
+          links: [{ text: 'Compress image', path: '/compress-image' }, { text: 'Resize image', path: '/resize-image' }, { text: 'Compress PDF', path: '/compress-pdf' }],
         },
         {
           heading: 'Location and camera details',
@@ -2877,7 +2916,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-json-file': {
       published: '2026-10-30',
-      updated: '2026-10-30',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'ما هو ملف JSON',
@@ -2907,7 +2946,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             '"Unexpected token" أو "Unexpected end of JSON input" تعني أن النص يخالف قاعدة من قواعد JSON: فاصلة زائدة، أو علامات اقتباس مفردة، أو تعليق. يعرض مدقق JSON السطر والعمود ويصلح الأخطاء الشائعة، ويشرح دليل أخطاء unexpected token كل رسالة.',
             'الملف الذي يبدأ بالعلامة < صفحة HTML حُفظت باسم json، وغالبًا صفحة خطأ من خادم.',
-            'الملف الذي فيه كائن JSON في كل سطر (jsonl أو ndjson) هو JSON Lines: كل سطر مستند مستقل، فيرفض محلل JSON العادي الملف كله، ولا يفتحه OpenAnyDoc بعد.',
+            'الملف الذي فيه كائن JSON في كل سطر (jsonl أو ndjson) هو JSON Lines: كل سطر مستند مستقل، فيرفض محلل JSON العادي الملف كله. ويفتح عارض JSON ملفات jsonl وndjson سطرًا سطرًا.',
             'فوق 10 ميغابايت يرفض OpenAnyDoc الملف كي تبقى الصفحة سريعة الاستجابة؛ ويتعامل محرر شيفرة أو أداة سطر أوامر مثل jq مع الملفات الأكبر.',
           ],
           links: [{ text: 'مدقق JSON', path: '/json-validator' }, { text: 'دليل أخطاء unexpected token', path: '/json-unexpected-token' }],
@@ -2925,7 +2964,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-xlsx-without-excel': {
       published: '2026-10-30',
-      updated: '2026-10-30',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -2958,6 +2997,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'تحويل Excel إلى CSV', path: '/excel-to-csv' }, { text: 'تحويل Excel إلى JSON', path: '/excel-to-json' }],
         },
         {
+          heading: 'تحتاج إلى تغيير الملف لا فتحه فقط؟',
+          paragraphs: ['إلى جانب تعديل الخلايا في العارض، تعمل هذه الأدوات على المصنفات كاملة في متصفحك، دون رفعها:'],
+          list: [
+            'تحويل Excel إلى PDF يحفظ الأوراق صفحات PDF بعرض الصفحة، بنص يبقى قابلًا للبحث.',
+            'دمج ملفات Excel يجمع عدة مصنفات في ملف xlsx واحد، كل ورقة في تبويب مستقل.',
+            'تقسيم ملف Excel يقسّم المصنف إلى ملفات xlsx أصغر حسب الورقة أو عدد الصفوف أو قيم عمود.',
+            'إزالة حماية Excel تزيل حماية الأوراق وبنية المصنف من ملف تملكه، فتستطيع تعديله من جديد. أما الملف الذي يحتاج كلمة مرور لفتحه فيبقى مقفلًا دونها.',
+            'إصلاح ملف Excel يقرأ المصنف التالف بتساهل ويحفظ بياناته في ملف xlsx جديد سليم.',
+            'تحويل Excel إلى Word يجعل ورقة واحدة جدولًا تعدّله في مستند وورد.',
+          ],
+          links: [{ text: 'تحويل Excel إلى PDF', path: '/excel-to-pdf' }, { text: 'دمج ملفات Excel', path: '/merge-excel' }, { text: 'تقسيم ملف Excel', path: '/split-excel' }, { text: 'إزالة حماية Excel', path: '/unprotect-excel' }, { text: 'إصلاح ملف Excel', path: '/repair-excel' }, { text: 'تحويل Excel إلى Word', path: '/excel-to-word' }],
+        },
+        {
           heading: 'الصيغ الأقدم والقريبة',
           paragraphs: ['ثلاث امتدادات أخرى تظهر إلى جانب xlsx:'],
           list: [
@@ -2979,7 +3031,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-docx-without-word': {
       published: '2026-11-02',
-      updated: '2026-11-02',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -2987,13 +3039,25 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'في متصفحك، دون رفع أي شيء',
-          paragraphs: ['أفلت الملف على عارض وورد. يُفتح المستند صفحاتٍ بمقاس الصفحة وهوامشها، وبخطوطه وجداوله وصوره وقوائمه وترويساته وتذييلاته وأرقام صفحاته، وتظهر الفقرات والجداول العربية من اليمين إلى اليسار. يمكنك التكبير وملاءمة الصفحة مع شاشتك وتنزيل الملف الأصلي من جديد. يعرض العارض المستندات ولا يحررها بعد. أما المستندات المحمية بكلمة مرور فلا تُفتح.'],
+          paragraphs: ['أفلت الملف على عارض وورد. يُفتح المستند صفحاتٍ بمقاس الصفحة وهوامشها، وبخطوطه وجداوله وصوره وقوائمه وترويساته وتذييلاته وأرقام صفحاته، وتظهر الفقرات والجداول العربية من اليمين إلى اليسار. يمكنك التكبير وملاءمة الصفحة مع شاشتك وتنزيل الملف الأصلي من جديد. يعرض العارض المستندات دون أن يحررها؛ والأدوات المذكورة أدناه تغيّرها في المتصفح. أما المستندات المحمية بكلمة مرور فلا تُفتح.'],
           links: [{ text: 'عارض وورد', path: '/word-viewer' }],
         },
         {
           heading: 'احفظه ملف PDF',
-          paragraphs: ['لإرسال المستند أو طباعته، افتحه في عارض وورد وانقر «طباعة / حفظ PDF». تُفتح نافذة الطباعة في متصفحك بصفحات المستند وحدها؛ اختر «حفظ بصيغة PDF» (أو Microsoft Print to PDF في ويندوز) طابعةً. يُنشأ ملف PDF على حاسوبك، فلا يُرفع المستند لهذا أيضًا.'],
-          links: [{ text: 'طباعة / حفظ PDF', path: '/word-viewer' }],
+          paragraphs: ['لإرسال المستند أو طباعته، افتحه في عارض وورد وانقر «طباعة / حفظ PDF»، أو استخدم أداة تحويل Word إلى PDF لتحصل على ملف PDF نصه قابل للبحث بخطوة واحدة. ومع «طباعة / حفظ PDF» تُفتح نافذة الطباعة في متصفحك بصفحات المستند وحدها؛ اختر «حفظ بصيغة PDF» (أو Microsoft Print to PDF في ويندوز) طابعةً. وفي الحالتين يُنشأ ملف PDF على حاسوبك، فلا يُرفع المستند لهذا أيضًا.'],
+          links: [{ text: 'طباعة / حفظ PDF', path: '/word-viewer' }, { text: 'تحويل Word إلى PDF', path: '/word-to-pdf' }],
+        },
+        {
+          heading: 'تحتاج إلى تغيير الملف لا فتحه فقط؟',
+          paragraphs: ['هذه الأدوات تغيّر مستند وورد في متصفحك، دون رفعه:'],
+          list: [
+            'تحويل Word إلى PDF يحفظ المستند ملف PDF صفحةً صفحة، بنص يبقى قابلًا للتحديد والبحث.',
+            'البحث والاستبدال في Word يستبدل كلمة أو عبارة في كل مكان من المستند، الرؤوس والحواشي أيضًا، مع بقاء تنسيقها.',
+            'دمج ملفات Word (تجريبي) يجمع مستندين أو أكثر في ملف docx واحد، ويبدأ كل مستند في صفحة جديدة.',
+            'إزالة التعليقات من Word تحذف التعليقات وتقبل كل تغيير متعقَّب أو ترفضه، لتحصل على نسخة نظيفة للإرسال.',
+            'إزالة بيانات Word الوصفية تعرض من كتب المستند ومن عدّله وحفظه، وتحذف ذلك بنقرة واحدة.',
+          ],
+          links: [{ text: 'تحويل Word إلى PDF', path: '/word-to-pdf' }, { text: 'البحث والاستبدال في Word', path: '/word-find-replace' }, { text: 'دمج ملفات Word', path: '/merge-word' }, { text: 'إزالة التعليقات من Word', path: '/remove-word-comments' }, { text: 'إزالة بيانات Word الوصفية', path: '/word-metadata' }],
         },
         {
           heading: 'برامج مجانية للحاسوب',
@@ -3018,8 +3082,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['امتدادات أخرى تظهر إلى جانب docx:'],
           list: [
             'doc صيغة وورد من 97 إلى 2003. لا يفتحها OpenAnyDoc؛ ويفتحها LibreOffice وPages ووورد، ويمكنها حفظها بصيغة docx التي تُفتح هنا بعد ذلك.',
-            'docm مستند فيه وحدات ماكرو، وdotx قالب. احفظ أيًّا منهما بصيغة docx أولًا؛ ولا تعمل وحدات الماكرو خارج وورد.',
-            'odt صيغة النصوص المفتوحة التي يحفظ بها LibreOffice افتراضيًا، وrtf صيغة نص منسق أقدم. يفتحهما وورد وLibreOffice وPages.',
+            'docm مستند فيه وحدات ماكرو، وdotx قالب. يفتح عارض وورد كليهما؛ ولا تعمل وحدات الماكرو خارج وورد.',
+            'odt صيغة النصوص المفتوحة التي يحفظ بها LibreOffice افتراضيًا، وrtf صيغة نص منسق أقدم. يفتحهما وورد وLibreOffice وPages، ويفتح عارض وورد هنا ملفات odt أيضًا.',
           ],
         },
         {
@@ -3149,7 +3213,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/sign-pdf-without-adobe': {
       published: '2026-11-17',
-      updated: '2026-11-17',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -3179,7 +3243,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'على Windows: متصفح Microsoft Edge',
           paragraphs: ['يفتح متصفح Microsoft Edge، الموجود مع Windows، ملفات PDF وفيه أداة رسم. افتح الملف في Edge، واختر «رسم»، واكتب توقيعك بالفأرة أو القلم أو الإصبع، ثم احفظ الملف. الطريقة سريعة، لكن التوقيع يُرسم يدويًا في كل مرة؛ أما «توقيع PDF» في المتصفح فيتيح لك كتابته أو رفعه ونسخه إلى كل الصفحات.'],
-          links: [{ text: 'توقيع PDF في المتصفح', path: '/sign-pdf' }],
+          links: [{ text: '«توقيع PDF» في المتصفح', path: '/sign-pdf' }],
         },
         {
           heading: 'صورة التوقيع ليست توقيعًا رقميًا',
@@ -3204,7 +3268,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/pdf-tools-without-upload': {
       published: '2026-11-17',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -3223,7 +3287,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'أين تقدّم تلك الخدمات أكثر',
-          paragraphs: ['إنصافًا في المقارنة: تقدّم هذه المواقع أدوات لا يملكها OpenAnyDoc بعد، مثل ضغط ملف PDF. ولعدد منها تطبيقات سطح مكتب وحسابات بتخزين سحابي ومعالجة دفعات. فإن احتجت إلى شيء من ذلك ولم يكن المستند حساسًا، فهي خيارات معقولة.'],
+          paragraphs: ['إنصافًا في المقارنة: يقدّم عدد من هذه المواقع إعدادات أكثر لضغط ملف PDF (الدقة وجودة الصور)، ويحوّل إلى PDF/A، ولها تطبيقات سطح مكتب وحسابات بتخزين سحابي ومعالجة دفعات. فإن احتجت إلى شيء من ذلك ولم يكن المستند حساسًا، فهي خيارات معقولة.'],
         },
         {
           heading: 'ما الذي يفعله OpenAnyDoc بشكل مختلف',
@@ -3249,7 +3313,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['قاعدة بسيطة:'],
           list: [
             'العقود وكشوف الرواتب والهويات والملفات الطبية وملفات العملاء: استخدم أداة تُبقي الملف على جهازك.',
-            'تحتاج إلى تصغير حجم ملف PDF: استخدم تطبيق سطح مكتب، أو خدمة على الإنترنت إن لم يكن المستند حساسًا.',
+            'تحتاج إلى تصغير حجم ملف PDF: تحفظ أداة ضغط PDF صوره من جديد في متصفحك وتعرض الحجم قبل الضغط وبعده؛ ولإعدادات الدقة استخدم تطبيق سطح مكتب.',
             'تعمل على حاسوب عمل لا تستطيع تثبيت برامج عليه: أداة في المتصفح بلا رفع، مثل OpenAnyDoc، تحل المشكلتين معًا.',
             'لدى جهتك قواعد حول مكان معالجة الملفات: اتبعها، واسأل فريق تقنية المعلومات أو الامتثال عند الشك.',
           ],
@@ -3392,7 +3456,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-pptx-without-powerpoint': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -3437,6 +3501,18 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'تحتاج الكلمات لا الشرائح؟',
           paragraphs: ['لتقتبس من عرض في تقرير أو تبحث فيه أو تلصقه في محادثة ذكاء اصطناعي، حوّله إلى نص. أداة تحويل PowerPoint إلى Markdown تكتب عنوان كل شريحة ونقاطها، وتحتها ملاحظات المتحدث، مخططًا مرتبًا؛ وتُترك الصور والمخططات والتخطيط. ويستطيع العارض نفسه أيضًا تصدير مخطط بالعناوين والنصوص والملاحظات بصيغة Markdown أو نص عادي.'],
           links: [{ text: 'تحويل PowerPoint إلى Markdown', path: '/pptx-to-markdown' }],
+        },
+        {
+          heading: 'تحتاج إلى تغيير الملف لا فتحه فقط؟',
+          paragraphs: ['لا يعدّل العارض الشرائح، لكن هذه الأدوات تعمل على العرض كاملًا في متصفحك، دون رفعه:'],
+          list: [
+            'تحويل PowerPoint إلى PDF يحفظ العرض ملف PDF، صفحة لكل شريحة، بنص يبقى قابلًا للتحديد والبحث.',
+            'دمج عروض PowerPoint (تجريبي) يجمع عرضين أو أكثر في ملف pptx واحد بالترتيب الذي تختاره.',
+            'تقسيم عرض PowerPoint يقسّم العرض إلى عدة ملفات pptx، ملف لكل شريحة أو حسب نطاقات الشرائح التي تكتبها.',
+            'البحث في PowerPoint يجد كلمة في كل الشرائح وملاحظات المتحدث، مع رقم الشريحة لكل نتيجة.',
+            'علامة مائية على PowerPoint تضع نصًا مثل «سري» أو «مسودة» على كل شريحة.',
+          ],
+          links: [{ text: 'تحويل PowerPoint إلى PDF', path: '/pptx-to-pdf' }, { text: 'دمج عروض PowerPoint', path: '/merge-pptx' }, { text: 'تقسيم عرض PowerPoint', path: '/split-pptx' }, { text: 'البحث في PowerPoint', path: '/search-pptx' }, { text: 'علامة مائية على PowerPoint', path: '/watermark-pptx' }],
         },
         {
           heading: 'أيّها تختار',
@@ -3752,7 +3828,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/stirling-pdf-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -3775,7 +3851,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'أين يقدّم Stirling-PDF أكثر',
           paragraphs: ['إنصافًا في المقارنة، يغطي Stirling-PDF أمورًا لا يغطيها OpenAnyDoc:'],
           list: [
-            'عمليات أكثر بكثير، منها ضغط ملف PDF، وهو ما لا يفعله OpenAnyDoc.',
+            'عمليات أكثر بكثير مما في OpenAnyDoc.',
             'مسارات عمل تربط عدة خطوات وتعمل على ملفات كثيرة دون أن ينقر أحد خطوة خطوة.',
             'واجهة REST برمجية، لترسل إليها أنظمة شركتك الأخرى ملفات PDF.',
             'حسابات ودخول موحد، وفي الخطط المدفوعة سجل تدقيق، وهذا مهم حين يجب أن تُثبت من فعل ماذا.',
@@ -3798,7 +3874,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'ما الذي تشغّله: Stirling-PDF حاوية Docker أو تطبيق سطح مكتب، مع 2 إلى 6 غيغابايت ذاكرة مقترحة؛ وOpenAnyDoc لا شيء، أو ملفات ثابتة على أي خادم ويب.',
             'المستخدمون والحدود: خطة Stirling-PDF المجانية 5 مستخدمين و1,000 وحدة معالجة شهريًا؛ وOpenAnyDoc بلا حسابات ولا حدود.',
             'العمليات: Stirling-PDF أكثر من 50 أداة مع مسارات عمل وواجهة برمجية؛ وOpenAnyDoc أكثر من 30 أداة PDF دون واجهة برمجية.',
-            'الضغط: Stirling-PDF نعم؛ وOpenAnyDoc لا.',
+            'الضغط: كلاهما؛ يحفظ OpenAnyDoc الصور بثلاثة مستويات جودة في المتصفح ولا يخفّض دقتها.',
             'الدفعات الكبيرة: يتولاها خادم Stirling-PDF؛ وفي OpenAnyDoc تحدها ذاكرة كل جهاز.',
           ],
         },
@@ -3816,14 +3892,14 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'من الأفضل له أن يبقى مع Stirling-PDF',
-          paragraphs: ['ابقَ مع Stirling-PDF، أو اختره، إن احتجت إلى ضغط ملفات PDF، أو تنفيذ الخطوات نفسها على آلاف الملفات، أو استدعاء أدوات PDF من برامج أخرى عبر واجهة برمجية، أو تسجيل من عالج أي مستند. هذه مهام خادم، وأداة المتصفح ليست مصممة لها. وتستطيع فرق كثيرة استخدام الاثنين: Stirling-PDF للأتمتة، وOpenAnyDoc على كل مكتب للدمج والتوقيع وOCR اليومي الذي لا ينبغي أن يصل إلى أي خادم.'],
+          paragraphs: ['ابقَ مع Stirling-PDF، أو اختره، إن احتجت إلى تنفيذ الخطوات نفسها على آلاف الملفات، أو استدعاء أدوات PDF من برامج أخرى عبر واجهة برمجية، أو تسجيل من عالج أي مستند. هذه مهام خادم، وأداة المتصفح ليست مصممة لها. وتستطيع فرق كثيرة استخدام الاثنين: Stirling-PDF للأتمتة، وOpenAnyDoc على كل مكتب للدمج والتوقيع وOCR اليومي الذي لا ينبغي أن يصل إلى أي خادم.'],
         },
         {
           heading: 'أيّهما تختار',
           paragraphs: ['قاعدة بسيطة:'],
           list: [
             'يحتاج الموظفون إلى مهام PDF يومية ولا تريد تشغيل خادم: OpenAnyDoc، على موقعنا أو على شبكتك.',
-            'تحتاج إلى أتمتة أو واجهة برمجية أو ضغط أو سجلات تدقيق: Stirling-PDF.',
+            'تحتاج إلى أتمتة أو واجهة برمجية أو سجلات تدقيق: Stirling-PDF.',
             'تقول قواعدكم إن المستندات لا يجوز أن تغادر جهاز الموظف إطلاقًا: أداة تعالجها محليًا.',
             'لست متأكدًا مما تسمح به قواعدكم: اسأل فريق تقنية المعلومات أو الامتثال أولًا. وخيارات أخرى في أدوات PDF لا ترفع ملفك.',
           ],
@@ -4737,7 +4813,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/how-to-merge-pdf-files': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -4793,10 +4869,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'حجم الملف',
           paragraphs: [
-            'ينسخ الدمج الصفحات كما هي، فيبقى النص حادًّا وقابلًا للتحديد، ويكون حجم الملف المدموج قريبًا من مجموع أحجام الملفات. فالدمج لا يصغّر شيئًا، ولا يستطيع OpenAnyDoc ضغط ملف PDF بعد.',
+            'ينسخ الدمج الصفحات كما هي، فيبقى النص حادًّا وقابلًا للتحديد، ويكون حجم الملف المدموج قريبًا من مجموع أحجام الملفات. فالدمج لا يصغّر شيئًا؛ ولتصغير الملف المدموج بعد ذلك افتحه في أداة ضغط PDF.',
             'وإن كانت الملفات كبيرة لأنها مليئة بصور الكاميرا، فصغّر الصور بأداة «ضغط الصور» قبل تحويلها إلى PDF. وإن كان الملف المدموج أكبر من أن يُرسل بالبريد، فقسّمه إلى أجزاء بأداة «تقسيم PDF»؛ ويشرح دليل تقسيم ملف PDF نطاقات الصفحات. أما المجموعات الكبيرة جدًا من الملفات فتحدّها ذاكرة جهازك.',
           ],
-          links: [{ text: 'ضغط الصور', path: '/compress-image' }, { text: 'تقسيم PDF', path: '/split-pdf' }, { text: 'دليل تقسيم ملف PDF', path: '/how-to-split-a-pdf' }],
+          links: [{ text: 'ضغط PDF', path: '/compress-pdf' }, { text: 'ضغط الصور', path: '/compress-image' }, { text: 'تقسيم PDF', path: '/split-pdf' }, { text: 'دليل تقسيم ملف PDF', path: '/how-to-split-a-pdf' }],
         },
         {
           heading: 'إن رفض ملف أن يُدمج',
@@ -4885,7 +4961,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/photos-to-one-pdf': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-23',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -4932,8 +5008,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             '«تغيير حجم الصورة»: صورة لمستند نادرًا ما تحتاج إلى دقة الكاميرا كاملة.',
             'لقطات الشاشة المحفوظة بصيغة PNG تصغر أقل؛ حوّلها إلى JPG أثناء الضغط.',
             'وأداة «مسح ضوئي إلى PDF» تصغّر الصور الكبيرة جدًا إلى 2000 بكسل على الضلع الطويل لكل صفحة.',
+            'أو صغّر ملف PDF الجاهز بأداة «ضغط PDF».',
           ],
-          links: [{ text: 'ضغط الصور', path: '/compress-image' }, { text: 'تغيير حجم الصورة', path: '/resize-image' }],
+          links: [{ text: 'ضغط الصور', path: '/compress-image' }, { text: 'تغيير حجم الصورة', path: '/resize-image' }, { text: 'ضغط PDF', path: '/compress-pdf' }],
         },
         {
           heading: 'الموقع وبيانات الكاميرا',

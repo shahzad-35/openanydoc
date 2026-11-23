@@ -1,0 +1,94 @@
+{
+  "title": "Merge Excel Files – Combine XLSX Workbooks Free, No Upload",
+  "description": "Merge Excel files into one workbook in your browser: every sheet kept as its own tab, with formulas and formatting from .xlsx. Free, no upload.",
+  "heading": "Merge Excel files",
+  "subtitle": "Combine several Excel workbooks into one .xlsx file, every sheet as its own tab, right in your browser; nothing is uploaded.",
+  "intro": "Merge Excel files online for monthly reports, regional sheets or exports from different systems: choose two or more workbooks, drag them into the order you want, and every sheet of every file becomes its own sheet in one .xlsx file. From .xlsx and .xlsm files the values, formulas, formatting, column widths and merged cells come along; from .xls, .ods and .csv files the values do. Sheets with the same name get a number so nothing is overwritten. Your files never leave your device.",
+  "features": [
+    {
+      "title": "Every sheet kept",
+      "text": "Each sheet of each file becomes its own sheet in the merged workbook, in the order you set."
+    },
+    {
+      "title": "Formatting kept",
+      "text": "From .xlsx and .xlsm files, formulas, formatting, column widths and merged cells come along."
+    },
+    {
+      "title": "Private",
+      "text": "Your files are joined by your own browser and never sent to a server, so nobody else sees them."
+    }
+  ],
+  "stepsTitle": "How to merge Excel files",
+  "steps": [
+    {
+      "title": "Choose your workbooks",
+      "text": "Click Choose a file, or drop two or more .xlsx, .xlsm, .xls, .ods or .csv files on the page."
+    },
+    {
+      "title": "Set the order",
+      "text": "Drag the files into the order their sheets should appear in the merged workbook."
+    },
+    {
+      "title": "Merge and download",
+      "text": "Click Merge and download one .xlsx file with every sheet."
+    }
+  ],
+  "handlesTitle": "What Merge Excel handles",
+  "handles": [
+    "Files: .xlsx, .xlsm, .xls, .ods and .csv, two or more at a time.",
+    "Values, formulas, formatting, column widths and merged cells from .xlsx and .xlsm files.",
+    "Values from .xls, .ods and .csv files.",
+    "Sheets with the same name, which get a number instead of overwriting each other."
+  ],
+  "limits": [
+    "Charts, pictures, pivot tables and macros are not carried over.",
+    "From .xls, .ods and .csv files only the values are copied, not the formatting.",
+    "Formulas that point to another sheet keep the original sheet name, which may change if that sheet was renamed in the merge."
+  ],
+  "worksBest": [
+    "Monthly or regional reports with the same layout",
+    "Exports from different systems gathered in one file",
+    ".xlsx workbooks with formulas and formatting"
+  ],
+  "mayNotKeep": [
+    "Charts and pictures",
+    "Pivot tables",
+    "Macros",
+    "Formatting from .xls, .ods and .csv files"
+  ],
+  "faqTitle": "Merge Excel: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I merge Excel files into one?",
+      "answer": "To merge Excel files into one, put every sheet in a single workbook, either by copying them yourself or with a tool that copies them for you. In Excel you can do it sheet by sheet with Move or Copy, and LibreOffice Calc and Google Sheets can copy sheets by hand too. On this page, choose all the files, put them in order and click Merge: every sheet lands in one .xlsx file, in your browser."
+    },
+    {
+      "question": "What happens to two sheets with the same name?",
+      "answer": "The second one gets a number after its name, so both are kept and nothing is overwritten."
+    },
+    {
+      "question": "Do formulas still work after merging?",
+      "answer": "Formulas from .xlsx and .xlsm files are kept. A formula that points to another sheet keeps that sheet's original name, so check it when the sheet was renamed because its name was taken."
+    },
+    {
+      "question": "Are charts and pivot tables kept?",
+      "answer": "No. Charts, pictures, pivot tables and macros are not carried over; the cells are. From .xls, .ods and .csv files only the values come along."
+    },
+    {
+      "question": "Can I join the rows of several CSV files instead?",
+      "answer": "Here each CSV becomes its own sheet. To join the rows of several CSV files into one table, use Merge CSV.",
+      "link": {
+        "text": "Merge CSV",
+        "path": "/merge-csv"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

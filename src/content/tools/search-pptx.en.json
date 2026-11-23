@@ -1,0 +1,87 @@
+{
+  "title": "Search PowerPoint – Find Text in PPTX Slides and Notes",
+  "description": "Search the text of every PowerPoint slide and its speaker notes in your browser, and see each match with its slide number. Free, no upload.",
+  "heading": "Search text in a PowerPoint presentation",
+  "subtitle": "Find a word in every slide and speaker note of a PowerPoint presentation, with the slide number of each match; nothing is uploaded.",
+  "intro": "Search a PPTX without PowerPoint: choose a presentation, type a word and see every match in the slides and their speaker notes, with the slide number and the words around it. Arabic and English are both found. Nothing is downloaded: the results are listed on the page. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Slides and notes",
+      "text": "The text of every slide and its speaker notes is searched in one go."
+    },
+    {
+      "title": "Arabic and English",
+      "text": "Arabic words are found as well as English ones."
+    }
+  ],
+  "stepsTitle": "How to search a PowerPoint presentation",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
+    },
+    {
+      "title": "Type a word",
+      "text": "Type the word or phrase you are looking for."
+    },
+    {
+      "title": "Read the results",
+      "text": "Each match is listed with its slide number and the words around it."
+    }
+  ],
+  "handlesTitle": "What Search PowerPoint handles",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
+    "The text on every slide and in its speaker notes.",
+    "Arabic and English text.",
+    "Results: the slide number and the words around each match."
+  ],
+  "limits": [
+    "Text inside pictures, such as a screenshot or a scanned page, can't be searched.",
+    "Text in charts may be missed.",
+    "Old .ppt files can't be read; save them as .pptx first."
+  ],
+  "faqTitle": "Search PowerPoint: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I search for a word in a PowerPoint?",
+      "answer": "PowerPoint, Keynote and LibreOffice Impress each have a Find command (Ctrl+F, or Cmd+F on a Mac) for the presentation you have open. On this page, choose the file and type the word; every slide and speaker note is searched in your browser, and each match is listed with its slide number."
+    },
+    {
+      "question": "Does it search the speaker notes?",
+      "answer": "Yes. The speaker notes of every slide are searched along with the slide text, and the results say where each match was found."
+    },
+    {
+      "question": "Why isn't the text in a picture found?",
+      "answer": "A picture holds pixels, not text, so words in a screenshot or a scanned page can't be searched. Text in charts may also be missed."
+    },
+    {
+      "question": "Does it work with Arabic?",
+      "answer": "Yes. Arabic words are found as well as English ones, in the slides and in the notes."
+    },
+    {
+      "question": "Can I see the slides themselves?",
+      "answer": "Yes. Open the file in the PowerPoint viewer to go through the slides.",
+      "link": {
+        "text": "PowerPoint viewer",
+        "path": "/powerpoint-viewer"
+      }
+    },
+    {
+      "question": "Can I copy all the text out?",
+      "answer": "Yes. PowerPoint to Markdown turns every slide's text and notes into one text file.",
+      "link": {
+        "text": "PowerPoint to Markdown",
+        "path": "/pptx-to-markdown"
+      }
+    }
+  ]
+}

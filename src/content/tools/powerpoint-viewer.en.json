@@ -42,7 +42,7 @@
     "Files: PowerPoint presentations (.pptx), slide shows (.ppsx), templates (.potx) and macro-enabled presentations (.pptm, macros are never run), made by PowerPoint, Google Slides, Keynote or LibreOffice. Older .ppt files are not supported: save them as .pptx first.",
     "Content: text with its fonts and formatting, pictures, tables with merged cells, basic shapes, lines and arrows, and slide backgrounds.",
     "Simplified: SmartArt is shown as last drawn by PowerPoint, and charts are drawn approximately. Animations and transitions are not played, and embedded video may not play.",
-    "Slides that cannot be drawn: a slide with features the viewer cannot show yet displays a note instead of a broken layout, and the other slides are not affected.",
+    "Slides that cannot be drawn: a slide with features the viewer cannot show displays a note instead of a broken layout, and the other slides are not affected.",
     "Navigation: thumbnails, a grid of all slides, previous and next buttons, arrow keys, a slide counter and full screen.",
     "Presenting: speaker notes under the slide, and a presenter view with the current and next slide, notes and a timer, while the audience sees the slide in a second window or full screen.",
     "Find and listen: search across slide text and speaker notes, and read the slides or notes aloud with the voices installed on your device.",
@@ -79,7 +79,7 @@
       {
         "label": "Edit and save",
         "cells": [
-          "View only for now (beta); editing is coming.",
+          "View only (beta); separate tools merge, split and watermark a .pptx.",
           "Yes, in the cloud copy.",
           "Often view only."
         ]
@@ -111,7 +111,7 @@
     ]
   },
   "limits": [
-    "View only: slides can't be edited.",
+    "View only: to change a presentation, use Merge PowerPoint, Split PowerPoint or Watermark PowerPoint.",
     "Animations and transitions are not played.",
     "Old .ppt files are not supported; save them as .pptx first.",
     "Macros in .pptm files are never run.",
@@ -129,7 +129,11 @@
     },
     {
       "question": "Can I edit and save it?",
-      "answer": "Not yet: the PowerPoint viewer shows presentations, and editing is coming. Today you can view the slides, present them full screen, or download the original .pptx again."
+      "answer": "The PowerPoint viewer shows presentations. To change one, use Merge PowerPoint, Split PowerPoint or Watermark PowerPoint; PowerPoint to PDF saves a copy as PDF.",
+      "link": {
+        "text": "PowerPoint to PDF",
+        "path": "/pptx-to-pdf"
+      }
     },
     {
       "question": "Is the original changed?",
@@ -153,7 +157,7 @@
     },
     {
       "question": "Why is it called beta?",
-      "answer": "Because PowerPoint files can hold many kinds of content, and not all of them are drawn yet. Text, pictures, tables and basic shapes are shown as in PowerPoint; animations, transitions, some effects and embedded video may be simplified or skipped."
+      "answer": "Because PowerPoint files can hold many kinds of content, and not all of them are drawn. Text, pictures, tables and basic shapes are shown as in PowerPoint; animations, transitions, some effects and embedded video may be simplified or skipped."
     },
     {
       "question": "Are animations and transitions played?",
@@ -161,7 +165,7 @@
     },
     {
       "question": "What happens if a slide looks wrong?",
-      "answer": "A slide with features the viewer cannot draw yet shows a note instead of a broken layout. If a slide is shown but looks wrong, use Report a slide that looks wrong next to the viewer: it opens an email to us. No file is sent, so describe what you see and please do not attach confidential slides."
+      "answer": "A slide with features the viewer cannot draw shows a note instead of a broken layout. If a slide is shown but looks wrong, use Report a slide that looks wrong next to the viewer: it opens an email to us. No file is sent, so describe what you see and please do not attach confidential slides."
     },
     {
       "question": "Can I present full screen?",

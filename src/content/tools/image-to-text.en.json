@@ -1,0 +1,83 @@
+{
+  "title": "Image to Text – Copy Text from a Photo or Screenshot, Free",
+  "description": "Copy the text out of a photo, scan or screenshot in your browser: English and Arabic, one picture or many. Free, nothing is uploaded.",
+  "heading": "Image to text",
+  "subtitle": "Get the text out of a photo, scan or screenshot, in English or Arabic; nothing is uploaded.",
+  "intro": "Turn an image into text without sending it anywhere: text recognition (OCR) runs in your browser and reads the words in a photo of a page, a scan, a receipt or a screenshot. Copy the text, or download it as a .txt or Markdown file. Choose several pictures and they are read one after another into one text, with each file's name as a heading. The first time, the text reader (about 10 MB) is loaded from this site and kept by your browser, so later it works offline.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The picture is read on your device; it never goes to a server."
+    },
+    {
+      "title": "English and Arabic",
+      "text": "English, Arabic, or both in the same picture."
+    },
+    {
+      "title": "Many pictures at once",
+      "text": "Read a whole set of photos or screenshots into one text."
+    }
+  ],
+  "stepsTitle": "How to copy text from an image",
+  "steps": [
+    {
+      "title": "Choose your pictures",
+      "text": "Click Choose a file, or drop one or more images on the page."
+    },
+    {
+      "title": "Pick the language",
+      "text": "Choose the language of the text in the pictures."
+    },
+    {
+      "title": "Read the text",
+      "text": "Click Read text; the time left is shown as it goes."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the text, or download it as .txt or .md."
+    }
+  ],
+  "handlesTitle": "What Image to text handles",
+  "handles": [
+    "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and iPhone HEIC pictures.",
+    "Photos of printed pages, scans, receipts and screenshots.",
+    "English and Arabic, alone or together.",
+    "Several pictures in one go, with a heading per file."
+  ],
+  "limits": [
+    "Text recognition makes mistakes, more so on blurry, small, curved or handwritten text; check what matters.",
+    "The first use loads the text reader (about 10 MB) from this site; after that it works offline.",
+    "Tables and columns come out as lines of words, not as a table."
+  ],
+  "faqTitle": "Image to text: questions",
+  "faq": [
+    {
+      "question": "Is my image uploaded?",
+      "answer": "No. Your picture is read by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I copy text from a screenshot?",
+      "answer": "Choose the screenshot here, pick the language and click Read text. The text appears in a box with a Copy button, and you can download it as a text or Markdown file."
+    },
+    {
+      "question": "Can it read Arabic?",
+      "answer": "Yes. Printed Arabic reads well, alone or mixed with English on the same picture."
+    },
+    {
+      "question": "Does it read handwriting?",
+      "answer": "Not reliably. It is made for printed text; handwriting usually comes out wrong."
+    },
+    {
+      "question": "I have a scanned PDF, not a picture. What do I use?",
+      "answer": "Use OCR PDF: it reads every page and lays the text over it, so the PDF itself becomes searchable.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
+    },
+    {
+      "question": "What does the first use download?",
+      "answer": "The text reader and the language data, about 10 MB, from this site itself. Your browser keeps them, so later uses start at once and work offline."
+    }
+  ]
+}

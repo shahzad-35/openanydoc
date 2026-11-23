@@ -1,0 +1,89 @@
+{
+  "title": "Remove Word Comments – Clear Tracked Changes in a DOCX",
+  "description": "Remove every comment from a Word document and accept or reject all tracked changes in your browser, for a clean .docx to send. Free, no upload.",
+  "heading": "Remove comments from Word",
+  "subtitle": "Delete all comments and accept or reject every tracked change in a Word document, for a clean copy to send; nothing is uploaded.",
+  "intro": "Clean a DOCX file before you send it: every comment and its replies is removed, and tracked changes are either all accepted or all rejected, so the reader sees only the final text. It is useful before sending a contract, a CV or a report outside your team. The rest of the document stays as it was. The file is cleaned in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is cleaned by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Comments and replies",
+      "text": "Every comment is removed together with its replies."
+    },
+    {
+      "title": "Tracked changes settled",
+      "text": "Accept all or reject all tracked changes, so no markup is left in the file."
+    }
+  ],
+  "stepsTitle": "How to remove comments from a Word document",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx file on the page."
+    },
+    {
+      "title": "Choose accept or reject",
+      "text": "Choose whether to accept all or reject all tracked changes."
+    },
+    {
+      "title": "Clean and download",
+      "text": "Click Remove and download the clean Word document."
+    }
+  ],
+  "handlesTitle": "What Remove comments handles",
+  "handles": [
+    "Files: .docx documents (Word 2007 and later).",
+    "Comments: every comment and its replies.",
+    "Tracked changes: all accepted or all rejected.",
+    "Result: a clean .docx; the rest of the document is unchanged."
+  ],
+  "limits": [
+    "It is all or nothing: you can't keep some comments and remove others.",
+    "Tracked changes are all accepted or all rejected, not one by one.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "Contracts before signing",
+    "CVs and cover letters",
+    "Reports leaving the team"
+  ],
+  "mayNotKeep": [
+    "Comments you wanted to keep",
+    "Changes you would accept one by one",
+    "Old .doc files"
+  ],
+  "faqTitle": "Remove Word comments: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I remove all comments from a Word document?",
+      "answer": "Removing all comments deletes every note and reply from the margin in one step; Word and LibreOffice both have a delete-all-comments command. On this page, choose the .docx, pick accept all or reject all for tracked changes and download a clean copy, cleaned in your browser."
+    },
+    {
+      "question": "What happens to tracked changes?",
+      "answer": "You choose: accept all keeps the suggested text, reject all goes back to the original. Either way no markup is left."
+    },
+    {
+      "question": "Are replies removed too?",
+      "answer": "Yes. Each comment is removed with all its replies."
+    },
+    {
+      "question": "Can I keep some comments?",
+      "answer": "No. The tool removes every comment; to keep a few, delete the others one by one in Word."
+    },
+    {
+      "question": "Does it remove the author's name from the file?",
+      "answer": "It removes the names shown on comments and tracked changes. The author stored in the file's properties is removed by Word metadata.",
+      "link": {
+        "text": "Word metadata",
+        "path": "/word-metadata"
+      }
+    }
+  ]
+}

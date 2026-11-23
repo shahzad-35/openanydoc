@@ -1,6 +1,6 @@
 /* oxlint-disable react/only-export-components */
 // JPG to PDF: pictures (JPG, PNG, WebP, HEIC, TIFF, SVG) in the order shown become one PDF, or one PDF per picture in a ZIP, with
-// a page size, orientation and margin. JPG and PNG go into the PDF as they are; the other formats are read by the browser (HEIC
+// a page size, orientation and margin. Images to PowerPoint: the same pictures, one per slide, fitted and centred (pptxgenjs, MIT). JPG and PNG go into the PDF as they are; the other formats are read by the browser (HEIC
 // by libheif-js where the browser can't), TIFF by utif2 (MIT, loaded only for a TIFF), and drawn once on a canvas.
 import { useEffect, useRef, useState } from 'react'
 import { useT } from '../../i18n'
@@ -14,8 +14,11 @@ import type { GridCard } from './PdfToolParts'
 
 export type ReadPicture = { image: EmbeddableImage; previewUrl: string } | { problem: 'heic' | 'unreadable' }
 type Margin = 'none' | 'small' | 'large'
+type SlideShape = 'wide' | 'standard'
 
 const MARGIN_POINTS: Record<Margin, number> = { none: 0, small: 18, large: 36 }
+// Slide sizes in inches, as PowerPoint makes them.
+const SLIDE_SIZES: Record<SlideShape, { width: number; height: number }> = { wide: { width: 13.333, height: 7.5 }, standard: { width: 10, height: 7.5 } }
 const SVG_LONG_SIDE_PX = 2000
 const fieldClass = 'control-shape min-h-11 border-2 border-rule bg-paper-raised px-3 text-ink'
 
@@ -118,8 +121,28 @@ export async function readPicture(file: File): Promise<ReadPicture> {
   return canvasToImage(canvas, file.name, isSvg || extension === 'webp' ? 'png' : 'jpg')
 }
 
-export default function ImagesToPdf({ files, onFilesChange, onAddFiles, onResult }: ToolProps) {
+// One picture per slide, as large as fits and centred.
+async function writeImagesPresentation(images: EmbeddableImage[], slideShape: SlideShape, fileName: string) {
+  const { default: PptxGenJS } = await import('pptxgenjs')
+  const presentation = new PptxGenJS()
+  const slideSize = SLIDE_SIZES[slideShape]
+  presentation.defineLayout({ name: 'PICTURES', ...slideSize })
+  presentation.layout = 'PICTURES'
+  for (const image of images) {
+    const scale = Math.min(slideSize.width / image.width, slideSize.height / image.height)
+    const [width, height] = [image.width * scale, image.height * scale]
+    const base64 = btoa(Array.from(new Uint8Array(image.bytes), (byte) => String.fromCharCode(byte)).join(''))
+    presentation.addSlide().addImage({ data: `image/${image.kind === 'jpg' ? 'jpeg' : 'png'};base64,${base64}`, x: (slideSize.width - width) / 2, y: (slideSize.height - height) / 2, w: width, h: height })
+  }
+  const { removeTypesOfMissingParts } = await import('../office/officePackage')
+  return new File([await removeTypesOfMissingParts((await presentation.write({ outputType: 'arraybuffer' })) as ArrayBuffer)], fileName, { type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation' })
+}
+
+function PicturesConverter({ files, onFilesChange, onAddFiles, onResult, output }: ToolProps & { output: 'pdf' | 'pptx' }) {
   const { t } = useT()
+  const idPrefix = output === 'pdf' ? 'jpg' : 'images-pptx'
+  const toolId = output === 'pdf' ? 'jpg-to-pdf' : 'images-to-pptx'
+  const [slideShape, setSlideShape] = useState<SlideShape>('wide')
   const [readByFile, setReadByFile] = useState(new Map<File, ReadPicture>())
   const readRef = useRef(readByFile)
   useEffect(() => {
@@ -188,15 +211,29 @@ export default function ImagesToPdf({ files, onFilesChange, onAddFiles, onResult
     else setError(t('tools.images.failed'))
   }
 
-  const options: { id: string; labelKey: MessageKey; value: string; onChange: (value: string) => void; choices: [string, MessageKey][] }[] = [
+  async function makePresentation() {
+    setError('')
+    setProgress({ done: 0, total: readyImages.length })
+    const baseName = readyImages.length === 1 ? baseNameOf(readyImages[0].name) : `${baseNameOf(readyImages[0].name)}-and-${readyImages.length - 1}-more`
+    try {
+      onResult(await writeImagesPresentation(readyImages, slideShape, `${baseName}.pptx`))
+    } catch {
+      setError(t('tools.images.failed'))
+    } finally {
+      setProgress(null)
+    }
+  }
+
+  const pdfOptions: { id: string; labelKey: MessageKey; value: string; onChange: (value: string) => void; choices: [string, MessageKey][] }[] = [
     { id: 'jpg-page-size-select', labelKey: 'tools.images.pageSize', value: pageSize, onChange: (value) => setPageSize(value as PageSize), choices: [['a4', 'tools.images.sizeA4'], ['letter', 'tools.images.sizeLetter'], ['fit', 'tools.images.sizeFit']] },
     { id: 'jpg-orientation-select', labelKey: 'tools.images.orientation', value: orientation, onChange: (value) => setOrientation(value as PageOrientation), choices: [['auto', 'tools.images.orientationAuto'], ['portrait', 'tools.images.orientationPortrait'], ['landscape', 'tools.images.orientationLandscape']] },
     { id: 'jpg-margin-select', labelKey: 'tools.images.margin', value: margin, onChange: (value) => setMargin(value as Margin), choices: [['none', 'tools.images.marginNone'], ['small', 'tools.images.marginSmall'], ['large', 'tools.images.marginLarge']] },
   ]
+  const options = output === 'pdf' ? pdfOptions : [{ id: 'images-pptx-slide-shape-select', labelKey: 'tools.imagesPptx.slideShape' as MessageKey, value: slideShape, onChange: (value: string) => setSlideShape(value as SlideShape), choices: [['wide', 'tools.imagesPptx.wide'], ['standard', 'tools.imagesPptx.standard']] as [string, MessageKey][] }]
   const actionClass = 'grid size-11 place-items-center rounded-full text-ink-soft hover:bg-surface hover:text-ink disabled:opacity-40'
   return (
-    <div id="jpg-to-pdf-tool" className="space-y-4">
-      <p className="text-center text-sm text-ink-soft">{t('tools.images.hint')}</p>
+    <div id={`${toolId}-tool`} className="space-y-4">
+      <p className="text-center text-sm text-ink-soft">{t(output === 'pdf' ? 'tools.images.hint' : 'tools.imagesPptx.hint')}</p>
       <div className="flex flex-wrap items-end justify-center gap-4 text-start">
         {options.map((option) => (
           <label key={option.id} className="flex flex-col gap-1 text-sm font-medium">
@@ -210,35 +247,37 @@ export default function ImagesToPdf({ files, onFilesChange, onAddFiles, onResult
             </select>
           </label>
         ))}
-        <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
-          <input id="jpg-one-pdf-per-image-checkbox" type="checkbox" checked={isOnePdfPerImage} onChange={(event) => setIsOnePdfPerImage(event.target.checked)} className="size-5" />
-          {t('tools.images.onePerImage')}
-        </label>
+        {output === 'pdf' && (
+          <label className="flex min-h-11 items-center gap-2 text-sm font-medium">
+            <input id="jpg-one-pdf-per-image-checkbox" type="checkbox" checked={isOnePdfPerImage} onChange={(event) => setIsOnePdfPerImage(event.target.checked)} className="size-5" />
+            {t('tools.images.onePerImage')}
+          </label>
+        )}
       </div>
       <div className="flex flex-wrap items-center justify-center gap-3">
-        <button id="jpg-add-images-button" type="button" onClick={onAddFiles} className="btn btn--quiet press">
+        <button id={`${idPrefix}-add-images-button`} type="button" onClick={onAddFiles} className="btn btn--quiet press">
           {t('tools.images.addMore')}
         </button>
-        <button id="jpg-to-pdf-button" type="button" disabled={readyImages.length === 0 || !isEveryFileRead || progress !== null} onClick={() => void makePdf()} className="btn btn--primary press">
-          {progress ? t('tools.working') : t('tools.images.button')}
+        <button id={`${toolId}-button`} type="button" disabled={readyImages.length === 0 || !isEveryFileRead || progress !== null} onClick={() => void (output === 'pdf' ? makePdf() : makePresentation())} className="btn btn--primary press">
+          {progress ? t('tools.working') : t(output === 'pdf' ? 'tools.images.button' : 'tools.imagesPptx.button')}
         </button>
       </div>
       {progress && <ProgressBar id="tool-progress" done={progress.done} total={progress.total} label={t('tools.progress.images', { done: progress.done, total: progress.total })} />}
       <Notice id="tool-error" kind="error" role="alert" className="text-center font-medium text-danger" message={error} />
       <PdfThumbnailGrid
-        id="jpg-to-pdf-grid"
+        id={`${toolId}-grid`}
         label={t('tools.images.listLabel')}
         cards={cards}
         onReorder={moveFile}
         renderActions={(card, index) => (
           <>
-            <button id={`jpg-earlier-${index + 1}`} type="button" aria-label={t('tools.grid.moveEarlier', { name: card.caption })} disabled={index === 0} onClick={() => moveFile(index, index - 1)} className={actionClass}>
+            <button id={`${idPrefix}-earlier-${index + 1}`} type="button" aria-label={t('tools.grid.moveEarlier', { name: card.caption })} disabled={index === 0} onClick={() => moveFile(index, index - 1)} className={actionClass}>
               <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 6-6 6 6 6" /></svg>
             </button>
-            <button id={`jpg-later-${index + 1}`} type="button" aria-label={t('tools.grid.moveLater', { name: card.caption })} disabled={index === files.length - 1} onClick={() => moveFile(index, index + 1)} className={actionClass}>
+            <button id={`${idPrefix}-later-${index + 1}`} type="button" aria-label={t('tools.grid.moveLater', { name: card.caption })} disabled={index === files.length - 1} onClick={() => moveFile(index, index + 1)} className={actionClass}>
               <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5 rtl:-scale-x-100" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m9 6 6 6-6 6" /></svg>
             </button>
-            <button id={`jpg-remove-${index + 1}`} type="button" aria-label={t('tools.file.remove', { name: card.caption })} onClick={() => onFilesChange(files.filter((_, fileIndex) => fileIndex !== index))} className={actionClass}>
+            <button id={`${idPrefix}-remove-${index + 1}`} type="button" aria-label={t('tools.file.remove', { name: card.caption })} onClick={() => onFilesChange(files.filter((_, fileIndex) => fileIndex !== index))} className={actionClass}>
               <svg aria-hidden="true" viewBox="0 0 24 24" className="size-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="m6 6 12 12M18 6 6 18" /></svg>
             </button>
           </>
@@ -246,4 +285,12 @@ export default function ImagesToPdf({ files, onFilesChange, onAddFiles, onResult
       />
     </div>
   )
+}
+
+export default function ImagesToPdf(props: ToolProps) {
+  return <PicturesConverter {...props} output="pdf" />
+}
+
+export function ImagesToPptx(props: ToolProps) {
+  return <PicturesConverter {...props} output="pptx" />
 }

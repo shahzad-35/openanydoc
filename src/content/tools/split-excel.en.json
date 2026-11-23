@@ -1,0 +1,92 @@
+{
+  "title": "Split Excel File – By Sheet, Rows or Column Value, Free",
+  "description": "Split an Excel workbook into separate files in your browser: one per sheet, every N rows, or one per column value. Free, and nothing is uploaded.",
+  "heading": "Split an Excel file",
+  "subtitle": "Split a workbook into smaller .xlsx files by sheet, by number of rows or by the values of a column, in your browser; nothing is uploaded.",
+  "intro": "Split an Excel file online in one of three ways: one file per sheet, with each sheet's formatting kept; a new file every N rows, with the header row repeated in each part; or one file per value of a column, such as one file per region, team or month. The parts are saved as .xlsx files and downloaded together as one ZIP. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Three ways to split",
+      "text": "By sheet, by a number of rows, or by the values of a column you choose."
+    },
+    {
+      "title": "Header in every part",
+      "text": "When you split by rows, each part starts with the header row, so it makes sense on its own."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is split by your own browser and never sent to a server, so nobody else sees it."
+    }
+  ],
+  "stepsTitle": "How to split an Excel file",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Click Choose a file, or drop an Excel workbook on the page."
+    },
+    {
+      "title": "Choose how to split",
+      "text": "Pick one file per sheet, every N rows, or one file per value of a column."
+    },
+    {
+      "title": "Split and download",
+      "text": "Click Split and download the parts as .xlsx files in one ZIP."
+    }
+  ],
+  "handlesTitle": "What Split Excel handles",
+  "handles": [
+    "One file per sheet, with the sheet's formatting kept.",
+    "A new file every N rows, with the header row repeated in each part.",
+    "One file per value of a column, for example one file per region."
+  ],
+  "limits": [
+    "Splitting by rows or by value writes the values; that sheet's formatting is not kept.",
+    "Formulas that refer to other sheets may break in a file that holds only one sheet.",
+    "The parts come as one ZIP; unzip it to get the separate files."
+  ],
+  "worksBest": [
+    "Workbooks with one sheet per month, team or region",
+    "Long lists that must be sent in smaller parts",
+    "Sales or contact lists split by region"
+  ],
+  "mayNotKeep": [
+    "Formatting, when splitting by rows or by value",
+    "Formulas that refer to other sheets",
+    "The workbook as one file (each part is its own .xlsx)"
+  ],
+  "faqTitle": "Split Excel: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I split an Excel sheet into multiple files?",
+      "answer": "To split an Excel file, save each part as its own workbook: by sheet, by a number of rows or by the values in a column. In Excel you can do it by hand with Move or Copy into a new book, or by filtering and copying rows, and LibreOffice Calc and Google Sheets work the same way by hand. On this page, choose the file and the way to split, and every part is saved as an .xlsx file in one ZIP."
+    },
+    {
+      "question": "Can I make one file per region or customer?",
+      "answer": "Yes. Choose to split by the value of a column, pick that column, and you get one file for each value in it."
+    },
+    {
+      "question": "Does each part keep the header row?",
+      "answer": "Yes, when you split every N rows: the header row is repeated at the top of each part."
+    },
+    {
+      "question": "Is the formatting kept?",
+      "answer": "When you split by sheet, yes. When you split by rows or by value, the values are written and that sheet's formatting is not kept. Formulas that refer to other sheets may break in a one-sheet file."
+    },
+    {
+      "question": "Can I split a CSV file?",
+      "answer": "Yes, with Split CSV, which cuts a CSV into parts by rows or by size, each with the header row.",
+      "link": {
+        "text": "Split CSV",
+        "path": "/split-csv"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

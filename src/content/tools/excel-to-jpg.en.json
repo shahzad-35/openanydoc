@@ -1,0 +1,94 @@
+{
+  "title": "Excel to JPG – Convert XLSX Sheets to Images, No Upload",
+  "description": "Turn Excel sheets into JPG images in your browser: colours, borders and merged cells kept, fitted to an A4 or Letter page. Free, nothing uploaded.",
+  "heading": "Excel to JPG",
+  "subtitle": "Turn the sheets of an Excel workbook into JPG pictures, page by page, with their colours and borders; nothing is uploaded.",
+  "intro": "Convert Excel to JPG online for a timetable, a price list or a table to post: every visible sheet, or one you choose by name, is laid out with its column widths, merged cells, colours, borders and bold text, fitted to an A4 or Letter page, and split between rows (and between columns when still too wide) onto as many pages as it needs. Each page is saved as a JPG; several come in one ZIP. Arabic sheets sit right to left. Works with .xlsx, .xls, .xlsm and .ods files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "The sheet's look",
+      "text": "Column widths, merged cells, colours, borders and bold text are kept; hidden rows and columns are left out."
+    },
+    {
+      "title": "Fitted to the page",
+      "text": "Each sheet is scaled to the page width and split between rows, never through the middle of one."
+    }
+  ],
+  "stepsTitle": "How to convert Excel to JPG",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Click Choose a file, or drop an .xlsx, .xls or .ods file on the page."
+    },
+    {
+      "title": "Set the pages",
+      "text": "Choose all sheets or one sheet, the page size, the orientation and whether to show gridlines."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to JPG, check the preview and download the JPG or the ZIP."
+    }
+  ],
+  "handlesTitle": "What Excel to JPG handles",
+  "handles": [
+    "Workbooks: .xlsx, .xlsm, .xls and .ods.",
+    "Column widths, merged cells and hidden rows and columns.",
+    "Colours, borders, bold and alignment from .xlsx and .xlsm files.",
+    "Page: A4 or Letter; portrait, landscape or automatic; gridlines on or off."
+  ],
+  "limits": [
+    "Charts, pictures in the sheet and conditional formatting are not drawn.",
+    "Formulas show the value saved in the file.",
+    "A sheet is scaled down to half size at most; wider sheets continue on more pages, split between columns."
+  ],
+  "worksBest": [
+    "Timetables, schedules and price lists",
+    "Small tables to post or send as a picture",
+    "Sheets with colours and borders"
+  ],
+  "mayNotKeep": [
+    "Charts and pictures in the sheet",
+    "Conditional formatting",
+    "Excel's print area and page breaks",
+    "Colours from .xls and .ods files"
+  ],
+  "faqTitle": "Excel to JPG: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert an Excel sheet to JPG without Excel?",
+      "answer": "Without Excel, you can take a screenshot of the sheet in LibreOffice Calc, Numbers or Google Sheets, but a large sheet won't fit on one screen. In OpenAnyDoc, choose the workbook, pick the sheets and page, and download a JPG of each page; it is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Can I convert only one sheet?",
+      "answer": "Yes. Choose the sheet by name instead of all visible sheets."
+    },
+    {
+      "question": "What happens to a very wide sheet?",
+      "answer": "It is scaled down to fit the page width, to half size at most; what still doesn't fit continues on further pages, split between columns. Landscape pages give it more room."
+    },
+    {
+      "question": "Are charts included?",
+      "answer": "No. Charts and pictures placed on the sheet are not drawn, and conditional formatting is not applied; only the cells are drawn."
+    },
+    {
+      "question": "Can I get a PDF instead?",
+      "answer": "Yes. Excel to PDF lays the sheets out the same way, with text you can search.",
+      "link": {
+        "text": "Excel to PDF",
+        "path": "/excel-to-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

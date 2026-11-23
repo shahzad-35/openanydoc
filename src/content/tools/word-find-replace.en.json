@@ -1,0 +1,93 @@
+{
+  "title": "Find and Replace in Word – Change Text in a DOCX Online",
+  "description": "Find a word or phrase in a Word document and replace it everywhere, headers and footnotes included, in your browser. Formatting kept. No upload.",
+  "heading": "Find and replace in Word",
+  "subtitle": "Replace a word or phrase everywhere in a Word document, headers and footnotes included, and keep its formatting; nothing is uploaded.",
+  "intro": "Find and replace text in a DOCX file without Word: type what to find and what to put instead, and every match is replaced in the body, tables, headers, footers and footnotes. Turn on match case or whole words only to be precise, and see how many matches there are before you save. The new text keeps the formatting of the start of each match, and everything else in the file stays as it was. The document is edited in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your document is edited by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Everywhere at once",
+      "text": "Body, tables, headers, footers and footnotes are all searched and changed."
+    },
+    {
+      "title": "Check first",
+      "text": "See how many matches there are before you save the changed file."
+    }
+  ],
+  "stepsTitle": "How to find and replace text in a Word document",
+  "steps": [
+    {
+      "title": "Choose your document",
+      "text": "Click Choose a file, or drop a .docx file on the page."
+    },
+    {
+      "title": "Type find and replace",
+      "text": "Type the word or phrase to find and its replacement; turn on match case or whole words only if you need them."
+    },
+    {
+      "title": "Check the matches",
+      "text": "See how many matches were found."
+    },
+    {
+      "title": "Replace and download",
+      "text": "Click Replace and download the changed Word document."
+    }
+  ],
+  "handlesTitle": "What Find and Replace handles",
+  "handles": [
+    "Files: .docx documents (Word 2007 and later).",
+    "Where: body text, tables, headers, footers and footnotes.",
+    "Options: match case and whole words only.",
+    "Formatting: the new text takes the formatting of the start of each match; the rest of the file is unchanged."
+  ],
+  "limits": [
+    "Plain text only: regular expressions and wildcards are not supported.",
+    "Text in text boxes may be missed, and a phrase split by a tracked change may not match.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "Names and dates in contracts",
+    "Product or company names in reports",
+    "Templates reused for a new client"
+  ],
+  "mayNotKeep": [
+    "Text inside text boxes",
+    "Phrases split by tracked changes",
+    "Mixed formatting inside one match"
+  ],
+  "faqTitle": "Find and replace in Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I find and replace text in a Word document?",
+      "answer": "Find and replace swaps every match of a word or phrase for new text in one step; Word, LibreOffice and Google Docs all have a Replace command. On this page, choose the .docx, type what to find and what to put instead, check the number of matches and download the changed file, edited in your browser."
+    },
+    {
+      "question": "Are headers, footers and footnotes changed too?",
+      "answer": "Yes. Matches in the body, tables, headers, footers and footnotes are all replaced."
+    },
+    {
+      "question": "Can I use regular expressions?",
+      "answer": "No. The tool finds plain words and phrases, with match case and whole words only as options; regular expressions and wildcards are not supported."
+    },
+    {
+      "question": "What formatting does the new text get?",
+      "answer": "The formatting of the start of each match. If a match is half bold, the whole replacement follows its first letters."
+    },
+    {
+      "question": "Why wasn't a phrase found?",
+      "answer": "Text in text boxes may be missed, and a phrase split by a tracked change may not match. Remove Word comments can accept all tracked changes first.",
+      "link": {
+        "text": "Remove Word comments",
+        "path": "/remove-word-comments"
+      }
+    }
+  ]
+}

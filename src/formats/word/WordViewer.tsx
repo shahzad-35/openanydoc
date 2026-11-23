@@ -14,6 +14,7 @@ import type { ExportKind, WordDocumentFacts } from './wordDocument'
 import type { WordHeading, WordNote } from './WordPanels'
 import '../sheet/sheetChrome.css'
 import './wordViewer.css'
+import { ViewerAiButtons } from '../../tools/ai/onDeviceAi'
 
 const NavigationPanel = lazy(() => import('./WordPanels').then((module) => ({ default: module.NavigationPanel })))
 const SearchPanel = lazy(() => import('./WordPanels').then((module) => ({ default: module.SearchPanel })))
@@ -493,6 +494,7 @@ export default function WordViewer({ openedFile, onOpenAnotherFile, onClose }: F
           <Icon name="print" />
           <span className="desk-only">{t('word.print')}</span>
         </button>
+        <ViewerAiButtons file={openedFile.file} idPrefix="word" isReady={isReady} />
         <span className="spacer" />
         <button className="tbtn labelled" id="edit-toggle" type="button" aria-pressed={false} aria-label={t(canEdit ? 'word.edit' : 'word.editComingSoon')} data-tip={t(canEdit ? 'word.edit' : 'word.editComingSoon')} data-tip-align="end" disabled={!canEdit}>
           <Icon name="edit" />

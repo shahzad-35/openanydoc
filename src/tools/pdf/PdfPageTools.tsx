@@ -1,15 +1,18 @@
-// The one-PDF page tools: Split PDF, Remove pages, Extract pages, Rotate PDF, Crop PDF, Repair PDF, Protect PDF and Unlock PDF. Each shows the PDF's pages
-// as thumbnails (Crop shows one page large); the work runs in pdfTools.worker.ts.
+// The one-PDF page tools: Split PDF, Remove pages, Extract pages, Rotate PDF, Crop PDF, Repair PDF, Protect PDF, Unlock PDF, Compress PDF,
+// Flatten PDF and Remove PDF metadata. The page tools show the PDF's pages as thumbnails (Crop shows one page large); the work runs in
+// pdfTools.worker.ts.
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
-import { useT } from '../../i18n'
+import type { PDFDocumentProxy } from 'pdfjs-dist'
+import { isolateLeftToRight, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { Notice } from '../../components/Messages'
 import type { ToolProps } from '../registry'
-import { PdfPasswordError, openPdfForReading } from '../../formats/pdf/pdfLibrary'
+import { formatFileSize } from '../../useFileIntake'
+import { PdfPasswordError, loadPdfCore, openPdfForReading } from '../../formats/pdf/pdfLibrary'
 import { runPdfTask } from './pdfTasks'
-import type { OutputDocument, OutputPage, PageBox, PagePicture, PdfTaskRequest } from './pdfTasks'
-import { PagesChoice, PdfThumbnailGrid, ProgressBar, SelectionBar, baseNameOf, chosenPageIndexes, describePageNumbers, drawPagePicture, parsePageRanges, pdfResultFile, problemMessageKey, useOpenedPdfs, zipResultFile } from './PdfToolParts'
+import type { OutputDocument, OutputPage, PageBox, PagePicture, PageStamp, PdfTaskRequest } from './pdfTasks'
+import { PagesChoice, PdfThumbnailGrid, ProgressBar, SelectionBar, baseNameOf, chosenPageIndexes, describePageNumbers, drawPagePicture, drawTextPicture, parsePageRanges, pdfResultFile, pngBytesOf, problemMessageKey, useOpenedPdfs, zipResultFile } from './PdfToolParts'
 import type { GridCard, PagesChoiceValue } from './PdfToolParts'
 
 const fieldClass = 'control-shape min-h-11 border-2 border-rule bg-paper-raised px-3 text-ink'
@@ -468,8 +471,9 @@ export function RepairPdf({ files, onResult }: ToolProps) {
 
 const SHORTEST_PASSWORD = 4
 
-// The chosen file's name, the button and the error line those two tools share; `request` is given the file's bytes.
-function usePasswordTask({ files, onResult }: Pick<ToolProps, 'files' | 'onResult'>, resultSuffix: string) {
+// One qpdf task on the chosen file (Protect, Unlock, Flatten PDF, Remove PDF metadata): working state, the result offered, the error
+// line; `request` is given the file's bytes.
+function useOneFileTask({ files, onResult }: Pick<ToolProps, 'files' | 'onResult'>, resultSuffix: string) {
   const file = files[0]
   const [isWorking, setIsWorking] = useState(false)
   const [error, setError] = useState<{ file: File; key: MessageKey } | null>(null)
@@ -488,7 +492,7 @@ const passwordFieldClass = `${fieldClass} w-64`
 
 export function ProtectPdf({ files, onResult }: ToolProps) {
   const { t } = useT()
-  const task = usePasswordTask({ files, onResult }, 'protected')
+  const task = useOneFileTask({ files, onResult }, 'protected')
   const [password, setPassword] = useState('')
   const [repeatedPassword, setRepeatedPassword] = useState('')
   const [ownerPassword, setOwnerPassword] = useState('')
@@ -553,7 +557,7 @@ export function ProtectPdf({ files, onResult }: ToolProps) {
 
 export function UnlockPdf({ files, onResult }: ToolProps) {
   const { t } = useT()
-  const task = usePasswordTask({ files, onResult }, 'unlocked')
+  const task = useOneFileTask({ files, onResult }, 'unlocked')
   const [password, setPassword] = useState('')
   const [isShown, setIsShown] = useState(false)
   return (
@@ -584,6 +588,230 @@ export function UnlockPdf({ files, onResult }: ToolProps) {
         </button>
       </form>
       <Notice id="tool-error" kind="error" role="alert" className="text-center font-medium text-danger" message={task.errorKey ? t(task.errorKey) : ''} />
+    </div>
+  )
+}
+
+// ---------------------------------------------------------------- Compress PDF, Flatten PDF and Remove PDF metadata (qpdf in pdfTools.worker.ts)
+
+const panelClass = 'space-y-3 rounded-[22px] border-2 border-rule bg-paper-raised p-5 text-start'
+const shownSize = (byteCount: number) => isolateLeftToRight(formatFileSize(byteCount))
+
+type CompressionLevel = 'high' | 'balanced' | 'smallest'
+// Measured on 2026-11-23: a 2.1 MB PDF of two photos became 1.46 MB, 691 KB and 445 KB; a PDF that is only text barely changes.
+const JPEG_QUALITY_BY_LEVEL: Record<CompressionLevel, number> = { high: 85, balanced: 70, smallest: 50 }
+// A copy less than a tenth smaller is offered with a note that the PDF was compact already.
+
+// The new size is shown before the copy is offered, so a PDF that hardly shrinks (or grows) is never handed over as a smaller one.
+export function CompressPdf({ files, onResult }: ToolProps) {
+  const { t } = useT()
+  const file = files[0]
+  const [level, setLevel] = useState<CompressionLevel>('balanced')
+  const [isWorking, setIsWorking] = useState(false)
+  const [error, setError] = useState<{ file: File; key: MessageKey } | null>(null)
+  // A copy that came out no smaller is not offered; the page says so instead.
+  const [notSmallerFor, setNotSmallerFor] = useState<{ file: File; level: CompressionLevel } | null>(null)
+  const isNotSmaller = notSmallerFor?.file === file && notSmallerFor.level === level
+
+  async function compress() {
+    setError(null)
+    setIsWorking(true)
+    const response = await runPdfTask({ type: 'compress-pdf', pdf: await file.arrayBuffer(), jpegQuality: JPEG_QUALITY_BY_LEVEL[level] }).catch(() => null)
+    setIsWorking(false)
+    if (response?.status !== 'ok' || !response.pdf) setError({ file, key: response?.status === 'error' ? problemMessageKey(response.reason) : 'tools.pdf.unreadable' })
+    else if (response.pdf.length >= file.size) setNotSmallerFor({ file, level })
+    else onResult(pdfResultFile(response.pdf, `${baseNameOf(file.name)}-compressed.pdf`))
+  }
+
+  const levelLabels: [CompressionLevel, MessageKey][] = [['high', 'tools.compressPdf.levelHigh'], ['balanced', 'tools.compressPdf.levelBalanced'], ['smallest', 'tools.compressPdf.levelSmallest']]
+  return (
+    <div id="compress-pdf-tool" className="space-y-4">
+      <p className="text-center text-sm text-ink-soft">{t('tools.compressPdf.hint')}</p>
+      <p className="text-center font-medium">
+        <bdi>{file.name}</bdi> <span id="compress-pdf-original-size" className="text-sm font-normal text-ink-soft">· {shownSize(file.size)}</span>
+      </p>
+      <div className="flex flex-wrap items-end justify-center gap-4 text-start">
+        <label className="flex flex-col gap-1 text-sm font-medium">
+          {t('tools.compressPdf.level')}
+          <select id="compress-pdf-level-select" value={level} disabled={isWorking} onChange={(event) => setLevel(event.target.value as CompressionLevel)} className={fieldClass}>
+            {levelLabels.map(([value, labelKey]) => (
+              <option key={value} value={value}>
+                {t(labelKey)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <button id="compress-pdf-button" type="button" disabled={isWorking || isNotSmaller} onClick={() => void compress()} className="btn btn--primary press">
+          {isWorking ? t('tools.working') : t('tools.compressPdf.button')}
+        </button>
+      </div>
+      <Notice id="compress-pdf-note" kind="info" role="status" className="text-center text-sm text-ink-soft" message={isNotSmaller ? t('tools.compressPdf.notSmaller') : ''} />
+      <Notice id="tool-error" kind="error" role="alert" className="text-center font-medium text-danger" message={error?.file === file ? t(error.key) : ''} />
+    </div>
+  )
+}
+
+// A form field as pdf.js reads it from a page.
+type FormWidget = { subtype: string; fieldType?: string; fieldName?: string; fieldValue?: unknown; multiLine?: boolean; rect: number[]; options?: { exportValue: string; displayValue: string }[] }
+const hasLettersOutsideLatin1 = (text: string) => [...text].some((character) => character.codePointAt(0)! > 0xff)
+
+// The text and choice values qpdf can't draw (letters outside Latin-1, which it turns into "?", and multi-line values, which it writes
+// on one huge line), drawn by the browser in their boxes as Fill PDF does, with the names of their fields.
+async function browserDrawnFieldValues(pdfDocument: PDFDocumentProxy) {
+  const images: ArrayBuffer[] = []
+  const stamps: PageStamp[] = []
+  const drawnFieldNames = new Set<string>()
+  for (let pageNumber = 1; pageNumber <= pdfDocument.numPages; pageNumber++) {
+    const page = await pdfDocument.getPage(pageNumber)
+    const viewport = page.getViewport({ scale: 1 })
+    for (const widget of (await page.getAnnotations()) as FormWidget[]) {
+      if (widget.subtype !== 'Widget' || !widget.fieldName || (widget.fieldType !== 'Tx' && widget.fieldType !== 'Ch')) continue
+      const chosenValues = Array.isArray(widget.fieldValue) ? widget.fieldValue : [widget.fieldValue]
+      const text = widget.fieldType === 'Tx' ? String(widget.fieldValue ?? '') : chosenValues.map((value) => widget.options?.find((option) => option.exportValue === value)?.displayValue ?? String(value ?? '')).filter(Boolean).join(', ')
+      if (!hasLettersOutsideLatin1(text) && !(widget.fieldType === 'Tx' && widget.multiLine)) continue
+      drawnFieldNames.add(widget.fieldName)
+      if (!text.trim()) continue
+      const [left, top] = viewport.convertToViewportPoint(widget.rect[0], widget.rect[1])
+      const [right, bottom] = viewport.convertToViewportPoint(widget.rect[2], widget.rect[3])
+      const box = { x: Math.min(left, right), y: Math.min(top, bottom), width: Math.abs(right - left), height: Math.abs(bottom - top) }
+      const picture = await drawTextPicture(text, { sizePoints: Math.min(11, box.height * 0.7), color: '#111111', fontWeight: 500 })
+      // The value fits its box: smaller when it is too wide, at the start of the box (the right for Arabic), centred up and down.
+      const fit = Math.min(1, (box.width - 4) / picture.width)
+      const width = picture.width * fit
+      const height = picture.height * fit
+      images.push(await pngBytesOf(picture.canvas))
+      stamps.push({ pageIndex: pageNumber - 1, imageIndex: images.length - 1, box: { x: /[؀-ۿ]/.test(text) ? box.x + box.width - width - 2 : box.x + 2, y: box.y + (box.height - height) / 2, width, height } })
+    }
+  }
+  return { images, stamps, drawnFieldNames: [...drawnFieldNames] }
+}
+
+// qpdf flattens what each field shows. It redraws the fields only when the file asks for that; the values its drawing would spoil are
+// then drawn by the browser instead (the worker ignores them otherwise).
+export function FlattenPdf({ files, onResult }: ToolProps) {
+  const { t } = useT()
+  const task = useOneFileTask({ files, onResult }, 'flattened')
+  const [isDrawing, setIsDrawing] = useState(false)
+
+  async function flatten() {
+    setIsDrawing(true)
+    const pdfDocument = await openPdfForReading(await task.file.arrayBuffer()).catch(() => null)
+    const drawnValues = pdfDocument ? await browserDrawnFieldValues(pdfDocument).catch(() => null) : null
+    void pdfDocument?.loadingTask.destroy()
+    setIsDrawing(false)
+    // A locked or unreadable file still goes to the worker, which says which it is.
+    void task.run((pdf) => ({ type: 'flatten-pdf', pdf, ...(drawnValues ?? { images: [], stamps: [], drawnFieldNames: [] }) }))
+  }
+
+  const isWorking = task.isWorking || isDrawing
+  return (
+    <div id="flatten-pdf-tool" className="space-y-4">
+      <p className="text-center text-sm text-ink-soft">{t('tools.flattenPdf.hint')}</p>
+      <p className="text-center font-medium">
+        <bdi>{task.file.name}</bdi>
+      </p>
+      <div className="flex justify-center">
+        <button id="flatten-pdf-button" type="button" disabled={isWorking} onClick={() => void flatten()} className="btn btn--primary press">
+          {isWorking ? t('tools.working') : t('tools.flattenPdf.button')}
+        </button>
+      </div>
+      <Notice id="tool-error" kind="error" role="alert" className="text-center font-medium text-danger" message={task.errorKey ? t(task.errorKey) : ''} />
+    </div>
+  )
+}
+
+type PdfProperty = 'Title' | 'Author' | 'Subject' | 'Keywords' | 'Creator' | 'Producer' | 'CreationDate' | 'ModDate'
+const PDF_PROPERTY_LABELS: [PdfProperty, MessageKey][] = [
+  ['Title', 'office.metadata.title'],
+  ['Author', 'office.metadata.author'],
+  ['Subject', 'office.metadata.subject'],
+  ['Keywords', 'office.metadata.keywords'],
+  ['Creator', 'tools.pdfMetadata.creator'],
+  ['Producer', 'tools.pdfMetadata.producer'],
+  ['CreationDate', 'office.metadata.created'],
+  ['ModDate', 'office.metadata.modified'],
+]
+type ShownPdfProperties = { rows: [MessageKey, string][]; hasXmp: boolean; customCount: number }
+
+// The document's properties shown (as the PDF's information dictionary holds them), then removed with its XMP metadata in a copy.
+export function RemovePdfMetadata({ files, onResult }: ToolProps) {
+  const { t, locale } = useT()
+  const task = useOneFileTask({ files, onResult }, 'no-metadata')
+  const file = task.file
+  const [shown, setShown] = useState<{ file: File; properties: ShownPdfProperties } | { file: File; problem: MessageKey } | null>(null)
+
+  useEffect(() => {
+    let isCurrent = true
+    const dateFormat = new Intl.DateTimeFormat(locale === 'ar' ? 'ar-u-nu-latn' : 'en-GB', { dateStyle: 'medium', timeStyle: 'short' })
+    void (async () => {
+      try {
+        const [pdfjs, document] = await Promise.all([loadPdfCore(), openPdfForReading(await file.arrayBuffer())])
+        const { info, metadata } = await document.getMetadata()
+        void document.loadingTask.destroy()
+        const values = info as Partial<Record<PdfProperty, unknown>> & { Custom?: object }
+        const rows: [MessageKey, string][] = []
+        for (const [property, labelKey] of PDF_PROPERTY_LABELS) {
+          const value = typeof values[property] === 'string' ? values[property].trim() : ''
+          if (!value) continue
+          const date = property.endsWith('Date') ? pdfjs.PDFDateString.toDateObject(value) : null
+          rows.push([labelKey, date ? dateFormat.format(date) : value])
+        }
+        if (isCurrent) setShown({ file, properties: { rows, hasXmp: metadata !== null, customCount: Object.keys(values.Custom ?? {}).length } })
+      } catch (problem) {
+        if (isCurrent) setShown({ file, problem: problem instanceof PdfPasswordError ? 'tools.pdf.encrypted' : 'tools.pdf.unreadable' })
+      }
+    })()
+    return () => {
+      isCurrent = false
+    }
+  }, [file, locale])
+
+  const properties = shown?.file === file && 'properties' in shown ? shown.properties : null
+  const readProblem = shown?.file === file && 'problem' in shown ? shown.problem : null
+  const isEmpty = properties !== null && properties.rows.length === 0 && !properties.hasXmp && properties.customCount === 0
+  return (
+    <div id="remove-pdf-metadata-tool" className="space-y-4">
+      <p className="text-center text-sm text-ink-soft">{t('office.metadata.hint')}</p>
+      <p className="text-center font-medium">
+        <bdi>{file.name}</bdi>
+      </p>
+      {!shown && <p className="text-center text-sm text-ink-soft">{t('tools.pdf.reading')}</p>}
+      {properties && (
+        <div id="remove-pdf-metadata-properties" className={panelClass}>
+          {isEmpty ? (
+            <p id="remove-pdf-metadata-none">{t('office.metadata.none')}</p>
+          ) : (
+            <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-sm">
+              {properties.rows.map(([labelKey, value]) => (
+                <div key={labelKey} className="contents">
+                  <dt className="font-medium">{t(labelKey)}</dt>
+                  <dd dir="auto" className="break-words text-ink-soft">
+                    {value}
+                  </dd>
+                </div>
+              ))}
+              {properties.customCount > 0 && (
+                <>
+                  <dt className="font-medium">{t('office.metadata.custom')}</dt>
+                  <dd className="text-ink-soft">{properties.customCount}</dd>
+                </>
+              )}
+              {properties.hasXmp && (
+                <>
+                  <dt className="font-medium">{t('tools.pdfMetadata.xmp')}</dt>
+                  <dd className="text-ink-soft">{t('tools.pdfMetadata.stored')}</dd>
+                </>
+              )}
+            </dl>
+          )}
+        </div>
+      )}
+      <div className="flex justify-center">
+        <button id="remove-pdf-metadata-button" type="button" disabled={task.isWorking || properties === null} onClick={() => void task.run((pdf) => ({ type: 'remove-pdf-metadata', pdf }))} className="btn btn--primary press">
+          {task.isWorking ? t('tools.working') : t('office.metadata.button')}
+        </button>
+      </div>
+      <Notice id="tool-error" kind="error" role="alert" className="text-center font-medium text-danger" message={readProblem ? t(readProblem) : task.errorKey ? t(task.errorKey) : ''} />
     </div>
   )
 }

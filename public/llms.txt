@@ -4,13 +4,14 @@
 
 How it keeps files private: the site's Content-Security-Policy is `default-src 'self'; connect-src 'self'`, so the browser refuses any request to another origin, and an automated test suite fails the build if any page makes a network request or writes browser storage beyond the theme choice. Anyone can confirm this in the browser's Network tab while opening a file.
 
-What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices; Word .docx, .dotx and .docm documents (macros are never run) and OpenDocument .odt text shown as pages with fonts, tables, images, lists, headers and footers, right-to-left Arabic, zoom, and print or save as PDF, plus a navigation pane from the headings, search with highlighted matches, word and page counts with the author and dates, comments and tracked changes in the margin (read only), a reading mode with larger text and dark pages, read aloud with the voices installed on the device, and export as plain text, Markdown or HTML or all pictures as a ZIP (view only; old .doc files are not supported); PowerPoint .pptx, .ppsx, .potx and .pptm presentations in beta (macros are never run), one slide at a time with text, images, tables and shapes, thumbnails, a grid of all slides, arrow keys and full screen, plus speaker notes, a presenter view with the current and next slide, notes and a timer while the audience sees the slide in a second window, search across slides and notes, read aloud with the voices installed on the device, an outline export as Markdown or text, slides saved as PNG pictures, and print or save as PDF (view only; animations are not played; old .ppt files are not supported). Microsoft's standalone PowerPoint Viewer has been retired; this page opens .pptx files without installing anything. Files download back in their own format, or convert between formats: Excel to CSV or JSON, CSV to Excel or JSON, and JSON to CSV with nested objects flattened into dot-notation columns. The JSON viewer also opens JSON Lines, JSON5, YAML and GeoJSON, shows a graph of the document, compares two documents, validates against a JSON Schema (and writes one), runs JSONPath queries live, converts to YAML, XML or TypeScript interfaces, and can open a file from an https address you type (your browser fetches it directly). The Excel viewer also shows frozen panes, hidden rows, columns and sheets, notes and links, has column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compares two sheets or two workbooks, splits a workbook into one file per sheet, merges sheets from several workbooks, saves every sheet as CSV in one ZIP, prints or saves a sheet as PDF, and reports what a workbook holds (macros are detected and never run; password-protected files cannot be opened yet). The CSV viewer also opens Parquet files (read only), has a filter row under the headers, a health check (mixed types, spaces, repeated rows), a quick bar, line or pie chart, SQL queries in the browser, and saves what you see as Excel, Markdown, HTML or SQL INSERT statements, or as a zip of smaller CSV files. Sensitive data in CSV, Excel, JSON and TXT files can be masked before sharing, on the Mask data page or with the Mask button in the CSV, Excel and JSON viewers. PDF tools: merge, split, remove or extract pages, organize (reorder, rotate, delete, duplicate, blank pages), rotate and number PDFs, turn JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and HEIC pictures into a PDF, save PDF pages as JPG or PNG, get a PDF's text as .txt, save the pictures inside a PDF as a ZIP, add text boxes, highlights, drawings, shapes and pictures to a PDF, sign it with a drawn, typed or uploaded signature (a visual signature, not a certificate-based digital signature), fill in PDF forms (optionally flattened), and add watermarks, headers and footers (password-protected PDFs are not supported). The PDF viewer shows PDFs as continuous pages with thumbnails, zoom, fit to width, rotation, go to page, search with highlights, selectable text (Arabic included), and a password prompt that stays on the device (view only; scanned PDFs have no text to search until OCR PDF adds a text layer). Image tools work on many pictures at once (one ZIP): compress JPG, PNG, WebP and AVIF with high-quality encoders and a before/after slider, resize by pixels, percent or ready sizes (Instagram, WhatsApp, passport photos at 300 dpi), crop (fixed ratios or a transparent circle), rotate and flip, add a text or logo watermark, remove GPS, camera and date metadata (JPG, PNG and WebP pixels unchanged), edit a photo (brightness, contrast, saturation, warmth, filters, text, with undo), convert between JPG, PNG, WebP and AVIF from HEIC, TIFF, SVG, GIF and BMP too, and make memes with Arabic captions. The image viewer opens JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF and SVG with zoom and the camera, date and GPS details. iPhone HEIC photos are decoded in the browser too.
+What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices; Word .docx, .dotx and .docm documents (macros are never run) and OpenDocument .odt text shown as pages with fonts, tables, images, lists, headers and footers, right-to-left Arabic, zoom, and print or save as PDF, plus a navigation pane from the headings, search with highlighted matches, word and page counts with the author and dates, comments and tracked changes in the margin (read only), a reading mode with larger text and dark pages, read aloud with the voices installed on the device, and export as plain text, Markdown or HTML or all pictures as a ZIP (to change a document, use the Word tools below; old .doc files are not supported); PowerPoint .pptx, .ppsx, .potx and .pptm presentations in beta (macros are never run), one slide at a time with text, images, tables and shapes, thumbnails, a grid of all slides, arrow keys and full screen, plus speaker notes, a presenter view with the current and next slide, notes and a timer while the audience sees the slide in a second window, search across slides and notes, read aloud with the voices installed on the device, an outline export as Markdown or text, slides saved as PNG pictures, and print or save as PDF (animations are not played; to change a presentation, use the PowerPoint tools below; old .ppt files are not supported). Microsoft's standalone PowerPoint Viewer has been retired; this page opens .pptx files without installing anything. Files download back in their own format, or convert between formats: Excel to CSV or JSON, CSV to Excel or JSON, and JSON to CSV with nested objects flattened into dot-notation columns. The JSON viewer also opens JSON Lines, JSON5, YAML and GeoJSON, shows a graph of the document, compares two documents, validates against a JSON Schema (and writes one), runs JSONPath queries live, converts to YAML, XML or TypeScript interfaces, and can open a file from an https address you type (your browser fetches it directly). The Excel viewer also shows frozen panes, hidden rows, columns and sheets, notes and links, has column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compares two sheets or two workbooks, splits a workbook into one file per sheet, merges sheets from several workbooks, saves every sheet as CSV in one ZIP, prints or saves a sheet as PDF, and reports what a workbook holds (macros are detected and never run; workbooks encrypted with a password to open can't be opened, while sheet protection can be removed with Unprotect Excel). The CSV viewer also opens Parquet files (read only), has a filter row under the headers, a health check (mixed types, spaces, repeated rows), a quick bar, line or pie chart, SQL queries in the browser, and saves what you see as Excel, Markdown, HTML or SQL INSERT statements, or as a zip of smaller CSV files. Sensitive data in CSV, Excel, JSON and TXT files can be masked before sharing, on the Mask data page or with the Mask button in the CSV, Excel and JSON viewers. PDF tools: merge, split, remove or extract pages, organize (reorder, rotate, delete, duplicate, blank pages), rotate and number PDFs, turn JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and HEIC pictures into a PDF, save PDF pages as JPG or PNG, get a PDF's text as .txt, save the pictures inside a PDF as a ZIP, add text boxes, highlights, drawings, shapes and pictures to a PDF, sign it with a drawn, typed or uploaded signature (a visual signature, not a certificate-based digital signature), fill in PDF forms (optionally flattened), add watermarks, headers and footers, compress, flatten, make grayscale, remove metadata, redact, compare, repair, OCR, translate, convert to and from Word, Excel and PowerPoint, and protect or unlock with a password (a PDF with a password to open needs Unlock PDF first, with the password). The PDF viewer shows PDFs as continuous pages with thumbnails, zoom, fit to width, rotation, go to page, search with highlights, selectable text (Arabic included), and a password prompt that stays on the device (view only; scanned PDFs have no text to search until OCR PDF adds a text layer). Image tools work on many pictures at once (one ZIP): compress JPG, PNG, WebP and AVIF with high-quality encoders and a before/after slider, resize by pixels, percent or ready sizes (Instagram, WhatsApp, passport photos at 300 dpi), crop (fixed ratios or a transparent circle), rotate and flip, add a text or logo watermark, remove GPS, camera and date metadata (JPG, PNG and WebP pixels unchanged), edit a photo (brightness, contrast, saturation, warmth, filters, text, with undo), convert between JPG, PNG, WebP and AVIF from HEIC, TIFF, SVG, GIF and BMP too, and make memes with Arabic captions. The image viewer opens JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF and SVG with zoom and the camera, date and GPS details. iPhone HEIC photos are decoded in the browser too.
 
 ## Answers
 
 - Is my file uploaded? No. The browser reads and changes it on the device. The page's Content-Security-Policy lets it contact only its own site, plus one exception: the JSON page's "Open from a URL" fetches the https address the visitor types. How to verify: https://www.openanydoc.com/en/check-file-upload
-- Which formats? .csv, .tsv, .tab, .parquet, .xlsx, .xls, .xlsm, .ods, .json, .jsonl, .txt, .docx, .dotx, .docm, .odt, .pptx, .ppsx, .potx, .pptm and .pdf. Word and PowerPoint files are view only. Not old .doc or .ppt files. JPG to PDF also takes .jpg, .png, .webp, .tif and .svg pictures.
-- Word to PDF? Open the .docx in the Word viewer (https://www.openanydoc.com/en/word-viewer) and choose Print / Save as PDF; the browser's print dialog saves only the document's pages. Old .doc files are not supported: save them as .docx first.
+- Which formats? .csv, .tsv, .tab, .parquet, .xlsx, .xls, .xlsm, .ods, .json, .jsonl, .txt, .docx, .dotx, .docm, .odt, .pptx, .ppsx, .potx, .pptm and .pdf. Word and PowerPoint files can be viewed, converted (to PDF, JPG, Markdown), merged, split, watermarked, compared and cleaned of metadata. Not old .doc or .ppt files. JPG to PDF also takes .jpg, .png, .webp, .tif and .svg pictures.
+- Word to PDF? Yes: Word to PDF (https://www.openanydoc.com/en/word-to-pdf) saves .docx, .dotx, .docm and .odt documents as PDF pages at 200 dpi with searchable text, Arabic included, in the browser. Old .doc files: save them as .docx first.
+- Compress a PDF? Yes: Compress PDF (https://www.openanydoc.com/en/compress-pdf) re-saves the pictures inside as JPEG at quality 85, 70 or 50 (High quality, Balanced, Smallest), recompresses the rest without loss and removes unused objects; it shows the size before and after, and if the copy isn't smaller you keep the original. Picture resolution is not lowered.
 - How big a file? CSV has no fixed limit (a 120,000-row file opens in under a second; a warning above 50 MB). JSON up to 10 MB. Excel cell styles are read for files up to 8 MB.
 - Arabic? The whole interface is in Arabic too (https://www.openanydoc.com/ar). CSV files in Windows-1256 are detected, and downloads add a UTF-8 byte order mark so Excel shows Arabic correctly.
 - Offline? Yes. After the first visit, each tool page and its viewer are kept by the browser (a service worker), so files open and edit with no network; AI tools work offline after their first use. It can be installed as an app (Chrome, Edge, Android; Add to Home Screen on iPhone and iPad), which opens files from the desktop and takes files shared on Android.
@@ -40,6 +41,17 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [JSON validator](https://www.openanydoc.com/en/json-validator): errors with line and column, repair of common mistakes
 - [TXT viewer and editor](https://www.openanydoc.com/en/txt-viewer): line numbers, find and replace, encodings and line endings
 - [Word viewer](https://www.openanydoc.com/en/word-viewer): DOCX, DOTX, DOCM and ODT documents as pages with fonts, tables, images, headers and footers; Arabic right to left; navigation, search, comments and tracked changes, reading mode, read aloud; zoom, print, save as PDF, export as text, Markdown or HTML
+- [Word to JPG](https://www.openanydoc.com/en/word-to-jpg), [Excel to JPG](https://www.openanydoc.com/en/excel-to-jpg) and [PowerPoint to JPG](https://www.openanydoc.com/en/pptx-to-jpg): each page or slide as a JPG picture, several in a ZIP
+- [Markdown to Word](https://www.openanydoc.com/en/markdown-to-word), [HTML to Word](https://www.openanydoc.com/en/html-to-word) and [Text to Word](https://www.openanydoc.com/en/text-to-word): an editable .docx with real headings, lists, tables and links
+- [Images to PowerPoint](https://www.openanydoc.com/en/images-to-pptx): one picture per slide, 16:9 or 4:3, as an editable .pptx
+- [Merge Word](https://www.openanydoc.com/en/merge-word) (beta) and [Split Word](https://www.openanydoc.com/en/split-word) (at headings or page breaks); [Compare Word](https://www.openanydoc.com/en/compare-word): two versions word by word, with a Word report of the changes
+- [Word counter](https://www.openanydoc.com/en/word-counter): words (Arabic counted by its own rules), characters, sentences, pages, reading and speaking time
+- [Find and replace in Word](https://www.openanydoc.com/en/word-find-replace), [Remove comments and tracked changes](https://www.openanydoc.com/en/remove-word-comments), [Watermark Word](https://www.openanydoc.com/en/watermark-word), [Extract images from Word](https://www.openanydoc.com/en/extract-word-images)
+- [Mail merge](https://www.openanydoc.com/en/word-mail-merge): a .docx template with {{Column}} fields and a CSV or Excel file give one document per row, in a ZIP
+- [Merge Excel](https://www.openanydoc.com/en/merge-excel), [Split Excel](https://www.openanydoc.com/en/split-excel) (per sheet, every N rows or by a column's value), [Compare Excel](https://www.openanydoc.com/en/compare-excel), [Excel to Word](https://www.openanydoc.com/en/excel-to-word)
+- [Unprotect Excel](https://www.openanydoc.com/en/unprotect-excel): removes sheet and workbook protection from files you own (no password guessing; files encrypted to open are not opened); [Repair Excel](https://www.openanydoc.com/en/repair-excel): values, formulas and merged cells rewritten into a clean workbook
+- [Merge PowerPoint](https://www.openanydoc.com/en/merge-pptx) (beta), [Split PowerPoint](https://www.openanydoc.com/en/split-pptx), [Extract PowerPoint media](https://www.openanydoc.com/en/extract-pptx-media), [Search PowerPoint](https://www.openanydoc.com/en/search-pptx), [Watermark PowerPoint](https://www.openanydoc.com/en/watermark-pptx), [Remove macros (.pptm to .pptx)](https://www.openanydoc.com/en/pptm-to-pptx)
+- Metadata for [Word](https://www.openanydoc.com/en/word-metadata), [Excel](https://www.openanydoc.com/en/excel-metadata) and [PowerPoint](https://www.openanydoc.com/en/pptx-metadata): author, company and dates shown, then removed in a copy
 - [PowerPoint viewer (beta)](https://www.openanydoc.com/en/powerpoint-viewer): PPTX, PPSX, POTX and PPTM slides with text, images, tables and shapes; thumbnails, grid, speaker notes, presenter view, search, read aloud; outline export, PNG pictures, print and save as PDF
 - [PDF viewer](https://www.openanydoc.com/en/pdf-viewer): PDFs as continuous pages with thumbnails, zoom, rotation, go to page, search with highlights, selectable Arabic text, and a local password prompt
 - [Large CSV viewer](https://www.openanydoc.com/en/large-csv-viewer): files beyond Excel's row limit
@@ -76,6 +88,7 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [AI-ready file tools](https://www.openanydoc.com/en/ai-tools): files made into text to paste into an AI chat, with the token count; no AI runs on these pages and nothing is sent to any AI service
 - [PDF to Markdown](https://www.openanydoc.com/en/pdf-to-markdown) (headings, lists, simple tables; .md, .txt or .html), [Word to Markdown](https://www.openanydoc.com/en/word-to-markdown), [PowerPoint to Markdown](https://www.openanydoc.com/en/pptx-to-markdown) (slide outline with speaker notes), [Excel to Markdown](https://www.openanydoc.com/en/excel-to-markdown), [CSV to Markdown](https://www.openanydoc.com/en/csv-to-markdown)
 - [Token counter](https://www.openanydoc.com/en/token-counter): tokens (the tokenizer GPT-4o models use; other models are estimates), words and characters of a file or pasted text; [JSON to TOON](https://www.openanydoc.com/en/json-to-toon): JSON to Token-Oriented Object Notation and back, with token counts before and after
+- On-device AI (needs a recent desktop Chrome with its built-in AI; in other browsers the feature is hidden and there is no upload fallback): [AI summarizer](https://www.openanydoc.com/en/ai-summarizer) (key points, short or long summary of a PDF, Word, PowerPoint, TXT or Markdown file), [Translate document](https://www.openanydoc.com/en/translate-document) (the text of a PDF, Word or text file into 39 languages including Arabic, not Urdu; .txt, .md or .docx), [Chat with PDF](https://www.openanydoc.com/en/chat-with-pdf) (questions answered from the PDF's text). Arabic documents are translated to English on the device, worked on, and translated back. The PDF, Word and PowerPoint viewers have Summarise and Translate buttons in Chrome.
 - OpenAnyDoc is not affiliated with OpenAI, Anthropic or Google; ChatGPT, Claude and Gemini are named only as places people paste text.
 - Every one of these pages: pasted text stays in the tab and is never sent anywhere; nothing is saved on the site, no share links, no history.
 - [Mask sensitive data](https://www.openanydoc.com/en/mask-data): finds names, emails, phone numbers, national IDs, IBANs, card numbers, addresses and dates of birth in CSV, Excel, JSON and TXT files (any other column can be added) and replaces them with consistent tokens, partial masks or removal; an optional private key file restores the tokens. Also a Mask button in the CSV, Excel and JSON viewers
@@ -98,17 +111,23 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Crop PDF](https://www.openanydoc.com/en/crop-pdf): drag a box to cut margins from every page or chosen pages; what is outside is removed from the file (or only hidden, to keep vector pages), text stays selectable
 - [Redact PDF](https://www.openanydoc.com/en/redact-pdf): black out areas or every match of a word; the text under the boxes is removed from the file and the rest of the page stays selectable
 - [Compare PDF](https://www.openanydoc.com/en/compare-pdf): two versions, added and removed lines page by page, and changed areas painted red
-- [PDF to Markdown](https://www.openanydoc.com/en/pdf-to-markdown): headings, lists and paragraphs as a .md file (scanned PDFs: run OCR PDF first)
 - [Repair PDF](https://www.openanydoc.com/en/repair-pdf): rewrites a damaged PDF with a new cross-reference table, or rebuilds readable pages as pictures
+- [Compress PDF](https://www.openanydoc.com/en/compress-pdf): pictures re-saved at a chosen quality, the rest compressed losslessly, unused objects removed; shows the size before and after (no promised percentage)
+- [PDF to grayscale](https://www.openanydoc.com/en/pdf-to-grayscale) (beta): pages as grey pictures with the text still selectable and searchable
+- [Flatten PDF](https://www.openanydoc.com/en/flatten-pdf) (beta): form fields and annotations made part of the page
+- [Remove PDF metadata](https://www.openanydoc.com/en/remove-pdf-metadata): title, author, app and dates shown, then removed with the XMP block
 - [Scan to PDF](https://www.openanydoc.com/en/scan-to-pdf): phone photos of paper straightened from four corners, cleaned in black and white, saved as one PDF
 - [PDF Forms](https://www.openanydoc.com/en/pdf-forms): add fillable text, long text, checkbox, drop-down, choice-button, date and signature fields to a PDF
 - [Protect PDF](https://www.openanydoc.com/en/protect-pdf): AES-256 password set in the browser; printing, copying and changes allowed or blocked
 - [Unlock PDF](https://www.openanydoc.com/en/unlock-pdf): removes a known password, or printing and copying restrictions (no password guessing)
 - [PDF to Word](https://www.openanydoc.com/en/pdf-to-word): editable .docx with paragraphs, headings, lists and pictures; layout approximate
 - [PDF to Excel](https://www.openanydoc.com/en/pdf-to-excel): one sheet per page, text columns into cells, numbers as numbers
-- [PDF to PowerPoint](https://www.openanydoc.com/en/pdf-to-powerpoint): one slide per page with editable text boxes and pictures
+- [PDF to PowerPoint](https://www.openanydoc.com/en/pdf-to-powerpoint): one slide per page as a picture that looks exactly like the PDF, or editable text boxes and pictures (beta)
 - [Word to PDF](https://www.openanydoc.com/en/word-to-pdf): .docx, .dotx, .docm and .odt as PDF pages laid out like the Word viewer, text searchable
-- [Excel to PDF](https://www.openanydoc.com/en/excel-to-pdf): visible sheets fitted to A4 or Letter with colours, borders and merges, text searchable
+- [Excel to PDF](https://www.openanydoc.com/en/excel-to-pdf): all visible sheets or one chosen by name, fitted to A4 or Letter with colours, borders and merges, text searchable
+- [PowerPoint to PDF](https://www.openanydoc.com/en/pptx-to-pdf): one page per slide as the PowerPoint viewer shows it, text searchable
+- [CSV to PDF](https://www.openanydoc.com/en/csv-to-pdf): a CSV table fitted to A4 or Letter, header row in bold, text searchable
+- [Markdown to PDF](https://www.openanydoc.com/en/markdown-to-pdf), [Text to PDF](https://www.openanydoc.com/en/text-to-pdf) and [HTML to PDF](https://www.openanydoc.com/en/html-to-pdf): typed, pasted or chosen text laid out on pages, text searchable; HTML is pasted, never fetched from an address
 - [OCR PDF](https://www.openanydoc.com/en/ocr-pdf): reads scanned pages (English, Arabic) on the device and adds an invisible text layer; pages unchanged
 - [Translate PDF](https://www.openanydoc.com/en/translate-pdf): English to Arabic or Arabic to English with on-device translation models, saved as an editable Word document
 - [Image viewer](https://www.openanydoc.com/en/image-viewer): JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF and SVG with zoom and the camera, date and GPS details
@@ -123,7 +142,8 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Meme generator](https://www.openanydoc.com/en/meme-generator): top and bottom captions in outlined letters, Arabic written right to left
 - [Blur faces](https://www.openanydoc.com/en/blur-face): faces found on the device, blurred or pixelated; areas can be added or skipped by hand
 - [Remove background](https://www.openanydoc.com/en/remove-background): cut out a person or an object on the device, transparent PNG or white
-- [Upscale image](https://www.openanydoc.com/en/upscale-image): 2× or 4× with an on-device AI model, up to 1,024 px input
+- [Upscale image (beta)](https://www.openanydoc.com/en/upscale-image): 2× or 4× with an on-device AI model, up to 1,024 px input
+- [Image to text](https://www.openanydoc.com/en/image-to-text): the text of photos, scans and screenshots (English, Arabic), read on the device; copy or download as .txt or .md
 - [All tools](https://www.openanydoc.com/en/all-tools), grouped as [PDF tools](https://www.openanydoc.com/en/pdf-tools), [Image tools](https://www.openanydoc.com/en/image-tools), [Data tools](https://www.openanydoc.com/en/data-tools) and [Office tools](https://www.openanydoc.com/en/office-tools)
 
 ## Guides
@@ -204,13 +224,56 @@ Every page has an Arabic version under /ar with the same address, for example:
 - [إنشاء نماذج PDF](https://www.openanydoc.com/ar/pdf-forms)
 - [حماية PDF بكلمة مرور](https://www.openanydoc.com/ar/protect-pdf)
 - [فتح قفل PDF](https://www.openanydoc.com/ar/unlock-pdf)
+- [ضغط PDF](https://www.openanydoc.com/ar/compress-pdf)
+- [تحويل PDF إلى تدرج رمادي](https://www.openanydoc.com/ar/pdf-to-grayscale)
+- [تسطيح PDF](https://www.openanydoc.com/ar/flatten-pdf)
+- [إزالة بيانات PDF الوصفية](https://www.openanydoc.com/ar/remove-pdf-metadata)
 - [تحويل PDF إلى Word](https://www.openanydoc.com/ar/pdf-to-word)
 - [تحويل PDF إلى Excel](https://www.openanydoc.com/ar/pdf-to-excel)
 - [تحويل PDF إلى PowerPoint](https://www.openanydoc.com/ar/pdf-to-powerpoint)
 - [تحويل Word إلى PDF](https://www.openanydoc.com/ar/word-to-pdf)
 - [تحويل Excel إلى PDF](https://www.openanydoc.com/ar/excel-to-pdf)
+- [تحويل PowerPoint إلى PDF](https://www.openanydoc.com/ar/pptx-to-pdf)
+- [تحويل Markdown إلى PDF](https://www.openanydoc.com/ar/markdown-to-pdf)
+- [تحويل النص إلى PDF](https://www.openanydoc.com/ar/text-to-pdf)
+- [تحويل CSV إلى PDF](https://www.openanydoc.com/ar/csv-to-pdf)
+- [تحويل HTML إلى PDF](https://www.openanydoc.com/ar/html-to-pdf)
+- [تحويل PowerPoint إلى JPG](https://www.openanydoc.com/ar/pptx-to-jpg)
+- [تحويل Word إلى JPG](https://www.openanydoc.com/ar/word-to-jpg)
+- [تحويل Excel إلى JPG](https://www.openanydoc.com/ar/excel-to-jpg)
+- [تحويل Markdown إلى Word](https://www.openanydoc.com/ar/markdown-to-word)
+- [تحويل HTML إلى Word](https://www.openanydoc.com/ar/html-to-word)
+- [تحويل النص إلى Word](https://www.openanydoc.com/ar/text-to-word)
+- [تحويل الصور إلى PowerPoint](https://www.openanydoc.com/ar/images-to-pptx)
+- [دمج ملفات Word](https://www.openanydoc.com/ar/merge-word)
+- [تقسيم ملف Word](https://www.openanydoc.com/ar/split-word)
+- [مقارنة ملفات Word](https://www.openanydoc.com/ar/compare-word)
+- [عدّاد الكلمات](https://www.openanydoc.com/ar/word-counter)
+- [البحث والاستبدال في Word](https://www.openanydoc.com/ar/word-find-replace)
+- [إزالة التعليقات من Word](https://www.openanydoc.com/ar/remove-word-comments)
+- [بيانات ملف Word الوصفية](https://www.openanydoc.com/ar/word-metadata)
+- [استخراج الصور من Word](https://www.openanydoc.com/ar/extract-word-images)
+- [علامة مائية على Word](https://www.openanydoc.com/ar/watermark-word)
+- [دمج المراسلات](https://www.openanydoc.com/ar/word-mail-merge)
+- [دمج ملفات Excel](https://www.openanydoc.com/ar/merge-excel)
+- [تقسيم ملف Excel](https://www.openanydoc.com/ar/split-excel)
+- [مقارنة ملفات Excel](https://www.openanydoc.com/ar/compare-excel)
+- [إزالة حماية Excel](https://www.openanydoc.com/ar/unprotect-excel)
+- [إصلاح ملف Excel](https://www.openanydoc.com/ar/repair-excel)
+- [بيانات ملف Excel الوصفية](https://www.openanydoc.com/ar/excel-metadata)
+- [تحويل Excel إلى Word](https://www.openanydoc.com/ar/excel-to-word)
+- [دمج عروض PowerPoint](https://www.openanydoc.com/ar/merge-pptx)
+- [تقسيم عرض PowerPoint](https://www.openanydoc.com/ar/split-pptx)
+- [استخراج الوسائط من PowerPoint](https://www.openanydoc.com/ar/extract-pptx-media)
+- [البحث في PowerPoint](https://www.openanydoc.com/ar/search-pptx)
+- [بيانات عرض PowerPoint الوصفية](https://www.openanydoc.com/ar/pptx-metadata)
+- [إزالة الماكرو من PowerPoint](https://www.openanydoc.com/ar/pptm-to-pptx)
+- [علامة مائية على PowerPoint](https://www.openanydoc.com/ar/watermark-pptx)
 - [التعرّف الضوئي على نص PDF](https://www.openanydoc.com/ar/ocr-pdf)
 - [ترجمة PDF](https://www.openanydoc.com/ar/translate-pdf)
+- [تلخيص بالذكاء الاصطناعي](https://www.openanydoc.com/ar/ai-summarizer)
+- [ترجمة مستند](https://www.openanydoc.com/ar/translate-document)
+- [محادثة مع PDF](https://www.openanydoc.com/ar/chat-with-pdf)
 - [أدوات الصور](https://www.openanydoc.com/ar/image-tools)
 - [ضغط الصور](https://www.openanydoc.com/ar/compress-image)
 - [تغيير حجم الصور](https://www.openanydoc.com/ar/resize-image)
@@ -219,7 +282,8 @@ Every page has an Arabic version under /ar with the same address, for example:
 - [صانع الميمز](https://www.openanydoc.com/ar/meme-generator)
 - [تمويه الوجوه](https://www.openanydoc.com/ar/blur-face)
 - [إزالة خلفية الصورة](https://www.openanydoc.com/ar/remove-background)
-- [تكبير الصورة بدقة](https://www.openanydoc.com/ar/upscale-image)
+- [تكبير الصورة بدقة (تجريبي)](https://www.openanydoc.com/ar/upscale-image)
+- [تحويل الصورة إلى نص](https://www.openanydoc.com/ar/image-to-text)
 - [كيف تفتح ملف DOCX بدون وورد](https://www.openanydoc.com/ar/open-docx-without-word)
 - [لماذا تظهر العربية في ملف CSV برموز غريبة في Excel](https://www.openanydoc.com/ar/fix-arabic-csv-in-excel)
 - [كيف تفتح ملف TXT: أي برنامج تستخدم على أي جهاز](https://www.openanydoc.com/ar/open-txt-file)
@@ -249,6 +313,86 @@ Every page has an Arabic version under /ar with the same address, for example:
 - [كيف تزيل خلفية الصورة دون رفعها](https://www.openanydoc.com/ar/remove-background-without-upload)
 - [كيف تحوّل ورقة اكسل إلى JSON لواجهة برمجية](https://www.openanydoc.com/ar/convert-excel-to-json-for-api)
 - [الأدلة](https://www.openanydoc.com/ar/guides)
+- [عارض الصور](https://www.openanydoc.com/ar/image-viewer)
+- [قص الصورة](https://www.openanydoc.com/ar/crop-image)
+- [تدوير الصورة](https://www.openanydoc.com/ar/rotate-image)
+- [علامة مائية على الصور](https://www.openanydoc.com/ar/watermark-image)
+- [محرر الصور](https://www.openanydoc.com/ar/photo-editor)
+- [تحويل الصور](https://www.openanydoc.com/ar/convert-image)
+- [تحويل WebP إلى JPG](https://www.openanydoc.com/ar/webp-to-jpg)
+- [تحويل PNG إلى JPG](https://www.openanydoc.com/ar/png-to-jpg)
+- [تحويل JPG إلى PNG](https://www.openanydoc.com/ar/jpg-to-png)
+- [تحويل SVG إلى PNG](https://www.openanydoc.com/ar/svg-to-png)
+- [تحويل الصور إلى WebP](https://www.openanydoc.com/ar/image-to-webp)
+- [عارض ملفات CSV الكبيرة](https://www.openanydoc.com/ar/large-csv-viewer)
+- [عارض TSV](https://www.openanydoc.com/ar/tsv-viewer)
+- [تنسيق JSON](https://www.openanydoc.com/ar/json-formatter)
+- [التحقق من JSON](https://www.openanydoc.com/ar/json-validator)
+- [تهريب JSON وفكه](https://www.openanydoc.com/ar/json-escape)
+- [تصغير JSON](https://www.openanydoc.com/ar/json-minify)
+- [ترتيب مفاتيح JSON](https://www.openanydoc.com/ar/json-sort)
+- [عارض شجرة JSON](https://www.openanydoc.com/ar/json-tree-viewer)
+- [رسم عقد JSON](https://www.openanydoc.com/ar/json-graph)
+- [مقارنة JSON](https://www.openanydoc.com/ar/json-compare)
+- [مخطط JSON](https://www.openanydoc.com/ar/json-schema)
+- [مختبر JSONPath](https://www.openanydoc.com/ar/jsonpath)
+- [تحويل JSON إلى YAML](https://www.openanydoc.com/ar/json-to-yaml)
+- [تحويل YAML إلى JSON](https://www.openanydoc.com/ar/yaml-to-json)
+- [تحويل JSON إلى XML](https://www.openanydoc.com/ar/json-to-xml)
+- [تحويل XML إلى JSON](https://www.openanydoc.com/ar/xml-to-json)
+- [تحويل JSON إلى TypeScript](https://www.openanydoc.com/ar/json-to-typescript)
+- [تحويل JSON إلى Python](https://www.openanydoc.com/ar/json-to-python)
+- [تحويل JSON إلى Go](https://www.openanydoc.com/ar/json-to-go)
+- [تحويل JSON إلى Java](https://www.openanydoc.com/ar/json-to-java)
+- [تحويل JSON إلى C#](https://www.openanydoc.com/ar/json-to-csharp)
+- [CSV إلى SQL](https://www.openanydoc.com/ar/csv-to-sql)
+- [Excel إلى SQL](https://www.openanydoc.com/ar/excel-to-sql)
+- [CSV إلى XML](https://www.openanydoc.com/ar/csv-to-xml)
+- [Excel إلى XML](https://www.openanydoc.com/ar/excel-to-xml)
+- [CSV إلى YAML](https://www.openanydoc.com/ar/csv-to-yaml)
+- [Excel إلى YAML](https://www.openanydoc.com/ar/excel-to-yaml)
+- [CSV إلى Markdown](https://www.openanydoc.com/ar/csv-to-markdown)
+- [Excel إلى Markdown](https://www.openanydoc.com/ar/excel-to-markdown)
+- [CSV إلى HTML](https://www.openanydoc.com/ar/csv-to-html)
+- [Excel إلى HTML](https://www.openanydoc.com/ar/excel-to-html)
+- [CSV إلى LaTeX](https://www.openanydoc.com/ar/csv-to-latex)
+- [Excel إلى LaTeX](https://www.openanydoc.com/ar/excel-to-latex)
+- [CSV إلى نص بعرض ثابت](https://www.openanydoc.com/ar/csv-to-fixed-width)
+- [Excel إلى نص بعرض ثابت](https://www.openanydoc.com/ar/excel-to-fixed-width)
+- [XML إلى CSV](https://www.openanydoc.com/ar/xml-to-csv)
+- [YAML إلى CSV](https://www.openanydoc.com/ar/yaml-to-csv)
+- [جدول HTML إلى CSV](https://www.openanydoc.com/ar/html-table-to-csv)
+- [SQL إلى CSV](https://www.openanydoc.com/ar/sql-to-csv)
+- [مدقق CSV](https://www.openanydoc.com/ar/csv-validator)
+- [تقسيم CSV](https://www.openanydoc.com/ar/split-csv)
+- [SQL على CSV](https://www.openanydoc.com/ar/sql-on-csv)
+- [جدول محوري](https://www.openanydoc.com/ar/pivot-table)
+- [صانع الرسوم البيانية](https://www.openanydoc.com/ar/chart-maker)
+- [حذف المكررات](https://www.openanydoc.com/ar/remove-duplicates)
+- [تبديل الصفوف والأعمدة](https://www.openanydoc.com/ar/transpose)
+- [تغيير حالة الأحرف](https://www.openanydoc.com/ar/change-case)
+- [دمج CSV](https://www.openanydoc.com/ar/merge-csv)
+- [مقارنة CSV](https://www.openanydoc.com/ar/compare-csv)
+- [تغيير ترميز CSV](https://www.openanydoc.com/ar/change-csv-encoding)
+- [تغيير فاصل CSV](https://www.openanydoc.com/ar/change-csv-delimiter)
+- [مولّد بيانات الاختبار](https://www.openanydoc.com/ar/test-data-generator)
+- [تحويل Word إلى Markdown](https://www.openanydoc.com/ar/word-to-markdown)
+- [تحويل PowerPoint إلى Markdown](https://www.openanydoc.com/ar/pptx-to-markdown)
+- [عدّاد الرموز](https://www.openanydoc.com/ar/token-counter)
+- [تحويل JSON إلى TOON](https://www.openanydoc.com/ar/json-to-toon)
+- [عارض XML](https://www.openanydoc.com/ar/xml-viewer)
+- [تنسيق YAML](https://www.openanydoc.com/ar/yaml-formatter)
+- [ترميز Base64 وفكّه](https://www.openanydoc.com/ar/base64-encode-decode)
+- [ترميز الروابط وفكّه](https://www.openanydoc.com/ar/url-encode-decode)
+- [فك ترميز JWT](https://www.openanydoc.com/ar/jwt-decoder)
+- [إخفاء البيانات الحساسة](https://www.openanydoc.com/ar/mask-data)
+- [تحويل CSV إلى Excel](https://www.openanydoc.com/ar/csv-to-excel)
+- [تحويل CSV إلى JSON](https://www.openanydoc.com/ar/csv-to-json)
+- [تحويل JSON إلى CSV](https://www.openanydoc.com/ar/json-to-csv)
+- [تحويل Excel إلى CSV](https://www.openanydoc.com/ar/excel-to-csv)
+- [تحويل Excel إلى JSON](https://www.openanydoc.com/ar/excel-to-json)
+- [عارض XLS](https://www.openanydoc.com/ar/xls-viewer)
+- [محرر TXT](https://www.openanydoc.com/ar/txt-viewer)
 
 ## Tested limits
 

@@ -61,7 +61,7 @@
     },
     {
       "question": "Are the page edges found automatically?",
-      "answer": "Not yet. You drag the four corners onto the paper; it takes a few seconds per page and works on any background."
+      "answer": "No. You drag the four corners onto the paper; it takes a few seconds per page and works on any background."
     },
     {
       "question": "Can I search the text of the scan?",

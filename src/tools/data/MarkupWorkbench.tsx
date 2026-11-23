@@ -2,7 +2,7 @@ import { useDeferredValue, useEffect, useMemo, useRef, useState } from 'react'
 import { CORE_SCHEMA, YAMLException, dump, load } from 'js-yaml'
 import { uiIconShapes } from '../../components/KitIcon'
 import { useToast } from '../../components/Messages'
-import { useT } from '../../i18n'
+import { translate, useT } from '../../i18n'
 import JsonCodeEditor from '../../formats/json/JsonCodeEditor'
 import JsonTree from '../../formats/json/JsonTree'
 import type { TreeRowAction } from '../../formats/json/JsonTree'
@@ -39,7 +39,7 @@ function checkText(text: string, format: MarkupFormat): TextCheck {
 }
 
 function MarkupWorkbench({ format, files, onOpenInPage }: ToolProps & { format: MarkupFormat }) {
-  const { t } = useT()
+  const { locale, t } = useT()
   const { showToast } = useToast()
   const [text, setText] = useState('')
   const [fileName, setFileName] = useState(`pasted.${format}`)
@@ -59,14 +59,14 @@ function MarkupWorkbench({ format, files, onOpenInPage }: ToolProps & { format: 
   useEffect(() => {
     if (!chosenFile) return
     if (chosenFile.size > MAX_TEXT_BYTES) {
-      showToast({ kind: 'error', message: t('markup.tooLarge') })
+      showToast({ kind: 'error', message: translate(locale, 'markup.tooLarge') })
       return
     }
     void chosenFile.text().then((fileText) => {
       setText(fileText)
       setFileName(chosenFile.name)
     })
-  }, [chosenFile, showToast, t])
+  }, [chosenFile, showToast, locale])
 
   function toggleExpanded(pathKey: string) {
     const newKeys = new Set(expandedKeys)

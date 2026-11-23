@@ -1,0 +1,87 @@
+{
+  "title": "Extract Images from PowerPoint – Save PPTX Media, No Upload",
+  "description": "Save every picture, video and audio file stored in a PowerPoint presentation at original quality, in one ZIP, right in your browser. No upload.",
+  "heading": "Extract images and media from PowerPoint",
+  "subtitle": "Save every picture, video and audio file inside a PowerPoint presentation at its original quality; nothing is uploaded.",
+  "intro": "Get the images out of a PPTX without PowerPoint: choose a presentation and download every picture, video and audio file stored in it, as they were put in. Nothing is re-compressed, so photos keep their full resolution. Several files come in one ZIP; a single file is saved directly. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Original quality",
+      "text": "Files are saved as they are stored in the presentation, never re-compressed."
+    },
+    {
+      "title": "Pictures, video and audio",
+      "text": "Every picture, video and audio file in the presentation, all at once."
+    }
+  ],
+  "stepsTitle": "How to extract images from PowerPoint",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
+    },
+    {
+      "title": "Let it collect the media",
+      "text": "Every picture, video and audio file stored in the presentation is gathered."
+    },
+    {
+      "title": "Download",
+      "text": "Several files come in one ZIP; a single file is saved directly."
+    }
+  ],
+  "handlesTitle": "What Extract PowerPoint media handles",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
+    "Pictures, saved in the format and size stored in the file.",
+    "Video and audio files embedded in the presentation.",
+    "Result: one ZIP, or the file itself when there is only one."
+  ],
+  "limits": [
+    "Videos linked from the web are not stored in the file, so they can't be saved.",
+    "Shapes, charts and SmartArt are drawings, not pictures, so they are not included.",
+    "Old .ppt files can't be read; save them as .pptx first."
+  ],
+  "faqTitle": "Extract PowerPoint media: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I get all the pictures out of a PowerPoint?",
+      "answer": "Pictures in a presentation can be saved one at a time in PowerPoint by right-clicking a picture and choosing Save as Picture. This page saves all of them at once: choose the file and download every picture, video and audio file at original quality, without uploading."
+    },
+    {
+      "question": "Are the pictures re-compressed?",
+      "answer": "No. Each file is saved exactly as it is stored in the presentation, so photos keep their resolution and quality."
+    },
+    {
+      "question": "Why is my video missing?",
+      "answer": "A video linked from the web is not stored in the presentation, only its address, so there is no file to save. Videos inserted from your device are included."
+    },
+    {
+      "question": "Why are charts and SmartArt not included?",
+      "answer": "They are drawings made of shapes, not picture files. To keep them as images, save the slides with PowerPoint to JPG.",
+      "link": {
+        "text": "PowerPoint to JPG",
+        "path": "/pptx-to-jpg"
+      }
+    },
+    {
+      "question": "Do the photos still carry camera or location data?",
+      "answer": "They can: pictures are saved as they were stored, with any camera or location details still in them. Remove those with Remove image metadata, also in your browser.",
+      "link": {
+        "text": "Remove image metadata",
+        "path": "/remove-image-metadata"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

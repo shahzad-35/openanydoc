@@ -1,0 +1,82 @@
+{
+  "title": "Unprotect Excel Sheet – Remove Sheet Protection, No Upload",
+  "description": "Remove sheet and workbook protection from your own Excel file in your browser, so locked cells can be edited again. No password needed, no upload.",
+  "heading": "Unprotect an Excel sheet",
+  "subtitle": "Remove sheet and workbook structure protection from an Excel file you own, so you can edit it again; nothing is uploaded.",
+  "intro": "Unprotect an Excel sheet when you can no longer edit your own file: sheet protection (locked cells and the protected-sheet message) and workbook structure protection (which stops adding or renaming sheets) are removed from an .xlsx or .xlsm file, and everything else in the file stays as it was. No password is needed and none is guessed. Use it for files you own or have the right to change. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "No password needed",
+      "text": "Sheet and workbook protection are taken off without asking for a password or trying to guess it."
+    },
+    {
+      "title": "Everything else unchanged",
+      "text": "Cells, formulas, formatting and sheets stay exactly as they were."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is changed by your own browser and never sent to a server, so nobody else sees it."
+    }
+  ],
+  "stepsTitle": "How to unprotect an Excel sheet",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Click Choose a file, or drop an .xlsx or .xlsm file on the page."
+    },
+    {
+      "title": "Remove the protection",
+      "text": "Sheet protection and workbook structure protection are removed from the file."
+    },
+    {
+      "title": "Download the copy",
+      "text": "Download the unprotected workbook and edit it in Excel as usual."
+    }
+  ],
+  "handlesTitle": "What Unprotect Excel handles",
+  "handles": [
+    "Files: .xlsx and .xlsm.",
+    "Sheet protection: locked cells and the protected-sheet message.",
+    "Workbook structure protection: adding, renaming, moving or deleting sheets."
+  ],
+  "limits": [
+    "A file that asks for a password to open is encrypted and can't be opened here; that needs the password.",
+    "Older .xls files are not supported, only .xlsx and .xlsm files.",
+    "It is meant for files you own or have the right to change."
+  ],
+  "faqTitle": "Unprotect Excel: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I unprotect an Excel sheet without the password?",
+      "answer": "Sheet protection only stops edits inside a spreadsheet app; it does not encrypt the file, so it can be removed by saving the workbook without it. Excel's Unprotect Sheet asks for the password when one was set. On this page, choose your .xlsx or .xlsm file and download a copy with the sheet and workbook protection removed, for files you own or may change."
+    },
+    {
+      "question": "Is the password cracked or guessed?",
+      "answer": "No. Nothing is guessed. The protection settings are simply removed from the file, and no password is found or shown."
+    },
+    {
+      "question": "What if Excel asks for a password to open the file?",
+      "answer": "That file is encrypted, and it can't be opened here: you need the password that was set. This page only removes protection from a file that opens without one."
+    },
+    {
+      "question": "Is anything else in the file changed?",
+      "answer": "No. Cells, formulas, formatting and sheets stay as they were; only the protection is removed."
+    },
+    {
+      "question": "Does it work with .xls files?",
+      "answer": "No. Save the file as .xlsx in your spreadsheet app first, then unprotect that copy."
+    },
+    {
+      "question": "Can I remove a password from a PDF too?",
+      "answer": "Yes, when you know the password: Unlock PDF saves a copy without it.",
+      "link": {
+        "text": "Unlock PDF",
+        "path": "/unlock-pdf"
+      }
+    }
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "title": "AI Summarizer – Summarise PDF and Word Files on Your Device",
+  "description": "Summarise a PDF, Word, PowerPoint or text file with AI that runs on your device in Chrome: key points, a short or a long summary. Nothing is uploaded.",
+  "heading": "AI summarizer on your device",
+  "subtitle": "Summarise a PDF, Word or PowerPoint file as key points or a short summary with desktop Chrome's built-in AI; nothing is uploaded.",
+  "intro": "Get the key points of a long report, contract or slide deck without reading every page. Drop a PDF, Word, PowerPoint, TXT or Markdown file, choose key points, a short summary or a long one, and the summary is written by the AI built into desktop Chrome, on your own computer. The file is read in your browser and never uploaded, and there is no account and no limit. Arabic and other languages the on-device AI can't summarise directly are translated to English on your device, summarised, and the summary translated back. In a browser without on-device AI, the page says so and offers no upload instead.",
+  "features": [
+    {
+      "title": "Runs on your device",
+      "text": "The summary is written by the AI built into Chrome on your computer; the file is never sent to a server or an AI service."
+    },
+    {
+      "title": "Three kinds of summary",
+      "text": "Key points as a list, a short summary of one sentence, or a long one of a few sentences."
+    },
+    {
+      "title": "Long files too",
+      "text": "A document longer than the AI reads at once is summarised in parts, then the parts are summarised together."
+    }
+  ],
+  "stepsTitle": "How it works: summarise a document on your device",
+  "steps": [
+    {
+      "title": "Choose a file",
+      "text": "Drop a PDF, Word, PowerPoint, TXT or Markdown file, or try a sample."
+    },
+    {
+      "title": "Pick the kind of summary",
+      "text": "Key points, a short summary or a long one, then click Summarise. The first time, Chrome downloads its AI model and the page shows the progress."
+    },
+    {
+      "title": "Copy or download",
+      "text": "Copy the summary or download it as Markdown or plain text."
+    }
+  ],
+  "handlesTitle": "What the AI summarizer handles",
+  "handles": [
+    "Files: PDF, Word (.docx, .dotx, .docm), PowerPoint (.pptx, .ppsx, .potx, .pptm), TXT and Markdown.",
+    "PowerPoint decks are summarised from their slide text and speaker notes.",
+    "English, Spanish, Japanese, German and French are summarised directly.",
+    "Arabic and the other languages Chrome translates are summarised through English and translated back.",
+    "Downloads: Markdown (.md) and plain text (.txt)."
+  ],
+  "limits": [
+    "Works only in a recent desktop Chrome with its on-device AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM; not on phones or in other browsers.",
+    "Summaries can leave out or get things wrong; check anything important against the document.",
+    "Scanned PDFs hold pictures of pages and have no text to summarise; run OCR PDF first."
+  ],
+  "faqTitle": "AI summarizer: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. The file is read by your browser and summarised by the AI built into Chrome on your own computer. Nothing is sent to a server or to any AI service, and nothing is saved on the site."
+    },
+    {
+      "question": "Which browsers can summarise files?",
+      "answer": "A recent desktop Chrome with its built-in AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM. In other browsers the page tells you the feature isn't available and offers no upload instead."
+    },
+    {
+      "question": "Why doesn't it work on my phone?",
+      "answer": "The on-device AI in Chrome is only on desktop computers for now, because the model needs a lot of memory and disk space. Open the page in Chrome on a computer."
+    },
+    {
+      "question": "Can it summarise an Arabic document?",
+      "answer": "Yes. The on-device summarizer writes in English, Spanish, Japanese, German and French, so an Arabic document is translated to English on your device, summarised, and the summary is translated back to Arabic. The page tells you when this happened."
+    },
+    {
+      "question": "Why does the first summary take longer?",
+      "answer": "The first time, Chrome downloads its AI model to your computer, and the page shows the progress. After that the model is already there and summaries start at once."
+    },
+    {
+      "question": "Why does my PDF have nothing to summarise?",
+      "answer": "It is probably scanned: its pages are pictures, so there is no text to read. OCR PDF adds a text layer, then you can summarise it here.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
+    }
+  ]
+}

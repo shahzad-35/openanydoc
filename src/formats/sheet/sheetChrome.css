@@ -370,3 +370,5 @@
   & .is-read-aloud{background:color-mix(in srgb,var(--accent) 16%,transparent);border-radius:2px}
 }
 @media (pointer:coarse){#docs-workbench .read-aloud-field select{height:44px}}
+/* The viewers' Summarise and Translate dialog (OnDeviceAiTools.tsx): its selects and buttons reach a finger's size. */
+@media (pointer:coarse){#docs-workbench .dlg-body .field select,#docs-workbench .dlg-body .btn{min-height:44px}}

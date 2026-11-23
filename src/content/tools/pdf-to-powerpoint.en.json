@@ -1,21 +1,21 @@
 {
-  "title": "PDF to PowerPoint – Convert PDF to Editable PPTX, No Upload",
-  "description": "Convert a PDF to PowerPoint in your browser: one slide per page, with editable text boxes and the pictures where they were. Free, nothing is uploaded.",
+  "title": "PDF to PowerPoint – PDF Pages to PPTX Slides, No Upload",
+  "description": "Convert a PDF to PowerPoint in your browser: each page becomes a slide that looks exactly like it, or editable text boxes (beta). Nothing is uploaded.",
   "heading": "PDF to PowerPoint",
-  "subtitle": "Turn each page of a PDF into a slide with editable text boxes and its pictures; nothing is uploaded.",
-  "intro": "Convert PDF to PowerPoint online to reuse a report or handout in a presentation: every page becomes a slide of the same shape, each block of text an editable text box where it was, and each picture where it sat. Headings keep their size and lists their bullets. Drawn shapes, colours and backgrounds are left out, so the slides are clean to restyle. Your file never leaves your device.",
+  "subtitle": "Turn each page of a PDF into a slide that looks exactly like the page, or into editable text boxes; nothing is uploaded.",
+  "intro": "Convert PDF to PowerPoint online to show a report or handout in a presentation. By default every page becomes one slide holding a picture of the page, so it looks exactly like the PDF. Choose Editable text (beta) instead to get each block of text as an editable text box where it was and each picture where it sat; headings keep their size and lists their bullets, and the layout is approximate. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
       "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Editable slides",
-      "text": "Text boxes you can click into and change, not pictures of pages."
+      "title": "Looks exactly right",
+      "text": "By default each slide is a picture of its page, so nothing shifts or reflows."
     },
     {
-      "title": "Pictures kept",
-      "text": "Photos and charts saved as pictures go on the slide where they were."
+      "title": "Editable text (beta)",
+      "text": "Prefer to edit? Get text boxes you can click into, with the pictures where they were."
     }
   ],
   "stepsTitle": "How to convert PDF to PowerPoint",
@@ -23,6 +23,10 @@
     {
       "title": "Choose your PDF",
       "text": "Click Choose a file, or drop a PDF on the page."
+    },
+    {
+      "title": "Choose the slides",
+      "text": "Keep Pages as pictures for slides that look exactly like the PDF, or pick Editable text (beta)."
     },
     {
       "title": "Convert",
@@ -36,14 +40,14 @@
   "handlesTitle": "What PDF to PowerPoint handles",
   "handles": [
     "One slide per page, the size and shape of the first page.",
-    "Text blocks as editable text boxes, with size, bold, italic and bullets.",
-    "Pictures, placed where they were.",
+    "Pages as pictures (default): each slide is a picture of its page at 200 dpi, at most 2,000 pixels on the long side, so it looks exactly like the page.",
+    "Editable text (beta): text blocks as text boxes, with size, bold, italic and bullets, and pictures where they were.",
     "Arabic text boxes, right to left."
   ],
   "limits": [
-    "Drawn shapes, lines, colours and backgrounds are left out; only text and pictures come across.",
-    "Text boxes use Arial, so lines can wrap a little differently from the PDF.",
-    "Scanned PDFs hold pictures of pages, so there is no text to convert (that needs OCR).",
+    "With Pages as pictures, the text on the slides can't be edited.",
+    "Editable text is in beta: drawn shapes, lines, colours and backgrounds are left out, text boxes use Arial, and the layout is approximate.",
+    "Scanned PDFs hold pictures of pages, so Editable text finds no text to convert (that needs OCR).",
     "PDFs that need a password to open must be unlocked first, with Unlock PDF."
   ],
   "faqTitle": "PDF to PowerPoint: questions",
@@ -54,19 +58,23 @@
     },
     {
       "question": "Can I edit the text on the slides?",
-      "answer": "Yes. Every block of text is a normal PowerPoint text box."
+      "answer": "With Editable text (beta), yes: every block of text is a normal PowerPoint text box. With the default, Pages as pictures, each slide is a picture of its page, so the text can't be edited."
     },
     {
       "question": "Why are some shapes or backgrounds missing?",
-      "answer": "Only text and pictures are carried over; drawn shapes, lines and backgrounds are left out, so the slides can be restyled."
+      "answer": "That happens with Editable text (beta): only text and pictures are carried over, and drawn shapes, lines and backgrounds are left out. Pages as pictures keeps everything, because each slide is a picture of the whole page."
     },
     {
       "question": "Does it work with scanned PDFs?",
-      "answer": "No. A scanned PDF holds pictures of pages, so there is no text to convert; that needs text recognition (OCR), which this tool does not do."
+      "answer": "Yes, with Pages as pictures, which shows each scanned page as it is. Editable text needs text in the file; a scan holds only pictures, so it needs text recognition first, which OCR PDF does.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
     },
     {
-      "question": "I need the pages exactly as they look. What can I use?",
-      "answer": "PDF to JPG saves each page as a picture you can put on a slide.",
+      "question": "I only need the pages as pictures, not a presentation. What can I use?",
+      "answer": "PDF to JPG saves each page as a picture file.",
       "link": {
         "text": "PDF to JPG",
         "path": "/pdf-to-jpg"
@@ -77,8 +85,8 @@
       "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
     },
     {
-      "question": "How do I convert a PDF to an editable PowerPoint?",
-      "answer": "Turn each PDF page into a slide whose text sits in editable text boxes, then open the .pptx in PowerPoint, Keynote or Google Slides. OpenAnyDoc's PDF to PowerPoint does it in your browser: choose the PDF, click Convert to PowerPoint and download, with nothing uploaded."
+      "question": "How do I convert a PDF to PowerPoint?",
+      "answer": "Turn each PDF page into a slide, then open the .pptx in PowerPoint, Keynote or Google Slides. OpenAnyDoc's PDF to PowerPoint does it in your browser: choose the PDF, keep Pages as pictures for slides that look exactly like the pages or pick Editable text (beta) for text boxes, click Convert to PowerPoint and download, with nothing uploaded."
     }
   ]
 }

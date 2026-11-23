@@ -1,0 +1,102 @@
+{
+  "title": "PPTX to JPG – Turn PowerPoint Slides into Images Free",
+  "description": "Turn each PowerPoint slide into a JPG image in your browser, about 2000 px wide for a 16:9 slide, several in one ZIP. Free, and nothing is uploaded.",
+  "heading": "PowerPoint to JPG",
+  "subtitle": "Turn every slide of a PowerPoint file into a sharp JPG picture, several at once in a ZIP; nothing is uploaded.",
+  "intro": "Convert PPTX to JPG online without PowerPoint: each slide is drawn the way this site's PowerPoint viewer (beta) shows it and saved as a JPG picture at 200 dpi, about 2000 px wide for a 16:9 slide. One slide gives one .jpg; a whole deck gives a ZIP with the slides numbered in order. Handy for posting a slide on social media, adding it to a document or sending it to a phone. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Sharp pictures",
+      "text": "Each slide is drawn at 200 dpi, about 2000 px wide for a 16:9 slide."
+    },
+    {
+      "title": "Numbered in order",
+      "text": "Several slides come in one ZIP, named name-slide-01.jpg, name-slide-02.jpg and so on."
+    }
+  ],
+  "stepsTitle": "How to convert PowerPoint to JPG",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to JPG."
+    },
+    {
+      "title": "Download",
+      "text": "Check the preview and download the JPG, or the ZIP with every slide."
+    }
+  ],
+  "handlesTitle": "What PowerPoint to JPG handles",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
+    "Text, shapes, tables and pictures saved in the file.",
+    "Widescreen 16:9 and standard 4:3 slides, each picture in the slide's shape.",
+    "Output: one .jpg for a single slide, a ZIP for several."
+  ],
+  "limits": [
+    "The slides follow this site's PowerPoint viewer, which is in beta and close to PowerPoint but not identical; fonts your browser doesn't have are replaced.",
+    "Every slide is saved as a JPG at 200 dpi; there is no size or format choice.",
+    "Animations, video and audio are not kept, pictures linked from the web are not fetched, and old .ppt files can't be read."
+  ],
+  "worksBest": [
+    "Sharing one slide on social media or in a chat",
+    "Slide pictures for documents and websites",
+    "Thumbnails of a whole deck"
+  ],
+  "mayNotKeep": [
+    "Animations and slide transitions",
+    "Video and audio",
+    "SmartArt and charts drawn differently",
+    "Fonts your browser doesn't have"
+  ],
+  "faqTitle": "PowerPoint to JPG: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I save a PowerPoint slide as a JPG without PowerPoint?",
+      "answer": "Keynote on a Mac, LibreOffice Impress and Google Slides can all export slides as pictures for free. In OpenAnyDoc, choose the .pptx file and download a JPG of every slide, numbered in a ZIP; it is converted in your browser and never uploaded."
+    },
+    {
+      "question": "How large are the pictures?",
+      "answer": "Each slide is drawn at 200 dpi: about 2000 px wide for a 16:9 slide. To make the files smaller, run them through Compress image.",
+      "link": {
+        "text": "Compress image",
+        "path": "/compress-image"
+      }
+    },
+    {
+      "question": "Can I choose which slides to save?",
+      "answer": "No: every slide is saved, as a JPG at 200 dpi, with no size or format choice. Keep the JPGs you need from the ZIP."
+    },
+    {
+      "question": "Will it look exactly like PowerPoint?",
+      "answer": "Close, not identical: the slides follow this site's PowerPoint viewer, which is in beta, and fonts your browser doesn't have are replaced. Open the file in the PowerPoint viewer to see how it will come out.",
+      "link": {
+        "text": "PowerPoint viewer",
+        "path": "/powerpoint-viewer"
+      }
+    },
+    {
+      "question": "Can I get a PDF instead?",
+      "answer": "Yes. PowerPoint to PDF saves one page per slide, with text you can search.",
+      "link": {
+        "text": "PowerPoint to PDF",
+        "path": "/pptx-to-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -1505,3 +1505,104 @@ feedbackForm.createCheckBox('contact_me').addToPage(feedbackPage, { x: 60, y: 46
 feedbackPage.drawText('You may contact me about this feedback', { x: 86, y: 463, size: 12, font: feedbackBodyFont })
 writeSampleFile('feedback-form.pdf', await feedbackPdf.save())
 console.log('Wrote the Fill PDF sample feedback-form.pdf.')
+
+// ---------------------------------------------------------------- Word, Excel and PowerPoint tool samples
+// Made from the samples above, edited as packages: a second version of the Word summary (Compare Word), the same summary with
+// comments and tracked changes (Remove comments), a mail-merge letter template, a protected and a changed copy of the sales
+// workbook (Unprotect and Compare Excel), and the review deck as a macro-enabled .pptm (Remove macros).
+const loadSample = async (fileName) => JSZip.loadAsync(readFileSync(new URL(fileName, sampleDirectory)))
+const writeSamplePackage = async (zip, fileName) => writeSampleFile(fileName, await zip.generateAsync({ type: 'uint8array', compression: 'DEFLATE' }))
+async function editSamplePart(zip, partPath, edit) {
+  const xml = await zip.file(partPath).async('string')
+  const edited = edit(xml)
+  if (edited === xml) throw new Error(`Sample edit changed nothing in ${partPath}`)
+  zip.file(partPath, edited)
+}
+
+const summaryVersion2 = await loadSample('quarterly-summary.docx')
+await editSamplePart(summaryVersion2, 'word/document.xml', (xml) => xml.replace('Version 2.4.1 is out; write to', 'Version 2.5 is out with faster exports; write to').replace(' test document with ', ' sample document with '))
+await writeSamplePackage(summaryVersion2, 'quarterly-summary-v2.docx')
+
+const reviewedSummary = await loadSample('quarterly-summary.docx')
+const commentAuthor = 'w:author="Reviewer (synthetic)" w:date="2026-11-20T10:00:00Z"'
+await editSamplePart(reviewedSummary, 'word/document.xml', (xml) =>
+  xml
+    .replace('<w:r><w:t xml:space="preserve">Version 2.4.1 is out; write to support@example.com with questions.</w:t></w:r>', `<w:commentRangeStart w:id="0"/><w:r><w:t xml:space="preserve">Version </w:t></w:r><w:del w:id="1" ${commentAuthor}><w:r><w:delText>2.4.1</w:delText></w:r></w:del><w:ins w:id="2" ${commentAuthor}><w:r><w:t>2.5</w:t></w:r></w:ins><w:r><w:t xml:space="preserve"> is out; write to support@example.com with questions.</w:t></w:r><w:commentRangeEnd w:id="0"/><w:r><w:commentReference w:id="0"/></w:r>`),
+)
+reviewedSummary.file('word/comments.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><w:comments xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main"><w:comment w:id="0" ${commentAuthor} w:initials="R"><w:p><w:r><w:t>Check the version number before sending.</w:t></w:r></w:p></w:comment></w:comments>`)
+await editSamplePart(reviewedSummary, '[Content_Types].xml', (xml) => xml.replace('</Types>', '<Override PartName="/word/comments.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.comments+xml"/></Types>'))
+await editSamplePart(reviewedSummary, 'word/_rels/document.xml.rels', (xml) => xml.replace('</Relationships>', '<Relationship Id="rIdComments1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/comments" Target="comments.xml"/></Relationships>'))
+await writeSamplePackage(reviewedSummary, 'quarterly-summary-reviewed.docx')
+
+const { Document, Packer, Paragraph, TextRun, HeadingLevel } = createRequire(import.meta.url)('docx')
+const letterParagraphs = [
+  new Paragraph({ heading: HeadingLevel.HEADING_1, children: [new TextRun('Order summary (synthetic sample)')] }),
+  new Paragraph({ children: [new TextRun('Dear '), new TextRun({ text: '{{name}}', bold: true }), new TextRun(',')] }),
+  new Paragraph({ children: [new TextRun('Thank you for your '), new TextRun('{{orders}}'), new TextRun(' orders since '), new TextRun('{{joined}}'), new TextRun('. Your total so far is '), new TextRun({ text: '{{total}}', bold: true }), new TextRun('.')] }),
+  new Paragraph({ children: [new TextRun('We will send the next catalogue to our '), new TextRun('{{city}}'), new TextRun(' shop.')] }),
+  new Paragraph({ children: [new TextRun('Kind regards,')] }),
+]
+writeSampleFile('letter-template.docx', await Packer.toBuffer(new Document({ sections: [{ children: letterParagraphs }] })))
+
+const protectedSales = await loadSample('sales-three-sheets.xlsx')
+await editSamplePart(protectedSales, 'xl/worksheets/sheet1.xml', (xml) => xml.replace('</sheetData>', '</sheetData><sheetProtection sheet="1" objects="1" scenarios="1"/>'))
+await editSamplePart(protectedSales, 'xl/workbook.xml', (xml) => xml.replace('<sheets>', '<workbookProtection lockStructure="1"/><sheets>'))
+await writeSamplePackage(protectedSales, 'sales-protected.xlsx')
+
+const salesVersion2 = await loadSample('sales-three-sheets.xlsx')
+await editSamplePart(salesVersion2, 'xl/worksheets/sheet1.xml', (xml) => xml.replace('<c r="C2"><v>85</v></c>', '<c r="C2"><v>92</v></c>').replace('<v>Desk lamp</v>', '<v>Desk lamp (LED)</v>'))
+await writeSamplePackage(salesVersion2, 'sales-three-sheets-v2.xlsx')
+
+const macroDeck = await loadSample('quarterly-review-3-slides.pptx')
+macroDeck.file('ppt/vbaProject.bin', new TextEncoder().encode('Synthetic placeholder for a macro project. OpenAnyDoc never runs or reads it.'))
+await editSamplePart(macroDeck, '[Content_Types].xml', (xml) =>
+  xml
+    .replace('application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml', 'application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml')
+    .replace('</Types>', '<Default Extension="bin" ContentType="application/vnd.ms-office.vbaProject"/></Types>'),
+)
+await editSamplePart(macroDeck, 'ppt/_rels/presentation.xml.rels', (xml) => xml.replace('</Relationships>', '<Relationship Id="rIdVba1" Type="http://schemas.microsoft.com/office/2006/relationships/vbaProject" Target="vbaProject.bin"/></Relationships>'))
+await writeSamplePackage(macroDeck, 'quarterly-review-macro.pptm')
+const protectedArabic = await loadSample('arabic-branches.xlsx')
+await editSamplePart(protectedArabic, 'xl/worksheets/sheet1.xml', (xml) => xml.replace('</sheetData>', '</sheetData><sheetProtection sheet="1" objects="1" scenarios="1"/>'))
+await writeSamplePackage(protectedArabic, 'arabic-protected.xlsx')
+
+const arabicMacroDeck = await loadSample('arabic-review-3-slides.pptx')
+arabicMacroDeck.file('ppt/vbaProject.bin', new TextEncoder().encode('Synthetic placeholder for a macro project. OpenAnyDoc never runs or reads it.'))
+await editSamplePart(arabicMacroDeck, '[Content_Types].xml', (xml) =>
+  xml
+    .replace('application/vnd.openxmlformats-officedocument.presentationml.presentation.main+xml', 'application/vnd.ms-powerpoint.presentation.macroEnabled.main+xml')
+    .replace('</Types>', '<Default Extension="bin" ContentType="application/vnd.ms-office.vbaProject"/></Types>'),
+)
+await editSamplePart(arabicMacroDeck, 'ppt/_rels/presentation.xml.rels', (xml) => xml.replace('</Relationships>', '<Relationship Id="rIdVba1" Type="http://schemas.microsoft.com/office/2006/relationships/vbaProject" Target="vbaProject.bin"/></Relationships>'))
+await writeSamplePackage(arabicMacroDeck, 'arabic-review-macro.pptm')
+console.log('Wrote the Arabic protected workbook and macro deck samples.')
+// Copies with document properties for the metadata pages (made-up author and company).
+async function writeSampleWithProperties(sourceName, fileName, { title, author, company, application }) {
+  const zip = await loadSample(sourceName)
+  zip.file('docProps/core.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><cp:coreProperties xmlns:cp="http://schemas.openxmlformats.org/package/2006/metadata/core-properties" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><dc:title>${title}</dc:title><dc:creator>${author}</dc:creator><cp:lastModifiedBy>${author}</cp:lastModifiedBy><cp:revision>4</cp:revision><dcterms:created xsi:type="dcterms:W3CDTF">2026-10-02T09:15:00Z</dcterms:created><dcterms:modified xsi:type="dcterms:W3CDTF">2026-11-18T16:40:00Z</dcterms:modified></cp:coreProperties>`)
+  zip.file('docProps/app.xml', `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Properties xmlns="http://schemas.openxmlformats.org/officeDocument/2006/extended-properties"><Application>${application}</Application><Company>${company}</Company><Manager>${author}</Manager></Properties>`)
+  await editSamplePart(zip, '[Content_Types].xml', (xml) => xml.replace('</Types>', '<Override PartName="/docProps/core.xml" ContentType="application/vnd.openxmlformats-package.core-properties+xml"/><Override PartName="/docProps/app.xml" ContentType="application/vnd.openxmlformats-officedocument.extended-properties+xml"/></Types>'))
+  await editSamplePart(zip, '_rels/.rels', (xml) => xml.replace('</Relationships>', '<Relationship Id="rIdCore1" Type="http://schemas.openxmlformats.org/package/2006/relationships/metadata/core-properties" Target="docProps/core.xml"/><Relationship Id="rIdApp1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/extended-properties" Target="docProps/app.xml"/></Relationships>'))
+  await writeSamplePackage(zip, fileName)
+}
+await writeSampleWithProperties('quarterly-summary.docx', 'summary-with-details.docx', { title: 'Quarterly summary', author: 'Sample Author', company: 'Example Ltd', application: 'Microsoft Office Word' })
+await writeSampleWithProperties('arabic-summary.docx', 'arabic-summary-with-details.docx', { title: 'ملخص ربع سنوي', author: 'مؤلف تجريبي', company: 'شركة المثال', application: 'Microsoft Office Word' })
+await writeSampleWithProperties('quarterly-review-3-slides.pptx', 'review-with-details.pptx', { title: 'Quarterly review', author: 'Sample Author', company: 'Example Ltd', application: 'Microsoft Office PowerPoint' })
+await writeSampleWithProperties('arabic-review-3-slides.pptx', 'arabic-review-with-details.pptx', { title: 'مراجعة ربع سنوية', author: 'مؤلف تجريبي', company: 'شركة المثال', application: 'Microsoft Office PowerPoint' })
+// Remove PDF metadata: copies of two PDF samples with made-up document properties (the originals name the library that made them).
+for (const [sourceName, fileName, details] of [
+  ['report-3-pages.pdf', 'report-with-details.pdf', { title: 'Quarterly report', author: 'Sample Author', subject: 'Sales by region', keywords: ['sales', 'quarterly'], creator: 'Example Writer 4.2', producer: 'Example PDF Maker' }],
+  ['arabic-english-guide.pdf', 'arabic-guide-with-details.pdf', { title: 'دليل المستخدم', author: 'مؤلف تجريبي', subject: 'دليل تجريبي', keywords: ['دليل'], creator: 'Example Writer 4.2', producer: 'Example PDF Maker' }],
+]) {
+  const document = await PDFDocument.load(readFileSync(new URL(sourceName, sampleDirectory)), { updateMetadata: false })
+  document.setTitle(details.title)
+  document.setAuthor(details.author)
+  document.setSubject(details.subject)
+  document.setKeywords(details.keywords)
+  document.setCreator(details.creator)
+  document.setProducer(details.producer)
+  document.setCreationDate(new Date('2026-10-02T09:15:00Z'))
+  document.setModificationDate(new Date('2026-11-18T16:40:00Z'))
+  writeSampleFile(fileName, await document.save())
+}
+console.log('Wrote the Word, Excel and PowerPoint tool samples.')

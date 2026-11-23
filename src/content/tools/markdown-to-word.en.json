@@ -1,0 +1,95 @@
+{
+  "title": "Markdown to Word – Convert .md to DOCX Free, No Upload",
+  "description": "Convert Markdown to a Word document in your browser: headings, lists, tables, links and code become real Word formatting. Free, no upload.",
+  "heading": "Markdown to Word",
+  "subtitle": "Paste Markdown or open a .md file and download an editable Word document with real headings, lists and tables; nothing is uploaded.",
+  "intro": "Convert Markdown to DOCX online: type or paste your text, or open a .md, .markdown or .txt file, and GitHub-style Markdown becomes a Word document. # headings become Word's Heading 1 to 6, so the navigation pane and a table of contents work; bulleted and numbered lists keep their levels, tables become Word tables, links stay clickable, quotes are indented and code is set in a monospaced font on grey. Arabic paragraphs are set right to left. The text is converted in your browser and never uploaded, and nothing is fetched from the web.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your text is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Real Word headings",
+      "text": "Headings become Word's Heading 1 to 6, so the navigation pane and a table of contents work at once."
+    },
+    {
+      "title": "Paste or open",
+      "text": "Paste Markdown straight into the box, or open a .md file to fill it, and edit it before you convert."
+    }
+  ],
+  "stepsTitle": "How to convert Markdown to Word",
+  "steps": [
+    {
+      "title": "Paste or open your Markdown",
+      "text": "Type or paste Markdown into the box, or choose or drop a .md, .markdown or .txt file to fill it."
+    },
+    {
+      "title": "Convert",
+      "text": "Click the convert button to make the Word document."
+    },
+    {
+      "title": "Download",
+      "text": "Download the .docx file and edit it in Word, LibreOffice, Google Docs or Pages."
+    }
+  ],
+  "handlesTitle": "What Markdown to Word handles",
+  "handles": [
+    "Files: .md, .markdown and .txt, or Markdown you type or paste.",
+    "Headings, paragraphs, bold, italic, strikethrough, links and inline code.",
+    "Bulleted and numbered lists with nested levels, tables, code blocks, block quotes and horizontal rules.",
+    "Arabic and English, each paragraph in its own direction."
+  ],
+  "limits": [
+    "Pictures from web addresses are left out, because nothing is fetched from the web; only pictures written into the text as data are kept.",
+    "Only GitHub-style Markdown is read: maths, diagrams and other editor extensions stay as plain text.",
+    "The document uses Word's default look (Calibri 11); your Markdown editor's theme, fonts and colours are not carried over.",
+    "Files up to 10 MB are opened; a larger file shows a message instead."
+  ],
+  "worksBest": [
+    "README files and notes",
+    "Documentation with headings and tables",
+    "Answers copied from an AI chat",
+    "Meeting notes and outlines"
+  ],
+  "mayNotKeep": [
+    "Pictures linked from web addresses",
+    "Maths and diagrams",
+    "Your editor's theme, fonts and colours"
+  ],
+  "faqTitle": "Markdown to Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert Markdown to Word?",
+      "answer": "Converting Markdown to Word means turning its # headings, lists and tables into Word's own headings, lists and tables, so the document can be edited like any other. In OpenAnyDoc, paste the Markdown or open the .md file, click convert and download the .docx; the text is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Will the headings show in Word's navigation pane?",
+      "answer": "Yes. # to ###### become Word's Heading 1 to 6 styles, so the navigation pane lists them and Word can build a table of contents from them."
+    },
+    {
+      "question": "What happens to pictures?",
+      "answer": "Pictures from web addresses are left out, because this page never fetches anything from the web. Pictures written into the Markdown as data (a data: address) are kept."
+    },
+    {
+      "question": "Can I paste an answer from an AI chat?",
+      "answer": "Yes. Copy the answer with its Markdown marks, paste it into the box and convert it: headings, lists, tables and code come out as Word formatting."
+    },
+    {
+      "question": "Can I make a PDF instead?",
+      "answer": "Yes. If the document only needs to be read, not edited, Markdown to PDF lays it out on A4 or Letter pages with text you can search.",
+      "link": {
+        "text": "Markdown to PDF",
+        "path": "/markdown-to-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

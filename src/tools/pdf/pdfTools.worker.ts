@@ -1,7 +1,7 @@
 import { zipSync } from 'fflate'
-import { EncryptedPDFError, PDFArray, PDFDict, PDFDocument, PDFHexString, PDFName, PDFNull, PDFRef, PDFStream, PDFString, TextRenderingMode, beginText, degrees, endText, popGraphicsState, pushGraphicsState, rgb, setCharacterSqueeze, setFontAndSize, setTextMatrix, setTextRenderingMode, showText } from 'pdf-lib'
+import { EncryptedPDFError, PDFArray, PDFBool, PDFDict, PDFDocument, PDFHexString, PDFName, PDFNull, PDFRef, PDFStream, PDFString, TextRenderingMode, beginText, degrees, endText, popGraphicsState, pushGraphicsState, rgb, setCharacterSqueeze, setFontAndSize, setTextMatrix, setTextRenderingMode, showText } from 'pdf-lib'
 import type { PDFObject, PDFOperator, PDFPage } from 'pdf-lib'
-import type { LayerWord, NewFormField, OutputPage, PageOrientation, PageShape, PageSize, PdfTaskProgress, PdfTaskRequest, PdfTaskResponse } from './pdfTasks'
+import type { LayerWord, NewFormField, OutputPage, PageOrientation, PageShape, PageSize, PageStamp, PdfTaskProgress, PdfTaskRequest, PdfTaskResponse } from './pdfTasks'
 
 const ARROW_HEAD_LENGTH = 12
 const PAGE_SIZES_IN_POINTS: Record<Exclude<PageSize, 'fit'>, [number, number]> = { a4: [595.28, 841.89], letter: [612, 792] }
@@ -206,21 +206,38 @@ function drawInvisibleWords(output: PDFDocument, pages: { page: PDFPage; words: 
   }
 }
 
-// ---------------------------------------------------------------- qpdf (Protect and Unlock PDF)
+// ---------------------------------------------------------------- qpdf (Protect, Unlock, Compress and Flatten PDF, Remove PDF metadata)
 
 type QpdfInstance = { callMain: (args: string[]) => number; FS: { writeFile: (path: string, data: Uint8Array) => void; readFile: (path: string) => Uint8Array } }
 
 // qpdf run once on the file at /input.pdf; its result is read from /output.pdf. Its .wasm is inlined in this worker (vite.config.ts,
 // `inlinedWasmFiles`) and handed over as bytes (`feedQpdfWasmBytes`), so nothing is fetched. Exit codes: 0 done, 3 done with
 // warnings, 2 failed (a wrong password among them).
-async function runQpdf(args: string[], input: ArrayBuffer) {
+async function runQpdf(args: string[], input: ArrayBuffer | Uint8Array) {
   const [{ default: createQpdf }, { default: wasmAddress }] = await Promise.all([import('@neslinesli93/qpdf-wasm'), import('@neslinesli93/qpdf-wasm/dist/qpdf.wasm?url')])
-  const wasmBinary = import.meta.env.DEV && !wasmAddress.startsWith('data:') ? new Uint8Array(await (await fetch(wasmAddress)).arrayBuffer()) : Uint8Array.from(atob(wasmAddress.slice(wasmAddress.indexOf(',') + 1)), (character) => character.charCodeAt(0))
-  const qpdf = (await (createQpdf as unknown as (options: object) => Promise<QpdfInstance>)({ wasmBinary, locateFile: () => 'qpdf.wasm' })) as QpdfInstance
+  // On the development server qpdf is pre-bundled (it is a CommonJS module), which skips `feedQpdfWasmBytes`, so it is pointed at its
+  // .wasm on the server and loads it itself. The build inlines the .wasm and hands over its bytes, so nothing is fetched.
+  const options = import.meta.env.DEV && !wasmAddress.startsWith('data:') ? { locateFile: () => wasmAddress } : { wasmBinary: Uint8Array.from(atob(wasmAddress.slice(wasmAddress.indexOf(',') + 1)), (character) => character.charCodeAt(0)), locateFile: () => 'qpdf.wasm' }
+  const qpdf = (await (createQpdf as unknown as (options: object) => Promise<QpdfInstance>)(options)) as QpdfInstance
   qpdf.FS.writeFile('/input.pdf', new Uint8Array(input))
   const exitCode = qpdf.callMain([...args, '/input.pdf', '/output.pdf'])
   return exitCode === 0 || exitCode === 3 ? qpdf.FS.readFile('/output.pdf') : null
 }
+
+// PNG pictures drawn upright on the pages as shown (`stamp-pdf`, and Flatten PDF's values).
+async function drawStamps(pdf: PDFDocument, imageBytes: ArrayBuffer[], stamps: PageStamp[]) {
+  const images = await Promise.all(imageBytes.map((bytes) => pdf.embedPng(bytes)))
+  const pages = pdf.getPages()
+  for (const [position, stamp] of stamps.entries()) {
+    const page = pages[stamp.pageIndex]
+    const { x, y, width, height } = stamp.box
+    // The picture stands upright on screen: anchored at its bottom-left corner as shown, and turned with the page.
+    page.drawImage(images[stamp.imageIndex], { ...shownPointToPdf(page, x, y + height), width, height, rotate: degrees(page.getRotation().angle), opacity: stamp.opacity ?? 1 })
+    if (position % 25 === 24) reportProgress(position + 1, stamps.length)
+  }
+}
+
+const isEncryptedPdf = async (pdf: ArrayBuffer) => (await PDFDocument.load(pdf, { ignoreEncryption: true })).isEncrypted
 
 // A permissions password nobody is told, when none is given, so a reader doesn't treat the password to open as the permissions
 // password. The restrictions stay advisory: anyone with the password to open can decrypt the file (Unlock PDF does).
@@ -384,7 +401,7 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
     return { status: 'ok', pdf: await pdf.save() }
   }
   if (request.type === 'protect-pdf') {
-    if ((await PDFDocument.load(request.pdf, { ignoreEncryption: true })).isEncrypted) return { status: 'error', reason: 'encrypted' }
+    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
     const restrictions = [...(request.canPrint ? [] : ['--print=none']), ...(request.canCopy ? [] : ['--extract=n']), ...(request.canEdit ? [] : ['--modify=none'])]
     const ownerPassword = request.ownerPassword || (restrictions.length ? randomPassword() : request.userPassword)
     const pdf = await runQpdf(['--encrypt', `--user-password=${request.userPassword}`, `--owner-password=${ownerPassword}`, '--bits=256', ...restrictions, '--'], request.pdf)
@@ -394,6 +411,40 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
     if (!(await PDFDocument.load(request.pdf, { ignoreEncryption: true })).isEncrypted) return { status: 'error', reason: 'not-encrypted' }
     const pdf = await runQpdf([...(request.password ? [`--password=${request.password}`] : []), '--decrypt'], request.pdf)
     return pdf ? { status: 'ok', pdf } : { status: 'error', reason: 'wrong-password' }
+  }
+  if (request.type === 'compress-pdf') {
+    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    // qpdf keeps a picture's new JPEG only when it is smaller, and writes only the objects the document still reaches.
+    const pdf = await runQpdf(['--optimize-images', `--jpeg-quality=${request.jpegQuality}`, '--recompress-flate', '--compression-level=9', '--object-streams=generate', '--remove-unreferenced-resources=yes'], request.pdf)
+    return pdf ? { status: 'ok', pdf } : { status: 'error', reason: 'unreadable' }
+  }
+  if (request.type === 'flatten-pdf') {
+    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    const document = await PDFDocument.load(request.pdf, { updateMetadata: false })
+    // qpdf redraws the fields only when the file says their pictures are out of date; otherwise it keeps them as every reader shows them.
+    const needsAppearances = document.catalog.getAcroForm()?.dict.lookup(PDFName.of('NeedAppearances')) === PDFBool.True
+    if (!needsAppearances || !request.drawnFieldNames.length) {
+      const pdf = await runQpdf(['--generate-appearances', '--flatten-annotations=all'], request.pdf)
+      return pdf ? { status: 'ok', pdf } : { status: 'error', reason: 'unreadable' }
+    }
+    // The browser's values go on after qpdf, or the emptied fields' white boxes, now part of the page, would cover them.
+    const form = document.getForm()
+    for (const fieldName of request.drawnFieldNames) form.getFieldMaybe(fieldName)?.acroField.dict.delete(PDFName.of('V'))
+    const flattened = await runQpdf(['--generate-appearances', '--flatten-annotations=all'], await document.save({ updateFieldAppearances: false }))
+    if (!flattened) return { status: 'error', reason: 'unreadable' }
+    const flattenedDocument = await PDFDocument.load(flattened, { updateMetadata: false })
+    await drawStamps(flattenedDocument, request.images, request.stamps)
+    return { status: 'ok', pdf: await flattenedDocument.save() }
+  }
+  if (request.type === 'remove-pdf-metadata') {
+    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    // qpdf's --remove-info keeps the modification date, so the whole dictionary is taken out first; qpdf then leaves out the objects
+    // nothing points at any more.
+    const document = await PDFDocument.load(request.pdf, { updateMetadata: false })
+    document.context.trailerInfo.Info = undefined
+    document.catalog.delete(PDFName.of('Metadata'))
+    const pdf = await runQpdf(['--remove-info', '--remove-metadata'], await document.save({ updateFieldAppearances: false }))
+    return pdf ? { status: 'ok', pdf } : { status: 'error', reason: 'unreadable' }
   }
   if (request.type === 'repair-pdf') {
     const pdf = await PDFDocument.load(request.pdf, { throwOnInvalidObject: false, updateMetadata: false })
@@ -405,15 +456,8 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
     const form = pdf.getForm()
     for (const field of form.getFields()) form.removeField(field)
   }
-  const images = await Promise.all(request.images.map((imageBytes) => pdf.embedPng(imageBytes)))
+  await drawStamps(pdf, request.images, request.stamps)
   const pages = pdf.getPages()
-  for (const [position, stamp] of request.stamps.entries()) {
-    const page = pages[stamp.pageIndex]
-    const { x, y, width, height } = stamp.box
-    // The picture stands upright on screen: anchored at its bottom-left corner as shown, and turned with the page.
-    page.drawImage(images[stamp.imageIndex], { ...shownPointToPdf(page, x, y + height), width, height, rotate: degrees(page.getRotation().angle), opacity: stamp.opacity ?? 1 })
-    if (position % 25 === 24) reportProgress(position + 1, request.stamps.length)
-  }
   for (const shape of request.shapes ?? []) drawShape(pages[shape.pageIndex], shape)
   return { status: 'ok', pdf: await pdf.save() }
 }

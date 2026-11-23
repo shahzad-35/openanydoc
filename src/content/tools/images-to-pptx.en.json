@@ -1,0 +1,109 @@
+{
+  "title": "Images to PPTX – Make PowerPoint Slides from Photos",
+  "description": "Turn JPG, PNG, WebP, HEIC and other pictures into an editable PowerPoint file in your browser: one picture per slide, 16:9 or 4:3. Free, no upload.",
+  "heading": "Images to PowerPoint",
+  "subtitle": "Put your photos and pictures into an editable PowerPoint file, one per slide, in the order you choose; nothing is uploaded.",
+  "intro": "Convert JPG to PPTX online for a photo slideshow, a portfolio or scanned pages: add your pictures, drag them into order, choose widescreen 16:9 or standard 4:3 slides, and download a .pptx with one picture per slide, as large as fits and centred. Each picture can still be moved or resized in PowerPoint, Keynote, Google Slides or LibreOffice. JPG and PNG photos go in as they are, without being compressed again. Your files never leave your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Editable slides",
+      "text": "A real .pptx file: every picture can be moved, resized or replaced in any presentation app."
+    },
+    {
+      "title": "Your order",
+      "text": "Drag pictures into order, move them earlier or later, or remove one before you make the file."
+    }
+  ],
+  "stepsTitle": "How to turn images into a PowerPoint",
+  "steps": [
+    {
+      "title": "Choose your pictures",
+      "text": "Click Choose a file, or drop pictures on the page. Add more at any time."
+    },
+    {
+      "title": "Order them",
+      "text": "Drag the pictures into order, or remove the ones you don't need."
+    },
+    {
+      "title": "Pick the slide shape",
+      "text": "Choose Widescreen 16:9 or Standard 4:3."
+    },
+    {
+      "title": "Make the file",
+      "text": "Click Make PowerPoint and download the .pptx."
+    }
+  ],
+  "handlesTitle": "What Images to PowerPoint handles",
+  "handles": [
+    "Pictures: JPG, PNG, WebP, TIFF, SVG and HEIC (where your browser can read it).",
+    "Slides: Widescreen 16:9 or Standard 4:3.",
+    "One picture per slide, as large as fits and centred.",
+    "Output: an editable .pptx file."
+  ],
+  "limits": [
+    "No text, titles or captions are added; type them in your presentation app afterwards.",
+    "Every picture gets a slide of its own; several pictures on one slide aren't supported.",
+    "HEIC photos work only where your browser can read them; save others as JPG first."
+  ],
+  "worksBest": [
+    "Photo slideshows and albums",
+    "Portfolios and product pictures",
+    "Scanned pages or screenshots to present"
+  ],
+  "mayNotKeep": [
+    "Titles, captions and text",
+    "Several pictures on one slide",
+    "HEIC photos your browser can't read"
+  ],
+  "faqTitle": "Images to PowerPoint: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I make a PowerPoint from photos without PowerPoint?",
+      "answer": "Google Slides, Keynote and LibreOffice Impress can all insert pictures into slides for free, one picture at a time. In OpenAnyDoc, add all your pictures at once, set their order and download a .pptx with one picture per slide; it is made in your browser and nothing is uploaded."
+    },
+    {
+      "question": "Can I edit the slides afterwards?",
+      "answer": "Yes. The result is an ordinary .pptx file: open it in PowerPoint, Keynote, Google Slides or LibreOffice to move or resize pictures and add text. To check it here, open it in the PowerPoint viewer.",
+      "link": {
+        "text": "PowerPoint viewer",
+        "path": "/powerpoint-viewer"
+      }
+    },
+    {
+      "question": "Is the quality of my photos kept?",
+      "answer": "Yes. JPG and PNG pictures go into the file as they are, without being compressed again. To make the file smaller, compress the photos first with Compress image.",
+      "link": {
+        "text": "Compress image",
+        "path": "/compress-image"
+      }
+    },
+    {
+      "question": "Can I use iPhone HEIC photos?",
+      "answer": "Yes, where your browser can read them. If one won't open, turn it into a JPG with HEIC to JPG first.",
+      "link": {
+        "text": "HEIC to JPG",
+        "path": "/heic-to-jpg"
+      }
+    },
+    {
+      "question": "Can I make a PDF instead?",
+      "answer": "Yes. JPG to PDF puts the same pictures into a PDF, with the page size and margin you choose.",
+      "link": {
+        "text": "JPG to PDF",
+        "path": "/jpg-to-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

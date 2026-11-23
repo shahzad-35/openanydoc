@@ -1,0 +1,94 @@
+{
+  "title": "Excel to Word – Turn an XLSX Sheet Into a DOCX Table",
+  "description": "Convert an Excel sheet to a Word table in your browser: bold header row, numbers and dates as Excel shows them, ready to edit. Free, no upload.",
+  "heading": "Excel to Word",
+  "subtitle": "Turn one Excel sheet into a table you can edit in a Word document, in your browser; nothing is uploaded.",
+  "intro": "Convert Excel to Word when a price list, a schedule or a summary table has to go into a report or a letter: the sheet you choose becomes a table in a .docx file, with a bold header row and each cell's text as Excel shows it, dates and numbers included. A wide table gets a landscape page, and an Arabic sheet is laid out right to left. Edit the table in Word like any other. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "An editable table",
+      "text": "The sheet becomes a real Word table, so you can change text, add rows and restyle it in Word."
+    },
+    {
+      "title": "Values as Excel shows them",
+      "text": "Dates and numbers keep the look they have in the sheet, not raw values."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is converted by your own browser and never sent to a server, so nobody else sees it."
+    }
+  ],
+  "stepsTitle": "How to convert Excel to Word",
+  "steps": [
+    {
+      "title": "Choose your workbook",
+      "text": "Click Choose a file, or drop an Excel workbook on the page."
+    },
+    {
+      "title": "Pick the sheet",
+      "text": "Choose the sheet that should become the table."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to Word and download the Word document."
+    }
+  ],
+  "handlesTitle": "What Excel to Word handles",
+  "handles": [
+    "One chosen sheet, written as a Word table with a bold header row.",
+    "Each cell's text as Excel shows it, dates and numbers included.",
+    "A landscape page when the table is wide.",
+    "Arabic sheets, laid out right to left."
+  ],
+  "limits": [
+    "Cell colours and merged cells are not carried over.",
+    "Charts are not included, and formulas become the text they show.",
+    "Very wide sheets get narrow columns."
+  ],
+  "worksBest": [
+    "Price lists and summary tables for a report",
+    "Schedules and lists for a letter or an annex",
+    "Arabic sheets, right to left"
+  ],
+  "mayNotKeep": [
+    "Cell colours",
+    "Merged cells",
+    "Charts",
+    "Formulas (their shown values are kept)"
+  ],
+  "faqTitle": "Excel to Word: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert an Excel sheet to a Word table?",
+      "answer": "To put an Excel sheet into Word as a table you can edit, copy its cells into a Word table or convert the sheet to a Word document. In Excel, LibreOffice Calc or Google Sheets you can copy the range and paste it into your document. On this page, choose the file and the sheet, and download a Word document with the table, ready to edit."
+    },
+    {
+      "question": "Can I edit the table in Word?",
+      "answer": "Yes. It is a normal Word table, so you can change the text, add or delete rows and change its style."
+    },
+    {
+      "question": "Are dates and numbers kept as they look in Excel?",
+      "answer": "Yes. Each cell's text is taken as Excel shows it, so dates and numbers keep their format."
+    },
+    {
+      "question": "Are colours and merged cells kept?",
+      "answer": "No. Cell colours, merged cells and charts are not carried over, and formulas become the text they show. To keep the colours, convert the sheet with Excel to PDF instead.",
+      "link": {
+        "text": "Excel to PDF",
+        "path": "/excel-to-pdf"
+      }
+    },
+    {
+      "question": "What happens to a very wide sheet?",
+      "answer": "The page turns to landscape, and the columns get narrower to fit. A very wide sheet ends up with narrow columns."
+    },
+    {
+      "question": "Does it work with Arabic sheets?",
+      "answer": "Yes. An Arabic sheet becomes a right-to-left table in the Word document."
+    }
+  ]
+}

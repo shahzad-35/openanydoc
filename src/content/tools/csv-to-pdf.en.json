@@ -1,0 +1,94 @@
+{
+  "title": "CSV to PDF – Print a CSV File as a Table Online Free",
+  "description": "Convert a CSV file to a PDF table in your browser: bold header row, fitted to A4 or Letter, with text you can still search. Free, and nothing is uploaded.",
+  "heading": "CSV to PDF",
+  "subtitle": "Turn a CSV file into a tidy PDF table with a bold header row, fitted to the page; nothing is uploaded.",
+  "intro": "Convert CSV to PDF online to print or share an export: the file becomes one table, with its first row bold on a grey background as the header and the delimiter found automatically. It is fitted to the width of an A4 or Letter page, portrait, landscape or automatic, and split between rows (and between columns when still too wide) onto as many pages as it needs. Tables that are mostly Arabic run right to left. The PDF's text can be selected and searched. Works with .csv and .tsv files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "The table's text can be selected, searched and copied in any PDF reader."
+    },
+    {
+      "title": "Fitted to the page",
+      "text": "The table is scaled to the page width and split between rows, with the header row in bold."
+    }
+  ],
+  "stepsTitle": "How to convert CSV to PDF",
+  "steps": [
+    {
+      "title": "Choose your file",
+      "text": "Click Choose a file, or drop a .csv or .tsv file on the page."
+    },
+    {
+      "title": "Set the page",
+      "text": "Choose A4 or Letter, the orientation and whether to show gridlines."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to PDF, check the preview and download it."
+    }
+  ],
+  "handlesTitle": "What CSV to PDF handles",
+  "handles": [
+    "Files: .csv and .tsv, with commas, semicolons, tabs or other delimiters found automatically.",
+    "Header: the first row, bold on a grey background.",
+    "Page: A4 or Letter; portrait, landscape or automatic; gridlines on or off.",
+    "Arabic tables right to left, English left to right."
+  ],
+  "limits": [
+    "Files are read as UTF-8; a CSV saved in another encoding may show wrong letters.",
+    "The table is scaled down to half size at most; wider tables continue on more pages, split between columns.",
+    "Very large CSV files make very many pages and take a while.",
+    "Pages are pictures at 200 dpi with their text laid over them: the text can be selected and searched, but zooming in far is less sharp than type."
+  ],
+  "worksBest": [
+    "Exports to print or attach to an email",
+    "Contact lists, inventories and price lists",
+    "Tables of a few hundred rows"
+  ],
+  "mayNotKeep": [
+    "Text saved in encodings other than UTF-8",
+    "Wide tables on one page",
+    "Number formats from a spreadsheet"
+  ],
+  "faqTitle": "CSV to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert a CSV file to PDF without Excel?",
+      "answer": "Without Excel, you can open the CSV in LibreOffice Calc, Numbers or Google Sheets and print it to PDF, after setting the columns to fit. In OpenAnyDoc, choose the CSV and download a PDF table fitted to the page with a bold header row; it is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Why do some letters look wrong?",
+      "answer": "The file is read as UTF-8. A CSV saved in an older encoding, such as some Arabic exports from Excel, may show wrong letters; save it as \"CSV UTF-8\" and try again."
+    },
+    {
+      "question": "What happens to a table with many columns?",
+      "answer": "It is scaled down to fit the page width, to half size at most; the columns that still don't fit continue on further pages. Landscape pages fit more columns."
+    },
+    {
+      "question": "Can I check or clean the data first?",
+      "answer": "Yes. Open the file in the CSV viewer to sort, filter and edit it, then convert it.",
+      "link": {
+        "text": "CSV viewer",
+        "path": "/csv-viewer"
+      }
+    },
+    {
+      "question": "Can I search the text of the PDF?",
+      "answer": "Yes. The table is written as text, so it can be selected, searched and copied, Arabic included."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

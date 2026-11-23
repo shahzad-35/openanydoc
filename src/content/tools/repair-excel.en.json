@@ -1,0 +1,93 @@
+{
+  "title": "Repair Excel File – Recover Data From a Corrupted XLSX",
+  "description": "Recover data from a damaged Excel file in your browser: values, formulas, merged cells and column widths saved into a new .xlsx. Free, no upload.",
+  "heading": "Repair an Excel file",
+  "subtitle": "Read a damaged Excel file leniently and save its sheets' data into a new, clean .xlsx file, in your browser; nothing is uploaded.",
+  "intro": "Repair an Excel file that Excel says is damaged or that won't open: the .xlsx, .xls or .ods file is read leniently, and every sheet's values, formulas, merged cells and column widths are written into a new, clean .xlsx file. You see how many sheets and cells were recovered before you download it. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Lenient reading",
+      "text": "The file is read with tolerance for damage, so the data that is still there can be saved."
+    },
+    {
+      "title": "See what was recovered",
+      "text": "The number of sheets and cells recovered is shown before you download."
+    },
+    {
+      "title": "Private",
+      "text": "Your file is repaired by your own browser and never sent to a server, so nobody else sees it."
+    }
+  ],
+  "stepsTitle": "How to repair an Excel file",
+  "steps": [
+    {
+      "title": "Choose the damaged file",
+      "text": "Click Choose a file, or drop the .xlsx, .xls or .ods file that won't open."
+    },
+    {
+      "title": "Check what was recovered",
+      "text": "See how many sheets and cells were read from the file."
+    },
+    {
+      "title": "Download the repaired copy",
+      "text": "Download the new .xlsx file and open it in Excel or any spreadsheet app."
+    }
+  ],
+  "handlesTitle": "What Repair Excel handles",
+  "handles": [
+    "Files: .xlsx, .xls and .ods that Excel reports as damaged or won't open.",
+    "Values, formulas, merged cells and column widths of every sheet.",
+    "A count of the sheets and cells recovered."
+  ],
+  "limits": [
+    "Formatting, charts, pictures, pivot tables and macros are not recovered.",
+    "A file that is not a spreadsheet at all can't be repaired.",
+    "The repaired copy is always .xlsx, even when the original was an .xls or .ods file."
+  ],
+  "worksBest": [
+    "Workbooks Excel says are damaged",
+    "Files that won't open in Excel",
+    "Data you need back more than its look"
+  ],
+  "mayNotKeep": [
+    "Formatting",
+    "Charts and pictures",
+    "Pivot tables",
+    "Macros"
+  ],
+  "faqTitle": "Repair Excel: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I repair a corrupted Excel file?",
+      "answer": "A corrupted Excel file can often be saved by reading what is still readable and writing it into a new workbook. Excel's Open and Repair, in the Open dialog, tries this first, and LibreOffice Calc can sometimes open a file Excel refuses. On this page, choose the file and download a clean .xlsx with the sheets' values, formulas, merged cells and column widths."
+    },
+    {
+      "question": "What is recovered?",
+      "answer": "The values, formulas, merged cells and column widths of every sheet that can still be read. The number of sheets and cells recovered is shown."
+    },
+    {
+      "question": "Is the formatting recovered?",
+      "answer": "No. Formatting, charts, pictures, pivot tables and macros are not recovered; the data is. A file that is not a spreadsheet at all can't be repaired."
+    },
+    {
+      "question": "How can I check the repaired file?",
+      "answer": "Open it in the Excel viewer on this site, or in any spreadsheet app, and look through the sheets.",
+      "link": {
+        "text": "Excel viewer",
+        "path": "/excel-viewer"
+      }
+    },
+    {
+      "question": "Is my original file changed?",
+      "answer": "No. A new .xlsx file is written and downloaded; your original file stays as it was."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

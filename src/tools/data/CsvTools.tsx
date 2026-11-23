@@ -19,9 +19,21 @@ const labelClasses = 'text-sm font-semibold'
 const tableClasses = 'w-full border-collapse text-sm [&_td]:border-b [&_td]:border-rule [&_td]:px-2 [&_td]:py-1 [&_th]:border-b-2 [&_th]:border-rule [&_th]:px-2 [&_th]:py-1 [&_th]:text-start'
 const MAX_SHOWN_ROWS = 100
 
-type ReadCsv = { fileName: string; rows: string[][]; delimiter: string; encodingLabel: string; usesCrlf: boolean } | { fileName: string; error: true }
+// An Excel workbook (Compare Excel) is read as its sheets' shown text; `rows` is its first sheet.
+type ReadCsv = { fileName: string; rows: string[][]; delimiter: string; encodingLabel: string; usesCrlf: boolean; sheets?: { name: string; rows: string[][] }[] } | { fileName: string; error: true }
 
 async function readCsvFile(file: File, delimiterChoice: DelimiterChoice = 'auto', encodingChoice: EncodingChoice = 'auto'): Promise<ReadCsv> {
+  if (/\.(xlsx|xlsm|xls|ods)$/i.test(file.name)) {
+    try {
+      const XLSX = await import('xlsx')
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true })
+      const sheets = workbook.SheetNames.map((name) => ({ name, rows: XLSX.utils.sheet_to_json<string[]>(workbook.Sheets[name], { header: 1, raw: false, defval: '', blankrows: false }) })).filter((sheet) => sheet.rows.length > 0)
+      if (sheets.length === 0) return { fileName: file.name, error: true }
+      return { fileName: file.name, rows: sheets[0].rows, delimiter: '', encodingLabel: '', usesCrlf: false, sheets }
+    } catch {
+      return { fileName: file.name, error: true }
+    }
+  }
   const parsed = parseCsv(await file.arrayBuffer(), delimiterChoice, encodingChoice)
   if (parsed.status === 'error') return { fileName: file.name, error: true }
   return { fileName: file.name, rows: parsed.rows, delimiter: parsed.detectedDelimiter, encodingLabel: parsed.encodingLabel, usesCrlf: parsed.usesCrlf }
@@ -159,7 +171,12 @@ export function CompareCsv({ files, onAddFiles }: ToolProps) {
   const { t, tp } = useT()
   // The last two files chosen: the first of them is the old version, the second the new one.
   const readFiles = useReadCsvFiles(files).slice(-2)
-  const [oldFile, newFile] = readFiles.length === 2 && readFiles.every((readFile) => !('error' in readFile)) ? (readFiles as Extract<ReadCsv, { rows: string[][] }>[]) : [null, null]
+  const [readOld, readNew] = readFiles.length === 2 && readFiles.every((readFile) => !('error' in readFile)) ? (readFiles as Extract<ReadCsv, { rows: string[][] }>[]) : [null, null]
+  // A workbook's sheet is chosen per file (by position in its sheet list).
+  const [sheetChoices, setSheetChoices] = useState<[number, number]>([0, 0])
+  const withChosenSheet = (readFile: Extract<ReadCsv, { rows: string[][] }> | null, choice: number) => (readFile?.sheets?.[choice] ? { ...readFile, rows: readFile.sheets[choice].rows } : readFile)
+  const oldFile = useMemo(() => withChosenSheet(readOld, sheetChoices[0]), [readOld, sheetChoices])
+  const newFile = useMemo(() => withChosenSheet(readNew, sheetChoices[1]), [readNew, sheetChoices])
   const sharedColumns = oldFile && newFile ? newFile.rows[0].map((name) => name.trim()).filter((name) => oldFile.rows[0].map((oldName) => oldName.trim()).includes(name)) : []
   const [chosenKey, setChosenKey] = useState('')
   const keyColumn = sharedColumns.includes(chosenKey) ? chosenKey : (sharedColumns.find((name) => /(^|[\s_-])id$|^id([\s_-]|$)|^key$|^code$/i.test(name)) ?? sharedColumns[0] ?? '')
@@ -201,6 +218,22 @@ export function CompareCsv({ files, onAddFiles }: ToolProps) {
       <p className="text-sm">
         {t('csvTools.compare.files', { old: oldFile.fileName, new: newFile.fileName })}
       </p>
+      {[readOld, readNew].map(
+        (readFile, position) =>
+          readFile?.sheets &&
+          readFile.sheets.length > 1 && (
+            <label key={position} className={`block ${labelClasses}`}>
+              {t(position === 0 ? 'csvTools.compare.oldSheet' : 'csvTools.compare.newSheet', { name: readFile.fileName })}
+              <select id={`compare-${position === 0 ? 'old' : 'new'}-sheet-select`} value={sheetChoices[position]} onChange={(event) => setSheetChoices(position === 0 ? [Number(event.target.value), sheetChoices[1]] : [sheetChoices[0], Number(event.target.value)])} className={fieldClasses}>
+                {readFile.sheets.map((sheet, sheetIndex) => (
+                  <option key={sheetIndex} value={sheetIndex}>
+                    {sheet.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ),
+      )}
       {sharedColumns.length === 0 ? (
         <p id="compare-csv-no-key" role="alert" className="text-sm font-semibold text-danger">
           {t('csvTools.compare.noSharedColumn')}

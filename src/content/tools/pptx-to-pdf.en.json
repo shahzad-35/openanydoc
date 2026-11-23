@@ -1,0 +1,98 @@
+{
+  "title": "PowerPoint to PDF – Save PPTX Slides as PDF, No Upload",
+  "description": "Convert PowerPoint slides to PDF in your browser: one page per slide, 16:9 or 4:3 kept, with text you can still select and search. Free, no upload.",
+  "heading": "PowerPoint to PDF",
+  "subtitle": "Save a PowerPoint presentation as a PDF, one page per slide, with text you can still select and search; nothing is uploaded.",
+  "intro": "Convert PPTX to PDF online without PowerPoint: each slide is drawn the way this site's PowerPoint viewer (beta) shows it and saved as one PDF page in the slide's own shape, 16:9 or 4:3. Every page carries an invisible copy of its text, so the PDF can be searched and copied, Arabic included. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "Each page carries its slide's text, so it can be selected, searched and copied in any PDF reader."
+    },
+    {
+      "title": "Slide shape kept",
+      "text": "One page per slide, in the slide's own shape: widescreen 16:9 or standard 4:3."
+    }
+  ],
+  "stepsTitle": "How to convert PowerPoint to PDF",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to PDF."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the first pages; download the PDF."
+    }
+  ],
+  "handlesTitle": "What PowerPoint to PDF handles",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
+    "Text, shapes, tables and pictures saved in the file.",
+    "Widescreen 16:9 and standard 4:3 slides, each page in the slide's shape.",
+    "Arabic and English text, selectable and searchable in the PDF."
+  ],
+  "limits": [
+    "The slides follow this site's PowerPoint viewer, which is in beta and close to PowerPoint but not identical; fonts your browser doesn't have are replaced.",
+    "Animations, transitions, video, audio and speaker notes are not kept, and pictures linked from the web are not fetched.",
+    "Old .ppt files can't be read; save them as .pptx first."
+  ],
+  "worksBest": [
+    "Lecture slides and handouts",
+    "Pitch decks and reports to share",
+    "Slides with text, pictures and simple shapes"
+  ],
+  "mayNotKeep": [
+    "Animations and slide transitions",
+    "Video, audio and speaker notes",
+    "SmartArt and charts drawn differently",
+    "Fonts your browser doesn't have"
+  ],
+  "faqTitle": "PowerPoint to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert PPTX to PDF without PowerPoint?",
+      "answer": "A .pptx file can be saved as PDF by any free app that opens presentations, such as Keynote on a Mac, LibreOffice Impress or Google Slides. In OpenAnyDoc, choose the file and download the PDF, one page per slide with searchable text; it is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Will it look exactly like PowerPoint?",
+      "answer": "Close, not identical: the slides follow this site's PowerPoint viewer, which is in beta, and fonts your browser doesn't have are replaced. Open the file in the PowerPoint viewer to see how it will come out.",
+      "link": {
+        "text": "PowerPoint viewer",
+        "path": "/powerpoint-viewer"
+      }
+    },
+    {
+      "question": "Are speaker notes or animations included?",
+      "answer": "No. The PDF has one page per slide as it looks when shown; speaker notes, animations, transitions, video and audio are left out."
+    },
+    {
+      "question": "Can I search the text of the PDF?",
+      "answer": "Yes. Each page is a picture of the slide at 200 dpi with its text laid invisibly over it, so the text can be selected, searched and copied, Arabic included."
+    },
+    {
+      "question": "Can I join several presentations into one PDF?",
+      "answer": "Convert each presentation, then put the PDFs together with Merge PDF.",
+      "link": {
+        "text": "Merge PDF",
+        "path": "/merge-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

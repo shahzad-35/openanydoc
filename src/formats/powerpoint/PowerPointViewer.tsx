@@ -13,11 +13,12 @@ import { downloadTextFile } from '../registry'
 import type { FormatViewerProps } from '../registry'
 import { DropOverlay, Icon, SheetIconSprite, Sidebar, Toolbar, ToolbarButton, ToolbarSeparator, TopBar, useIsNarrowScreen, useThemeToggle } from '../sheet/SheetChrome'
 import { outlineAsMarkdown, outlineAsText, readPresentationText } from './presentationText'
-import { canvasToPngBlob, renderSlideInBox, renderSlideToCanvas, slideImageName, slidesToPngZip } from './slideCanvas'
+import { canvasToPngBlob, renderSlideInBox, renderSlideToCanvas, routeStyleAttributesThroughCssom, slideImageName, slidesToPngZip } from './slideCanvas'
 import type { PresentationText } from './presentationText'
 import type { SlideSearchResult } from './PowerPointPanels'
 import '../sheet/sheetChrome.css'
 import './powerPointViewer.css'
+import { ViewerAiButtons } from '../../tools/ai/onDeviceAi'
 
 const SlideSearchPanel = lazy(() => import('./PowerPointPanels').then((module) => ({ default: module.SlideSearchPanel })))
 const SlideListenPanel = lazy(() => import('./PowerPointPanels').then((module) => ({ default: module.SlideListenPanel })))
@@ -38,19 +39,6 @@ const PRINT_AREA = { width: 1040, height: 720 }
 // The renderer raises no error for a missing or unsupported picture: it draws its own grey box with this English text
 // (pictures load after the slide, so the box can appear later). A slide with one counts as a slide it cannot display.
 const RENDERER_FALLBACK_TEXT = /Image not found|Unsupported format:/
-
-// The renderer sets a few styles (blend effects, equations) as style attributes, which the site's CSP refuses. The same text
-// set through CSSOM is allowed and has the same effect, so style attributes are routed there.
-let areStyleAttributesRouted = false
-function routeStyleAttributesThroughCssom() {
-  if (areStyleAttributesRouted) return
-  areStyleAttributesRouted = true
-  const setAttributeDirectly = Element.prototype.setAttribute
-  Element.prototype.setAttribute = function (name: string, value: string) {
-    if (name.toLowerCase() === 'style' && (this instanceof HTMLElement || this instanceof SVGElement)) this.style.cssText = value
-    else setAttributeDirectly.call(this, name, value)
-  }
-}
 
 // Draws each thumbnail of a list once it scrolls into view, so a long deck does not lay out every slide at once. Used by the
 // sidebar and by the grid of all slides.
@@ -519,6 +507,7 @@ export default function PowerPointViewer({ openedFile, onOpenAnotherFile, onClos
           <Icon name="print" />
           <span className="desk-only">{t('powerpoint.printShort')}</span>
         </button>
+        <ViewerAiButtons file={openedFile.file} idPrefix="powerpoint" isReady={isReady} />
         <span className="spacer" />
         <a className="tbtn labelled" id="report-slide-link" href={reportSlideHref} aria-label={t('powerpoint.report')} data-tip={t('powerpoint.reportTip')}>
           <Icon name="flag" />

@@ -1,0 +1,97 @@
+{
+  "title": "Word Mail Merge from Excel or CSV – Free, No Upload",
+  "description": "Fill a Word template with each row of a CSV or Excel file and get one .docx per row in a ZIP: letters, certificates, contracts. Free, no upload.",
+  "heading": "Word mail merge",
+  "subtitle": "Fill a Word template from a CSV or Excel list and get one document per row; nothing is uploaded.",
+  "intro": "Make letters, certificates or contracts from a list without Word's mail merge: write fields such as {{Name}} or {{City}} in a .docx template, using the column names of your data, then choose a CSV or Excel file. You get one Word document per row, named from a column you choose, in a ZIP. Fields work in tables, headers and footers and keep their formatting, and any field not found in the data is listed before you start. The files are merged in your browser and never uploaded.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your template and your list are read by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "One file per row",
+      "text": "Every row becomes its own .docx, named from a column you choose."
+    },
+    {
+      "title": "Checked first",
+      "text": "Fields that aren't in your data are listed before the documents are made."
+    }
+  ],
+  "stepsTitle": "How to do a mail merge with Word and Excel",
+  "steps": [
+    {
+      "title": "Choose your template",
+      "text": "Choose a .docx with fields written as {{Name}}, {{City}} and so on."
+    },
+    {
+      "title": "Choose your data",
+      "text": "Choose a CSV or Excel file whose column names match the fields."
+    },
+    {
+      "title": "Pick the file names",
+      "text": "Choose the column used to name each document, and check any missing fields."
+    },
+    {
+      "title": "Merge and download",
+      "text": "Click Merge and download the ZIP of documents."
+    }
+  ],
+  "handlesTitle": "What Mail merge handles",
+  "handles": [
+    "Template: a .docx with {{Column}} fields.",
+    "Data: CSV or Excel, one document per row.",
+    "Fields: in the body, tables, headers and footers, keeping their formatting.",
+    "Result: a ZIP of .docx files named from a column you choose."
+  ],
+  "limits": [
+    "Fields are filled as they are: no conditions, loops or email sending.",
+    "Large lists take longer: the documents are made one after another in your browser.",
+    "Word's own merge fields are not filled; write fields as {{Name}} instead."
+  ],
+  "worksBest": [
+    "Letters to a list of people",
+    "Certificates and badges",
+    "Contracts from one template"
+  ],
+  "mayNotKeep": [
+    "Word's own merge fields",
+    "Conditional text",
+    "Sending by email"
+  ],
+  "faqTitle": "Word mail merge: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I do a mail merge from Excel to Word?",
+      "answer": "A mail merge fills one template with each row of a list, making one letter, certificate or contract per person; Word and LibreOffice both have a mail merge feature. On this page, write {{Name}}-style fields in a .docx, choose a CSV or Excel file whose columns have the same names, and download one document per row in a ZIP, merged in your browser."
+    },
+    {
+      "question": "How do I write the fields?",
+      "answer": "Type the column name between double braces, such as {{Name}} or {{City}}, anywhere in the template: in the body, tables, headers or footers. The filled text keeps the field's formatting."
+    },
+    {
+      "question": "What if a field isn't in my data?",
+      "answer": "Fields not found in the data file are listed before you start, so you can fix the template or the column names."
+    },
+    {
+      "question": "Are Word's own merge fields filled?",
+      "answer": "No. Fields made with Word's mail merge are not filled; replace them with {{ }} fields. Conditions, loops and sending emails are not supported either."
+    },
+    {
+      "question": "How many rows can I use?",
+      "answer": "There is no fixed limit; large lists take longer, because the documents are made one after another in your browser."
+    },
+    {
+      "question": "Can I check my list first?",
+      "answer": "Yes. Open it in the Excel viewer or the CSV viewer to check the column names and rows.",
+      "link": {
+        "text": "Excel viewer",
+        "path": "/excel-viewer"
+      }
+    }
+  ]
+}

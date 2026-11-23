@@ -1,4 +1,5 @@
 import { useT } from '../i18n'
+import { CONTACT_EMAIL } from '../legalContent'
 import { pageSeo } from '../seo'
 import type { ToolContent, ToolQuestion } from '../tools/registry'
 import type { Viewer } from '../viewers'
@@ -86,6 +87,36 @@ export default function FormatGuide({ content, toolName, fileType, relatedPages,
               </tbody>
             </table>
           </div>
+        </section>
+      )}
+      {content.worksBest && content.mayNotKeep && (
+        <section id="conversion-fit-section">
+          <div className="grid gap-8 sm:grid-cols-2">
+            <div>
+              <h2 id="works-best-heading" className="type-h3">{t('tools.worksBestHeading')}</h2>
+              <ul id="works-best-list" className="mt-4 list-disc space-y-2 ps-6">
+                {content.worksBest.map((item, position) => (
+                  <li key={item} id={`works-best-${position + 1}`}>{item}</li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h2 id="may-not-keep-heading" className="type-h3">{t('tools.mayNotKeepHeading')}</h2>
+              <ul id="may-not-keep-list" className="mt-4 list-disc space-y-2 ps-6">
+                {content.mayNotKeep.map((item, position) => (
+                  <li key={item} id={`may-not-keep-${position + 1}`}>{item}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+          {/* The site has no server: a report is an email the visitor writes, with the file only if they choose to attach it. */}
+          <a
+            id="report-bad-conversion-link"
+            href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent(t('tools.reportBadConversion.subject', { tool: toolName }))}&body=${encodeURIComponent(t('tools.reportBadConversion.body'))}`}
+            className="mt-4 inline-flex min-h-11 items-center font-medium underline underline-offset-2 hover:text-accent"
+          >
+            {t('tools.reportBadConversion')}
+          </a>
         </section>
       )}
       <section id="tool-limits-section">

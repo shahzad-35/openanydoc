@@ -1,0 +1,96 @@
+{
+  "title": "Flatten PDF – Lock Form Fields and Comments Into the Page",
+  "description": "Flatten a PDF in your browser: filled form fields and comments become part of the page, so they can't be changed and look the same anywhere. No upload.",
+  "heading": "Flatten PDF",
+  "subtitle": "Turn form fields and comments into part of the page, so the values can't be changed and look the same in every reader; nothing is uploaded.",
+  "intro": "Flatten a PDF before you send a filled form or a reviewed document. Form fields and annotations (comments, highlights, stamps and drawings) are drawn into the page itself: the filled values stay visible, but nobody can type over them, and every reader shows them the same way. Arabic values are supported. The flattening happens in your browser, so your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Values locked",
+      "text": "Filled fields become part of the page, so the answers can't be changed afterwards."
+    },
+    {
+      "title": "Same everywhere",
+      "text": "Comments, highlights and stamps look the same in every PDF reader."
+    }
+  ],
+  "stepsTitle": "How to flatten a PDF",
+  "steps": [
+    {
+      "title": "Choose your PDF",
+      "text": "Click Choose a file, or drop a filled form or a reviewed PDF on the page."
+    },
+    {
+      "title": "Flatten",
+      "text": "Click Flatten PDF."
+    },
+    {
+      "title": "Check and download",
+      "text": "Check the preview and download the flattened copy; keep the original if you may need to edit it."
+    }
+  ],
+  "handlesTitle": "What Flatten PDF handles",
+  "handles": [
+    "Form fields: text boxes, check boxes, choices and their filled values.",
+    "Annotations: comments, highlights, stamps and drawings.",
+    "Arabic values, right to left."
+  ],
+  "limits": [
+    "This tool is in beta.",
+    "Flattened fields can't be edited again, so keep the original file.",
+    "Some readers draw unusual fields differently, so check the preview before you send the copy."
+  ],
+  "worksBest": [
+    "Filled forms ready to send",
+    "Contracts with stamps or signatures drawn on",
+    "Reviewed PDFs with comments and highlights"
+  ],
+  "mayNotKeep": [
+    "Editable form fields",
+    "Comment pop-ups you can open or reply to",
+    "The look of unusual fields in some readers"
+  ],
+  "faqTitle": "Flatten PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I flatten a PDF form so it can't be edited?",
+      "answer": "Flattening draws a form's fields and their values into the page, so they show as ordinary content that can't be typed over. Here, choose the filled PDF, click Flatten PDF and download the copy, all in your browser."
+    },
+    {
+      "question": "Do the values I filled in stay visible?",
+      "answer": "Yes. Every filled value is drawn on the page where its field was, Arabic included; only the field around it is removed."
+    },
+    {
+      "question": "Can I edit the fields after flattening?",
+      "answer": "No. That is the point of flattening, so keep the original if you may need to change an answer. You can fill it again with Fill PDF form, then flatten a new copy.",
+      "link": {
+        "text": "Fill PDF form",
+        "path": "/fill-pdf"
+      }
+    },
+    {
+      "question": "Why does a field look different after flattening?",
+      "answer": "PDF readers draw some unusual fields in their own way, and the flattened copy keeps one fixed look. Check the preview before you send it."
+    },
+    {
+      "question": "Does flattening hide what is under a comment?",
+      "answer": "No. Flattening only draws the comments into the page; the text under them stays in the file. To remove text for good, use Redact PDF.",
+      "link": {
+        "text": "Redact PDF",
+        "path": "/redact-pdf"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

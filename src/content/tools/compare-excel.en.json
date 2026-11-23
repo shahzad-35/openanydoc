@@ -1,0 +1,90 @@
+{
+  "title": "Compare Excel Files – Find Differences Between Two Sheets",
+  "description": "Compare two Excel workbooks in your browser: rows matched by an ID column, with added, removed and changed cells listed. Free, nothing is uploaded.",
+  "heading": "Compare two Excel files",
+  "subtitle": "See which rows were added, removed or changed between an old and a new Excel sheet, matched by an ID column; nothing is uploaded.",
+  "intro": "Compare Excel files online without uploading them: choose the old and the new workbook, pick the sheet to compare in each and a key column such as an ID, and see every added row, removed row and changed cell, with its old and new value. Rows are paired by their key, so a sorted file doesn't show false changes. Download the differences as a CSV for your records or a report.",
+  "features": [
+    {
+      "title": "Matched by key",
+      "text": "Rows are paired by a key column such as an ID, wherever they sit in the sheet."
+    },
+    {
+      "title": "Old and new values",
+      "text": "Every changed cell shows its old value and its new value."
+    },
+    {
+      "title": "Private",
+      "text": "Both workbooks are compared by your own browser and never sent to a server, so nobody else sees them."
+    }
+  ],
+  "stepsTitle": "How to compare two Excel files",
+  "steps": [
+    {
+      "title": "Choose the old and new files",
+      "text": "Choose or drop the older workbook first, then the newer one."
+    },
+    {
+      "title": "Pick the sheets and the key",
+      "text": "Choose the sheet to compare in each workbook and the column that identifies each row, such as an ID."
+    },
+    {
+      "title": "Review the differences",
+      "text": "See the added rows, the removed rows and the changed cells, old value next to new."
+    },
+    {
+      "title": "Download the differences",
+      "text": "Save the differences as a CSV file."
+    }
+  ],
+  "handlesTitle": "What Compare Excel handles",
+  "handles": [
+    "Two workbooks, old and new, with the sheet of each chosen by you.",
+    "Added rows, removed rows and changed cells, paired by the key column in any order.",
+    "A CSV of the differences to download."
+  ],
+  "limits": [
+    "The values shown in cells are compared, not formatting or formulas.",
+    "Rows without a value in the key column can't be matched.",
+    "One sheet of each workbook is compared at a time."
+  ],
+  "faqTitle": "Compare Excel: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I compare two Excel files for differences?",
+      "answer": "To compare two Excel files, pair their rows by a column that identifies each row, such as an ID, and check which rows and cells differ. In Excel, LibreOffice Calc or Google Sheets you can do this with lookup formulas or by placing the sheets side by side. On this page, choose the old and the new file, the sheets and the key column, and the added, removed and changed rows are listed for you."
+    },
+    {
+      "question": "What is a key column?",
+      "answer": "It is the column that names each row uniquely in both sheets, such as a customer ID, an order number or a product code. Rows with the same key are compared with each other."
+    },
+    {
+      "question": "Does the order of the rows matter?",
+      "answer": "No. Rows are paired by their key, so a sheet that was sorted differently shows only the real changes."
+    },
+    {
+      "question": "Are changes in formatting or formulas found?",
+      "answer": "No. The values the cells show are compared, so a new colour or a rewritten formula with the same result is not listed. Rows without a key value can't be matched."
+    },
+    {
+      "question": "Can I save the differences?",
+      "answer": "Yes. Download them as a CSV and open it in Excel or the CSV viewer.",
+      "link": {
+        "text": "CSV viewer",
+        "path": "/csv-viewer"
+      }
+    },
+    {
+      "question": "Can I compare two CSV files?",
+      "answer": "Yes, with Compare CSV, which pairs the rows of two CSV files by a key column in the same way.",
+      "link": {
+        "text": "Compare CSV",
+        "path": "/compare-csv"
+      }
+    }
+  ]
+}

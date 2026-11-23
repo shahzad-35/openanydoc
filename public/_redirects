@@ -48,3 +48,11 @@
 /ar/view-powerpoint /ar/powerpoint-viewer 302
 /ar/view-file /ar 302
 /ar/view /ar 302
+# EXAMINE.md named the page /blur-faces; the tool lives at /blur-face (2026-11-23).
+/blur-faces /en/blur-face 301
+/en/blur-faces /en/blur-face 301
+/ar/blur-faces /ar/blur-face 301
+# PDF to PowerPoint makes picture slides by default; the PPTX address people type goes there.
+/pdf-to-pptx /en/pdf-to-powerpoint 301
+/en/pdf-to-pptx /en/pdf-to-powerpoint 301
+/ar/pdf-to-pptx /ar/pdf-to-powerpoint 301

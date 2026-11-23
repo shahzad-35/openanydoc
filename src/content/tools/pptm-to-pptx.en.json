@@ -1,0 +1,93 @@
+{
+  "title": "PPTM to PPTX – Remove Macros from PowerPoint, No Upload",
+  "description": "Convert a macro-enabled PPTM to a normal PPTX in your browser: the macros are removed without being run, and the slides stay as they were. No upload.",
+  "heading": "PPTM to PPTX",
+  "subtitle": "Remove the macros from a macro-enabled PowerPoint file and save it as a normal .pptx; nothing is uploaded.",
+  "intro": "Convert PPTM to PPTX without PowerPoint: the macros, that is the VBA project and its signature, are taken out of the file and it is saved as a normal .pptx. The macros are never run or read, and the slides, speaker notes and media stay exactly as they were. Macro-enabled templates and shows (.potm, .ppsm) are saved as .pptx too. If a file has no macros, the page says so. Your file never leaves your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Macros never run",
+      "text": "The macros are removed without being run or read."
+    },
+    {
+      "title": "Slides unchanged",
+      "text": "Slides, speaker notes, pictures, video and audio stay exactly as they were."
+    }
+  ],
+  "stepsTitle": "How to convert PPTM to PPTX",
+  "steps": [
+    {
+      "title": "Choose your file",
+      "text": "Click Choose a file, or drop a .pptm, .potm or .ppsm file on the page."
+    },
+    {
+      "title": "Remove the macros",
+      "text": "The VBA project and its signature are taken out of the file."
+    },
+    {
+      "title": "Download",
+      "text": "Download the normal .pptx file."
+    }
+  ],
+  "handlesTitle": "What PPTM to PPTX handles",
+  "handles": [
+    "Macro-enabled PowerPoint files: .pptm, .potm and .ppsm.",
+    "Removed: the VBA project and its signature.",
+    "Kept: slides, speaker notes, pictures, video and audio.",
+    "Result: a normal .pptx file, or a note when the file has no macros."
+  ],
+  "limits": [
+    "Buttons and actions that ran macros will do nothing afterwards.",
+    "The macros are removed, not kept or shown; this page can't read or convert them.",
+    "Old .ppt and .pps files can't be read; save them as .pptx first."
+  ],
+  "worksBest": [
+    "Sharing a deck without its macros",
+    "Templates saved as .potm",
+    "Shows saved as .ppsm"
+  ],
+  "mayNotKeep": [
+    "Macros and their code",
+    "The macro signature",
+    "Buttons that ran macros"
+  ],
+  "faqTitle": "PPTM to PPTX: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert PPTM to PPTX?",
+      "answer": "A .pptm file becomes a .pptx when it is saved again as a PowerPoint Presentation in PowerPoint or LibreOffice Impress, which leaves the macros out. On this page, choose the file and download the .pptx; the macros are removed in your browser without being run."
+    },
+    {
+      "question": "Are the macros run or read?",
+      "answer": "No. The macros are taken out of the file as they are, without being run or read."
+    },
+    {
+      "question": "What happens to buttons that ran macros?",
+      "answer": "They stay on the slides but do nothing when clicked, because the macros they called are gone."
+    },
+    {
+      "question": "What if my file has no macros?",
+      "answer": "The page tells you so; there is nothing to remove."
+    },
+    {
+      "question": "Can I see the slides first?",
+      "answer": "Yes. Open the file in the PowerPoint viewer; macros are never run there either.",
+      "link": {
+        "text": "PowerPoint viewer",
+        "path": "/powerpoint-viewer"
+      }
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

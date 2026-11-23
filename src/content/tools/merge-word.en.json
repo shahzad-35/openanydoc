@@ -1,0 +1,97 @@
+{
+  "title": "Merge Word Documents – Combine DOCX Files Free, No Upload",
+  "description": "Combine several Word documents into one .docx in your browser: drag them into order and each one starts on a new page. Free, and nothing is uploaded.",
+  "heading": "Merge Word documents",
+  "subtitle": "Combine two or more Word documents into one .docx, in the order you choose, each starting on a new page; nothing is uploaded.",
+  "intro": "Merge DOCX files online without Word: add two or more .docx documents, drag them into order and download one Word file. Each document starts on a new page, and its text, tables, pictures, links and numbered lists are kept. The first document sets the look of the whole result: its styles, page size, headers and footers apply to every page. The files are joined in your browser and never leave your device. This tool is in beta.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your documents are joined by your own browser and never sent to a server, so nobody else sees them."
+    },
+    {
+      "title": "Your order",
+      "text": "Drag the documents into the order you want before merging; each one starts on a new page."
+    },
+    {
+      "title": "Still editable",
+      "text": "The result is one ordinary .docx with real text, tables and lists, ready to edit in Word."
+    }
+  ],
+  "stepsTitle": "How to merge Word documents",
+  "steps": [
+    {
+      "title": "Choose your documents",
+      "text": "Click Choose a file, or drop two or more .docx files on the page."
+    },
+    {
+      "title": "Put them in order",
+      "text": "Drag the documents until they are in the order you want."
+    },
+    {
+      "title": "Merge and download",
+      "text": "Click Merge and download the combined Word document."
+    }
+  ],
+  "handlesTitle": "What Merge Word handles",
+  "handles": [
+    "Files: two or more .docx documents (Word 2007 and later).",
+    "Kept: text, tables, pictures, links and numbered lists.",
+    "Layout: each document starts on a new page; the first document's styles, page size, headers and footers apply to all.",
+    "Result: one .docx file you can keep editing."
+  ],
+  "limits": [
+    "The first document's styles, page size, headers and footers apply to the whole result; the later documents' own headers, footers and section settings are not kept.",
+    "Comments in the second and later documents may be dropped.",
+    "Old .doc files can't be read; save them as .docx first."
+  ],
+  "worksBest": [
+    "Chapters written as separate files",
+    "Sections from several authors",
+    "Documents made from one template"
+  ],
+  "mayNotKeep": [
+    "Later documents' headers and footers",
+    "Later documents' page size and margins",
+    "Comments in later documents"
+  ],
+  "faqTitle": "Merge Word documents: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I merge Word documents?",
+      "answer": "Merging Word documents means putting their contents one after another in a single .docx file. In Word you can insert another document with Insert → Text from File, and LibreOffice and Google Docs let you copy one document into another. On this page, choose two or more .docx files, drag them into order and click Merge: each document starts on a new page and the result downloads as one Word file, joined in your browser."
+    },
+    {
+      "question": "Whose headers and footers does the result use?",
+      "answer": "The first document's. Its styles, page size, headers and footers apply to the whole result, and the later documents' own headers, footers and section settings are not kept. Put the document whose look you want first."
+    },
+    {
+      "question": "Are comments kept?",
+      "answer": "Comments in the first document stay; comments in the second and later documents may be dropped."
+    },
+    {
+      "question": "Does it work with .doc files?",
+      "answer": "No. Old .doc files can't be read; save them as .docx in Word or LibreOffice first."
+    },
+    {
+      "question": "Can I split the merged document again?",
+      "answer": "Yes. Split Word cuts a document into separate .docx files at its headings or page breaks.",
+      "link": {
+        "text": "Split Word",
+        "path": "/split-word"
+      }
+    },
+    {
+      "question": "Can I merge PDF files too?",
+      "answer": "Yes, with Merge PDF, which joins PDF files in the order you choose, also without uploading them.",
+      "link": {
+        "text": "Merge PDF",
+        "path": "/merge-pdf"
+      }
+    }
+  ]
+}

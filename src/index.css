@@ -390,23 +390,30 @@ body {
 }
 
 /* The page header stays at the top while you scroll: SiteNav hides it while you scroll down and brings it back on any scroll
-   up. Its background is the page's own and runs the full width (the shadow, clipped to the header's height); over the page
-   (is-floating) a 1 px line and a soft shadow mark its edge. A transform is set only while it is hidden, since a transformed header would hold
-   the phone search panel (position: fixed) inside it. */
+   up. Its background is the page's own and runs the full width (::before, reaching past the sides; .toy-page clips the overflow);
+   over the page (is-floating) a 1 px line and a soft shadow mark its edge. Nothing may clip the header itself: the search panel
+   lives inside it (full screen on phones, hanging below it on desktop). A transform is set only while it is hidden, since a
+   transformed header would hold the phone search panel (position: fixed) inside it. */
 #site-header,
 #changelog-header {
   position: sticky;
   top: 0;
   z-index: 30;
   background: var(--color-paper-raised);
-  box-shadow: 0 0 0 100vmax var(--color-paper-raised);
-  clip-path: inset(0 -100vmax);
   transition: transform 0.2s ease;
 }
-#site-header.is-floating,
-#changelog-header.is-floating {
-  box-shadow: 0 0 0 100vmax var(--color-paper-raised), 0 1px 0 100vmax var(--color-line);
-  clip-path: inset(0 -100vmax -12px);
+#site-header::before,
+#changelog-header::before {
+  content: '';
+  position: absolute;
+  inset-block: 0;
+  inset-inline: -100vmax;
+  z-index: -1;
+  background: var(--color-paper-raised);
+}
+#site-header.is-floating::before,
+#changelog-header.is-floating::before {
+  box-shadow: 0 1px 0 var(--color-line);
 }
 #site-header.is-floating::after,
 #changelog-header.is-floating::after {

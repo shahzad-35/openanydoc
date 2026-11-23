@@ -30,6 +30,19 @@ export async function readImageAsDataUrl(address: string): Promise<string> {
   return canvas.toDataURL('image/png')
 }
 
+// The renderer sets a few styles (blend effects, equations) as style attributes, which the site's CSP refuses. The same text
+// set through CSSOM is allowed and has the same effect, so style attributes are routed there.
+let areStyleAttributesRouted = false
+export function routeStyleAttributesThroughCssom() {
+  if (areStyleAttributesRouted) return
+  areStyleAttributesRouted = true
+  const setAttributeDirectly = Element.prototype.setAttribute
+  Element.prototype.setAttribute = function (name: string, value: string) {
+    if (name.toLowerCase() === 'style' && (this instanceof HTMLElement || this instanceof SVGElement)) this.style.cssText = value
+    else setAttributeDirectly.call(this, name, value)
+  }
+}
+
 // The renderer scales a slide with a CSS transform but keeps its full-size layout box, so a container that centres it would
 // centre the unscaled box and shift the drawing. The slide is drawn into a wrapper of exactly its scaled size instead.
 export function renderSlideInBox(viewer: PptxViewer, slideIndex: number, container: HTMLElement, scale: number) {

@@ -1,4 +1,4 @@
-// The PDF tools' work runs in pdfTools.worker.ts (pdf-lib, MIT, and fflate, MIT), so a large PDF never freezes the page. One worker
+// The PDF tools' work runs in pdfTools.worker.ts (pdf-lib, MIT, fflate, MIT, and qpdf, Apache-2.0), so a large PDF never freezes the page. One worker
 // per task, started here from the tool components, never from a module the worker imports.
 
 // A page of an output PDF: a page of one of the source PDFs, turned by `rotation` degrees (a multiple of 90) on top of its own
@@ -52,6 +52,13 @@ export type PdfTaskRequest =
   | { type: 'protect-pdf'; pdf: ArrayBuffer; userPassword: string; ownerPassword: string; canPrint: boolean; canCopy: boolean; canEdit: boolean }
   // qpdf: the encryption taken off with the password (none needed when only the actions are restricted).
   | { type: 'unlock-pdf'; pdf: ArrayBuffer; password: string }
+  // qpdf: pictures saved again as JPEG at `jpegQuality` (only where that is smaller), streams recompressed, objects packed.
+  | { type: 'compress-pdf'; pdf: ArrayBuffer; jpegQuality: number }
+  // qpdf: form fields and comments made part of the page. When the file asks for its field pictures to be redrawn, qpdf's own
+  // drawing turns Arabic into "?", so the fields in `drawnFieldNames` are emptied and their values drawn by the browser (`stamps`).
+  | { type: 'flatten-pdf'; pdf: ArrayBuffer; images: ArrayBuffer[]; stamps: PageStamp[]; drawnFieldNames: string[] }
+  // The document information dictionary and the XMP metadata taken out.
+  | { type: 'remove-pdf-metadata'; pdf: ArrayBuffer }
   // Read leniently by pdf-lib and written again, which rebuilds the cross-reference table.
   | { type: 'repair-pdf'; pdf: ArrayBuffer }
 

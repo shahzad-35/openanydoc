@@ -4,7 +4,7 @@
 import { useEffect, useRef, useState } from 'react'
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react'
 import type { PDFDocumentProxy, PDFPageProxy } from 'pdfjs-dist'
-import { isolateLeftToRight, useT } from '../../i18n'
+import { isolateLeftToRight, translate, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
 import { formatFileSize } from '../../useFileIntake'
 import { PdfPasswordError, openPdfForReading } from '../../formats/pdf/pdfLibrary'
@@ -257,12 +257,33 @@ export function SelectionBar({ idPrefix, total, selectedCount, onSelectAll, onSe
 
 // ---------------------------------------------------------------- progress
 
+// "5 seconds", "3 minutes" in the page's language, Western digits, rounded up so the estimate doesn't promise too much.
+function formatTimeLeft(seconds: number, locale: string) {
+  const inMinutes = seconds >= 90
+  const amount = inMinutes ? Math.ceil(seconds / 60) : Math.max(5, Math.ceil(seconds / 5) * 5)
+  return new Intl.NumberFormat(locale, { style: 'unit', unit: inMinutes ? 'minute' : 'second', unitDisplay: 'long', numberingSystem: 'latn' }).format(amount)
+}
+
 export function ProgressBar({ id, done, total, label }: { id: string; done: number; total: number; label: string }) {
+  const { locale } = useT()
+  const timeLeftRef = useRef<HTMLParagraphElement>(null)
+  // The time left comes from the pace since the bar first had this total (a new total, as a tool's second phase, starts over). It is
+  // written straight into its line, since it depends on the clock rather than on what is rendered.
+  const measuredFromRef = useRef<{ total: number; done: number; time: number } | null>(null)
+  useEffect(() => {
+    const now = Date.now()
+    const measuredFrom = measuredFromRef.current
+    if (measuredFrom?.total !== total) measuredFromRef.current = total > 0 ? { total, done, time: now } : null
+    const secondsLeft = measuredFrom?.total === total && done > measuredFrom.done ? ((now - measuredFrom.time) / 1000 / (done - measuredFrom.done)) * (total - done) : 0
+    if (timeLeftRef.current) timeLeftRef.current.textContent = secondsLeft > 0 ? translate(locale, 'tools.progress.timeLeft', { time: formatTimeLeft(secondsLeft, locale) }) : ''
+  }, [done, total, locale])
   return (
     <div className="mx-auto max-w-[480px] text-center" role="status">
       {/* With no total yet (one step that reports nothing on the way) the bar moves without a value. */}
       {total > 0 ? <progress id={id} className="tool-progress" max={total} value={done} aria-label={label} /> : <progress id={id} className="tool-progress" aria-label={label} />}
       <p className="mt-1 text-sm text-ink-soft">{label}</p>
+      {/* Drawn from the start, empty until there is an estimate, so nothing below moves when it appears. */}
+      <p id={`${id}-time-left`} ref={timeLeftRef} className="min-h-5 text-xs text-ink-soft" />
     </div>
   )
 }
@@ -441,11 +462,22 @@ async function readPageRuns(page: PDFPageProxy): Promise<{ box: PageBox; words: 
 
 const boxesOverlap = (first: PageBox, second: PageBox) => first.x < second.x + second.width && second.x < first.x + first.width && first.y < second.y + second.height && second.y < first.y + first.height
 
+// Each pixel set to its brightness (the weights of video luma), so red, green and blue are equal and no colour is left.
+function turnPixelsGrey(context: CanvasRenderingContext2D, width: number, height: number) {
+  const image = context.getImageData(0, 0, width, height)
+  const pixels = image.data
+  for (let offset = 0; offset < pixels.length; offset += 4) {
+    pixels[offset] = pixels[offset + 1] = pixels[offset + 2] = Math.round(0.299 * pixels[offset] + 0.587 * pixels[offset + 1] + 0.114 * pixels[offset + 2])
+  }
+  context.putImageData(image, 0, 0)
+}
+
 // A page drawn by pdf.js as a JPEG at 200 dpi on white, with its words for the text layer: what Redact PDF, Crop PDF (when what is
 // outside is removed) and the repair of a damaged PDF put in place of the page. `blackBoxes` (points, as shown) are filled in and
-// their words left out; with `keptBox` only that part of the page is kept, with the words inside it.
+// their words left out; with `keptBox` only that part of the page is kept, with the words inside it. With `isGrayscale` the picture
+// is turned grey (PDF to grayscale).
 const PAGE_PICTURE_SCALE = 200 / 72
-export async function drawPagePicture(document: PDFDocumentProxy, pageIndex: number, { blackBoxes = [], keptBox }: { blackBoxes?: PageBox[]; keptBox?: PageBox } = {}): Promise<PagePicture> {
+export async function drawPagePicture(document: PDFDocumentProxy, pageIndex: number, { blackBoxes = [], keptBox, isGrayscale = false }: { blackBoxes?: PageBox[]; keptBox?: PageBox; isGrayscale?: boolean } = {}): Promise<PagePicture> {
   const page = await document.getPage(pageIndex + 1)
   const viewport = page.getViewport({ scale: PAGE_PICTURE_SCALE })
   const shownSize = { width: viewport.width / PAGE_PICTURE_SCALE, height: viewport.height / PAGE_PICTURE_SCALE }
@@ -460,8 +492,10 @@ export async function drawPagePicture(document: PDFDocumentProxy, pageIndex: num
   const canvas = window.document.createElement('canvas')
   canvas.width = Math.max(1, Math.round(area.width * PAGE_PICTURE_SCALE))
   canvas.height = Math.max(1, Math.round(area.height * PAGE_PICTURE_SCALE))
-  canvas.getContext('2d')!.drawImage(pageCanvas, -area.x * PAGE_PICTURE_SCALE, -area.y * PAGE_PICTURE_SCALE)
+  const context = canvas.getContext('2d')!
+  context.drawImage(pageCanvas, -area.x * PAGE_PICTURE_SCALE, -area.y * PAGE_PICTURE_SCALE)
   pageCanvas.width = 0
+  if (isGrayscale) turnPixelsGrey(context, canvas.width, canvas.height)
   const words = (await readPageRuns(page))
     // A word's place inside its run is only estimated (the PDF's font can be much wider or narrower than the measuring font), so a
     // run that a black box even touches is left out of the text layer whole.

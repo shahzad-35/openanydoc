@@ -1,0 +1,79 @@
+{
+  "title": "Chat with PDF – Ask a PDF Questions on Your Device",
+  "description": "Ask questions about a PDF and get answers from its text, written by the AI built into Chrome on your computer. The PDF is never uploaded, no account.",
+  "heading": "Chat with a PDF on your device",
+  "subtitle": "Ask questions about a PDF and get answers taken from its text, written by the AI built into desktop Chrome; nothing is uploaded.",
+  "intro": "Ask a PDF what it says: the deadline in a contract, the total in a report, the steps in a manual. Drop a PDF, type a question, and the answer is written from the document's text by the AI built into desktop Chrome, on your own computer. The PDF is read in your browser and never uploaded, and nothing is kept after you close the tab. Arabic PDFs are translated to English on your device, and each answer is translated back. Answers can be wrong, so check anything important in the document.",
+  "features": [
+    {
+      "title": "Runs on your device",
+      "text": "Questions and answers stay on your computer; the PDF is never sent to a server or an AI service."
+    },
+    {
+      "title": "Answers from the document",
+      "text": "The AI is told to answer only from the PDF's text and to say when the answer isn't there."
+    },
+    {
+      "title": "Follow-up questions",
+      "text": "For a short document the chat remembers what you asked before; Clear chat starts again."
+    }
+  ],
+  "stepsTitle": "How it works: ask a PDF questions",
+  "steps": [
+    {
+      "title": "Choose a PDF",
+      "text": "Drop a PDF or try a sample. Its text is read in your browser."
+    },
+    {
+      "title": "Ask a question",
+      "text": "Type your question and click Ask. The first time, Chrome downloads its AI model and the page shows the progress."
+    },
+    {
+      "title": "Read the answer",
+      "text": "The answer appears as it is written. Ask another question, or clear the chat."
+    }
+  ],
+  "handlesTitle": "What Chat with PDF handles",
+  "handles": [
+    "PDF files with text; scanned PDFs need OCR PDF first.",
+    "Questions and answers in English, Spanish, Japanese, German and French directly.",
+    "Arabic and the other languages Chrome translates, through English.",
+    "Long PDFs: for each question, the parts of the text that share the most words with it are given to the AI."
+  ],
+  "limits": [
+    "Works only in a recent desktop Chrome with its on-device AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM; not on phones or in other browsers.",
+    "The on-device AI is small, so answers can miss or misread details; a PDF of up to about 12,000 characters is read whole, and a longer one is searched for the paragraphs that match each question.",
+    "Nothing is saved: the chat is gone when you close or reload the tab."
+  ],
+  "faqTitle": "Chat with PDF: questions",
+  "faq": [
+    {
+      "question": "Is my PDF uploaded?",
+      "answer": "No. The PDF is read by your browser and the answers are written by the AI built into Chrome on your own computer. Nothing is sent to a server or to any AI service, and the chat is not saved."
+    },
+    {
+      "question": "Which browsers can chat with a PDF?",
+      "answer": "A recent desktop Chrome with its built-in AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM. In other browsers the page tells you the feature isn't available and offers no upload instead."
+    },
+    {
+      "question": "Why doesn't it work on my phone?",
+      "answer": "The on-device AI in Chrome is only on desktop computers for now, because the model needs a lot of memory and disk space. Open the page in Chrome on a computer."
+    },
+    {
+      "question": "Can I ask about an Arabic PDF?",
+      "answer": "Yes. The on-device AI answers in English, Spanish, Japanese, German and French, so an Arabic PDF is translated to English on your device, and your question and each answer are translated between Arabic and English. The page says when this happens."
+    },
+    {
+      "question": "Are the answers always right?",
+      "answer": "No. The AI is told to answer only from the document, but it is a small model running on your computer and can miss or misread details. Check anything important in the PDF itself."
+    },
+    {
+      "question": "Why does it say there is no text?",
+      "answer": "The PDF is probably scanned: its pages are pictures. OCR PDF adds a text layer, then you can ask questions here.",
+      "link": {
+        "text": "OCR PDF",
+        "path": "/ocr-pdf"
+      }
+    }
+  ]
+}

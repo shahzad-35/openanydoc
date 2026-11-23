@@ -1,0 +1,104 @@
+{
+  "title": "Markdown to PDF – Convert .md Files to PDF Online Free",
+  "description": "Convert Markdown to PDF in your browser: headings, tables and code laid out on A4 or Letter pages, with text you can search. Free, no upload.",
+  "heading": "Markdown to PDF",
+  "subtitle": "Paste Markdown or open a .md file and download it as A4 or Letter PDF pages with searchable text; nothing is uploaded.",
+  "intro": "Convert Markdown to PDF online: type or paste your text, or open a .md, .markdown or .txt file, and GitHub-style Markdown is laid out with headings, lists, tables, code blocks and quotes on A4 or Letter pages with 0.75-inch margins. Pages are cut between lines, so no line is split, and long code lines wrap. Each page carries its text, so it can be selected, searched and copied, Arabic included. The text is converted in your browser and never uploaded, and nothing is fetched from the web.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your text is converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Searchable PDF",
+      "text": "The pages carry their text, so it can be selected, searched and copied in any PDF reader."
+    },
+    {
+      "title": "A4 or Letter",
+      "text": "Choose the page size; pages are cut between lines with 0.75-inch margins, so no line is split."
+    }
+  ],
+  "stepsTitle": "How to convert Markdown to PDF",
+  "steps": [
+    {
+      "title": "Paste or open your Markdown",
+      "text": "Type or paste Markdown into the box, or choose or drop a .md, .markdown or .txt file to fill it."
+    },
+    {
+      "title": "Choose the page size",
+      "text": "Pick A4 or Letter."
+    },
+    {
+      "title": "Convert",
+      "text": "Click the convert button to lay out the pages."
+    },
+    {
+      "title": "Check and download",
+      "text": "The preview shows the first pages; download the PDF."
+    }
+  ],
+  "handlesTitle": "What Markdown to PDF handles",
+  "handles": [
+    "Files: .md, .markdown and .txt, or Markdown you type or paste.",
+    "Headings, paragraphs, bold, italic, strikethrough, links and inline code.",
+    "Nested lists, tables, code blocks (long lines wrap), block quotes and horizontal rules.",
+    "Arabic and English, each paragraph in its own direction."
+  ],
+  "limits": [
+    "Pages are pictures at 200 dpi with their text laid over them: the text can be selected and searched, but zooming in far is less sharp than type.",
+    "Links are not clickable in the PDF, and the pages have no page numbers.",
+    "Pictures from web addresses are left out; only pictures written into the text as data are kept.",
+    "Files up to 10 MB are opened; a larger file shows a message instead."
+  ],
+  "worksBest": [
+    "README files and documentation",
+    "Notes to print or share",
+    "Answers copied from an AI chat",
+    "Reports with tables and code"
+  ],
+  "mayNotKeep": [
+    "Pictures linked from web addresses",
+    "Clickable links",
+    "Page numbers",
+    "Maths and diagrams"
+  ],
+  "faqTitle": "Markdown to PDF: questions",
+  "faq": [
+    {
+      "question": "Is my file uploaded?",
+      "answer": "No. Your file is read and changed by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while you use the tool and you will see no upload."
+    },
+    {
+      "question": "How do I convert Markdown to PDF?",
+      "answer": "Markdown has to be shown formatted before it can become a PDF; many Markdown editors show a preview you can print with your browser's or system's Save as PDF. In OpenAnyDoc, paste the Markdown or open the .md file, choose A4 or Letter, click convert and download the PDF; the text is converted in your browser and never uploaded."
+    },
+    {
+      "question": "Can I search and copy the text of the PDF?",
+      "answer": "Yes. Each page carries its text, so it can be selected, searched and copied, Arabic included."
+    },
+    {
+      "question": "Are links clickable in the PDF?",
+      "answer": "No. Links show as text but can't be clicked. If you need working links, make an editable document with Markdown to Word and save it as PDF from Word.",
+      "link": {
+        "text": "Markdown to Word",
+        "path": "/markdown-to-word"
+      }
+    },
+    {
+      "question": "Can I add page numbers or join it with other PDFs?",
+      "answer": "This page adds no page numbers; you can add them afterwards with the site's PDF tools. To put several PDFs into one file, use Merge PDF.",
+      "link": {
+        "text": "Merge PDF",
+        "path": "/merge-pdf"
+      }
+    },
+    {
+      "question": "What happens to pictures?",
+      "answer": "Pictures from web addresses are left out, because this page never fetches anything from the web. Pictures written into the Markdown as data (a data: address) are kept."
+    },
+    {
+      "question": "Is it really free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}
