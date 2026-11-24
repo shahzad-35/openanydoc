@@ -3,7 +3,7 @@
   "description": "Convert JPG, PNG, HEIC and other pictures to WebP in your browser for smaller, faster web pages, with a quality slider. Many at once, nothing uploaded.",
   "heading": "Convert Images to WebP",
   "subtitle": "Make pictures for your website smaller with WebP; nothing is uploaded.",
-  "intro": "WebP pictures are usually 25–35% smaller than JPG at the same look, and keep transparency like PNG, so pages load faster. Convert your JPG, PNG, HEIC, TIFF or SVG pictures to WebP with the libwebp encoder, choose the quality, and download one file or a ZIP ready to upload to your site.",
+  "intro": "WebP pictures are often a quarter to a third smaller than JPG at the same look, and keep transparency like PNG, so pages load faster. Convert your JPG, PNG, HEIC, TIFF or SVG pictures to WebP in your browser, choose the quality, and download one file or a ZIP ready to upload to your site.",
   "features": [
     {
       "title": "Private",
@@ -36,7 +36,7 @@
   "handlesTitle": "What Image to WebP handles",
   "handles": [
     "From: JPG, PNG, AVIF, GIF, BMP, TIFF, SVG and HEIC.",
-    "Encoder: libwebp, the reference encoder.",
+    "Encoding: done on your device, at the quality you choose.",
     "Transparency: kept.",
     "Batch: a whole folder of site pictures in one ZIP."
   ],

@@ -75,6 +75,17 @@ function keepLibheifLicenceNotice(): Plugin {
   }
 }
 
+// The MP3 extension (MPL-2.0, with LAME under LGPL-2.0) keeps a pointer to its notices in the shipped chunk, as libheif-js does.
+function keepMp3EncoderLicenceNotice(): Plugin {
+  return {
+    name: 'mp3-encoder-licence-notice',
+    transform(code, id) {
+      if (!id.includes('/node_modules/@mediabunny/mp3-encoder/')) return null
+      return `/*! @mediabunny/mp3-encoder 1.66.2 with LAME 3.100, unmodified. MPL-2.0 and LGPL-2.0: /licenses/mediabunny-mp3-encoder-lame.txt */\n${code}`
+    },
+  }
+}
+
 // https://vite.dev/config/
 const inlinedWasmFiles = ['sql-wasm-browser.wasm', 'mozjpeg_enc.wasm', 'squoosh_png_bg.wasm', 'pkg/squoosh_oxipng_bg.wasm', 'webp_enc.wasm', 'webp_enc_simd.wasm', 'avif_enc.wasm', 'squoosh_resize_bg.wasm', 'qpdf.wasm']
 
@@ -103,13 +114,13 @@ export default defineConfig({
   // Pre-bundled, the translator would skip startBergamotWorkerFromModels in dev and start its worker from node_modules.
   optimizeDeps: { exclude: ['@browsermt/bergamot-translator'] },
   // The tool pages' sample files (src/samples/) are imported with ?inline, so they arrive as data inside a script: no fetch.
-  assetsInclude: ['**/*.xlsx', '**/*.xls', '**/*.docx', '**/*.pptx', '**/*.pptm', '**/*.heic'],
+  assetsInclude: ['**/*.xlsx', '**/*.xls', '**/*.docx', '**/*.pptx', '**/*.pptm', '**/*.heic', '**/*.mkv'],
   // SQLite's WebAssembly for the CSV page's query mode (CsvQueryPanel) is inlined as data, like the samples: the site never fetches
   // (Vite has no ?inline for .wasm, so its ?url address is inlined here). Every other asset keeps the default limit.
   // Workers are ES modules (they are started with type: 'module'), so a worker's dynamic import becomes its own chunk: the CSV
   // parse worker fetches the Parquet reader only for a .parquet file.
   // Workers are bundled on their own and use only worker.plugins.
-  worker: { format: 'es', plugins: () => [fixPdfjsArabicLigatures(), dropJsquashDefaultWasm(), keepLibheifLicenceNotice(), feedQpdfWasmBytes()] },
+  worker: { format: 'es', plugins: () => [fixPdfjsArabicLigatures(), dropJsquashDefaultWasm(), keepLibheifLicenceNotice(), keepMp3EncoderLicenceNotice(), feedQpdfWasmBytes()] },
   // The image tools' codecs (jSquash) are inlined the same way and compiled in imageTools.worker.ts.
   build: { assetsInlineLimit: (filePath) => (inlinedWasmFiles.some((name) => filePath.endsWith(name)) ? true : undefined) },
 })

@@ -27,8 +27,8 @@ export const ALL_PROFILE_URLS = [REPOSITORY_URL, ...SOCIAL_PROFILES.map((profile
 export const X_HANDLE = '@openanydoc'
 // The one sentence that says what OpenAnyDoc is, wherever the brand is described as data (Organization, WebSite, llms.txt, README).
 export const SITE_DESCRIPTION: Record<'en' | 'ar', string> = {
-  en: 'OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, a viewer for Word, PowerPoint, PDF and image files, and a set of PDF and image tools, that runs in your browser: files are never uploaded.',
-  ar: 'OpenAnyDoc عارض ومحرر ومحوّل مجاني ومفتوح المصدر لملفات CSV وExcel وJSON وTXT، وعارض لملفات Word وPowerPoint وPDF والصور، ومجموعة أدوات PDF والصور، يعمل في متصفحك: لا تُرفع الملفات أبدًا.',
+  en: 'OpenAnyDoc is a free, open-source set of file tools that runs in your browser: a viewer, editor and converter for CSV, Excel, JSON and TXT files, viewers for Word, PowerPoint, PDF, image and video files, and PDF, Office, image, video and AI tools. Files are never uploaded.',
+  ar: 'OpenAnyDoc مجموعة أدوات ملفات مجانية ومفتوحة المصدر تعمل في متصفحك: عارض ومحرر ومحوّل لملفات CSV وExcel وJSON وTXT، وعارضات لملفات Word وPowerPoint وPDF والصور والفيديو، وأدوات PDF والمكتب والصور والفيديو والذكاء الاصطناعي. لا تُرفع الملفات أبدًا.',
 }
 
 type Locale = 'en' | 'ar'
@@ -45,13 +45,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
   en: {
     '/': {
       title: 'Free Online File Viewer and Editor, No Upload – OpenAnyDoc',
-      description: 'Free online file viewer and editor: open CSV, Excel, JSON, Word, PowerPoint, PDF and image files in your browser and edit them. No upload, no sign-up.',
+      description: 'Free online file viewer and editor: open CSV, Excel, JSON, Word, PowerPoint, PDF, image and video files in your browser and edit them. No upload, no sign-up.',
       heading: 'Free online file viewer and editor: open any file, upload nothing',
       intro: 'Drop a CSV, Excel, JSON or text file to edit it, view Word, PowerPoint and PDF files, or edit, sign and merge PDFs, right here in your browser. A free online file viewer and editor, with no upload and no sign-up.',
     },
     '/about': {
       title: 'About OpenAnyDoc – Private Online File Viewer',
-      description: 'About OpenAnyDoc, built and run by the OpenAnyDoc team: a free file viewer and editor that runs in your browser and never uploads your files, CSV to PDF.',
+      description: 'About OpenAnyDoc: free file tools for CSV, Excel, JSON, Word, PowerPoint, PDF, image and video files that run in your browser and never upload your files.',
       heading: 'About OpenAnyDoc',
       intro: 'A free, privacy-first file viewer and editor that runs in your browser.',
     },
@@ -353,6 +353,19 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
         'Each tool shows a preview before you download, and its next steps pass the result to another tool in memory, so you can merge, number and sign a PDF in one visit.',
       ],
     },
+    '/video-tools': {
+      title: 'Video Tools Online – Convert, Compress, Trim, No Upload',
+      description: 'Free video tools in your browser: convert MOV, WebM and MKV to MP4, compress, trim, crop and merge videos, make GIFs and MP3s, record your screen. No upload.',
+      heading: 'Free video tools: convert, compress, trim and edit videos',
+      intro: 'Free video tools that work on your own device: convert MOV, WebM and MKV to MP4, make a video smaller, trim, crop, rotate, resize, merge or loop it, change its speed, mute it or give it new sound, turn it into a GIF or an MP3, and record your screen or webcam.',
+      linkText: 'Video tools',
+      body: [
+        'Every video tool here runs on your own device. Your browser reads the video, a background worker changes it with the video encoders built into the browser, and you download the result; nothing is sent to a server, so family videos, screen recordings and work calls stay private, and the tools keep working offline once the page has loaded.',
+        'To make a video play everywhere, convert it to MP4 with H.264 picture and AAC sound. To make it smaller for email or chat, use Compress video with a quality level or a target size, or Resize video. To keep only part of it, use Trim; to change its shape, Crop, Rotate or Flip. Merge videos joins clips into one, Loop video repeats one, and Change video speed makes it faster or slower.',
+        'Which videos can my browser read? That depends on the browser: Chrome and Edge read the most, Safari reads HEVC from iPhones, and Firefox reads a little less. When a video uses a codec this browser can\'t read or make, the page names the codec and suggests one that works, rather than giving you a broken file.',
+        'Can I record my screen without installing anything? Yes. The screen recorder and the webcam recorder record in the browser and give you a video file to save; nothing is uploaded, and the recording stops as soon as you press Stop or close the tab. PowerPoint to video turns slides into an MP4 with the number of seconds per slide you choose.',
+      ],
+    },
     '/image-tools': {
       title: 'Image Tools Online – Compress, Resize, Convert, No Upload',
       description: 'Free image tools in your browser: compress, resize, crop, rotate and watermark pictures, convert HEIC to JPG, remove GPS data and make memes. Nothing uploaded.',
@@ -410,26 +423,26 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       ],
     },
     '/all-tools': {
-      title: 'All Free File Tools: PDF, Office, Image, Data and AI',
-      description: 'Every free OpenAnyDoc tool in one place: PDF, Word, Excel and PowerPoint tools, image editors, CSV and JSON converters and on-device AI. Nothing is uploaded.',
-      heading: 'All free file tools: PDF, Office, image, data and AI',
+      title: 'All Free File Tools: PDF, Office, Image, Video, Data and AI',
+      description: 'Every free OpenAnyDoc tool in one place: PDF, Word, Excel and PowerPoint tools, image and video tools, CSV and JSON converters, on-device AI. Nothing uploaded.',
+      heading: 'All free file tools: PDF, Office, image, video, data and AI',
       intro: 'Every tool on OpenAnyDoc, grouped by the kind of file it works on. Each one runs in your browser, and none of them uploads your files.',
       linkText: 'All tools',
       body: [
-        'Every OpenAnyDoc tool works the same way: you choose a file, your browser does the work, and you download the result. Nothing is uploaded, there is no account and no watermark, and the tools work offline once a page has loaded. Pick a tool from the PDF, office, image, data or AI groups above, or drop any supported file on the home page and it opens in the right viewer.',
+        'Every OpenAnyDoc tool works the same way: you choose a file, your browser does the work, and you download the result. Nothing is uploaded, there is no account and no watermark, and the tools work offline once a page has loaded. Pick a tool from the PDF, office, image, video, data or AI groups above, or drop any supported file on the home page and it opens in the right viewer.',
       ],
     },
   },
   ar: {
     '/': {
       title: 'عارض ملفات اون لاين مجاني – فتح الملفات بدون برامج',
-      description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV واكسل وJSON ووورد وبوربوينت وPDF والصور في متصفحك وعدّلها، بدون برامج وبدون تسجيل، وملفاتك لا تُرفع ولا تغادر جهازك.',
+      description: 'عارض ملفات اون لاين مجاني: افتح ملفات CSV واكسل وJSON ووورد وبوربوينت وPDF والصور والفيديو في متصفحك وعدّلها، بلا برامج ولا تسجيل، ولا تُرفع ملفاتك أبدًا.',
       heading: 'عارض ومحرر ملفات اون لاين مجاني: افتح أي ملف بدون رفع',
       intro: 'أفلِت ملف CSV أو Excel أو JSON أو ملفًا نصيًا لتعدّله، أو اعرض ملفات Word وPowerPoint وPDF، أو عدّل ملفات PDF ووقّعها وادمجها، هنا في متصفحك مباشرة. عارض ملفات اون لاين مجاني ومحرر للملفات، بدون رفع وبدون تسجيل.',
     },
     '/about': {
       title: 'عن OpenAnyDoc – عارض ملفات خاص اون لاين',
-      description: 'عن OpenAnyDoc الذي يبنيه ويديره فريقه: عارض ومحرر ملفات مجاني يعمل في متصفحك ولا يرفع ملفاتك أبدًا. يدعم اليوم CSV وExcel وJSON وTXT وWord وPowerPoint.',
+      description: 'عن OpenAnyDoc: أدوات ملفات مجانية لـCSV وExcel وJSON وWord وPowerPoint وPDF والصور والفيديو، تعمل في متصفحك ولا ترفع ملفاتك أبدًا، دون حساب ودون إعلانات.',
       heading: 'عن OpenAnyDoc',
       intro: 'عارض ومحرر ملفات مجاني يضع الخصوصية أولًا ويعمل داخل متصفحك.',
     },
@@ -731,6 +744,19 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
         'تعرض كل أداة معاينة قبل التنزيل، وتمرر خطواتها التالية النتيجة إلى أداة أخرى في الذاكرة، فيمكنك دمج ملف وترقيمه وتوقيعه في زيارة واحدة.',
       ],
     },
+    '/video-tools': {
+      title: 'أدوات الفيديو أونلاين – تحويل وضغط وقص بدون رفع',
+      description: 'أدوات فيديو مجانية في متصفحك: حوّل MOV وWebM وMKV إلى MP4، واضغط الفيديو وقصّه واقتطعه وادمجه، واصنع GIF وMP3، وسجّل شاشتك. دون رفع أي ملف إلى أي خادم.',
+      heading: 'أدوات فيديو مجانية: تحويل وضغط وقص وتعديل الفيديو',
+      intro: 'أدوات فيديو مجانية تعمل على جهازك: حوّل MOV وWebM وMKV إلى MP4، وصغّر حجم الفيديو، واقتطع منه أو قصّ إطاره أو دوّره أو غيّر مقاسه، وادمج المقاطع أو كرّرها، وغيّر سرعتها، واكتم صوتها أو ضع لها صوتًا جديدًا، وحوّلها إلى GIF أو MP3، وسجّل شاشتك أو كاميرتك.',
+      linkText: 'أدوات الفيديو',
+      body: [
+        'كل أدوات الفيديو هنا تعمل على جهازك. يقرأ متصفحك الفيديو، ويغيّره عامل في الخلفية بمرمّزات الفيديو المدمجة في المتصفح، ثم تنزّل النتيجة؛ لا يُرسل شيء إلى أي خادم، فتبقى فيديوهات العائلة وتسجيلات الشاشة ومكالمات العمل خاصة، وتعمل الأدوات دون اتصال بعد تحميل الصفحة.',
+        'ليعمل الفيديو على كل الأجهزة، حوّله إلى MP4 بصورة H.264 وصوت AAC. ولتصغير حجمه للبريد أو المحادثات، استخدم ضغط الفيديو بمستوى جودة أو بحجم تختاره، أو غيّر مقاسه. ولإبقاء جزء منه فقط استخدم الاقتطاع، ولتغيير شكله القص أو التدوير أو القلب. ويجمع دمج الفيديو المقاطع في ملف واحد، ويكرّر تكرار الفيديو مقطعًا واحدًا، ويسرّع تغيير السرعة الفيديو أو يبطئه.',
+        'ما الفيديوهات التي يقرؤها متصفحي؟ يعتمد ذلك على المتصفح: Chrome وEdge يقرآن أكثر الصيغ، وSafari يقرأ HEVC من iPhone، وFirefox يقرأ أقل قليلًا. وعندما يستخدم الفيديو ترميزًا لا يستطيع هذا المتصفح قراءته أو إنشاءه، تذكر الصفحة اسم الترميز وتقترح ترميزًا يعمل، بدلًا من أن تعطيك ملفًا معطوبًا.',
+        'هل يمكنني تسجيل شاشتي دون تثبيت أي برنامج؟ نعم. يسجّل مسجّل الشاشة ومسجّل الكاميرا داخل المتصفح ويعطيانك ملف فيديو لحفظه؛ لا يُرفع شيء، ويتوقف التسجيل بمجرد الضغط على إيقاف أو إغلاق التبويب. ويحوّل تحويل PowerPoint إلى فيديو الشرائح إلى MP4 بعدد الثواني الذي تختاره لكل شريحة.',
+      ],
+    },
     '/image-tools': {
       title: 'أدوات الصور – ضغط وتغيير حجم وتحويل الصور دون رفع',
       description: 'أدوات صور مجانية في متصفحك: اضغط الصور وغيّر حجمها وقصّها ودوّرها وأضف علامة مائية، وحوّل HEIC إلى JPG، وأزل بيانات GPS، واصنع الميمز. لا يُرفع أي ملف.',
@@ -788,13 +814,13 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       ],
     },
     '/all-tools': {
-      title: 'كل الأدوات المجانية: PDF والمكتب والصور والبيانات والذكاء',
-      description: 'كل أدوات OpenAnyDoc المجانية في مكان واحد: أدوات PDF ووورد واكسل وبوربوينت، ومحررات الصور، ومحوّلات CSV وJSON، وذكاء اصطناعي على جهازك. لا يُرفع أي ملف.',
-      heading: 'كل الأدوات المجانية: PDF والمكتب والصور والبيانات والذكاء الاصطناعي',
+      title: 'كل الأدوات المجانية: PDF والمكتب والصور والفيديو والبيانات',
+      description: 'كل أدوات OpenAnyDoc المجانية في مكان واحد: أدوات PDF ووورد واكسل وبوربوينت، وأدوات الصور والفيديو، ومحوّلات CSV وJSON، وذكاء اصطناعي على جهازك. لا يُرفع أي ملف.',
+      heading: 'كل الأدوات المجانية: PDF والمكتب والصور والفيديو والبيانات والذكاء الاصطناعي',
       intro: 'كل أدوات OpenAnyDoc مرتبة حسب نوع الملف الذي تعمل عليه. كلها تعمل في متصفحك، ولا ترفع أي منها ملفاتك.',
       linkText: 'كل الأدوات',
       body: [
-        'تعمل كل أدوات OpenAnyDoc بالطريقة نفسها: تختار ملفًا، ويقوم متصفحك بالعمل، وتنزّل النتيجة. لا يُرفع شيء، ولا حساب ولا علامة مائية، وتعمل الأدوات دون اتصال بعد تحميل الصفحة. اختر أداة من مجموعات PDF أو المكتب أو الصور أو البيانات أو الذكاء الاصطناعي أعلاه، أو أفلت أي ملف مدعوم على الصفحة الرئيسية فيُفتح في العارض المناسب.',
+        'تعمل كل أدوات OpenAnyDoc بالطريقة نفسها: تختار ملفًا، ويقوم متصفحك بالعمل، وتنزّل النتيجة. لا يُرفع شيء، ولا حساب ولا علامة مائية، وتعمل الأدوات دون اتصال بعد تحميل الصفحة. اختر أداة من مجموعات PDF أو المكتب أو الصور أو الفيديو أو البيانات أو الذكاء الاصطناعي أعلاه، أو أفلت أي ملف مدعوم على الصفحة الرئيسية فيُفتح في العارض المناسب.',
       ],
     },
   },

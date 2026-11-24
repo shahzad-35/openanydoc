@@ -1,0 +1,80 @@
+{
+  "title": "Blur Part of a Video Online – Free, No Upload",
+  "description": "Blur a fixed part of a video: a number plate, a screen, a name tag or a logo. Draw boxes, pick the strength and save. Free, with no upload.",
+  "heading": "Blur Part of a Video",
+  "subtitle": "Draw a box over what should not be seen and save a blurred copy, without uploading the video.",
+  "intro": "Hide something that stays in one place in the shot: a parked car's number plate, a computer screen, a whiteboard, a name badge or a house number. Draw one box or several on the paused video, move and resize them, see the blur on the preview, then choose how strong it is and whether it covers the whole video or only part of it. The boxes stay where you draw them, so this suits a still camera; for faces in a photo, Blur faces finds them on its own.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The video is blurred by your own browser and never sent to a server, which matters most for the things you want hidden."
+    },
+    {
+      "title": "Several boxes",
+      "text": "Blur as many parts as you need at once, each one moved and resized on the preview."
+    },
+    {
+      "title": "Only when needed",
+      "text": "Blur the whole video, or only between two times, such as the seconds a screen is in view."
+    }
+  ],
+  "stepsTitle": "How to blur part of a video",
+  "steps": [
+    {
+      "title": "Choose your video",
+      "text": "Choose or drop an MP4, MOV, WebM or MKV file."
+    },
+    {
+      "title": "Draw the boxes",
+      "text": "Pick the frame with the slider, then drag on the video to draw a box over each part to hide."
+    },
+    {
+      "title": "Choose the strength",
+      "text": "Pick light, medium or strong, and optionally the times the blur is on."
+    },
+    {
+      "title": "Save the video",
+      "text": "Click Blur and save, then download the new video."
+    }
+  ],
+  "handlesTitle": "What you can blur",
+  "handles": [
+    "Boxes: as many as you like, drawn with the mouse or a finger, or added and moved with the keyboard.",
+    "Strength: light, medium or strong; strong leaves no readable letters.",
+    "Time: the whole video, or only between two times you type.",
+    "Formats: MP4, MOV, WebM and MKV keep their format; other videos are saved as MP4.",
+    "Sound: kept as it is."
+  ],
+  "limits": [
+    "Boxes stay where you draw them: they do not follow a face or a car that moves.",
+    "Boxes are rectangles; there are no round or freehand shapes.",
+    "The video is encoded again, so saving takes about as long as the video plays on slower devices."
+  ],
+  "faqTitle": "Questions about blurring part of a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser reads the video, blurs the boxes on each frame and saves the new file on your device. Nothing is sent to a server."
+    },
+    {
+      "question": "Does the blur follow a moving face?",
+      "answer": "No. Each box stays in the same place for the whole time it is on, so it works best with a camera that does not move. Make the box large enough to cover the whole path, or split the video and blur each part."
+    },
+    {
+      "question": "Can the blur be undone?",
+      "answer": "Not from the saved video: the blurred pixels replace the original ones. Strong blur leaves no readable letters or numbers. Keep your original if you need it."
+    },
+    {
+      "question": "Can I blur faces in a photo instead?",
+      "answer": "Yes, with Blur faces, which finds the faces in a photo by itself, on your device."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "How do I blur part of a video?",
+      "answer": "Video editors can blur a part of the picture with a mask or a mosaic effect. OpenAnyDoc does it in your browser: draw a box over the part, pick the strength and save, without an account or an upload."
+    }
+  ]
+}

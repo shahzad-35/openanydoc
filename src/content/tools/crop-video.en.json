@@ -1,0 +1,79 @@
+{
+  "title": "Crop Video – Cut Edges, Make 9:16 or Square, No Upload",
+  "description": "Crop a video to remove black bars or edges, or to make it square or 9:16 for Reels and TikTok. Drag the box and save; runs in your browser.",
+  "heading": "Crop a Video",
+  "subtitle": "Drag a box over the picture to keep only that part, free or in a fixed shape; nothing is uploaded.",
+  "intro": "Cut away black bars, a messy background or the edges of a screen recording, or turn a wide video into a 9:16 clip for Reels, Shorts and TikTok. Choose a shape (free, square 1:1, 9:16, 16:9 or 4:5), drag the box over the part you want and resize it from the corner. The new size in pixels is shown under the picture.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is cropped by your own browser and never sent to a server."
+    },
+    {
+      "title": "Shapes for social apps",
+      "text": "Square, 9:16, 16:9 and 4:5 keep the box in the shape each app expects."
+    },
+    {
+      "title": "Mouse or keyboard",
+      "text": "Drag the box, or move it with the arrow keys and resize with Shift."
+    }
+  ],
+  "stepsTitle": "How to crop a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Place the box",
+      "text": "Choose a shape, then drag the box over the part to keep and resize it from the corner."
+    },
+    {
+      "title": "Crop and download",
+      "text": "Click Crop video, check the result and download it."
+    }
+  ],
+  "handlesTitle": "Videos and shapes it handles",
+  "handles": [
+    "Shapes: free, square 1:1, upright 9:16, wide 16:9 and portrait 4:5.",
+    "Sizes: the crop is made in the video's own pixels, with even widths and heights for every player.",
+    "Sound: kept as it is.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+  ],
+  "limits": [
+    "Only the first chosen video is cropped.",
+    "The box stays in one place for the whole video; it doesn't follow movement.",
+    "Cropping makes the picture smaller; to make it bigger again, use Resize video."
+  ],
+  "faqTitle": "Questions about cropping a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Cropping is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "How do I make a video 9:16 for TikTok or Reels?",
+      "answer": "Choose Upright 9:16, drag the box over the part to keep and click Crop video. For an exact 1080 × 1920 size, open the result in Resize video and choose Story.",
+      "link": {
+        "text": "Resize video",
+        "path": "/resize-video"
+      }
+    },
+    {
+      "question": "What is the difference between crop and resize?",
+      "answer": "Crop cuts parts of the picture away. Resize keeps the whole picture and changes its size in pixels."
+    },
+    {
+      "question": "Can I remove black bars?",
+      "answer": "Yes. Choose Free and drag the box's edges to the picture inside the bars."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Is it free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

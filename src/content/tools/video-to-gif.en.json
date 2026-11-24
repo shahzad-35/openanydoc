@@ -1,0 +1,71 @@
+{
+  "title": "Video to GIF – Make an Animated GIF from a Clip Free",
+  "description": "Turn up to 30 seconds of an MP4, MOV or WebM video into an animated GIF. Pick the width and frames per second; nothing is uploaded.",
+  "heading": "Convert Video to GIF",
+  "subtitle": "Pick a start and an end, a width and a frame rate, and get an animated GIF made in your browser.",
+  "intro": "A GIF plays on its own, loops, and works in chats, emails, slides and pages that don't take video. Choose the moment you want, up to 30 seconds, a width from 240 to 640 pixels and 5 to 20 frames per second. The page counts the frames before you start, so you know how big the GIF will be, and shows the result before you download it.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your clip is turned into a GIF by your own browser; the video never leaves your device."
+    },
+    {
+      "title": "You choose the size",
+      "text": "Width and frames per second decide how smooth and how large the GIF is; the page counts the frames for you."
+    },
+    {
+      "title": "See it first",
+      "text": "The GIF plays on the page before you download it, so you can try another part or setting."
+    }
+  ],
+  "stepsTitle": "How to make a GIF from a video",
+  "steps": [
+    {
+      "title": "Add your video",
+      "text": "Choose or drop an MP4, MOV, WebM or MKV file. The first 5 seconds are chosen for you."
+    },
+    {
+      "title": "Pick the part",
+      "text": "Type a start and an end, up to 30 seconds apart, and choose the width and frames per second."
+    },
+    {
+      "title": "Make the GIF",
+      "text": "Click Make GIF, watch it play on the page and download it."
+    }
+  ],
+  "handlesTitle": "Videos it turns into GIFs",
+  "handles": [
+    "Videos: MP4, MOV, WebM, MKV and other files your browser can play.",
+    "Length: up to 30 seconds from anywhere in the video.",
+    "Width: 240, 320, 480 or 640 pixels; the height follows the video's shape, and a small video is never enlarged.",
+    "Frame rate: 5, 10, 15 or 20 frames per second, with up to 256 colours per frame."
+  ],
+  "limits": [
+    "A GIF is at most 30 seconds long. Every frame is stored as a whole picture, so long GIFs become very large.",
+    "GIFs have no sound and at most 256 colours per frame, so smooth gradients can look banded.",
+    "Above about 300 frames the page warns you: the GIF may be slow to make and large to send."
+  ],
+  "faqTitle": "Video to GIF questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser reads the video and draws the GIF on your device; nothing is sent anywhere. You can check it in your browser's network panel."
+    },
+    {
+      "question": "Why is a GIF limited to 30 seconds?",
+      "answer": "A GIF stores every frame as a full picture, without the clever compression video uses. Thirty seconds at 15 frames per second is already 450 pictures, which can be tens of megabytes."
+    },
+    {
+      "question": "How do I make the GIF smaller?",
+      "answer": "Use a shorter part, a smaller width or fewer frames per second. 320 pixels at 10 frames per second suits most chats."
+    },
+    {
+      "question": "Does the GIF keep the sound?",
+      "answer": "No, GIFs can't hold sound. To keep the sound, trim the video instead, or save its sound with Video to MP3."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    }
+  ]
+}

@@ -147,7 +147,8 @@ function collectKnownJsonValues(value: unknown, path: string[], choicesById: Map
 function maskJsonValue(value: unknown, path: string[], choicesById: Map<string, MaskChoice>, registry: TokenRegistry, maskFreeText: FreeTextMasker): unknown {
   if (Array.isArray(value)) return value.map((item) => maskJsonValue(item, [...path, '[]'], choicesById, registry, maskFreeText))
   if (typeof value === 'object' && value !== null && !isMarkedBigNumber(value)) {
-    const maskedObject: Record<string, unknown> = {}
+    // No prototype, so a key named __proto__ stays an ordinary field instead of vanishing.
+    const maskedObject: Record<string, unknown> = Object.create(null)
     for (const [key, child] of Object.entries(value)) {
       const childPath = [...path, key]
       if (choicesById.get(jsonFieldId(childPath))?.strategy === 'remove') continue

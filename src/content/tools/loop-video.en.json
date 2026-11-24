@@ -1,0 +1,78 @@
+{
+  "title": "Loop Video – Repeat a Clip Online Free, No Upload",
+  "description": "Repeat a video 2 to 20 times, or until it lasts the number of seconds you choose, in your browser. Sound included and nothing is uploaded.",
+  "heading": "Loop a Video",
+  "subtitle": "Play a clip several times in a row, or until it reaches the length you need, and save it as one video.",
+  "intro": "Make a short clip long enough for a background, a status, a shop screen or a presentation. Choose how many times it plays, or type the length you need in seconds and the page works out the repeats and cuts the last one to fit exactly.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The loop is made by your own browser; your video never leaves your device."
+    },
+    {
+      "title": "Exact length",
+      "text": "Ask for 30 seconds and get 30 seconds: the last repeat is cut to fit."
+    },
+    {
+      "title": "Sound included",
+      "text": "The clip’s sound repeats with its picture."
+    }
+  ],
+  "stepsTitle": "How to loop a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a clip or drop it on the page."
+    },
+    {
+      "title": "Set the loop",
+      "text": "Choose 2 to 20 repeats, or the length you want in seconds."
+    },
+    {
+      "title": "Loop and download",
+      "text": "Click Loop video, check the result and download it."
+    }
+  ],
+  "handlesTitle": "Videos it can loop",
+  "handles": [
+    "Repeats: 2 to 20, or as many as a length of up to 10 minutes needs.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; other videos become MP4.",
+    "Picture: the same size and frame rate as your clip."
+  ],
+  "limits": [
+    "A looped video is at most 10 minutes long.",
+    "The video is encoded again, which takes a moment for long loops.",
+    "There is no fade between repeats; each one starts straight after the last."
+  ],
+  "faqTitle": "Questions about looping a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. The looping is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "How do I make a video exactly 60 seconds long?",
+      "answer": "Choose “Until it lasts”, type 60 and click Loop video. The clip repeats as often as needed and the last repeat stops at 60 seconds."
+    },
+    {
+      "question": "Can I loop a video for Instagram or WhatsApp?",
+      "answer": "Yes. Loop it to the length you need, then download the MP4, which both apps accept."
+    },
+    {
+      "question": "Is there a length limit?",
+      "answer": "The result can be up to 10 minutes long, and very large videos are limited by your device’s memory."
+    },
+    {
+      "question": "Does the sound loop too?",
+      "answer": "Yes, the sound repeats with the picture each time."
+    },
+    {
+      "question": "Is it free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    },
+    {
+      "question": "Does looping lower the quality?",
+      "answer": "The loop is encoded again at a high quality, at your clip's size and frame rate, so each repeat looks very close to the original."
+    }
+  ]
+}

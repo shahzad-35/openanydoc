@@ -11,6 +11,8 @@
   & #sidebar{width:min(340px,40vw);border-inline-start:1px solid var(--line)}
 
   & #word-document{position:relative;width:max-content;min-width:100%}
+  /* A file's own styles can ask for position:fixed and a huge z-index; containment keeps them inside the document area. */
+  & #word-pages,& #reading-view{contain:layout}
   /* Hidden (but laid out, so it can be measured) until it has its final zoom; see WordViewer.tsx. */
   & #word-document.is-sizing{visibility:hidden}
   & #word-document .docx-wrapper{background:none;padding:0}

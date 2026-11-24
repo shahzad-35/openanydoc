@@ -1,9 +1,10 @@
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; font-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self' data: blob:; media-src 'self' blob:; font-src 'self' blob:; connect-src 'self'; worker-src 'self' blob:; object-src 'none'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'
   Strict-Transport-Security: max-age=31536000; includeSubDomains
   X-Content-Type-Options: nosniff
   Referrer-Policy: no-referrer
-  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Permissions-Policy: camera=(self), microphone=(self), display-capture=(self), geolocation=(), usb=(), serial=(), hid=(), bluetooth=(), payment=(), midi=(), browsing-topics=()
+  Cross-Origin-Opener-Policy: same-origin
 
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
@@ -24,6 +25,12 @@
 # json-url-frame.html allows connect-src https:), so every page keeps connect-src 'self'. Cloudflare serves it at both addresses.
 /json-url-frame.html
   ! Content-Security-Policy
+  X-Frame-Options: SAMEORIGIN
 
 /json-url-frame
   ! Content-Security-Policy
+  X-Frame-Options: SAMEORIGIN
+
+# llms.txt has an Arabic section: name the charset so agents don't read it as Latin-1.
+/llms.txt
+  Content-Type: text/plain; charset=utf-8

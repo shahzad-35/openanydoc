@@ -1,0 +1,78 @@
+{
+  "title": "Trim Video – Cut the Start and End Online, No Upload",
+  "description": "Cut the start or end off a video: play it, mark the start and end, and save just that part. Works in your browser with nothing uploaded.",
+  "heading": "Trim a Video",
+  "subtitle": "Keep only the part of a video you want by marking where it starts and ends; nothing is uploaded.",
+  "intro": "Remove the shaky start of a recording or the long wait at the end. Play the video, pause where the part you want begins and click Set start here, then do the same for the end. You can also type the times, like 0:12.5. The page shows how long the new video will be before you save it.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is cut by your own browser and never sent to a server."
+    },
+    {
+      "title": "Mark while you watch",
+      "text": "Set the start and end from the player's current position, or type exact times."
+    },
+    {
+      "title": "Same format",
+      "text": "MP4 stays MP4 and WebM stays WebM, ready to share."
+    }
+  ],
+  "stepsTitle": "How to trim a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Mark the part to keep",
+      "text": "Play the video and click Set start here and Set end here, or type the times."
+    },
+    {
+      "title": "Trim and download",
+      "text": "Click Trim video, check the result and download it."
+    }
+  ],
+  "handlesTitle": "Videos it can trim",
+  "handles": [
+    "Start and end: set from the player or typed as minutes and seconds, to a tenth of a second.",
+    "Sound: kept, cut at the same points as the picture.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+  ],
+  "limits": [
+    "Only the first chosen video is trimmed.",
+    "One part is kept per run; to remove a part in the middle, trim twice and join the parts with Merge videos.",
+    "A WebM or MKV whose start you change is encoded again, so a long one takes longer."
+  ],
+  "faqTitle": "Questions about trimming a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Trimming is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "How do I cut out the middle of a video?",
+      "answer": "Trim the video twice, once for the part before and once for the part after, then put the two parts together with Merge videos."
+    },
+    {
+      "question": "How exact is the cut?",
+      "answer": "You can set times to a tenth of a second. The new video starts and ends at those times."
+    },
+    {
+      "question": "Does trimming lower the quality?",
+      "answer": "Not for an MP4 or MOV: the picture is copied as it is, not encoded again. A WebM or MKV is copied too when you only cut its end; otherwise the kept part is encoded again at a high quality, so it looks very close to the original."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Will the trimmed video play on my phone and in WhatsApp?",
+      "answer": "An MP4 or MOV keeps its format, which phones and chat apps open, and other videos such as AVI become MP4. A WebM or MKV stays WebM or MKV, which some phones and apps refuse: convert it afterwards with Video converter. To make it smaller as well, use Compress video next.",
+      "link": {
+        "text": "Video converter",
+        "path": "/video-converter"
+      }
+    }
+  ]
+}

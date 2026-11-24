@@ -160,7 +160,7 @@ export async function prepareOpenDocument(fileContents: ArrayBuffer) {
 function parseUntrustedDocumentHtml(html: string, hasOnlyDataPictures: boolean) {
   // Attribute values are escaped in the HTML (a quote inside is &quot;), so ' style="' only ever starts an attribute.
   const parsed = new DOMParser().parseFromString(html.replace(/(<[^>]*?\s)style="/g, '$1data-inline-style="'), 'text/html')
-  parsed.querySelectorAll('script, iframe, object, embed, link, meta, style, base, form').forEach((element) => element.remove())
+  parsed.querySelectorAll('script, iframe, object, embed, link, meta, style, base, form, animate, set, animateMotion, animateTransform').forEach((element) => element.remove())
   if (hasOnlyDataPictures) {
     parsed.querySelectorAll('video, audio, source, track, image, use').forEach((element) => element.remove())
     parsed.querySelectorAll('img').forEach((image) => !/^\s*data:image\//i.test(image.getAttribute('src') ?? '') && image.remove())
@@ -321,6 +321,15 @@ export async function renderWordPages(fileContents: ArrayBuffer, pagesHolder: HT
     documentCssSheet((styleElement.textContent ?? '').replace(/font-family:\s*([^;}]+)/g, (_, fontFamily: string) => `font-family: ${addGenericFontFamily(fontFamily.trim())}`)),
   )
   document.adoptedStyleSheets = [...document.adoptedStyleSheets, ...adoptedSheets]
+  // The renderer writes the file's links itself: they open in a new tab (the page keeps its edits), and only web and mail
+  // addresses stay; in-document links (#bookmark) work as before.
+  for (const link of Array.from(pagesHolder.querySelectorAll('a[href]'))) {
+    const address = link.getAttribute('href') ?? ''
+    if (address.startsWith('#')) continue
+    if (!/^\s*(https?:|mailto:)/i.test(address)) link.removeAttribute('href')
+    link.setAttribute('target', '_blank')
+    link.setAttribute('rel', 'noopener noreferrer')
+  }
   finishRenderedPages(pagesHolder, isTableRightToLeft)
   return { facts, adoptedSheets }
 }

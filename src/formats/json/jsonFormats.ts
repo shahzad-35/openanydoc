@@ -5,6 +5,20 @@ import type { JsonValue } from './jsonModel'
 
 export type JsonSourceFormat = 'json' | 'jsonLines' | 'json5' | 'yaml'
 
+// YAML aliases (*name) reuse a value, so a 500-byte file can stand for billions of values; reading it is cheap, but anything that
+// walks it (JSON text, tables, the tree) hangs. Counts the values a full walk would visit and stops past the limit.
+export const YAML_TOO_LARGE_MESSAGE = 'This YAML repeats its aliases so many times that it would expand to more than a million values.'
+export function isYamlWithinSizeLimit(value: unknown, limit = 1_000_000) {
+  let visited = 0
+  const pending: unknown[] = [value]
+  while (pending.length > 0) {
+    const current = pending.pop()
+    if (++visited > limit) return false
+    if (current !== null && typeof current === 'object') for (const child of Object.values(current)) pending.push(child)
+  }
+  return true
+}
+
 export function findJsonSourceFormat(fileName: string): JsonSourceFormat {
   const lowerCaseName = fileName.toLowerCase()
   if (lowerCaseName.endsWith('.jsonl') || lowerCaseName.endsWith('.ndjson')) return 'jsonLines'
@@ -37,7 +51,9 @@ export async function readSourceAsJsonText(text: string, format: Exclude<JsonSou
       return { jsonText: JSON.stringify(JSON5.parse(text), null, 2) }
     }
     const { load } = await import('js-yaml')
-    return { jsonText: JSON.stringify(load(text) ?? null, null, 2) }
+    const value = load(text) ?? null
+    if (!isYamlWithinSizeLimit(value)) return { message: YAML_TOO_LARGE_MESSAGE, line: null }
+    return { jsonText: JSON.stringify(value, null, 2) }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     // json5 and js-yaml both name the line in their messages ("at 3:5", "(3:5)").

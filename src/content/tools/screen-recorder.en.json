@@ -1,0 +1,79 @@
+{
+  "title": "Screen Recorder – Record Your Screen Free, No Upload",
+  "description": "Record your screen, a window or a browser tab with its sound and your microphone, in your browser. No sign-up, no watermark and nothing uploaded.",
+  "heading": "Free Online Screen Recorder",
+  "subtitle": "Record your screen, a window or a tab with sound and save it as a video; nothing is uploaded.",
+  "intro": "Record a bug report, a short tutorial or a walkthrough for a colleague without installing anything. Choose the whole screen, one window or a browser tab, add the tab's sound and your microphone if you want them, and pause whenever you need a break. When you stop, the video plays on the page so you can check it before you download it. If you end sharing from the browser's own bar, the recording stops and is saved the same way.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The recording is made by your own browser and stays on this device until you download it. Nothing is sent to a server."
+    },
+    {
+      "title": "Sound and voice together",
+      "text": "Record the sound of a tab or the screen and your microphone at the same time, mixed into one sound track."
+    },
+    {
+      "title": "No watermark, no limit",
+      "text": "No account, no logo stamped on the video and no time limit beyond your device's memory."
+    }
+  ],
+  "stepsTitle": "How to record your screen",
+  "steps": [
+    {
+      "title": "Choose the sound",
+      "text": "Tick the tab or screen sound and your microphone if you want them in the video."
+    },
+    {
+      "title": "Pick what to share",
+      "text": "Click Start recording and choose the whole screen, a window or a browser tab in the browser's sharing window."
+    },
+    {
+      "title": "Pause, then stop",
+      "text": "Pause and resume as often as you like, then click Stop and save, or end sharing from the browser's bar."
+    },
+    {
+      "title": "Check and download",
+      "text": "Play the video on the page and download it as an MP4 or WebM file."
+    }
+  ],
+  "handlesTitle": "What the screen recorder handles",
+  "handles": [
+    "Sources: the whole screen, one window or a single browser tab, as your browser offers them.",
+    "Sound: the tab's or the screen's sound, your microphone, or both mixed into one track.",
+    "Format: MP4 (H.264) where your browser can make it, otherwise WebM (VP9 or VP8); the page tells you which before you start.",
+    "Controls: start, pause, resume and stop, with a running timer."
+  ],
+  "limits": [
+    "Screen recording works in desktop browsers. Phones and tablets don't let web pages record the screen; use the system's own screen recorder there.",
+    "Sharing a screen's or window's sound depends on the browser and the system; a browser tab can usually share its sound in Chrome and Edge.",
+    "The recording is kept in memory until you download it, so very long recordings are limited by your device's memory."
+  ],
+  "faqTitle": "Screen recorder: questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser records the screen and keeps the video on this device; nothing is sent anywhere. You can check it: open your browser's network panel while you record and you will see no upload."
+    },
+    {
+      "question": "Can I record my screen on a phone?",
+      "answer": "Not on this page. Phone browsers don't let web pages record the screen. Use the screen recorder built into your phone instead: Control Centre on iPhone and iPad, or the Quick Settings panel on Android."
+    },
+    {
+      "question": "Why is there no sound from my screen?",
+      "answer": "The browser shares sound only for some choices. In Chrome and Edge, choose a browser tab and keep its sound option ticked in the sharing window; on Windows the whole screen can share its sound too. If no sound came with the share, the page tells you."
+    },
+    {
+      "question": "Can I record my voice while I record the screen?",
+      "answer": "Yes. Tick Record my microphone before you start. Your voice and the screen's sound are mixed into one track, so every player plays both."
+    },
+    {
+      "question": "What format is the video?",
+      "answer": "MP4 with H.264 where your browser can make it, which plays almost everywhere. Other browsers make WebM, which plays in every modern browser; convert it to MP4 afterwards if an app needs that."
+    },
+    {
+      "question": "What happens if I click Stop sharing in the browser's bar?",
+      "answer": "The recording stops and is saved, just as if you had clicked Stop and save on the page."
+    }
+  ]
+}

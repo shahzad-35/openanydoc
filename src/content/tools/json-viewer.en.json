@@ -58,18 +58,18 @@
     "caption": "A JSON file open in the viewer: the text on the left, the tree on the right, the validity in the status bar."
   },
   "comparison": {
-    "title": "JSON viewer compared with Excel Online, Google Sheets and upload-based viewers",
+    "title": "JSON viewer compared with online JSON formatters",
     "columns": [
       "OpenAnyDoc",
-      "Excel Online or Google Sheets",
-      "Upload-based online viewers"
+      "jsonformatter.org or Code Beautify",
+      "Other upload-based viewers"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "Yes, to Microsoft or Google servers.",
+          "Validation runs in the browser; Save, share links and Load URL use their servers.",
           "Yes, to the service's server."
         ]
       },
@@ -77,23 +77,23 @@
         "label": "Account or sign-in",
         "cells": [
           "None.",
-          "A Microsoft or Google account.",
-          "Often none; sometimes an email address."
+          "Not needed; JSON saved without login becomes public.",
+          "Varies by service."
         ]
       },
       {
-        "label": "Edit and save",
+        "label": "Analytics",
         "cells": [
-          "Yes. Download keeps the file's own format.",
-          "Yes, in the cloud copy.",
-          "Often view only."
+          "None.",
+          "Google Analytics, named in both privacy policies.",
+          "Varies by service."
         ]
       },
       {
         "label": "Works without a network once loaded",
         "cells": [
           "Yes.",
-          "No.",
+          "Not stated.",
           "No."
         ]
       },
@@ -101,16 +101,8 @@
         "label": "Size",
         "cells": [
           "Up to 10 MB; the text pane starts closed above 5 MB.",
-          "Set by the service.",
+          "Not stated.",
           "Set by the service."
-        ]
-      },
-      {
-        "label": "Cost",
-        "cells": [
-          "Free, no ads.",
-          "Free with an account; paid plans for more.",
-          "Free with ads, or paid."
         ]
       }
     ]

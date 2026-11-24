@@ -93,6 +93,20 @@ function ImagePreview({ file }: { file: File }) {
   return imageUrl ? <img id="tool-result-image" src={imageUrl} alt={t('tools.preview.label')} className="mx-auto max-h-80 rounded-[10px] border border-rule" /> : null
 }
 
+// A video or audio result plays on the page before it is downloaded.
+function MediaPreview({ file }: { file: File }) {
+  const { t } = useT()
+  const [mediaUrl, setMediaUrl] = useState('')
+  useEffect(() => {
+    const url = URL.createObjectURL(file)
+    setMediaUrl(url)
+    return () => URL.revokeObjectURL(url)
+  }, [file])
+  if (!mediaUrl) return null
+  if (file.type.startsWith('audio/')) return <audio id="tool-result-audio" src={mediaUrl} controls className="mx-auto w-full max-w-[480px]" aria-label={t('tools.preview.label')} />
+  return <video id="tool-result-video" src={mediaUrl} controls playsInline className="mx-auto max-h-80 rounded-[10px] border border-rule bg-black" aria-label={t('tools.preview.label')} />
+}
+
 export default function ToolResultPreview({ file }: { file: File }) {
   return (
     <div id="tool-result-preview" className="mt-4 space-y-3">
@@ -100,6 +114,7 @@ export default function ToolResultPreview({ file }: { file: File }) {
       {file.type === 'application/zip' && <ZipPreview file={file} />}
       {file.type.startsWith('text/') && <TextPreview file={file} />}
       {file.type.startsWith('image/') && <ImagePreview file={file} />}
+      {(file.type.startsWith('video/') || file.type.startsWith('audio/')) && <MediaPreview file={file} />}
     </div>
   )
 }

@@ -1,0 +1,92 @@
+{
+  "title": "PowerPoint to Video – Turn PPTX Slides into MP4 Free",
+  "description": "Turn a PowerPoint deck into an MP4 or WebM video in your browser: each slide shown for the seconds you choose, in 1080p or 720p. Nothing is uploaded.",
+  "heading": "Convert PowerPoint to Video",
+  "subtitle": "Turn your PowerPoint slides into an MP4 or WebM video, each slide on screen for the seconds you choose; nothing is uploaded.",
+  "intro": "Convert PPTX to MP4 without PowerPoint: each slide is drawn the way this site's PowerPoint viewer (beta) shows it, then held on screen for 1 to 30 seconds in a 1080p or 720p video. A 12-slide deck at 5 seconds a slide gives a one-minute video. Slides don't move, so a low frame rate keeps the file small and the video is made quickly. Handy for a looping screen in a lobby, a slide show for social media, or a deck someone can watch on a phone. Works with .pptx, .ppsx, .potx and .pptm files, and the video is made with the encoders built into your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your deck is drawn and turned into a video by your own browser and never sent to a server."
+    },
+    {
+      "title": "Your timing",
+      "text": "Choose how long each slide stays on screen, from 1 to 30 seconds, and which slides to include."
+    },
+    {
+      "title": "MP4 or WebM",
+      "text": "Full HD 1080p or 720p, in the slide's own shape, ready to play almost anywhere."
+    }
+  ],
+  "stepsTitle": "How to turn PowerPoint into a video",
+  "steps": [
+    {
+      "title": "Choose your presentation",
+      "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
+    },
+    {
+      "title": "Set the timing",
+      "text": "Pick the seconds per slide, the size and the format; type slide numbers if you want only some of them."
+    },
+    {
+      "title": "Make the video",
+      "text": "Click Make video. The slides are drawn one by one, then the video is put together."
+    },
+    {
+      "title": "Download",
+      "text": "Play the video on the page and download it."
+    }
+  ],
+  "handlesTitle": "Presentations it converts",
+  "handles": [
+    "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
+    "Text, shapes, tables and pictures saved in the file.",
+    "Widescreen 16:9 and standard 4:3 slides, the video in the slide's shape.",
+    "Output: MP4 or WebM, 1920 or 1280 pixels wide, with no sound."
+  ],
+  "limits": [
+    "Animations, slide transitions, embedded videos and audio are not included: each slide is a still picture.",
+    "The slides follow this site's PowerPoint viewer, which is in beta; fonts aren't embedded, so web fonts and fonts your browser doesn't have may look different.",
+    "There is no voice-over or music; the video is silent.",
+    "Every slide is kept in memory while the video is made, so very long decks may need 720p or fewer slides."
+  ],
+  "faqTitle": "PowerPoint to video questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. The slides are drawn and the video is made by your own browser, on your device; neither the deck nor the video is sent anywhere."
+    },
+    {
+      "question": "How long will the video be?",
+      "answer": "The number of slides times the seconds per slide: 10 slides at 5 seconds make a 50-second video."
+    },
+    {
+      "question": "Are animations and transitions kept?",
+      "answer": "No. Each slide is shown as a still picture, as it looks once all its animations have finished, and slides change with a cut. Embedded videos and audio are left out too."
+    },
+    {
+      "question": "Can I add a voice-over or music?",
+      "answer": "Not here: the video is silent. Add a sound track afterwards with Add audio to video.",
+      "link": {
+        "text": "Add audio to video",
+        "path": "/add-audio-to-video"
+      }
+    },
+    {
+      "question": "Why is the frame rate so low?",
+      "answer": "Slides don't move, so a low frame rate keeps the file small and makes the video quickly; it looks the same as a higher one."
+    },
+    {
+      "question": "Which browsers can make the video?",
+      "answer": "Recent Chrome and Edge make both MP4 and WebM; other browsers may make only one. If yours can't make the chosen format, the page says so and you can pick the other."
+    },
+    {
+      "question": "Can I get pictures or a PDF instead?",
+      "answer": "Yes. PowerPoint to JPG saves each slide as a picture, and PowerPoint to PDF saves one page per slide.",
+      "link": {
+        "text": "PowerPoint to JPG",
+        "path": "/pptx-to-jpg"
+      }
+    }
+  ]
+}

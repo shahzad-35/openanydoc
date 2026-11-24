@@ -1,0 +1,75 @@
+{
+  "title": "Extract Frames from Video – Save Stills as PNG or JPG",
+  "description": "Save the paused frame of a video, a picture every few seconds, or frames spread evenly, as PNG or JPG files. Done in your browser, no upload.",
+  "heading": "Extract Frames from a Video",
+  "subtitle": "Save the frame you paused on, or many frames as one ZIP of PNG or JPG pictures, without uploading the video.",
+  "intro": "Grab a sharp still for a thumbnail, a slide or a report straight from the video, at the video's own resolution. Pause the player on the moment you want and save that frame, or take a picture every few seconds, or a set number of pictures spread evenly over the whole video for a contact sheet. The page says how many pictures it will make before you start; several come as one ZIP file.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your browser takes the pictures from the video on your device; nothing is uploaded."
+    },
+    {
+      "title": "Full resolution",
+      "text": "Frames are saved at the video's own size, or at a width you choose, as lossless PNG or smaller JPG."
+    },
+    {
+      "title": "One frame or hundreds",
+      "text": "The paused frame, one every few seconds, or a number spread evenly; up to 500 pictures in one ZIP."
+    }
+  ],
+  "stepsTitle": "How to extract frames from a video",
+  "steps": [
+    {
+      "title": "Add your video",
+      "text": "Choose or drop an MP4, MOV, WebM or MKV file; it opens in the player."
+    },
+    {
+      "title": "Choose the frames",
+      "text": "Pick This frame and pause on the moment, or Every few seconds, or a number spread evenly."
+    },
+    {
+      "title": "Pick format and size",
+      "text": "Choose PNG or JPG and, if you like, a largest width."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Save and download one picture, or one ZIP with all of them."
+    }
+  ],
+  "handlesTitle": "Videos and picture formats it handles",
+  "handles": [
+    "Videos: MP4, MOV, WebM, MKV and other files your browser can play.",
+    "Pictures: PNG (lossless) or JPG, at the video's size or at most 1920, 1280, 640 or 320 pixels wide.",
+    "Choices: the paused frame, one picture every 1 to 60 seconds, or 1 to 500 pictures spread evenly.",
+    "Names: each picture's name holds its number and its time in the video, like clip-0003-2_00s.png."
+  ],
+  "limits": [
+    "At most 500 pictures at a time; choose a longer gap or fewer pictures for long videos.",
+    "A picture is the frame shown at that moment, so a fast-moving scene can look blurred, as it does when paused.",
+    "Videos in a format your browser can't play can't be read; the page says so and suggests Chrome or Edge."
+  ],
+  "faqTitle": "Questions about extracting video frames",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser reads the video and makes the pictures on your device; nothing is sent anywhere. Your browser's network panel shows no upload."
+    },
+    {
+      "question": "How do I save one exact frame?",
+      "answer": "Choose This frame, play the video and pause it on the moment you want (you can drag the player's bar), then click Save the picture."
+    },
+    {
+      "question": "Should I choose PNG or JPG?",
+      "answer": "PNG keeps every pixel and suits screenshots, text and editing. JPG files are much smaller and suit photos and sharing."
+    },
+    {
+      "question": "Why at most 500 pictures?",
+      "answer": "Every picture is kept in memory until the ZIP is made, and full-size frames are large. Five hundred is a safe limit for phones and laptops; for long videos choose a gap of a few seconds."
+    },
+    {
+      "question": "What resolution are the frames?",
+      "answer": "The video's own size, such as 1920 × 1080 for a Full HD video, unless you choose a largest width. A small video is never enlarged."
+    }
+  ]
+}

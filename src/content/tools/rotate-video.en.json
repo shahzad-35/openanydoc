@@ -1,0 +1,79 @@
+{
+  "title": "Rotate Video – Fix a Sideways Video Online, No Upload",
+  "description": "Turn a sideways or upside-down video 90 degrees left or right or 180 degrees, with a preview. The pixels are turned, so it plays upright anywhere.",
+  "heading": "Rotate a Video",
+  "subtitle": "Turn a video 90 degrees left or right, or upside down, and keep it upright in every player; nothing is uploaded.",
+  "intro": "Phones sometimes save a video sideways, or a recording ends up upside down. Rotate it left, right or 180 degrees and watch the preview turn. The picture itself is turned, not just marked to be turned, so it plays upright in every app, website and TV, even those that ignore the orientation tag.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is turned by your own browser and never sent to a server."
+    },
+    {
+      "title": "Upright everywhere",
+      "text": "The picture's pixels are turned, so no player can show it sideways again."
+    },
+    {
+      "title": "See it first",
+      "text": "The preview turns with every click, so you know the result before you save."
+    }
+  ],
+  "stepsTitle": "How to rotate a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Turn it",
+      "text": "Click Rotate left, Rotate right or Turn upside down until the preview is upright."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Rotate video and download the result."
+    }
+  ],
+  "handlesTitle": "Videos it can rotate",
+  "handles": [
+    "Turns: 90 degrees left, 90 degrees right and 180 degrees, as many clicks as you like.",
+    "Size: a 90-degree turn swaps width and height, so 1920 × 1080 becomes 1080 × 1920.",
+    "Sound: kept as it is.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+  ],
+  "limits": [
+    "Only the first chosen video is rotated.",
+    "Videos turn in steps of 90 degrees; there is no free angle.",
+    "The picture is made again, so a long video takes a while."
+  ],
+  "faqTitle": "Questions about rotating a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Rotating is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "Why is my video sideways in some apps but not others?",
+      "answer": "Phones often save the video sideways with a tag that tells players how to turn it, and some players ignore the tag. The rotated video here has its pixels turned, so it is upright everywhere."
+    },
+    {
+      "question": "How do I mirror a video instead?",
+      "answer": "Use Flip video, which mirrors the picture left to right or top to bottom."
+    },
+    {
+      "question": "Does rotating lower the quality?",
+      "answer": "The video is made again with your browser's encoder at a good quality, so it looks very close to the original."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Can I rotate only part of a video?",
+      "answer": "No. The whole video turns. To turn one part, trim it out first, rotate it, then join the parts with Merge videos.",
+      "link": {
+        "text": "Merge videos",
+        "path": "/merge-videos"
+      }
+    }
+  ]
+}

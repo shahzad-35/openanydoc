@@ -257,6 +257,12 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
     takeLaunchedFiles(openFileFromOutside)
     if (!new URLSearchParams(window.location.search).has('shared')) return
     window.history.replaceState(window.history.state, '', window.location.pathname)
+    // Only the installed app is a share target. Any website can post a form to /share, but that opens a normal browser tab, so
+    // a file arriving there was not shared by the visitor: it is thrown away unopened.
+    if (!window.matchMedia('(display-mode: standalone)').matches) {
+      void caches.delete('shared-files')
+      return
+    }
     void takeSharedFile().then((sharedFile) => sharedFile && openFileFromOutside(sharedFile))
   }, [])
 

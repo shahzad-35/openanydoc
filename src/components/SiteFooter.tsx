@@ -152,7 +152,7 @@ export default function SiteFooter({ currentPath, onNavigate }: { currentPath: s
             <h2 className={footerClasses.heading}>{t('about.moreFileTools')}</h2>
             <ul className={footerClasses.list}>
               {/* The hubs: the data hub lists every landing page, converter and developer tool (too many for the footer). */}
-              {[ALL_TOOLS_PATH, '/data-tools', '/pdf-tools', '/image-tools', '/office-tools', '/ai-tools', '/guides']
+              {[ALL_TOOLS_PATH, '/data-tools', '/pdf-tools', '/image-tools', '/video-tools', '/office-tools', '/ai-tools', '/guides']
                 .filter((address) => address !== currentPath)
                 .map((address) => (
                   <li key={address} className={footerClasses.item}>

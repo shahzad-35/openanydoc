@@ -35,7 +35,7 @@ const nextFrame = () => new Promise((resolve) => requestAnimationFrame(resolve))
 function makeOffscreenHolder() {
   const holder = document.createElement('div')
   holder.dir = 'ltr'
-  holder.style.cssText = 'position:fixed;left:-100000px;top:0;pointer-events:none;color-scheme:light;background:#fff'
+  holder.style.cssText = 'position:fixed;left:-100000px;top:0;pointer-events:none;color-scheme:light;background:#fff;contain:layout'
   holder.setAttribute('aria-hidden', 'true')
   document.body.append(holder)
   return holder

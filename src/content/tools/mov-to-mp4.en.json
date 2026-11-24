@@ -1,0 +1,71 @@
+{
+  "title": "MOV to MP4 – Convert iPhone Videos Free, No Upload",
+  "description": "Convert MOV videos from an iPhone or camera to MP4 that plays on Windows, Android and the web. Free, in your browser, with nothing uploaded.",
+  "heading": "Convert MOV to MP4",
+  "subtitle": "Turn an iPhone or camera MOV into an MP4 that plays on Windows, Android and websites; nothing is uploaded.",
+  "intro": "iPhones, Macs and many cameras save video as MOV, which some Windows apps, Android phones and upload forms refuse. This page makes an MP4 with H.264 picture and AAC sound, the pair nearly every device plays. Most MOV files already hold H.264, so the picture is simply moved into the MP4 box: it takes seconds and the quality stays exactly the same. iPhone videos recorded as HEVC (High Efficiency) are re-encoded to H.264, which works only if your browser can play HEVC.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your iPhone and camera videos stay on your device: your browser converts them and nothing is sent to a server."
+    },
+    {
+      "title": "Usually lossless",
+      "text": "A MOV with H.264 picture is re-packed, not re-encoded, so the MP4 looks exactly like the original."
+    },
+    {
+      "title": "Plays everywhere",
+      "text": "The MP4 uses H.264 and AAC, which Windows, Android, smart TVs and websites all play."
+    }
+  ],
+  "stepsTitle": "How to convert MOV to MP4",
+  "steps": [
+    {
+      "title": "Choose the MOV file",
+      "text": "Choose or drop a .mov file from your phone, camera or Mac."
+    },
+    {
+      "title": "Check the plan",
+      "text": "The line above the button says whether the picture is copied (H.264) or re-encoded (HEVC from recent iPhones)."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to MP4, play the result, then download it."
+    }
+  ],
+  "handlesTitle": "MOV files it converts",
+  "handles": [
+    "MOV files from iPhone, iPad, Mac screen recordings, QuickTime and most cameras.",
+    "H.264 picture: copied into the MP4 without re-encoding.",
+    "HEVC (H.265) picture: re-encoded to H.264 when your browser can play HEVC.",
+    "Sound: AAC is kept; other sound is changed to AAC."
+  ],
+  "limits": [
+    "HEVC MOVs need a browser that can play HEVC, such as Safari or Chrome and Edge on most recent computers.",
+    "ProRes videos from professional cameras can't be read in the browser.",
+    "One video at a time; long HEVC videos take a while to re-encode."
+  ],
+  "faqTitle": "MOV to MP4 questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your MOV is read and converted by your own browser, on your device, and is never sent anywhere. Your browser's network panel shows no upload while it works."
+    },
+    {
+      "question": "Why won't my iPhone video play on Windows?",
+      "answer": "Recent iPhones record in HEVC by default, inside a MOV file. Some Windows apps need a paid extension for HEVC, and some don't open MOV at all. An MP4 with H.264 plays without anything extra."
+    },
+    {
+      "question": "My HEVC video says this browser can't play it. What now?",
+      "answer": "Open this page in Safari on a Mac or iPhone, or in Chrome or Edge on a computer with hardware HEVC support. On the iPhone itself, Settings > Camera > Formats > Most Compatible records H.264 from now on."
+    },
+    {
+      "question": "Is MOV to MP4 lossless?",
+      "answer": "When the MOV holds H.264, yes: the picture is copied untouched. The page tells you before you start whether it will copy or re-encode."
+    },
+    {
+      "question": "Does it keep the sound and the length?",
+      "answer": "Yes. The whole video is kept, with its sound. Sound that MP4 players don't expect is changed to AAC."
+    }
+  ]
+}

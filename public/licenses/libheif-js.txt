@@ -1,5 +1,5 @@
 libheif-js 1.23.5, used unmodified by OpenAnyDoc to decode HEIC photos in browsers that cannot (loaded only when a HEIC file is opened).
-It contains libheif and libde265. Licence: GNU Lesser General Public License v3.0 (below; it refers to the GNU GPL v3, https://www.gnu.org/licenses/gpl-3.0.txt).
+It contains libheif and libde265. Licence: GNU Lesser General Public License v3.0 (below; it refers to the GNU GPL v3, whose full text is in gpl-3.0.txt beside this file).
 Source: https://www.npmjs.com/package/libheif-js/v/1.23.5 and https://github.com/catdad-experiments/libheif-js
 You may replace the decoder: it is the separate file assets/libheif-bundle-*.js.
 

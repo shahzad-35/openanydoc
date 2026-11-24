@@ -1,0 +1,71 @@
+{
+  "title": "MKV to MP4 – Convert OBS Recordings Free, No Upload",
+  "description": "Convert MKV files from OBS and downloads to MP4 for phones, TVs and editors. H.264 picture is copied without loss. In your browser, no upload.",
+  "heading": "Convert MKV to MP4",
+  "subtitle": "Make an MKV from OBS or a download into an MP4 that phones, TVs and editors open; nothing is uploaded.",
+  "intro": "OBS records to MKV by default, because a crash mid-recording leaves an MKV that still plays. Many downloads use MKV too. But iPhones, many smart TVs, Premiere and most social sites want MP4. MKV is only the box: inside there is usually H.264 picture, which this page copies straight into an MP4 without re-encoding, so even an hour of gameplay converts quickly and loses nothing. Other picture codecs are re-encoded to H.264, and sound becomes AAC when it isn't already.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your recordings and downloads are converted by your browser; nothing is sent to a server."
+    },
+    {
+      "title": "Fast remux",
+      "text": "H.264 picture is copied, not re-encoded, so a long OBS recording becomes an MP4 in a fraction of its length."
+    },
+    {
+      "title": "Ready for editors",
+      "text": "The MP4 opens in Premiere, DaVinci Resolve, iMovie and on phones and TVs."
+    }
+  ],
+  "stepsTitle": "How to convert MKV to MP4",
+  "steps": [
+    {
+      "title": "Choose the MKV file",
+      "text": "Choose or drop a .mkv file from OBS or a download."
+    },
+    {
+      "title": "Check the plan",
+      "text": "The line above the button says whether the picture is copied, as for most OBS recordings, or re-encoded. Subtitles are left out."
+    },
+    {
+      "title": "Convert and download",
+      "text": "Click Convert to MP4, play the result, then download it."
+    }
+  ],
+  "handlesTitle": "MKV files it converts",
+  "handles": [
+    "MKV from OBS Studio, capture cards and downloads.",
+    "H.264 picture: copied into the MP4 untouched.",
+    "H.265, VP9 and AV1 picture: re-encoded to H.264 when your browser can play them.",
+    "Sound: AAC is kept; other sound your browser can play, such as Opus or MP3, becomes AAC."
+  ],
+  "limits": [
+    "Subtitles and chapters are not carried over to the MP4.",
+    "H.265, VP9 and AV1 picture has to be re-encoded, which takes much longer than a copy.",
+    "One video at a time."
+  ],
+  "faqTitle": "MKV to MP4 questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your MKV is read and converted by your own browser, on your device, and is never sent anywhere. Large recordings stay on your disk the whole time."
+    },
+    {
+      "question": "Why does OBS record to MKV?",
+      "answer": "If OBS or the computer crashes, an MKV recorded so far still plays, while an unfinished MP4 is unreadable. OBS can remux to MP4 itself; this page does the same from any device, without OBS."
+    },
+    {
+      "question": "Is MKV to MP4 lossless?",
+      "answer": "When the picture is H.264, as in most OBS recordings, yes: it is copied untouched. The line above the button tells you before you start."
+    },
+    {
+      "question": "What happens to subtitles?",
+      "answer": "They are left out: the MP4 has the picture and the sound. If you need the subtitles, keep the .srt file next to the MP4 or burn them in with an editor."
+    },
+    {
+      "question": "How long does a big recording take?",
+      "answer": "A copied H.264 recording takes about as long as reading the file. A re-encoded one depends on its length and your device, and the progress bar shows where it is."
+    }
+  ]
+}

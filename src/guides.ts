@@ -635,20 +635,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/pdf-tools-without-upload': {
       published: '2026-11-17',
-      updated: '2026-11-23',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'The short answer',
-          paragraphs: ['Most free online PDF tools, including iLovePDF, Smallpdf and the PDF24 website, upload your file to their servers, process it there and delete it after a set time. That is fine for many documents. If a file must not leave your device, use a tool that processes it locally: OpenAnyDoc in the browser, or a desktop app that works offline, such as PDF24 Creator on Windows. The facts below come from each service\'s own pages, checked on 17 November 2026.'],
+          paragraphs: ['Most free online PDF tools, including iLovePDF, Smallpdf and the PDF24 website, upload your file to their servers, process it there and delete it after a set time. That is fine for many documents. If a file must not leave your device, use a tool that processes it locally: OpenAnyDoc in the browser, or a desktop app that works offline, such as PDF24 Creator on Windows. The facts below come from each service\'s own pages, checked on 24 November 2026 (Smallpdf\'s on 17 November 2026).'],
         },
         {
-          heading: 'How popular PDF sites handle your file (checked 17 November 2026)',
+          heading: 'How popular PDF sites handle your file (checked 24 November 2026)',
           paragraphs: ['What each service says on its own pages; follow the links for the current wording:'],
           list: [
             'iLovePDF: files are uploaded over HTTPS and kept "for a maximum of 2 hours" so you can download the result, then removed. A desktop app is available for Mac and Windows.',
-            'Smallpdf: files are "permanently removed" from its servers one hour after processing. Smallpdf says it is ISO 27001 certified and stores files in the EU.',
+            'Smallpdf (checked 17 November 2026): files are "permanently removed" from its servers one hour after processing. Smallpdf says it is ISO 27001 certified and stores files in the EU.',
             'PDF24 Tools (website): uploaded files are deleted from the processing server within one hour. PDF24 Creator, its Windows app, works offline and keeps all files on your computer.',
-            'Sejda (website): its privacy policy says uploaded and output files are stored for processing and then permanently deleted, with no backups.',
+            'Sejda (website): its privacy policy says uploaded and output files are stored for processing and then permanently deleted, with no backups. For its AI features, the policy says content is sent to an AI sub-processor for transient processing and not stored.',
           ],
           links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'Smallpdf', path: 'https://smallpdf.com/blog/is-smallpdf-safe' }, { text: 'PDF24 Tools', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
         },
@@ -1196,7 +1196,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/stirling-pdf-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-23',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'The short answer',
@@ -1229,7 +1229,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'What OpenAnyDoc does differently',
           paragraphs: [
-            'OpenAnyDoc has more than 30 PDF tools, and every one runs in the browser of the person using it. The file is read, changed and saved on that device. The page\'s security policy only lets it contact its own site, so a document cannot be sent anywhere else; anyone can confirm this in the browser\'s network panel, as the guide to check this yourself explains.',
+            'OpenAnyDoc has more than 40 PDF tools, and every one runs in the browser of the person using it. The file is read, changed and saved on that device. The page\'s security policy only lets it contact its own site, so a document cannot be sent anywhere else; anyone can confirm this in the browser\'s network panel, as the guide to check this yourself explains.',
             'Keeping files in-house therefore does not need a processing server. Because the site is a folder of static files, an organisation can host its own copy on an internal network: build it and serve the folder from any web server. There is no database, no user accounts, no Docker image to keep up to date and no processing limit, and the files employees open still never leave their devices. The source code is public on GitHub. Once a page has loaded, the tools also work offline.',
           ],
           links: [{ text: 'check this yourself', path: '/check-file-upload' }],
@@ -1241,7 +1241,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'Where files are processed: Stirling-PDF self-hosted, on your server; OpenAnyDoc, in each user\'s browser.',
             'What you run: Stirling-PDF, a Docker container or desktop app with 2 to 6 GB of memory suggested; OpenAnyDoc, nothing, or static files on any web server.',
             'Users and limits: Stirling-PDF Free, 5 users and 1,000 processing units a month; OpenAnyDoc, no accounts and no limits.',
-            'Operations: Stirling-PDF, 50+ tools with pipelines and an API; OpenAnyDoc, more than 30 PDF tools with no API.',
+            'Operations: Stirling-PDF, 50+ tools with pipelines and an API; OpenAnyDoc, more than 40 PDF tools with no API.',
             'Compression: both; OpenAnyDoc re-saves pictures at three quality levels in the browser and does not lower their resolution.',
             'Large batches: Stirling-PDF, handled by the server; OpenAnyDoc, limited by each device\'s memory.',
           ],
@@ -1281,14 +1281,14 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/jsonformatter-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'The short answer',
           paragraphs: ['jsonformatter.org and Code Beautify are popular free JSON tools with many converters and a way to save JSON as a shareable link. Both state that much of the work happens in your browser, but their saving and URL-loading features involve their servers, and they ask you not to save sensitive data. If you paste API responses, tokens or configuration files, OpenAnyDoc formats, validates and compares JSON in your browser and has no save-online feature at all.'],
         },
         {
-          heading: 'What jsonformatter.org says (checked 20 November 2026)',
+          heading: 'What jsonformatter.org says (checked 24 November 2026)',
           paragraphs: ['From its home page and privacy policy:'],
           list: [
             'Validation: "Your JSON Data gets validated in the browser itself." The page also says it keeps the last formatted JSON in the browser\'s local storage.',
@@ -1300,7 +1300,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'home page', path: 'https://jsonformatter.org/' }, { text: 'privacy policy', path: 'https://jsonformatter.org/policy' }],
         },
         {
-          heading: 'What Code Beautify says (checked 20 November 2026)',
+          heading: 'What Code Beautify says (checked 24 November 2026)',
           paragraphs: ['From its JSON viewer page and privacy policy:'],
           list: [
             'Processing: its privacy policy says "99% of our tools are doing processing on browser using Java Script" and that it does not store data unless you use the Save Online feature.',
@@ -3268,20 +3268,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/pdf-tools-without-upload': {
       published: '2026-11-17',
-      updated: '2026-11-23',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'الإجابة المختصرة',
-          paragraphs: ['معظم أدوات PDF المجانية على الإنترنت، ومنها iLovePDF وSmallpdf وموقع PDF24، ترفع ملفك إلى خوادمها وتعالجه هناك ثم تحذفه بعد مدة محددة. وهذا مقبول لكثير من المستندات. أما إن كان الملف لا يجوز أن يغادر جهازك، فاستخدم أداة تعالجه محليًا: OpenAnyDoc في المتصفح، أو تطبيق سطح مكتب يعمل دون اتصال مثل PDF24 Creator على Windows. والمعلومات أدناه من صفحات كل خدمة نفسها، وقد رُوجعت في 17 نوفمبر 2026.'],
+          paragraphs: ['معظم أدوات PDF المجانية على الإنترنت، ومنها iLovePDF وSmallpdf وموقع PDF24، ترفع ملفك إلى خوادمها وتعالجه هناك ثم تحذفه بعد مدة محددة. وهذا مقبول لكثير من المستندات. أما إن كان الملف لا يجوز أن يغادر جهازك، فاستخدم أداة تعالجه محليًا: OpenAnyDoc في المتصفح، أو تطبيق سطح مكتب يعمل دون اتصال مثل PDF24 Creator على Windows. والمعلومات أدناه من صفحات كل خدمة نفسها، وقد رُوجعت في 24 نوفمبر 2026 (ومعلومات Smallpdf في 17 نوفمبر 2026).'],
         },
         {
-          heading: 'كيف تتعامل مواقع PDF الشائعة مع ملفك (رُوجع في 17 نوفمبر 2026)',
+          heading: 'كيف تتعامل مواقع PDF الشائعة مع ملفك (رُوجع في 24 نوفمبر 2026)',
           paragraphs: ['ما تقوله كل خدمة في صفحاتها؛ اتبع الروابط للاطلاع على النص الحالي:'],
           list: [
             'iLovePDF: تُرفع الملفات عبر HTTPS وتُحفظ «لمدة أقصاها ساعتان» لتتمكن من تنزيل النتيجة، ثم تُحذف. ويتوفر تطبيق سطح مكتب لـ Mac وWindows.',
-            'Smallpdf: تُحذف الملفات نهائيًا من خوادمها بعد ساعة من المعالجة. وتقول Smallpdf إنها حاصلة على شهادة ISO 27001 وإنها تخزّن الملفات داخل الاتحاد الأوروبي.',
+            'Smallpdf (رُوجعت في 17 نوفمبر 2026): تُحذف الملفات نهائيًا من خوادمها بعد ساعة من المعالجة. وتقول Smallpdf إنها حاصلة على شهادة ISO 27001 وإنها تخزّن الملفات داخل الاتحاد الأوروبي.',
             'أدوات PDF24 (الموقع): تُحذف الملفات المرفوعة من خادم المعالجة خلال ساعة. أما PDF24 Creator، تطبيقها على Windows، فيعمل دون اتصال ويُبقي كل الملفات على حاسوبك.',
-            'Sejda (الموقع): تقول سياسة الخصوصية إن الملفات المرفوعة والناتجة تُخزَّن للمعالجة ثم تُحذف نهائيًا، دون نسخ احتياطية.',
+            'Sejda (الموقع): تقول سياسة الخصوصية إن الملفات المرفوعة والناتجة تُخزَّن للمعالجة ثم تُحذف نهائيًا، دون نسخ احتياطية. ولميزات الذكاء الاصطناعي، تقول السياسة إن المحتوى يُرسل إلى معالج فرعي للذكاء الاصطناعي لمعالجة عابرة ولا يُخزَّن.',
           ],
           links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'Smallpdf', path: 'https://smallpdf.com/blog/is-smallpdf-safe' }, { text: 'PDF24', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
         },
@@ -3828,7 +3828,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/stirling-pdf-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-23',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -3861,7 +3861,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'ما الذي يفعله OpenAnyDoc بشكل مختلف',
           paragraphs: [
-            'لدى OpenAnyDoc أكثر من 30 أداة PDF، وكلها تعمل في متصفح من يستخدمها. يُقرأ الملف ويُعدَّل ويُحفظ على ذلك الجهاز. ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه، فلا يمكن إرسال المستند إلى أي مكان آخر؛ ويستطيع أي شخص التأكد من ذلك في لوحة الشبكة في المتصفح، كما يشرح دليل التحقق بنفسك.',
+            'لدى OpenAnyDoc أكثر من 40 أداة PDF، وكلها تعمل في متصفح من يستخدمها. يُقرأ الملف ويُعدَّل ويُحفظ على ذلك الجهاز. ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه، فلا يمكن إرسال المستند إلى أي مكان آخر؛ ويستطيع أي شخص التأكد من ذلك في لوحة الشبكة في المتصفح، كما يشرح دليل التحقق بنفسك.',
             'لذلك لا يحتاج إبقاء الملفات داخل الجهة إلى خادم معالجة. ولأن الموقع مجلد من الملفات الثابتة، تستطيع أي جهة استضافة نسختها الخاصة على شبكتها الداخلية: ابنِه وقدّم المجلد من أي خادم ويب. لا قاعدة بيانات ولا حسابات مستخدمين ولا صورة Docker تحتاج إلى تحديث ولا حد للمعالجة، وتبقى الملفات التي يفتحها الموظفون على أجهزتهم. والكود المصدري منشور على GitHub. وبعد تحميل الصفحة تعمل الأدوات دون اتصال أيضًا.',
           ],
           links: [{ text: 'التحقق بنفسك', path: '/check-file-upload' }],
@@ -3873,7 +3873,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'أين تُعالَج الملفات: Stirling-PDF المستضاف ذاتيًا على خادمك؛ وOpenAnyDoc في متصفح كل مستخدم.',
             'ما الذي تشغّله: Stirling-PDF حاوية Docker أو تطبيق سطح مكتب، مع 2 إلى 6 غيغابايت ذاكرة مقترحة؛ وOpenAnyDoc لا شيء، أو ملفات ثابتة على أي خادم ويب.',
             'المستخدمون والحدود: خطة Stirling-PDF المجانية 5 مستخدمين و1,000 وحدة معالجة شهريًا؛ وOpenAnyDoc بلا حسابات ولا حدود.',
-            'العمليات: Stirling-PDF أكثر من 50 أداة مع مسارات عمل وواجهة برمجية؛ وOpenAnyDoc أكثر من 30 أداة PDF دون واجهة برمجية.',
+            'العمليات: Stirling-PDF أكثر من 50 أداة مع مسارات عمل وواجهة برمجية؛ وOpenAnyDoc أكثر من 40 أداة PDF دون واجهة برمجية.',
             'الضغط: كلاهما؛ يحفظ OpenAnyDoc الصور بثلاثة مستويات جودة في المتصفح ولا يخفّض دقتها.',
             'الدفعات الكبيرة: يتولاها خادم Stirling-PDF؛ وفي OpenAnyDoc تحدها ذاكرة كل جهاز.',
           ],
@@ -3913,14 +3913,14 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/jsonformatter-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'الإجابة المختصرة',
           paragraphs: ['موقعا jsonformatter.org وCode Beautify أداتان مجانيتان شائعتان لملفات جيسون، فيهما محوّلات كثيرة وطريقة لحفظ JSON رابطًا قابلًا للمشاركة. يقول الموقعان إن جزءًا كبيرًا من العمل يجري في متصفحك، لكن ميزتي الحفظ والتحميل من رابط تمرّان بخوادمهما، ويطلبان منك ألا تحفظ بيانات حساسة. فإن كنت تلصق ردود API أو رموز وصول أو ملفات إعدادات، فإن OpenAnyDoc ينسّق JSON ويتحقق منه ويقارنه في متصفحك، ولا توجد فيه ميزة حفظ على الإنترنت أصلًا.'],
         },
         {
-          heading: 'ما يقوله jsonformatter.org (رُوجع في 20 نوفمبر 2026)',
+          heading: 'ما يقوله jsonformatter.org (رُوجع في 24 نوفمبر 2026)',
           paragraphs: ['من صفحته الرئيسية وسياسة الخصوصية:'],
           list: [
             'التحقق: «Your JSON Data gets validated in the browser itself»، أي يجري التحقق في المتصفح نفسه. وتقول الصفحة أيضًا إنه يحفظ آخر JSON منسّق في التخزين المحلي للمتصفح.',
@@ -3932,7 +3932,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'صفحته الرئيسية', path: 'https://jsonformatter.org/' }, { text: 'سياسة الخصوصية', path: 'https://jsonformatter.org/policy' }],
         },
         {
-          heading: 'ما يقوله Code Beautify (رُوجع في 20 نوفمبر 2026)',
+          heading: 'ما يقوله Code Beautify (رُوجع في 24 نوفمبر 2026)',
           paragraphs: ['من صفحة عارض JSON وسياسة الخصوصية:'],
           list: [
             'المعالجة: تقول سياسة الخصوصية إن 99% من أدواته تعالج البيانات في المتصفح بلغة JavaScript، وإنه لا يخزّن بيانات إلا إذا استخدمت ميزة Save Online.',

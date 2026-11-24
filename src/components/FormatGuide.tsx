@@ -141,7 +141,8 @@ export default function FormatGuide({ content, toolName, fileType, relatedPages,
       <section id="related-tools">
         <h2 id="related-tools-heading" className="type-h3">{t('related.heading')}</h2>
         <ul id="related-tools-list" className="mt-4 flex flex-wrap gap-3">
-          {relatedPages.map((path) => (
+          {/* A page not built yet (a tool that is not live) has no words, so it is not linked. */}
+          {relatedPages.filter((path) => pageSeo[locale][path]).map((path) => (
             <li key={path}>
               <PageLink
                 id={`related-link-${path.slice(1)}`}

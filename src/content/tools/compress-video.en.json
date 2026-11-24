@@ -1,0 +1,80 @@
+{
+  "title": "Compress Video – Make MP4 Files Smaller, No Upload",
+  "description": "Make a video smaller for email, WhatsApp or Discord: pick a quality or type a size in MB and see an estimate first. Runs in your browser, no upload.",
+  "heading": "Compress a Video",
+  "subtitle": "Make a video file smaller by quality or to a size in MB, with an estimate before you start; nothing is uploaded.",
+  "intro": "A phone video is often too big to email or send in a chat. Choose how small you want it: pick a quality from Smallest file to Best picture, or type the size you need in MB and the tool works out the bitrate for you. You can also lower the picture size to 1080p, 720p or 480p, which saves the most. Before you start you see the original size and an estimate of the new one, measured on the first seconds of your video.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is compressed by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Hit a size limit",
+      "text": "Type 25 MB or 8 MB and the video is made to fit, with the sound kept clear."
+    },
+    {
+      "title": "Estimate first",
+      "text": "See the original size and the expected new size before you spend time compressing."
+    }
+  ],
+  "stepsTitle": "How to compress a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page: MP4, MOV, WebM, MKV and more."
+    },
+    {
+      "title": "Pick quality or size",
+      "text": "Choose a quality, or switch to To a file size and type the MB you need. Lower the picture size if you like."
+    },
+    {
+      "title": "Compress and download",
+      "text": "Click Compress video, watch the result and download it."
+    }
+  ],
+  "handlesTitle": "Videos it can compress",
+  "handles": [
+    "Quality levels: Smallest file, Small file, Balanced and Best picture.",
+    "Target size: any size in MB that leaves enough room for a watchable picture (about 150 kbps) and sound (96 kbps).",
+    "Picture size: keep it, or lower it to 1080p, 720p or 480p with the shape kept.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+  ],
+  "limits": [
+    "Only the first chosen video is compressed.",
+    "A video that is already well compressed may not get much smaller at a high quality.",
+    "A target size is a goal, not a promise: the result is usually within a few percent.",
+    "Long or 4K videos take a while and need free memory on your device."
+  ],
+  "faqTitle": "Questions about compressing a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Compressing is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "How do I make a video small enough for email?",
+      "answer": "Switch to To a file size, type a size a little under the limit (for example 20 MB for a 25 MB limit), and click Compress video. For long videos, also choose 720p or 480p so the picture stays sharp."
+    },
+    {
+      "question": "Why does it say the video can't get that small?",
+      "answer": "Every second of video needs some data to stay watchable. If the size you typed leaves less than about 150 kbps for the picture, the page tells you the smallest size it can make. Trim the video first or accept a larger file."
+    },
+    {
+      "question": "Which setting should I choose?",
+      "answer": "Small file suits chats and email. Balanced keeps more detail. Lowering the picture size to 720p usually saves more than lowering the quality."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "How do I make a video small enough for WhatsApp or Discord?",
+      "answer": "Look up the app's current size limit, then choose To a file size and type a little less, for example 9 MB for a 10 MB limit. Short clips keep the most detail; for a long video, use Trim video first or choose 480p.",
+      "link": {
+        "text": "Trim video",
+        "path": "/trim-video"
+      }
+    }
+  ]
+}

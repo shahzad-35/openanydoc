@@ -1,0 +1,79 @@
+{
+  "title": "Video Converter – MP4, WebM, MOV and MKV, No Upload",
+  "description": "Convert videos between MP4, WebM, MOV and MKV in your browser. Pick H.264, H.265, VP9 or AV1 and a quality. Your video is never uploaded.",
+  "heading": "Convert Videos to MP4, WebM, MOV or MKV",
+  "subtitle": "Change a video to MP4, WebM, MOV or MKV and choose its codec and quality; nothing is uploaded.",
+  "intro": "Turn a video into the format a player, editor or website asks for. Choose MP4, WebM, MOV or MKV, then a video codec and a quality, or leave both on Automatic. The codec list shows only the codecs your browser can actually make, so the choice you see is a choice that works. When the picture is already in the right codec, it is copied as it is, which is quick and loses nothing; otherwise it is re-encoded with the video encoders built into your browser.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is read and converted by your own browser and never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Only codecs that work",
+      "text": "The codec list is built from what your browser can make right now, so you never pick a codec that fails at the end."
+    },
+    {
+      "title": "Copied when it can be",
+      "text": "If the picture already fits the new format, it is moved across untouched: fast, and with no quality lost."
+    }
+  ],
+  "stepsTitle": "How to convert a video",
+  "steps": [
+    {
+      "title": "Choose your video",
+      "text": "Choose or drop a video, or try one of the samples."
+    },
+    {
+      "title": "Pick the format",
+      "text": "Choose MP4, WebM, MOV or MKV, and a codec and quality if you want something other than Automatic."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert. The line above the button says whether the picture is copied or re-encoded."
+    },
+    {
+      "title": "Download",
+      "text": "Play the result on the page, then download it."
+    }
+  ],
+  "handlesTitle": "Formats the video converter handles",
+  "handles": [
+    "Video in: MP4, MOV, WebM, MKV, M4V, OGV and 3GP files your browser can play.",
+    "Video out: MP4, WebM, MOV and MKV.",
+    "Video codecs: H.264, H.265 (HEVC), VP8, VP9 and AV1, as far as your browser can make them.",
+    "Sound: kept, and changed to AAC or Opus when the new format needs it."
+  ],
+  "limits": [
+    "One video at a time: convert it, then choose the next one.",
+    "Which codecs you can make depends on your browser and device; up-to-date Chrome and Edge offer the most.",
+    "Long or 4K videos take a while to re-encode and need enough memory on your device."
+  ],
+  "faqTitle": "Video converter questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your video is read and converted by your own browser, on your device, and is never sent anywhere. You can check it: open your browser's network panel while it converts and you will see no upload."
+    },
+    {
+      "question": "Which format should I choose?",
+      "answer": "MP4 with H.264 plays almost everywhere: phones, TVs, editors and websites. WebM suits web pages, MOV suits Apple editing apps, and MKV is a good box for keeping a video as it is."
+    },
+    {
+      "question": "Why is H.265 or AV1 missing from the list?",
+      "answer": "The list shows only the codecs your browser can make on this device. Many browsers can play H.265 but not make it. A note under the fields names the usual codecs that are missing."
+    },
+    {
+      "question": "Does converting lower the quality?",
+      "answer": "Not when the picture is copied, which the page tells you before you start. When it is re-encoded, Automatic quality looks the same as the original for most videos; choose High or Very high for more detail."
+    },
+    {
+      "question": "Can I convert several videos?",
+      "answer": "Yes, one after another. Convert a video, download it, then choose the next one; the format and codec you picked stay chosen."
+    },
+    {
+      "question": "Is there a size limit?",
+      "answer": "There is no fixed limit; the work happens on your device. Very long or 4K videos need time and memory, so a phone may struggle with what a laptop handles easily."
+    }
+  ]
+}

@@ -125,7 +125,7 @@ export function FormatGrid({ onNavigate }: { onNavigate: (path: string) => void 
         ))}
       <ul id="landing-links-list" aria-label={t('about.moreFileTools')} className="mt-6 flex flex-wrap gap-2">
         {/* The hubs, which list every landing page, converter and tool (too many to show here one by one). */}
-        {['/data-tools', '/pdf-tools', '/image-tools', ALL_TOOLS_PATH].map((hubPath) => (
+        {['/data-tools', '/pdf-tools', '/image-tools', '/video-tools', ALL_TOOLS_PATH].map((hubPath) => (
           <li key={hubPath}>
             <PageLink id={`hub-link-${hubPath.slice(1)}`} path={hubPath} onNavigate={onNavigate} className="pill-link border-2 border-line text-sm">
               {pageSeo[locale][hubPath].linkText}

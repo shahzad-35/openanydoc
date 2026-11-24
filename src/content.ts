@@ -58,7 +58,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     },
     {
       question: 'Which file types can I open?',
-      answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json), Excel (.xlsx, .xls, .xlsm, .ods) Word documents (.docx, .dotx, .docm, .odt), PowerPoint presentations (.pptx, .ppsx, .potx, .pptm, in beta) and PDF files (.pdf) to view. Old .doc and .ppt files are not supported.',
+      answer: 'CSV and tab-separated tables (.csv, .tsv, .tab), plain text (.txt), JSON (.json), Excel (.xlsx, .xls, .xlsm, .ods), Word documents (.docx, .dotx, .docm, .odt), PowerPoint presentations (.pptx, .ppsx, .potx, .pptm, in beta), PDF files (.pdf), pictures (.jpg, .png, .webp, .avif, .gif, .bmp, .heic, .tif, .svg) and videos (.mp4, .mov, .webm, .mkv and more; what plays depends on your browser). Old .doc and .ppt files are not supported.',
     },
     {
       question: 'Can I edit my file and save the changes?',
@@ -92,7 +92,7 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     },
     {
       question: 'ما أنواع الملفات التي يمكنني فتحها؟',
-      answer: 'جداول CSV والجداول المفصولة بعلامة جدولة (.csv و.tsv و.tab)، والنصوص العادية (.txt)، وJSON (.json)، وExcel (.xlsx و.xls و.xlsm و.ods)، ومستندات Word ‏(.docx و.dotx و.docm و.odt)، وعروض PowerPoint ‏(.pptx و.ppsx و.potx و.pptm، نسخة تجريبية)، وملفات PDF ‏(.pdf) للعرض. أما ملفات .doc و.ppt القديمة فغير مدعومة.',
+      answer: 'جداول CSV والجداول المفصولة بعلامة جدولة (.csv و.tsv و.tab)، والنصوص العادية (.txt)، وJSON (.json)، وExcel (.xlsx و.xls و.xlsm و.ods)، ومستندات Word ‏(.docx و.dotx و.docm و.odt)، وعروض PowerPoint ‏(.pptx و.ppsx و.potx و.pptm، نسخة تجريبية)، وملفات PDF ‏(.pdf)، والصور (.jpg و.png و.webp و.avif و.gif و.bmp و.heic و.tif و.svg)، والفيديو (.mp4 و.mov و.webm و.mkv وغيرها؛ ويعتمد التشغيل على متصفحك). أما ملفات .doc و.ppt القديمة فغير مدعومة.',
     },
     {
       question: 'هل يمكنني تحرير ملفي وحفظ التغييرات؟',

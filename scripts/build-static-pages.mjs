@@ -63,7 +63,7 @@ function renderChangelogFooter(locale) {
     .map((viewer) => item(link(`footer-link-${viewer.id}`, viewer.toolPath, t('viewer.name', { format: viewer.label }))))
     .join('')
   const moreItems =
-    [ALL_TOOLS_PATH, '/data-tools', '/pdf-tools', '/image-tools', '/office-tools', '/ai-tools', '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
+    [ALL_TOOLS_PATH, '/data-tools', '/pdf-tools', '/image-tools', '/video-tools', '/office-tools', '/ai-tools', '/guides'].map((address) => item(link(`footer-link-${address.slice(1)}`, address, escapeHtml(pageSeo[locale][address].linkText)))).join('') +
     item(link('footer-link-all-types', '/', t('footer.allTypes')))
   const legalItems =
     legalFooterLinks.map((entry) => item(link(entry.id, entry.path, t(entry.labelKey)))).join('') +
@@ -592,6 +592,10 @@ fs.writeFileSync(
   `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">\n${sitemapEntries.join('\n')}\n</urlset>\n`,
 )
 fs.writeFileSync(path.join(distFolder, 'robots.txt'), `User-agent: *\nAllow: /\n\nSitemap: ${SITE_ORIGIN}/sitemap.xml\n`)
+// llms.txt lists every page by hand, so a new page must be added there too (it was missed twice).
+const llmsText = fs.readFileSync(path.join(projectRoot, 'public', 'llms.txt'), 'utf8')
+const pagesMissingFromLlms = sitemapEntries.map((entry) => /<loc>([^<]+)<\/loc>/.exec(entry)[1]).filter((address) => !llmsText.includes(`(${address})`))
+if (pagesMissingFromLlms.length) throw new Error(`public/llms.txt has no link to ${pagesMissingFromLlms.join(', ')}.`)
 // pdf.js reads these from the site itself, only when a PDF needs them: character maps (CJK), the 14 standard fonts, image
 // decoders (JPEG 2000, JBIG2), colour profiles and annotation icons. QuickJS (PDF JavaScript) is left out: scripting is off.
 const pdfjsFolder = path.join(projectRoot, 'node_modules', 'pdfjs-dist')

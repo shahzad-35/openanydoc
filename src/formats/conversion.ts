@@ -12,6 +12,7 @@ import { columnLabel } from './DataTable'
 import { loadExcelJs } from './excel/excelStyles'
 import { isPlainObject, parseJsonText } from './json/jsonModel'
 import type { JsonValue } from './json/jsonModel'
+import { YAML_TOO_LARGE_MESSAGE, isYamlWithinSizeLimit } from './json/jsonFormats'
 import { isBigNumber } from './json/jsonTools'
 import { buildDownloadName } from './registry'
 
@@ -121,6 +122,7 @@ async function readMarkupTable(file: File, convertTo: ConversionTarget, locale: 
     } else {
       const { CORE_SCHEMA, load } = await import('js-yaml')
       value = (load(text, { schema: CORE_SCHEMA }) ?? null) as JsonValue
+      if (!isYamlWithinSizeLimit(value)) throw new Error(YAML_TOO_LARGE_MESSAGE)
     }
     const rows = readJsonRecordsAsTable(findFirstRecordList(value))
     return rows ? { status: 'ok', tables: [{ sheetName: '', rows }] } : { status: 'error', message: translate(locale, 'convert.notATable') }

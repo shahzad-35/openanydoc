@@ -9,6 +9,21 @@ import { findReleasedFormat, getFormatCapabilities, getReleasedFormats } from '.
 
 // The file chooser lists each extension's media types as well: iOS Safari and Android Chrome match files by type, and leave
 // some greyed out when given only an extension they cannot map (.tsv, .json on older iOS). Android labels CSV either way.
+// Word, Excel, PowerPoint and OpenDocument files are ZIP packages. A small one can unpack to gigabytes (a "zip bomb") and run the
+// tab out of memory, so the sizes its file list declares are added up first; nothing is unpacked for this.
+const OFFICE_PACKAGE_EXTENSION = /\.(docx|dotx|docm|xlsx|xlsm|pptx|ppsx|potx|pptm|odt|ods)$/i
+const MAX_UNPACKED_OFFICE_BYTES = 1024 ** 3
+async function unpackedSizeOf(fileContents: ArrayBuffer) {
+  const { unzipSync } = await import('fflate')
+  let total = 0
+  try {
+    unzipSync(new Uint8Array(fileContents), { filter: (entry) => ((total += entry.originalSize), false) })
+  } catch {
+    // Not a readable ZIP: the viewer reports that itself.
+  }
+  return total
+}
+
 const PICKER_MIME_TYPES: Record<string, string[]> = {
   '.jpg': ['image/jpeg'],
   '.jpeg': ['image/jpeg'],
@@ -22,6 +37,19 @@ const PICKER_MIME_TYPES: Record<string, string[]> = {
   '.tif': ['image/tiff'],
   '.tiff': ['image/tiff'],
   '.svg': ['image/svg+xml'],
+  '.mp4': ['video/mp4'],
+  '.m4v': ['video/x-m4v', 'video/mp4'],
+  '.mov': ['video/quicktime'],
+  '.webm': ['video/webm'],
+  '.mkv': ['video/x-matroska'],
+  '.avi': ['video/x-msvideo'],
+  '.ogv': ['video/ogg'],
+  '.3gp': ['video/3gpp'],
+  '.mp3': ['audio/mpeg'],
+  '.m4a': ['audio/mp4'],
+  '.wav': ['audio/wav'],
+  '.ogg': ['audio/ogg'],
+  '.aac': ['audio/aac'],
   '.csv': ['text/csv', 'text/comma-separated-values'],
   '.tsv': ['text/tab-separated-values'],
   '.txt': ['text/plain'],
@@ -160,6 +188,11 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
     try {
       const fileContents = await file.arrayBuffer()
       setLargeFileWarning(null)
+      if (OFFICE_PACKAGE_EXTENSION.test(file.name) && (await unpackedSizeOf(fileContents)) > MAX_UNPACKED_OFFICE_BYTES) {
+        setErrorMessage(t('intake.unpacksTooLarge'))
+        setErrorDetail(t('intake.unpacksTooLargeDetail'))
+        return
+      }
       onFileLoaded(file, fileContents)
     } catch {
       setErrorMessage(t('intake.readFailed'))

@@ -1,6 +1,6 @@
 # OpenAnyDoc
 
-**Free, open-source viewer, editor and converter for CSV, Excel, JSON and TXT files, a viewer for Word, PowerPoint, PDF and image files, and a set of PDF and image tools. Files stay in your browser: nothing is uploaded.**
+**Free, open-source set of file tools that runs in your browser: a viewer, editor and converter for CSV, Excel, JSON and TXT files, viewers for Word, PowerPoint, PDF, image and video files, and PDF, Office, image, video and AI tools. Files stay in your browser: nothing is uploaded.**
 
 Live site: **https://www.openanydoc.com** (English) · https://www.openanydoc.com/ar (Arabic)
 

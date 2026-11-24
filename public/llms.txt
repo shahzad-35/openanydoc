@@ -1,15 +1,28 @@
 # OpenAnyDoc
 
-> OpenAnyDoc is a free, open-source viewer, editor and converter for CSV, Excel (XLSX, XLS, XLSM, ODS), JSON and TXT files, a viewer for Word documents (DOCX), PowerPoint slides (PPTX), PDF files and pictures, and a set of PDF and image tools, that runs in your browser: files are never uploaded. No account, no cookies, no analytics. English and Arabic. MIT licence.
+> OpenAnyDoc is a free, open-source set of file tools that runs in your browser: a viewer, editor and converter for CSV, Excel, JSON and TXT files, viewers for Word, PowerPoint, PDF, image and video files, and PDF, Office, image, video and AI tools. Files are never uploaded. No account, no cookies, no analytics. English and Arabic. MIT licence.
 
 How it keeps files private: the site's Content-Security-Policy is `default-src 'self'; connect-src 'self'`, so the browser refuses any request to another origin, and an automated test suite fails the build if any page makes a network request or writes browser storage beyond the theme choice. Anyone can confirm this in the browser's Network tab while opening a file.
 
-What it handles: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows; Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx; JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify; plain text with encoding and line-ending choices; Word .docx, .dotx and .docm documents (macros are never run) and OpenDocument .odt text shown as pages with fonts, tables, images, lists, headers and footers, right-to-left Arabic, zoom, and print or save as PDF, plus a navigation pane from the headings, search with highlighted matches, word and page counts with the author and dates, comments and tracked changes in the margin (read only), a reading mode with larger text and dark pages, read aloud with the voices installed on the device, and export as plain text, Markdown or HTML or all pictures as a ZIP (to change a document, use the Word tools below; old .doc files are not supported); PowerPoint .pptx, .ppsx, .potx and .pptm presentations in beta (macros are never run), one slide at a time with text, images, tables and shapes, thumbnails, a grid of all slides, arrow keys and full screen, plus speaker notes, a presenter view with the current and next slide, notes and a timer while the audience sees the slide in a second window, search across slides and notes, read aloud with the voices installed on the device, an outline export as Markdown or text, slides saved as PNG pictures, and print or save as PDF (animations are not played; to change a presentation, use the PowerPoint tools below; old .ppt files are not supported). Microsoft's standalone PowerPoint Viewer has been retired; this page opens .pptx files without installing anything. Files download back in their own format, or convert between formats: Excel to CSV or JSON, CSV to Excel or JSON, and JSON to CSV with nested objects flattened into dot-notation columns. The JSON viewer also opens JSON Lines, JSON5, YAML and GeoJSON, shows a graph of the document, compares two documents, validates against a JSON Schema (and writes one), runs JSONPath queries live, converts to YAML, XML or TypeScript interfaces, and can open a file from an https address you type (your browser fetches it directly). The Excel viewer also shows frozen panes, hidden rows, columns and sheets, notes and links, has column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compares two sheets or two workbooks, splits a workbook into one file per sheet, merges sheets from several workbooks, saves every sheet as CSV in one ZIP, prints or saves a sheet as PDF, and reports what a workbook holds (macros are detected and never run; workbooks encrypted with a password to open can't be opened, while sheet protection can be removed with Unprotect Excel). The CSV viewer also opens Parquet files (read only), has a filter row under the headers, a health check (mixed types, spaces, repeated rows), a quick bar, line or pie chart, SQL queries in the browser, and saves what you see as Excel, Markdown, HTML or SQL INSERT statements, or as a zip of smaller CSV files. Sensitive data in CSV, Excel, JSON and TXT files can be masked before sharing, on the Mask data page or with the Mask button in the CSV, Excel and JSON viewers. PDF tools: merge, split, remove or extract pages, organize (reorder, rotate, delete, duplicate, blank pages), rotate and number PDFs, turn JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and HEIC pictures into a PDF, save PDF pages as JPG or PNG, get a PDF's text as .txt, save the pictures inside a PDF as a ZIP, add text boxes, highlights, drawings, shapes and pictures to a PDF, sign it with a drawn, typed or uploaded signature (a visual signature, not a certificate-based digital signature), fill in PDF forms (optionally flattened), add watermarks, headers and footers, compress, flatten, make grayscale, remove metadata, redact, compare, repair, OCR, translate, convert to and from Word, Excel and PowerPoint, and protect or unlock with a password (a PDF with a password to open needs Unlock PDF first, with the password). The PDF viewer shows PDFs as continuous pages with thumbnails, zoom, fit to width, rotation, go to page, search with highlights, selectable text (Arabic included), and a password prompt that stays on the device (view only; scanned PDFs have no text to search until OCR PDF adds a text layer). Image tools work on many pictures at once (one ZIP): compress JPG, PNG, WebP and AVIF with high-quality encoders and a before/after slider, resize by pixels, percent or ready sizes (Instagram, WhatsApp, passport photos at 300 dpi), crop (fixed ratios or a transparent circle), rotate and flip, add a text or logo watermark, remove GPS, camera and date metadata (JPG, PNG and WebP pixels unchanged), edit a photo (brightness, contrast, saturation, warmth, filters, text, with undo), convert between JPG, PNG, WebP and AVIF from HEIC, TIFF, SVG, GIF and BMP too, and make memes with Arabic captions. The image viewer opens JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF and SVG with zoom and the camera, date and GPS details. iPhone HEIC photos are decoded in the browser too.
+What it handles:
+
+- CSV: CSV, TSV and tab files with automatic delimiter and encoding detection (UTF-8, UTF-16, Windows-1256) and 100,000+ rows. The CSV viewer also opens Parquet files (read only), has a filter row under the headers, a health check (mixed types, spaces, repeated rows), a quick bar, line or pie chart, SQL queries in the browser, and saves what you see as Excel, Markdown, HTML or SQL INSERT statements, or as a zip of smaller CSV files.
+- Excel: Excel workbooks with every sheet, formulas that recalculate, number formats, merged cells and cell styles for .xlsx. The Excel viewer also shows frozen panes, hidden rows, columns and sheets, notes and links, has column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compares two sheets or two workbooks, splits a workbook into one file per sheet, merges sheets from several workbooks, saves every sheet as CSV in one ZIP, prints or saves a sheet as PDF, and reports what a workbook holds (macros are detected and never run; workbooks encrypted with a password to open can't be opened, while sheet protection can be removed with Unprotect Excel).
+- JSON: JSON up to 10 MB with tree, table and text views, a validator that reports the line and column of an error, repair, format and minify. The JSON viewer also opens JSON Lines, JSON5, YAML and GeoJSON, shows a graph of the document, compares two documents, validates against a JSON Schema (and writes one), runs JSONPath queries live, converts to YAML, XML or TypeScript interfaces, and can open a file from an https address you type (your browser fetches it directly).
+- Text: Plain text with encoding and line-ending choices.
+- Word: Word .docx, .dotx and .docm documents (macros are never run) and OpenDocument .odt text shown as pages with fonts, tables, images, lists, headers and footers, right-to-left Arabic, zoom, and print or save as PDF, plus a navigation pane from the headings, search with highlighted matches, word and page counts with the author and dates, comments and tracked changes in the margin (read only), a reading mode with larger text and dark pages, read aloud with the voices installed on the device, and export as plain text, Markdown or HTML or all pictures as a ZIP (to change a document, use the Word tools below; old .doc files are not supported).
+- PowerPoint: PowerPoint .pptx, .ppsx, .potx and .pptm presentations in beta (macros are never run), one slide at a time with text, images, tables and shapes, thumbnails, a grid of all slides, arrow keys and full screen, plus speaker notes, a presenter view with the current and next slide, notes and a timer while the audience sees the slide in a second window, search across slides and notes, read aloud with the voices installed on the device, an outline export as Markdown or text, slides saved as PNG pictures, and print or save as PDF (animations are not played; to change a presentation, use the PowerPoint tools below; old .ppt files are not supported). Microsoft's standalone PowerPoint Viewer has been retired; this page opens .pptx files without installing anything.
+- Conversions: Files download back in their own format, or convert between formats: Excel to CSV or JSON, CSV to Excel or JSON, and JSON to CSV with nested objects flattened into dot-notation columns.
+- Mask data: Sensitive data in CSV, Excel, JSON and TXT files can be masked before sharing, on the Mask data page or with the Mask button in the CSV, Excel and JSON viewers.
+- PDF tools: merge, split, remove or extract pages, organize (reorder, rotate, delete, duplicate, blank pages), rotate and number PDFs, turn JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and HEIC pictures into a PDF, save PDF pages as JPG or PNG, get a PDF's text as .txt, save the pictures inside a PDF as a ZIP, add text boxes, highlights, drawings, shapes and pictures to a PDF, sign it with a drawn, typed or uploaded signature (a visual signature, not a certificate-based digital signature), fill in PDF forms (optionally flattened), add watermarks, headers and footers, compress, flatten, make grayscale, remove metadata, redact, compare, repair, OCR, translate, convert to and from Word, Excel and PowerPoint, and protect or unlock with a password (a PDF with a password to open needs Unlock PDF first, with the password).
+- PDF viewer: The PDF viewer shows PDFs as continuous pages with thumbnails, zoom, fit to width, rotation, go to page, search with highlights, selectable text (Arabic included), and a password prompt that stays on the device (view only; scanned PDFs have no text to search until OCR PDF adds a text layer).
+- Images: Image tools work on many pictures at once (one ZIP): compress JPG, PNG, WebP and AVIF with high-quality encoders and a before/after slider, resize by pixels, percent or ready sizes (Instagram, WhatsApp, passport photos at 300 dpi), crop (fixed ratios or a transparent circle), rotate and flip, add a text or logo watermark, remove GPS, camera and date metadata (JPG, PNG and WebP pixels unchanged), edit a photo (brightness, contrast, saturation, warmth, filters, text, with undo), convert between JPG, PNG, WebP and AVIF from HEIC, TIFF, SVG, GIF and BMP too, and make memes with Arabic captions. The image viewer opens JPG, PNG, WebP, AVIF, GIF, BMP, HEIC, TIFF and SVG with zoom and the camera, date and GPS details. iPhone HEIC photos are decoded in the browser too.
+- Video: convert MOV, WebM and MKV to MP4 with H.264 picture and AAC sound, compress by quality level or to a target size, resize, trim, crop, rotate, flip, merge, loop, change the speed, mute, add sound or text, blur an area, turn a video into a GIF, an MP3 or still frames, turn PowerPoint slides into an MP4, play videos with their codec details, and record the screen or the webcam. The video encoders built into the browser do the work, so which videos can be read or made depends on the browser: Chrome and Edge read the most, Safari reads HEVC from iPhones, and Firefox reads a little less. When a codec can't be read or made, the page names it and suggests one that works.
 
 ## Answers
 
 - Is my file uploaded? No. The browser reads and changes it on the device. The page's Content-Security-Policy lets it contact only its own site, plus one exception: the JSON page's "Open from a URL" fetches the https address the visitor types. How to verify: https://www.openanydoc.com/en/check-file-upload
-- Which formats? .csv, .tsv, .tab, .parquet, .xlsx, .xls, .xlsm, .ods, .json, .jsonl, .txt, .docx, .dotx, .docm, .odt, .pptx, .ppsx, .potx, .pptm and .pdf. Word and PowerPoint files can be viewed, converted (to PDF, JPG, Markdown), merged, split, watermarked, compared and cleaned of metadata. Not old .doc or .ppt files. JPG to PDF also takes .jpg, .png, .webp, .tif and .svg pictures.
+- Which formats? Tables and text: .csv, .tsv, .tab, .parquet, .xlsx, .xls, .xlsm, .ods, .json, .jsonl and .txt. Documents: .docx, .dotx, .docm, .odt, .pptx, .ppsx, .potx, .pptm and .pdf. Pictures: .jpg, .png, .webp, .avif, .gif, .bmp, .heic, .tif and .svg. Videos: .mp4, .mov, .webm, .mkv, .m4v, .avi, .ogv and .3gp (which ones play depends on the codecs in the browser). Word and PowerPoint files can be viewed, converted (to PDF, JPG and Markdown, and PowerPoint to video), merged, split, watermarked, compared and cleaned of metadata. Not old .doc or .ppt files.
 - Word to PDF? Yes: Word to PDF (https://www.openanydoc.com/en/word-to-pdf) saves .docx, .dotx, .docm and .odt documents as PDF pages at 200 dpi with searchable text, Arabic included, in the browser. Old .doc files: save them as .docx first.
 - Compress a PDF? Yes: Compress PDF (https://www.openanydoc.com/en/compress-pdf) re-saves the pictures inside as JPEG at quality 85, 70 or 50 (High quality, Balanced, Smallest), recompresses the rest without loss and removes unused objects; it shows the size before and after, and if the copy isn't smaller you keep the original. Picture resolution is not lowered.
 - How big a file? CSV has no fixed limit (a 120,000-row file opens in under a second; a warning above 50 MB). JSON up to 10 MB. Excel cell styles are read for files up to 8 MB.
@@ -17,7 +30,7 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - Offline? Yes. After the first visit, each tool page and its viewer are kept by the browser (a service worker), so files open and edit with no network; AI tools work offline after their first use. It can be installed as an app (Chrome, Edge, Android; Add to Home Screen on iPhone and iPad), which opens files from the desktop and takes files shared on Android.
 - Does it change my original file? No. Edits stay in the page's memory until you download a copy.
 - Price? Free, with no account, plans or ads.
-- Can I try it without a file? Yes. Every tool page has two "Try a sample file" buttons with small made-up files (Arabic text, a workbook with three sheets, a 150,000-row CSV, a short Word document, three slides), opened in the browser like any other file.
+- Can I try it without a file? Yes. Every tool page has two "Try a sample file" buttons with small made-up files (Arabic text, a workbook with three sheets, a 150,000-row CSV, a short Word document, three slides, short MP4 clips), opened in the browser like any other file.
 - Can I hide personal data before sharing a file or pasting it into an AI assistant? Yes. The Mask data tool finds names, emails, phone numbers, Saudi national ID and Iqama numbers, IBANs and card numbers in CSV, Excel, JSON and TXT files and replaces them with consistent tokens (EMAIL-000001), partial masks (****1234) or removes the field, in the browser. An optional private key file restores the tokens later. https://www.openanydoc.com/en/mask-data
 
 - Can I edit a PDF? Yes: Edit PDF (https://www.openanydoc.com/en/edit-pdf) adds text boxes, highlights, freehand drawing, shapes and pictures, with undo and redo. Text already in the PDF cannot be rewritten; cover it with a white rectangle and type over it.
@@ -27,6 +40,10 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - Password-protected PDFs? The PDF viewer opens them after you type the password (it stays on the device). The other PDF tools need the password removed first: Unlock PDF does that in the browser when you know the password (it does not guess passwords). https://www.openanydoc.com/en/unlock-pdf
 - Scanned PDFs? They open and can be merged, split, rotated, signed and watermarked, but they hold pictures, not text. OCR PDF reads their words (English or Arabic) on the device and adds a searchable text layer; then PDF to text, PDF to Word and the other converters can use them. https://www.openanydoc.com/en/ocr-pdf
 - Arabic PDFs? Text is searched, selected and extracted in reading order; page numbers, headers and watermarks can use Arabic words and Arabic-Indic digits.
+- Compress a video without uploading it? Yes: Compress video (https://www.openanydoc.com/en/compress-video) makes a video smaller by quality level (Smallest file, Small file, Balanced, Best picture) or to a size you type in MB, optionally lowered to 1080p, 720p or 480p, and shows an estimate first. It keeps at least about 150 kbps for the picture and 96 kbps for the sound; when a size is too small for that, it names the smallest size it can make.
+- Convert MOV, WebM or MKV to MP4? Yes: MOV to MP4, WebM to MP4 and MKV to MP4 give an MP4 with H.264 picture and AAC sound. A MOV that already holds H.264 is copied without re-encoding. iPhone HEVC videos need a browser that can read HEVC: Safari, or Chrome or Edge on a computer with hardware HEVC support.
+- Record my screen without installing anything? Yes, on a computer: Screen recorder (https://www.openanydoc.com/en/screen-recorder) records the whole screen, a window or a tab, with the tab's sound and the microphone mixed into one track, as MP4 (H.264) where the browser can make it, otherwise WebM. Phone browsers don't let pages record the screen.
+- Which browsers do the video tools work in? They use the video encoders built into the browser: Chrome and Edge read and make the most formats, Safari reads iPhone HEVC, and Firefox reads a little less. When a codec can't be read or made, the page names it and suggests one that works.
 
 ## Pricing
 
@@ -144,7 +161,17 @@ What it handles: CSV, TSV and tab files with automatic delimiter and encoding de
 - [Remove background](https://www.openanydoc.com/en/remove-background): cut out a person or an object on the device, transparent PNG or white
 - [Upscale image (beta)](https://www.openanydoc.com/en/upscale-image): 2× or 4× with an on-device AI model, up to 1,024 px input
 - [Image to text](https://www.openanydoc.com/en/image-to-text): the text of photos, scans and screenshots (English, Arabic), read on the device; copy or download as .txt or .md
-- [All tools](https://www.openanydoc.com/en/all-tools), grouped as [PDF tools](https://www.openanydoc.com/en/pdf-tools), [Image tools](https://www.openanydoc.com/en/image-tools), [Data tools](https://www.openanydoc.com/en/data-tools) and [Office tools](https://www.openanydoc.com/en/office-tools)
+- [Video player](https://www.openanydoc.com/en/video-player): plays a local video and lists its container, length, picture size, frame rate, video and sound codecs and bitrates, and whether this browser can play it
+- [Video converter](https://www.openanydoc.com/en/video-converter): to MP4, WebM, MOV or MKV with a codec and quality choice (only codecs this browser can make are offered), plus [MOV to MP4](https://www.openanydoc.com/en/mov-to-mp4), [WebM to MP4](https://www.openanydoc.com/en/webm-to-mp4) and [MKV to MP4](https://www.openanydoc.com/en/mkv-to-mp4), which give H.264 picture and AAC sound
+- [Compress video](https://www.openanydoc.com/en/compress-video): by quality level or to a target size in MB, optionally at 1080p, 720p or 480p, with an estimate first
+- [Trim video](https://www.openanydoc.com/en/trim-video), [Crop video](https://www.openanydoc.com/en/crop-video) (free, 1:1, 9:16, 16:9, 4:5), [Rotate video](https://www.openanydoc.com/en/rotate-video), [Flip video](https://www.openanydoc.com/en/flip-video) and [Resize video](https://www.openanydoc.com/en/resize-video) (1080p to 360p, square, Story or custom); turns and flips are saved in the pixels
+- [Merge videos](https://www.openanydoc.com/en/merge-videos), [Loop video](https://www.openanydoc.com/en/loop-video), [Change video speed](https://www.openanydoc.com/en/change-video-speed) (0.25× to 4×; sound changes pitch with speed), [Mute video](https://www.openanydoc.com/en/mute-video) and [Add audio to video](https://www.openanydoc.com/en/add-audio-to-video) (replace the sound with an MP3, M4A, WAV, OGG or AAC file)
+- [Add text to video](https://www.openanydoc.com/en/add-text-to-video) (English or Arabic, nine positions, shown for a chosen time) and [Blur part of a video](https://www.openanydoc.com/en/blur-video-area) (fixed boxes; they do not follow moving objects)
+- [Video to MP3](https://www.openanydoc.com/en/video-to-mp3) (128 to 320 kbps, or M4A, WAV, OGG), [Video to GIF](https://www.openanydoc.com/en/video-to-gif) (up to 30 seconds) and [Extract video frames](https://www.openanydoc.com/en/extract-video-frames) (PNG or JPG, in a ZIP)
+- [PowerPoint to video](https://www.openanydoc.com/en/pptx-to-video): slides as an MP4 or WebM at 1080p or 720p with the seconds per slide you choose (no animations or sound)
+- [Screen recorder](https://www.openanydoc.com/en/screen-recorder) and [Webcam recorder](https://www.openanydoc.com/en/webcam-recorder): record in the browser with optional microphone; the recording stays on the device
+- Video tools use the video encoders built into the browser, so what a page can read or make depends on the browser (Chrome and Edge read the most); when a codec can't be read or made, the page names it and suggests one that works.
+- [All tools](https://www.openanydoc.com/en/all-tools), grouped as [PDF tools](https://www.openanydoc.com/en/pdf-tools), [Image tools](https://www.openanydoc.com/en/image-tools), [Video tools](https://www.openanydoc.com/en/video-tools), [Data tools](https://www.openanydoc.com/en/data-tools) and [Office tools](https://www.openanydoc.com/en/office-tools)
 
 ## Guides
 
@@ -278,6 +305,31 @@ Every page has an Arabic version under /ar with the same address, for example:
 - [ضغط الصور](https://www.openanydoc.com/ar/compress-image)
 - [تغيير حجم الصور](https://www.openanydoc.com/ar/resize-image)
 - [تحويل HEIC إلى JPG](https://www.openanydoc.com/ar/heic-to-jpg)
+- [أدوات الفيديو](https://www.openanydoc.com/ar/video-tools)
+- [مشغل الفيديو](https://www.openanydoc.com/ar/video-player)
+- [محول الفيديو](https://www.openanydoc.com/ar/video-converter)
+- [تحويل MOV إلى MP4](https://www.openanydoc.com/ar/mov-to-mp4)
+- [تحويل WebM إلى MP4](https://www.openanydoc.com/ar/webm-to-mp4)
+- [تحويل MKV إلى MP4](https://www.openanydoc.com/ar/mkv-to-mp4)
+- [ضغط الفيديو](https://www.openanydoc.com/ar/compress-video)
+- [تغيير حجم الفيديو](https://www.openanydoc.com/ar/resize-video)
+- [قص الفيديو](https://www.openanydoc.com/ar/trim-video)
+- [اقتصاص الفيديو](https://www.openanydoc.com/ar/crop-video)
+- [تدوير الفيديو](https://www.openanydoc.com/ar/rotate-video)
+- [قلب الفيديو](https://www.openanydoc.com/ar/flip-video)
+- [دمج مقاطع الفيديو](https://www.openanydoc.com/ar/merge-videos)
+- [تكرار الفيديو](https://www.openanydoc.com/ar/loop-video)
+- [تغيير سرعة الفيديو](https://www.openanydoc.com/ar/change-video-speed)
+- [كتم صوت الفيديو](https://www.openanydoc.com/ar/mute-video)
+- [إضافة صوت إلى الفيديو](https://www.openanydoc.com/ar/add-audio-to-video)
+- [إضافة نص إلى الفيديو](https://www.openanydoc.com/ar/add-text-to-video)
+- [تمويه جزء من الفيديو](https://www.openanydoc.com/ar/blur-video-area)
+- [تحويل الفيديو إلى MP3](https://www.openanydoc.com/ar/video-to-mp3)
+- [تحويل الفيديو إلى GIF](https://www.openanydoc.com/ar/video-to-gif)
+- [استخراج إطارات الفيديو](https://www.openanydoc.com/ar/extract-video-frames)
+- [تحويل PowerPoint إلى فيديو](https://www.openanydoc.com/ar/pptx-to-video)
+- [مسجّل الشاشة](https://www.openanydoc.com/ar/screen-recorder)
+- [مسجّل الكاميرا](https://www.openanydoc.com/ar/webcam-recorder)
 - [إزالة بيانات الصور](https://www.openanydoc.com/ar/remove-image-metadata)
 - [صانع الميمز](https://www.openanydoc.com/ar/meme-generator)
 - [تمويه الوجوه](https://www.openanydoc.com/ar/blur-face)
@@ -393,6 +445,25 @@ Every page has an Arabic version under /ar with the same address, for example:
 - [تحويل Excel إلى JSON](https://www.openanydoc.com/ar/excel-to-json)
 - [عارض XLS](https://www.openanydoc.com/ar/xls-viewer)
 - [محرر TXT](https://www.openanydoc.com/ar/txt-viewer)
+- [أدوات PDF](https://www.openanydoc.com/ar/pdf-tools)
+- [أدوات البيانات](https://www.openanydoc.com/ar/data-tools)
+- [أدوات المكتب](https://www.openanydoc.com/ar/office-tools)
+- [أدوات جاهزة للذكاء الاصطناعي](https://www.openanydoc.com/ar/ai-tools)
+- [كل الأدوات](https://www.openanydoc.com/ar/all-tools)
+- [كيف تتحقق من أن الموقع لا يرفع ملفك](https://www.openanydoc.com/ar/check-file-upload)
+- [ملف CSV يُفتح في عمود واحد في Excel: كيف تصلح الفاصل](https://www.openanydoc.com/ar/csv-opens-in-one-column)
+- [ملف CSV أكبر من أن يفتحه Excel: حد 1,048,576 صفًا وما تفعله](https://www.openanydoc.com/ar/csv-too-big-for-excel)
+- [أخطاء JSON "unexpected token": اعثر على السطر وأصلحه](https://www.openanydoc.com/ar/json-unexpected-token)
+- [كيف تفتح ملف JSON](https://www.openanydoc.com/ar/open-json-file)
+- [كيف تفتح ملف XLSX بدون Excel](https://www.openanydoc.com/ar/open-xlsx-without-excel)
+- [CSV أم Excel أم JSON: الفروق ومتى تستخدم كلًا منها](https://www.openanydoc.com/ar/csv-vs-excel-vs-json)
+- [كيف تخفي البيانات الشخصية في ملف CSV أو Excel قبل مشاركته](https://www.openanydoc.com/ar/anonymize-data-before-sharing)
+- [كيف توقّع ملف PDF بدون Adobe](https://www.openanydoc.com/ar/sign-pdf-without-adobe)
+- [أدوات PDF لا ترفع ملفك](https://www.openanydoc.com/ar/pdf-tools-without-upload)
+- [عن OpenAnyDoc](https://www.openanydoc.com/ar/about)
+- [سياسة الخصوصية](https://www.openanydoc.com/ar/privacy)
+- [شروط الاستخدام](https://www.openanydoc.com/ar/terms)
+- [سجل التحديثات](https://www.openanydoc.com/ar/changelog)
 
 ## Tested limits
 
@@ -405,9 +476,23 @@ Measured on OpenAnyDoc's own pages (checked 20 November 2026); results depend on
 - CSV, Excel and text files over 50 MB show a warning first and still open if the device has the memory.
 - Upscale image: pictures up to 1,024 pixels on the long side for 2×, 512 for 4×.
 
+## Video settings (from the tools' own limits)
+
+These are the limits set in the tools, not measurements.
+
+- Video to GIF: up to 30 seconds, 240 to 640 pixels wide; a warning above 300 frames.
+- Extract video frames: up to 500 pictures per ZIP, every 1 to 60 seconds or spread evenly, PNG or JPG.
+- Loop video: up to 10 minutes long.
+- Change video speed: 0.25× to 4× (sound changes pitch with speed).
+- Video to MP3: 128, 192, 256 or 320 kbps.
+- Compress video: no lower than about 150 kbps for the picture and 96 kbps for the sound.
+- PowerPoint to video: 1 to 30 seconds per slide, 1080p or 720p.
+
 ## About
 
+- [OpenAnyDoc home](https://www.openanydoc.com/en)
 - [About OpenAnyDoc](https://www.openanydoc.com/en/about)
+- [Changelog: what's new](https://www.openanydoc.com/en/changelog)
 - [Privacy](https://www.openanydoc.com/en/privacy)
 - [Terms](https://www.openanydoc.com/en/terms)
 - [Source code on GitHub](https://github.com/shahzad-35/openanydoc)

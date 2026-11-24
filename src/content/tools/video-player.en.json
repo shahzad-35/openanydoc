@@ -1,0 +1,141 @@
+{
+  "title": "Video Player Online – Play MP4, WebM, MOV & MKV Files",
+  "description": "Play a video file in your browser and see its codec, resolution, frame rate, bitrate and sound details. Save any frame as a PNG. Free, nothing uploaded.",
+  "heading": "Online Video Player with Codec Details",
+  "subtitle": "Drop a video to play it and see what codec, size and sound it uses; nothing is uploaded.",
+  "intro": "Play a clip from your phone, camera or a download without installing a player, and find out what is inside the file: the container, the video and audio codecs with their exact codec strings, the picture size, rotation, frame rate, bitrates, sample rate and channels. The page also tells you whether this browser can play the picture and the sound, which explains why a file shows a black screen or plays silently. Slow it down to 0.5× or speed it up to 2×, loop it, and save the frame you are watching as a PNG picture.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The video is played and read by your own browser and is never sent to a server, so a private clip stays on your device."
+    },
+    {
+      "title": "Every detail",
+      "text": "Codec names with their codec strings, picture size, rotation, frame rate, bitrates, sample rate and channels in one table."
+    },
+    {
+      "title": "Save a frame",
+      "text": "Pause on the moment you want and save it as a full-size PNG picture, ready to share or put in a document."
+    }
+  ],
+  "stepsTitle": "How to play a video and see its details",
+  "steps": [
+    {
+      "title": "Add your video",
+      "text": "Choose or drop one video, or several to switch between them."
+    },
+    {
+      "title": "Play it",
+      "text": "Use the player, change the speed between 0.5× and 2×, or turn on Loop."
+    },
+    {
+      "title": "Read the details",
+      "text": "The table under the player lists the container, codecs, picture size, frame rate, bitrates and sound."
+    },
+    {
+      "title": "Save a frame",
+      "text": "Pause where you like and click Save this frame to download it as a PNG."
+    }
+  ],
+  "handlesTitle": "What the video player handles",
+  "handles": [
+    "Files: MP4, M4V, MOV, WebM, MKV, OGV, 3GP and AVI.",
+    "Video codecs your browser plays, usually H.264, VP8, VP9 and AV1, and H.265 (HEVC) on many computers and phones.",
+    "Sound: AAC, Opus, MP3, Vorbis, FLAC and PCM, with the sample rate and the number of channels.",
+    "Details are read from the file even when the browser can't play its picture, so you can see why."
+  ],
+  "limits": [
+    "A video plays only if your browser has a decoder for its codec; the page says so when it doesn't.",
+    "AVI files and old codecs such as MPEG-4 Part 2 or WMV usually can't be read.",
+    "Bitrates are averages over the file; a file that doesn't state them shows Not stated."
+  ],
+  "faqTitle": "Video player: questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser plays the video and reads its details on your device; nothing is sent anywhere. You can check it in your browser's network panel: no upload appears while you use the page."
+    },
+    {
+      "question": "Why does my video play with no picture or no sound?",
+      "answer": "The file uses a codec this browser can't decode. The details table shows which one, and the last row says whether the picture and the sound can be played. Converting the video to MP4 with H.264 and AAC makes it play almost everywhere."
+    },
+    {
+      "question": "How do I find a video's codec?",
+      "answer": "Open the video here. The Video codec row shows the common name, like H.264, followed by the exact codec string, like avc1.640028, which says the profile and level."
+    },
+    {
+      "question": "Can I play HEVC (H.265) or MKV files?",
+      "answer": "MKV files open when the video inside uses a codec your browser plays. HEVC plays in Safari and in Chrome or Edge on most computers and phones with hardware support; where it doesn't, the page tells you."
+    },
+    {
+      "question": "How do I save a still picture from a video?",
+      "answer": "Pause the video on the moment you want and click Save this frame. You get a PNG at the video's full resolution. To save many frames at once, use Extract video frames.",
+      "link": {
+        "text": "Extract video frames",
+        "path": "/extract-video-frames"
+      }
+    },
+    {
+      "question": "Is it free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how many videos you play."
+    }
+  ],
+  "comparison": {
+    "title": "Video player compared with your computer's built-in player and upload-based players",
+    "columns": [
+      "OpenAnyDoc",
+      "Your computer's built-in player",
+      "Upload-based online players"
+    ],
+    "rows": [
+      {
+        "label": "Your file is uploaded",
+        "cells": [
+          "No. It is played in your browser.",
+          "No.",
+          "Yes, to the service's server."
+        ]
+      },
+      {
+        "label": "Install",
+        "cells": [
+          "None.",
+          "Comes with the system.",
+          "None."
+        ]
+      },
+      {
+        "label": "Codec, frame rate and bitrate in one table",
+        "cells": [
+          "Yes, under the player.",
+          "Varies by player.",
+          "Varies by service."
+        ]
+      },
+      {
+        "label": "Says why a video has no picture or no sound",
+        "cells": [
+          "Yes, it names the codec this browser can't play.",
+          "Varies by player.",
+          "Varies by service."
+        ]
+      },
+      {
+        "label": "Save the current frame as a PNG",
+        "cells": [
+          "Yes, at full resolution.",
+          "Varies by player.",
+          "Varies by service."
+        ]
+      },
+      {
+        "label": "Cost",
+        "cells": [
+          "Free, no ads.",
+          "Free.",
+          "Varies by service."
+        ]
+      }
+    ]
+  }
+}

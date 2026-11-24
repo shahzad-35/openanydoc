@@ -1,0 +1,80 @@
+{
+  "title": "Add Text to Video Online – Free Captions, No Upload",
+  "description": "Put a title, caption or note on a video in English or Arabic. Pick size, colour and place, choose when it shows, and save. Free, with no upload.",
+  "heading": "Add Text to a Video",
+  "subtitle": "Type your words, place them on the video and save; the video never leaves your device.",
+  "intro": "Add a title to the start of a clip, a caption under a speaker, or a date in a corner. Type one line or several, choose the size and colour, put a dark box behind the words if the picture is busy, and drag the text where you want it or pick one of nine places. Set the time it appears and the time it goes, check it on any frame of the preview, then save a new video with the words drawn into the picture.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is read and saved by your own browser and is never sent to a server, so nobody else sees it."
+    },
+    {
+      "title": "Arabic and English",
+      "text": "Arabic letters join and run right to left, and you can mix Arabic and English lines in one caption."
+    },
+    {
+      "title": "What you see is what you get",
+      "text": "The preview draws the very picture that goes into the video, at the video's own size."
+    }
+  ],
+  "stepsTitle": "How to add text to a video",
+  "steps": [
+    {
+      "title": "Choose your video",
+      "text": "Choose or drop an MP4, MOV, WebM or MKV file."
+    },
+    {
+      "title": "Type and place the text",
+      "text": "Type your words, set size and colour, then drag them on the preview or pick a place."
+    },
+    {
+      "title": "Set when it shows",
+      "text": "Leave the whole video, or type a start and end time for the text."
+    },
+    {
+      "title": "Save the video",
+      "text": "Click Add text and save, then download the new video."
+    }
+  ],
+  "handlesTitle": "Videos and text it handles",
+  "handles": [
+    "Text: one line or several, in English, Arabic or both, with each line running in its own direction.",
+    "Look: size from small to large, any colour, and an optional dark box behind the words.",
+    "Place: nine ready places (corners, edges and centre) or anywhere you drag it.",
+    "Time: from the start to the end, or only between two times you type.",
+    "Formats: MP4, MOV, WebM and MKV keep their format; other videos are saved as MP4."
+  ],
+  "limits": [
+    "One text per video; to add a second one, run the saved video through the tool again.",
+    "The text stays still: it does not move or fade in.",
+    "The video is encoded again, so saving takes about as long as the video plays on slower devices."
+  ],
+  "faqTitle": "Questions about adding text to a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser reads the video, draws the text on each frame and saves the new file on your device. Nothing is sent to a server."
+    },
+    {
+      "question": "Can I write in Arabic?",
+      "answer": "Yes. Arabic letters are joined as they should be and the line runs right to left. A caption can mix an Arabic line and an English line."
+    },
+    {
+      "question": "Can I show the text only for part of the video?",
+      "answer": "Yes. Type the time the text should appear and the time it should go, as 0:05 or in seconds. The rest of the video has no text."
+    },
+    {
+      "question": "Can I turn the text off later?",
+      "answer": "No. The words are drawn into the picture, like burned-in subtitles. Keep your original video if you may want it without text."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "How do I add text to a video?",
+      "answer": "A video editor can put a title over a clip; phone editors and desktop apps all have a text tool. OpenAnyDoc does it in your browser: type the words, place them on the preview, choose when they show and save, without an account or an upload."
+    }
+  ]
+}

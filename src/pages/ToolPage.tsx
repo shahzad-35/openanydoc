@@ -289,7 +289,7 @@ export default function ToolPage({
           )}
           {/* Kept while the result shows (hidden), so an editing tool's edits are still there after "Back to the tool". */}
           {/* A text tool (Base64, JWT, XML viewer) is drawn at once; the others once a file is chosen. */}
-          {hasToolComponent && (chosenFiles.length > 0 || (tool.takesText && hasMounted)) && (
+          {hasToolComponent && (chosenFiles.length > 0 || ((tool.takesText || tool.needsNoFile) && hasMounted)) && (
             <div id="tool-workspace" hidden={resultFile !== null} className={`mx-auto mt-8 ${tool.isEditor ? 'max-w-[1100px]' : 'max-w-[760px]'}`}>
               <Suspense fallback={null}>
                 <ToolComponent

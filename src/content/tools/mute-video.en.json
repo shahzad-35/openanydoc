@@ -1,0 +1,77 @@
+{
+  "title": "Mute Video – Remove Audio from Video Free, No Upload",
+  "description": "Remove the sound from a video in seconds, right in your browser. The picture is copied as it is, so quality stays the same. Nothing is uploaded.",
+  "heading": "Remove Sound from a Video",
+  "subtitle": "Take the sound out of a video in one click; the picture stays exactly as it was.",
+  "intro": "Remove background noise, voices or music before you share a clip. It is the quick way to take out music before you post a clip, or the background chatter from a screen recording. The picture is copied without being encoded again, so the result looks exactly like your video and is ready in seconds, even for a long recording.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is changed by your own browser and never sent anywhere."
+    },
+    {
+      "title": "Same picture",
+      "text": "The picture is copied as it is, with no loss of quality."
+    },
+    {
+      "title": "Quick",
+      "text": "Nothing is encoded again, so even a long video is done in seconds."
+    }
+  ],
+  "stepsTitle": "How to mute a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Remove the sound",
+      "text": "Click Remove the sound."
+    },
+    {
+      "title": "Download",
+      "text": "Play the silent video and download it."
+    }
+  ],
+  "handlesTitle": "Videos it can mute",
+  "handles": [
+    "Formats: MP4, WebM, MOV and MKV keep their format; other videos become MP4.",
+    "Picture: copied unchanged, at the same size, frame rate and quality.",
+    "Sound: the sound track is taken out completely, so players show the video as having no sound, not as a silent track."
+  ],
+  "limits": [
+    "The whole sound is removed; to silence only a part, trim the video first.",
+    "A format the browser can’t copy into is encoded again, which takes longer."
+  ],
+  "faqTitle": "Questions about removing sound from a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your own browser removes the sound on your device, and nothing is sent to a server. The picture is copied as it is, not encoded again. Open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "Does muting lower the quality?",
+      "answer": "No. The picture is copied as it is, so it looks exactly like the original."
+    },
+    {
+      "question": "Can I put different music on instead?",
+      "answer": "Yes. Use Add audio to video, which replaces the sound with an MP3, M4A, WAV, OGG or AAC file."
+    },
+    {
+      "question": "Can I remove the sound from only part of a video?",
+      "answer": "Not here: the whole sound is removed. Trim the part you need first, or keep the sound and cut the video later."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Can I remove the music but keep the voices?",
+      "answer": "No. This tool takes out the whole sound track; separating music from speech needs an audio editor. You can replace the sound instead: mute the video, then use Add audio to video with a voice recording or royalty-free music.",
+      "link": {
+        "text": "Add audio to video",
+        "path": "/add-audio-to-video"
+      }
+    }
+  ]
+}

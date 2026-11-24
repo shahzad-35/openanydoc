@@ -1,0 +1,79 @@
+{
+  "title": "Resize Video – Change to 1080p, 720p or Square, No Upload",
+  "description": "Change a video's size in pixels: 1080p, 720p, 480p, an Instagram square, a 1080 × 1920 story, or your own width and height. Runs in your browser.",
+  "heading": "Resize a Video",
+  "subtitle": "Change a video's width and height to a common size or your own, keeping its shape; nothing is uploaded.",
+  "intro": "Make a 4K clip 1080p for a website, shrink a recording to 720p for a slide deck, or fit a video into an Instagram square or a 1080 × 1920 story. The 1080p, 720p, 480p and 360p sizes keep the video's shape. When the new size has a different shape, the whole picture fits inside it with black bars, so nothing is cut off. The new size is shown before you start.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is resized by your own browser and never sent to a server."
+    },
+    {
+      "title": "Ready-made sizes",
+      "text": "1080p, 720p, 480p, 360p, Instagram square and story sizes in one list."
+    },
+    {
+      "title": "Nothing cut off",
+      "text": "A new shape adds black bars instead of cutting the picture."
+    }
+  ],
+  "stepsTitle": "How to resize a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Pick a size",
+      "text": "Choose a size from the list, or Custom size and type the width and height."
+    },
+    {
+      "title": "Resize and download",
+      "text": "Click Resize video and download the result."
+    }
+  ],
+  "handlesTitle": "Videos and sizes it handles",
+  "handles": [
+    "Sizes: 1080p, 720p, 480p and 360p by the shorter side, 1080 × 1080, 1080 × 1920, or any width and height from 16 to 7680 pixels.",
+    "Shape: kept for the p sizes and with Keep the shape; other shapes get black bars.",
+    "Sound: kept as it is.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+  ],
+  "limits": [
+    "Only the first chosen video is resized.",
+    "Making a small video bigger doesn't add detail; it only makes the pixels larger.",
+    "Widths and heights are rounded to even numbers, which every player needs."
+  ],
+  "faqTitle": "Questions about resizing a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Resizing is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "Does resizing make the file smaller?",
+      "answer": "A smaller size in pixels usually gives a smaller file. To aim for a file size in MB, use Compress video.",
+      "link": {
+        "text": "Compress video",
+        "path": "/compress-video"
+      }
+    },
+    {
+      "question": "How do I fill a square without black bars?",
+      "answer": "Crop the video to a square first with Crop video, then resize it to 1080 × 1080 here."
+    },
+    {
+      "question": "What does 720p mean for a vertical video?",
+      "answer": "The shorter side becomes 720 pixels, so a phone video becomes 720 × 1280 and keeps its shape."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Is it free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "title": "Video to MP3 – Extract Audio from Video, No Upload",
+  "description": "Turn a video's sound into an MP3 at 128 to 320 kbps, or into M4A, WAV or OGG, and keep only the part you need. It all happens in your browser.",
+  "heading": "Convert Video to MP3",
+  "subtitle": "Save the sound of an MP4, MOV, WebM or MKV video as an MP3 file; the video never leaves your device.",
+  "intro": "Keep the soundtrack of a talk, a song from a clip or the voice from a phone video as an audio file you can play anywhere. Choose MP3 at the quality you want, or M4A, WAV or OGG, and tick the box to keep only a part, from a start time to an end time. Your browser reads the video and writes the audio file itself, so even long or private recordings stay on your device.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The video is read by your own browser and never sent to a server, so a family video or a meeting recording stays yours."
+    },
+    {
+      "title": "MP3 at your quality",
+      "text": "Choose 128, 192, 256 or 320 kbps: smaller files for speech, higher quality for music."
+    },
+    {
+      "title": "Just the part you need",
+      "text": "Type a start and an end to keep one song or one answer instead of the whole soundtrack."
+    }
+  ],
+  "stepsTitle": "How to convert a video to MP3",
+  "steps": [
+    {
+      "title": "Add your video",
+      "text": "Choose or drop an MP4, MOV, WebM or MKV file. The player shows its length and its sound format."
+    },
+    {
+      "title": "Choose the format",
+      "text": "Keep MP3 and pick a quality, or open Other formats for M4A, WAV or OGG. Tick the box to keep only a part."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Save as MP3, listen to the result on the page and download it."
+    }
+  ],
+  "handlesTitle": "Videos it turns into MP3",
+  "handles": [
+    "Videos: MP4, MOV, WebM, MKV, M4V and other files your browser can play.",
+    "Audio out: MP3 (128 to 320 kbps), M4A (AAC), WAV and OGG (Opus).",
+    "Part of the sound: a start and end time, typed as minutes and seconds.",
+    "Names: holiday.mp4 becomes holiday.mp3."
+  ],
+  "limits": [
+    "A video with no sound track has nothing to save; the page tells you so before you start.",
+    "The sound is read with your browser's own decoders: a sound format your browser can't play (such as AC-3 in some browsers) can't be converted.",
+    "Very long videos take longer and use more memory, since the audio file is built in memory before it downloads."
+  ],
+  "faqTitle": "Video to MP3 questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser reads the video and makes the audio file on your device; nothing is sent anywhere. Open your browser's network panel while it works and you will see no upload."
+    },
+    {
+      "question": "Which MP3 quality should I choose?",
+      "answer": "128 kbps is plenty for speech, podcasts and lectures. 192 kbps suits most music, and 256 or 320 kbps keeps music closest to the original at a larger size."
+    },
+    {
+      "question": "Can I keep only part of the sound?",
+      "answer": "Yes. Tick Keep only part of the sound and type a start and an end, like 1:05 and 2:30. Only that part is saved."
+    },
+    {
+      "question": "Why does it say the video has no sound?",
+      "answer": "Some videos, such as screen recordings made without a microphone or clips saved without audio, have no sound track at all. There is nothing to extract from them."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Should I choose MP3 or M4A?",
+      "answer": "MP3 plays everywhere, from old car stereos to every phone. M4A (AAC) sounds a little better at the same size and plays well on Apple devices and most modern players."
+    }
+  ]
+}

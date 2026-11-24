@@ -1,0 +1,83 @@
+{
+  "title": "Webcam Recorder – Record Video from Your Camera, Free",
+  "description": "Record a video from your webcam and microphone in your browser, with a live mirrored preview. Choose the camera, pause and save; nothing is uploaded.",
+  "heading": "Record a Video with Your Webcam",
+  "subtitle": "Record yourself with your camera and microphone and save the video; nothing is uploaded.",
+  "intro": "Record a video message, a short introduction or a practice run of a talk straight from your camera. Pick the camera and microphone you want, look at the live preview, which is mirrored like a mirror unless you turn that off, and pause whenever you need to. When you stop, the camera turns off and the video plays on the page so you can check it before you download it.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The video is recorded by your own browser and stays on this device until you download it. Nothing is sent to a server."
+    },
+    {
+      "title": "Your camera, your microphone",
+      "text": "Choose between built-in and external cameras and microphones, or record with no sound at all."
+    },
+    {
+      "title": "Camera off when you stop",
+      "text": "The camera and microphone are switched off as soon as you stop or leave the page."
+    }
+  ],
+  "stepsTitle": "How to record a webcam video",
+  "steps": [
+    {
+      "title": "Turn on the camera",
+      "text": "Click Turn on camera and allow the camera and microphone when your browser asks."
+    },
+    {
+      "title": "Pick your devices",
+      "text": "Choose the camera and microphone, and turn the mirrored preview on or off."
+    },
+    {
+      "title": "Record",
+      "text": "Click Start recording, pause and resume as you like, then click Stop and save."
+    },
+    {
+      "title": "Check and download",
+      "text": "Play the video on the page and download it as an MP4 or WebM file."
+    }
+  ],
+  "handlesTitle": "What the webcam recorder handles",
+  "handles": [
+    "Cameras: the built-in camera, a USB webcam or another camera your browser can see.",
+    "Sound: any microphone your browser can see, or no microphone.",
+    "Format: MP4 (H.264) where your browser can make it, otherwise WebM (VP9 or VP8); the page tells you which.",
+    "Preview: live and mirrored like a mirror; the saved video is not mirrored, so text behind you reads the right way."
+  ],
+  "limits": [
+    "Your browser must be allowed to use the camera. If you refused once, allow it again in the site settings next to the address bar.",
+    "Another app that is using the camera, such as a video call, can stop the browser from opening it.",
+    "The recording is kept in memory until you download it, so very long recordings are limited by your device's memory."
+  ],
+  "faqTitle": "Webcam recorder: questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your browser records the camera and keeps the video on this device; nothing is sent anywhere. You can check it: open your browser's network panel while you record and you will see no upload."
+    },
+    {
+      "question": "Why is my video not mirrored like the preview?",
+      "answer": "The preview is mirrored so it feels like looking in a mirror. The saved video shows you as others see you, so writing behind you reads the right way. To mirror the video itself, use Flip video afterwards.",
+      "link": {
+        "text": "Flip video",
+        "path": "/flip-video"
+      }
+    },
+    {
+      "question": "I clicked Block by mistake. How do I allow the camera again?",
+      "answer": "Click the icon next to the address bar, set Camera and Microphone to Allow, then reload the page. On a phone, also check that the browser may use the camera in the system settings."
+    },
+    {
+      "question": "Does it work on phones?",
+      "answer": "Yes, in the phone's browser: allow the camera when asked and choose the front or back camera. The format depends on the browser; iPhone makes MP4."
+    },
+    {
+      "question": "Can I record without sound?",
+      "answer": "Yes. Choose No microphone in the microphone list before you start."
+    },
+    {
+      "question": "What format is the video?",
+      "answer": "MP4 with H.264 where your browser can make it, which plays almost everywhere. Other browsers make WebM, which plays in every modern browser; convert it to MP4 afterwards if an app needs that."
+    }
+  ]
+}

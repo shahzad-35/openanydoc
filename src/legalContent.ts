@@ -53,7 +53,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'How you can check that nothing is uploaded',
           paragraphs: [
-            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So not even a mistake in the code could send your file anywhere else. An automated test opens every page and fails the build if any of them makes a network request, sets a cookie or stores anything beyond the theme choice and the site's own offline copy. And the source code is public, so anyone can read it.",
+            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So the site's code cannot fetch from, or send to, any other site in the background. An automated test, run before every release, opens every page and fails if any of them makes a network request, sets a cookie or stores anything beyond the theme choice and the site's own offline copy. And the source code is public, so anyone can read it.",
             'You can check it yourself in a minute: open your browser\'s network panel, open a file here and see that no request carries it. The steps are in how to check that a website does not upload your file.',
           ],
           links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
@@ -92,7 +92,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
       ],
     },
     '/privacy': {
-      lastUpdated: 'Last updated: 2026-11-12',
+      lastUpdated: 'Last updated: 2026-11-24',
       sections: [
         {
           heading: 'Your files are never uploaded',
@@ -119,6 +119,13 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           ],
         },
         {
+          heading: 'Camera, microphone and screen',
+          paragraphs: [
+            'The screen recorder and the webcam recorder use your screen, camera or microphone only after you click to start and your browser asks for your permission. Your browser makes the recording and keeps it in the page\'s memory until you download it; it is never sent to us or to anyone else. Leaving the page or closing the tab discards it. You can withdraw the permission at any time in your browser\'s settings for this site.',
+            'Blur faces finds faces with an AI model that runs in your browser, on your device. The pictures and the faces it finds are not sent anywhere and are not kept.',
+          ],
+        },
+        {
           heading: 'What your browser keeps',
           paragraphs: ['These are kept in your browser and are never sent anywhere:'],
           list: [
@@ -141,7 +148,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
       ],
     },
     '/terms': {
-      lastUpdated: 'Last updated: 2026-10-17',
+      lastUpdated: 'Last updated: 2026-11-24',
       sections: [
         {
           heading: 'Free and as is',
@@ -159,6 +166,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'No liability for rendering or saving errors',
           paragraphs: [
             'A file may look different from how it looks in other software, and a saved copy may lose content or formatting. We are not liable for any loss or damage caused by how a file is shown, edited or saved.',
+          ],
+        },
+        {
+          heading: 'Recording, unlocking and automatic results',
+          paragraphs: [
+            'Record people only with their consent and where the law allows it. Unlock or change only files you have the right to open. Check every redacted, translated or recognised (OCR) result before you rely on it or share it: automatic results can be wrong.',
           ],
         },
         {
@@ -199,7 +212,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'كيف تتحقق بنفسك من أن شيئًا لا يُرفع',
           paragraphs: [
-            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فحتى خطأ في الكود لا يستطيع إرسال ملفك إلى أي مكان آخر. واختبار آلي يفتح كل صفحة ويُفشل البناء إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر ونسخة الموقع نفسه للعمل دون اتصال. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
+            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فلا يستطيع كود الموقع أن يجلب من أي موقع آخر أو يرسل إليه في الخلفية. واختبار آلي يُشغَّل قبل كل إصدار يفتح كل صفحة ويفشل إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر ونسخة الموقع نفسه للعمل دون اتصال. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
             'ويمكنك التحقق بنفسك خلال دقيقة: افتح لوحة الشبكة في متصفحك، وافتح ملفًا هنا، وتأكد أن أي طلب لا يحمله. الخطوات في دليل كيف تتحقق من أن الموقع لا يرفع ملفك.',
           ],
           links: [{ text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' }],
@@ -238,7 +251,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
       ],
     },
     '/privacy': {
-      lastUpdated: 'آخر تحديث: 2026-11-12',
+      lastUpdated: 'آخر تحديث: 2026-11-24',
       sections: [
         {
           heading: 'ملفاتك لا تُرفع أبدًا',
@@ -265,6 +278,13 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           ],
         },
         {
+          heading: 'الكاميرا والميكروفون والشاشة',
+          paragraphs: [
+            'لا يستخدم مسجّل الشاشة ومسجّل كاميرا الويب شاشتك أو الكاميرا أو الميكروفون إلا بعد أن تنقر للبدء ويطلب متصفحك إذنك. يُنشئ متصفحك التسجيل ويحفظه في ذاكرة الصفحة حتى تنزّله، ولا يُرسَل إلينا ولا إلى أي جهة أخرى. ومغادرة الصفحة أو إغلاق التبويب يحذف التسجيل. ويمكنك سحب الإذن في أي وقت من إعدادات هذا الموقع في متصفحك.',
+            'تجد أداة تمويه الوجوه الوجوهَ بنموذج ذكاء اصطناعي يعمل في متصفحك على جهازك. ولا تُرسَل الصور ولا الوجوه التي يجدها إلى أي مكان، ولا تُحفَظ.',
+          ],
+        },
+        {
           heading: 'ما يحفظه متصفحك',
           paragraphs: ['يحفظ متصفحك ما يلي، ولا يُرسَل أيٌّ منه إلى أي مكان:'],
           list: [
@@ -287,7 +307,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
       ],
     },
     '/terms': {
-      lastUpdated: 'آخر تحديث: 2026-10-17',
+      lastUpdated: 'آخر تحديث: 2026-11-24',
       sections: [
         {
           heading: 'مجاني وكما هو',
@@ -305,6 +325,12 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'لا مسؤولية عن أخطاء العرض أو الحفظ',
           paragraphs: [
             'قد يبدو الملف مختلفًا عمّا يبدو عليه في برامج أخرى، وقد تفقد النسخة المحفوظة بعض المحتوى أو التنسيق. ولسنا مسؤولين عن أي خسارة أو ضرر ينتج عن طريقة عرض الملف أو تعديله أو حفظه.',
+          ],
+        },
+        {
+          heading: 'التسجيل وفك الحماية والنتائج الآلية',
+          paragraphs: [
+            'لا تسجّل الآخرين إلا بموافقتهم وحيث يسمح القانون. ولا تفك حماية ملف أو تغيّره إلا إذا كان لك حق فتحه. وراجع كل نتيجة حجب أو ترجمة أو تعرّف ضوئي على النص قبل أن تعتمد عليها أو تشاركها، فالنتائج الآلية قد تخطئ.',
           ],
         },
         {

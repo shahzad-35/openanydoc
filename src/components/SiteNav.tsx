@@ -9,7 +9,7 @@ import { ALL_TOOLS_PATH, findToolIcon, liveTools, toolPath } from '../tools/regi
 import { landingPages, viewers } from '../viewers'
 import type { Viewer } from '../viewers'
 
-type SearchGroup = 'pdf' | 'image' | 'viewers' | 'tools' | 'convert' | 'guides'
+type SearchGroup = 'pdf' | 'image' | 'video' | 'viewers' | 'tools' | 'convert' | 'guides'
 // A page the search can open. `searchText` holds the words a query is matched against: the page's name and heading in the page's
 // language, the words of its address and the extensions it opens.
 type SearchEntry = { path: string; name: string; note: string; icon: string; group: SearchGroup; searchText: string }
@@ -17,7 +17,7 @@ type SearchEntry = { path: string; name: string; note: string; icon: string; gro
 type UnsupportedEntry = { id: string; icon: string; nameKey: MessageKey; noteKey: MessageKey }
 
 const viewerIcons: Record<Viewer['id'], string> = { csv: 'csv', text: 'txt', json: 'json', excel: 'xlsx', word: 'docx', pdf: 'pdf', powerpoint: 'pptx', image: 'image' }
-const searchGroups: SearchGroup[] = ['pdf', 'image', 'viewers', 'tools', 'convert', 'guides']
+const searchGroups: SearchGroup[] = ['pdf', 'image', 'video', 'viewers', 'tools', 'convert', 'guides']
 const unsupportedEntries: UnsupportedEntry[] = [
   { id: 'ppt', icon: 'pptx', nameKey: 'search.unsupported.ppt', noteKey: 'search.unsupported.pptNote' },
   { id: 'doc', icon: 'docx', nameKey: 'search.unsupported.doc', noteKey: 'search.unsupported.docNote' },
@@ -39,8 +39,8 @@ function buildSearchEntries(locale: Locale, translate: (key: MessageKey) => stri
   // The tools drawn by ToolPage (src/tools/registry.ts), in their category's group: the PDF tools and the image tools; the data
   // tools that are not a viewer's page (XML viewer, Base64, JWT ...) go with the other tools.
   const toolPageEntries = liveTools
-    .filter((tool) => ['pdf', 'image', 'data'].includes(tool.category) && !viewers.some((viewer) => viewer.toolPath === toolPath(tool)) && !landingPages.some((page) => page.path === toolPath(tool)))
-    .map((tool) => entry(toolPath(tool), findToolIcon(tool), tool.category === 'image' ? 'image' : tool.category === 'pdf' ? 'pdf' : 'tools', tool.inputFormats))
+    .filter((tool) => ['pdf', 'image', 'video', 'data'].includes(tool.category) && !viewers.some((viewer) => viewer.toolPath === toolPath(tool)) && !landingPages.some((page) => page.path === toolPath(tool)))
+    .map((tool) => entry(toolPath(tool), findToolIcon(tool), tool.category === 'image' || tool.category === 'video' || tool.category === 'pdf' ? tool.category : 'tools', tool.inputFormats))
   const guideEntries = guideAddresses.map((path) => entry(path, 'guide', 'guides', []))
   return [...viewerEntries, ...landingEntries, ...toolPageEntries, ...guideEntries]
 }

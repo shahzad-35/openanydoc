@@ -1,0 +1,70 @@
+{
+  "title": "WebM to MP4 – Convert Screen Recordings Free Online",
+  "description": "Convert WebM screen recordings and web videos to MP4 with H.264 and AAC, for PowerPoint, iPhone and editors. In your browser, with no upload.",
+  "heading": "Convert WebM to MP4",
+  "subtitle": "Make a WebM screen recording or web video into an MP4 that PowerPoint, iPhones and editors accept; nothing is uploaded.",
+  "intro": "Browser screen recorders, meeting tools and many websites save video as WebM. It plays in a browser, but PowerPoint, iMovie, older TVs and some upload forms want MP4. WebM holds VP8, VP9 or AV1 picture and Opus sound, none of which an MP4 player expects, so this page always re-encodes: the picture becomes H.264 and the sound AAC. A screen recording with sharp text keeps it sharp, and the progress bar shows how far along it is.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Screen recordings often show emails, chats and documents. They are converted by your browser and never leave your device."
+    },
+    {
+      "title": "Made for other apps",
+      "text": "The MP4 has H.264 picture and AAC sound, so PowerPoint, iMovie, Premiere and iPhones open it."
+    },
+    {
+      "title": "Same size and timing",
+      "text": "The MP4 keeps the recording's picture size and frame rate, so text, cursor and clicks look as they did."
+    }
+  ],
+  "stepsTitle": "How to convert WebM to MP4",
+  "steps": [
+    {
+      "title": "Choose the WebM file",
+      "text": "Choose or drop a .webm recording or download."
+    },
+    {
+      "title": "Convert",
+      "text": "Click Convert to MP4. Long recordings take a moment; you can cancel at any time."
+    },
+    {
+      "title": "Download",
+      "text": "Play the MP4 on the page to check it, then download it."
+    }
+  ],
+  "handlesTitle": "WebM files it converts",
+  "handles": [
+    "WebM from browser screen recorders, meeting and capture tools, and websites.",
+    "VP8, VP9 and AV1 picture, re-encoded to H.264.",
+    "Opus and Vorbis sound, re-encoded to AAC; silent recordings stay silent."
+  ],
+  "limits": [
+    "The picture is always re-encoded, so a long recording takes longer than a copy would.",
+    "Transparent WebM video loses its transparency, because H.264 has none.",
+    "One video at a time."
+  ],
+  "faqTitle": "WebM to MP4 questions",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Your WebM is read and converted by your own browser, on your device, and is never sent anywhere. That matters for screen recordings, which often show private things."
+    },
+    {
+      "question": "Why won't PowerPoint play my WebM?",
+      "answer": "PowerPoint, iMovie and many TVs expect MP4 with H.264. A WebM uses VP8, VP9 or AV1 instead. The MP4 from this page plays in all of them."
+    },
+    {
+      "question": "Why does it take longer than MOV to MP4?",
+      "answer": "A MOV usually already holds H.264, so its picture can be copied. A WebM never does, so every frame is re-encoded by your browser."
+    },
+    {
+      "question": "Will the text in my screen recording stay readable?",
+      "answer": "Yes, for most recordings. The MP4 keeps the picture size and frame rate. If very small text looks soft, use the Video converter and choose High quality."
+    },
+    {
+      "question": "Which browsers can do this?",
+      "answer": "Up-to-date Chrome, Edge and Safari can make H.264. If your browser can't, the page says so and names one it can make."
+    }
+  ]
+}

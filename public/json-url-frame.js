@@ -20,9 +20,27 @@ addEventListener('message', async (event) => {
     const response = await fetch(url, { credentials: 'omit', referrerPolicy: 'no-referrer', cache: 'no-store', redirect: 'follow', signal: controller.signal })
     if (!response.ok) return answer({ problem: 'status', status: response.status })
     if (Number(response.headers.get('content-length') ?? 0) > MAX_BYTES) return answer({ problem: 'tooLarge' })
-    const bytes = await response.arrayBuffer()
-    if (bytes.byteLength > MAX_BYTES) return answer({ problem: 'tooLarge' })
-    answer({ bytes, contentType: response.headers.get('content-type') ?? '' }, [bytes])
+    // Read in chunks and stop at the limit: a response with no length would otherwise be held whole first.
+    const reader = response.body.getReader()
+    const chunks = []
+    let byteCount = 0
+    for (;;) {
+      const { done, value } = await reader.read()
+      if (done) break
+      byteCount += value.byteLength
+      if (byteCount > MAX_BYTES) {
+        controller.abort()
+        return answer({ problem: 'tooLarge' })
+      }
+      chunks.push(value)
+    }
+    const bytes = new Uint8Array(byteCount)
+    let offset = 0
+    for (const chunk of chunks) {
+      bytes.set(chunk, offset)
+      offset += chunk.byteLength
+    }
+    answer({ bytes: bytes.buffer, contentType: response.headers.get('content-type') ?? '' }, [bytes.buffer])
   } catch (error) {
     // A blocked request (CORS), no network or an address that does not answer all end here, without saying which.
     answer({ problem: error instanceof DOMException && error.name === 'AbortError' ? 'timedOut' : 'blocked' })

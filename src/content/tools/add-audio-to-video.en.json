@@ -1,0 +1,82 @@
+{
+  "title": "Add Audio to Video – Put Music on a Video, Free",
+  "description": "Add an MP3, WAV or other sound to a video in your browser. Repeat it if it is shorter, cut where the video ends. No upload and no watermark.",
+  "heading": "Add Audio to a Video",
+  "subtitle": "Choose a video and a sound file, and save the video with that sound in place of its own.",
+  "intro": "Put music under a slideshow, a voice-over on a screen recording, or a new soundtrack on a clip with noisy sound. Choose the video and the sound file together or one after the other; the page tells which is which. A short sound can repeat until the video ends, and a long one stops where the video stops.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The video and the sound are joined by your own browser; neither is uploaded."
+    },
+    {
+      "title": "Fits the video",
+      "text": "A short sound repeats if you want, and a long one is cut where the video ends."
+    },
+    {
+      "title": "Picture unchanged",
+      "text": "The picture is copied as it is; only the sound is new."
+    }
+  ],
+  "stepsTitle": "How to add audio to a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick the video that needs the new sound."
+    },
+    {
+      "title": "Choose a sound",
+      "text": "Add an MP3, M4A, WAV, OGG or AAC file."
+    },
+    {
+      "title": "Set the repeat",
+      "text": "Tick or untick “Repeat the sound if it’s shorter”."
+    },
+    {
+      "title": "Add and download",
+      "text": "Click Add the sound, play the result and download it."
+    }
+  ],
+  "handlesTitle": "Videos and sounds it handles",
+  "handles": [
+    "Videos: MP4, MOV, WebM, MKV and others your browser can play.",
+    "Sounds: MP3, M4A, WAV, OGG and AAC.",
+    "Length: the result is as long as the video; the sound repeats or is cut to fit."
+  ],
+  "limits": [
+    "The new sound replaces the video’s own sound; the two are not mixed.",
+    "The sound starts with the video; you can’t move it to start later.",
+    "One video and one sound file at a time."
+  ],
+  "faqTitle": "Questions about adding audio to a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Adding the sound is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "What if the music is longer than the video?",
+      "answer": "It is cut where the video ends, so the result is exactly as long as the video."
+    },
+    {
+      "question": "What if the music is shorter?",
+      "answer": "With “Repeat the sound if it’s shorter” ticked it starts again until the video ends; unticked, the rest of the video is silent."
+    },
+    {
+      "question": "Is the video’s own sound kept?",
+      "answer": "No, the new sound replaces it. To remove the sound without adding another, use Mute video.",
+      "link": {
+        "text": "Mute video",
+        "path": "/mute-video"
+      }
+    },
+    {
+      "question": "Which sound files work?",
+      "answer": "MP3, M4A, WAV, OGG and AAC, as long as your browser can play them. If one doesn’t play, convert it to MP3 or WAV first."
+    },
+    {
+      "question": "Is it free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

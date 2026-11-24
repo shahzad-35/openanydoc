@@ -1606,3 +1606,128 @@ for (const [sourceName, fileName, details] of [
   writeSampleFile(fileName, await document.save())
 }
 console.log('Wrote the Word, Excel and PowerPoint tool samples.')
+
+// ---------------------------------------------------------------- video and sound samples (macOS: Chrome)
+// Short synthetic clips for the video tools, made in headless Chrome with the browser's own encoders through Mediabunny's
+// standalone bundle (read from a blob: address; the bytes come back over the DevTools protocol), and a tone written here.
+{
+  const mediabunnySource = readFileSync(new URL('../node_modules/mediabunny/dist/bundles/mediabunny.min.mjs', import.meta.url), 'utf8')
+  const userDataDirectory = join(tmpdir(), 'openanydoc-video-samples')
+  rmSync(userDataDirectory, { recursive: true, force: true })
+  const pagePath = join(tmpdir(), 'openanydoc-video-samples.html')
+  writeFileSync(pagePath, '<!doctype html><title>samples</title>')
+  const { spawn } = await import('node:child_process')
+  const chrome = spawn(chromePath, ['--headless=new', '--remote-debugging-port=0', `--user-data-dir=${userDataDirectory}`, `file://${pagePath}`], { stdio: 'ignore' })
+  let port = ''
+  for (let attempt = 0; attempt < 100 && !port; attempt++) {
+    await new Promise((resolve) => setTimeout(resolve, 100))
+    try {
+      port = readFileSync(join(userDataDirectory, 'DevToolsActivePort'), 'utf8').split('\n')[0]
+    } catch {
+      // Chrome has not written it yet.
+    }
+  }
+  const pageTarget = (await (await fetch(`http://127.0.0.1:${port}/json/list`)).json()).find((target) => target.type === 'page')
+  const socket = new WebSocket(pageTarget.webSocketDebuggerUrl)
+  await new Promise((resolve) => socket.addEventListener('open', resolve, { once: true }))
+  let messageId = 0
+  const evaluate = (expression) =>
+    new Promise((resolve, reject) => {
+      const id = ++messageId
+      const onMessage = (event) => {
+        const message = JSON.parse(event.data)
+        if (message.id !== id) return
+        socket.removeEventListener('message', onMessage)
+        if (message.result?.exceptionDetails) reject(new Error(JSON.stringify(message.result.exceptionDetails)))
+        else resolve(message.result.result.value)
+      }
+      socket.addEventListener('message', onMessage)
+      socket.send(JSON.stringify({ id, method: 'Runtime.evaluate', params: { expression, awaitPromise: true, returnByValue: true } }))
+    })
+  await new Promise((resolve) => setTimeout(resolve, 500))
+  await evaluate(`(async () => { window.Mediabunny = await import(URL.createObjectURL(new Blob([${JSON.stringify(mediabunnySource)}], { type: 'text/javascript' }))) })()`)
+
+  // A 3-second clip: a counter, a moving ball and colour bars, with a soft two-note tone. `look` picks the colours.
+  const makeClip = (container, videoCodec, audioCodec, look) =>
+    evaluate(`(async () => {
+      const { Output, BufferTarget, Mp4OutputFormat, MovOutputFormat, WebMOutputFormat, MkvOutputFormat, CanvasSource, AudioSampleSource, AudioSample } = window.Mediabunny
+      const formats = { mp4: () => new Mp4OutputFormat({ fastStart: 'in-memory' }), mov: () => new MovOutputFormat({ fastStart: 'in-memory' }), webm: () => new WebMOutputFormat(), mkv: () => new MkvOutputFormat() }
+      const width = 480, height = 270, frameRate = 25, seconds = 3, sampleRate = 48000
+      const output = new Output({ format: formats['${container}'](), target: new BufferTarget() })
+      const canvas = new OffscreenCanvas(width, height)
+      const context = canvas.getContext('2d')
+      const video = new CanvasSource(canvas, { codec: '${videoCodec}', bitrate: 400000, keyFrameInterval: 1 })
+      const audio = new AudioSampleSource({ codec: '${audioCodec}', bitrate: 96000 })
+      output.addVideoTrack(video, { frameRate })
+      output.addAudioTrack(audio)
+      await output.start()
+      const colours = ${look === 'warm' ? "['#f97316', '#facc15', '#ef4444', '#a855f7']" : "['#0ea5e9', '#22c55e', '#6366f1', '#14b8a6']"}
+      for (let frame = 0; frame < frameRate * seconds; frame++) {
+        const time = frame / frameRate
+        context.fillStyle = '${look === 'warm' ? '#1c1917' : '#0f172a'}'
+        context.fillRect(0, 0, width, height)
+        colours.forEach((colour, index) => { context.fillStyle = colour; context.fillRect(index * (width / 4), height - 40, width / 4, 40) })
+        context.fillStyle = '#ffffff'
+        context.beginPath()
+        context.arc(40 + (width - 80) * (time / seconds), 90 + 40 * Math.sin(time * 4), 22, 0, Math.PI * 2)
+        context.fill()
+        context.font = 'bold 72px sans-serif'
+        context.textAlign = 'center'
+        context.fillText(String(seconds - Math.floor(time)), width / 2, 190)
+        await video.add(time, 1 / frameRate)
+      }
+      const frames = sampleRate * seconds
+      const data = new Float32Array(frames * 2)
+      for (let index = 0; index < frames; index++) {
+        const note = index < frames / 2 ? 440 : 554.37
+        const value = 0.2 * Math.sin((2 * Math.PI * note * index) / sampleRate) * Math.min(1, index / 2000, (frames - index) / 2000)
+        data[index] = value
+        data[frames + index] = value
+      }
+      await audio.add(new AudioSample({ data, format: 'f32-planar', numberOfChannels: 2, sampleRate, timestamp: 0 }))
+      video.close()
+      audio.close()
+      await output.finalize()
+      const bytes = new Uint8Array(output.target.buffer)
+      let text = ''
+      for (let index = 0; index < bytes.length; index += 0x8000) text += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
+      return btoa(text)
+    })()`)
+
+  for (const [fileName, container, videoCodec, audioCodec, look] of [
+    ['countdown-clip.mp4', 'mp4', 'avc', 'aac', 'cool'],
+    ['sunset-clip.mp4', 'mp4', 'avc', 'aac', 'warm'],
+    ['countdown-clip.webm', 'webm', 'vp9', 'opus', 'cool'],
+    ['countdown-clip.mov', 'mov', 'avc', 'aac', 'warm'],
+    ['countdown-clip.mkv', 'mkv', 'vp9', 'opus', 'cool'],
+  ]) {
+    writeSampleFile(fileName, Buffer.from(await makeClip(container, videoCodec, audioCodec, look), 'base64'))
+  }
+  socket.close()
+  chrome.kill()
+  rmSync(pagePath)
+
+  // Add audio to video's sample sound: 4 seconds of a soft chord as 16-bit mono WAV.
+  const sampleRate = 22050
+  const frameCount = sampleRate * 4
+  const wav = Buffer.alloc(44 + frameCount * 2)
+  wav.write('RIFF', 0)
+  wav.writeUInt32LE(36 + frameCount * 2, 4)
+  wav.write('WAVEfmt ', 8)
+  wav.writeUInt32LE(16, 16)
+  wav.writeUInt16LE(1, 20)
+  wav.writeUInt16LE(1, 22)
+  wav.writeUInt32LE(sampleRate, 24)
+  wav.writeUInt32LE(sampleRate * 2, 28)
+  wav.writeUInt16LE(2, 32)
+  wav.writeUInt16LE(16, 34)
+  wav.write('data', 36)
+  wav.writeUInt32LE(frameCount * 2, 40)
+  for (let index = 0; index < frameCount; index++) {
+    const time = index / sampleRate
+    const value = (Math.sin(2 * Math.PI * 261.63 * time) + Math.sin(2 * Math.PI * 329.63 * time) + Math.sin(2 * Math.PI * 392 * time)) * 0.08 * Math.min(1, index / 2000, (frameCount - index) / 2000)
+    wav.writeInt16LE(Math.round(value * 32767), 44 + index * 2)
+  }
+  writeSampleFile('soft-chord-4s.wav', wav)
+  console.log('Wrote the video and sound samples.')
+}

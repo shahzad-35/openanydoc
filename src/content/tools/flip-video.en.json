@@ -1,0 +1,87 @@
+{
+  "title": "Flip Video – Mirror a Video or Turn It Over, No Upload",
+  "description": "Mirror a selfie video so text reads the right way, or flip a clip top to bottom. See the preview first; the work runs in your browser with no upload.",
+  "heading": "Flip or Mirror a Video",
+  "subtitle": "Mirror a video left to right or flip it top to bottom, with a preview; nothing is uploaded.",
+  "intro": "Front cameras often record a mirrored picture, so signs and shirts read backwards. Choose Mirror to swap left and right, or Upside down to swap top and bottom, check the preview and save. The pixels themselves are flipped, so the video looks the same in every player.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "Your video is flipped by your own browser and never sent to a server."
+    },
+    {
+      "title": "Text reads right",
+      "text": "Mirror a selfie video so writing and logos face the right way."
+    },
+    {
+      "title": "Preview first",
+      "text": "The still shows the flip before you make the video."
+    }
+  ],
+  "stepsTitle": "How to flip a video",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Choose the direction",
+      "text": "Click Mirror (left to right) or Upside down (top to bottom) and check the preview."
+    },
+    {
+      "title": "Flip and download",
+      "text": "Click Flip video and download the result."
+    }
+  ],
+  "handlesTitle": "Videos it can flip",
+  "handles": [
+    "Mirror: left and right swap, as in a mirror.",
+    "Upside down: top and bottom swap.",
+    "Sound: kept as it is.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+  ],
+  "limits": [
+    "Only the first chosen video is flipped.",
+    "One direction per run; to flip both ways, which is the same as turning 180 degrees, use Rotate video.",
+    "The picture is made again, so a long video takes a while."
+  ],
+  "faqTitle": "Questions about flipping a video",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. Flipping is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "How do I un-mirror a selfie video?",
+      "answer": "Choose Mirror (left to right) and click Flip video. Text in the picture then reads the right way round."
+    },
+    {
+      "question": "What is the difference between flip and rotate?",
+      "answer": "Flip makes a mirror image. Rotate video turns the picture around its centre without mirroring it.",
+      "link": {
+        "text": "Rotate video",
+        "path": "/rotate-video"
+      }
+    },
+    {
+      "question": "Does flipping change the sound?",
+      "answer": "No. The sound is kept as it is; left and right audio channels are not swapped."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Can I flip only part of a video?",
+      "answer": "No. The whole video is flipped. To flip one part, trim it out first, flip it, then join the parts with Merge videos.",
+      "link": {
+        "text": "Merge videos",
+        "path": "/merge-videos"
+      }
+    },
+    {
+      "question": "Does flipping lower the quality?",
+      "answer": "The flipped picture is encoded again at a high quality and the same size, so it looks very close to the original."
+    }
+  ]
+}

@@ -56,7 +56,8 @@ const CHECKSUM_CATEGORIES = new Set<SensitiveCategory>(['iban', 'card', 'nationa
 const VALUE_ONLY_CATEGORIES = new Set<SensitiveCategory>(['email', 'iban', 'card', 'nationalId', 'phone'])
 const CONFIDENCE_RANK: Record<Confidence, number> = { high: 3, medium: 2, low: 1 }
 
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/
+// Dot-separated labels with nothing to backtrack across (the earlier pattern took quadratic time on long values).
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@.]+(?:\.[^\s@.]+)*\.[^\s@.]{2,}$/
 const LATIN_NAME_WORD = /^\p{Lu}[\p{L}'’-]*$/u
 const ARABIC_WORD = /^[ء-ي٠-٩ٮ-ۓ]+$/
 const DATE_TEXT_PATTERN = /^(\d{4}[-/.]\d{1,2}[-/.]\d{1,2}|\d{1,2}[-/.]\d{1,2}[-/.]\d{2,4})([T ][\d:.]+Z?)?$/
@@ -136,7 +137,7 @@ function valueMatchesCategory(value: unknown, category: SensitiveCategory): bool
   const text = getValueText(value).trim()
   switch (category) {
     case 'email':
-      return EMAIL_PATTERN.test(text)
+      return text.length <= 320 && EMAIL_PATTERN.test(text)
     case 'iban':
       return isValidIban(text)
     case 'card':

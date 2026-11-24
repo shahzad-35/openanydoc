@@ -1,0 +1,74 @@
+{
+  "title": "Change Video Speed – Speed Up or Slow Down, Free",
+  "description": "Speed up a video up to 4 times or slow it down to a quarter, in your browser. See the new length first. Free, with no upload and no watermark.",
+  "heading": "Change Video Speed",
+  "subtitle": "Make a video play faster or slower, from 0.25× to 4× or any speed you type, and save it.",
+  "intro": "Speed up a long screen recording, a cooking video or a timelapse, or slow down a moment you want to see clearly. Pick a speed or type your own and the page shows the new length before you start. You can keep the sound, which plays faster or slower with the picture and changes pitch, or leave it out.",
+  "features": [
+    {
+      "title": "Private",
+      "text": "The speed is changed by your own browser; nothing is uploaded."
+    },
+    {
+      "title": "Any speed",
+      "text": "Presets from 0.25× to 4×, or any speed from 0.1 to 10 that you type."
+    },
+    {
+      "title": "Length shown first",
+      "text": "See how long the result will be before you run it."
+    }
+  ],
+  "stepsTitle": "How to change a video’s speed",
+  "steps": [
+    {
+      "title": "Choose a video",
+      "text": "Pick a video or drop it on the page."
+    },
+    {
+      "title": "Pick a speed",
+      "text": "Choose a preset or type a custom speed, and keep or drop the sound."
+    },
+    {
+      "title": "Save and download",
+      "text": "Click Change speed and download the new video."
+    }
+  ],
+  "handlesTitle": "Speeds and formats it handles",
+  "handles": [
+    "Speeds: 0.25×, 0.5×, 0.75×, 1.25×, 1.5×, 2×, 3×, 4× and any value from 0.1 to 10.",
+    "Sound: played at the new speed, so its pitch rises when faster and falls when slower; or left out.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; other videos become MP4."
+  ],
+  "limits": [
+    "Slowing down shows each frame for longer; no new frames are made between them.",
+    "The sound’s pitch changes with the speed; there is no pitch correction.",
+    "The video is encoded again, which takes a moment for long videos."
+  ],
+  "faqTitle": "Questions about changing video speed",
+  "faq": [
+    {
+      "question": "Is my video uploaded?",
+      "answer": "No. The speed change is done by your own browser, on your device, with the video encoders built into it. Nothing is sent to a server; open your browser's network panel while it runs and you will see no upload."
+    },
+    {
+      "question": "How do I make a video 2 times faster?",
+      "answer": "Choose 2× (faster) in the Speed list and click Change speed. The result plays in half the time."
+    },
+    {
+      "question": "Does the sound change too?",
+      "answer": "Yes, when Keep sound is ticked the sound plays faster or slower and its pitch changes, as on a tape. Untick it for a silent video."
+    },
+    {
+      "question": "Will slow motion look smooth?",
+      "answer": "Slowing down shows each frame for longer, so 0.25× of a 30 frames per second video looks less smooth. Videos filmed at 60 frames per second or more slow down best."
+    },
+    {
+      "question": "Which browsers does it work in?",
+      "answer": "Recent Chrome and Edge read and make the most formats; Safari and Firefox work with most videos. If your browser can't read or make a codec, the page names it and says what to try instead."
+    },
+    {
+      "question": "Is it free?",
+      "answer": "Yes. There is no account, no watermark and no limit on how often you use it."
+    }
+  ]
+}

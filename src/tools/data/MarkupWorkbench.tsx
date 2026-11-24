@@ -5,6 +5,7 @@ import { useToast } from '../../components/Messages'
 import { translate, useT } from '../../i18n'
 import JsonCodeEditor from '../../formats/json/JsonCodeEditor'
 import JsonTree from '../../formats/json/JsonTree'
+import { YAML_TOO_LARGE_MESSAGE, isYamlWithinSizeLimit } from '../../formats/json/jsonFormats'
 import type { TreeRowAction } from '../../formats/json/JsonTree'
 import { findXmlError, rewriteXml, xmlToJsonValue } from '../../formats/json/jsonConvert'
 import { expandNodesUpToLimit, formatPathText, getPathKey } from '../../formats/json/jsonModel'
@@ -31,7 +32,9 @@ function checkText(text: string, format: MarkupFormat): TextCheck {
     return xmlError ? { status: 'invalid', message: xmlError.message, line: xmlError.line, column: null } : { status: 'valid', root: xmlToJsonValue(text) }
   }
   try {
-    return { status: 'valid', root: (load(text, { schema: CORE_SCHEMA }) ?? null) as JsonValue }
+    const root = (load(text, { schema: CORE_SCHEMA }) ?? null) as JsonValue
+    if (!isYamlWithinSizeLimit(root)) return { status: 'invalid', message: YAML_TOO_LARGE_MESSAGE, line: null, column: null }
+    return { status: 'valid', root }
   } catch (error) {
     if (!(error instanceof YAMLException)) throw error
     return { status: 'invalid', message: error.reason, line: error.mark ? error.mark.line + 1 : null, column: error.mark ? error.mark.column + 1 : null }
