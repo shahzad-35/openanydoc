@@ -362,18 +362,25 @@ async function importMissingStyles(source: JSZip, target: JSZip) {
   writeXmlPart(target, targetPath, targetXml)
 }
 
-// Footnotes or endnotes of the appended document copied into the target's with new ids; without such a part in the target
-// their references are taken out.
+// Footnotes or endnotes of the appended document copied into the target's with new ids. A target without such a part gets
+// one made from the source's, with only its separator lines kept.
 async function importNotes(source: JSZip, target: JSZip, nodes: Element[], kind: 'footnote' | 'endnote') {
   const references = nodes.flatMap((node) => wordElements(node, `${kind}Reference`))
   if (references.length === 0) return
   const sourcePath = await findLinkedPart(source, DOCUMENT, `${kind}s`)
-  const targetPath = await findLinkedPart(target, DOCUMENT, `${kind}s`)
   const sourceXml = sourcePath ? await readXmlPart(source, sourcePath) : null
-  const targetXml = targetPath ? await readXmlPart(target, targetPath) : null
-  if (!sourceXml || !targetXml || !targetPath) {
+  if (!sourceXml) {
     for (const reference of references) reference.remove()
     return
+  }
+  const linkedTargetPath = await findLinkedPart(target, DOCUMENT, `${kind}s`)
+  const targetPath = linkedTargetPath ?? `word/${kind}s.xml`
+  let targetXml = linkedTargetPath ? await readXmlPart(target, linkedTargetPath) : null
+  if (!targetXml) {
+    if (!linkedTargetPath) await addRelationship(target, DOCUMENT, `${RELATIONSHIP_TYPE}/${kind}s`, `${kind}s.xml`)
+    targetXml = sourceXml.cloneNode(true) as XMLDocument
+    for (const note of wordElements(targetXml, kind)) if (['', 'normal'].includes(wordAttribute(note, 'type'))) note.remove()
+    await setContentType(target, targetPath, `application/vnd.openxmlformats-officedocument.wordprocessingml.${kind}s+xml`)
   }
   let nextId = highestNumber(wordElements(targetXml, kind), 'id') + 1
   for (const reference of references) {

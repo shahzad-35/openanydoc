@@ -12,7 +12,7 @@ import { guideAddresses } from './seo'
 import { findViewerByToolPath, getFileViewPath, isFileViewPath } from './viewers'
 import type { ConversionTarget, Viewer } from './viewers'
 import { preloadPageSamples } from './samples/toolSamples'
-import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage } from './tools/registry'
+import { ALL_TOOLS_PATH, findLiveHub, findLiveToolPage, hubs } from './tools/registry'
 import { loadToolPageWords } from './seo'
 import { keepPageForOffline, takeLaunchedFiles, takeSharedFile } from './pwa'
 
@@ -21,27 +21,72 @@ const ChangelogPage = lazy(() => import('./pages/ChangelogPage'))
 const loadFileViewPage = () => import('./pages/FileViewPage')
 const FileViewPage = lazy(loadFileViewPage)
 const viewerIdForConversion: Record<ConversionTarget, Viewer['id']> = { csv: 'csv', xlsx: 'excel', json: 'json' }
+// Word, Excel, PowerPoint and OpenDocument files are ZIP packages: the file intake reads their file list (fflate) before opening.
+const OFFICE_PACKAGE_EXTENSIONS = ['.docx', '.dotx', '.docm', '.xlsx', '.xlsm', '.pptx', '.ppsx', '.potx', '.pptm', '.odt', '.ods']
+const acceptsOfficePackages = (extensions: string[]) => extensions.some((extension) => OFFICE_PACKAGE_EXTENSIONS.includes(extension))
+
+// A tiny script run in the SQL worker, so the worker and SQLite are fetched once.
+const startSqlWorker = () => import('./formats/csv/sqliteWasm').then((sqlite) => sqlite.readTableFromSqlScript('CREATE TABLE warm_up (a); INSERT INTO warm_up VALUES (1);'))
+const startJsonParseWorker = () => import('./formats/json/jsonModel').then((jsonModel) => jsonModel.parseJsonText('null', 'en'))
+const loadJsonCodeWriter = () => Promise.all([import('./formats/json/jsonConvert'), import('quicktype-core')])
+// The code a page's own task fetches only once a file is chosen (a panel the page opens on, a converter, a reader), by address.
+const pageTaskCodeByPath: Record<string, () => Promise<unknown>> = {
+  '/chart-maker': () => import('./formats/csv/CsvChartPanel'),
+  '/sql-on-csv': () => Promise.all([import('./formats/csv/CsvQueryPanel'), startSqlWorker()]),
+  '/sql-to-csv': startSqlWorker,
+  '/xml-to-csv': () => import('./formats/json/jsonConvert'),
+  '/xml-to-json': () => import('./formats/json/jsonConvert'),
+  '/yaml-to-csv': () => import('js-yaml'),
+  '/json-to-csv': startJsonParseWorker,
+  '/json-graph': () => import('./formats/json/JsonGraph'),
+  '/json-compare': () => import('./formats/json/JsonComparePanel'),
+  '/json-schema': () => import('./formats/json/JsonSchemaPanel'),
+  '/jsonpath': () => import('jsonpath-plus'),
+  '/json-to-yaml': () => import('js-yaml'),
+  // A YAML file is turned into JSON inside the parse worker, which fetches its YAML reader then.
+  '/yaml-to-json': () => import('./formats/json/jsonModel').then((jsonModel) => jsonModel.parseJsonText('a: 1', 'en', 'yaml')),
+  '/json-to-xml': () => import('./formats/json/jsonConvert'),
+  '/json-to-typescript': loadJsonCodeWriter,
+  '/json-to-python': loadJsonCodeWriter,
+  '/json-to-go': loadJsonCodeWriter,
+  '/json-to-java': loadJsonCodeWriter,
+  '/json-to-csharp': loadJsonCodeWriter,
+  '/word-to-markdown': () => Promise.all([import('./formats/word/wordDocument'), import('mammoth'), import('./formats/csv/csvExport')]),
+  '/pptx-to-markdown': () => import('./formats/powerpoint/presentationText'),
+  '/token-counter': () => Promise.all([import('./tools/pdf/PdfExtractTools'), import('mammoth'), import('./formats/powerpoint/presentationText'), import('./formats/conversion'), import('./formats/csv/csvExport')]),
+}
 
 // Once a page is idle it fetches the file page and the viewer its visitors are about to need (the page's own format, the result's
-// format on a conversion page, CSV on the home page), so a file then opens with no network and no wait. Offline or after a new
+// format on a conversion page, CSV on the home page) or the page's tool, with the code its task fetches later (workers are started
+// once), so a file then opens and the task runs with no network and no wait. Offline or after a new
 // release the fetch fails; the file then fails to open with LoadFailedMessage, not here.
 function preloadFileOpening(path: string) {
   // The page's bundled sample files ("Try a sample file"), so they also open offline.
   void preloadPageSamples(path).catch(() => {})
-  // A tool page: its component and, for the PDF tools, the worker with pdf-lib (an empty task fetches it).
+  const pageTaskCode = pageTaskCodeByPath[path]?.()
+  // A tool page: its component, the result preview (which also lists ZIP results) and, for the tools that read PDFs, pdf.js with
+  // its worker and the worker with pdf-lib (an empty task fetches it). The AI-ready pages count tokens.
   const toolPage = findLiveToolPage(path)
   if (toolPage?.loadComponent) {
-    const preloads: Promise<unknown>[] = [toolPage.loadComponent?.() ?? Promise.resolve()]
-    if (toolPage.category === 'pdf') preloads.push(import('./tools/pdf/pdfTasks').then(({ runPdfTask }) => runPdfTask({ type: 'warm-up' })))
+    const preloads = [toolPage.loadComponent(), import('./tools/pdf/ToolResultPreview'), pageTaskCode]
+    if (toolPage.category === 'pdf' || toolPage.inputFormats.includes('.pdf')) {
+      preloads.push(import('./formats/pdf/pdfLibrary').then((pdfLibrary) => pdfLibrary.warmUpPdfWorker()))
+      preloads.push(import('./tools/pdf/pdfTasks').then(({ runPdfTask }) => runPdfTask({ type: 'warm-up' })))
+    }
+    const aiHub = hubs.find((hub) => hub.category === 'ai')
+    if (toolPage.group === 'aiReady' || (aiHub?.sharedTools?.aiReady ?? []).includes(toolPage.slug)) {
+      preloads.push(import('./tools/ai/textStats').then((textStats) => textStats.countTokens('')))
+    }
     return Promise.all(preloads)
   }
   const toolViewer = findViewerByToolPath(path)
+  const officePackageReader = toolViewer && acceptsOfficePackages(toolViewer.extensions) ? import('fflate') : undefined
   // The Mask Data page keeps the file on the page: it needs its tool and the Excel writer, not a viewer.
   if (toolViewer?.tool === 'mask') {
     return Promise.all([import('./formats/mask/MaskWorkbench'), import('./formats/excel/excelStyles').then((stylesFile) => stylesFile.loadExcelJs())])
   }
   const viewerId = toolViewer?.convertTo ? viewerIdForConversion[toolViewer.convertTo] : (toolViewer?.id ?? (path === '/' ? 'csv' : undefined))
-  const preloads = [loadFileViewPage(), formatDefinitions.find((definition) => definition.viewerId === viewerId)?.preloadViewer?.()]
+  const preloads = [loadFileViewPage(), formatDefinitions.find((definition) => definition.viewerId === viewerId)?.preloadViewer?.(), pageTaskCode, officePackageReader]
   if (toolViewer?.convertTo) preloads.push(import('./formats/conversion'))
   return Promise.all(preloads)
 }
@@ -243,7 +288,17 @@ export default function App({ initialPathname }: { initialPathname?: string }) {
   useEffect(() => {
     if (openedFile) return
     // Once fetched, the service worker keeps the page and what it loaded (src/pwa.ts), and the footer says it is available offline.
-    const preloadTimer = window.setTimeout(() => void preloadFileOpening(path).then(keepPageForOffline).catch(() => {}), 1500)
+    const preloadTimer = window.setTimeout(() => {
+      const wasControlledByServiceWorker = !('serviceWorker' in navigator) || Boolean(navigator.serviceWorker.controller)
+      void preloadFileOpening(path)
+        .then(keepPageForOffline)
+        // On a first visit the workers started before the service worker took over and fetched their own imports past it (the
+        // page cannot list those): started once more, they are cached too.
+        .then(() => {
+          if (!wasControlledByServiceWorker) return preloadFileOpening(path)
+        })
+        .catch(() => {})
+    }, 1500)
     return () => window.clearTimeout(preloadTimer)
   }, [path, openedFile])
 

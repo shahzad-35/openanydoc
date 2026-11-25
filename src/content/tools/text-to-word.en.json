@@ -3,15 +3,15 @@
   "description": "Turn plain text or a .txt file into a Word document in your browser: every line kept, Arabic set right to left. Free, and nothing is uploaded.",
   "heading": "Text to Word",
   "subtitle": "Paste text or open a .txt file and download it as a Word document, line for line; nothing is uploaded.",
-  "intro": "Convert TXT to DOCX: type or paste text, or open a .txt file, and every line becomes a line in a Word document, blank lines included. Each line keeps its own direction, so Arabic reads right to left and English left to right in the same document. The document uses Word's default Calibri 11 and opens in Word, LibreOffice, Google Docs and Pages, ready to format. The text is converted in your browser and never uploaded.",
+  "intro": "Convert TXT to DOCX: type or paste text, or open a .txt file, and every line becomes a line in a Word document, blank lines included. Each line keeps its own direction, so Arabic reads right to left and English left to right in the same document. The document uses Calibri 11 and opens in Word, LibreOffice, Google Docs and Pages, ready to format. The text is converted in your browser and never uploaded.",
   "features": [
     {
       "title": "Private",
-      "text": "Your text is converted by your own browser and never sent to a server, so nobody else sees it."
+      "text": "The .docx is built inside your browser tab, so your words are not sent to any server."
     },
     {
-      "title": "Every line kept",
-      "text": "Each line of your text is a line in the document, and blank lines stay where they were."
+      "title": "One line, one paragraph",
+      "text": "Each line of your text becomes its own Word paragraph, and a blank line becomes an empty paragraph, so the gaps you typed stay."
     },
     {
       "title": "Arabic and English",
@@ -21,12 +21,12 @@
   "stepsTitle": "How to convert text to Word",
   "steps": [
     {
-      "title": "Paste or open your text",
-      "text": "Type or paste text into the box, or choose or drop a .txt file to fill it."
+      "title": "Add your text",
+      "text": "Write or paste in the Text box, or choose or drop a .txt file to load it there; you can still edit it before converting."
     },
     {
       "title": "Convert",
-      "text": "Click the convert button to make the Word document."
+      "text": "Click Convert to Word."
     },
     {
       "title": "Download",
@@ -35,25 +35,25 @@
   ],
   "handlesTitle": "What Text to Word handles",
   "handles": [
-    "Files: .txt, or text you type or paste.",
-    "Every line, blank lines included.",
-    "Arabic and English lines, each in its own direction."
+    "Input: a .txt file, or any text you write or paste in the box.",
+    "Every line as a paragraph, blank lines included; a long line wraps inside its paragraph in Word.",
+    "Lines whose first letter is Arabic are marked right to left in Word; the rest stay left to right."
   ],
   "limits": [
     "No formatting is guessed: lines that look like headings or lists stay plain lines. For headings and lists, write Markdown and use Markdown to Word.",
     "Columns lined up with spaces or tabs may not line up in the document, because Calibri letters are not all the same width.",
     "The document uses Calibri 11; change the font and size in Word afterwards.",
-    "Files up to 10 MB are opened; a larger file shows a message instead."
+    "A chosen .txt file can be up to 10 MB; a bigger one is turned away with a message."
   ],
   "worksBest": [
     "Notes and drafts",
-    "Text copied from an email or chat",
+    "Emails and messages you want to keep as a document",
     "Lists and logs to share or print",
-    "Arabic and mixed-language text"
+    "Arabic, English, or both in one file"
   ],
   "mayNotKeep": [
-    "Columns lined up with spaces",
-    "Headings and lists (they stay plain lines)",
+    "Spacing that lines up columns",
+    "Heading and list styles (lines stay normal paragraphs)",
     "Your text editor's font"
   ],
   "faqTitle": "Text to Word: questions",
@@ -67,8 +67,8 @@
       "answer": "Word, LibreOffice and Google Docs can each open a .txt file and save it as .docx. In OpenAnyDoc, paste the text or open the .txt file, click convert and download the .docx with every line kept and each line in its own direction; the text is converted in your browser and never uploaded."
     },
     {
-      "question": "Does Arabic text come out right to left?",
-      "answer": "Yes. Each line is set in its own direction, so Arabic lines read right to left and English lines left to right, even in the same document."
+      "question": "How is each paragraph's direction chosen?",
+      "answer": "By its first letter. A paragraph that starts with an Arabic letter is marked right to left in Word, and one that starts with a Latin letter left to right, so both can sit in the same document."
     },
     {
       "question": "Will lines that look like headings be formatted?",

@@ -18,7 +18,7 @@
   "handlesTitle": "What the CSV to XML converter handles",
   "handles": [
     "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters detected.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, written out as UTF-8 XML.",
+    "Encodings: UTF-8, UTF-16 (when the file starts with a byte order mark), Windows-1256 Arabic and Windows-1252 Western European text, written out as UTF-8 XML.",
     "Shape: <rows><row><column>value</column></row></rows>, with root and row names you choose.",
     "Headers such as \"Order ID\" or \"2024 total\" turned into valid element names.",
     "Escaping: <, > and & in cells written as &lt;, &gt; and &amp;.",

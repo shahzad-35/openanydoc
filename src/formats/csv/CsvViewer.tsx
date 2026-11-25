@@ -1266,7 +1266,7 @@ export default function CsvViewer({ openedFile, session: untypedSession, confirm
     return option ? t(option.labelKey) : t('csv.delimiter.custom')
   }
   const statusDelimiter = delimiterChoice === 'auto' ? t('csv.wb.autoDetected', { name: delimiterLabel(readableCsv?.detectedDelimiter ?? ',') }) : delimiterLabel(delimiterChoice)
-  const statusEncoding = encodingChoice === 'auto' ? t('csv.wb.autoDetected', { name: readableCsv?.encodingLabel.startsWith('Windows-1256') ? 'Windows-1256' : (readableCsv?.encodingLabel ?? 'UTF-8') }) : ENCODING_LABELS[encodingChoice]
+  const statusEncoding = encodingChoice === 'auto' ? t('csv.wb.autoDetected', { name: readableCsv?.encodingLabel.replace(/ \(.*\)$/, '') ?? 'UTF-8' }) : ENCODING_LABELS[encodingChoice]
   const statusLineEnding = readableCsv?.usesCrlf ? 'CRLF' : 'LF'
   const unevenCount = unevenRowIds.length
   const hiddenCount = displayColumnIds.length - shownColumnIds.length

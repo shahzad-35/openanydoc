@@ -1,7 +1,7 @@
 import { translate, translatePlural } from '../../i18n'
 import type { Locale } from '../../i18n'
-import { isBigNumber, restoreBigNumbers } from './jsonTools'
-import type { BigNumber } from './jsonTools'
+import { isBigNumber, readJsonKeepingOrder, restoreBigNumbers, writeJsonKeepingOrder } from './jsonTools'
+import type { BigNumber, OrderedJsonValue } from './jsonTools'
 import type { JsonSourceFormat } from './jsonFormats'
 import type { JsonParseRequest } from './jsonParse.worker'
 
@@ -11,17 +11,20 @@ export type JsonContainer = JsonValue[] | { [key: string]: JsonValue }
 // The steps from the document root to a node: object keys and array positions.
 export type JsonPath = (string | number)[]
 
-// `convertedText`: the JSON text a JSON Lines, JSON5 or YAML file was turned into (jsonFormats.ts).
-export type JsonParseResult = { status: 'ok'; value: JsonValue; bigNumberCount: number; convertedText?: string } | { status: 'error'; message: string; line: number | null; column: number | null }
+// `convertedText`: the JSON text a JSON Lines, JSON5 or YAML file was turned into (jsonFormats.ts). `duplicateKey`: the first key
+// written twice in one object (JSON keeps its last value), or null.
+export type JsonParseResult = { status: 'ok'; value: JsonValue; bigNumberCount: number; duplicateKey: string | null; convertedText?: string } | { status: 'error'; message: string; line: number | null; column: number | null }
 
 // The edit model: the parsed document, changed by copying only the path to the changed node, so the undo history shares
 // everything else and stays small even for a 50 MB file. `root` is null until the first edit (the original text is then used).
 // `indent` is what JSON.stringify gets as its spacing: 0 is minified, a number is that many spaces, '\t' is a tab.
+// `text` is the document's exact text after typing, Repair, Format, Minify or Sort, which keep the keys in their written order;
+// null after a tree edit (the text is then written from `root`).
 export type JsonIndent = 0 | 1 | 2 | 3 | 4 | 8 | '\t'
-export type JsonEdits = { root: JsonValue | null; indent: JsonIndent; changeCount: number }
+export type JsonEdits = { root: JsonValue | null; indent: JsonIndent; changeCount: number; text: string | null }
 export type JsonExportSource = { originalText: string }
 
-export const createEmptyJsonEdits = (): JsonEdits => ({ root: null, indent: 2, changeCount: 0 })
+export const createEmptyJsonEdits = (): JsonEdits => ({ root: null, indent: 2, changeCount: 0, text: null })
 export const countJsonChanges = (edits: unknown) => (edits as JsonEdits).changeCount
 
 export function describeJsonChanges(edits: unknown, locale: Locale) {
@@ -155,17 +158,40 @@ export function getNodeAt(root: JsonValue, path: JsonPath): JsonValue {
 }
 
 // The edits after the document became `newRoot`; the same object when nothing changed, so no empty undo step is recorded.
-export function withNewRoot(currentEdits: JsonEdits, originalRoot: JsonValue, newRoot: JsonValue, indent: JsonIndent = currentEdits.indent): JsonEdits {
-  if (newRoot === (currentEdits.root ?? originalRoot) && indent === currentEdits.indent) return currentEdits
-  return { root: newRoot, indent, changeCount: currentEdits.changeCount + 1 }
+// `newText`: the exact text the new document was read from (typing, Repair), kept so its key order survives.
+export function withNewRoot(currentEdits: JsonEdits, originalRoot: JsonValue, newRoot: JsonValue, newText: string | null = null): JsonEdits {
+  if (newRoot === (currentEdits.root ?? originalRoot)) return currentEdits
+  return { root: newRoot, indent: currentEdits.indent, changeCount: currentEdits.changeCount + 1, text: newText }
 }
 
-// The edits after the document is written with another indentation (or minified). While nothing is edited the original text is
-// kept, so choosing the layout the file already has changes nothing.
-export function withIndent(currentEdits: JsonEdits, originalText: string, originalRoot: JsonValue, indent: JsonIndent): JsonEdits {
-  const root = currentEdits.root ?? originalRoot
-  if (currentEdits.root === null ? JSON.stringify(root, null, indent) === originalText : indent === currentEdits.indent) return currentEdits
-  return { root, indent, changeCount: currentEdits.changeCount + 1 }
+// The JSON text written again with `indent`, its keys in their written order, after `change`. A document nested thousands of
+// levels deep is too deep to read in order and is written from `fallbackRoot` instead.
+export function rewriteJsonInOrder(text: string, indent: JsonIndent, fallbackRoot: JsonValue, change = (document: OrderedJsonValue) => document) {
+  try {
+    return writeJsonKeepingOrder(change(readJsonKeepingOrder(text).value), indent)
+  } catch {
+    return JSON.stringify(fallbackRoot, null, indent)
+  }
+}
+
+// The edits after the document's text is written again in key order, with the tree's document `newRoot`. The same object when
+// the text did not change, so choosing the layout the file already has changes nothing.
+function withRewrittenText(currentEdits: JsonEdits, originalText: string, newRoot: JsonValue, indent: JsonIndent, change?: (document: OrderedJsonValue) => OrderedJsonValue): JsonEdits {
+  const currentText = buildJsonDownload(currentEdits, { originalText })
+  const text = rewriteJsonInOrder(currentText, indent, newRoot, change)
+  if (text === currentText) return currentEdits
+  return { root: newRoot, indent, changeCount: currentEdits.changeCount + 1, text }
+}
+
+// The edits after the document is written with another indentation (or minified).
+export function withIndent(currentEdits: JsonEdits, originalText: string, currentRoot: JsonValue, indent: JsonIndent): JsonEdits {
+  return withRewrittenText(currentEdits, originalText, currentRoot, indent)
+}
+
+// The edits after the keys are sorted A–Z or Z–A: on every level, or only those of the object at `levelPath`.
+export function withSortedKeys(currentEdits: JsonEdits, originalText: string, currentRoot: JsonValue, direction: 'asc' | 'desc', levelPath: JsonPath | null): JsonEdits {
+  const newRoot = levelPath === null ? sortKeys(currentRoot, direction, true) : withValueAt(currentRoot, levelPath, sortKeys(getNodeAt(currentRoot, levelPath), direction, false))
+  return withRewrittenText(currentEdits, originalText, newRoot, currentEdits.indent, (document) => sortKeysInOrder(document, direction, levelPath === null, levelPath ?? []))
 }
 
 // ---------------------------------------------------------------- toolbar edits
@@ -188,6 +214,21 @@ export function sortKeys(value: JsonValue, direction: 'asc' | 'desc', includeNes
   const originalKeys = Object.keys(value)
   const isUnchanged = sortedEntries.every(([key, child], position) => key === originalKeys[position] && child === value[key])
   return isUnchanged ? value : Object.fromEntries(sortedEntries)
+}
+
+// sortKeys for the document as written (with its key order), at the object `path` leads to. Keys like "2024" and "10" are
+// sorted with the others, by their number.
+function sortKeysInOrder(value: OrderedJsonValue, direction: 'asc' | 'desc', includeNested: boolean, path: JsonPath): OrderedJsonValue {
+  if (typeof value === 'string') return value
+  if (path.length > 0) {
+    const [step, ...remainingPath] = path
+    if (Array.isArray(value)) return value.map((item, position) => (position === step ? sortKeysInOrder(item, direction, includeNested, remainingPath) : item))
+    return { members: value.members.map((member) => (member.key === step ? { ...member, value: sortKeysInOrder(member.value, direction, includeNested, remainingPath) } : member)) }
+  }
+  if (Array.isArray(value)) return includeNested ? value.map((item) => sortKeysInOrder(item, direction, true, [])) : value
+  const directionFactor = direction === 'asc' ? 1 : -1
+  const members = includeNested ? value.members.map((member) => ({ ...member, value: sortKeysInOrder(member.value, direction, true, []) })) : value.members.slice()
+  return { members: members.sort((first, second) => directionFactor * keyCollator.compare(first.key, second.key)) }
 }
 
 // A copy of the node right after it: an item in a list, or a key named "name copy" (then "name copy 2") in an object.
@@ -312,5 +353,6 @@ export function findMatchingPaths(root: JsonValue, lowerCaseSearch: string, limi
 
 // The text that is saved: the original text while nothing is edited, so key order and number spelling survive untouched.
 export function buildJsonDownload(edits: JsonEdits, source: JsonExportSource) {
+  if (edits.text !== null) return edits.text
   return edits.root === null ? source.originalText : JSON.stringify(edits.root, null, edits.indent)
 }

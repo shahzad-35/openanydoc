@@ -53,7 +53,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'How you can check that nothing is uploaded',
           paragraphs: [
-            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So the site's code cannot fetch from, or send to, any other site in the background. An automated test, run before every release, opens every page and fails if any of them makes a network request, sets a cookie or stores anything beyond the theme choice and the site's own offline copy. And the source code is public, so anyone can read it.",
+            "Three things back the promise. The site's security policy lets the site's code fetch only from openanydoc.com itself; the one exception is a web address you type yourself into “Open from a URL” on the JSON page, and that only receives a file, never sends one. So the site's code cannot fetch from, or send to, any other site in the background. An automated test, run before every release, opens the site's main pages and fails if any of them fetches data, contacts another site, sets a cookie or stores anything beyond the theme choice, the colour order of the file-type list and the site's own offline copy. And the source code is public, so anyone can read it.",
             'You can check it yourself in a minute: open your browser\'s network panel, open a file here and see that no request carries it. The steps are in how to check that a website does not upload your file.',
           ],
           links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
@@ -212,7 +212,7 @@ export const infoPages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'كيف تتحقق بنفسك من أن شيئًا لا يُرفع',
           paragraphs: [
-            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فلا يستطيع كود الموقع أن يجلب من أي موقع آخر أو يرسل إليه في الخلفية. واختبار آلي يُشغَّل قبل كل إصدار يفتح كل صفحة ويفشل إذا أرسلت أي صفحة طلبًا عبر الشبكة أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر ونسخة الموقع نفسه للعمل دون اتصال. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
+            'ثلاثة أمور تضمن هذا الوعد. سياسة أمان الموقع لا تسمح لكود الموقع بجلب أي شيء إلا من openanydoc.com نفسه؛ والاستثناء الوحيد عنوان ويب تكتبه أنت في «فتح من عنوان URL» في صفحة JSON، وهو يستقبل ملفًا فقط ولا يرسل أي ملف. فلا يستطيع كود الموقع أن يجلب من أي موقع آخر أو يرسل إليه في الخلفية. واختبار آلي يُشغَّل قبل كل إصدار يفتح صفحات الموقع الرئيسية ويفشل إذا جلبت أي منها بيانات أو اتصلت بموقع آخر أو حفظت ملف تعريف ارتباط أو خزّنت أي شيء غير اختيار المظهر وترتيب ألوان قائمة أنواع الملفات ونسخة الموقع نفسه للعمل دون اتصال. والكود المصدري متاح للجميع، فيستطيع أي شخص قراءته.',
             'ويمكنك التحقق بنفسك خلال دقيقة: افتح لوحة الشبكة في متصفحك، وافتح ملفًا هنا، وتأكد أن أي طلب لا يحمله. الخطوات في دليل كيف تتحقق من أن الموقع لا يرفع ملفك.',
           ],
           links: [{ text: 'كيف تتحقق من أن الموقع لا يرفع ملفك', path: '/check-file-upload' }],

@@ -4,10 +4,10 @@ import { useEffect, useRef, useState } from 'react'
 import type { ReactNode, Ref } from 'react'
 import { useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
-import { Notice } from '../../components/Messages'
+import { Notice, useToast } from '../../components/Messages'
 import { formatFileSize } from '../../useFileIntake'
 import { ProgressBar } from '../pdf/PdfToolParts'
-import { VideoTaskFailed, codecName, runVideoTask } from './videoTasks'
+import { VideoTaskFailed, codecName, resultsWithoutSound, runVideoTask } from './videoTasks'
 import type { OutputContainer, VideoInfo } from './videoTasks'
 import type { AudioCodec, VideoCodec } from 'mediabunny'
 
@@ -165,9 +165,11 @@ const ERROR_MESSAGES: Record<VideoTaskFailed['reason'], MessageKey> = {
 }
 
 // The run of a video tool: progress with a Cancel button, the error line (naming a codec this browser can't read or make, and one
-// it can), and the result handed to the page.
+// it can), and the result handed to the page, with a warning when the video's sound couldn't be read and was left out (a toast,
+// because the tool is hidden once the result shows).
 export function useVideoJob(onResult: (file: File) => void) {
   const { t } = useT()
+  const { showToast } = useToast()
   const [progress, setProgress] = useState<{ done: number; total: number } | null>(null)
   const [error, setError] = useState('')
   const controllerRef = useRef<AbortController | null>(null)
@@ -180,7 +182,10 @@ export function useVideoJob(onResult: (file: File) => void) {
     setProgress({ done: 0, total: 0 })
     try {
       const file = await make((done, total) => setProgress({ done, total }), controller.signal)
-      if (!controller.signal.aborted) onResult(file)
+      if (!controller.signal.aborted) {
+        onResult(file)
+        if (resultsWithoutSound.has(file)) showToast({ message: t('tools.video.soundDropped'), kind: 'warning' })
+      }
     } catch (caught) {
       if (caught instanceof VideoTaskFailed) {
         const key = caught.reason === 'encode' && !caught.suggestion ? 'tools.video.cantEncodeNoOther' : ERROR_MESSAGES[caught.reason]

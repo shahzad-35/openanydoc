@@ -1,7 +1,10 @@
 import { useDeferredValue, useMemo, useRef, useState } from 'react'
-import { useT } from '../../i18n'
+import { isolateLeftToRight, useT } from '../../i18n'
 import type { MessageKey } from '../../i18n'
+import { formatFileSize } from '../../useFileIntake'
+import { formatDefinitions } from '../registry'
 import { diffJson, formatWithPaths } from './jsonDiff'
+import { findJsonSourceFormat, readSourceAsJsonText } from './jsonFormats'
 import type { JsonDifference, PathLine } from './jsonDiff'
 import { formatPathText, getPathKey } from './jsonModel'
 import type { JsonPath, JsonValue } from './jsonModel'
@@ -9,6 +12,8 @@ import { parseKeepingBigNumbers, restoreBigNumbers } from './jsonTools'
 
 const MAX_SHOWN_LINES = 20_000
 const MAX_LISTED_DIFFERENCES = 300
+// The second document has the same size limit as the open one.
+const MAX_FILE_BYTES = formatDefinitions.find((format) => format.viewerId === 'json')?.maxFileBytes ?? Infinity
 
 type Side = 'left' | 'right'
 
@@ -35,19 +40,26 @@ export default function JsonComparePanel({ root }: { root: JsonValue }) {
   const { t, tp } = useT()
   const [otherText, setOtherText] = useState('')
   const [otherName, setOtherName] = useState('')
+  const [fileError, setFileError] = useState('')
   const [ignoreKeyOrder, setIgnoreKeyOrder] = useState(true)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const deferredOtherText = useDeferredValue(otherText)
 
+  const describeTooLarge = (byteCount: number) =>
+    `${t('intake.tooLarge', { size: isolateLeftToRight(formatFileSize(byteCount)) })} ${t('intake.tooLargeDetail', { format: 'JSON', limit: isolateLeftToRight(`${MAX_FILE_BYTES / (1024 * 1024)} MB`) })}`
+
+  // Pasted text: its length in characters is at most its size in bytes, so this quick check never refuses a text under the limit.
+  const isPastedTextTooLarge = deferredOtherText.length > MAX_FILE_BYTES
   const other = useMemo((): { value: JsonValue } | { error: string } | null => {
-    if (deferredOtherText.trim() === '') return null
+    if (deferredOtherText.trim() === '' || isPastedTextTooLarge) return null
     try {
       const { value, bigNumberCount } = parseKeepingBigNumbers(deferredOtherText)
       return { value: bigNumberCount > 0 ? restoreBigNumbers(value) : (value as JsonValue) }
     } catch (error) {
       return { error: error instanceof Error ? error.message : String(error) }
     }
-  }, [deferredOtherText])
+  }, [deferredOtherText, isPastedTextTooLarge])
+  const shownError = fileError || (isPastedTextTooLarge ? describeTooLarge(new Blob([deferredOtherText]).size) : other && 'error' in other ? other.error : '')
 
   const comparison = useMemo(() => {
     if (!other || 'error' in other) return null
@@ -59,10 +71,29 @@ export default function JsonComparePanel({ root }: { root: JsonValue }) {
     return { differences, leftLines, rightLines, leftMarks: markLines(leftLines, differences, 'left'), rightMarks: markLines(rightLines, differences, 'right'), counts }
   }, [root, other, ignoreKeyOrder])
 
+  // A JSON Lines file is compared as a list of its lines, as the page opens it.
   async function readChosenFile(file: File | undefined) {
     if (!file) return
+    setFileError('')
+    setOtherName('')
+    setOtherText('')
+    if (file.size > MAX_FILE_BYTES) {
+      setFileError(describeTooLarge(file.size))
+      return
+    }
+    const text = await file.text()
+    if (findJsonSourceFormat(file.name) === 'jsonLines') {
+      const converted = await readSourceAsJsonText(text, 'jsonLines')
+      if ('message' in converted) {
+        setFileError(converted.line === null ? converted.message : t('markup.errorAt', { line: converted.line, message: converted.message }))
+        return
+      }
+      setOtherName(file.name)
+      setOtherText(converted.jsonText)
+      return
+    }
     setOtherName(file.name)
-    setOtherText(await file.text())
+    setOtherText(text)
   }
 
   // Scrolls both sides to the first line of a difference's node.
@@ -101,6 +132,7 @@ export default function JsonComparePanel({ root }: { root: JsonValue }) {
           value={otherText}
           onChange={(event) => {
             setOtherName('')
+            setFileError('')
             setOtherText(event.target.value)
           }}
           onDragOver={(event) => event.preventDefault()}
@@ -122,9 +154,9 @@ export default function JsonComparePanel({ root }: { root: JsonValue }) {
           </label>
         </div>
       </div>
-      {other && 'error' in other && (
-        <p className="cmp-error" id="compare-error" role="alert" dir="ltr">
-          {other.error}
+      {shownError && (
+        <p className="cmp-error" id="compare-error" role="alert" dir="auto">
+          {shownError}
         </p>
       )}
       {comparison && (

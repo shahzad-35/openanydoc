@@ -73,7 +73,7 @@
     },
     {
       "question": "How do I convert a PNG to JPG?",
-      "answer": "Open the PNG in an image app and save or export it as JPG: Paint on Windows and Preview on a Mac both can. OpenAnyDoc converts one or many PNGs in your browser with a quality slider, fills transparent parts with white and downloads the JPGs, or a ZIP, without uploading anything."
+      "answer": "Open the PNG in an image app and save or export it as JPG: Preview on a Mac can (checked 24 November 2026). OpenAnyDoc converts one or many PNGs in your browser with a quality slider, fills transparent parts with white and downloads the JPGs, or a ZIP, without uploading anything."
     }
   ]
 }

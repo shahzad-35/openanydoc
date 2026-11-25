@@ -60,6 +60,142 @@ export function parseValueExactly(text: string): JsonValue {
   return bigNumberCount > 0 ? restoreBigNumbers(value) : (value as JsonValue)
 }
 
+// ---------------------------------------------------------------- key order kept
+
+// The document as written, for the steps that write it out again (Format, Minify, Sort, YAML, XML). A plain object would move
+// keys that look like whole numbers ("2024", "10") to the front. A value is its exact text (strings keep their escapes, numbers
+// their digits), a list a list, an object its members in order, each with its key and the key's text as written.
+export type OrderedJsonValue = string | OrderedJsonValue[] | { members: OrderedJsonMember[] }
+export type OrderedJsonMember = { key: string; keyText: string; value: OrderedJsonValue }
+
+// Reads valid JSON text (it throws on anything else). A key written twice in one object keeps its first place and its last
+// value, as JSON.parse does; `duplicateKey` names the first one found.
+export function readJsonKeepingOrder(text: string): { value: OrderedJsonValue; duplicateKey: string | null } {
+  let position = 0
+  let duplicateKey: string | null = null
+
+  const isWhitespaceAt = (at: number) => {
+    const code = text.charCodeAt(at)
+    return code === 32 || code === 10 || code === 13 || code === 9
+  }
+  function skipWhitespace() {
+    while (isWhitespaceAt(position)) position++
+  }
+  function readStringText() {
+    const start = position
+    let end = text.indexOf('"', start + 1)
+    for (;;) {
+      if (end === -1) throw new Error('unterminated string')
+      let backslashCount = 0
+      while (text.charCodeAt(end - 1 - backslashCount) === 92) backslashCount++
+      if (backslashCount % 2 === 0) break
+      end = text.indexOf('"', end + 1)
+    }
+    position = end + 1
+    return text.slice(start, position)
+  }
+  function expect(character: string) {
+    skipWhitespace()
+    if (text[position] !== character) throw new Error(`${character} expected`)
+    position++
+  }
+  function readValue(): OrderedJsonValue {
+    skipWhitespace()
+    const character = text[position]
+    if (character === '{') {
+      position++
+      const members: OrderedJsonMember[] = []
+      skipWhitespace()
+      if (text[position] === '}') {
+        position++
+        return { members }
+      }
+      const positionByKey = new Map<string, number>()
+      for (;;) {
+        skipWhitespace()
+        if (text[position] !== '"') throw new Error('key expected')
+        const keyText = readStringText()
+        const key = keyText.includes('\\') ? (JSON.parse(keyText) as string) : keyText.slice(1, -1)
+        expect(':')
+        const value = readValue()
+        const earlierPosition = positionByKey.get(key)
+        if (earlierPosition === undefined) {
+          positionByKey.set(key, members.length)
+          members.push({ key, keyText, value })
+        } else {
+          duplicateKey ??= key
+          members[earlierPosition] = { key, keyText, value }
+        }
+        skipWhitespace()
+        const separator = text[position++]
+        if (separator === '}') return { members }
+        if (separator !== ',') throw new Error(', expected')
+      }
+    }
+    if (character === '[') {
+      position++
+      const items: OrderedJsonValue[] = []
+      skipWhitespace()
+      if (text[position] === ']') {
+        position++
+        return items
+      }
+      for (;;) {
+        items.push(readValue())
+        skipWhitespace()
+        const separator = text[position++]
+        if (separator === ']') return items
+        if (separator !== ',') throw new Error(', expected')
+      }
+    }
+    if (character === '"') return readStringText()
+    // A number, true, false or null: up to the next comma, closing bracket or space.
+    const start = position
+    while (position < text.length && !isWhitespaceAt(position) && text[position] !== ',' && text[position] !== ']' && text[position] !== '}') position++
+    if (position === start) throw new Error('value expected')
+    return text.slice(start, position)
+  }
+
+  const value = readValue()
+  skipWhitespace()
+  if (position < text.length) throw new Error('unexpected text after the document')
+  return { value, duplicateKey }
+}
+
+// The document as JSON text, laid out the way JSON.stringify(value, null, indent) lays it out.
+export function writeJsonKeepingOrder(value: OrderedJsonValue, indent: number | string): string {
+  const indentUnit = typeof indent === 'number' ? ' '.repeat(indent) : indent
+  const parts: string[] = []
+  function write(node: OrderedJsonValue, currentIndent: string) {
+    if (typeof node === 'string') {
+      parts.push(node)
+      return
+    }
+    const isList = Array.isArray(node)
+    const childCount = isList ? node.length : node.members.length
+    if (childCount === 0) {
+      parts.push(isList ? '[]' : '{}')
+      return
+    }
+    const childIndent = currentIndent + indentUnit
+    const childStart = indentUnit === '' ? '' : `\n${childIndent}`
+    parts.push(isList ? '[' : '{')
+    for (let childPosition = 0; childPosition < childCount; childPosition++) {
+      parts.push(childPosition === 0 ? childStart : `,${childStart}`)
+      if (isList) {
+        write(node[childPosition], childIndent)
+      } else {
+        const member = node.members[childPosition]
+        parts.push(member.keyText, indentUnit === '' ? ':' : ': ')
+        write(member.value, childIndent)
+      }
+    }
+    parts.push(indentUnit === '' ? '' : `\n${currentIndent}`, isList ? ']' : '}')
+  }
+  write(value, '')
+  return parts.join('')
+}
+
 // ---------------------------------------------------------------- Repair
 
 export type RepairFixes = {

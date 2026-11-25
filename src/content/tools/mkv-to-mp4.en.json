@@ -3,7 +3,7 @@
   "description": "Convert MKV files from OBS and downloads to MP4 for phones, TVs and editors. H.264 picture is copied without loss. In your browser, no upload.",
   "heading": "Convert MKV to MP4",
   "subtitle": "Make an MKV from OBS or a download into an MP4 that phones, TVs and editors open; nothing is uploaded.",
-  "intro": "OBS records to MKV by default, because a crash mid-recording leaves an MKV that still plays. Many downloads use MKV too. But iPhones, many smart TVs, Premiere and most social sites want MP4. MKV is only the box: inside there is usually H.264 picture, which this page copies straight into an MP4 without re-encoding, so even an hour of gameplay converts quickly and loses nothing. Other picture codecs are re-encoded to H.264, and sound becomes AAC when it isn't already.",
+  "intro": "OBS records to MKV by default, because a crash mid-recording leaves an MKV that still plays. Many downloads use MKV too. But iPhones, many smart TVs, Premiere and most social sites want MP4. MKV is only the box: inside there is usually H.264 picture, which this page copies straight into an MP4 without re-encoding, so the picture loses nothing. Other picture codecs are re-encoded to H.264, and sound becomes AAC when it isn't already.",
   "features": [
     {
       "title": "Private",

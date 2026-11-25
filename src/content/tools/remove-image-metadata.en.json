@@ -1,9 +1,9 @@
 {
   "title": "Remove Photo Metadata – Strip GPS & EXIF, No Upload",
-  "description": "See the GPS location, camera and date hidden in your photos, then download clean copies without them. JPG pixels kept exactly. Free, and nothing uploaded.",
+  "description": "See the GPS location, camera and date hidden in your photos, then download clean copies without them. Upright JPGs keep exact pixels. Free, no upload.",
   "heading": "Remove GPS and EXIF from Photos",
   "subtitle": "See what your photo reveals, then save a clean copy; nothing is uploaded.",
-  "intro": "Photos from phones carry hidden details: the exact GPS location where they were taken, the phone or camera model, and the date and time. This tool lists what each picture contains, for example \"This photo contains your GPS location\", then saves a clean copy. JPG, PNG and WebP files keep their exact pixels because only the metadata is cut out; each copy is checked again before you get it.",
+  "intro": "Photos from phones carry hidden details: the exact GPS location where they were taken, the phone or camera model, and the date and time. This tool lists what each picture contains, for example \"This photo contains your GPS location\", then saves a clean copy. JPG, PNG and WebP files keep their exact pixels because only the metadata is cut out, apart from a JPG with a sideways orientation tag; each copy is checked again before you get it.",
   "features": [
     {
       "title": "Private",
@@ -11,7 +11,7 @@
     },
     {
       "title": "Pixels untouched",
-      "text": "JPG, PNG and WebP are cleaned without being re-saved, so the picture looks exactly the same."
+      "text": "JPG, PNG and WebP are cleaned without being re-saved, so the picture looks exactly the same; only a JPG with a sideways orientation tag is saved again upright."
     },
     {
       "title": "Checked before download",
@@ -38,7 +38,7 @@
     "Found and removed: GPS location, camera and lens, date taken, software, author and other EXIF, XMP and IPTC fields.",
     "JPG: EXIF, XMP, IPTC and comments cut out; the colour profile is kept so colours don't shift.",
     "PNG and WebP: text, EXIF and XMP chunks removed; pixels unchanged.",
-    "HEIC, TIFF and others: saved again as a clean JPG."
+    "HEIC and TIFF: saved again as a clean JPG; GIF, BMP and SVG as a clean PNG, and AVIF as a clean AVIF."
   ],
   "limits": [
     "A JPG with a sideways orientation tag is saved again upright, so its pixels change slightly.",
@@ -61,7 +61,7 @@
     },
     {
       "question": "Will the photo lose quality?",
-      "answer": "No for JPG, PNG and WebP: only the metadata is cut out and the picture data is copied as it is. HEIC and TIFF are saved again as high-quality JPG."
+      "answer": "No for JPG, PNG and WebP: only the metadata is cut out and the picture data is copied as it is. The exception is a JPG with a sideways orientation tag, which is saved again upright at high quality, as are HEIC and TIFF (as JPG)."
     },
     {
       "question": "Why is a turned JPG saved again?",
@@ -73,7 +73,7 @@
     },
     {
       "question": "How do I remove the location from a photo?",
-      "answer": "Remove the photo's metadata, which is where the GPS location is kept: on iPhone, Options in the share sheet can leave the location out, and a metadata remover saves a clean copy of any photo. OpenAnyDoc lists what each photo reveals and saves clean copies in your browser, without uploading them."
+      "answer": "Remove the photo's metadata, which is where the GPS location is kept: on iPhone, Options in the share sheet can leave the location out (checked 24 November 2026), and a metadata remover saves a clean copy of any photo. OpenAnyDoc lists what each photo reveals and saves clean copies in your browser, without uploading them."
     }
   ]
 }

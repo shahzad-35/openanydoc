@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: make a chart from a CSV",
@@ -39,7 +39,7 @@
   ],
   "handlesTitle": "What the chart maker handles",
   "handles": [
-    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet).",
     "Charts: bar, line and pie, drawn in your browser.",
     "Labels: one category column.",
     "Values: count of rows, or sum or average of a number column.",
@@ -70,7 +70,7 @@
     },
     {
       "question": "Can I make a chart from an Excel file?",
-      "answer": "Yes. Its first sheet opens as the table, and a notice says so."
+      "answer": "Yes. Its first sheet opens as the table."
     },
     {
       "question": "In what format can I save the chart?",

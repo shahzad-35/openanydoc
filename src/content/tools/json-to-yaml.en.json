@@ -1,13 +1,13 @@
 {
   "title": "JSON to YAML Converter for Config Files | OpenAnyDoc",
-  "description": "Convert JSON to YAML in your browser: the YAML appears at once, keys in their original order, ready to copy or download as a .yaml file.",
+  "description": "Convert JSON to YAML in your browser: the YAML appears at once, keys not sorted A to Z, ready to copy or download as a .yaml file.",
   "heading": "JSON to YAML Converter",
   "subtitle": "Open or paste JSON and its YAML appears at once, ready to copy or download as .yaml; nothing is uploaded.",
-  "intro": "Turn a JSON file into YAML for a Kubernetes manifest, a Docker Compose file, a GitHub Actions workflow or an OpenAPI spec. Open, drop or paste the JSON and the YAML version opens in a dialog straight away, with keys in the order you wrote them and long lines left unwrapped, so strings come out whole. Copy it or download it as a .yaml file. The JSON stays open in the viewer behind it, so you can fix a value and convert again. The conversion runs in your browser.",
+  "intro": "Turn a JSON file into YAML for a Kubernetes manifest, a Docker Compose file, a GitHub Actions workflow or an OpenAPI spec. Open, drop or paste the JSON and the YAML version opens in a dialog straight away, with keys in the order you wrote them (keys that are whole numbers, such as \"2024\", included) and long lines left unwrapped, so strings come out whole. Copy it or download it as a .yaml file. The JSON stays open in the viewer behind it, so you can fix a value and convert again. The conversion runs in your browser.",
   "features": [
     { "title": "Private", "text": "Your JSON is converted by your own browser and never sent to a server, so configs with secrets stay on your device." },
-    { "title": "Key order kept", "text": "Keys come out in the order they appear in the JSON, not sorted, so the YAML reads like the file you know." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Not sorted A to Z", "text": "Keys come out in the order they appear in the JSON, not sorted A to Z, and keys that are whole numbers, such as \"2024\", stay where they were." },
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: convert JSON to YAML",
   "steps": [
@@ -18,7 +18,7 @@
   "handlesTitle": "What the JSON to YAML converter handles",
   "handles": [
     "Nested objects and arrays, written as indented block YAML.",
-    "Key order exactly as in the JSON file.",
+    "Key order as in the JSON file, keys that are whole numbers such as \"2024\" included.",
     "Long strings kept on one line, never folded at 80 characters.",
     "Strings that would read as something else in YAML (yes, no, on, 0123, dates) are quoted so they stay strings.",
     "Arabic and other non-Latin text written as it is, not as escape codes.",
@@ -32,11 +32,11 @@
   "faqTitle": "JSON to YAML: questions and answers",
   "faq": [
     { "question": "Is my file uploaded?", "answer": "No. The JSON is read and turned into YAML by your browser, on your device. Pasted text stays in this tab and is never sent anywhere." },
-    { "question": "Will the keys be sorted alphabetically?", "answer": "No. Keys keep the order they have in your JSON, which matters for files people read, such as a Compose file or a workflow." },
+    { "question": "Will the keys be sorted alphabetically?", "answer": "No. Keys keep the order they have in your JSON, which matters for files people read, such as a Compose file or a workflow. That includes keys that are whole numbers, such as \"2024\", which stay where you wrote them." },
     { "question": "Why are some values in quotes in the YAML?", "answer": "In YAML, bare words such as yes, no, on, off or 2026-11-19 can be read as booleans or dates. Strings like these are quoted so that reading the YAML back gives the same strings your JSON had." },
     { "question": "Can I use the result for Kubernetes or Docker Compose?", "answer": "Yes. The output is plain block-style YAML that kubectl, Docker Compose and GitHub Actions read. The converter changes the format only, not the meaning, so the content still has to be a valid manifest." },
     { "question": "Is there a size limit?", "answer": "Files up to 10 MB. Larger files are refused before they are read." },
     { "question": "Can I convert YAML back to JSON?", "answer": "Yes, on the YAML to JSON page, which opens a .yaml or .yml file as JSON.", "link": { "text": "YAML to JSON", "path": "/yaml-to-json" } },
-    { "question": "How do I convert JSON to YAML?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON to YAML converter and the YAML appears at once, with keys in their original order. Copy it or download it as a .yaml file; the JSON is converted in your browser without being uploaded." }
+    { "question": "How do I convert JSON to YAML?", "answer": "Open or paste the JSON in OpenAnyDoc's JSON to YAML converter and the YAML appears at once, with keys not sorted A to Z. Copy it or download it as a .yaml file; the JSON is converted in your browser without being uploaded." }
   ]
 }

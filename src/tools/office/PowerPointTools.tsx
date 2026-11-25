@@ -70,13 +70,27 @@ async function readLayouts(zip: JSZip) {
   )
 }
 
+async function findNotesMasterPath(zip: JSZip) {
+  const relationship = (await readRelationships(zip, PRESENTATION)).find((candidate) => typeEnd(candidate.type) === 'notesMaster')
+  return relationship ? resolveTarget(PRESENTATION, relationship.target) : null
+}
+
+// The target has no notes master, so later decks' speaker notes would have nothing to stand on: the source's is copied in,
+// with its theme, and listed in the presentation.
+async function addNotesMaster(source: JSZip, sourcePath: string, target: JSZip, presentationXml: XMLDocument) {
+  const targetPath = await copyPartTree(source, sourcePath, target, () => undefined)
+  const relationshipId = await addRelationship(target, PRESENTATION, `${RELATIONSHIP_TYPE}/notesMaster`, targetPath.replace(/^ppt\//, ''))
+  const [notesMasterList] = parseXmlElements(presentationXml, `<p:notesMasterIdLst><p:notesMasterId r:id="${relationshipId}"/></p:notesMasterIdLst>`)
+  presentationXml.getElementsByTagNameNS(P, 'sldMasterIdLst')[0].after(notesMasterList)
+  return targetPath
+}
+
 async function mergePresentations(files: File[]) {
   const target = await openPresentation(files[0])
   const presentationXml = (await readXmlPart(target, PRESENTATION))!
   const targetLayouts = await readLayouts(target)
   if (targetLayouts.length === 0) throw new OfficeToolProblem('office.notPowerPoint')
-  const notesMasterRelationship = (await readRelationships(target, PRESENTATION)).find((relationship) => typeEnd(relationship.type) === 'notesMaster')
-  const notesMasterPath = notesMasterRelationship ? resolveTarget(PRESENTATION, notesMasterRelationship.target) : null
+  let notesMasterPath = await findNotesMasterPath(target)
   let slideIdList = presentationXml.getElementsByTagNameNS(P, 'sldIdLst')[0]
   if (!slideIdList) {
     slideIdList = presentationXml.createElementNS(P, 'p:sldIdLst')
@@ -89,6 +103,8 @@ async function mergePresentations(files: File[]) {
   for (const file of files.slice(1)) {
     const source = await openPresentation(file)
     const sourceXml = (await readXmlPart(source, PRESENTATION))!
+    const sourceNotesMasterPath = await findNotesMasterPath(source)
+    if (!notesMasterPath && sourceNotesMasterPath) notesMasterPath = await addNotesMaster(source, sourceNotesMasterPath, target, presentationXml)
     const copied = new Map<string, string>()
     for (const { path } of await readSlideList(source, sourceXml)) {
       if (!path || !source.file(path)) continue
@@ -119,6 +135,7 @@ async function mergePresentations(files: File[]) {
     }
   }
   writeXmlPart(target, PRESENTATION, presentationXml)
+  await setContentType(target, PRESENTATION, PRESENTATION_MAIN_TYPE)
   return packageToFile(target, `${baseNameOf(files[0].name)}-merged.pptx`, POWERPOINT_TYPE)
 }
 
@@ -159,6 +176,8 @@ async function keepSlides(bytes: ArrayBuffer, fileName: string, keptIndexes: Set
   for (const customShows of Array.from(presentationXml.getElementsByTagNameNS(P, 'custShowLst'))) customShows.remove()
   writeXmlPart(zip, PRESENTATION, presentationXml)
   await removeUnusedParts(zip)
+  // The part is saved as .pptx, also when it comes from a slide show or a template.
+  await setContentType(zip, PRESENTATION, PRESENTATION_MAIN_TYPE)
   return zip
 }
 
@@ -243,10 +262,13 @@ export function SearchPptx({ files }: ToolProps) {
     if (!slides || needle === '') return []
     return slides.flatMap((slide, slideIndex) =>
       [...[slide.title, ...slide.paragraphs].map((text) => ({ text, isNotes: false })), { text: slide.notes, isNotes: true }].flatMap(({ text, isNotes }) => {
-        const index = text.toLocaleLowerCase().indexOf(needle)
-        if (index === -1) return []
-        const start = Math.max(0, index - SNIPPET_RADIUS)
-        return [{ slideNumber: slideIndex + 1, isNotes, before: `${start > 0 ? '…' : ''}${text.slice(start, index)}`, match: text.slice(index, index + needle.length), after: `${text.slice(index + needle.length, index + needle.length + SNIPPET_RADIUS)}${index + needle.length + SNIPPET_RADIUS < text.length ? '…' : ''}` }]
+        const lowerText = text.toLocaleLowerCase()
+        const matches = []
+        for (let index = lowerText.indexOf(needle); index !== -1; index = lowerText.indexOf(needle, index + needle.length)) {
+          const start = Math.max(0, index - SNIPPET_RADIUS)
+          matches.push({ slideNumber: slideIndex + 1, isNotes, before: `${start > 0 ? '…' : ''}${text.slice(start, index)}`, match: text.slice(index, index + needle.length), after: `${text.slice(index + needle.length, index + needle.length + SNIPPET_RADIUS)}${index + needle.length + SNIPPET_RADIUS < text.length ? '…' : ''}` })
+        }
+        return matches
       }),
     )
   }, [slides, query])

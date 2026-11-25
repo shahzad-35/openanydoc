@@ -1,9 +1,9 @@
 {
   "title": "PPTX to JPG – Turn PowerPoint Slides into Images Free",
-  "description": "Turn each PowerPoint slide into a JPG image in your browser, about 2000 px wide for a 16:9 slide, several in one ZIP. Free, and nothing is uploaded.",
+  "description": "Turn each PowerPoint slide into a JPG image in your browser at 200 dpi, about 2,670 px wide for PowerPoint's 16:9 slide, several in a ZIP. No upload.",
   "heading": "PowerPoint to JPG",
   "subtitle": "Turn every slide of a PowerPoint file into a sharp JPG picture, several at once in a ZIP; nothing is uploaded.",
-  "intro": "Convert PPTX to JPG online without PowerPoint: each slide is drawn the way this site's PowerPoint viewer (beta) shows it and saved as a JPG picture at 200 dpi, about 2000 px wide for a 16:9 slide. One slide gives one .jpg; a whole deck gives a ZIP with the slides numbered in order. Handy for posting a slide on social media, adding it to a document or sending it to a phone. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "intro": "Convert PPTX to JPG online without PowerPoint: each slide is drawn the way this site's PowerPoint viewer (beta) shows it and saved as a JPG picture at 200 dpi, about 2,670 px wide for PowerPoint's standard 16:9 slide. One slide gives one .jpg; a whole deck gives a ZIP with the slides numbered in order. Handy for posting a slide on social media, adding it to a document or sending it to a phone. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -11,7 +11,7 @@
     },
     {
       "title": "Sharp pictures",
-      "text": "Each slide is drawn at 200 dpi, about 2000 px wide for a 16:9 slide."
+      "text": "Each slide is drawn at 200 dpi, about 2,670 px wide for PowerPoint's standard 16:9 slide."
     },
     {
       "title": "Numbered in order",
@@ -64,11 +64,11 @@
     },
     {
       "question": "How do I save a PowerPoint slide as a JPG without PowerPoint?",
-      "answer": "Keynote on a Mac, LibreOffice Impress and Google Slides can all export slides as pictures for free. In OpenAnyDoc, choose the .pptx file and download a JPG of every slide, numbered in a ZIP; it is converted in your browser and never uploaded."
+      "answer": "In OpenAnyDoc, choose the .pptx file and download a JPG of every slide, numbered in a ZIP; it is converted in your browser and never uploaded."
     },
     {
       "question": "How large are the pictures?",
-      "answer": "Each slide is drawn at 200 dpi: about 2000 px wide for a 16:9 slide. To make the files smaller, run them through Compress image.",
+      "answer": "Each slide is drawn at 200 dpi: about 2,670 px wide for PowerPoint's standard 16:9 slide (13.33 inches). To make the files smaller, run them through Compress image.",
       "link": {
         "text": "Compress image",
         "path": "/compress-image"

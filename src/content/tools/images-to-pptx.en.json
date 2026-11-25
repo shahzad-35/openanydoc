@@ -39,7 +39,7 @@
   ],
   "handlesTitle": "What Images to PowerPoint handles",
   "handles": [
-    "Pictures: JPG, PNG, WebP, TIFF, SVG and HEIC (where your browser can read it).",
+    "Pictures: JPG, PNG, WebP, TIFF, SVG and HEIC.",
     "Slides: Widescreen 16:9 or Standard 4:3.",
     "One picture per slide, as large as fits and centred.",
     "Output: an editable .pptx file."
@@ -47,7 +47,7 @@
   "limits": [
     "No text, titles or captions are added; type them in your presentation app afterwards.",
     "Every picture gets a slide of its own; several pictures on one slide aren't supported.",
-    "HEIC photos work only where your browser can read them; save others as JPG first."
+    "A HEIC photo that can't be decoded is marked and left out; turn it into a JPG first."
   ],
   "worksBest": [
     "Photo slideshows and albums",
@@ -57,7 +57,7 @@
   "mayNotKeep": [
     "Titles, captions and text",
     "Several pictures on one slide",
-    "HEIC photos your browser can't read"
+    "HEIC photos that can't be decoded"
   ],
   "faqTitle": "Images to PowerPoint: questions",
   "faq": [
@@ -67,11 +67,11 @@
     },
     {
       "question": "How do I make a PowerPoint from photos without PowerPoint?",
-      "answer": "Google Slides, Keynote and LibreOffice Impress can all insert pictures into slides for free, one picture at a time. In OpenAnyDoc, add all your pictures at once, set their order and download a .pptx with one picture per slide; it is made in your browser and nothing is uploaded."
+      "answer": "In OpenAnyDoc, add all your pictures at once, set their order and download a .pptx with one picture per slide; it is made in your browser and nothing is uploaded."
     },
     {
       "question": "Can I edit the slides afterwards?",
-      "answer": "Yes. The result is an ordinary .pptx file: open it in PowerPoint, Keynote, Google Slides or LibreOffice to move or resize pictures and add text. To check it here, open it in the PowerPoint viewer.",
+      "answer": "Yes. The result is an ordinary .pptx file: open it in PowerPoint to move or resize pictures and add text. To check it here, open it in the PowerPoint viewer.",
       "link": {
         "text": "PowerPoint viewer",
         "path": "/powerpoint-viewer"
@@ -79,7 +79,7 @@
     },
     {
       "question": "Is the quality of my photos kept?",
-      "answer": "Yes. JPG and PNG pictures go into the file as they are, without being compressed again. To make the file smaller, compress the photos first with Compress image.",
+      "answer": "Mostly. PNG pictures and JPG photos that need no turning go into the file as they are, without being compressed again; HEIC photos and JPGs that need turning are redrawn as JPG, and WebP, TIFF and SVG as PNG. To make the file smaller, compress the photos first with Compress image.",
       "link": {
         "text": "Compress image",
         "path": "/compress-image"
@@ -87,7 +87,7 @@
     },
     {
       "question": "Can I use iPhone HEIC photos?",
-      "answer": "Yes, where your browser can read them. If one won't open, turn it into a JPG with HEIC to JPG first.",
+      "answer": "Yes. If one can't be decoded, turn it into a JPG with HEIC to JPG first.",
       "link": {
         "text": "HEIC to JPG",
         "path": "/heic-to-jpg"

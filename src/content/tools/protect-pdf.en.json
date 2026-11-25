@@ -41,12 +41,12 @@
   "handles": [
     "AES-256 encryption with a password to open.",
     "Printing, copying and changes allowed or blocked, with a permissions password.",
-    "Any PDF that opens without a password; text, pictures, links and form fields stay as they are."
+    "Any PDF that opens without a password, including one that only restricts printing or copying; text, pictures, links and form fields stay as they are."
   ],
   "limits": [
     "A forgotten password can't be recovered, here or anywhere else.",
     "Permissions are honoured by PDF readers; they are not a lock on what someone who can open the file sees.",
-    "A PDF that already has a password must be unlocked first."
+    "A PDF that already needs a password to open must be unlocked first. Printing or copying restrictions already on a file are replaced by the ones you choose."
   ],
   "faqTitle": "Protect PDF: questions",
   "faq": [

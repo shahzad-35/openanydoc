@@ -54,7 +54,7 @@
   "faq": [
     {
       "question": "Is any real data used?",
-      "answer": "No. Every value is made up by your browser from scratch. Names are random combinations, emails always end in @example.com, a domain reserved for examples, and phone numbers come from ranges set aside for fiction, so none of them belongs to a real person."
+      "answer": "No. Every value is made up by your browser from scratch. Names are random combinations, emails always end in @example.com, a domain reserved for examples, and phone numbers come from ranges set aside for fiction, so none of them is taken from a real person."
     },
     {
       "question": "Is anything sent to a server?",
@@ -78,7 +78,7 @@
     },
     {
       "question": "How do I generate fake data for testing?",
-      "answer": "Generate fake test data with a tool that makes up names, emails, dates and numbers instead of copying real customer records. In OpenAnyDoc, choose the columns and the number of rows, press Generate and download CSV, Excel or JSON; every value is made up in your browser, so no real person's data is involved."
+      "answer": "Generate fake test data with a tool that makes up names, emails, dates and numbers instead of copying real customer records. In OpenAnyDoc, choose the columns and the number of rows, then download CSV, Excel or JSON; every value is made up in your browser, so no real person's data is involved."
     }
   ]
 }

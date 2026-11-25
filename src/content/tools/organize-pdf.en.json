@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to organize PDF pages",
@@ -42,7 +42,7 @@
   ],
   "limits": [
     "PDFs that need a password to open can't be organized; remove the password first.",
-    "Bookmarks and form fields may not carry over to the new PDF.",
+    "Bookmarks don't carry over to the new PDF; form fields on the pages you keep stay fillable.",
     "Very large PDFs are limited by your device's memory."
   ],
   "faqTitle": "Organize PDF: questions",

@@ -46,7 +46,7 @@
   "limits": [
     "Pages with a box become pictures with an invisible text layer: their text can be selected and searched but not edited, and zooming in is less sharp. Pages without a box are copied as they are.",
     "A line of text that a box touches is left out of the selectable text whole, to be safe; it still shows on the page.",
-    "Bookmarks, form fields and the document's links are not carried into the redacted copy.",
+    "Bookmarks and form fields are not carried into the redacted copy, and links on pages with a redaction box are not kept; pages without a box keep their web links.",
     "Search finds text, not words inside scanned pictures; mark scanned pages by hand.",
     "PDFs that need a password to open can't be read; remove the password first."
   ],

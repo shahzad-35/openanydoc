@@ -1,9 +1,9 @@
 {
   "title": "Base64 Encode and Decode Online – Text, Files | OpenAnyDoc",
-  "description": "Encode text or any file to Base64, or decode Base64 back to text or a file. UTF-8 safe, with a URL-safe option. Free, in your browser, nothing is uploaded.",
+  "description": "Encode text or a file, such as an image or PDF, to Base64, or decode Base64 back to text or a file. UTF-8 safe, with a URL-safe option. No upload.",
   "heading": "Base64 Encoder and Decoder",
   "subtitle": "Type or paste text and press Encode to turn it into Base64, or Decode to turn Base64 back into text; nothing is uploaded.",
-  "intro": "A free Base64 encoder and decoder online: type or paste text and press Encode or Decode, or drop any file to get its Base64. Text is read as UTF-8, so Arabic, accents and emoji come back exactly, and the URL-safe option writes - and _ instead of + and / with no = padding. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "intro": "A free Base64 encoder and decoder online: type or paste text and press Encode or Decode, or drop a file, such as an image, PDF or ZIP, to get its Base64. Text is read as UTF-8, so Arabic, accents and emoji come back exactly, and the URL-safe option writes - and _ instead of + and / with no = padding. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
   "features": [
     {
       "title": "Text and files",
@@ -36,7 +36,7 @@
   "handlesTitle": "What the Base64 tool handles",
   "handles": [
     "Text: read and written as UTF-8, so Arabic, accented letters and emoji round-trip exactly.",
-    "Files: any file up to 10 MB, opened or dropped, turned into Base64.",
+    "Files: .txt, .json, .xml, .csv, .yaml, .yml, .html, .svg, .png, .jpg, .jpeg, .gif, .webp, .pdf, .zip and .bin files up to 10 MB, opened or dropped, turned into Base64.",
     "URL-safe Base64: - and _ instead of + and /, with no = padding; both forms are decoded.",
     "Binary results: decoded bytes that are not text can be downloaded as a file.",
     "Errors: Base64 with invalid characters or a broken length is reported, not silently decoded."

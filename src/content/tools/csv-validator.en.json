@@ -40,7 +40,7 @@
   "handlesTitle": "What the CSV validator checks",
   "handles": [
     "Delimiter: detected from the file and shown in the report.",
-    "Encoding: UTF-8, UTF-16, or Windows-1256 when the file is not valid UTF-8; the byte order mark is reported.",
+    "Encoding: UTF-8, UTF-16, or, when the file is not valid UTF-8, Windows-1256 (Arabic) or Windows-1252 (Western European); the byte order mark is reported.",
     "Line endings: CRLF or LF.",
     "Parse problems: unclosed quotes, and rows with more or fewer fields than the header, each with its row.",
     "Health checks: mixed types in a column, spaces at either end of cells, repeated rows."
@@ -65,7 +65,7 @@
     },
     {
       "question": "How is the encoding detected?",
-      "answer": "The file is read as UTF-8, or UTF-16 when it starts with that byte order mark. When it is not valid UTF-8, it is read as Windows-1256, common in older Arabic files."
+      "answer": "The file is read as UTF-8, or UTF-16 when it starts with that byte order mark. When it is not valid UTF-8, it is read as Windows-1256, common in older Arabic files, or as Windows-1252 when its letters look Western European, such as ä, é or ñ."
     },
     {
       "question": "Can I fix the problems here?",

@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert Excel to SQL",
@@ -71,7 +71,7 @@
     },
     {
       "question": "How do I turn several sheets into several tables?",
-      "answer": "Convert one sheet at a time: pick a sheet, copy or download its SQL, then pick the next. Each sheet name gives its own table name."
+      "answer": "Convert one sheet at a time: pick a sheet, copy or download its SQL, then pick the next. The table name is set from the first sheet when the workbook opens; type the next table's name yourself."
     },
     {
       "question": "Why does the preview stop partway through?",
@@ -79,7 +79,7 @@
     },
     {
       "question": "How do I convert an Excel file to SQL INSERT statements?",
-      "answer": "Open the workbook in OpenAnyDoc's Excel to SQL converter, pick the sheet, and copy the INSERT statements or download them as a .sql file. One sheet becomes one table named after the sheet, and the workbook is read in your browser without being uploaded."
+      "answer": "Open the workbook in OpenAnyDoc's Excel to SQL converter, pick the sheet, and copy the INSERT statements or download them as a .sql file. One sheet becomes one table, with a table name you can change, and the workbook is read in your browser without being uploaded."
     }
   ]
 }

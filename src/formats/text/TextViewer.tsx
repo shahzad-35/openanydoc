@@ -1013,7 +1013,7 @@ export default function TextViewer({ openedFile, session: untypedSession, confir
       ? 'utf-8-bom'
       : readableText.status === 'ok' && readableText.encodingLabel === 'UTF-16 LE'
         ? 'utf-16le'
-        : readableText.status === 'ok' && readableText.encodingLabel === 'Windows-1256'
+        : readableText.status === 'ok' && readableText.encodingLabel.startsWith('Windows-1256')
           ? 'windows-1256'
           : 'utf-8'
     setDownloadSettings({ fileName: buildDownloadName(fileName, isEdited, null), encoding: sourceEncoding, lineEnding: effectiveLineEnding })

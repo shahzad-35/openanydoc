@@ -25,8 +25,8 @@
       "text": "Click Choose a file, or drop a .pptx, .ppsx, .potx or .pptm file on the page."
     },
     {
-      "title": "Let it collect the media",
-      "text": "Every picture, video and audio file stored in the presentation is gathered."
+      "title": "Extract the media",
+      "text": "Click Extract: every picture, video and audio file stored in the presentation is gathered."
     },
     {
       "title": "Download",
@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I get all the pictures out of a PowerPoint?",
-      "answer": "Pictures in a presentation can be saved one at a time in PowerPoint by right-clicking a picture and choosing Save as Picture. This page saves all of them at once: choose the file and download every picture, video and audio file at original quality, without uploading."
+      "answer": "Pictures in a presentation can be saved one at a time in PowerPoint by right-clicking a picture and choosing Save as Picture (checked 24 November 2026). This page saves all of them at once: choose the file and download every picture, video and audio file at original quality, without uploading."
     },
     {
       "question": "Are the pictures re-compressed?",

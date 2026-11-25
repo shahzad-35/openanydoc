@@ -66,7 +66,7 @@
     },
     {
       "question": "Why can't it decode my token?",
-      "answer": "A token with five parts is an encrypted JWT (JWE), whose contents can only be read with the key. Otherwise a part may have been cut off or changed when it was copied; the page says which part could not be read."
+      "answer": "A token with five parts is an encrypted JWT (JWE), whose contents can only be read with the key. Otherwise a part may have been cut off or changed when it was copied; the page says that the header or the payload could not be read."
     },
     {
       "question": "Is it free, and does it work offline?",

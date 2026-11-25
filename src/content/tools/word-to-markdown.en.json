@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After your first file, the tool keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert Word to Markdown",
@@ -43,7 +43,7 @@
   ],
   "limits": [
     "Pictures, charts and shapes are left out; only the text is converted.",
-    "Old .doc files and OpenDocument .odt files are not read here; save them as .docx in Word or LibreOffice first.",
+    "Old .doc files and OpenDocument .odt files are not read here; save them as .docx in Word or LibreOffice first (checked 24 November 2026).",
     "Tables with merged cells or tables inside tables may come out flattened.",
     "Headings are found from Word's heading styles, so text that only looks like a heading stays a paragraph."
   ],
@@ -63,7 +63,7 @@
     },
     {
       "question": "Can I convert an old .doc or an .odt file?",
-      "answer": "Not directly: only .docx, .dotx and .docm files are converted. Open the file in Word or LibreOffice and save it as .docx, then drop the new file here. You can still read an .odt file in the Word viewer.",
+      "answer": "Not directly: only .docx, .dotx and .docm files are converted. Open the file in Word or LibreOffice and save it as .docx (checked 24 November 2026), then drop the new file here. You can still read an .odt file in the Word viewer.",
       "link": {
         "text": "Word viewer",
         "path": "/word-viewer"

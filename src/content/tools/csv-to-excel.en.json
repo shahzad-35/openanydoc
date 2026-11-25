@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -42,7 +42,7 @@
     "Files: .csv, .tsv and .tab, or CSV text you paste.",
     "Delimiters: comma, semicolon, tab and pipe, detected for you; UTF-8 and other common encodings.",
     "Layout: one sheet, a bold header row, and columns sized to their longest text (up to 60 characters).",
-    "Numbers: plain numbers such as 42 or 3.5 become real numbers; values like 007, phone numbers and long IDs stay text, so no digit is lost.",
+    "Numbers: plain numbers such as 42 or 3.5 become real numbers; values with a leading zero, such as 007, values that start with +, and IDs longer than 15 digits stay text. A decimal loses its trailing zeros (2.50 becomes 2.5).",
     "Arabic and other non-Latin text is kept exactly in the workbook."
   ],
   "limits": [
@@ -57,7 +57,7 @@
     },
     {
       "question": "Are leading zeros kept, for example in codes like 00123?",
-      "answer": "Yes. Only plain numbers become numbers in the workbook. A value that starts with 0, a phone number or an ID longer than 15 digits stays text, exactly as it was in the CSV."
+      "answer": "Yes. Only plain numbers become numbers in the workbook. A value with a leading zero, such as 00123, a value that starts with +, or an ID longer than 15 digits stays text, exactly as it was in the CSV."
     },
     {
       "question": "What if the columns come out wrong?",

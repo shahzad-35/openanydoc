@@ -137,29 +137,44 @@ export async function translateLongText(text: string, translator: OnDeviceTransl
 }
 
 // A text longer than the summarizer takes at once is cut at paragraphs into parts that fit; each part is summarised, then the
-// part summaries are summarised together.
-export async function summarizeLongText(text: string, summarizer: OnDeviceSummarizer, onProgress: (done: number, total: number) => void) {
+// part summaries are summarised together (in parts again if they still don't fit).
+export async function summarizeLongText(text: string, summarizer: OnDeviceSummarizer, onProgress: (done: number, total: number) => void): Promise<string> {
   const fitsAtOnce = async (part: string) => !summarizer.measureInputUsage || !summarizer.inputQuota || (await summarizer.measureInputUsage(part)) <= summarizer.inputQuota
   if (await fitsAtOnce(text)) {
     onProgress(1, 1)
     return summarizer.summarize(text)
   }
+  // A paragraph too long on its own is cut at sentence ends, and a sentence too long on its own into even slices, so every word is read.
+  const piecesThatFit = async (paragraph: string): Promise<string[]> => {
+    if (await fitsAtOnce(paragraph)) return [paragraph]
+    const sentences = paragraph.split(/(?<=[.!?؟。])\s+/)
+    if (sentences.length > 1) {
+      const pieces: string[] = []
+      for (const sentence of sentences) pieces.push(...(await piecesThatFit(sentence)))
+      return pieces
+    }
+    const sliceCount = Math.ceil((await summarizer.measureInputUsage!(paragraph)) / summarizer.inputQuota!) + 1
+    const sliceLength = Math.ceil(paragraph.length / sliceCount)
+    return Array.from({ length: sliceCount }, (_, index) => paragraph.slice(index * sliceLength, (index + 1) * sliceLength)).filter(Boolean)
+  }
   const parts: string[] = []
   let currentPart = ''
   for (const paragraph of text.split(/\n{2,}/)) {
-    const candidate = currentPart ? `${currentPart}\n\n${paragraph}` : paragraph
-    if (currentPart && !(await fitsAtOnce(candidate))) {
-      parts.push(currentPart)
-      currentPart = paragraph
-    } else currentPart = candidate
+    for (const piece of await piecesThatFit(paragraph)) {
+      const candidate = currentPart ? `${currentPart}\n\n${piece}` : piece
+      if (currentPart && !(await fitsAtOnce(candidate))) {
+        parts.push(currentPart)
+        currentPart = piece
+      } else currentPart = candidate
+    }
   }
   if (currentPart) parts.push(currentPart)
   const partSummaries: string[] = []
   for (const [position, part] of parts.entries()) {
-    partSummaries.push(await summarizer.summarize(part.slice(0, 40_000)))
+    partSummaries.push(await summarizer.summarize(part))
     onProgress(position + 1, parts.length + 1)
   }
-  const summary = await summarizer.summarize(partSummaries.join('\n\n'))
+  const summary = await summarizeLongText(partSummaries.join('\n\n'), summarizer, () => {})
   onProgress(parts.length + 1, parts.length + 1)
   return summary
 }

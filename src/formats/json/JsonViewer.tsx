@@ -26,10 +26,11 @@ import {
   getValueClassName,
   isBigNumber,
   parseValueExactly,
+  readJsonKeepingOrder,
   repairJson,
   runPathQuery,
 } from './jsonTools'
-import type { RepairFixes } from './jsonTools'
+import type { OrderedJsonValue, RepairFixes } from './jsonTools'
 import {
   buildJsonDownload,
   expandNodesUpToLimit,
@@ -41,7 +42,7 @@ import {
   isArrayOfObjects,
   isContainer,
   parseJsonText,
-  sortKeys,
+  rewriteJsonInOrder,
   withAddedChild,
   withDuplicatedNode,
   withIndent,
@@ -49,6 +50,7 @@ import {
   withNewRoot,
   withoutNodeAt,
   withRenamedKey,
+  withSortedKeys,
   withValueAt,
   withoutEmptyValues,
 } from './jsonModel'
@@ -100,6 +102,8 @@ type WorkbenchNotice =
   | { kind: 'opened' }
   | { kind: 'formatterHint' }
   | { kind: 'largeFile'; message: string }
+  // A key written twice in one object: JSON keeps its last value, so the tree and every rewrite show only that one.
+  | { kind: 'duplicateKey'; key: string }
   | { kind: 'valid' }
   | { kind: 'repaired'; fixes: string }
   | { kind: 'nothingToRepair' }
@@ -118,6 +122,13 @@ type WorkbenchNotice =
 
 type StructureView = 'tree' | 'table' | 'graph' | 'compare' | 'schema' | 'geo'
 type TextTarget = 'yaml' | 'xml' | CodeLanguage
+
+// The document as written, as values the YAML writer takes: objects become Maps so their keys keep their order.
+function toYamlInput(value: OrderedJsonValue): unknown {
+  if (typeof value === 'string') return JSON.parse(value)
+  if (Array.isArray(value)) return value.map(toYamlInput)
+  return new Map(value.members.map((member) => [member.key, toYamlInput(member.value)]))
+}
 
 // What each landing page of the JSON viewer (src/viewers.ts, `openedFrom`) opens on: its notice, its tab, an open JSONPath query,
 // or a step taken as soon as the file is read (validate, expand the tree, show a conversion). Keeps each page's mode its own.
@@ -392,10 +403,11 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   // would freeze the page.
   const codeText = useMemo(() => {
     if (!showText) return ''
+    if (edits.text !== null) return edits.text
     if (edits.root !== null) return JSON.stringify(edits.root, null, edits.indent)
-    if (originalRoot !== null && !originalText.includes('\n')) return JSON.stringify(originalRoot, null, 2)
+    if (originalRoot !== null && !originalText.includes('\n')) return rewriteJsonInOrder(originalText, 2, originalRoot)
     return originalText
-  }, [showText, edits.root, edits.indent, originalRoot, originalText])
+  }, [showText, edits.text, edits.root, edits.indent, originalRoot, originalText])
 
   const [draftText, setDraftText] = useState(codeText)
   const [syncedText, setSyncedText] = useState(codeText)
@@ -438,6 +450,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     parseJsonText(decodedText, locale, sourceFormat).then((result) => {
       if (isStale) return
       if (result.status === 'ok' && result.convertedText !== undefined) setConvertedText(result.convertedText)
+      if (result.status === 'ok' && result.duplicateKey !== null) setNotice({ kind: 'duplicateKey', key: result.duplicateKey })
       setParseResult(result)
       if (result.status === 'ok') setExpandedKeys(expandNodesUpToLimit(result.value, 2).expandedKeys)
       else setMobileTab('text')
@@ -554,8 +567,9 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
       return result
     }
     setDraftError(null)
-    lastCommittedTextRef.current = JSON.stringify(result.value, null, session.edits.indent)
-    session.update((currentEdits) => withNewRoot(currentEdits, originalRoot, result.value))
+    lastCommittedTextRef.current = text
+    session.update((currentEdits) => withNewRoot(currentEdits, originalRoot, result.value, text))
+    if (result.duplicateKey !== null) setNotice({ kind: 'duplicateKey', key: result.duplicateKey })
     return null
   }
 
@@ -660,8 +674,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     }
     window.clearTimeout(commitTimerRef.current)
     setDraftError(null)
-    session.update((currentEdits) => withNewRoot(currentEdits, originalRoot, result.value))
-    setNotice({ kind: 'repaired', fixes: describeRepairFixes(fixes, locale) })
+    session.update((currentEdits) => withNewRoot(currentEdits, originalRoot, result.value, repairedText))
+    setNotice(result.duplicateKey !== null ? { kind: 'duplicateKey', key: result.duplicateKey } : { kind: 'repaired', fixes: describeRepairFixes(fixes, locale) })
   }
 
   // Resolves false when the text could not be read, so nothing was changed.
@@ -690,8 +704,12 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   async function sortDocumentKeys(direction: 'asc' | 'desc' = 'asc', selectedLevelOnly = false) {
     setOpenMenu(null)
     if (!(await commitTypingFirst())) return
-    const levelPath = selectedLevelOnly && selectedPath !== null ? selectedPath : []
-    changeDocument((currentRoot) => (levelPath.length === 0 ? sortKeys(currentRoot, direction, !selectedLevelOnly) : withValueAt(currentRoot, levelPath, sortKeys(getNodeAt(currentRoot, levelPath), direction, false))))
+    // The root counts as a level of its own: "this level" at the root sorts the root's keys only.
+    const levelPath = selectedLevelOnly ? (selectedPath ?? []) : null
+    session.update((currentEdits) => {
+      const currentRoot = currentEdits.root ?? originalRoot
+      return currentRoot === null ? currentEdits : withSortedKeys(currentEdits, originalText, currentRoot, direction, levelPath)
+    })
     setNotice({ kind: 'sorted' })
   }
 
@@ -712,7 +730,10 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   async function escapeDocument() {
     setOpenMenu(null)
     if (!(await commitTypingFirst()) || root === null) return
-    changeDocument((currentRoot) => JSON.stringify(currentRoot))
+    session.update((currentEdits) => {
+      const currentRoot = currentEdits.root ?? originalRoot
+      return currentRoot === null ? currentEdits : withNewRoot(currentEdits, originalRoot, rewriteJsonInOrder(buildJsonDownload(currentEdits, { originalText }), 0, currentRoot))
+    })
     setNotice({ kind: 'done', title: t('json.escape.doneTitle'), detail: t('json.escape.doneDetail') })
   }
 
@@ -720,7 +741,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
   async function copyAsStringLiteral() {
     const documentText = await buildDocumentText()
     if (!documentText) return
-    await copyText(JSON.stringify(JSON.stringify(parseValueExactly(documentText.fileText))), t('json.escape.stringifyCopied'))
+    await copyText(JSON.stringify(rewriteJsonInOrder(documentText.fileText, 0, root)), t('json.escape.stringifyCopied'))
   }
 
   async function unescapeDocument() {
@@ -737,7 +758,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
       showToast(t('json.escape.notJsonInside'))
       return
     }
-    changeDocument(() => value)
+    const innerText = root
+    session.update((currentEdits) => withNewRoot(currentEdits, originalRoot, value, rewriteJsonInOrder(innerText, currentEdits.indent, value)))
     setNotice({ kind: 'done', title: t('json.escape.unescapedTitle'), detail: t('json.escape.unescapedDetail') })
   }
 
@@ -748,13 +770,15 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     if (!documentText || root === null) return
     const baseName = fileName.replace(/\.[^.]+$/, '')
     if (target === 'yaml') {
-      const { dump } = await import('js-yaml')
-      setOpenDialog({ kind: 'text', title: t('convert.toYaml'), fileName: `${baseName}.yaml`, text: dump(JSON.parse(documentText.fileText), { lineWidth: -1 }), mimeType: 'application/yaml;charset=utf-8' })
+      // Objects are handed over as Maps, which keep keys like "2024" in their written place.
+      const { DUMP_SCHEMA, dump, realMapTag } = await import('js-yaml')
+      const yamlText = dump(toYamlInput(readJsonKeepingOrder(documentText.fileText).value), { lineWidth: -1, schema: DUMP_SCHEMA.withTags(realMapTag) })
+      setOpenDialog({ kind: 'text', title: t('convert.toYaml'), fileName: `${baseName}.yaml`, text: yamlText, mimeType: 'application/yaml;charset=utf-8' })
       return
     }
     const { codeFileExtensions, jsonToCode, jsonToXml } = await import('./jsonConvert')
     if (target === 'xml') {
-      setOpenDialog({ kind: 'text', title: t('convert.toXml'), fileName: `${baseName}.xml`, text: jsonToXml(root), mimeType: 'application/xml;charset=utf-8' })
+      setOpenDialog({ kind: 'text', title: t('convert.toXml'), fileName: `${baseName}.xml`, text: jsonToXml(documentText.fileText), mimeType: 'application/xml;charset=utf-8' })
       return
     }
     try {
@@ -868,7 +892,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     if (!documentText) return
     const isEdited = documentText.hasUncommittedTyping || session.changeCount > 0
     if (sourceFormat === 'jsonLines') {
-      downloadTextFile(buildDownloadName(fileName, isEdited, null), buildJsonLines(JSON.parse(documentText.fileText) as JsonValue), 'application/x-ndjson;charset=utf-8')
+      downloadTextFile(buildDownloadName(fileName, isEdited, null), buildJsonLines(documentText.fileText), 'application/x-ndjson;charset=utf-8')
       return
     }
     downloadTextFile(buildDownloadName(fileName, isEdited, sourceFormat === 'json' ? null : '.json'), documentText.fileText, 'application/json;charset=utf-8')
@@ -1069,6 +1093,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         return { className: 'info', icon: 'sparkle', canUndo: false, content: t('json.wb.formatterHint') }
       case 'largeFile':
         return { className: 'info', icon: 'sparkle', canUndo: false, content: currentNotice.message }
+      case 'duplicateKey':
+        return { className: 'info', icon: 'warning', canUndo: false, content: t('json.duplicateKey.notice', { key: isolateLeftToRight(JSON.stringify(currentNotice.key)) }) }
       case 'valid':
         return {
           className: 'ok',
@@ -1267,7 +1293,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
                 id="copy-button-menu-formatted"
                 onClick={() => {
                   setOpenMenu(null)
-                  void copyText(JSON.stringify(root, null, chosenIndent), t('json.wb.formattedCopied'))
+                  void copyText(rewriteJsonInOrder(buildJsonDownload(edits, { originalText }), chosenIndent, root), t('json.wb.formattedCopied'))
                 }}
               >
                 <SpriteIcon name="indent" isSmall />
@@ -1280,7 +1306,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
                 id="copy-button-menu-minified"
                 onClick={() => {
                   setOpenMenu(null)
-                  void copyText(JSON.stringify(root), t('json.wb.minifiedCopied'))
+                  void copyText(rewriteJsonInOrder(buildJsonDownload(edits, { originalText }), 0, root), t('json.wb.minifiedCopied'))
                 }}
               >
                 <SpriteIcon name="minify" isSmall />

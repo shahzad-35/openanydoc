@@ -36,8 +36,8 @@
   "handlesTitle": "Videos it can trim",
   "handles": [
     "Start and end: set from the player or typed as minutes and seconds, to a tenth of a second.",
-    "Sound: kept, cut at the same points as the picture.",
-    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+    "Sound: kept, cut at the same points as the picture. If your browser can't read it, the page tells you the result has no sound.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V and 3GP videos become MP4."
   ],
   "limits": [
     "Only the first chosen video is trimmed.",
@@ -60,7 +60,7 @@
     },
     {
       "question": "Does trimming lower the quality?",
-      "answer": "Not for an MP4 or MOV: the picture is copied as it is, not encoded again. A WebM or MKV is copied too when you only cut its end; otherwise the kept part is encoded again at a high quality, so it looks very close to the original."
+      "answer": "Not for an MP4 or MOV: its picture, H.264, HEVC from recent iPhones, VP9 or AV1, is copied as it is, not encoded again. An MKV or a WebM is copied too when you only cut its end. Otherwise the kept part is encoded again at a high quality, so it looks very close to the original."
     },
     {
       "question": "Which browsers does it work in?",
@@ -68,7 +68,7 @@
     },
     {
       "question": "Will the trimmed video play on my phone and in WhatsApp?",
-      "answer": "An MP4 or MOV keeps its format, which phones and chat apps open, and other videos such as AVI become MP4. A WebM or MKV stays WebM or MKV, which some phones and apps refuse: convert it afterwards with Video converter. To make it smaller as well, use Compress video next.",
+      "answer": "An MP4 or MOV keeps its format, which phones and chat apps open, and other videos such as M4V become MP4. A WebM or MKV stays WebM or MKV, which some phones and apps refuse: convert it afterwards with Video converter. To make it smaller as well, use Compress video next.",
       "link": {
         "text": "Video converter",
         "path": "/video-converter"

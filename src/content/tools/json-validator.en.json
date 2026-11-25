@@ -2,7 +2,7 @@
   "title": "JSON Validator Online – Find and Fix JSON Syntax Errors",
   "description": "JSON validator online: check JSON syntax, see the line and column of each error, and repair trailing commas, comments and quotes in one click. No upload.",
   "heading": "JSON Validator Online: Check and Fix JSON",
-  "subtitle": "Paste or drop JSON to see whether it is valid and where any error is, instantly; nothing is uploaded.",
+  "subtitle": "Paste or drop JSON to see whether it is valid and where any error is; nothing is uploaded.",
   "intro": "A free JSON validator online: paste JSON or open a .json file and press Validate. If the JSON is not valid, you see what is wrong with its line and column, Go to error selects the spot, and Repair fixes the usual mistakes. Your JSON is checked in your browser and never uploaded.",
   "features": [
     {
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {

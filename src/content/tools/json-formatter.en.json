@@ -2,7 +2,7 @@
   "title": "JSON Formatter Online – Beautify and Pretty Print JSON",
   "description": "JSON formatter online: pretty print JSON with 2 or 4 spaces or a tab, minify it to one line or sort its keys, keeping long numbers exact. Free, no upload.",
   "heading": "JSON Formatter Online: Beautify and Minify JSON",
-  "subtitle": "Paste or drop JSON and press Format to make it readable instantly; nothing is uploaded.",
+  "subtitle": "Paste or drop JSON and press Format to make it readable; nothing is uploaded.",
   "intro": "A free JSON formatter online: paste JSON or open a .json file, press Format to pretty print it with the indentation you choose, or Minify to put it on one line. The JSON beautifier keeps long numbers exactly and runs in your browser, so nothing is uploaded.",
   "features": [
     {
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -61,7 +61,7 @@
     },
     {
       "question": "Will formatting change my numbers or the order of keys?",
-      "answer": "No. Format and Minify only change spaces and line breaks. Keys keep their order unless you press Sort keys, and integers too long for JavaScript are kept digit for digit."
+      "answer": "No. Format and Minify only change spaces and line breaks. Keys keep the order you wrote them in, including keys that are whole numbers such as \"2024\", unless you press Sort keys, and integers too long for JavaScript are kept digit for digit. If a key is written twice in one object, the page tells you and keeps the last value, as JSON does."
     },
     {
       "question": "Can I format JSON that has an error in it?",

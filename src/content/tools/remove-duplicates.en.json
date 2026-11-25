@@ -39,7 +39,7 @@
   ],
   "handlesTitle": "What the duplicate remover handles",
   "handles": [
-    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet).",
     "Matching: all columns by default, or only the ones you choose.",
     "Kept row: the first of each set of duplicates.",
     "Result: the number of rows removed is shown, and Undo restores them.",

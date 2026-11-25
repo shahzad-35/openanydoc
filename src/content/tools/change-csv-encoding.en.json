@@ -22,7 +22,7 @@
   "steps": [
     {
       "title": "Open your CSV",
-      "text": "Choose or drop a CSV file. Its encoding is detected: UTF-8 with or without a BOM, UTF-16, or Windows-1256 when the file is not valid UTF-8."
+      "text": "Choose or drop a CSV file. Its encoding is detected: UTF-8 with or without a BOM, UTF-16 when the file starts with a byte order mark, or, when the file is not valid UTF-8, Windows-1256 for Arabic or Windows-1252 for Western European letters."
     },
     {
       "title": "Check the preview",
@@ -39,15 +39,15 @@
   ],
   "handlesTitle": "What Change CSV Encoding handles",
   "handles": [
-    "Reads: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for Arabic files that are not valid UTF-8.",
+    "Reads: UTF-8 with or without a BOM, UTF-16 (found by its byte order mark, or chosen by hand), and, for files that are not valid UTF-8, Windows-1256 for Arabic and Windows-1252 for Western European text.",
     "Override: choose the input encoding yourself when detection is wrong.",
     "Writes: UTF-8, UTF-8 with BOM, UTF-16 LE and Windows-1256.",
     "Preview: the first rows as they will read, before you download.",
     "Content: cells, delimiters and quotes stay exactly as they are; only the encoding changes."
   ],
   "limits": [
-    "Detection covers UTF-8, UTF-16 and Windows-1256; files in other encodings may need the input encoding picked by hand.",
-    "Windows-1256 has no room for emoji or for letters outside Arabic and English, so such characters can't be saved in it.",
+    "Detection covers UTF-8, UTF-16 (only with a byte order mark), Windows-1256 and Windows-1252; for UTF-16 without a byte order mark or another encoding, pick the input encoding by hand.",
+    "Windows-1256 has no room for emoji or for most letters outside Arabic and English, so such characters can't be saved in it.",
     "A file that was already saved with question marks in place of letters can't be repaired; the original letters are gone."
   ],
   "faqTitle": "Change CSV Encoding: questions",
@@ -58,7 +58,7 @@
     },
     {
       "question": "Why does Arabic show as question marks or gibberish in Excel?",
-      "answer": "Excel guesses a CSV file's encoding when it opens it, and without a BOM it often guesses wrong for UTF-8. Save the file here as UTF-8 with BOM and Excel shows the Arabic letters correctly."
+      "answer": "Excel opens a UTF-8 CSV normally only if it was saved with a BOM. Save the file here as UTF-8 with BOM and Excel shows the Arabic letters correctly."
     },
     {
       "question": "Which encoding should I choose?",

@@ -46,7 +46,7 @@
   "limits": [
     "Pictures keep their resolution, so a scan saved at a very high resolution may stay large.",
     "A PDF made mostly of text is often compact already, so the saving can be small.",
-    "PDFs that need a password to open can't be read; remove the password first."
+    "A PDF that needs a password to open can't be compressed; remove the password first with Unlock PDF. A file that only restricts printing or copying is compressed, and the copy has no restrictions."
   ],
   "worksBest": [
     "PDFs with photos or scanned pages",
@@ -66,7 +66,7 @@
     },
     {
       "question": "How do I reduce the size of a PDF?",
-      "answer": "A PDF gets smaller when the pictures inside it are saved more compactly, because pictures usually take most of the space. On a Mac, Preview can do it with File, Export and the Reduce File Size Quartz filter; Word's Save As PDF has a minimum size option, and LibreOffice can lower picture quality when it exports a PDF. Here, choose the PDF, pick a level and click Compress PDF: the pictures are saved again in your browser, and the text stays sharp."
+      "answer": "A PDF gets smaller when the pictures inside it are saved more compactly, because pictures usually take most of the space. On a Mac, Preview can do it with File, Export and the Reduce File Size Quartz filter, and LibreOffice can lower picture quality when it exports a PDF. Here, choose the PDF, pick a level and click Compress PDF: the pictures are saved again in your browser, and the text stays sharp."
     },
     {
       "question": "Will my text get blurry?",

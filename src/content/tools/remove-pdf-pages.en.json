@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to delete pages from a PDF",
@@ -43,7 +43,7 @@
   "limits": [
     "At least one page must stay in the PDF.",
     "PDFs that need a password to open can't be changed; remove the password first.",
-    "Bookmarks that point to removed pages may stop working."
+    "Bookmarks of the original PDF are not carried over."
   ],
   "faqTitle": "Remove PDF pages: questions",
   "faq": [

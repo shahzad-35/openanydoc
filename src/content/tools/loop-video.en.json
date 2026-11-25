@@ -40,7 +40,7 @@
     "Picture: the same size and frame rate as your clip."
   ],
   "limits": [
-    "A looped video is at most 10 minutes long.",
+    "With Until it lasts, the result is at most 10 minutes long; with A number of times, it repeats at most 20 times.",
     "The video is encoded again, which takes a moment for long loops.",
     "There is no fade between repeats; each one starts straight after the last."
   ],
@@ -56,15 +56,15 @@
     },
     {
       "question": "Can I loop a video for Instagram or WhatsApp?",
-      "answer": "Yes. Loop it to the length you need, then download the MP4, which both apps accept."
+      "answer": "Yes. Loop it to the length you need and download it. An MP4 stays an MP4, which both apps accept; a WebM or MKV keeps its format, so convert it to MP4 afterwards."
     },
     {
       "question": "Is there a length limit?",
-      "answer": "The result can be up to 10 minutes long, and very large videos are limited by your device’s memory."
+      "answer": "With Until it lasts the result can be up to 10 minutes long, and with A number of times up to 20 repeats; very large videos are limited by your device’s memory."
     },
     {
       "question": "Does the sound loop too?",
-      "answer": "Yes, the sound repeats with the picture each time."
+      "answer": "Yes, the sound repeats with the picture each time. If your browser can't read the clip's sound, the page tells you the result has none."
     },
     {
       "question": "Is it free?",

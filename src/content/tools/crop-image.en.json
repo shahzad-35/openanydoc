@@ -3,7 +3,7 @@
   "description": "Crop pictures in your browser: drag a free box or pick square, 4:3, 16:9, passport or a circle with a transparent outside. Free, and nothing is uploaded.",
   "heading": "Crop Images Online",
   "subtitle": "Drag the crop box, choose a shape, and save; nothing is uploaded.",
-  "intro": "Crop a picture by dragging a box over it, freely or at a fixed shape: square, 4:3, 3:2, 16:9, 9:16 for stories, passport 35:45, or a circle saved as a PNG with a transparent outside for profile pictures and logos. The size of the crop in pixels is shown as you drag. Add several pictures and the same shape is cut from the centre of each.",
+  "intro": "Crop a picture by dragging a box over it, freely or at a fixed shape: square, 4:3, 3:2, 16:9, 9:16 for stories, passport 35:45, or a circle saved as a PNG with a transparent outside for profile pictures and logos. The size of the crop in pixels is shown as you drag. Add several pictures and, with a fixed shape, the same shape is cut from the centre of each; with Free, the same box is used on each.",
   "features": [
     {
       "title": "Private",
@@ -38,10 +38,10 @@
     "Shapes: free, square, 4:3, 3:2, 16:9, 9:16, passport 35:45 and circle.",
     "Precision: the crop size in pixels of the original picture, shown as you drag.",
     "Circle: saved as PNG, so the corners are transparent.",
-    "Batch: the same shape cut from the centre of every other picture."
+    "Batch: with a fixed shape, the same shape cut from the centre of every other picture; with Free, the same box."
   ],
   "limits": [
-    "The crop box is placed on the first picture; the others are cropped from their centre.",
+    "The crop box is placed on the first picture; with a fixed shape the others are cropped from their centre, and with Free they get the same box.",
     "A circle is always saved as PNG, which is larger than JPG for photos.",
     "Very large pictures (above about 100 megapixels) are limited by your device's memory."
   ],
@@ -57,7 +57,7 @@
     },
     {
       "question": "Is the crop full quality?",
-      "answer": "Yes. The box is applied to the original picture, not to the preview, so the result keeps every pixel inside it."
+      "answer": "The box is applied to the original picture, not to the preview, so the result keeps every pixel inside it at full resolution. JPG, WebP and AVIF are saved again at the quality you choose (90 at first); PNG loses nothing."
     },
     {
       "question": "Can I crop many pictures at once?",
@@ -73,7 +73,7 @@
     },
     {
       "question": "How do I crop a photo to a square?",
-      "answer": "Choose the square 1:1 shape, drag the box over the part to keep, then click Crop pictures and download it. OpenAnyDoc crops the original picture in your browser at full quality, without uploading it."
+      "answer": "Choose the square 1:1 shape, drag the box over the part to keep, then click Crop pictures and download it. OpenAnyDoc crops the original picture in your browser at full resolution, without uploading it."
     }
   ]
 }

@@ -18,7 +18,7 @@
   "handlesTitle": "What the CSV to YAML converter handles",
   "handles": [
     "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Encodings: UTF-8, UTF-16 (when the file starts with a byte order mark), Windows-1256 Arabic and Windows-1252 Western European text, detected automatically.",
     "Shape: a YAML list with one mapping per row, keyed by the header row.",
     "Numbers: plain decimals such as 42 or 3.5 become numbers; 007, phone numbers and long IDs stay text.",
     "Arabic and other non-Latin text written as it is, not as escape codes.",

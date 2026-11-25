@@ -7,7 +7,7 @@
   "features": [
     { "title": "Private", "text": "Your JSON is read and the interfaces are written by your own browser; nothing is sent to a server." },
     { "title": "Ready for strict mode", "text": "Optional keys get ?, null values are typed as null, and every nested object gets its own named interface." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: generate TypeScript interfaces from JSON",
   "steps": [

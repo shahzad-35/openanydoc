@@ -1,6 +1,6 @@
 {
   "title": "CSV to JSON Converter Online – Free, Private, No Upload",
-  "description": "CSV to JSON converter online: turn a CSV file into a JSON array of objects keyed by the header row, with codes and phone numbers kept as text. No upload.",
+  "description": "CSV to JSON converter: turn a CSV file into a JSON array of objects keyed by the header row, with leading zeros and long IDs kept as text. No upload.",
   "heading": "CSV to JSON Converter Online",
   "subtitle": "Drop a CSV file and it opens as JSON, ready to format and download; nothing is uploaded.",
   "intro": "Convert CSV to JSON in your browser: drop or paste a CSV or TSV file and it opens in the JSON viewer as an array of objects, one per row, with the header row as keys. The delimiter and encoding are detected for you. Your file never leaves your device.",
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -41,7 +41,7 @@
   "handles": [
     "Files: .csv, .tsv and .tab, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
     "Shape: an array of objects keyed by the header row, one object per row.",
-    "Numbers: plain numbers such as 42 or 3.5 become JSON numbers; 007, phone numbers and long IDs stay strings.",
+    "Numbers: plain numbers such as 42 or 3.5 become JSON numbers; values with a leading zero, such as 007, values that start with +, and IDs over 15 digits stay strings.",
     "Keys: an empty header cell becomes its column letter, and a repeated header gets _2, _3.",
     "Text: UTF-8 and other common encodings, Arabic included, written as UTF-8 JSON."
   ],
@@ -57,7 +57,7 @@
     },
     {
       "question": "Does the converter turn numbers into JSON numbers?",
-      "answer": "Plain numbers, yes: 42 and -3.5 become numbers. Values that would lose something as a number, such as 00123, a phone number or an ID over 15 digits, stay strings."
+      "answer": "Plain numbers, yes: 42 and -3.5 become numbers, and 2.50 becomes 2.5. Values with a leading zero, such as 00123, values that start with +, such as a phone number written +966..., and IDs over 15 digits stay strings."
     },
     {
       "question": "What if a row has fewer cells than the header?",

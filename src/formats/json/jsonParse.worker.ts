@@ -1,5 +1,5 @@
 import type { JsonSourceFormat } from './jsonFormats'
-import { parseKeepingBigNumbers } from './jsonTools'
+import { parseKeepingBigNumbers, readJsonKeepingOrder } from './jsonTools'
 import type { JsonParseResult, JsonValue } from './jsonModel'
 
 // Line and column (both counted from 1) of a character position in the text.
@@ -23,6 +23,16 @@ function findErrorPosition(message: string, text: string) {
   return { line: null, column: null }
 }
 
+// A key written twice in one object, which JSON.parse drops without a word: the text is read a second time, in order, to find it.
+// A document nested thousands of levels deep is too deep for that reading and is not checked.
+function findDuplicateKey(text: string) {
+  try {
+    return readJsonKeepingOrder(text).duplicateKey
+  } catch {
+    return null
+  }
+}
+
 // `format`: a JSON Lines, JSON5 or YAML file is first turned into JSON text (jsonFormats.ts, fetched only then); the result then
 // carries that text as `convertedText`, which the page shows and saves.
 export type JsonParseRequest = { text: string; format: JsonSourceFormat }
@@ -43,7 +53,7 @@ self.onmessage = async (event: MessageEvent<JsonParseRequest>) => {
   let result: JsonParseResult
   try {
     const { value, bigNumberCount } = parseKeepingBigNumbers(text)
-    result = { status: 'ok', value: value as JsonValue, bigNumberCount, convertedText }
+    result = { status: 'ok', value: value as JsonValue, bigNumberCount, duplicateKey: findDuplicateKey(text), convertedText }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     result = { status: 'error', message, ...findErrorPosition(message, text) }

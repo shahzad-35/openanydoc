@@ -175,9 +175,12 @@ async function convert(file: Blob, settings: ConvertSettings) {
   const output = new Output({ format, target: new BufferTarget() })
   const shownWidth = videoTrack?.displayWidth ?? 0
   const shownHeight = videoTrack?.displayHeight ?? 0
-  const videoCodec = isAudioOnly ? undefined : await chooseVideoCodec(settings.container, format, settings.videoCodec, settings.width ?? shownWidth, settings.height ?? shownHeight)
-  const audioCodec = (await chooseAudioCodec(settings.container, format)) ?? undefined
   const changesPixels = Boolean(settings.quality || settings.videoBitrate || settings.overlay || settings.crop || settings.width || settings.rotate || settings.flip || settings.frameRate)
+  // Pictures that stay as they are and fit the container are copied, not made again (Trim, Mute, Add audio of an HEVC, VP8 or AV1
+  // video). No codec is named then, so if Mediabunny still has to re-encode (a cut between key frames), it picks one it can make.
+  const copiesPicture = !isAudioOnly && !settings.videoCodec && !changesPixels && Boolean(videoTrack?.codec && format.getSupportedVideoCodecs().includes(videoTrack.codec))
+  const videoCodec = isAudioOnly || copiesPicture ? undefined : await chooseVideoCodec(settings.container, format, settings.videoCodec, settings.width ?? shownWidth, settings.height ?? shownHeight)
+  const audioCodec = (await chooseAudioCodec(settings.container, format)) ?? undefined
   const crop = settings.crop && {
     left: Math.round(settings.crop.x * shownWidth),
     top: Math.round(settings.crop.y * shownHeight),
@@ -214,6 +217,10 @@ async function convert(file: Blob, settings: ConvertSettings) {
     audio: settings.dropAudio || settings.addedAudio ? { discard: true } : { codec: audioCodec, bitrate: settings.audioBitrate, forceTranscode: isAudioOnly && settings.audioBitrate !== undefined },
   })
   if (!conversion.isValid) throw await failureOf(conversion, format)
+  // The video's own sound left out because this browser can't read it (or make it again for this container): the page says so.
+  const soundDropped = conversion.discardedTracks.some(
+    (discarded) => discarded.track.id === audioTrack?.id && (discarded.reason === 'undecodable_source_codec' || discarded.reason === 'unknown_source_codec' || discarded.reason === 'no_encodable_target_codec'),
+  )
 
   let feedAudio = async () => {}
   if (settings.addedAudio) {
@@ -224,7 +231,7 @@ async function convert(file: Blob, settings: ConvertSettings) {
   conversion.onProgress = (fraction) => reportProgress(fraction)
   await Promise.all([conversion.execute(), feedAudio()])
   if (settings.addedAudio) await output.finalize()
-  return finishedFile(output, settings.container)
+  return { ...(await finishedFile(output, settings.container)), soundDropped }
 }
 
 // Why Mediabunny could not set the conversion up, as the page's error: a codec this browser cannot read or make.
@@ -339,7 +346,8 @@ async function join(request: Extract<VideoTaskRequest, { type: 'join' }>) {
       if (!video) throw new VideoTaskFailed('no-video')
       if (!(await video.canDecode())) throw new VideoTaskFailed('decode', video.codec ?? undefined)
       const audio = request.dropAudio ? null : await input.getPrimaryAudioTrack()
-      return { video, audio: audio && (await audio.canDecode()) ? audio : null, duration: await input.computeDuration() }
+      const canHearAudio = Boolean(audio && (await audio.canDecode()))
+      return { video, audio: canHearAudio ? audio : null, soundDropped: Boolean(audio) && !canHearAudio, duration: await input.computeDuration() }
     }),
   )
   const format = outputFormatOf(container)
@@ -385,7 +393,7 @@ async function join(request: Extract<VideoTaskRequest, { type: 'join' }>) {
   videoSource.close()
   audioSource?.close()
   await output.finalize()
-  return finishedFile(output, container)
+  return { ...(await finishedFile(output, container)), soundDropped: tracks.some((track) => track.soundDropped) }
 }
 
 async function addJoinedSound(source: AudioSampleSource, track: InputAudioTrack | null, start: number, end: number, offset: number, partLength: number, speed: number) {

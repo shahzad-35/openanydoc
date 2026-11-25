@@ -1,9 +1,9 @@
 {
   "title": "YAML Formatter and Validator Online – Free | OpenAnyDoc",
-  "description": "Check YAML and see each error with its line and column, then reformat it with 2 or 4 spaces and copy or download it. Free, in your browser, no upload.",
+  "description": "Check YAML and see the first error with its line and column, then reformat it with 2 or 4 spaces and copy or download it. Free, in your browser, no upload.",
   "heading": "YAML Formatter and Validator",
   "subtitle": "Paste or open a YAML file to find its errors by line and column and reformat it with clean indentation; nothing is uploaded.",
-  "intro": "A free YAML formatter and validator online: paste YAML or open a .yaml or .yml file, press Validate to see every error with its line and column, and Format to rewrite it with 2 or 4 spaces. A tree shows the data underneath, and Convert to JSON hands it to the JSON tools. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
+  "intro": "A free YAML formatter and validator online: paste YAML or open a .yaml or .yml file, press Validate to see the first error with its line and column, and Format to rewrite it with 2 or 4 spaces. A tree shows the data underneath, and Convert to JSON hands it to the JSON tools. The text you paste stays in this tab and is never sent anywhere; nothing is saved on the site, there are no share links and no history. It is free, needs no account and works offline after your first visit.",
   "features": [
     {
       "title": "Errors with line and column",
@@ -26,7 +26,7 @@
     },
     {
       "title": "Validate it",
-      "text": "Press Validate. If something is wrong, each error is listed with its line and column so you can fix it in the editor."
+      "text": "Press Validate. If something is wrong, the first error is shown with its line and column so you can fix it in the editor, then validate again."
     },
     {
       "title": "Format it",
@@ -40,7 +40,7 @@
   "handlesTitle": "What the YAML formatter handles",
   "handles": [
     "Input: pasted YAML or a .yaml or .yml file.",
-    "Validation: each error with its line and column.",
+    "Validation: the first error, with its line and column.",
     "Format: indentation of 2 or 4 spaces for the whole document.",
     "Tree: the data shown as foldable keys, lists and values.",
     "Output: copy to the clipboard, download as .yaml, or convert to JSON."
@@ -82,7 +82,7 @@
     },
     {
       "question": "How do I validate a YAML file?",
-      "answer": "Validate a YAML file by reading it with a YAML parser, which stops at a wrong indent, a tab or a missing colon and reports the line. In OpenAnyDoc, paste the YAML or open the file and press Validate to see every error with its line and column; the text stays in your browser."
+      "answer": "Validate a YAML file by reading it with a YAML parser, which stops at a wrong indent, a tab or a missing colon and reports the line. In OpenAnyDoc, paste the YAML or open the file and press Validate to see the first error with its line and column; the text stays in your browser."
     }
   ]
 }

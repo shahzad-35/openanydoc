@@ -11,7 +11,7 @@
     },
     {
       "title": "Text still searchable",
-      "text": "An invisible text layer keeps every page's words selectable and searchable."
+      "text": "An invisible text layer keeps the words selectable and searchable, except text set at an angle."
     },
     {
       "title": "Ready to print",

@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert PDF to Markdown",
@@ -26,7 +26,7 @@
     },
     {
       "title": "Read the Markdown",
-      "text": "The Markdown appears in a text box, with its token count."
+      "text": "Click Convert to Markdown; the Markdown appears in a text box, with its token count."
     },
     {
       "title": "Copy or download",

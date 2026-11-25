@@ -2,7 +2,7 @@
   "title": "CSV Viewer Online – Free CSV File Editor, No Upload",
   "description": "CSV viewer online: open a CSV file as a table, search, sort and edit cells, with Arabic text shown correctly, then download it. Free, nothing uploaded.",
   "heading": "CSV Viewer Online and CSV Editor",
-  "subtitle": "Drop a CSV file to view, edit, sort and search it instantly; nothing is uploaded.",
+  "subtitle": "Drop a CSV file to view, edit, sort and search it; nothing is uploaded.",
   "intro": "A free CSV viewer online and CSV editor: open a CSV or TSV file as a searchable table, view large CSV files (a 120,000-row file opens in under a second) and edit CSV in your browser before you download it. Your file never leaves your device.",
   "features": [
     {
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -44,7 +44,7 @@
   "handlesTitle": "What the CSV file reader handles: CSV, TSV and tab files",
   "handles": [
     "Files: .csv, .tsv and .tab, with the delimiter (comma, semicolon, tab or pipe) detected for you.",
-    "Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic files, so Arabic text shows correctly and right to left.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16 (found by its byte order mark, or chosen by hand), Windows-1256 for older Arabic files and Windows-1252 for older Western European files, so Arabic text shows correctly and right to left.",
     "Size: no row limit of its own; a 120,000-row file opens in under a second, and files over 50 MB show a warning first.",
     "Editing: cells, rows and columns, find and replace, clean-up tools, filters, sorting and column profiles, with undo and redo.",
     "Saving: a CSV with the file's own delimiter, or your choice of delimiter, quotes and line endings; leading zeros and long numbers stay as written.",
@@ -58,59 +58,52 @@
     "caption": "A CSV file open in the viewer: the table, a column profile on the right, and the delimiter and encoding in the status bar."
   },
   "comparison": {
-    "title": "CSV viewer compared with Excel Online, Google Sheets and upload-based viewers",
+    "title": "CSV viewer compared with Excel Online and Google Sheets",
     "columns": [
       "OpenAnyDoc",
-      "Excel Online or Google Sheets",
-      "Upload-based online viewers"
+      "Excel Online or Google Sheets (checked 25 November 2026)"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "Yes, to Microsoft or Google servers.",
-          "Yes, to the service's server."
-        ]
-      },
-      {
-        "label": "Account or sign-in",
-        "cells": [
-          "None.",
-          "A Microsoft or Google account.",
-          "Varies by service."
+          "Yes, to Microsoft or Google servers."
         ]
       },
       {
         "label": "Edit and save",
         "cells": [
           "Yes. Download keeps the file's own format.",
-          "Yes, in the cloud copy.",
-          "Varies by service."
+          "Yes, in the cloud copy."
         ]
       },
       {
         "label": "Works without a network once loaded",
         "cells": [
           "Yes.",
-          "Google, only after you turn on offline access in Chrome or Edge; Microsoft's, no.",
-          "No."
+          "Google Sheets, only after you turn on offline access in Chrome or Edge."
         ]
       },
       {
         "label": "Size",
         "cells": [
           "Your device's memory; a warning above 50 MB. 120,000 rows open in under a second.",
-          "Set by the service.",
           "Set by the service."
         ]
       },
       {
-        "label": "Cost",
+        "label": "Formulas, and several people editing at once",
         "cells": [
-          "Free, no ads.",
-          "Free with an account; paid plans for more.",
-          "Varies by service."
+          "No. A CSV holds values only, and each person edits a copy on their own device.",
+          "Yes: formulas, and several people can edit the same sheet at the same time."
+        ]
+      },
+      {
+        "label": "Cost and account",
+        "cells": [
+          "Free, no account, no ads.",
+          "Free with a Microsoft or Google account; paid plans for more."
         ]
       }
     ]
@@ -163,7 +156,7 @@
     },
     {
       "question": "How do I open a CSV file with Arabic or other non-English text?",
-      "answer": "Just open it: UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Arabic cells display right-to-left. When you download, a byte order mark is added if the file has non-English text, so Excel shows it correctly. For the Excel side of the problem, read Fix broken Arabic in a CSV.",
+      "answer": "Just open it: UTF-8 files (with or without a BOM), and UTF-16 files that start with a byte order mark, are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding, or as Windows-1252 when its letters look Western European (ä, é, ñ). Arabic cells display right-to-left. When you download, a byte order mark is added if the file has non-English text, so Excel shows it correctly. For the Excel side of the problem, read Fix broken Arabic in a CSV.",
       "link": {
         "text": "Fix broken Arabic in a CSV",
         "path": "/fix-arabic-csv-in-excel"

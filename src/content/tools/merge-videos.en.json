@@ -42,10 +42,10 @@
     "Input: MP4, MOV, WebM, MKV, M4V and other videos your browser can play.",
     "Output: MP4 (H.264) or WebM (VP9 or VP8), whichever your browser can make.",
     "Size: the first clip’s size, 1080p or 720p, following the first clip’s orientation.",
-    "Sound: kept by default; a clip without sound plays silence for its length."
+    "Sound: kept by default; a clip without sound, or with sound your browser can't read, plays silence for its length, and the page says so for the second."
   ],
   "limits": [
-    "Every clip is encoded again, so merging takes about as long as the videos play on a slow device.",
+    "Every clip is encoded again.",
     "Very long or 4K videos are limited by your device’s memory.",
     "There are no transitions between clips; one cuts straight to the next."
   ],

@@ -3,19 +3,19 @@
   "description": "Merge PDF files into one in your browser: put them in order and download a single PDF. Free, no sign-up, no watermark, and nothing is ever uploaded.",
   "heading": "Merge PDF",
   "subtitle": "Combine several PDF files into one, in the order you choose, right in your browser; nothing is uploaded.",
-  "intro": "Merge PDF files online, free and without uploading them: add as many PDFs as you need, drag their first pages into order and download one combined PDF. Pages are copied exactly, so text stays sharp and selectable, and the work runs on your own device, even offline once the page has loaded.",
+  "intro": "Merge PDF files online, free and without uploading them: add as many PDFs as you need, drag their first pages into order and download one combined PDF. Pages are copied exactly, so text stays sharp and selectable, and the work runs on your own device, even offline once you have used it.",
   "features": [
     {
       "title": "Private",
       "text": "Your PDFs are combined by your own browser. They are never sent to a server, so nobody else ever sees them."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files or merges."
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, merging keeps working without an internet connection."
+      "text": "After you have used it once, merging keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to merge PDF files",
@@ -37,12 +37,12 @@
   "handles": [
     "Files: any number of PDFs, added at once or a few at a time.",
     "Order: drag the thumbnails, or use the arrows under each file on a phone.",
-    "Quality: pages are copied as they are, with their fonts, pictures and links.",
+    "Quality: pages are copied as they are, with their fonts, pictures and web links.",
     "Result: one PDF named after the first file, ready to pass to Add page numbers, Split or Organize."
   ],
   "limits": [
     "PDFs that need a password to open can't be merged; remove the password first.",
-    "Bookmarks and fillable form fields of the original files may not carry over to the merged PDF.",
+    "Bookmarks of the original files don't carry over. Fillable form fields do; when two files use the same field name, the second file's field gets \"_2\" added to its name.",
     "Very large sets of files are limited by your device's memory."
   ],
   "faqTitle": "Merge PDF: questions",

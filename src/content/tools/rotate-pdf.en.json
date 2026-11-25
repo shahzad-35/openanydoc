@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to rotate a PDF",
@@ -38,11 +38,12 @@
     "Scope: all pages, or only the pages you click.",
     "Turns: 90 degrees left, 90 degrees right, or 180 degrees, as many times as you like.",
     "Permanence: the rotation is saved in the PDF, so it opens turned in every PDF app.",
-    "Quality: only each page's rotation changes; text and pictures stay exactly as they were."
+    "Quality: each page's text and pictures are unchanged apart from the rotation, but bookmarks and links between pages are not kept."
   ],
   "limits": [
     "PDFs that need a password to open can't be rotated; remove the password first.",
     "Pages turn in steps of 90 degrees.",
+    "Bookmarks and links between pages are not kept in the rotated copy.",
     "Very large PDFs are limited by your device's memory."
   ],
   "faqTitle": "Rotate PDF: questions",
@@ -57,7 +58,7 @@
     },
     {
       "question": "Does rotating lower the quality?",
-      "answer": "No. Only the page's turn is changed; its text and pictures stay exactly as they were."
+      "answer": "No. The page's text and pictures are unchanged apart from the turn. Bookmarks and links between pages are not kept, though."
     },
     {
       "question": "Can I use a password-protected PDF?",

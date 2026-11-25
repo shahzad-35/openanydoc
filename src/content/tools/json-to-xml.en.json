@@ -7,7 +7,7 @@
   "features": [
     { "title": "Private", "text": "Your JSON is converted by your own browser and never sent to a server, so nobody else sees it." },
     { "title": "Well-formed every time", "text": "One <root> element, escaped text and valid element names, so any XML parser can read the result." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: convert JSON to XML",
   "steps": [
@@ -17,7 +17,7 @@
   ],
   "handlesTitle": "How JSON becomes XML",
   "handles": [
-    "Objects: each key becomes a child element, in the JSON's order.",
+    "Objects: each key becomes a child element, in the JSON's order, keys that are whole numbers such as \"2024\" included.",
     "Arrays: each item becomes a repeated element named after the array's key, so \"tags\": [\"a\", \"b\"] gives two <tags> elements.",
     "null becomes an empty element; numbers and true/false become element text.",
     "Keys that are not valid element names (spaces, a leading digit, symbols) are changed into valid names.",

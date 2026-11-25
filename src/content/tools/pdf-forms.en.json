@@ -41,7 +41,7 @@
   "handles": [
     "Text and long text boxes, with a starting value.",
     "Checkboxes, drop-downs and choice buttons, with their choices and a starting choice.",
-    "Date fields that Acrobat keeps in the yyyy-mm-dd format, and an empty signature box readers can sign in.",
+    "Date fields set to the yyyy-mm-dd format, and an empty signature box readers can sign in.",
     "PDFs that already have fields: they are kept, and new names can't clash with them."
   ],
   "limits": [

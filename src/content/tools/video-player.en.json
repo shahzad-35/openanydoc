@@ -39,14 +39,14 @@
   ],
   "handlesTitle": "What the video player handles",
   "handles": [
-    "Files: MP4, M4V, MOV, WebM, MKV, OGV, 3GP and AVI.",
+    "Files: MP4, M4V, MOV, WebM, MKV and 3GP.",
     "Video codecs your browser plays, usually H.264, VP8, VP9 and AV1, and H.265 (HEVC) on many computers and phones.",
     "Sound: AAC, Opus, MP3, Vorbis, FLAC and PCM, with the sample rate and the number of channels.",
     "Details are read from the file even when the browser can't play its picture, so you can see why."
   ],
   "limits": [
     "A video plays only if your browser has a decoder for its codec; the page says so when it doesn't.",
-    "AVI files and old codecs such as MPEG-4 Part 2 or WMV usually can't be read.",
+    "AVI files can't be read, and old codecs such as MPEG-4 Part 2 or WMV usually can't either.",
     "Bitrates are averages over the file; a file that doesn't state them shows Not stated."
   ],
   "faqTitle": "Video player: questions",
@@ -81,59 +81,59 @@
     }
   ],
   "comparison": {
-    "title": "Video player compared with your computer's built-in player and upload-based players",
+    "title": "Video player compared with your computer's built-in player",
     "columns": [
       "OpenAnyDoc",
-      "Your computer's built-in player",
-      "Upload-based online players"
+      "Your computer's built-in player"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is played in your browser.",
-          "No.",
-          "Yes, to the service's server."
+          "No."
         ]
       },
       {
         "label": "Install",
         "cells": [
           "None.",
-          "Comes with the system.",
-          "None."
+          "Comes with the system."
         ]
       },
       {
         "label": "Codec, frame rate and bitrate in one table",
         "cells": [
           "Yes, under the player.",
-          "Varies by player.",
-          "Varies by service."
+          "Varies by player."
         ]
       },
       {
         "label": "Says why a video has no picture or no sound",
         "cells": [
           "Yes, it names the codec this browser can't play.",
-          "Varies by player.",
-          "Varies by service."
+          "Varies by player."
         ]
       },
       {
         "label": "Save the current frame as a PNG",
         "cells": [
           "Yes, at full resolution.",
-          "Varies by player.",
-          "Varies by service."
+          "Varies by player."
+        ]
+      },
+      {
+        "label": "Plays files this browser can't decode",
+        "cells": [
+          "No. It plays only what the browser supports, and names the codec it can't play.",
+          "Often, because it uses the system's own codecs; it varies by player."
         ]
       },
       {
         "label": "Cost",
         "cells": [
           "Free, no ads.",
-          "Free.",
-          "Varies by service."
+          "Free."
         ]
       }
     ]

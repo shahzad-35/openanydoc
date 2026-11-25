@@ -18,7 +18,7 @@
   "handlesTitle": "What the CSV to Markdown converter handles",
   "handles": [
     "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Encodings: UTF-8, UTF-16 (when the file starts with a byte order mark), Windows-1256 Arabic and Windows-1252 Western European text, detected automatically.",
     "Output: a GitHub-flavoured table with a header row and a --- separator line.",
     "A | inside a cell escaped as \\|, so it stays in its column.",
     "Tables that render in GitHub, GitLab, Notion, Obsidian and other Markdown editors."
@@ -33,7 +33,7 @@
     { "question": "Is my file uploaded?", "answer": "No. The CSV is read and turned into a Markdown table by your browser, on your device. Pasted text stays in this tab and is never sent anywhere." },
     { "question": "Where does the table render?", "answer": "Anywhere that reads GitHub-flavoured Markdown tables: GitHub and GitLab READMEs, issues and pull requests, Notion, Obsidian and most Markdown editors." },
     { "question": "What happens to a | inside a cell?", "answer": "It is written as \\| so the table reader sees it as text, not as a column border, and the row keeps its columns." },
-    { "question": "Can a cell hold several lines?", "answer": "Not in a Markdown table, which has one line per row. Keep each cell's text short, or put long text below the table." },
+    { "question": "Can a cell hold several lines?", "answer": "A Markdown table has one line per row, so a line break inside a cell is written as <br>, which most Markdown viewers show as a new line." },
     { "question": "My CSV uses semicolons. Will it work?", "answer": "Yes. The delimiter is detected from the file, whether it is a comma, semicolon, tab or pipe, so CSV files saved by Excel in Europe convert too." },
     { "question": "Can I edit the CSV before converting?", "answer": "Yes: open it in the CSV viewer, edit the cells and save, then convert the saved file to Markdown.", "link": { "text": "CSV viewer", "path": "/csv-viewer" } },
     { "question": "How do I convert a CSV file to a Markdown table?", "answer": "Open or paste the CSV: the first row becomes the header, followed by one Markdown line per row, ready to copy into a README or download as a .md file. OpenAnyDoc converts it in your browser, without uploading the data." }

@@ -26,7 +26,7 @@
     },
     {
       "title": "The largest table is picked",
-      "text": "The table with the most cells is converted. Its <th> cells, or its first row when it has none, become the column names."
+      "text": "The table with the most cells is converted. Its first row, which in most tables holds the <th> cells, becomes the column names."
     },
     {
       "title": "Check and edit",
@@ -41,7 +41,7 @@
   "handles": [
     "Input: .html and .htm files, or pasted HTML.",
     "Table: the largest <table> on the page, counted by cells.",
-    "Header: <th> cells, or the first row when there are none.",
+    "Header: the first row of the table, usually its <th> cells.",
     "Merged cells: colspan and rowspan repeat the value in each cell they cover.",
     "Content: links and formatting become plain text, and scripts never run."
   ],
@@ -61,7 +61,7 @@
     },
     {
       "question": "Where do the column names come from?",
-      "answer": "From the table's <th> header cells. When it has none, the first row is used as the header."
+      "answer": "From the table's first row, which usually holds its <th> header cells."
     },
     {
       "question": "How are merged cells handled?",

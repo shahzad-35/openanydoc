@@ -45,7 +45,8 @@ function ConvertVideo({ slug, files, onResult, choosesFormat }: ToolProps & { sl
 
   function convert() {
     void job.run(async (onProgress, signal) => {
-      const settings = { container, videoCodec: videoCodec === 'automatic' ? undefined : videoCodec, quality: quality === 'keep' ? undefined : quality }
+      // The codec shown in the plan line is named, so the worker doesn't copy an HEVC or VP9 picture into an MP4 meant for H.264.
+      const settings = { container, videoCodec: madeCodec, quality: quality === 'keep' ? undefined : quality }
       const answer = await runVideoTask({ type: 'convert', file, settings }, onProgress, signal)
       return resultFileOf(answer, file.name, '')
     })

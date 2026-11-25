@@ -42,8 +42,6 @@ const PICKER_MIME_TYPES: Record<string, string[]> = {
   '.mov': ['video/quicktime'],
   '.webm': ['video/webm'],
   '.mkv': ['video/x-matroska'],
-  '.avi': ['video/x-msvideo'],
-  '.ogv': ['video/ogg'],
   '.3gp': ['video/3gpp'],
   '.mp3': ['audio/mpeg'],
   '.m4a': ['audio/mp4'],
@@ -94,6 +92,8 @@ type FileIntakeOptions = {
   // no viewer opens them yet (JPG to PDF takes pictures, which no viewer opens).
   allowsSeveralFiles?: boolean
   acceptsComingSoonFormats?: boolean
+  // The size limit of the viewer the page opens, for a file whose own format has none: XML on XML to JSON becomes a JSON document.
+  pageMaxFileBytes?: number
 }
 
 // A file whose type another viewer opens: shown as an offer to open it there instead of as an error.
@@ -111,7 +111,7 @@ export function getLargeFileWarning(file: File, locale: Locale) {
 }
 
 // Everything a drop zone needs, with no markup of its own, so each layout can build its own UI.
-export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed, allowsSeveralFiles = false, acceptsComingSoonFormats = false }: FileIntakeOptions) {
+export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = true, handoffFile = null, onHandoffConsumed, allowsSeveralFiles = false, acceptsComingSoonFormats = false, pageMaxFileBytes }: FileIntakeOptions) {
   const { locale, t } = useT()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   // The grey line under an error toast, for the rejection that can say what to do instead.
@@ -161,10 +161,11 @@ export function useFileIntake({ acceptedExtensions, onFileLoaded, allowPaste = t
       return
     }
 
-    const maxFileBytes = findFormatForFileName(file.name)?.maxFileBytes
+    const maxFileBytes = findFormatForFileName(file.name)?.maxFileBytes ?? pageMaxFileBytes
     if (maxFileBytes !== undefined && file.size > maxFileBytes) {
+      const formatLabel = droppedViewer?.label ?? (/\.([^.]+)$/.exec(file.name)?.[1].toUpperCase() ?? '')
       setErrorMessage(t('intake.tooLarge', { size: isolateLeftToRight(formatFileSize(file.size)) }))
-      setErrorDetail(t('intake.tooLargeDetail', { format: droppedViewer?.label ?? '', limit: isolateLeftToRight(`${maxFileBytes / (1024 * 1024)} MB`) }))
+      setErrorDetail(t('intake.tooLargeDetail', { format: formatLabel, limit: isolateLeftToRight(`${maxFileBytes / (1024 * 1024)} MB`) }))
       return
     }
 

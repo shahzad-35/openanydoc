@@ -3,7 +3,7 @@
 // Plain data whose only import is the tool registry (JSON and types), because scripts/build-static-pages.mjs also reads it to write
 // each page's <head> at build time.
 //
-// Rules for anything added here (see CLAUDE.md, "Writing for search"): the main phrase a person would type comes first in the
+// Rules for anything added here: the main phrase a person would type comes first in the
 // title and the heading; a title is at most 60 characters and a description 150 to 160; every page has its own; say only what
 // the page really does (no format that is not built); the heading is the only h1 of the page.
 import { liveHubs, liveTools, toolContent, toolContentLoaders, toolPath, ALL_TOOLS_PATH } from './tools/registry.ts'
@@ -145,8 +145,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'Sign a PDF without Adobe',
     },
     '/pdf-tools-without-upload': {
-      title: 'PDF Tools That Don\'t Upload Your File: iLovePDF Alternatives',
-      description: 'How iLovePDF, Smallpdf, PDF24 and Sejda handle your PDF, from their own pages, and free PDF tools that run in your browser so the file never leaves your device.',
+      title: 'PDF Tools Without Upload: What iLovePDF and PDF24 Do With Files',
+      description: 'How iLovePDF, PDF24 and Sejda handle your PDF, from their own pages, where they do more, and free browser PDF tools that keep the file on your device.',
       heading: 'PDF tools that do not upload your file',
       intro: 'How popular PDF sites handle your file, where they do more, and the tools that keep a PDF on your own device.',
       linkText: 'PDF tools without upload',
@@ -208,14 +208,14 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'Stirling-PDF alternative',
     },
     '/jsonformatter-alternative': {
-      title: 'JSON Formatter Alternative: No Save Links, No Upload',
+      title: 'jsonformatter.org Alternative That Keeps JSON in Your Browser',
       description: 'How jsonformatter.org and Code Beautify handle pasted JSON, from their own pages, and a JSON formatter and validator that keeps keys and tokens on your device.',
       heading: 'A jsonformatter.org and Code Beautify alternative',
       intro: 'What the popular JSON sites say about saving, sharing and loading your data, where they do more, and JSON tools that keep it in your browser.',
       linkText: 'JSON formatter alternative',
     },
     '/reduce-photo-file-size': {
-      title: 'Reduce Photo File Size for Email and Upload Limits',
+      title: 'How to Get a Photo Under 1 MB for Email or an Upload Form',
       description: 'Get a photo under 1 MB or any upload limit: resize first, pick the right quality and format, then check the result. Done in your browser, nothing uploaded.',
       heading: 'How to reduce a photo\'s file size for email or a form',
       intro: 'Resize, quality and format, in the order that saves the most, and how to check the file before a form refuses it.',
@@ -236,7 +236,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'Remove location from a photo',
     },
     '/remove-background-without-upload': {
-      title: 'Remove Background Without Uploading Your Photo Anywhere',
+      title: 'Removing a Photo Background: What Works Well and What to Avoid',
       description: 'Cut a person or object out of a photo with an on-device AI model in your browser: transparent PNG or white, what works well, and options already on your phone.',
       heading: 'How to remove a photo\'s background without uploading it',
       intro: 'How an on-device model cuts out the subject, what the first use loads, which photos work best and which to avoid.',
@@ -250,7 +250,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'Spreadsheet to AI chat',
     },
     '/make-markdown-table-from-csv': {
-      title: 'Make a Markdown Table from a CSV for GitHub, Docs or Chat',
+      title: 'Markdown Tables from CSV: Alignment, Pipes and Wide Tables',
       description: 'Turn a CSV into a Markdown table for a README, docs or AI chat: header and separator lines, column alignment, pipes and line breaks in cells, and wide tables.',
       heading: 'How to make a Markdown table from a CSV file',
       intro: 'What a Markdown table is made of, how to align its columns, and what to do about pipes, line breaks and wide tables.',
@@ -269,6 +269,97 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'How to convert an Excel sheet to JSON for an API',
       intro: 'Prepare the header row, know how numbers, dates and empty cells come out, and get an array of objects your code can send.',
       linkText: 'Excel to JSON for an API',
+    },
+    '/split-large-csv': {
+      title: 'How to Split a Big CSV for Excel\'s Row Limit, Header Kept',
+      description: 'Split a big CSV by rows or size with the header row in every part: for Excel\'s 1,048,576 rows, upload limits or AI chats. Free, in your browser, no upload.',
+      heading: 'How to split a large CSV file into smaller files',
+      intro: 'Split a big CSV by rows or size with the header in every part, a worked example for Excel, and the command-line way explained fairly.',
+      linkText: 'Split a large CSV',
+    },
+    '/json-vs-json-lines': {
+      title: 'JSON vs JSON Lines (.jsonl, NDJSON): The Difference',
+      description: 'JSON holds one value; JSON Lines (.jsonl, NDJSON) holds one per line. When each is used (logs, exports, AI batch files) and how to open and convert them.',
+      heading: 'JSON vs JSON Lines: what is the difference?',
+      intro: 'What changes when JSON is written one record per line, where each format is used, and how to open and convert a .jsonl file.',
+      linkText: 'JSON vs JSON Lines',
+    },
+    '/compare-two-json-files': {
+      title: 'Why a Text Diff Misleads on JSON, and How to Compare by Key',
+      description: 'Compare two JSON files by key, not by line: see added, removed and changed values with their paths, ignore key order, and read a worked before/after example.',
+      heading: 'How to compare two JSON files and see what changed',
+      intro: 'Why a text diff misleads, what a JSON comparison reports, and a worked example with a before and after file.',
+      linkText: 'Compare two JSON files',
+    },
+    '/excel-row-and-column-limits': {
+      title: 'Excel Row and Column Limits: Rows, Columns, Cells, Digits',
+      description: 'Excel\'s limits from Microsoft\'s own list: 1,048,576 rows, 16,384 columns, 32,767 characters a cell, 15 digits, and what to do when your data is bigger.',
+      heading: 'What are Excel\'s row and column limits?',
+      intro: 'Every Excel limit worth knowing, from Microsoft\'s own list, what each one means for a real file, and what to do when your data goes past them.',
+      linkText: 'Excel row and column limits',
+    },
+    '/find-hidden-sheets-in-excel': {
+      title: 'Find Hidden Sheets in Excel, Including Very Hidden Ones',
+      description: 'How to find hidden and very hidden sheets, hidden rows and columns, and every formula in an Excel workbook, in Excel or in your browser with nothing uploaded.',
+      heading: 'How do I find hidden sheets, rows and formulas in an Excel file?',
+      intro: 'The four places a workbook hides things, how to see them all in your browser, and how to unhide them in Excel, very hidden sheets included.',
+      linkText: 'Find hidden sheets in Excel',
+    },
+    '/excel-to-csv-without-breaking-arabic': {
+      title: 'Excel to CSV Without Breaking Arabic: UTF-8 and the BOM',
+      description: 'Convert Excel to CSV and keep Arabic readable: why letters turn into ? or symbols, what UTF-8 and the BOM do, and how to save a CSV that Excel opens correctly.',
+      heading: 'How do I convert Excel to CSV without breaking Arabic text?',
+      intro: 'Why Arabic gets lost when a workbook is saved as CSV, what the bytes look like, and how to write a UTF-8 CSV with the mark Excel needs.',
+      linkText: 'Excel to CSV with Arabic',
+    },
+    '/read-speaker-notes-without-powerpoint': {
+      title: 'Read Speaker Notes Without PowerPoint: View, Search, Export',
+      description: 'Read the speaker notes in a .pptx without PowerPoint: see them under each slide, search them, hear them read aloud and export them as text, with no upload.',
+      heading: 'How to read speaker notes without PowerPoint',
+      intro: 'Where the notes sit in a .pptx file, how to read, search, hear and export them in your browser, and what PowerPoint, Google Slides and Keynote offer.',
+      linkText: 'Read speaker notes',
+    },
+    '/compress-video-without-upload': {
+      title: 'Video Too Big for Email or WhatsApp? Work Out the Size You Need',
+      description: 'Make a video small enough for email, WhatsApp or a form: what makes it big, the size arithmetic, real limits, and how to shrink it in your browser, no upload.',
+      heading: 'How to compress a video without uploading it',
+      intro: 'Why videos are big, how to work out the size you can reach, the limits of common places, and how to compress one on your own device.',
+      linkText: 'Compress video without upload',
+    },
+    '/file-too-large-for-chatgpt': {
+      title: 'File Too Large for ChatGPT? How to Cut It Down to Size',
+      description: 'Why ChatGPT, Claude or Gemini refuse a big file, the upload and token limits from their help pages, and how to count, split and shrink it in your browser.',
+      heading: 'What to do when a file is too large for ChatGPT',
+      intro: 'The two limits an AI chat sets, a measured example, and the steps to cut a PDF, Word, Excel or CSV file down to a size it can read.',
+      linkText: 'File too large for AI chat',
+    },
+    '/best-free-csv-viewers': {
+      title: 'Best Free CSV Viewers: Six Free Ways to Open a CSV File',
+      description: 'Six free ways to open a CSV file, from a browser viewer that uploads nothing to Google Sheets, LibreOffice Calc and desktop CSV apps, with each one\'s limits.',
+      heading: 'What is the best free CSV viewer?',
+      intro: 'Six free ways to open and view a CSV file, what each one does well, and the limits its own pages state.',
+      linkText: 'Best free CSV viewers',
+    },
+    '/best-free-json-formatters': {
+      title: 'Best Free JSON Formatters That Don\'t Store Your Data',
+      description: 'Six free JSON formatters compared by what their own pages say about your data: browser tools, a code editor, a terminal tool, and websites that keep JSON local.',
+      heading: 'Which free JSON formatters don\'t store your data?',
+      intro: 'Six free ways to pretty print JSON, and exactly what each one\'s own pages say about where your JSON goes.',
+      linkText: 'Best free JSON formatters',
+    },
+    '/openanydoc-vs-google-sheets-large-files': {
+      title: 'OpenAnyDoc vs Google Sheets vs Excel for Large CSV Files',
+      description: 'Large CSV files compared: Google Sheets\' 20 million cells, Excel\'s 1,048,576 rows, Excel for the web\'s size limits, and a browser viewer with no row limit.',
+      heading: 'OpenAnyDoc vs Google Sheets vs Excel: which opens large CSV files?',
+      intro: 'The official limits of Google Sheets, Excel and Excel for the web, what OpenAnyDoc does with a big CSV, and where each one does more.',
+      linkText: 'Large CSV: OpenAnyDoc vs Sheets',
+    },
+    '/large-csv-test': {
+      title: 'Large CSV Test: Try 3 Million Rows in 6 Tools Yourself',
+      description: 'A test you can run: one synthetic 3-million-row CSV in Excel, Google Sheets, LibreOffice, a text editor and OpenAnyDoc, with the limits that decide the outcome.',
+      heading: 'How to test a 3-million-row CSV in 6 tools',
+      intro: 'One synthetic file with 3,000,000 rows, six tools, the official limits that decide the outcome, and the steps to run the test yourself.',
+      linkText: '3-million-row CSV test',
     },
     '/pdf-to-ai-chat-with-tables': {
       title: 'PDF to ChatGPT Without Losing Tables: Paste It as Markdown',
@@ -313,21 +404,21 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'Split a PDF',
     },
     '/photos-to-one-pdf': {
-      title: 'Combine Photos Into One PDF: JPG, HEIC and PNG, No Upload',
+      title: 'Phone Photos to One PDF: HEIC, Page Order and Page Size',
       description: 'Turn phone photos into one PDF: pick JPG, HEIC or PNG pictures, set their order, page size and margins, straighten document photos and keep the file small.',
       heading: 'How to turn phone photos into one PDF',
       intro: 'Order, page size and margins, photos of paper documents, and how to keep the PDF small enough to send.',
       linkText: 'Photos to one PDF',
     },
     '/password-protect-pdf-free': {
-      title: 'How to Password Protect a PDF for Free, Without Uploading It',
+      title: 'PDF Password vs Restrictions: What Each One Really Protects',
       description: 'Password-protect a PDF for free: the password to open versus print and copy restrictions, what a password stops, how to send it, and how to remove it later.',
       heading: 'How to password-protect a PDF',
       intro: 'The two kinds of PDF password, what each one really protects, and how to share a locked file safely.',
       linkText: 'Password-protect a PDF',
     },
     '/make-scanned-pdf-searchable': {
-      title: 'How to Make a Scanned PDF Searchable With OCR, No Upload',
+      title: 'Why a Scanned PDF Isn\'t Searchable and How OCR Fixes It',
       description: 'Make a scanned PDF searchable: what OCR does, English and Arabic, why it need not upload your file, how accurate it is, and how to get the text into Word.',
       heading: 'How to make a scanned PDF searchable',
       intro: 'What text recognition adds to a scan, where it runs, how far to trust it, and what to do with the text afterwards.',
@@ -347,7 +438,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Free PDF tools that work on your own device: compress a PDF, convert it to and from Word, Excel and PowerPoint, add text, highlights, drawings and a signature, fill in forms, add watermarks, headers and page numbers, merge, split and organize pages, and turn pictures into a PDF and pages into pictures or text, without uploading anything.',
       linkText: 'PDF tools',
       body: [
-        'Every PDF tool here runs on your own device. Your browser reads the PDF, changes it and hands you a new file; nothing is sent to a server, so contracts, invoices and forms stay private, and the tools keep working offline once the page has loaded.',
+        'Every PDF tool here runs on your own device. Your browser reads the PDF, changes it and hands you a new file; nothing is sent to a server, so contracts, invoices and forms stay private, and each tool keeps working offline once you have used it.',
         'To change which pages a PDF has, use Merge, Split, Remove pages, Extract pages or Organize. To change what is on the pages, use Edit PDF for text boxes, highlights, drawings and shapes, Sign PDF for a drawn, typed or uploaded signature, Fill PDF form for form fields, and Watermark, Header and footer or Add page numbers for text on every page. To change the format, turn pictures into a PDF with JPG to PDF, or a PDF into pictures, text or its embedded images.',
         'To make a PDF smaller or fix it, use Compress PDF (pictures re-saved at the quality you choose, with the size shown before and after), PDF to grayscale, Repair PDF, or OCR PDF to make a scan searchable. To move between formats, Word, Excel, PowerPoint, Markdown, HTML, text and CSV files become PDFs with text you can still search, and PDF to Word, Excel or PowerPoint turns a PDF back into an editable file. To keep a PDF safe, Protect PDF adds a password, Redact PDF removes text for good, Flatten PDF locks form values, and Remove PDF metadata clears the author and dates.',
         'Each tool shows a preview before you download, and its next steps pass the result to another tool in memory, so you can merge, number and sign a PDF in one visit.',
@@ -360,7 +451,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Free video tools that work on your own device: convert MOV, WebM and MKV to MP4, make a video smaller, trim, crop, rotate, resize, merge or loop it, change its speed, mute it or give it new sound, turn it into a GIF or an MP3, and record your screen or webcam.',
       linkText: 'Video tools',
       body: [
-        'Every video tool here runs on your own device. Your browser reads the video, a background worker changes it with the video encoders built into the browser, and you download the result; nothing is sent to a server, so family videos, screen recordings and work calls stay private, and the tools keep working offline once the page has loaded.',
+        'Every video tool here runs on your own device. Your browser reads the video, a background worker changes it with the video encoders built into the browser, and you download the result; nothing is sent to a server, so family videos, screen recordings and work calls stay private, and each tool keeps working offline once you have used it.',
         'To make a video play everywhere, convert it to MP4 with H.264 picture and AAC sound. To make it smaller for email or chat, use Compress video with a quality level or a target size, or Resize video. To keep only part of it, use Trim; to change its shape, Crop, Rotate or Flip. Merge videos joins clips into one, Loop video repeats one, and Change video speed makes it faster or slower.',
         'Which videos can my browser read? That depends on the browser: Chrome and Edge read the most, Safari reads HEVC from iPhones, and Firefox reads a little less. When a video uses a codec this browser can\'t read or make, the page names the codec and suggests one that works, rather than giving you a broken file.',
         'Can I record my screen without installing anything? Yes. The screen recorder and the webcam recorder record in the browser and give you a video file to save; nothing is uploaded, and the recording stops as soon as you press Stop or close the tab. PowerPoint to video turns slides into an MP4 with the number of seconds per slide you choose.',
@@ -373,7 +464,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Free picture tools that work on your own device: make photos smaller, resize them for Instagram, WhatsApp or a passport, crop, rotate and watermark them, convert HEIC, WebP, PNG and SVG, remove the GPS location, and edit photos or make memes, many pictures at once.',
       linkText: 'Image tools',
       body: [
-        'Every image tool here runs on your own device. Your browser reads the pictures, a background worker changes them, and you download the result; nothing is sent to a server, so family photos, ID pictures and screenshots stay private, and the tools keep working offline once the page has loaded.',
+        'Every image tool here runs on your own device. Your browser reads the pictures, a background worker changes them, and you download the result; nothing is sent to a server, so family photos, ID pictures and screenshots stay private, and each tool keeps working offline once you have used it.',
         'To make pictures smaller, use Compress image or convert them to WebP. To change their shape, use Resize, Crop or Rotate. To change their format, use the image converter or one of the pages for a single pair, such as HEIC to JPG for iPhone photos. To protect them, add a watermark, or remove the camera, date and GPS location before you share them.',
         'Most tools take many pictures at once and hand you one ZIP file. JPG to PDF puts pictures into a PDF, and PDF to JPG turns PDF pages back into pictures.',
         'Can I hide faces or remove a background without uploading the photo? Yes. Blur faces finds the faces in a photo and covers them with blur or large squares, Remove background cuts out a person or an object onto a transparent or white background, and Upscale makes a small picture two or four times larger. Each uses an on-device AI model that this site sends to your browser the first time (about 16 to 22 MB) and that works offline after that. The models are small, so check the result: a side view or a very small face can be missed, and fine hair can come out rough.',
@@ -418,7 +509,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
         'Received a file you cannot open? The office tools open the files people send at work without Microsoft Office: Word documents (.docx, .dotx, .docm and OpenDocument .odt), Excel workbooks (.xlsx, .xlsm, .ods and old .xls files), PowerPoint presentations (.pptx, .ppsx, .potx and .pptm, in beta) and plain text files. Everything is drawn by your browser, so a confidential document is never uploaded to read it, and the pages keep working offline once they have loaded.',
         'The Word viewer shows pages with their fonts, tables and pictures, plus a navigation pane, search, comments and read aloud. The Excel viewer keeps formulas, number formats and frozen panes and lets you edit cells and download the workbook. The PowerPoint viewer shows slides with speaker notes, a grid of all slides, full screen and a presenter view. The TXT editor reads and edits text files and fixes their encoding. The Word, Excel and PowerPoint viewers can print or save as PDF, and Arabic documents display right to left.',
         'Need a PDF to send? Word to PDF and Excel to PDF save a document or a workbook as PDF pages with text you can still select and search. Need the words for an AI chat, a wiki or notes? Word to Markdown and PowerPoint to Markdown turn headings, lists, tables and speaker notes into clean Markdown, and Excel to CSV or Excel to JSON pull the data out of a sheet.',
-        'Need to change the file itself? Merge or split Word documents, Excel workbooks and PowerPoint presentations; find and replace text across a Word document; remove comments and tracked changes before you send it; add a CONFIDENTIAL watermark; make one letter per row of a spreadsheet with mail merge; compare two versions of a Word document or a workbook; take off sheet protection from a workbook you own or repair one Excel will not open; and see or remove the author, company and dates stored in any of the three. Each tool edits the file in your browser and leaves everything else in it as it was.',
+        'Need to change the file itself? Merge or split Word documents, Excel workbooks and PowerPoint presentations; find and replace text across a Word document; remove comments and tracked changes before you send it; add a CONFIDENTIAL watermark; make one letter per row of a spreadsheet with mail merge; compare two versions of a Word document or a workbook; take off sheet protection from a workbook you own or repair one Excel will not open; and see or remove the author, company and dates stored in any of the three. Each tool edits the file in your browser.',
         'Not sure which app to use? The guides compare the free options for each kind of file: how to open a DOCX file without Word, an XLSX file without Excel, a PPTX file without PowerPoint and a TXT file on any device, which of them upload your file, and what each one keeps.',
       ],
     },
@@ -429,7 +520,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'Every tool on OpenAnyDoc, grouped by the kind of file it works on. Each one runs in your browser, and none of them uploads your files.',
       linkText: 'All tools',
       body: [
-        'Every OpenAnyDoc tool works the same way: you choose a file, your browser does the work, and you download the result. Nothing is uploaded, there is no account and no watermark, and the tools work offline once a page has loaded. Pick a tool from the PDF, office, image, video, data or AI groups above, or drop any supported file on the home page and it opens in the right viewer.',
+        'Every OpenAnyDoc tool works the same way: you choose a file, your browser does the work, and you download the result. Nothing is uploaded, there is no account and no watermark, and each tool works offline once you have used it. Pick a tool from the PDF, office, image, video, data or AI groups above, or drop any supported file on the home page and it opens in the right viewer.',
       ],
     },
   },
@@ -536,8 +627,8 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'توقيع PDF بدون Adobe',
     },
     '/pdf-tools-without-upload': {
-      title: 'أدوات PDF لا ترفع ملفك: بدائل iLovePDF وSmallpdf',
-      description: 'كيف تتعامل iLovePDF وSmallpdf وPDF24 وSejda مع ملف PDF وفق صفحاتها، وأدوات PDF مجانية تعمل في متصفحك فلا يغادر الملف جهازك أبدًا ولا يُرفع إلى أي خادم.',
+      title: 'أدوات PDF دون رفع: ماذا تفعل iLovePDF وPDF24 بملفاتك',
+      description: 'كيف تتعامل iLovePDF وPDF24 وSejda مع ملف PDF وفق صفحاتها، وأين تقدّم أكثر، وأدوات PDF مجانية تعمل في متصفحك فلا يغادر الملف جهازك ولا يُرفع إلى أي خادم.',
       heading: 'أدوات PDF لا ترفع ملفك',
       intro: 'كيف تتعامل مواقع PDF الشائعة مع ملفك، وأين تقدّم أكثر، والأدوات التي تُبقي الملف على جهازك.',
       linkText: 'أدوات PDF بدون رفع',
@@ -599,14 +690,14 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'بديل Stirling-PDF',
     },
     '/jsonformatter-alternative': {
-      title: 'بديل منسّق جيسون JSON Formatter: بلا روابط حفظ وبلا رفع',
+      title: 'بديل jsonformatter.org يُبقي بيانات JSON داخل متصفحك',
       description: 'كيف يتعامل jsonformatter.org وCode Beautify مع JSON الملصوق وفق صفحاتهما، ومنسّق ومدقق جيسون يُبقي مفاتيح API ورموز الوصول داخل متصفحك فلا تغادر جهازك.',
       heading: 'بديل jsonformatter.org وCode Beautify',
       intro: 'ما يقوله موقعا JSON الشائعان عن حفظ بياناتك ومشاركتها وتحميلها، وأين يقدّمان أكثر، وأدوات JSON تُبقيها في متصفحك.',
       linkText: 'بديل منسّق JSON',
     },
     '/reduce-photo-file-size': {
-      title: 'تقليل حجم ملف الصورة للبريد ونماذج الرفع ذات الحد الأقصى',
+      title: 'كيف تجعل حجم الصورة أقل من 1 ميغابايت للبريد أو نموذج رفع',
       description: 'اجعل صورتك أقل من 1 ميغابايت أو أي حد للرفع: غيّر الأبعاد أولًا، واختر الجودة والصيغة المناسبتين، ثم افحص النتيجة. ويتم كل ذلك في متصفحك دون رفع أي ملف.',
       heading: 'كيف تقلل حجم ملف الصورة للبريد أو النماذج',
       intro: 'الأبعاد والجودة والصيغة بالترتيب الذي يوفّر أكثر، وكيف تفحص الملف قبل أن يرفضه النموذج.',
@@ -627,7 +718,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'حذف الموقع من الصورة',
     },
     '/remove-background-without-upload': {
-      title: 'إزالة خلفية الصورة مجانًا دون رفعها إلى أي موقع أو خادم',
+      title: 'إزالة خلفية الصورة: ما الذي ينجح جيدًا وما الذي يجب تجنبه',
       description: 'قص شخص أو شيء من صورة بنموذج ذكاء اصطناعي يعمل على جهازك داخل المتصفح: PNG شفافة أو خلفية بيضاء، وما الذي ينجح جيدًا، وخيارات موجودة على هاتفك وحاسوبك أصلًا.',
       heading: 'كيف تزيل خلفية الصورة دون رفعها',
       intro: 'كيف يقص نموذج يعمل على الجهاز موضوع الصورة، وما الذي يُحمَّل في أول استخدام، وأي الصور تنجح أكثر وأيها تتجنب.',
@@ -641,7 +732,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'جدول بيانات لمحادثة الذكاء الاصطناعي',
     },
     '/make-markdown-table-from-csv': {
-      title: 'إنشاء جدول Markdown من ملف CSV لـ GitHub والتوثيق والمحادثات',
+      title: 'جداول Markdown من CSV: المحاذاة والخط العمودي والجداول العريضة',
       description: 'حوّل ملف CSV إلى جدول Markdown لملف README أو التوثيق أو محادثة ذكاء اصطناعي: سطر الرأس والفصل، ومحاذاة الأعمدة، والخط العمودي داخل الخلايا، والجداول العريضة.',
       heading: 'كيف تصنع جدول Markdown من ملف CSV',
       intro: 'مِمَّ يتكوّن جدول Markdown، وكيف تحاذي أعمدته، وماذا تفعل بالخطوط العمودية وفواصل الأسطر والجداول العريضة.',
@@ -660,6 +751,97 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       heading: 'كيف تحوّل ورقة اكسل إلى JSON لواجهة برمجية',
       intro: 'جهّز صف الرأس، واعرف كيف تخرج الأرقام والتواريخ والخلايا الفارغة، واحصل على مصفوفة كائنات يرسلها كودك.',
       linkText: 'اكسل إلى جيسون لواجهة API',
+    },
+    '/split-large-csv': {
+      title: 'كيف تقسّم ملف CSV كبيرًا ليناسب حد صفوف Excel مع العناوين',
+      description: 'قسّم ملف CSV كبيرًا حسب الصفوف أو الحجم مع صف العناوين في كل جزء، لأجل حد Excel البالغ 1,048,576 صفًا أو حدود الرفع أو محادثات الذكاء الاصطناعي، داخل متصفحك.',
+      heading: 'كيف تقسّم ملف CSV كبيرًا إلى ملفات أصغر',
+      intro: 'قسّم ملف CSV كبيرًا حسب الصفوف أو الحجم مع صف العناوين في كل جزء، مع مثال محسوب لأجل Excel، وشرح منصف لطريقة سطر الأوامر.',
+      linkText: 'تقسيم ملف CSV كبير',
+    },
+    '/json-vs-json-lines': {
+      title: 'JSON أم JSON Lines ‏(jsonl وNDJSON)؟ الفرق ومتى تستخدم كلًّا',
+      description: 'ملف JSON يحمل قيمة واحدة، وJSON Lines ‏(jsonl وNDJSON) قيمة في كل سطر. متى تُستعمل كل صيغة في السجلات والتصدير وملفات الذكاء الاصطناعي، وكيف تفتحها وتحوّلها.',
+      heading: 'ما الفرق بين JSON وJSON Lines؟',
+      intro: 'ما الذي يتغير حين يُكتب JSON سجلًا في كل سطر، وأين تُستعمل كل صيغة، وكيف تفتح ملف jsonl وتحوّله.',
+      linkText: 'JSON أم JSON Lines',
+    },
+    '/compare-two-json-files': {
+      title: 'لماذا يضلّلك فرق الأسطر في JSON وكيف تقارن الملفين بالمفاتيح',
+      description: 'قارن ملفي JSON بالمفتاح لا بالسطر: القيم المضافة والمحذوفة والمتغيرة مع مساراتها، وتجاهل ترتيب المفاتيح، ومثال عملي على ملف قبل التعديل وبعده، كله في متصفحك.',
+      heading: 'كيف تقارن ملفي JSON وتعرف ما الذي تغيّر',
+      intro: 'لماذا تضلّلك المقارنة النصية، وما الذي تذكره مقارنة JSON، ومثال عملي على ملف قبل التعديل وبعده.',
+      linkText: 'مقارنة ملفي JSON',
+    },
+    '/excel-row-and-column-limits': {
+      title: 'حدود الصفوف والأعمدة في Excel: الخلايا والأحرف والخانات',
+      description: 'حدود Excel كما تذكرها Microsoft: 1,048,576 صفًا و16,384 عمودًا و32,767 حرفًا في الخلية و15 خانة للرقم، وماذا تفعل حين تتجاوز بياناتك هذه الحدود دون رفع الملف.',
+      heading: 'ما حدود الصفوف والأعمدة في Excel؟',
+      intro: 'كل حد في Excel يستحق المعرفة، من قائمة Microsoft نفسها، وما يعنيه لملف حقيقي، وماذا تفعل حين تتجاوزه بياناتك.',
+      linkText: 'حدود الصفوف والأعمدة في Excel',
+    },
+    '/find-hidden-sheets-in-excel': {
+      title: 'اكتشف الأوراق المخفية في Excel، حتى المخفية جدًا منها',
+      description: 'كيف تعثر على الأوراق المخفية والمخفية جدًا والصفوف والأعمدة المخفية وكل صيغة في مصنف Excel، في برنامج Excel نفسه أو داخل متصفحك مجانًا دون رفع أي ملف.',
+      heading: 'كيف أعثر على الأوراق والصفوف والصيغ المخفية في ملف Excel؟',
+      intro: 'الأماكن الأربعة التي يخفي فيها المصنف شيئًا، وكيف تراها كلها في متصفحك، وكيف تُظهرها في Excel، بما فيها الأوراق المخفية جدًا.',
+      linkText: 'الأوراق المخفية في Excel',
+    },
+    '/excel-to-csv-without-breaking-arabic': {
+      title: 'تحويل Excel إلى CSV دون تشويه العربية: UTF-8 وعلامة BOM',
+      description: 'حوّل ملف Excel إلى CSV واحفظ العربية مقروءة: لماذا تتحول الحروف إلى علامات استفهام أو رموز، وما دور UTF-8 وعلامة BOM، وكيف تحفظ ملفًا يفتحه Excel سليمًا.',
+      heading: 'كيف أحوّل ملف Excel إلى CSV دون أن تتشوه العربية؟',
+      intro: 'لماذا تضيع العربية عند حفظ المصنف بصيغة CSV، وكيف تبدو البايتات، وكيف تكتب ملف CSV بترميز UTF-8 مع العلامة التي يحتاجها Excel.',
+      linkText: 'تحويل Excel إلى CSV بالعربية',
+    },
+    '/read-speaker-notes-without-powerpoint': {
+      title: 'قراءة ملاحظات المتحدث دون بوربوينت: عرضها والبحث فيها وتصديرها',
+      description: 'اقرأ ملاحظات المتحدث في ملف ‎.pptx دون بوربوينت: تظهر تحت كل شريحة، وتبحث فيها وتسمعها بصوت عالٍ وتصدّرها نصًا، كل ذلك في متصفحك ودون رفع الملف إلى أي خادم.',
+      heading: 'كيف تقرأ ملاحظات المتحدث دون بوربوينت',
+      intro: 'أين توجد الملاحظات في ملف ‎.pptx، وكيف تقرؤها وتبحث فيها وتسمعها وتصدّرها في متصفحك، وما الذي يقدّمه PowerPoint وGoogle Slides وKeynote.',
+      linkText: 'قراءة ملاحظات المتحدث',
+    },
+    '/compress-video-without-upload': {
+      title: 'فيديو أكبر من حد البريد أو WhatsApp؟ احسب الحجم الذي تحتاجه',
+      description: 'اجعل الفيديو صغيرًا بما يكفي للبريد أو WhatsApp أو نموذج رفع: ما الذي يكبّره، وكيف تحسب حجمه، وحدود الخدمات الشائعة، وكيف تضغطه داخل متصفحك دون رفع أي ملف.',
+      heading: 'كيف تضغط فيديو دون رفعه',
+      intro: 'لماذا تكون الفيديوهات كبيرة، وكيف تحسب الحجم الذي يمكنك الوصول إليه، وحدود الأماكن الشائعة، وكيف تضغط الفيديو على جهازك.',
+      linkText: 'ضغط الفيديو دون رفع',
+    },
+    '/file-too-large-for-chatgpt': {
+      title: 'ملف أكبر من أن يقبله ChatGPT؟ كيف تقسّمه وتختصره',
+      description: 'لماذا يرفض ChatGPT أو Claude أو Gemini الملف الكبير، وحدود الرفع والرموز كما تذكرها صفحات مساعدتها، وكيف تعدّ الملف وتقسّمه وتختصره داخل متصفحك دون رفعه.',
+      heading: 'ماذا تفعل حين يكون الملف أكبر من أن يقبله ChatGPT',
+      intro: 'الحدّان اللذان تضعهما محادثة الذكاء الاصطناعي، ومثال مقيس، وخطوات اختصار ملف PDF أو وورد أو اكسل أو CSV إلى حجم تقرؤه.',
+      linkText: 'ملف كبير على محادثة الذكاء الاصطناعي',
+    },
+    '/best-free-csv-viewers': {
+      title: 'أفضل عارض CSV مجاني: ست طرق مجانية لفتح ملف CSV وعرضه',
+      description: 'ست طرق مجانية لفتح ملف CSV، من عارض في المتصفح لا يرفع شيئًا إلى Google Sheets وLibreOffice Calc وتطبيقات CSV لسطح المكتب، مع حدود كل أداة كما تذكرها صفحاتها.',
+      heading: 'ما أفضل عارض CSV مجاني؟',
+      intro: 'ست طرق مجانية لفتح ملف CSV وعرضه، وما تجيده كل واحدة، والحدود التي تذكرها صفحاتها.',
+      linkText: 'أفضل عارض CSV مجاني',
+    },
+    '/best-free-json-formatters': {
+      title: 'أفضل منسّق JSON مجاني لا يخزّن بياناتك: ست أدوات',
+      description: 'ست أدوات مجانية لتنسيق JSON مقارنة بما تقوله صفحاتها عن بياناتك: أدوات في المتصفح ومحرر برمجي وسطر الأوامر ومواقع تُبقي JSON على جهازك دون أن تخزّنه أبدًا.',
+      heading: 'ما منسّقات JSON المجانية التي لا تخزّن بياناتك؟',
+      intro: 'ست طرق مجانية لتنسيق JSON، وما تقوله صفحات كل واحدة بالضبط عن المكان الذي يذهب إليه JSON.',
+      linkText: 'أفضل منسّقات JSON المجانية',
+    },
+    '/openanydoc-vs-google-sheets-large-files': {
+      title: 'OpenAnyDoc أم Google Sheets أم Excel لملفات CSV الكبيرة',
+      description: 'مقارنة لملفات CSV الكبيرة: حد 20 مليون خلية في Google Sheets، و1,048,576 صفًا في Excel، وحدود الحجم في Excel للويب، وعارض في المتصفح بلا حد خاص به للصفوف.',
+      heading: 'OpenAnyDoc أم Google Sheets أم Excel: أيها يفتح ملفات CSV الكبيرة؟',
+      intro: 'الحدود الرسمية لـ Google Sheets وExcel وExcel للويب، وما يفعله OpenAnyDoc بملف CSV كبير، وأين يقدّم كلٌّ منها أكثر.',
+      linkText: 'CSV كبير: OpenAnyDoc أم Sheets',
+    },
+    '/large-csv-test': {
+      title: 'اختبار ملف CSV كبير: جرّب 3 ملايين صف في 6 أدوات بنفسك',
+      description: 'اختبار تجريه بنفسك: ملف CSV تجريبي واحد من 3 ملايين صف في Excel وGoogle Sheets وLibreOffice ومحرر نصوص وOpenAnyDoc، مع الحدود الرسمية التي تحدد النتيجة.',
+      heading: 'كيف تختبر ملف CSV من 3 ملايين صف في 6 أدوات',
+      intro: 'ملف تجريبي واحد فيه 3,000,000 صف، وست أدوات، والحدود الرسمية التي تحدد النتيجة، وخطوات إجراء الاختبار بنفسك.',
+      linkText: 'اختبار CSV الكبير',
     },
     '/pdf-to-ai-chat-with-tables': {
       title: 'ملف PDF إلى ChatGPT دون فقدان الجداول: الصقه بصيغة Markdown',
@@ -704,21 +886,21 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'تقسيم ملف PDF',
     },
     '/photos-to-one-pdf': {
-      title: 'جمع الصور في ملف PDF واحد: صور JPG وHEIC وPNG دون رفع',
+      title: 'صور الهاتف في ملف PDF واحد: HEIC وترتيب الصفحات ومقاسها',
       description: 'حوّل صور الهاتف إلى ملف بي دي اف واحد: اختر صور JPG أو HEIC أو PNG، ورتّبها، واضبط مقاس الصفحة والهوامش، وقوّم صور المستندات الورقية، وأبقِ الملف صغيرًا.',
       heading: 'كيف تجمع صور الهاتف في ملف PDF واحد',
       intro: 'الترتيب ومقاس الصفحة والهوامش، وصور المستندات الورقية، وكيف تُبقي الملف صغيرًا بما يكفي لإرساله.',
       linkText: 'جمع الصور في PDF واحد',
     },
     '/password-protect-pdf-free': {
-      title: 'كيف تحمي ملف PDF بكلمة مرور مجانًا دون رفعه إلى أي موقع',
+      title: 'كلمة مرور PDF أم قيوده: ما الذي يحميه كلٌّ منهما فعلًا',
       description: 'احمِ ملف بي دي اف بكلمة مرور مجانًا: الفرق بين كلمة مرور الفتح وقيود الطباعة والنسخ، وما الذي تمنعه كلمة المرور، وكيف ترسلها بأمان، وكيف تزيلها لاحقًا.',
       heading: 'كيف تحمي ملف PDF بكلمة مرور',
       intro: 'نوعا كلمات مرور PDF، وما يحميه كل منهما فعلًا، وكيف تشارك ملفًا مقفلًا بأمان.',
       linkText: 'حماية ملف PDF بكلمة مرور',
     },
     '/make-scanned-pdf-searchable': {
-      title: 'كيف تجعل ملف PDF الممسوح ضوئيًا قابلًا للبحث دون رفعه',
+      title: 'لماذا لا يمكن البحث في ملف PDF الممسوح ضوئيًا وكيف يحل OCR ذلك',
       description: 'اجعل ملف بي دي اف الممسوح ضوئيًا قابلًا للبحث: ماذا يفعل التعرّف الضوئي، والعربية والإنجليزية، ولماذا لا يلزم رفع ملفك، ومدى دقته، وكيف تنقل النص إلى Word.',
       heading: 'كيف تجعل ملف PDF الممسوح ضوئيًا قابلًا للبحث',
       intro: 'ما يضيفه التعرّف الضوئي إلى المسح، وأين يعمل، وإلى أي حد تثق به، وماذا تفعل بالنص بعده.',
@@ -738,7 +920,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'أدوات PDF مجانية تعمل على جهازك: اضغط ملف PDF، وحوّله من وإلى Word وExcel وPowerPoint، وأضف نصوصًا وتظليلًا ورسومًا وتوقيعك، وعبّئ النماذج، وأضف علامات مائية ورؤوسًا وأرقام صفحات، وادمج الصفحات وقسّمها ورتّبها، وحوّل الصور إلى PDF والصفحات إلى صور أو نص، دون رفع أي شيء.',
       linkText: 'أدوات PDF',
       body: [
-        'تعمل كل أدوات PDF هنا على جهازك. يقرأ متصفحك ملف PDF ويعدّله ويعطيك ملفًا جديدًا، ولا يُرسل شيء إلى خادم، فتبقى العقود والفواتير والنماذج خاصة، وتواصل الأدوات العمل دون اتصال بعد تحميل الصفحة.',
+        'تعمل كل أدوات PDF هنا على جهازك. يقرأ متصفحك ملف PDF ويعدّله ويعطيك ملفًا جديدًا، ولا يُرسل شيء إلى خادم، فتبقى العقود والفواتير والنماذج خاصة، وتواصل كل أداة العمل دون اتصال بعد أن تستخدمها مرة.',
         'لتغيير صفحات الملف استخدم الدمج أو التقسيم أو حذف الصفحات أو استخراجها أو ترتيبها. ولتغيير ما على الصفحات استخدم «تعديل PDF» لمربعات النص والتظليل والرسم والأشكال، و«توقيع PDF» لتوقيع مرسوم أو مكتوب أو مرفوع، و«تعبئة نموذج PDF» لحقول النماذج، والعلامة المائية والرأس والتذييل وترقيم الصفحات للنص على كل صفحة. ولتغيير الصيغة حوّل الصور إلى PDF، أو PDF إلى صور أو نص أو استخرج صوره.',
         'لتصغير ملف PDF أو إصلاحه استخدم «ضغط PDF» (تُحفظ الصور بالجودة التي تختارها ويُعرض الحجم قبل الضغط وبعده)، أو التحويل إلى تدرج رمادي، أو «إصلاح PDF»، أو «التعرّف الضوئي» لجعل الملف الممسوح قابلًا للبحث. وللتنقل بين الصيغ تصبح ملفات Word وExcel وPowerPoint وMarkdown وHTML والنص وCSV ملفات PDF يبقى نصها قابلًا للبحث، ويعيد تحويل PDF إلى Word أو Excel أو PowerPoint الملف قابلًا للتعديل. ولحماية الملف تضيف «حماية PDF» كلمة مرور، ويحذف «تنقيح PDF» النص نهائيًا، ويثبّت «تسطيح PDF» قيم النماذج، وتزيل «إزالة بيانات PDF الوصفية» اسم المؤلف والتواريخ.',
         'تعرض كل أداة معاينة قبل التنزيل، وتمرر خطواتها التالية النتيجة إلى أداة أخرى في الذاكرة، فيمكنك دمج ملف وترقيمه وتوقيعه في زيارة واحدة.',
@@ -751,7 +933,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'أدوات فيديو مجانية تعمل على جهازك: حوّل MOV وWebM وMKV إلى MP4، وصغّر حجم الفيديو، واقتطع منه أو قصّ إطاره أو دوّره أو غيّر مقاسه، وادمج المقاطع أو كرّرها، وغيّر سرعتها، واكتم صوتها أو ضع لها صوتًا جديدًا، وحوّلها إلى GIF أو MP3، وسجّل شاشتك أو كاميرتك.',
       linkText: 'أدوات الفيديو',
       body: [
-        'كل أدوات الفيديو هنا تعمل على جهازك. يقرأ متصفحك الفيديو، ويغيّره عامل في الخلفية بمرمّزات الفيديو المدمجة في المتصفح، ثم تنزّل النتيجة؛ لا يُرسل شيء إلى أي خادم، فتبقى فيديوهات العائلة وتسجيلات الشاشة ومكالمات العمل خاصة، وتعمل الأدوات دون اتصال بعد تحميل الصفحة.',
+        'كل أدوات الفيديو هنا تعمل على جهازك. يقرأ متصفحك الفيديو، ويغيّره عامل في الخلفية بمرمّزات الفيديو المدمجة في المتصفح، ثم تنزّل النتيجة؛ لا يُرسل شيء إلى أي خادم، فتبقى فيديوهات العائلة وتسجيلات الشاشة ومكالمات العمل خاصة، وتعمل كل أداة دون اتصال بعد أن تستخدمها مرة.',
         'ليعمل الفيديو على كل الأجهزة، حوّله إلى MP4 بصورة H.264 وصوت AAC. ولتصغير حجمه للبريد أو المحادثات، استخدم ضغط الفيديو بمستوى جودة أو بحجم تختاره، أو غيّر مقاسه. ولإبقاء جزء منه فقط استخدم الاقتطاع، ولتغيير شكله القص أو التدوير أو القلب. ويجمع دمج الفيديو المقاطع في ملف واحد، ويكرّر تكرار الفيديو مقطعًا واحدًا، ويسرّع تغيير السرعة الفيديو أو يبطئه.',
         'ما الفيديوهات التي يقرؤها متصفحي؟ يعتمد ذلك على المتصفح: Chrome وEdge يقرآن أكثر الصيغ، وSafari يقرأ HEVC من iPhone، وFirefox يقرأ أقل قليلًا. وعندما يستخدم الفيديو ترميزًا لا يستطيع هذا المتصفح قراءته أو إنشاءه، تذكر الصفحة اسم الترميز وتقترح ترميزًا يعمل، بدلًا من أن تعطيك ملفًا معطوبًا.',
         'هل يمكنني تسجيل شاشتي دون تثبيت أي برنامج؟ نعم. يسجّل مسجّل الشاشة ومسجّل الكاميرا داخل المتصفح ويعطيانك ملف فيديو لحفظه؛ لا يُرفع شيء، ويتوقف التسجيل بمجرد الضغط على إيقاف أو إغلاق التبويب. ويحوّل تحويل PowerPoint إلى فيديو الشرائح إلى MP4 بعدد الثواني الذي تختاره لكل شريحة.',
@@ -764,7 +946,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'أدوات صور مجانية تعمل على جهازك: صغّر حجم الصور، وغيّر مقاسها لإنستغرام أو واتساب أو الجواز، وقصّها ودوّرها وأضف إليها علامة مائية، وحوّل HEIC وWebP وPNG وSVG، وأزل موقع GPS، وعدّل الصور أو اصنع الميمز، لعدة صور معًا.',
       linkText: 'أدوات الصور',
       body: [
-        'تعمل كل أدوات الصور هنا على جهازك. يقرأ متصفحك الصور، ويعدّلها عامل في الخلفية، ثم تنزّل النتيجة؛ ولا يُرسل شيء إلى خادم، فتبقى صور العائلة وصور الهوية ولقطات الشاشة خاصة، وتواصل الأدوات العمل دون اتصال بعد تحميل الصفحة.',
+        'تعمل كل أدوات الصور هنا على جهازك. يقرأ متصفحك الصور، ويعدّلها عامل في الخلفية، ثم تنزّل النتيجة؛ ولا يُرسل شيء إلى خادم، فتبقى صور العائلة وصور الهوية ولقطات الشاشة خاصة، وتواصل كل أداة العمل دون اتصال بعد أن تستخدمها مرة.',
         'لتصغير حجم الصور استخدم ضغط الصور أو حوّلها إلى WebP. ولتغيير شكلها استخدم تغيير الحجم أو القص أو التدوير. ولتغيير صيغتها استخدم محوّل الصور أو إحدى صفحات التحويل المخصصة، مثل HEIC إلى JPG لصور الآيفون. ولحمايتها أضف علامة مائية، أو أزل بيانات الكاميرا والتاريخ وموقع GPS قبل مشاركتها.',
         'تقبل معظم الأدوات عدة صور معًا وتعطيك ملف ZIP واحدًا. ويضع «JPG إلى PDF» الصور في ملف PDF، ويحوّل «PDF إلى JPG» صفحات PDF إلى صور.',
         'هل يمكنني إخفاء الوجوه أو إزالة الخلفية دون رفع الصورة؟ نعم. تجد أداة تمويه الوجوه الوجوه في الصورة وتغطيها بتمويه أو بمربعات كبيرة، وتقص أداة إزالة الخلفية شخصًا أو غرضًا على خلفية شفافة أو بيضاء، وتكبّر أداة تكبير الصورة الصورة الصغيرة مرتين أو أربع مرات. وتستخدم كل منها نموذج ذكاء اصطناعي يعمل على جهازك، يرسله هذا الموقع إلى متصفحك في أول استخدام (نحو 16 إلى 22 ميغابايت) ثم يعمل دون اتصال. النماذج صغيرة، فراجع النتيجة: قد يفوتها وجه جانبي أو صغير جدًا، وقد يخرج الشعر الدقيق خشنًا.',
@@ -809,7 +991,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
         'وصلك ملف لا تستطيع فتحه؟ تفتح أدوات المكتب الملفات التي تصلك في العمل دون Microsoft Office: مستندات Word (‎.docx و‎.dotx و‎.docm وOpenDocument ‎.odt)، ومصنفات Excel (‎.xlsx و‎.xlsm و‎.ods وملفات ‎.xls القديمة)، وعروض PowerPoint (‎.pptx و‎.ppsx و‎.potx و‎.pptm، تجريبيًا)، والملفات النصية. يرسم متصفحك كل شيء، فلا يُرفع مستند سري لقراءته، وتواصل الصفحات العمل دون اتصال بعد تحميلها.',
         'يعرض عارض Word الصفحات بخطوطها وجداولها وصورها، مع لوحة تنقل وبحث وتعليقات وقراءة بصوت عالٍ. ويحتفظ عارض Excel بالمعادلات وتنسيقات الأرقام والأجزاء المثبتة، ويتيح تعديل الخلايا وتنزيل المصنف. ويعرض عارض PowerPoint الشرائح مع ملاحظات المتحدث وشبكة كل الشرائح وملء الشاشة وعرض المقدّم. ويقرأ محرر TXT الملفات النصية ويعدّلها ويصلح ترميزها. ويمكن لعارضات Word وExcel وPowerPoint الطباعة أو الحفظ بصيغة PDF، وتظهر المستندات العربية من اليمين إلى اليسار.',
         'تحتاج ملف PDF لإرساله؟ تحفظ أداتا تحويل Word إلى PDF وتحويل Excel إلى PDF المستند أو المصنف صفحات PDF يبقى نصها قابلًا للتحديد والبحث. وتحتاج الكلمات لمحادثة ذكاء اصطناعي أو ويكي أو ملاحظات؟ تحوّل أداتا Word إلى Markdown وPowerPoint إلى Markdown العناوين والقوائم والجداول وملاحظات المتحدث إلى Markdown مرتب، وتستخرج أداتا تحويل Excel إلى CSV وExcel إلى JSON بيانات الورقة.',
-        'تحتاج إلى تعديل الملف نفسه؟ ادمج مستندات Word ومصنفات Excel وعروض PowerPoint أو قسّمها، وابحث عن نص واستبدله في مستند Word كله، وأزل التعليقات والتغييرات المتعقَّبة قبل الإرسال، وأضف علامة مائية «سري»، وأنشئ رسالة لكل صف من جدول بدمج المراسلات، وقارن نسختين من مستند Word أو مصنف، وأزل حماية الأوراق من مصنف تملكه أو أصلح مصنفًا لا يفتحه Excel، واعرض بيانات المؤلف والشركة والتواريخ المحفوظة في أي منها أو أزلها. تعدّل كل أداة الملف في متصفحك وتترك كل ما فيه غير ذلك كما هو.',
+        'تحتاج إلى تعديل الملف نفسه؟ ادمج مستندات Word ومصنفات Excel وعروض PowerPoint أو قسّمها، وابحث عن نص واستبدله في مستند Word كله، وأزل التعليقات والتغييرات المتعقَّبة قبل الإرسال، وأضف علامة مائية «سري»، وأنشئ رسالة لكل صف من جدول بدمج المراسلات، وقارن نسختين من مستند Word أو مصنف، وأزل حماية الأوراق من مصنف تملكه أو أصلح مصنفًا لا يفتحه Excel، واعرض بيانات المؤلف والشركة والتواريخ المحفوظة في أي منها أو أزلها. تعدّل كل أداة الملف في متصفحك.',
         'لست متأكدًا أي برنامج تستخدم؟ تقارن الأدلة الخيارات المجانية لكل نوع ملف: كيف تفتح ملف DOCX بدون وورد، وملف XLSX بدون اكسل، وملف PPTX بدون بوربوينت، وملف TXT على أي جهاز، وأيها يرفع ملفك، وما يحفظه كل منها.',
       ],
     },
@@ -820,7 +1002,7 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       intro: 'كل أدوات OpenAnyDoc مرتبة حسب نوع الملف الذي تعمل عليه. كلها تعمل في متصفحك، ولا ترفع أي منها ملفاتك.',
       linkText: 'كل الأدوات',
       body: [
-        'تعمل كل أدوات OpenAnyDoc بالطريقة نفسها: تختار ملفًا، ويقوم متصفحك بالعمل، وتنزّل النتيجة. لا يُرفع شيء، ولا حساب ولا علامة مائية، وتعمل الأدوات دون اتصال بعد تحميل الصفحة. اختر أداة من مجموعات PDF أو المكتب أو الصور أو الفيديو أو البيانات أو الذكاء الاصطناعي أعلاه، أو أفلت أي ملف مدعوم على الصفحة الرئيسية فيُفتح في العارض المناسب.',
+        'تعمل كل أدوات OpenAnyDoc بالطريقة نفسها: تختار ملفًا، ويقوم متصفحك بالعمل، وتنزّل النتيجة. لا يُرفع شيء، ولا حساب ولا علامة مائية، وتعمل كل أداة دون اتصال بعد أن تستخدمها مرة. اختر أداة من مجموعات PDF أو المكتب أو الصور أو الفيديو أو البيانات أو الذكاء الاصطناعي أعلاه، أو أفلت أي ملف مدعوم على الصفحة الرئيسية فيُفتح في العارض المناسب.',
       ],
     },
   },
@@ -857,9 +1039,9 @@ export const openGraphLocales: Record<Locale, string> = { en: 'en_US', ar: 'ar_A
 // The pages with a share picture of their own, format, landing and guide pages (public/og/, 1200 x 630, made by scripts/generate-og-images.mjs); every other page
 // (About, Privacy, Terms, the changelog) shows the home page's picture in its language.
 // The guides, in the order of the /guides index (App.tsx shows them with InfoPage; the header's search lists them).
-export const guideAddresses = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload', '/open-txt-file', '/open-csv-without-excel', '/open-pptx-without-powerpoint', '/open-pdf-without-adobe', '/fix-arabic-text-copied-from-pdf', '/cant-edit-text-in-pdf', '/fill-pdf-form-without-acrobat', '/stirling-pdf-alternative', '/jsonformatter-alternative', '/pdf-to-ai-chat-with-tables', '/how-many-tokens-is-my-pdf', '/word-document-to-ai-chat', '/powerpoint-to-ai-chat', '/spreadsheet-to-ai-chat', '/make-markdown-table-from-csv', '/what-is-toon-format', '/how-to-merge-pdf-files', '/how-to-split-a-pdf', '/photos-to-one-pdf', '/password-protect-pdf-free', '/make-scanned-pdf-searchable', '/reduce-photo-file-size', '/open-heic-on-windows', '/remove-location-from-photo', '/remove-background-without-upload', '/convert-excel-to-json-for-api']
+export const guideAddresses = ['/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload', '/open-txt-file', '/open-csv-without-excel', '/open-pptx-without-powerpoint', '/open-pdf-without-adobe', '/fix-arabic-text-copied-from-pdf', '/cant-edit-text-in-pdf', '/fill-pdf-form-without-acrobat', '/stirling-pdf-alternative', '/jsonformatter-alternative', '/pdf-to-ai-chat-with-tables', '/how-many-tokens-is-my-pdf', '/word-document-to-ai-chat', '/powerpoint-to-ai-chat', '/spreadsheet-to-ai-chat', '/make-markdown-table-from-csv', '/what-is-toon-format', '/how-to-merge-pdf-files', '/how-to-split-a-pdf', '/photos-to-one-pdf', '/password-protect-pdf-free', '/make-scanned-pdf-searchable', '/reduce-photo-file-size', '/open-heic-on-windows', '/remove-location-from-photo', '/remove-background-without-upload', '/convert-excel-to-json-for-api', '/split-large-csv', '/json-vs-json-lines', '/compare-two-json-files', '/excel-row-and-column-limits', '/find-hidden-sheets-in-excel', '/excel-to-csv-without-breaking-arabic', '/read-speaker-notes-without-powerpoint', '/compress-video-without-upload', '/file-too-large-for-chatgpt', '/best-free-csv-viewers', '/best-free-json-formatters', '/openanydoc-vs-google-sheets-large-files', '/large-csv-test']
 
-export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload', '/open-txt-file', '/open-csv-without-excel', '/open-pptx-without-powerpoint', '/open-pdf-without-adobe', '/fix-arabic-text-copied-from-pdf', '/cant-edit-text-in-pdf', '/fill-pdf-form-without-acrobat', '/stirling-pdf-alternative', '/jsonformatter-alternative', '/pdf-to-ai-chat-with-tables', '/how-many-tokens-is-my-pdf', '/word-document-to-ai-chat', '/powerpoint-to-ai-chat', '/spreadsheet-to-ai-chat', '/make-markdown-table-from-csv', '/what-is-toon-format', '/how-to-merge-pdf-files', '/how-to-split-a-pdf', '/photos-to-one-pdf', '/password-protect-pdf-free', '/make-scanned-pdf-searchable', '/reduce-photo-file-size', '/open-heic-on-windows', '/remove-location-from-photo', '/remove-background-without-upload', '/convert-excel-to-json-for-api']
+export const pagesWithShareImage = ['/', '/csv-viewer', '/excel-viewer', '/json-viewer', '/txt-viewer', '/word-viewer', '/powerpoint-viewer', '/json-formatter', '/json-validator', '/tsv-viewer', '/large-csv-viewer', '/xls-viewer', '/excel-to-csv', '/csv-to-excel', '/excel-to-json', '/csv-to-json', '/json-to-csv', '/mask-data', '/guides', '/fix-arabic-csv-in-excel', '/csv-opens-in-one-column', '/csv-too-big-for-excel', '/json-unexpected-token', '/check-file-upload', '/open-json-file', '/open-xlsx-without-excel', '/open-docx-without-word', '/csv-vs-excel-vs-json', '/anonymize-data-before-sharing', '/sign-pdf-without-adobe', '/pdf-tools-without-upload', '/open-txt-file', '/open-csv-without-excel', '/open-pptx-without-powerpoint', '/open-pdf-without-adobe', '/fix-arabic-text-copied-from-pdf', '/cant-edit-text-in-pdf', '/fill-pdf-form-without-acrobat', '/stirling-pdf-alternative', '/jsonformatter-alternative', '/pdf-to-ai-chat-with-tables', '/how-many-tokens-is-my-pdf', '/word-document-to-ai-chat', '/powerpoint-to-ai-chat', '/spreadsheet-to-ai-chat', '/make-markdown-table-from-csv', '/what-is-toon-format', '/how-to-merge-pdf-files', '/how-to-split-a-pdf', '/photos-to-one-pdf', '/password-protect-pdf-free', '/make-scanned-pdf-searchable', '/reduce-photo-file-size', '/open-heic-on-windows', '/remove-location-from-photo', '/remove-background-without-upload', '/convert-excel-to-json-for-api', '/split-large-csv', '/json-vs-json-lines', '/compare-two-json-files', '/excel-row-and-column-limits', '/find-hidden-sheets-in-excel', '/excel-to-csv-without-breaking-arabic', '/read-speaker-notes-without-powerpoint', '/compress-video-without-upload', '/file-too-large-for-chatgpt', '/best-free-csv-viewers', '/best-free-json-formatters', '/openanydoc-vs-google-sheets-large-files', '/large-csv-test']
 
 // The live tool and hub pages have one each too, drawn from the registry.
 export const registryPagesWithShareImage = [...liveTools.map(toolPath), ...liveHubs.map((hub) => hub.path), ALL_TOOLS_PATH]

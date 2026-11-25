@@ -24,7 +24,8 @@ export type FrameOverlay = { picture?: ImageBitmap; blurBoxes?: FrameBox[]; blur
 
 export type ConvertSettings = {
   container: OutputContainer
-  // A codec the visitor chose; without one the browser's first codec for the container is used (or the input is copied).
+  // A codec the visitor chose. Without one, a picture that isn't changed is copied when the container can hold its codec;
+  // otherwise the container's usual codec this browser can make is used.
   videoCodec?: VideoCodec
   quality?: VideoQuality
   // Bits per second; wins over `quality` (Compress to a target size).
@@ -65,7 +66,8 @@ export type VideoTaskError =
   | 'failed'
 
 export type VideoTaskResponse =
-  | { status: 'ok'; bytes?: Uint8Array; mimeType?: string; extension?: string; info?: VideoInfo; videoCodecs?: VideoCodec[]; audioCodecs?: AudioCodec[] }
+  // `soundDropped`: the video had sound this browser couldn't read, so the result has none.
+  | { status: 'ok'; bytes?: Uint8Array; mimeType?: string; extension?: string; info?: VideoInfo; videoCodecs?: VideoCodec[]; audioCodecs?: AudioCodec[]; soundDropped?: boolean }
   | { status: 'error'; reason: VideoTaskError; codec?: string; suggestion?: string }
 export type VideoTaskProgress = { status: 'progress'; done: number; total: number }
 
@@ -137,8 +139,13 @@ export function runVideoTask(request: VideoTaskRequest, onProgress?: (done: numb
   }).finally(() => worker.terminate())
 }
 
+// Results whose source sound couldn't be read, so useVideoJob can say so without every page passing the flag along.
+export const resultsWithoutSound = new WeakSet<File>()
+
 // The result as a file named after the input: "holiday.mov" → "holiday-trimmed.mp4".
-export function resultFileOf(answer: { bytes?: Uint8Array; mimeType?: string; extension?: string }, inputName: string, suffix: string) {
+export function resultFileOf(answer: { bytes?: Uint8Array; mimeType?: string; extension?: string; soundDropped?: boolean }, inputName: string, suffix: string) {
   const baseName = inputName.replace(/\.[^.]+$/, '') || 'video'
-  return new File([answer.bytes as BlobPart], `${baseName}${suffix ? `-${suffix}` : ''}.${answer.extension}`, { type: answer.mimeType })
+  const file = new File([answer.bytes as BlobPart], `${baseName}${suffix ? `-${suffix}` : ''}.${answer.extension}`, { type: answer.mimeType })
+  if (answer.soundDropped) resultsWithoutSound.add(file)
+  return file
 }

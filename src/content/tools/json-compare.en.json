@@ -3,11 +3,11 @@
   "description": "Compare two JSON files side by side: added, removed and changed values listed with their paths, with key order ignored unless you choose. No upload.",
   "heading": "Compare JSON: Find What Changed",
   "subtitle": "See every added, removed and changed value between two JSON files; nothing is uploaded.",
-  "intro": "A free JSON diff tool: open, drop or paste your first JSON document and the page opens on the Compare tab. Paste or open the second one and the two are compared by key and by position, not line by line, so a change in indentation is not a difference. The open document stays on the left and the second one on the right, and every added, removed and changed value is listed with its path. Both documents are read in your browser and never uploaded.",
+  "intro": "A free JSON diff tool: open, drop or paste your first JSON document and the page opens on the Compare tab. Paste or open the second one and the two are compared by key and by position, not line by line, so a change in indentation is not a difference. The open document stays on the left and the second one on the right, and the added, removed and changed values are counted, and up to 300 are listed with their paths. Both documents are read in your browser and never uploaded.",
   "features": [
-    { "title": "Differences by path", "text": "Each difference names where it is, such as users[2].email, and whether it was added, removed or changed." },
+    { "title": "Differences by path", "text": "Each difference names where it is, such as $.users[2].email, and whether it was added, removed or changed." },
     { "title": "Private and free", "text": "Both documents are compared by your own browser and never sent to a server. No account, no watermark." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: compare two JSON documents",
   "steps": [
@@ -19,13 +19,13 @@
   "handles": [
     "Comparison by key in objects and by position in arrays, so whitespace and indentation never count as changes.",
     "Ignore key order, on by default; turned off, objects whose keys moved are reported.",
-    "Added, removed and changed values, each with its path.",
+    "Added, removed and changed values counted, and up to 300 listed with their paths.",
     "Side-by-side view with the open document on the left and the second one on the right.",
     "Big integer IDs compared digit by digit, so two IDs that differ only in the last digits are told apart."
   ],
   "limits": [
     "Arrays are compared by position: an item inserted near the start shows as changes to the items after it.",
-    "Each document up to 10 MB, and both must be valid JSON.",
+    "Both documents up to 10 MB each, and both must be valid JSON. A .jsonl or .ndjson file is compared as a list of its lines.",
     "The comparison is not saved and has no share link; it lasts as long as the tab is open."
   ],
   "faqTitle": "Questions about comparing JSON",

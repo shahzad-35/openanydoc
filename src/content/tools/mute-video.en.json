@@ -1,9 +1,9 @@
 {
   "title": "Mute Video – Remove Audio from Video Free, No Upload",
-  "description": "Remove the sound from a video in seconds, right in your browser. The picture is copied as it is, so quality stays the same. Nothing is uploaded.",
+  "description": "Remove the sound from a video right in your browser. The picture is copied as it is, H.264, HEVC, VP9 or AV1, so its quality stays the same. No upload.",
   "heading": "Remove Sound from a Video",
-  "subtitle": "Take the sound out of a video in one click; the picture stays exactly as it was.",
-  "intro": "Remove background noise, voices or music before you share a clip. It is the quick way to take out music before you post a clip, or the background chatter from a screen recording. The picture is copied without being encoded again, so the result looks exactly like your video and is ready in seconds, even for a long recording.",
+  "subtitle": "Take the sound out of a video in one click; nothing is uploaded.",
+  "intro": "Remove background noise, voices or music before you share a clip. It is the quick way to take out music before you post a clip, or the background chatter from a screen recording. The picture is copied without being encoded again, whether it is H.264, HEVC from a recent iPhone, VP9 or AV1, so the result looks exactly like your video and is ready in seconds, even for a long recording.",
   "features": [
     {
       "title": "Private",
@@ -11,11 +11,11 @@
     },
     {
       "title": "Same picture",
-      "text": "The picture is copied as it is, with no loss of quality."
+      "text": "H.264, HEVC, VP9 and AV1 pictures are copied as they are, with no loss of quality."
     },
     {
       "title": "Quick",
-      "text": "Nothing is encoded again, so even a long video is done in seconds."
+      "text": "When the picture is copied, even a long video is done in seconds."
     }
   ],
   "stepsTitle": "How to mute a video",
@@ -36,22 +36,22 @@
   "handlesTitle": "Videos it can mute",
   "handles": [
     "Formats: MP4, WebM, MOV and MKV keep their format; other videos become MP4.",
-    "Picture: copied unchanged, at the same size, frame rate and quality.",
+    "Picture: copied unchanged, whatever its codec: H.264, HEVC, VP8, VP9, AV1 or ProRes.",
     "Sound: the sound track is taken out completely, so players show the video as having no sound, not as a silent track."
   ],
   "limits": [
     "The whole sound is removed; to silence only a part, trim the video first.",
-    "A format the browser can’t copy into is encoded again, which takes longer."
+    "Only the first chosen video is muted."
   ],
   "faqTitle": "Questions about removing sound from a video",
   "faq": [
     {
       "question": "Is my video uploaded?",
-      "answer": "No. Your own browser removes the sound on your device, and nothing is sent to a server. The picture is copied as it is, not encoded again. Open your browser's network panel while it runs and you will see no upload."
+      "answer": "No. Your own browser removes the sound on your device, and nothing is sent to a server. Open your browser's network panel while it runs and you will see no upload."
     },
     {
       "question": "Does muting lower the quality?",
-      "answer": "No. The picture is copied as it is, so it looks exactly like the original."
+      "answer": "No. The picture is copied as it is, not encoded again, so it looks exactly like the original."
     },
     {
       "question": "Can I put different music on instead?",

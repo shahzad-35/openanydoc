@@ -39,7 +39,7 @@
   ],
   "handlesTitle": "What the case changer handles",
   "handles": [
-    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet).",
     "Cases: UPPER CASE, lower case and Capitalize Each Word.",
     "Scope: one column at a time.",
     "Scripts without case: Arabic and similar text stays unchanged.",

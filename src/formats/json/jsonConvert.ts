@@ -2,7 +2,8 @@
 // asked for), and XML read and rewritten with the browser's own parser (DOMParser: the page only, not a worker). YAML uses
 // js-yaml in the page. Used by the JSON viewer's Convert menu, its landing pages (/json-to-xml, /json-to-go ...), XML to JSON
 // (src/formats/conversion.ts) and the XML viewer page (src/tools/data/MarkupWorkbench.tsx).
-import { isBigNumber } from './jsonTools'
+import { readJsonKeepingOrder } from './jsonTools'
+import type { OrderedJsonValue } from './jsonTools'
 import type { JsonValue } from './jsonModel'
 
 const escapeXml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
@@ -12,36 +13,36 @@ const toElementName = (key: string) => {
   return /^[\p{L}_]/u.test(name) ? name : `_${name}`
 }
 
-// One root element (<root>); an object's keys become child elements, an array becomes repeated elements with the array's own
-// name (or <item> inside another array), null an empty element.
-export function jsonToXml(value: JsonValue, rootName = 'root') {
+// One root element (<root>); an object's keys become child elements in their written order, an array becomes repeated elements
+// with the array's own name (or <item> inside another array), null an empty element. Numbers keep their exact digits.
+export function jsonToXml(jsonText: string, rootName = 'root') {
   const lines = ['<?xml version="1.0" encoding="UTF-8"?>']
-  const write = (node: JsonValue, name: string, indent: string) => {
+  const write = (node: OrderedJsonValue, name: string, indent: string) => {
     if (Array.isArray(node)) {
       if (node.length === 0) lines.push(`${indent}<${name}/>`)
       for (const item of node) write(item, Array.isArray(item) ? 'item' : name, indent)
       return
     }
-    if (typeof node === 'object' && node !== null && !isBigNumber(node)) {
-      const entries = Object.entries(node)
-      if (entries.length === 0) {
+    if (typeof node !== 'string') {
+      if (node.members.length === 0) {
         lines.push(`${indent}<${name}/>`)
         return
       }
       lines.push(`${indent}<${name}>`)
-      for (const [key, child] of entries) write(child, toElementName(key), `${indent}  `)
+      for (const member of node.members) write(member.value, toElementName(member.key), `${indent}  `)
       lines.push(`${indent}</${name}>`)
       return
     }
-    if (node === null) lines.push(`${indent}<${name}/>`)
-    else lines.push(`${indent}<${name}>${escapeXml(isBigNumber(node) ? node.rawJSON : String(node))}</${name}>`)
+    if (node === 'null') lines.push(`${indent}<${name}/>`)
+    else lines.push(`${indent}<${name}>${escapeXml(node.startsWith('"') ? (JSON.parse(node) as string) : node)}</${name}>`)
   }
-  if (Array.isArray(value)) {
+  const document = readJsonKeepingOrder(jsonText).value
+  if (Array.isArray(document)) {
     lines.push(`<${rootName}>`)
-    for (const item of value) write(item, 'item', '  ')
+    for (const item of document) write(item, 'item', '  ')
     lines.push(`</${rootName}>`)
   } else {
-    write(value, rootName, '')
+    write(document, rootName, '')
   }
   return lines.join('\n') + '\n'
 }

@@ -1,6 +1,6 @@
 // Draws the share pictures (og:image, 1200 x 630) into public/og/<locale>-<page>.png: the home page and each format page, in
 // English and Arabic, and each landing page. Also draws public/logo.png (512 x 512), the logo in the home page's structured data. Run by hand with `npm run og:images` after a heading in src/seo.ts changes, and commit the PNGs (the
-// Cloudflare build has no Chrome). Also draws the LinkedIn logo and cover into .claude/launch-kit/brand/. It renders an HTML card in
+// Cloudflare build has no Chrome). Also draws the LinkedIn logo and cover when LINKEDIN_IMAGES_FOLDER names a folder for them. It renders an HTML card in
 // headless Chrome over the DevTools protocol, with the Toy Blocks fonts from node_modules and the colours of src/index.css. Set CHROME_PATH if Chrome is not in its usual macOS place.
 
 import { spawn } from 'node:child_process'
@@ -183,10 +183,10 @@ try {
     console.log(file)
   }
 
-  // LinkedIn: the profile logo (400 x 400, the mark on white) and the company page cover (1128 x 191). Written into the launch kit,
-  // which is not committed. LinkedIn lays the logo over the cover's bottom left, so the cover keeps its content to the right.
-  const linkedinFolder = path.join(projectRoot, '.claude/launch-kit/brand')
-  fs.mkdirSync(linkedinFolder, { recursive: true })
+  // LinkedIn: the profile logo (400 x 400, the mark on white) and the company page cover (1128 x 191). Written only when
+  // LINKEDIN_IMAGES_FOLDER is set, into that folder (not committed). LinkedIn lays the logo over the cover's bottom left, so the cover keeps its content to the right.
+  const linkedinFolder = process.env.LINKEDIN_IMAGES_FOLDER
+  if (linkedinFolder) fs.mkdirSync(linkedinFolder, { recursive: true })
   await send('Emulation.setDefaultBackgroundColorOverride', { color: { r: 255, g: 255, b: 255, a: 1 } })
   const linkedinImages = [
     { name: 'linkedin-logo.png', width: 400, height: 400, html: `<style>* { margin: 0; } body { width: 400px; height: 400px; display: grid; place-items: center; background: #fff; } svg { width: 288px; height: 288px; }</style>${markSvg}` },
@@ -205,7 +205,7 @@ try {
         <div class="band">${viewers.filter((shown) => shown.toolPath).map((shown) => `<span style="background:${palette[`type-${shown.id}`]}"></span>`).join('')}</div>`,
     },
   ]
-  for (const image of linkedinImages) {
+  for (const image of linkedinFolder ? linkedinImages : []) {
     const imageFile = path.join(scratchFolder, image.name.replace('.png', '.html'))
     fs.writeFileSync(imageFile, `<!doctype html><meta charset="utf-8" />${image.html}`)
     await send('Emulation.setDeviceMetricsOverride', { width: image.width, height: image.height, deviceScaleFactor: 1, mobile: false })

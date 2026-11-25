@@ -42,7 +42,7 @@
   "limits": [
     "Names on comments and annotations are not removed, nor is text on the pages.",
     "Pictures inside the PDF keep their own metadata, such as camera and GPS location.",
-    "PDFs that need a password to open can't be read; remove the password first."
+    "A PDF that needs a password to open can't be cleaned; remove the password first with Unlock PDF. A file that only restricts printing or copying is cleaned, and the copy has no restrictions."
   ],
   "faqTitle": "Remove PDF metadata: questions",
   "faq": [

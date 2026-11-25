@@ -131,17 +131,33 @@ async function readMarkupTable(file: File, convertTo: ConversionTarget, locale: 
   }
 }
 
+// A number in the General format is shown by Excel cut to 11 characters (123456789012 as 1.23457E+11, 1234.5678901234 as
+// 1234.56789). Its shown text becomes the full value instead, to Excel's 15 significant digits; numbers with an explicit
+// format (dates, percentages, currencies) keep the text the sheet shows. Needs the workbook read with `cellNF`. An OpenDocument
+// cell may have no format code but shown text such as "12.5%", which is kept too: only text that is itself a number is replaced.
+export function showFullGeneralNumbers(sheet: XLSX.WorkSheet) {
+  for (const [address, cell] of Object.entries(sheet)) {
+    if (address.startsWith('!') || cell.t !== 'n' || (cell.z !== undefined && cell.z !== 'General')) continue
+    if (cell.w !== undefined && Number.isNaN(Number(cell.w))) continue
+    const fullText = String(Number((cell.v as number).toPrecision(15)))
+    if (!fullText.includes('e')) cell.w = fullText
+  }
+}
+
 // For JSON output, cells keep their type (numbers stay numbers); for CSV and Excel output they are the text the sheet shows.
 export async function readInputTables(file: File, contents: ArrayBuffer, inputViewerId: Viewer['id'], convertTo: ConversionTarget, locale: Locale): Promise<ReadResult> {
   if (/\.(xml|ya?ml|html?|sql)$/i.test(file.name)) return readMarkupTable(file, convertTo, locale)
   if (inputViewerId === 'excel') {
     try {
       // UTC: a date cell is a calendar day, not a moment, so it must not move by the visitor's time zone in the ISO text.
-      const workbook = XLSX.read(contents, { type: 'array', cellDates: true, UTC: true })
-      const tables = workbook.SheetNames.map((sheetName) => ({
-        sheetName,
-        rows: XLSX.utils.sheet_to_json<CellValue[]>(workbook.Sheets[sheetName], { header: 1, raw: convertTo === 'json', defval: convertTo === 'json' ? null : '', blankrows: false, UTC: true }),
-      }))
+      const workbook = XLSX.read(contents, { type: 'array', cellDates: true, cellNF: true, UTC: true })
+      const tables = workbook.SheetNames.map((sheetName) => {
+        showFullGeneralNumbers(workbook.Sheets[sheetName])
+        return {
+          sheetName,
+          rows: XLSX.utils.sheet_to_json<CellValue[]>(workbook.Sheets[sheetName], { header: 1, raw: convertTo === 'json', defval: convertTo === 'json' ? null : '', blankrows: false, UTC: true }),
+        }
+      })
       return { status: 'ok', tables }
     } catch {
       return { status: 'error', message: translate(locale, 'convert.readFailed') }

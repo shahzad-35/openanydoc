@@ -3,11 +3,11 @@
   "description": "Generate Java classes from a JSON sample, with private fields, getters and setters and a class per nested object. Copy or download a .java file.",
   "heading": "JSON to Java Classes: POJOs from a Sample",
   "subtitle": "Paste or open JSON and get Java classes with getters and setters; nothing is uploaded.",
-  "intro": "Mapping a JSON response to Java usually starts with a pile of boilerplate: a class for each object, a private field for each key, and a getter and setter for every field. Open or paste the JSON and the page writes it for you as plain classes with no annotations, such as private long id with getID() and setID(). Nested objects get their own classes, arrays become typed arrays of their items, whole numbers become long and decimals double. Copy the classes into your project or download a .java file. The code is generated in your browser, so nothing about your data reaches a server.",
+  "intro": "Mapping a JSON response to Java usually starts with a pile of boilerplate: a class for each object, a private field for each key, and a getter and setter for every field. Open or paste the JSON and the page writes it for you as plain classes with no annotations, such as private long id with getID() and setID(). Nested objects get their own classes, arrays become lists typed by their items, such as List<String>, whole numbers become long and decimals double. Copy the classes into your project or download a .java file. The code is generated in your browser, so nothing about your data reaches a server.",
   "features": [
     { "title": "Private", "text": "Your JSON is read and the classes are written by your own browser; nothing is sent to a server." },
     { "title": "No boilerplate to type", "text": "Plain classes with a private field, a getter and a setter for every key, and no library to depend on." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: generate Java classes from JSON",
   "steps": [
@@ -20,7 +20,7 @@
     "Objects: one plain class each, with a private field plus a getter and a setter per key.",
     "Names: keys such as order_id or first-name become camel-case fields, with getters and setters named to match.",
     "Numbers: long for whole numbers, double as soon as a value has a decimal part.",
-    "Arrays: typed by their items, such as String[] or Item[]; objects in one array merge into one class.",
+    "Arrays: lists typed by their items, such as List<String> or List<Item>; objects in one array merge into one class.",
     "A value that is null everywhere in the sample becomes Object.",
     "Input from a .json file, a drop, the paste box or a sample, up to 10 MB."
   ],
@@ -37,7 +37,7 @@
     { "question": "Why long and not int?", "answer": "A JSON number can be larger than an int holds, for example an ID or a timestamp in milliseconds. long is the safe choice; change a field to int by hand where you know the values are small." },
     { "question": "My keys are snake_case. Will Jackson still fill the fields?", "answer": "Not on its own, because the fields are camelCase and carry no annotations. Set a naming strategy, such as PropertyNamingStrategies.SNAKE_CASE on your ObjectMapper, or add @JsonProperty(\"order_id\") to the fields that differ." },
     { "question": "How do I read JSON into the classes?", "answer": "Put the classes in your project and pass the top-level class to the library's read method, such as objectMapper.readValue(json, Root.class) with Jackson or gson.fromJson(json, Root.class) with Gson." },
-    { "question": "The code is one file. Will it compile?", "answer": "Java allows only one public top-level class per file. Move each public class into a file named after it, or make the others package-private, and it compiles." },
+    { "question": "The code is one file. Will it compile?", "answer": "Not as it is: Java allows only one public top-level class per file, and each class comes with its own package line. Move each class into a file named after it, as the // Root.java comments show, and it compiles." },
     { "question": "How do I convert JSON to a Java class?", "answer": "Paste JSON into OpenAnyDoc's JSON to Java generator and the classes appear at once, one per kind of object, each with fields, getters and setters. Copy them or download a .java file and change the package to yours; the JSON is never uploaded." }
   ]
 }

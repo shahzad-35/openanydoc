@@ -26,7 +26,7 @@
     },
     {
       "title": "Write the watermark",
-      "text": "Pick CONFIDENTIAL or DRAFT, or type your own text."
+      "text": "Keep CONFIDENTIAL, or type your own text, such as DRAFT."
     },
     {
       "title": "Choose the look",
@@ -67,7 +67,7 @@
     },
     {
       "question": "How do I add a watermark to all slides in PowerPoint?",
-      "answer": "In PowerPoint, Keynote or LibreOffice Impress, a watermark on every slide is usually added as a text box on the slide master, which shows behind each slide. On this page, type the text, choose its look and download the presentation; the text box is put on top of every slide in one step, in your browser."
+      "answer": "PowerPoint's own help adds a watermark to every slide as a text box on the slide master, which shows behind each slide (checked 24 November 2026). On this page, type the text, choose its look and download the presentation; the text box is put on top of every slide in one step, in your browser."
     },
     {
       "question": "Can the watermark be removed?",

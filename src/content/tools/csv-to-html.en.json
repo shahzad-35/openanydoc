@@ -18,7 +18,7 @@
   "handlesTitle": "What the CSV to HTML converter handles",
   "handles": [
     "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, written as a UTF-8 page.",
+    "Encodings: UTF-8, UTF-16 (when the file starts with a byte order mark), Windows-1256 Arabic and Windows-1252 Western European text, written as a UTF-8 page.",
     "Structure: <table> with the header row in <thead> and every other row in <tbody>.",
     "Arabic and mixed text: in a full page each cell has dir=\"auto\", so each cell reads in its own direction.",
     "Escaping: <, > and & in cells are written as entities, so data is never read as markup."

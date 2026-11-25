@@ -37,8 +37,8 @@
   "handles": [
     "Sizes: 1080p, 720p, 480p and 360p by the shorter side, 1080 × 1080, 1080 × 1920, or any width and height from 16 to 7680 pixels.",
     "Shape: kept for the p sizes and with Keep the shape; other shapes get black bars.",
-    "Sound: kept as it is.",
-    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+    "Sound: kept when your browser can read it. If it can't, the page tells you the result has no sound.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V and 3GP videos become MP4."
   ],
   "limits": [
     "Only the first chosen video is resized.",

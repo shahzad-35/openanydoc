@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert XML to JSON",
@@ -40,13 +40,13 @@
     "Repeated child elements with the same name become an array; a single child stays an object.",
     "An element with only text, such as <title>Hello</title>, becomes the string \"Hello\".",
     "Namespace prefixes stay in the names, such as \"soap:Body\" or \"@xmlns:xsi\".",
-    "Input from an .xml file, a drop, the paste box or a sample, up to 10 MB."
+    "Input from an .xml file, a drop, the paste box or a sample."
   ],
   "limits": [
     "No DTD or XSD validation: the file is checked for being well-formed, not against a schema.",
     "Comments and processing instructions are dropped.",
-    "All values come out as strings; \"42\" in XML stays \"42\", because XML text has no types.",
-    "Files up to 10 MB."
+    "Files up to 10 MB; larger ones are refused before they are read.",
+    "All values come out as strings; \"42\" in XML stays \"42\", because XML text has no types."
   ],
   "faqTitle": "XML to JSON: questions and answers",
   "faq": [

@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert Excel to fixed-width text",
@@ -43,7 +43,7 @@
     "Layout: every column padded to its widest cell, with a gap of 1 to 4 spaces; empty rows are skipped.",
     "Header: the first row, underlined with a line of dashes.",
     "Wide characters: Chinese, Japanese and Korean characters count as two columns, as a monospaced font draws them.",
-    "Values: each cell as Excel shows it, so formulas give their result and dates and prices keep their format."
+    "Values: each cell as its number format shows it, so formulas give their result and dates and prices keep their format; numbers in the General format are written in full, so 123456789012 stays 123456789012."
   ],
   "limits": [
     "Columns line up only in a monospaced font, such as a terminal, code editor or plain-text email.",

@@ -3,7 +3,7 @@
   "description": "Test JSONPath queries on your JSON as you type, filters like $..book[?(@.price < 10)] included, with matches marked in the tree. Free, no upload.",
   "heading": "JSONPath Tester: Query Your JSON Live",
   "subtitle": "Type a JSONPath expression and see the matching values from your JSON as you type; nothing is uploaded.",
-  "intro": "A free JSONPath tester: open a .json file, drop it or paste the text, and the page opens with the query box ready, starting from $..*. Type an expression and the results update as you type, while the matching nodes are marked in the tree so you see where each one lives. The syntax is the common JSONPath one, filters such as $..book[?(@.price < 10)] included, run by a safe evaluator that never executes code from the query. Copy the results when they look right. Your JSON is queried in your browser and never uploaded.",
+  "intro": "A free JSONPath tester: open a .json file, drop it or paste the text, and the page opens with the query box ready, starting from $..*. Type an expression and the results update as you type, while the matching nodes are marked in the tree so you see where each one lives. The syntax is the common JSONPath one, filters such as $..book[?(@.price < 10)] included, run by a safe evaluator that never executes code from the query. Select a result to jump to its node in the tree, where Copy value copies it. Your JSON is queried in your browser and never uploaded.",
   "features": [
     {
       "title": "Results as you type",
@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: test a JSONPath query",
@@ -30,11 +30,11 @@
     },
     {
       "title": "See the matches",
-      "text": "Matching values are listed and marked in the tree, so you can check that the query picks what you meant."
+      "text": "The first 50 matches are listed and the matches are marked in the tree, so you can check that the query picks what you meant."
     },
     {
-      "title": "Copy the results",
-      "text": "Copy the matching values to use them elsewhere."
+      "title": "Go to a result",
+      "text": "Select a result to jump to its node in the tree; Copy value in the inspector copies that value."
     }
   ],
   "handlesTitle": "What the JSONPath tester handles",
@@ -43,7 +43,7 @@
     "Filters such as $..book[?(@.price < 10)], run by a safe evaluator with no access to code or the page.",
     "Results that update about 150 ms after you stop typing.",
     "Matching nodes marked in the tree.",
-    "Copy the results; big integer IDs keep every digit."
+    "Select a result to jump to its node; big integer IDs keep every digit."
   ],
   "limits": [
     "Filters are evaluated safely, so they cannot call arbitrary JavaScript; comparisons, && and || and the usual operators work.",
@@ -79,7 +79,7 @@
     },
     {
       "question": "How do I extract values from a JSON file with JSONPath?",
-      "answer": "Write a JSONPath expression that starts at the root $, such as $.store.book[*].title, and run it against the JSON: every matching value is returned. The OpenAnyDoc JSONPath tester runs it in your browser as you type, marks the matches in the tree and lets you copy them, without uploading the file."
+      "answer": "Write a JSONPath expression that starts at the root $, such as $.store.book[*].title, and run it against the JSON: every matching value is returned. The OpenAnyDoc JSONPath tester runs it in your browser as you type, marks the matches in the tree and jumps to each one you select, without uploading the file."
     }
   ]
 }

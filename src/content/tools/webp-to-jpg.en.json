@@ -77,7 +77,7 @@
     },
     {
       "question": "How do I convert WebP to JPG?",
-      "answer": "Open the WebP picture in an image app that can export JPEG, such as Preview on a Mac, and save it as JPG, or use a WebP to JPG converter for many pictures at once. In OpenAnyDoc, choose the WebP files, set the quality and download the JPGs; they are converted in your browser and never uploaded."
+      "answer": "Open the WebP picture in an image app that can export JPEG, such as Preview on a Mac (checked 24 November 2026), and save it as JPG, or use a WebP to JPG converter for many pictures at once. In OpenAnyDoc, choose the WebP files, set the quality and download the JPGs; they are converted in your browser and never uploaded."
     }
   ]
 }

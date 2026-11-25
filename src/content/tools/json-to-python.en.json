@@ -7,7 +7,7 @@
   "features": [
     { "title": "Private", "text": "Your JSON is read and the dataclasses are written by your own browser; nothing is sent to a server." },
     { "title": "Typed for mypy and your editor", "text": "Each field carries a type hint, so autocompletion and type checkers know what the data holds." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: generate Python dataclasses from JSON",
   "steps": [

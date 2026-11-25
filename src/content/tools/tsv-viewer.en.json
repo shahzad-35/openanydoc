@@ -2,7 +2,7 @@
   "title": "TSV Viewer Online – Open TSV Files as a Table, No Upload",
   "description": "TSV viewer online: open a TSV or .tab file as a table with the header row detected, then search, sort, edit and save it as TSV again. No upload.",
   "heading": "TSV Viewer Online: Open Tab-Separated Files",
-  "subtitle": "Drop a TSV file to see it as a table, then sort, search and edit it instantly; nothing is uploaded.",
+  "subtitle": "Drop a TSV file to see it as a table, then sort, search and edit it; nothing is uploaded.",
   "intro": "A free TSV viewer online: open a TSV file online and read its tab-separated values as a table, with the header row detected for you. Search, filter, sort and edit the cells, then download it as TSV again. The file is read in your browser and never uploaded.",
   "features": [
     {
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -42,7 +42,7 @@
     "Files: .tsv and .tab, read with tab as the separator.",
     "Header row: worked out from the data, and you can switch it.",
     "Quoted values: read the way Excel and Google Sheets write them, so a tab or line break inside quotes stays in one cell.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 for older Arabic files.",
+    "Encodings: UTF-8, UTF-16 (found by its byte order mark, or chosen by hand), Windows-1256 for older Arabic files and Windows-1252 for older Western European files.",
     "Saving: tab-separated again with the file's line endings; Download options set quotes and line endings or keep only the filtered rows."
   ],
   "limits": [

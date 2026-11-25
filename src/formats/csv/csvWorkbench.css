@@ -1,4 +1,4 @@
-/* The CSV file page: "Grid studio" (.claude/design-options/csv-viewer/option-1-grid-studio.html), ported as it is. Every rule is
+/* The CSV file page: the "Grid studio" design. Every rule is
    scoped to #csv-workbench, so no other page gets them. Light and dark follow the site's .dark class. The site's own tokens are
    pointed at the studio's colours so shared parts (the file error box) match. The grid stays left-to-right in Arabic. */
 #csv-workbench{--ui:var(--font-body);

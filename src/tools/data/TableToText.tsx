@@ -9,8 +9,8 @@ import { findViewerForFileName } from '../../viewers'
 import type { ToolProps } from '../registry'
 
 // The CSV and Excel to SQL, XML, YAML, Markdown, HTML, LaTeX and fixed-width pages: the file is read as a table (an Excel sheet
-// at a time, cells as Excel shows them), and the text appears at once to copy or download, with that format's options. The
-// builders are the CSV download dialog's (src/formats/csv/csvExport.ts); YAML is js-yaml's.
+// at a time, cells as Excel shows them, General numbers in full), and the text appears at once to copy or download, with that
+// format's options. The builders are the CSV download dialog's (src/formats/csv/csvExport.ts); YAML is js-yaml's.
 
 type TextFormat = 'sql' | 'xml' | 'yaml' | 'markdown' | 'html' | 'latex' | 'fixedWidth'
 type InputTable = { sheetName: string; rows: string[][] }
@@ -42,7 +42,8 @@ function TableToText({ format, files }: ToolProps & { format: TextFormat }) {
   const [tables, setTables] = useState<InputTable[]>([])
   const [readError, setReadError] = useState('')
   const [sheetName, setSheetName] = useState('')
-  const [tableName, setTableName] = useState('')
+  // null until the visitor types a table name; until then the name follows the chosen sheet.
+  const [typedTableName, setTypedTableName] = useState<string | null>(null)
   const [rootName, setRootName] = useState('rows')
   const [rowName, setRowName] = useState('row')
   const [isFullHtmlPage, setIsFullHtmlPage] = useState(true)
@@ -65,7 +66,7 @@ function TableToText({ format, files }: ToolProps & { format: TextFormat }) {
       setReadError('')
       setTables(textTables)
       setSheetName(textTables[0]?.sheetName ?? '')
-      setTableName(toSqlTableName(textTables[0]?.sheetName || chosenFile.name))
+      setTypedTableName(null)
     })
     return () => {
       isCurrentFile = false
@@ -73,6 +74,7 @@ function TableToText({ format, files }: ToolProps & { format: TextFormat }) {
   }, [chosenFile, locale])
 
   const chosenTable = tables.find((table) => table.sheetName === sheetName) ?? tables[0]
+  const tableName = typedTableName ?? toSqlTableName(chosenTable?.sheetName || chosenFile?.name || '')
   const outputText = useMemo(() => {
     if (!chosenTable || chosenTable.rows.length === 0) return ''
     const rows = chosenTable.rows
@@ -129,7 +131,7 @@ function TableToText({ format, files }: ToolProps & { format: TextFormat }) {
         {format === 'sql' && (
           <label htmlFor="table-text-table-name-input" className="text-sm font-semibold">
             {t('tableText.tableName')}
-            <input id="table-text-table-name-input" dir="ltr" value={tableName} onChange={(event) => setTableName(event.target.value)} className={inputClasses} />
+            <input id="table-text-table-name-input" dir="ltr" value={tableName} onChange={(event) => setTypedTableName(event.target.value)} className={inputClasses} />
           </label>
         )}
         {format === 'xml' && (

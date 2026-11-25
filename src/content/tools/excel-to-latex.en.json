@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert Excel to LaTeX",
@@ -38,7 +38,7 @@
     "Files: .xlsx, .xls (Excel 97–2003), .xlsm and .ods workbooks, one sheet at a time.",
     "Table: a tabular with an l column for each sheet column, \\hline rules and the header row first; empty rows are skipped.",
     "Escaping: & % $ # _ { } ~ ^ and \\ are escaped, so cell text is printed, not run as commands.",
-    "Values: each cell as Excel shows it, so formulas give their result and 15% or $2.50 print as in the sheet.",
+    "Values: each cell as its number format shows it, so formulas give their result and 15% or $2.50 print as in the sheet; numbers in the General format are written in full, so 123456789012 stays 123456789012.",
     "Merged cells: the value goes to the first cell of the range; the others stay empty."
   ],
   "limits": [

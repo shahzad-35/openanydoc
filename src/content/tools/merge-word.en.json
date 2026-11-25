@@ -1,9 +1,9 @@
 {
   "title": "Merge Word Documents – Combine DOCX Files Free, No Upload",
-  "description": "Combine several Word documents into one .docx in your browser: drag them into order and each one starts on a new page. Free, and nothing is uploaded.",
+  "description": "Combine several Word documents into one .docx in your browser, in the order you add them, each starting on a new page. Free, and nothing is uploaded.",
   "heading": "Merge Word documents",
   "subtitle": "Combine two or more Word documents into one .docx, in the order you choose, each starting on a new page; nothing is uploaded.",
-  "intro": "Merge DOCX files online without Word: add two or more .docx documents, drag them into order and download one Word file. Each document starts on a new page, and its text, tables, pictures, links and numbered lists are kept. The first document sets the look of the whole result: its styles, page size, headers and footers apply to every page. The files are joined in your browser and never leave your device. This tool is in beta.",
+  "intro": "Merge DOCX files online without Word: add two or more .docx documents in the order you want them joined and download one Word file. Each document starts on a new page, and its text, tables, pictures, links and numbered lists are kept. The first document sets the look of the whole result: its styles, page size, headers and footers apply to every page. The files are joined in your browser and never leave your device. This tool is in beta.",
   "features": [
     {
       "title": "Private",
@@ -11,7 +11,7 @@
     },
     {
       "title": "Your order",
-      "text": "Drag the documents into the order you want before merging; each one starts on a new page."
+      "text": "The documents are joined in the order you add them; each one starts on a new page."
     },
     {
       "title": "Still editable",
@@ -25,18 +25,18 @@
       "text": "Click Choose a file, or drop two or more .docx files on the page."
     },
     {
-      "title": "Put them in order",
-      "text": "Drag the documents until they are in the order you want."
+      "title": "Add more if needed",
+      "text": "Click Add files to add more documents; they are joined in the order they were added."
     },
     {
       "title": "Merge and download",
-      "text": "Click Merge and download the combined Word document."
+      "text": "Click Merge documents and download the combined Word document."
     }
   ],
   "handlesTitle": "What Merge Word handles",
   "handles": [
     "Files: two or more .docx documents (Word 2007 and later).",
-    "Kept: text, tables, pictures, links and numbered lists.",
+    "Kept: text, tables, pictures, links, numbered lists, footnotes and endnotes.",
     "Layout: each document starts on a new page; the first document's styles, page size, headers and footers apply to all.",
     "Result: one .docx file you can keep editing."
   ],
@@ -63,7 +63,7 @@
     },
     {
       "question": "How do I merge Word documents?",
-      "answer": "Merging Word documents means putting their contents one after another in a single .docx file. In Word you can insert another document with Insert → Text from File, and LibreOffice and Google Docs let you copy one document into another. On this page, choose two or more .docx files, drag them into order and click Merge: each document starts on a new page and the result downloads as one Word file, joined in your browser."
+      "answer": "Merging Word documents means putting their contents one after another in a single .docx file. In Word you can insert another document with Insert → Object → Text from File, and LibreOffice and Google Docs let you copy one document into another. On this page, choose two or more .docx files in the order you want and click Merge documents: each document starts on a new page and the result downloads as one Word file, joined in your browser."
     },
     {
       "question": "Whose headers and footers does the result use?",

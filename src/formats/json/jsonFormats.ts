@@ -2,6 +2,8 @@
 // are read (in the parse worker, which fetches this module only for them), and GeoJSON is plain JSON the page also summarises.
 // Pure functions, so a future converter page can use them too.
 import type { JsonValue } from './jsonModel'
+import { readJsonKeepingOrder, writeJsonKeepingOrder } from './jsonTools'
+import type { OrderedJsonValue } from './jsonTools'
 
 export type JsonSourceFormat = 'json' | 'jsonLines' | 'json5' | 'yaml'
 
@@ -14,7 +16,8 @@ export function isYamlWithinSizeLimit(value: unknown, limit = 1_000_000) {
   while (pending.length > 0) {
     const current = pending.pop()
     if (++visited > limit) return false
-    if (current !== null && typeof current === 'object') for (const child of Object.values(current)) pending.push(child)
+    if (current instanceof Map) for (const child of current.values()) pending.push(child)
+    else if (current !== null && typeof current === 'object') for (const child of Object.values(current)) pending.push(child)
   }
   return true
 }
@@ -50,10 +53,11 @@ export async function readSourceAsJsonText(text: string, format: Exclude<JsonSou
       const JSON5 = (await import('json5')).default
       return { jsonText: JSON.stringify(JSON5.parse(text), null, 2) }
     }
-    const { load } = await import('js-yaml')
-    const value = load(text) ?? null
+    // Mappings are read as Maps, which keep keys like "2024" in their written place (a plain object puts them first).
+    const { CORE_SCHEMA, load, realMapTag } = await import('js-yaml')
+    const value = load(text, { schema: CORE_SCHEMA.withTags(realMapTag) }) ?? null
     if (!isYamlWithinSizeLimit(value)) return { message: YAML_TOO_LARGE_MESSAGE, line: null }
-    return { jsonText: JSON.stringify(value, null, 2) }
+    return { jsonText: writeJsonKeepingOrder(toOrderedJson(value), 2) }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     // json5 and js-yaml both name the line in their messages ("at 3:5", "(3:5)").
@@ -62,10 +66,18 @@ export async function readSourceAsJsonText(text: string, format: Exclude<JsonSou
   }
 }
 
-// An array as JSON Lines: one item per line, no indentation.
-export function buildJsonLines(value: JsonValue) {
-  const items = Array.isArray(value) ? value : [value]
-  return items.map((item) => JSON.stringify(item)).join('\n') + '\n'
+// A value read from YAML, with Maps for its mappings, as the document the JSON writer takes.
+function toOrderedJson(value: unknown): OrderedJsonValue {
+  if (value instanceof Map) return { members: [...value].map(([key, child]) => ({ key: String(key), keyText: JSON.stringify(String(key)), value: toOrderedJson(child) })) }
+  if (Array.isArray(value)) return value.map(toOrderedJson)
+  return JSON.stringify(value) ?? 'null'
+}
+
+// A JSON array's text as JSON Lines: one item per line, no indentation, keys in their written order.
+export function buildJsonLines(jsonText: string) {
+  const document = readJsonKeepingOrder(jsonText).value
+  const items = Array.isArray(document) ? document : [document]
+  return items.map((item) => writeJsonKeepingOrder(item, 0)).join('\n') + '\n'
 }
 
 // ---------------------------------------------------------------- GeoJSON

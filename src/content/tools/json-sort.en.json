@@ -26,6 +26,7 @@
   ],
   "limits": [
     "Only keys are sorted; the items of an array are never reordered.",
+    "A key written twice in one object keeps only its last value, as JSON does; the page tells you when it finds one.",
     "Files up to 10 MB.",
     "The JSON must be valid to be sorted; a file with a syntax error shows where the error is first."
   ],

@@ -10,6 +10,7 @@ import { Notice } from '../../components/Messages'
 import type { ToolProps } from '../registry'
 import { ProgressBar } from '../pdf/PdfToolParts'
 import { BeforeAfterSlider, ImageFileGrid, fieldClass, keptFormatOf, outputNameOf, useBatch, useReadImages } from './ImageToolParts'
+import { runImageTask } from './imageTasks'
 
 type Box = { x: number; y: number; width: number; height: number }
 
@@ -57,6 +58,14 @@ const extensionOfType = (type: string) => ({ 'image/jpeg': 'jpg', 'image/png': '
 async function canvasToFile(canvas: HTMLCanvasElement | OffscreenCanvas, name: string, type: string) {
   const blob = canvas instanceof OffscreenCanvas ? await canvas.convertToBlob({ type, quality: 0.92 }) : await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, type, 0.92))
   if (!blob) throw new Error('The picture could not be made')
+  // Some browsers' canvases can't write WebP and quietly give a PNG instead: the image worker's own encoder makes the WebP then.
+  if (type === 'image/webp' && blob.type !== 'image/webp') {
+    const job = { name, picture: await createImageBitmap(canvas), steps: [], output: { format: 'webp' as const, quality: 92, optimisePng: false } }
+    const answer = await runImageTask({ type: 'process', jobs: [job], zipName: null })
+    const made = answer.status === 'ok' ? answer.images?.[0] : undefined
+    if (!made) throw new Error('The picture could not be made')
+    return new File([made.bytes as BlobPart], name, { type })
+  }
   return new File([blob], name, { type })
 }
 

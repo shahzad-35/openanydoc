@@ -37,8 +37,8 @@
   "handles": [
     "Mirror: left and right swap, as in a mirror.",
     "Upside down: top and bottom swap.",
-    "Sound: kept as it is.",
-    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+    "Sound: kept when your browser can read it. If it can't, the page tells you the result has no sound.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V and 3GP videos become MP4."
   ],
   "limits": [
     "Only the first chosen video is flipped.",

@@ -3,7 +3,7 @@
   "description": "Convert videos between MP4, WebM, MOV and MKV in your browser. Pick H.264, H.265, VP9 or AV1 and a quality. Your video is never uploaded.",
   "heading": "Convert Videos to MP4, WebM, MOV or MKV",
   "subtitle": "Change a video to MP4, WebM, MOV or MKV and choose its codec and quality; nothing is uploaded.",
-  "intro": "Turn a video into the format a player, editor or website asks for. Choose MP4, WebM, MOV or MKV, then a video codec and a quality, or leave both on Automatic. The codec list shows only the codecs your browser can actually make, so the choice you see is a choice that works. When the picture is already in the right codec, it is copied as it is, which is quick and loses nothing; otherwise it is re-encoded with the video encoders built into your browser.",
+  "intro": "Turn a video into the format a player, editor or website asks for. Choose MP4, WebM, MOV or MKV, then a video codec and a quality, or leave the codec on Automatic and the quality on Default. The codec list shows only the codecs your browser can actually make, so the choice you see is a choice that works. When the picture is already in the right codec, it is copied as it is, which is quick and loses nothing; otherwise it is re-encoded with the video encoders built into your browser.",
   "features": [
     {
       "title": "Private",
@@ -11,7 +11,7 @@
     },
     {
       "title": "Only codecs that work",
-      "text": "The codec list is built from what your browser can make right now, so you never pick a codec that fails at the end."
+      "text": "The list shows only codecs this browser can make (checked at 1280×720), so a very large video can still be refused when the conversion starts."
     },
     {
       "title": "Copied when it can be",
@@ -26,7 +26,7 @@
     },
     {
       "title": "Pick the format",
-      "text": "Choose MP4, WebM, MOV or MKV, and a codec and quality if you want something other than Automatic."
+      "text": "Choose MP4, WebM, MOV or MKV, and a codec and quality if you want something other than Automatic and Default."
     },
     {
       "title": "Convert",
@@ -39,10 +39,10 @@
   ],
   "handlesTitle": "Formats the video converter handles",
   "handles": [
-    "Video in: MP4, MOV, WebM, MKV, M4V, OGV and 3GP files your browser can play.",
+    "Video in: MP4, MOV, WebM, MKV, M4V and 3GP files your browser can play.",
     "Video out: MP4, WebM, MOV and MKV.",
     "Video codecs: H.264, H.265 (HEVC), VP8, VP9 and AV1, as far as your browser can make them.",
-    "Sound: kept, and changed to AAC or Opus when the new format needs it."
+    "Sound: kept when your browser can read it, and changed to AAC (Opus in WebM) when it isn't already. If it can't, the page tells you the result has no sound."
   ],
   "limits": [
     "One video at a time: convert it, then choose the next one.",
@@ -65,11 +65,11 @@
     },
     {
       "question": "Does converting lower the quality?",
-      "answer": "Not when the picture is copied, which the page tells you before you start. When it is re-encoded, Automatic quality looks the same as the original for most videos; choose High or Very high for more detail."
+      "answer": "Not when the picture is copied, which the page tells you before you start. When it is re-encoded, the Default quality looks the same as the original for most videos; choose High or Very high for more detail."
     },
     {
       "question": "Can I convert several videos?",
-      "answer": "Yes, one after another. Convert a video, download it, then choose the next one; the format and codec you picked stay chosen."
+      "answer": "Yes, one after another. Convert a video, download it, then choose the next one and pick its format again."
     },
     {
       "question": "Is there a size limit?",

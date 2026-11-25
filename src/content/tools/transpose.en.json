@@ -39,7 +39,7 @@
   ],
   "handlesTitle": "What the transpose tool handles",
   "handles": [
-    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet).",
     "Transpose: rows become columns and columns become rows.",
     "Scope: the whole table, or only the filtered rows.",
     "Undo: restores the table as it was."

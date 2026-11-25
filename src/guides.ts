@@ -24,15 +24,15 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Why Excel gets the encoding wrong',
           paragraphs: [
             'A CSV file is plain text, and plain text carries no label saying which encoding it uses. Nearly every system today writes UTF-8, which covers Arabic and every other script.',
-            'When you double-click a .csv, Excel does not ask. It assumes the old Windows code page of your computer (Windows-1252 on an English PC, Windows-1256 on an Arabic one) unless the file starts with a three-byte UTF-8 marker called the byte order mark, or BOM. Most exports leave the BOM out, so Excel reads each Arabic letter as two or three Latin symbols. Tab-separated files (.tsv) have exactly the same problem.',
+            'Microsoft\'s note on opening CSV UTF-8 files (checked 24 November 2026) says a UTF-8 CSV opens normally in Excel if it was saved with a byte order mark, or BOM, a three-byte marker at the start of the file. Most exports leave the BOM out, and that is when Arabic turns into symbols. Tab-separated files (.tsv) have exactly the same problem.',
           ],
-          links: [{ text: 'Tab-separated files', path: '/tsv-viewer' }],
+          links: [{ text: 'Tab-separated files', path: '/tsv-viewer' }, { text: 'note on opening CSV UTF-8 files', path: 'https://support.microsoft.com/en-us/office/opening-csv-utf-8-files-correctly-in-excel-8a935af5-3416-4edd-ba7e-3dfd2bc4a032' }],
         },
         {
           heading: 'Fix 1: download an Excel-ready copy (free, nothing uploaded)',
           paragraphs: ['OpenAnyDoc adds the missing marker for you, and the file never leaves your computer:'],
           list: [
-            'Open the CSV viewer and drop the file on the page. It checks for a BOM, UTF-16 and UTF-8, and falls back to Windows-1256 for older Arabic files; the status bar at the bottom shows the encoding it found.',
+            'Open the CSV viewer and drop the file on the page. It checks for a BOM, UTF-16 and UTF-8, and falls back to Windows-1256 for older Arabic files, or Windows-1252 when the letters look Western European; the status bar at the bottom shows the encoding it found.',
             'If the file has Arabic text and no BOM, an "Excel copy" button appears in the status bar. Click it.',
             'A copy named like your file with "-excel" added is downloaded, with the UTF-8 marker and Windows line endings. Double-click that copy and Excel shows the Arabic correctly.',
           ],
@@ -41,28 +41,28 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Fix 2: import the file instead of opening it',
           paragraphs: [
-            'Excel reads the encoding correctly when you import rather than double-click: go to Data, then Get Data, From File, From Text/CSV (older versions: Data, From Text), pick the file, set File Origin to "65001: Unicode (UTF-8)" and load it. It works every time, but you have to repeat it for every file, and the result is a workbook rather than the CSV itself.',
-            'The normal Download button in OpenAnyDoc also adds the marker whenever the file holds non-English text, so any copy you edit there opens cleanly in Excel too. If Excel refuses the file altogether because it has more than about a million rows, the large CSV viewer opens it in the browser instead.',
+            'Microsoft\'s note on opening CSV UTF-8 files (checked 24 November 2026) gives a way to open a UTF-8 file that has no BOM: go to Data, then Get Data, From File, From Text/CSV, and pick the file. It works, but you have to repeat it for every file, and the result is a workbook rather than the CSV itself.',
+            'The normal Download button in OpenAnyDoc also adds the marker whenever the file holds non-English text, so any copy you edit there opens cleanly in Excel too. If the file has more rows than an Excel sheet holds, the large CSV viewer opens it in the browser instead.',
           ],
-          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+          links: [{ text: 'note on opening CSV UTF-8 files', path: 'https://support.microsoft.com/en-us/office/opening-csv-utf-8-files-correctly-in-excel-8a935af5-3416-4edd-ba7e-3dfd2bc4a032' }, { text: 'large CSV viewer', path: '/large-csv-viewer' }],
         },
         {
           heading: 'Fix 3: write the file the right way next time',
           paragraphs: [
-            'If the CSV is made in Excel, use Save As and choose "CSV UTF-8 (Comma delimited)": that format writes the BOM. If it comes from code or an export tool, write UTF-8 with a BOM for files that will be opened in Excel, or export an .xlsx workbook instead, which stores its encoding and never has this problem. You can check an XLSX in the Excel viewer without opening Excel.',
+            'If the CSV comes from code or an export tool, write UTF-8 with a BOM for files that will be opened in Excel, or export an .xlsx workbook instead, which stores its encoding and never has this problem. You can check an XLSX in the Excel viewer without opening Excel.',
           ],
           links: [{ text: 'Excel viewer', path: '/excel-viewer' }],
         },
         {
-          heading: 'The reverse case: a file that only Excel reads correctly',
+          heading: 'The reverse case: an older Arabic file',
           paragraphs: [
-            'Exports from older Arabic systems are often Windows-1256 with no UTF-8 at all. Excel on an Arabic PC shows them fine, while browsers, editors and most modern tools assume UTF-8 and show nonsense. OpenAnyDoc reads such a file as Windows-1256 automatically, and if the guess is wrong you can pick the encoding yourself in the status bar. Downloading then writes UTF-8 with the marker, so the file opens correctly everywhere.',
+            'Exports from older Arabic systems are often Windows-1256 with no UTF-8 at all. Browsers, editors and most modern tools assume UTF-8 and show such a file as nonsense. OpenAnyDoc reads such a file as Windows-1256 automatically, and if the guess is wrong you can pick the encoding yourself in the status bar. Downloading then writes UTF-8 with the marker, so the file opens correctly everywhere.',
           ],
         },
         {
           heading: 'When the letters are right but the order is wrong',
           paragraphs: [
-            'If the Arabic letters themselves are correct but numbers, brackets or English words sit on the wrong side, the encoding is fine. That is text direction: set the cell or sheet to right-to-left in Excel (Page Layout, then Sheet Right-to-Left, or the paragraph direction buttons). In OpenAnyDoc, cells with Arabic text are shown right-to-left automatically.',
+            'If the Arabic letters themselves are correct but numbers, brackets or English words sit on the wrong side, the encoding is fine. That is text direction. In OpenAnyDoc, cells with Arabic text are shown right-to-left automatically.',
           ],
         },
         {
@@ -84,9 +84,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Why Excel puts a CSV in one column',
           paragraphs: [
-            'A CSV file has no header that says which character separates the fields. "Comma-separated" is the name, but Excel does not look for commas: when you double-click a .csv it uses the list separator of your Windows region. In countries that write decimals with a comma (most of Europe, and several Arabic locales) that separator is a semicolon, so a file with commas lands in one column. The reverse happens too: a file exported with semicolons opens in one column on an English PC.',
-            'Tab-separated files (.tsv and .tab) and pipe-separated exports hit the same wall, because Excel only splits them if you go through the import dialog.',
+            'A CSV file has no header that says which character separates the fields. "Comma-separated" is the name, but when you open a .csv directly, Excel uses your computer\'s current settings, and the list separator is set in the Windows region settings, as Microsoft\'s page on importing and exporting text files explains (checked 24 November 2026). The same page says that when the decimal separator is a comma, Excel uses a semicolon as the list separator, so a file with commas lands in one column. The reverse happens too: a file exported with semicolons opens in one column on a PC whose list separator is a comma.',
           ],
+          links: [{ text: 'page on importing and exporting text files', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }],
         },
         {
           heading: 'Fix 1: let the viewer detect the separator, then save a copy Excel understands',
@@ -104,22 +104,24 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Fix 2: import instead of double-clicking',
           paragraphs: [
-            'In Excel go to Data, then Get Data, From File, From Text/CSV (older versions: Data, From Text). The preview shows the data with a Delimiter box: choose comma, semicolon, tab or a custom character, then Load. Excel reads the file correctly every time, but you have to do it for every file, and the result is a workbook, not the CSV itself.',
-            'If the data is already in one column, select it and use Data, then Text to Columns, choose Delimited, tick the separator, and finish. That fixes the sheet in front of you without reopening the file.',
+            'In Excel go to Data, then Get Data, From File, From Text/CSV. The preview shows the data with a Delimiter box: choose comma, semicolon, tab or a custom character, then Load. The steps are in Microsoft\'s page on importing and exporting text files (checked 24 November 2026). It works, but you have to do it for every file, and the result is a workbook, not the CSV itself.',
+            'If the data is already in one column, select it and use Data, then Text to Columns, choose Delimited, tick the separator, and finish. That fixes the sheet in front of you without reopening the file; Microsoft\'s page on splitting text into columns has the steps (checked 24 November 2026).',
           ],
+          links: [{ text: 'page on importing and exporting text files', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }, { text: 'page on splitting text into columns', path: 'https://support.microsoft.com/en-us/office/split-text-into-different-columns-30b14928-5550-41f5-97ca-7a3e9c363ed7' }],
         },
         {
-          heading: 'Fix 3: tell Excel the separator inside the file',
+          heading: 'Fix 3: change the list separator in Windows',
           paragraphs: [
-            'Excel honours a first line that reads sep=; (or sep=, sep=| and so on). Add it above the header and Excel splits the file on that character when double-clicked. It is an Excel-only trick: other programs show the line as data, so use it for files meant only for Excel.',
-            'The lasting fix for one PC is the region setting: Windows Settings, Time & language, Language & region, Administrative language settings, Additional settings, List separator. Change it only if every file you open uses the same separator.',
+            'The lasting fix for one PC is the list separator in Windows. On Windows 11, search for Region Settings, select Administrative language settings, then Additional settings on the Formats tab, and type the separator in the List separator box on the Numbers tab. Microsoft\'s page on importing and exporting text files gives these steps (checked 24 November 2026) and notes that the change affects other programs on the computer too, so change it only if every file you open uses the same separator.',
           ],
+          links: [{ text: 'page on importing and exporting text files', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }],
         },
         {
           heading: 'Quotes, line breaks and numbers',
           paragraphs: [
-            'A field that contains the separator itself, a line break or a quote must be wrapped in double quotes ("Riyadh, KSA"), with inner quotes doubled. A file that does this correctly survives any of the fixes above; one that does not will also break in the viewer, which then shows the uneven rows so you can see where. Leading zeros (postal codes, IDs) are a separate problem: Excel drops them when it guesses a number, while the viewer keeps them as written.',
+            'A field that contains the separator itself, a line break or a quote must be wrapped in double quotes ("Riyadh, KSA"), with inner quotes doubled. A file that does this correctly survives any of the fixes above; one that does not will also break in the viewer, which then shows the uneven rows so you can see where. Leading zeros (postal codes, IDs) are a separate problem: Excel drops them when it treats the value as a number, as Microsoft\'s page on keeping leading zeros explains (checked 24 November 2026), while the viewer keeps them as written.',
           ],
+          links: [{ text: 'page on keeping leading zeros', path: 'https://support.microsoft.com/topic/1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
         },
         {
           heading: 'Still in one column?',
@@ -129,19 +131,21 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/csv-too-big-for-excel': {
       published: '2026-10-22',
-      updated: '2026-10-22',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'What you see',
           paragraphs: [
-            'Excel says "File not loaded completely", the sheet stops at row 1,048,576, or Excel freezes for minutes on a file of a few hundred megabytes and then opens it with some rows missing. The export looked fine; it is simply larger than a worksheet can hold.',
+            'Excel warns "This data set is too large for the Excel grid. If you save this workbook, you\'ll lose data that wasn\'t loaded.", and the sheet stops at row 1,048,576, as Microsoft\'s page on a data set too large for the Excel grid describes (checked 24 November 2026). The export looked fine; it is simply larger than a worksheet can hold.',
           ],
+          links: [{ text: 'page on a data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
           heading: 'Why Excel cannot open it',
           paragraphs: [
-            'A worksheet holds at most 1,048,576 rows and 16,384 columns. A CSV with more rows is cut at that line, silently in older versions and with a warning in newer ones. Well below that limit the size itself bites: a 300 MB text file becomes several gigabytes of cells in memory, so Excel spends minutes parsing and may run out of memory. Google Sheets stops earlier, at 10 million cells per spreadsheet.',
+            'A worksheet holds at most 1,048,576 rows and 16,384 columns, according to Microsoft\'s Excel specifications and limits page (checked 24 November 2026). A CSV with more rows is cut at that line. Google Sheets has its own limit: up to 20 million cells or 100MB for a spreadsheet created in or converted to Google Sheets, according to Google\'s page on files you can store in Google Drive (checked 24 November 2026).',
           ],
+          links: [{ text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'files you can store in Google Drive', path: 'https://support.google.com/drive/answer/37603' }],
         },
         {
           heading: 'Option 1: open it in the browser and cut it down',
@@ -156,8 +160,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Option 2: load it into Excel without a worksheet',
           paragraphs: [
-            'Excel can hold more than a million rows in its Data Model, just not in cells. Go to Data, Get Data, From File, From Text/CSV, then instead of Load choose Load To, tick "Only Create Connection" and "Add this data to the Data Model". You can then build a PivotTable over all the rows, filter in Power Query and load only a slice into a sheet.',
+            'Excel can load all the rows for a PivotTable without putting them in cells. Open a blank workbook, go to Data, From Text/CSV, pick the file and select Import, then in the preview choose Load To and PivotTable Report. The steps are in Microsoft\'s page on a data set too large for the Excel grid (checked 24 November 2026).',
           ],
+          links: [{ text: 'page on a data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
           heading: 'Option 3: split or summarise the file first',
@@ -296,15 +301,17 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'On Windows or a Mac with no extra software',
-          paragraphs: ['Every browser opens JSON: drag the file onto a Chrome, Edge or Firefox window. Firefox shows a built-in viewer with a collapsible tree; the others show the text. Notepad on Windows and TextEdit on a Mac open it as text too: right-click the file, choose Open with, and pick the editor. They are fine for small files, but long lines and deep nesting are hard to follow.'],
+          paragraphs: ['Firefox and Microsoft Edge open a JSON file without extra software. Firefox shows it in a built-in viewer where objects and arrays fold open and closed, as its JSON viewer documentation describes. Edge shows the text as it is, with a Pretty-print checkbox that indents a file saved on one line, as Microsoft\'s page on viewing JSON in Edge describes (both checked 24 November 2026).'],
+          links: [{ text: 'JSON viewer documentation', path: 'https://firefox-source-docs.mozilla.org/devtools-user/json_viewer/index.html' }, { text: 'viewing JSON in Edge', path: 'https://learn.microsoft.com/en-us/microsoft-edge/web-platform/json-viewer' }],
         },
         {
           heading: 'In a code editor',
-          paragraphs: ['If you work with JSON often, a code editor such as the free Visual Studio Code colours the syntax, folds objects and marks errors. Format Document (Shift+Alt+F on Windows, Shift+Option+F on a Mac) indents a file saved on one line.'],
+          paragraphs: ['If you work with JSON often, a code editor such as Visual Studio Code helps. Its Format Document command (Shift+Alt+F on Windows, Shift+Option+F on a Mac) indents a file saved on one line, according to its basic editing documentation (checked 24 November 2026).'],
+          links: [{ text: 'basic editing documentation', path: 'https://code.visualstudio.com/docs/editing/codebasics' }],
         },
         {
           heading: 'Make a one-line file readable',
-          paragraphs: ['A file saved on a single line is valid but unreadable. The JSON formatter indents it with 2 or 4 spaces (anything from 1 to 8, or a tab), can sort the keys, and minifies it again when you need a small file.'],
+          paragraphs: ['A file saved on a single line is valid but unreadable. The JSON formatter indents it with 2 or 4 spaces (or 1, 3 or 8 spaces, or a tab), can sort the keys, and minifies it again when you need a small file.'],
           links: [{ text: 'JSON formatter', path: '/json-formatter' }],
         },
         {
@@ -346,17 +353,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Free desktop apps',
           paragraphs: ['Both work offline and keep the file on your computer:'],
           list: [
-            'LibreOffice Calc (Windows, Mac and Linux) opens and saves .xlsx and keeps formulas and most formatting. It is the closest free equivalent to desktop Excel.',
-            'Apple Numbers (Mac, iPhone and iPad) opens .xlsx and can export back to the Excel format; some Excel-only features are converted or dropped.',
+            'LibreOffice Calc (Windows, Mac and Linux) opens and saves .xlsx files, according to LibreOffice\'s system requirements and its help page on Microsoft Office files (checked 24 November 2026).',
+            'Apple Numbers opens Excel spreadsheets and can export a copy to Excel, according to Apple\'s Numbers guide (checked 24 November 2026).',
           ],
+          links: [{ text: 'system requirements', path: 'https://www.libreoffice.org/get-help/system-requirements/' }, { text: 'help page on Microsoft Office files', path: 'https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html' }, { text: 'Numbers guide', path: 'https://support.apple.com/guide/numbers/tan9f3c54bdc/mac' }],
         },
         {
           heading: 'Online suites (the file is uploaded)',
-          paragraphs: ['Google Sheets opens an .xlsx after you upload it to Google Drive, and Excel for the web does the same with OneDrive. Both need an account, and the workbook is stored on their servers. That is fine for most files, but not for payroll, customer lists or anything you are not allowed to share.'],
+          paragraphs: ['Google Sheets opens an .xlsx file that is in Google Drive, according to Google\'s page on using Office files (checked 24 November 2026). It needs a Google account, and the workbook is stored on Google\'s servers. That is fine for most files, but not for payroll, customer lists or anything you are not allowed to share.'],
+          links: [{ text: 'page on using Office files', path: 'https://support.google.com/docs/answer/6055139' }],
         },
         {
           heading: 'On a phone',
-          paragraphs: ['Mobile browsers open OpenAnyDoc the same way: tap Choose a file and pick the workbook from Files or your downloads. Microsoft\'s Excel app and Google Sheets also have phone apps; both work with your account.'],
+          paragraphs: ['Mobile browsers open OpenAnyDoc the same way: tap Choose a file and pick the workbook from Files or your downloads.'],
         },
         {
           heading: 'Only need the data?',
@@ -382,9 +391,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             '.xls is the Excel 97 to 2003 format. The XLS viewer opens it with values, formulas and number formats, without cell styles.',
             '.xlsm is a workbook with macros. Viewers open the data; the macros never run outside Excel, and OpenAnyDoc does not keep them when it saves.',
-            '.ods is the OpenDocument spreadsheet that LibreOffice saves by default. Excel and OpenAnyDoc both open it.',
+            '.ods is the OpenDocument spreadsheet format. Excel opens it, according to Microsoft\'s list of file formats supported in Excel (checked 24 November 2026), and so does OpenAnyDoc.',
           ],
-          links: [{ text: 'XLS viewer', path: '/xls-viewer' }],
+          links: [{ text: 'XLS viewer', path: '/xls-viewer' }, { text: 'list of file formats supported in Excel', path: 'https://support.microsoft.com/en-us/office/file-formats-that-are-supported-in-excel-0943ff2c-6014-4e8d-aaea-b83d51d46247' }],
         },
         {
           heading: 'What may look different',
@@ -430,19 +439,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Free desktop apps',
           paragraphs: ['These work offline and keep the file on your computer:'],
           list: [
-            'LibreOffice Writer (Windows, Mac and Linux) opens, edits and saves .docx and keeps most formatting. It is the closest free equivalent to desktop Word.',
-            'Apple Pages (Mac, iPhone and iPad) opens .docx and can export back to the Word format; some Word-only features are converted or dropped.',
-            'On a Mac, selecting the file in Finder and pressing the Space bar shows a quick preview, and TextEdit opens it with simpler formatting.',
+            'LibreOffice Writer (Windows, Mac and Linux) opens and saves .docx files, according to LibreOffice\'s system requirements and its help page on Microsoft Office files (checked 24 November 2026).',
+            'Apple Pages on a Mac opens .doc and .docx files and can save them as Word files, according to Apple\'s Pages guide (checked 24 November 2026).',
+            'On a Mac, selecting the file in Finder and pressing the Space bar shows a quick preview, as Apple\'s page on previewing files describes (checked 24 November 2026).',
           ],
+          links: [{ text: 'system requirements', path: 'https://www.libreoffice.org/get-help/system-requirements/' }, { text: 'help page on Microsoft Office files', path: 'https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html' }, { text: 'Pages guide', path: 'https://support.apple.com/guide/pages/tancdeedb11c/mac' }, { text: 'page on previewing files', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }],
         },
         {
           heading: 'Online suites (the file is uploaded)',
-          paragraphs: ['Google Docs opens a .docx after you upload it to Google Drive, and Word for the web does the same with OneDrive. Both need an account, and the document is stored on their servers. That is fine for most files, but not for contracts, HR letters or anything you are not allowed to share. If you are unsure whether a site uploads your file, you can check it yourself.'],
-          links: [{ text: 'check it yourself', path: '/check-file-upload' }],
+          paragraphs: ['Google Docs opens a .docx file that is in Google Drive, according to Google\'s page on using Office files (checked 24 November 2026). It needs a Google account, and the document is stored on Google\'s servers. That is fine for most files, but not for contracts, HR letters or anything you are not allowed to share. If you are unsure whether a site uploads your file, you can check it yourself.'],
+          links: [{ text: 'page on using Office files', path: 'https://support.google.com/docs/answer/6055139' }, { text: 'check it yourself', path: '/check-file-upload' }],
         },
         {
           heading: 'On a phone',
-          paragraphs: ['Mobile browsers open OpenAnyDoc the same way: tap Choose a file and pick the document from Files or your downloads; the page fits the screen width. Microsoft\'s Word app and Google Docs also have phone apps; both work with your account.'],
+          paragraphs: ['Mobile browsers open OpenAnyDoc the same way: tap Choose a file and pick the document from Files or your downloads; the page fits the screen width.'],
         },
         {
           heading: 'Older and related formats',
@@ -450,7 +460,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             '.doc is the Word 97 to 2003 format. OpenAnyDoc does not open it; LibreOffice, Pages and Word do, and can save it as .docx, which then opens here.',
             '.docm is a document with macros and .dotx a template. The Word viewer opens both; the macros never run outside Word.',
-            '.odt is the OpenDocument text format that LibreOffice saves by default, and .rtf an older rich text format. Word, LibreOffice and Pages open both, and the Word viewer here opens .odt too.',
+            '.odt is the OpenDocument text format, and .rtf an older rich text format. The Word viewer here opens .odt.',
           ],
         },
         {
@@ -600,21 +610,22 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'On a Mac: Preview',
-          paragraphs: ['Preview, the PDF app that comes with every Mac, signs PDFs without any download. Open the PDF in Preview, show the Markup toolbar and click the Sign button. Create a signature with the trackpad, with the Mac\'s camera (sign on white paper and hold it up), or with an iPhone or iPad, then click the signature to place it and drag it into position. Saved signatures are available on your other Macs that use iCloud Drive. Apple describes the steps in its Preview guide.'],
+          paragraphs: ['Preview, the PDF app that comes with every Mac, signs PDFs without any download. Open the PDF in Preview, show the Markup toolbar and click the Sign button. Create a signature with the trackpad, with the Mac\'s camera (sign on white paper and hold it up), or with an iPhone or iPad, then click the signature to place it and drag it into position. Saved signatures are available on your other Macs that use iCloud Drive. Apple describes the steps in its Preview guide (checked 24 November 2026).'],
           links: [{ text: 'Preview guide', path: 'https://support.apple.com/guide/preview/prvw35725/mac' }],
         },
         {
           heading: 'On an iPhone or iPad: Markup',
-          paragraphs: ['Open the PDF in the Files app, tap the Markup button (a pen tip in a circle), tap the plus button and choose Add Signature. Draw your signature with your finger, tap Done, then drag and resize it on the page. If an app does not show Markup, save the PDF to Files first and open it there. Saved signatures can be reused on the next document.'],
+          paragraphs: ['Open the PDF in the Files app, tap the Markup button, tap the Add button and choose Add Signature. Sign your name with your finger and tap Done, then drag the signature where it belongs and drag a blue dot to resize it. iPhone saves the signature for the next time you add one with Markup. Apple describes the steps in its iPhone guide (checked 24 November 2026).'],
+          links: [{ text: 'iPhone guide', path: 'https://support.apple.com/guide/iphone/fill-forms-sign-documents-create-signatures-iph1d3607e5c/ios' }],
         },
         {
           heading: 'On Windows: Microsoft Edge',
-          paragraphs: ['Microsoft Edge, the browser that comes with Windows, opens PDFs and has a Draw tool. Open the PDF in Edge, choose Draw, write your signature with a mouse, pen or finger, then save the PDF. It is quick, but the signature is drawn freehand each time; Sign PDF in the browser lets you type or upload one instead and copy it to every page.'],
-          links: [{ text: 'Sign PDF in the browser', path: '/sign-pdf' }],
+          paragraphs: ['Microsoft Edge has a built-in PDF reader, and Microsoft\'s page on the Edge PDF reader (checked 24 November 2026) says you can ink on a PDF to sign it or fill out a form. Open the PDF in Edge and write your signature in ink with a mouse, pen or finger. It is quick, but the signature is drawn freehand each time; Sign PDF in the browser lets you type or upload one instead and copy it to every page.'],
+          links: [{ text: 'page on the Edge PDF reader', path: 'https://learn.microsoft.com/en-us/deployedge/microsoft-edge-pdf' }, { text: 'Sign PDF in the browser', path: '/sign-pdf' }],
         },
         {
           heading: 'A picture of a signature is not a digital signature',
-          paragraphs: ['Every method above adds a visual signature: a picture of your handwriting placed on the page, like signing a printout. It does not prove who signed, and someone with a PDF editor could copy it.', 'A certificate-based digital signature is different. It uses a digital ID issued to you (by an employer, a bank, a government service or a certificate authority) and seals the file, so any later change shows. Some contracts, government forms and regulated processes require this kind.', 'If you have a digital ID, LibreOffice can sign an existing PDF with it for free: open LibreOffice, choose File, Digital Signatures, Sign Existing PDF, and follow the steps. Whether a visual signature is enough depends on who asked for it; when in doubt, ask them or your legal team.'],
+          paragraphs: ['Every method above adds a visual signature: a picture of your handwriting placed on the page, like signing a printout. It does not prove who signed, and someone with a PDF editor could copy it.', 'A certificate-based digital signature is different. It uses a digital ID issued to you (by an employer, a bank, a government service or a certificate authority) and seals the file, so any later change shows. Some contracts, government forms and regulated processes require this kind.', 'If you have a digital ID, LibreOffice can sign an existing PDF with it for free: open LibreOffice, choose File, Digital Signatures, Sign Existing PDF (checked 24 November 2026), and follow the steps. Whether a visual signature is enough depends on who asked for it; when in doubt, ask them or your legal team.'],
           links: [{ text: 'Sign Existing PDF', path: 'https://help.libreoffice.org/latest/en-US/text/shared/01/signexistingpdf.html' }],
         },
         {
@@ -635,30 +646,36 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/pdf-tools-without-upload': {
       published: '2026-11-17',
-      updated: '2026-11-24',
+      updated: '2026-11-25',
       sections: [
         {
           heading: 'The short answer',
-          paragraphs: ['Most free online PDF tools, including iLovePDF, Smallpdf and the PDF24 website, upload your file to their servers, process it there and delete it after a set time. That is fine for many documents. If a file must not leave your device, use a tool that processes it locally: OpenAnyDoc in the browser, or a desktop app that works offline, such as PDF24 Creator on Windows. The facts below come from each service\'s own pages, checked on 24 November 2026 (Smallpdf\'s on 17 November 2026).'],
+          paragraphs: ['The three popular PDF sites below, iLovePDF, the PDF24 website and Sejda, upload your file to their servers, process it there and delete it later, according to their own pages. That is fine for many documents. If a file must not leave your device, use a tool that processes it locally: OpenAnyDoc in the browser, or a desktop app that works offline, such as PDF24 Creator on Windows. The facts below come from each service\'s own pages, checked on 25 November 2026.'],
         },
         {
-          heading: 'How popular PDF sites handle your file (checked 24 November 2026)',
+          heading: 'How popular PDF sites handle your file (checked 25 November 2026)',
           paragraphs: ['What each service says on its own pages; follow the links for the current wording:'],
           list: [
-            'iLovePDF: files are uploaded over HTTPS and kept "for a maximum of 2 hours" so you can download the result, then removed. A desktop app is available for Mac and Windows.',
-            'Smallpdf (checked 17 November 2026): files are "permanently removed" from its servers one hour after processing. Smallpdf says it is ISO 27001 certified and stores files in the EU.',
-            'PDF24 Tools (website): uploaded files are deleted from the processing server within one hour. PDF24 Creator, its Windows app, works offline and keeps all files on your computer.',
-            'Sejda (website): its privacy policy says uploaded and output files are stored for processing and then permanently deleted, with no backups. For its AI features, the policy says content is sent to an AI sub-processor for transient processing and not stored.',
+            'iLovePDF: files are uploaded over HTTPS and kept "for a maximum of 2 hours" so you can download the result, then removed. Its pricing page lists a desktop app for Mac and Windows and mobile apps for iOS and Android on the Premium plan (US$4 a month billed yearly, or US$7 billed monthly), not on the free plan.',
+            'PDF24 Tools (website): uploaded files are deleted from the server after one hour, and its FAQ says "All processing servers are located in data centers within the EU". The online tools are free "without restriction". PDF24 Creator, its Windows app, works offline.',
+            'Sejda (website): its privacy policy says uploaded and output files are stored for processing and then permanently deleted, with no backups. For its AI features, the policy says content is sent to an AI sub-processor for transient processing and not stored. The policy also mentions Sejda Desktop, a downloadable app.',
           ],
-          links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'Smallpdf', path: 'https://smallpdf.com/blog/is-smallpdf-safe' }, { text: 'PDF24 Tools', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
+          links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'pricing page', path: 'https://www.ilovepdf.com/pricing' }, { text: 'PDF24 Tools', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
         },
         {
           heading: 'Where those services do more',
-          paragraphs: ['To be fair about the choice: several of these sites give more settings for compressing a PDF (resolution and picture quality), convert to PDF/A, and have desktop apps, accounts with cloud storage and batch processing. If you need one of those and the document is not sensitive, they are reasonable choices.'],
+          paragraphs: ['To be fair about the choice, these services offer things OpenAnyDoc does not, according to their own pages linked above:'],
+          list: [
+            'iLovePDF Premium merges up to 500 files in one batch (25 on the free plan), handles up to 4 GB per task, and adds Workflows, PDF to PDF/A and digital signatures. Its desktop and mobile apps are part of Premium too.',
+            'PDF24 has no usage limits on its free online tools, and PDF24 Creator brings them to a Windows PC and works offline.',
+            'Sejda has a desktop app as well as its website.',
+            'Server tools don\'t depend on the memory of your own device, so very large batches can be easier there.',
+            'OpenAnyDoc\'s Compress PDF keeps picture resolution, so a tool that lowers resolution can shrink a scanned PDF further.',
+          ],
         },
         {
           heading: 'What OpenAnyDoc does differently',
-          paragraphs: ['Every OpenAnyDoc PDF tool runs in your browser. The file is read, changed and saved on your device, and the page\'s security policy only lets it contact its own site, so there is no upload to delete later. You can check this yourself in the browser\'s network panel while a tool runs. The tools work offline once a page has loaded, have no account, watermark or daily limit, read Arabic PDFs correctly, and the code is open source.'],
+          paragraphs: ['Every OpenAnyDoc PDF tool runs in your browser. The file is read, changed and saved on your device, and the page\'s security policy only lets it contact its own site, so there is no upload to delete later. You can check this yourself in the browser\'s network panel while a tool runs. The tools have no account, watermark or daily limit, read Arabic PDFs correctly, and the code is open source. Each tool works offline once you have used it with a connection; OCR PDF and Translate PDF also load their language data from this site the first time.'],
           links: [{ text: 'check this yourself', path: '/check-file-upload' }],
         },
         {
@@ -704,14 +721,16 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'On Windows',
           paragraphs: ['Double-click the file and it opens in Notepad, which comes with every version of Windows. If another program opens it instead, right-click the file, choose Open with, then Notepad, and choose to always use it if you want it as the default.'],
           list: [
-            'Notepad shows the text exactly as it is, with no formatting. File, Save as lets you choose the encoding of the copy you save.',
-            'Microsoft Word also opens .txt files, and asks which encoding to use when it is not sure.',
-            'Free code editors such as Notepad++ or Visual Studio Code handle large files and many encodings, and number the lines.',
+            'Notepad shows the text exactly as it is, with no formatting.',
+            'Microsoft Word also opens .txt files, and if the text looks garbled you can pick the encoding when you open the file, as Microsoft\'s page on choosing text encoding explains (checked 24 November 2026).',
+            'Free code editors such as Notepad++ or Visual Studio Code open text files too.',
           ],
+          links: [{ text: 'page on choosing text encoding', path: 'https://support.microsoft.com/en-us/office/choose-text-encoding-when-you-open-and-save-files-60d59c21-88b5-4006-831c-d536d42fd861' }],
         },
         {
           heading: 'On a Mac',
-          paragraphs: ['Double-click the file and it opens in TextEdit. To read it without opening any app, select it in Finder and press the Space bar for a quick preview. If TextEdit shows the wrong characters, open TextEdit, Settings (Preferences on older versions of macOS), Open and Save, set the plain text encoding for opening files to the right one, for example Unicode (UTF-8), and open the file again.'],
+          paragraphs: ['TextEdit opens plain text files. To read one without opening any app, select it in Finder and press the Space bar for a quick preview. If TextEdit shows the wrong characters, open TextEdit, Settings (Preferences on older versions of macOS), Open and Save, set the plain text encoding for opening files to the right one, for example Unicode (UTF-8), and open the file again. Apple describes these steps in its page on previewing files and its TextEdit guide (checked 24 November 2026).'],
+          links: [{ text: 'page on previewing files', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }, { text: 'TextEdit guide', path: 'https://support.apple.com/guide/textedit/txted1028/mac' }],
         },
         {
           heading: 'On a phone or tablet',
@@ -738,7 +757,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Fix the encoding without uploading the file',
           paragraphs: [
-            'Drop the file on the TXT editor. It recognises UTF-8 with or without a BOM, UTF-16 and Windows-1256, and shows the encoding it found. If the text still looks wrong, choose another one in the Encoding group and click Reopen with this encoding.',
+            'Drop the file on the TXT editor. It recognises UTF-8 with or without a BOM, UTF-16, Windows-1256 and Windows-1252, and shows the encoding it found. If the text still looks wrong, choose another one in the Encoding group and click Reopen with this encoding.',
             'To pass the file on safely, download it as UTF-8, which every modern program reads; choose UTF-8 with BOM if it will be opened in older Windows programs that otherwise guess the old code page.',
           ],
           links: [{ text: 'TXT editor', path: '/txt-viewer' }],
@@ -778,7 +797,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Free spreadsheet apps',
           paragraphs: ['Each of these opens a CSV as a sheet:'],
           list: [
-            'LibreOffice Calc (Windows, Mac and Linux) shows an import window first, where you choose the character set and the separator before the data loads. That window is why it rarely gets Arabic text or semicolons wrong.',
+            'LibreOffice Calc (Windows, Mac and Linux) shows an import window first, where you choose the character set and the separator before the data loads.',
             'Apple Numbers (Mac, iPhone and iPad) opens a CSV directly and can export it as an Excel file.',
             'Google Sheets opens a CSV after you upload it to Google Drive or bring it in with File, Import. It needs an account and keeps the file on Google\'s servers, which is fine for most files but not for payroll or customer data.',
           ],
@@ -794,7 +813,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Files too big for Excel',
-          paragraphs: ['An Excel sheet stops at 1,048,576 rows, and a file of a few hundred megabytes can freeze it long before that. The large CSV viewer has no row limit of its own: a 120,000-row file opens in under a second, and the real limit is your device\'s memory, with a warning above 50 MB. Why Excel cuts the file short, and other ways around it, are explained in CSV too big for Excel.'],
+          paragraphs: ['An Excel sheet stops at 1,048,576 rows. The large CSV viewer has no row limit of its own: a 120,000-row file opens in under a second, and the real limit is your device\'s memory, with a warning above 50 MB. Why Excel cuts the file short, and other ways around it, are explained in CSV too big for Excel.'],
           links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
         },
         {
@@ -804,7 +823,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Arabic text turns into symbols',
-          paragraphs: ['When Arabic shows as "Ø§Ù„" or question marks, the program read a UTF-8 file with the wrong encoding. The CSV viewer reads UTF-8, UTF-16 and older Windows-1256 files correctly and shows Arabic right to left. For Excel itself, the guide to broken Arabic in a CSV shows how to make a copy that opens correctly with a double-click.'],
+          paragraphs: ['When Arabic shows as "Ø§Ù„" or question marks, the program read a UTF-8 file with the wrong encoding. The CSV viewer reads UTF-8, UTF-16 and older Windows-1256 and Windows-1252 files correctly and shows Arabic right to left. For Excel itself, the guide to broken Arabic in a CSV shows how to make a copy that opens correctly with a double-click.'],
           links: [{ text: 'CSV viewer', path: '/csv-viewer' }, { text: 'broken Arabic in a CSV', path: '/fix-arabic-csv-in-excel' }],
         },
         {
@@ -828,7 +847,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'The short answer',
-          paragraphs: ['A .pptx file is a PowerPoint presentation, but you do not need PowerPoint to open it. A browser-based viewer, Google Slides, LibreOffice Impress and Apple Keynote all open it for free. Microsoft\'s standalone PowerPoint Viewer has been retired, so these are the options today. They differ in whether the file is uploaded, whether you can edit it, and how faithfully they draw the slides.'],
+          paragraphs: ['A .pptx file is a PowerPoint presentation, but you do not need PowerPoint to open it. A browser-based viewer, Google Slides, LibreOffice Impress and Apple Keynote all open it for free. Microsoft\'s standalone PowerPoint Viewer was retired on 30 April 2018, according to Microsoft\'s page on viewing a presentation without PowerPoint (checked 24 November 2026), so these are the options today. They differ in whether the file is uploaded, whether you can edit it, and how faithfully they draw the slides.'],
+          links: [{ text: 'viewing a presentation without PowerPoint', path: 'https://support.microsoft.com/en-us/office/view-a-presentation-without-powerpoint-2f1077ab-9a4e-41ba-9f75-d55bd9b231a6' }],
         },
         {
           heading: 'In your browser, with nothing uploaded',
@@ -847,13 +867,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['If you need to change the slides, these open and save .pptx:'],
           list: [
             'LibreOffice Impress (Windows, Mac and Linux) opens, edits and saves .pptx, and opens old .ppt files too.',
-            'Apple Keynote (Mac, iPhone and iPad) opens .pptx and can export back to PowerPoint; some effects and fonts are replaced.',
+            'Apple Keynote (Mac, iPhone and iPad) opens .pptx and can export back to PowerPoint; some fonts may be replaced.',
             'Google Slides opens a .pptx after you upload it to Google Drive, and PowerPoint for the web does the same with OneDrive. Both need an account and store the presentation on their servers, which is fine for most decks but not for unreleased plans or figures.',
           ],
         },
         {
           heading: 'On a phone',
-          paragraphs: ['Mobile browsers open the PowerPoint viewer the same way: tap Choose a file and pick the presentation; the slide fills the width of the screen and the buttons move between slides. On an iPhone or iPad, the Files app shows a quick preview and Keynote opens the file. Microsoft\'s PowerPoint app and Google Slides also have phone apps; both work with your account.'],
+          paragraphs: ['Mobile browsers open the PowerPoint viewer the same way: tap Choose a file and pick the presentation; the slide fills the width of the screen and the buttons move between slides. Microsoft says its free PowerPoint mobile app opens presentations too.'],
           links: [{ text: 'PowerPoint viewer', path: '/powerpoint-viewer' }],
         },
         {
@@ -910,13 +930,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'The short answer',
-          paragraphs: ['You do not need Adobe Acrobat or Adobe Reader to open a PDF. Every modern web browser, including Chrome, Edge, Firefox and Safari, opens one: drag the file onto a window. A Mac opens PDFs in Preview, an iPhone or iPad in the Files or Books app, and an Android phone in the Google Drive app that most of them come with. All of these are free and usually already installed.'],
+          paragraphs: ['You do not need Adobe Acrobat or Adobe Reader to open a PDF. Every modern web browser, including Chrome, Edge, Firefox and Safari, opens one: drag the file onto a window. A Mac opens PDFs in Preview, an iPhone or iPad in the Files or Books app, and an Android phone in the Google Drive app. All of these are free and usually already installed.'],
         },
         {
           heading: 'On a computer',
           paragraphs: ['What each system already has:'],
           list: [
-            'Windows: PDFs open in Microsoft Edge by default. It zooms, searches, highlights and fills in forms.',
+            'Windows: Microsoft Edge has a built-in PDF reader; Microsoft\'s page on the Edge PDF reader lists zoom, search, highlights and basic form filling (checked 24 November 2026).',
             'Mac: Preview opens PDFs, fills in forms, adds text and signatures, and reorders pages.',
             'Linux: the document viewer that comes with most desktops opens PDFs.',
             'Any system: Chrome, Firefox and Safari show a PDF in a tab. Drag the file onto the window, or press Ctrl+O (Cmd+O on a Mac) and choose it.',
@@ -946,19 +966,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Fill in and sign a PDF without Adobe',
           paragraphs: [
-            'Chrome, Edge and Firefox let you type into the fields of most fillable forms, and Preview does on a Mac. To fill in a form and save a clean copy without uploading it, use Fill PDF form: it handles text fields, multi-line boxes, checkboxes, radio buttons and drop-down lists, in English or Arabic, and can flatten the answers onto the page. XFA forms, an older Adobe format, are not supported there and usually need Adobe Reader.',
+            'Microsoft Edge fills in basic PDF forms, and Preview does on a Mac. To fill in a form and save a clean copy without uploading it, use Fill PDF form: it handles text fields, multi-line boxes, checkboxes, radio buttons and drop-down lists, in English or Arabic, and can flatten the answers onto the page. XFA forms, an older Adobe format, are not supported there, and Microsoft\'s page on the Edge PDF reader says Edge does not support them either (checked 24 November 2026).',
             'For a signature, the guide to signing a PDF without Adobe walks through the free options on a computer and on a phone, and when a picture of a signature is not enough.',
           ],
           links: [{ text: 'Fill PDF form', path: '/fill-pdf' }, { text: 'signing a PDF without Adobe', path: '/sign-pdf-without-adobe' }],
         },
         {
           heading: 'Choose which app opens your PDFs',
-          paragraphs: ['If PDFs keep opening in a program you do not want, change the default. On Windows, right-click a PDF, choose Open with, then Choose another app, pick the one you want and choose to always use it. On a Mac, select a PDF in Finder, choose File, Get Info, pick the app under Open with and click Change All. On a phone, the share or open menu lets you pick the app each time.'],
+          paragraphs: ['If PDFs keep opening in a program you do not want, change the default. On Windows, choose a default app for .pdf files in Settings, under Default apps, as Microsoft\'s page on changing default programs describes. On a Mac, select a PDF in Finder, choose File, Get Info, pick the app under Open with and click Change All, as Apple\'s Mac User Guide describes (both checked 24 November 2026). On a phone, the share or open menu lets you pick the app each time.'],
+          links: [{ text: 'changing default programs', path: 'https://support.microsoft.com/en-gb/windows/change-default-programs-in-windows-27af8dcd-6d1c-44d0-a999-80d2c29b4f15' }, { text: 'Mac User Guide', path: 'https://support.apple.com/guide/mac-help/mh35597/mac' }],
         },
         {
           heading: 'Do you need Acrobat at all?',
-          paragraphs: ['Adobe Acrobat Reader is free as well, and Adobe\'s paid Acrobat adds features such as editing a PDF\'s original text. You need neither to read, print, search, fill in or sign a PDF, or to merge, split, rotate and number its pages: browsers and the free PDF tools here do that on your own device.'],
-          links: [{ text: 'PDF tools', path: '/pdf-tools' }],
+          paragraphs: ['Adobe Acrobat Reader is free as well, and Adobe\'s Acrobat Reader page says text and image editing needs a paid Acrobat plan (checked 24 November 2026). You need neither to read, print, search, fill in or sign a PDF, or to merge, split, rotate and number its pages: browsers and the free PDF tools here do that on your own device.'],
+          links: [{ text: 'PDF tools', path: '/pdf-tools' }, { text: 'Acrobat Reader page', path: 'https://www.adobe.com/acrobat/pdf-reader.html' }],
         },
         {
           heading: 'Questions?',
@@ -1001,7 +1022,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Private files stay on your device',
-          paragraphs: ['The PDF is read by your own browser and never uploaded, so this works for contracts, statements and other documents you would not send to a website. You can check that nothing is uploaded in your browser\'s network panel. Once the page has loaded, the viewer and PDF to text keep working without an internet connection.'],
+          paragraphs: ['The PDF is read by your own browser and never uploaded, so this works for contracts, statements and other documents you would not send to a website. You can check that nothing is uploaded in your browser\'s network panel. Once the page has loaded, the viewer keeps working without an internet connection, and PDF to text does too after you have used it once.'],
           links: [{ text: 'check that nothing is uploaded', path: '/check-file-upload' }],
         },
         {
@@ -1100,10 +1121,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Free options you may already have',
           paragraphs: ['A few apps on your own computer help as well:'],
           list: [
-            'Microsoft Word opens a PDF and converts it into an editable document. Like any conversion, complex layouts can shift.',
+            'Microsoft Word opens a PDF and converts it into an editable document; Microsoft\'s page on editing a PDF says this works best with PDFs that are mostly text (checked 24 November 2026).',
             'Preview on a Mac adds text boxes, shapes and signatures to a PDF from its Markup toolbar.',
-            'Microsoft Edge can add text and drawings to a PDF it opens.',
-            'Adobe\'s paid Acrobat changes a PDF\'s original text line by line, when the fonts in the file allow it.',
+            'Microsoft Edge can add ink drawings and highlights to a PDF it opens, according to Microsoft\'s page on the Edge PDF reader (checked 24 November 2026).',
+            'Adobe\'s paid Acrobat edits a PDF\'s text and images; Adobe\'s Acrobat Reader page says the free Reader does not (checked 24 November 2026).',
           ],
         },
         {
@@ -1127,7 +1148,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             'A fillable form has real fields; the standard kind is called AcroForm. Click a line and a cursor appears, or click a box and it shows a tick. The answers are stored in the fields, so they can be read and changed later.',
             'A flat form only looks like a form: a scan, or a page saved without fields. Clicking does nothing, so you place text where each answer goes.',
-            'An XFA form was made with Adobe LiveCycle, an older Adobe format still used by some organisations. Outside Adobe\'s apps it often shows only a message instead of the form. Fill PDF form does not support XFA, and such forms usually need Adobe Acrobat Reader, which is free.',
+            'An XFA form uses XML Forms Architecture, which Microsoft\'s page on the Edge PDF reader calls a legacy format of forms that Edge does not support (checked 24 November 2026). Fill PDF form does not support XFA either.',
           ],
         },
         {
@@ -1150,9 +1171,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['Open Fill PDF form in your phone\'s browser, choose the file from your downloads or the Files app and tap each field. The phone\'s own apps can fill many forms too:'],
           list: [
             'iPhone and iPad: open the PDF in the Files app and tap a field to type in it. On a form without fields, the Markup button adds text and a signature.',
-            'Android: the Google Drive app opens PDFs and can fill in many fillable forms.',
+            'Android: the Google Drive app opens PDFs and can fill in many fillable forms, according to Google\'s Drive help (checked 24 November 2026).',
           ],
-          links: [{ text: 'Fill PDF form', path: '/fill-pdf' }],
+          links: [{ text: 'Fill PDF form', path: '/fill-pdf' }, { text: 'Drive help', path: 'https://support.google.com/drive/answer/9463834' }],
         },
         {
           heading: 'A flat form: type where the answers go',
@@ -1178,9 +1199,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Other free ways on a computer',
           paragraphs: ['You may not need a website at all:'],
           list: [
-            'Chrome, Edge and Firefox fill in the fields of most fillable forms in a browser tab and save a copy with your answers.',
+            'Microsoft Edge fills in basic PDF forms; Microsoft\'s page on its PDF reader says forms that use JavaScript are not supported (checked 24 November 2026).',
             'Preview on a Mac fills in fields, and on a flat form adds text boxes and signatures from its Markup toolbar.',
-            'Adobe Acrobat Reader is free as well, and is the safe choice for XFA forms.',
+            'Adobe Acrobat Reader is free as well, according to Adobe\'s Acrobat Reader page (checked 24 November 2026).',
           ],
         },
         {
@@ -1196,22 +1217,22 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/stirling-pdf-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-24',
+      updated: '2026-11-25',
       sections: [
         {
           heading: 'The short answer',
           paragraphs: ['Stirling-PDF is a PDF toolkit you run on your own server, so files go from your staff\'s browsers to a machine you control and are processed there. OpenAnyDoc does the work inside each person\'s browser instead, so there is no server to run and the file never leaves the device. Stirling-PDF has far more operations, an API and automation; OpenAnyDoc is the lighter choice when everyday PDF tasks are what people need.'],
         },
         {
-          heading: 'How Stirling-PDF works (checked 20 November 2026)',
+          heading: 'How Stirling-PDF works (checked 25 November 2026)',
           paragraphs: ['What Stirling-PDF says on its own pages; follow the links for the current wording:'],
           list: [
             'Self-hosted server: the GitHub README starts it with one Docker command and describes it as something you can "deploy on your own servers with a private API". The Docker guide lists three images, from a core-only one (about 2 GB of memory suggested) to a full one with a bundled AI engine (6 GB suggested).',
-            'Where files are processed: its page on where tools run says that in a self-hosted setup "every tool runs on your server, even ones your computer could run". The desktop app also has a local-only mode in which nothing is uploaded, and an administrator can turn on local processing.',
-            'Features: the README lists "50+ PDF tools", including edit, merge, split, sign, redact, convert, OCR and compress, plus no-code pipelines and REST APIs for nearly all tools.',
+            'Where files are processed: its page on where tools run says that in a self-hosted setup "every tool runs on your server, even ones your computer could run". The desktop app also has a local-only mode in which nothing is uploaded. If an administrator turns on local document processing, documents stay on the device, and the tools that cannot run locally are hidden.',
+            'Features: the README lists "50+ PDF tools", and the pricing page says "60+ PDF tools", including edit, merge, split, sign, redact, convert, OCR and compress, plus no-code pipelines and REST APIs for nearly all tools.',
             'Licence: the README calls Stirling-PDF "open-core". Its LICENSE file is MIT for most of the code, with several directories under their own separate licences.',
-            'Plans: its plans page says a self-hosted server runs on the Free plan (5 users, 1,000 monthly processing units) until you add Team or Enterprise. The pricing page lists Team at $99 a month with 100 users; Enterprise is custom and adds SAML single sign-on, audit logging and air-gapped deployment.',
-            'Stirling Cloud: its files and privacy page says compress, OCR, convert and watermark files are sent to Stirling\'s servers, processed and returned.',
+            'Plans: its plans page says a self-hosted server runs on the Free plan (5 users, and 1,000 units a month for automation, AI and API calls) until you add Team or Enterprise. The pricing page lists Team at $99 a month with 100 users; Enterprise is custom and adds air-gapped deployment, SCIM provisioning, and data residency and audit logs; single sign-on is listed from the Team plan.',
+            'Stirling Cloud: its files and privacy page says compress, OCR, convert and watermark files are sent to Stirling\'s servers, processed and returned. Files you open in its editor stay in your browser\'s storage unless you sign in and choose to upload or share them.',
           ],
           links: [{ text: 'GitHub README', path: 'https://github.com/Stirling-Tools/Stirling-PDF' }, { text: 'Docker guide', path: 'https://docs.stirlingpdf.com/Server/Install/Docker/' }, { text: 'page on where tools run', path: 'https://docs.stirlingpdf.com/Desktop/Where-Tools-Run/' }, { text: 'LICENSE file', path: 'https://github.com/Stirling-Tools/Stirling-PDF/blob/main/LICENSE' }, { text: 'plans page', path: 'https://docs.stirlingpdf.com/Server/Licensing/Plans-and-Licences/' }, { text: 'pricing page', path: 'https://stirling.com/pricing' }, { text: 'files and privacy page', path: 'https://docs.stirlingpdf.com/Cloud/Files-and-Privacy/' }],
         },
@@ -1230,7 +1251,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'What OpenAnyDoc does differently',
           paragraphs: [
             'OpenAnyDoc has more than 40 PDF tools, and every one runs in the browser of the person using it. The file is read, changed and saved on that device. The page\'s security policy only lets it contact its own site, so a document cannot be sent anywhere else; anyone can confirm this in the browser\'s network panel, as the guide to check this yourself explains.',
-            'Keeping files in-house therefore does not need a processing server. Because the site is a folder of static files, an organisation can host its own copy on an internal network: build it and serve the folder from any web server. There is no database, no user accounts, no Docker image to keep up to date and no processing limit, and the files employees open still never leave their devices. The source code is public on GitHub. Once a page has loaded, the tools also work offline.',
+            'Keeping files in-house therefore does not need a processing server. Because the site is a folder of static files, an organisation can host its own copy on an internal network: build it and serve the folder from a web server that sends the same security headers as this site. There is no database, no user accounts, no Docker image to keep up to date and no processing limit, and the files employees open still never leave their devices. The source code is public on GitHub. Each tool also works offline once you have used it with a connection; OCR PDF and Translate PDF also load their language data from the site the first time.',
           ],
           links: [{ text: 'check this yourself', path: '/check-file-upload' }],
         },
@@ -1238,10 +1259,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Side by side',
           paragraphs: ['The main differences, in short:'],
           list: [
-            'Where files are processed: Stirling-PDF self-hosted, on your server; OpenAnyDoc, in each user\'s browser.',
-            'What you run: Stirling-PDF, a Docker container or desktop app with 2 to 6 GB of memory suggested; OpenAnyDoc, nothing, or static files on any web server.',
-            'Users and limits: Stirling-PDF Free, 5 users and 1,000 processing units a month; OpenAnyDoc, no accounts and no limits.',
-            'Operations: Stirling-PDF, 50+ tools with pipelines and an API; OpenAnyDoc, more than 40 PDF tools with no API.',
+            'Where files are processed: Stirling-PDF self-hosted, on your server by default, and an administrator can turn on local processing, which hides the tools that can\'t run locally; OpenAnyDoc, in each user\'s browser.',
+            'What you run: Stirling-PDF, a Docker container with 2 to 6 GB of memory suggested, or a desktop app; OpenAnyDoc, nothing, or static files on any web server.',
+            'Users and limits: Stirling-PDF Free, 5 users on a self-hosted server, and 1,000 units a month for automation, AI and API calls (plans page, checked 25 November 2026); OpenAnyDoc, no accounts, and no automation or API to meter.',
+            'Operations: Stirling-PDF, 50+ tools (60+ on its pricing page) with pipelines and an API; OpenAnyDoc, more than 40 PDF tools with no API.',
             'Compression: both; OpenAnyDoc re-saves pictures at three quality levels in the browser and does not lower their resolution.',
             'Large batches: Stirling-PDF, handled by the server; OpenAnyDoc, limited by each device\'s memory.',
           ],
@@ -1326,7 +1347,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'The JSON tools that keep your data in the browser',
           paragraphs: ['Each of these works on your own device:'],
           list: [
-            'JSON formatter: pretty print with 1 to 8 spaces or a tab, minify, and sort keys; long integers are kept digit for digit.',
+            'JSON formatter: pretty print with 1, 2, 3, 4 or 8 spaces or a tab, minify, and sort keys; long integers are kept digit for digit.',
             'JSON validator: shows the line and column of an error, and Repair fixes trailing commas, comments, single quotes and unquoted keys.',
             'JSON viewer: tree, table and text views, with editing and download.',
             'Compare JSON: differences by key and path, ignoring key order.',
@@ -1424,23 +1445,24 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'The short answer',
-          paragraphs: ['Windows opens iPhone HEIC photos in its Photos app once the HEIF Image Extensions from the Microsoft Store are installed. If you can\'t or don\'t want to install anything, open the photo in your browser with OpenAnyDoc\'s Image viewer, or turn it into a JPG with HEIC to JPG; both work in Chrome, Edge and Firefox on Windows, and the photo stays on your PC. To avoid the problem next time, set the iPhone to save photos as JPG.'],
+          paragraphs: ['Windows opens iPhone HEIC photos in its Photos app once two add-ons from the Microsoft Store are installed: the HEIF Image Extensions and the HEVC Video Extensions. If you can\'t or don\'t want to install anything, open the photo in your browser with OpenAnyDoc\'s Image viewer, or turn it into a JPG with HEIC to JPG; both work in Chrome, Edge and Firefox on Windows, and the photo stays on your PC. To avoid the problem next time, set the iPhone to save photos as JPG.'],
           links: [{ text: 'Image viewer', path: '/image-viewer' }, { text: 'HEIC to JPG', path: '/heic-to-jpg' }],
         },
         {
           heading: 'What a HEIC file is',
-          paragraphs: ['HEIC is the file type iPhones use for photos by default. It is a photo saved in the HEIF format, which takes less space than a JPG at a similar quality, so the same phone storage holds more photos. A Mac opens it in Photos and Preview with nothing to install, an iPhone or iPad opens it in Photos, and most Android phones open it in Google Photos or their own gallery app.', 'The file may end in .heic or .heif. Both are the same kind of photo, and both open with the steps below. Some Android phones save HEIC photos too.'],
+          paragraphs: ['HEIC is the file type iPhones use for photos by default. It is a photo saved in the HEIF format, which takes less space than a JPG at a similar quality, so the same phone storage holds more photos. A Mac opens it in Photos and Preview with nothing to install, and an iPhone or iPad opens it in Photos.', 'The file may end in .heic or .heif. Both are the same kind of photo, and both open with the steps below. Some Android phones save HEIC photos too.'],
         },
         {
           heading: 'Why Windows may not open it',
-          paragraphs: ['Windows reads HEIC through an add-on rather than out of the box. The usual one is the HEIF Image Extensions, a free download from the Microsoft Store; once it is installed, the Photos app opens HEIC photos. On some PCs the photos open only when the HEVC Video Extensions are installed as well, because the picture inside a HEIC file is compressed the same way as HEVC video; those are sold in the Store, and some PCs come with them.', 'That route is fine on your own PC. It does not help on a work or school computer where the Store is blocked, on a shared or borrowed PC, or when you only need to open one photo once. Browsers can\'t help on their own either: Chrome, Edge and Firefox don\'t show HEIC themselves, which is also why many websites refuse it as an upload.'],
+          links: [{ text: 'page on HEIF and HEVC files in Photos', path: 'https://support.microsoft.com/help/4494024' }],
+          paragraphs: ['Windows reads HEIC through add-ons rather than out of the box. Microsoft\'s page on HEIF and HEVC files in Photos (checked 24 November 2026) says the Photos app needs two from the Microsoft Store, the HEIF Image Extensions, which are free, and the HEVC Video Extensions, which are paid, and that you need both even if you only use photos. The picture inside a HEIC file is compressed the same way as HEVC video.', 'That route is fine on your own PC. It does not help on a work or school computer where the Store is blocked, on a shared or borrowed PC, or when you only need to open one photo once. Browsers can\'t help on their own either: Chrome, Edge and Firefox don\'t show HEIC themselves, which is also why many websites refuse it as an upload.'],
         },
         {
           heading: 'Open it in your browser, with nothing installed',
           paragraphs: ['OpenAnyDoc reads the photo on your PC. The first time you open a HEIC file in Chrome, Edge or Firefox, a HEIC decoder loads from this site and your browser keeps it; the photo itself is never uploaded.'],
           list: [
             'To look at a photo: open the Image viewer and drop the .heic file on the page. You can zoom, fit it to the window and see the camera, the date taken and, if the photo has one, its GPS location.',
-            'To use it somewhere else: open HEIC to JPG, add one photo or a whole folder, choose the quality (90 keeps them looking the same) and download a JPG, or a ZIP of all of them.',
+            'To use it somewhere else: open HEIC to JPG, add one photo or many at once, choose the quality (90 keeps them looking the same) and download a JPG, or a ZIP of all of them.',
             'From the viewer, the next steps can compress, resize or clean the photo, or turn it into a PDF, without choosing the file again.',
           ],
           links: [{ text: 'Image viewer', path: '/image-viewer' }, { text: 'HEIC to JPG', path: '/heic-to-jpg' }],
@@ -1457,10 +1479,11 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Stop the iPhone making HEIC files',
-          paragraphs: ['Two iPhone settings help. They change the photos you take or copy from now on, not the ones already saved.'],
+          links: [{ text: 'Apple\'s page on HEIF and HEVC media', path: 'https://support.apple.com/en-us/116944' }],
+          paragraphs: ['Two iPhone settings help, as Apple\'s page on HEIF and HEVC media describes (checked 24 November 2026). They change the photos you take or copy from now on, not the ones already saved.'],
           list: [
             'Settings, Camera, Formats, Most Compatible: the camera saves new photos as JPG instead of HEIC. They take more space on the phone.',
-            'Settings, Photos, Transfer to Mac or PC, Automatic: photos copied to a computer with a cable are converted to a compatible format on the way.',
+            'Settings, Apps, Photos, and leave Keep Originals off: photos imported to a computer with a cable might then be converted to JPEG on the way.',
           ],
         },
         {
@@ -1515,9 +1538,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Stop the phone adding it',
+          links: [{ text: 'Apple\'s page on location in photos', path: 'https://support.apple.com/guide/personal-safety/manage-location-metadata-in-photos-ips0d7a5df82/web' }],
           paragraphs: ['Phone settings can leave the location out from the start, or for one share. Menu names change between versions and phone makers, so look for these words:'],
           list: [
-            'iPhone, for one share: in the share sheet, tap Options at the top and turn off Location before you send.',
+            'iPhone, for one share: in the share sheet, tap Options and turn off Location before you send, as Apple\'s page on location in photos explains (checked 24 November 2026).',
             'iPhone, for every new photo: Settings, Privacy & Security, Location Services, Camera, Never.',
             'Android: open the Camera app\'s settings and turn off the option for location tags or saving the location; its name depends on the phone maker.',
           ],
@@ -1548,7 +1572,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Why it matters where the photo goes',
-          paragraphs: ['Many online background removers make the cut-out on their own servers, so the photo has to be uploaded first. That may not matter for a product shot, but it does for a family photo, a picture of a child or a portrait for an ID.', 'When the model runs in your browser, the photo stays on your device. You don\'t have to take that on trust: you can check that nothing is uploaded by watching your browser\'s network panel while you use the tool.'],
+          paragraphs: ['Some online background removers make the cut-out on their own servers, so the photo has to be uploaded first. That may not matter for a product shot, but it does for a family photo, a picture of a child or a portrait for an ID.', 'When the model runs in your browser, the photo stays on your device. You don\'t have to take that on trust: you can check that nothing is uploaded by watching your browser\'s network panel while you use the tool.'],
           links: [{ text: 'check that nothing is uploaded', path: '/check-file-upload' }],
         },
         {
@@ -1593,7 +1617,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Options already on your devices',
-          paragraphs: ['You may not need a website at all. These also work on the device:'],
+          paragraphs: ['You may not need a website at all. These also work on the device (the makers\' pages, checked 24 November 2026):'],
+          links: [{ text: 'touch and hold the subject', path: 'https://support.apple.com/102460' }, { text: 'choose Copy Subject', path: 'https://support.apple.com/guide/safari/ibrw1c2374cd/mac' }, { text: 'Remove background button', path: 'https://blogs.windows.com/windows-insider/2023/09/07/background-removal-in-paint-begins-rolling-out-to-windows-insiders/' }],
           list: [
             'iPhone and iPad: in Photos, touch and hold the subject of a photo until it lifts, then copy or share it.',
             'Mac: in Photos or Preview, right-click the photo and choose Copy Subject, then paste it into another app.',
@@ -1626,7 +1651,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Markdown table or CSV?',
-          paragraphs: ['Both work. The difference is readability against size. In our test, a synthetic table of 100 orders with 5 columns took 1,759 tokens as a Markdown table and 1,367 tokens as CSV, so the Markdown version was about 29% larger. The extra tokens are the pipes and the separator line.'],
+          paragraphs: ['Both work. The difference is readability against size. In our test, a synthetic table of 100 orders with 5 columns took 2,449 tokens as a Markdown table and 2,148 tokens as CSV, so the Markdown version was about 14% larger. The extra tokens are the pipes and the separator line.'],
           list: [
             'Choose a Markdown table when the table is small or medium, when cells contain commas, or when you want the chat to show the same table back to you.',
             'Choose CSV when the table is large and every token counts. Excel to CSV gives you the file; open it in any text editor and paste its text.',
@@ -1708,7 +1733,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             'A line break inside a cell is written as <br>. GitHub shows it as a new line within the cell; some editors show the tag as text, so shorten such cells if the table is going elsewhere.',
             'Markdown inside cells still works: *text* becomes italic and backticks become code. If a cell holds asterisks or underscores that should stay as they are, check the rendered table.',
-            'Accented and Arabic letters stay as they are. The delimiter (comma, semicolon, tab or pipe) and the encoding are detected from the file, so a CSV saved by Excel in Europe or an Arabic Windows CSV converts without changes.',
+            'Arabic letters stay as they are in a UTF-8 file or an Arabic Windows CSV, and accented letters stay as they are in a UTF-8 file or a Western European Windows CSV. The delimiter (comma, semicolon, tab or pipe) is detected from the file, so a semicolon CSV saved by Excel in Europe keeps its columns.',
           ],
         },
         {
@@ -1742,7 +1767,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Pasting the table into a chat',
-          paragraphs: ['ChatGPT, Claude and Gemini read Markdown tables well, because each value sits under its column name. A table costs more tokens than the same data as CSV, so for large tables count first with the token counter. If the data comes from a workbook, Excel to Markdown does the same job sheet by sheet, and the guide on giving an AI chat a spreadsheet covers size, formulas and hiding personal data.'],
+          paragraphs: ['A Markdown table is easy for an AI chat to read, because each value sits under its column name. A table costs more tokens than the same data as CSV, so for large tables count first with the token counter. If the data comes from a workbook, Excel to Markdown does the same job sheet by sheet, and the guide on giving an AI chat a spreadsheet covers size, formulas and hiding personal data.'],
           links: [{ text: 'token counter', path: '/token-counter' }, { text: 'Excel to Markdown', path: '/excel-to-markdown' }, { text: 'giving an AI chat a spreadsheet', path: '/spreadsheet-to-ai-chat' }],
         },
         {
@@ -2185,24 +2210,18 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'The short answer',
-          paragraphs: ['A Mac can merge PDFs with Preview, and an iPhone or iPad with the Files app or a shortcut. Windows and Android have no merge built in, so the simplest way there is a browser tool. OpenAnyDoc\'s Merge PDF works in any modern browser on any of these devices and joins the files on your device, without uploading them.'],
+          paragraphs: ['A Mac can merge PDFs with Preview. Windows and Android have no merge built in, so the simplest way there is a browser tool. OpenAnyDoc\'s Merge PDF works in any modern browser on any of these devices and joins the files on your device, without uploading them.'],
           links: [{ text: 'Merge PDF', path: '/merge-pdf' }],
         },
         {
           heading: 'On a Mac: Preview',
-          paragraphs: ['Preview, the PDF app that comes with every Mac, can add one PDF to another. Open the first PDF, choose View, then Thumbnails, and select the page after which the next file should go. Choose Edit, then Insert, then Page from File, and pick the other PDF. Drag thumbnails to change the order. Preview changes the file you opened, so if you want to keep the original, make a copy first with File, then Duplicate, and save the copy.'],
+          paragraphs: ['Preview, the PDF app that comes with every Mac, can add one PDF to another. Open the first PDF, choose View, then Thumbnails, and select the page after which the next file should go. Choose Edit, then Insert, then Page from File, and pick the other PDF. Drag thumbnails to change the order. Preview changes the file you opened, so if you want to keep the original, make a copy first with File, then Duplicate, and save the copy. The steps are in Apple\'s pages Add, delete, or move PDF pages and Combine PDFs in Preview (checked 24 November 2026).'],
+          links: [{ text: 'Add, delete, or move PDF pages', path: 'https://support.apple.com/guide/preview/prvw11793/mac' }, { text: 'Combine PDFs in Preview', path: 'https://support.apple.com/guide/preview/prvw43696/mac' }],
         },
         {
           heading: 'On Windows: no built-in merge',
           paragraphs: ['Windows opens and prints PDFs in Microsoft Edge, but neither Edge nor Windows has a command that joins two PDFs. Printing to Microsoft Print to PDF makes a new PDF from one file at a time, so it cannot combine files either. You can install a PDF program, or use a tool in the browser you already have: open Merge PDF in Edge or Chrome, and there is nothing to install and nothing uploaded.'],
           links: [{ text: 'Merge PDF in Edge or Chrome', path: '/merge-pdf' }],
-        },
-        {
-          heading: 'On an iPhone or iPad: Files or Shortcuts',
-          paragraphs: [
-            'In the Files app, open the folder that holds the PDFs, tap Select, tap each file, then tap the More button (three dots) and choose Create PDF. A new PDF appears in the same folder. Files decides the order of the pages, so open the result and check it; if it is wrong, use a browser tool where you set the order yourself.',
-            'The Shortcuts app has a Make PDF action that joins whatever it is given into one PDF. A shortcut that takes files from the share sheet and passes them to Make PDF is handy if you merge files often.',
-          ],
         },
         {
           heading: 'On Android: use the browser',
@@ -2302,16 +2321,17 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Without a website',
           paragraphs: ['A computer can also save some pages as a new PDF through its print dialog:'],
+          links: [{ text: 'Apple\'s Preview guide', path: 'https://support.apple.com/guide/preview/prvw11793/mac' }, { text: 'Chrome Help', path: 'https://support.google.com/chrome/answer/1069693?co=GENIE.Platform%3DAndroid' }],
           list: [
-            'Mac: open the PDF in Preview, choose File, then Print, type the pages you want, then choose Save as PDF from the PDF menu. You can also drag a page thumbnail from Preview\'s sidebar to the desktop to get that page on its own.',
+            'Mac: in Preview, select the page thumbnails you want in the sidebar and drag them to the desktop; Apple\'s Preview guide says this creates a new PDF (checked 24 November 2026). File, then Print, then Save as PDF from the PDF menu also saves a PDF.',
             'Windows: open the PDF in Microsoft Edge, choose Print, pick Microsoft Print to PDF as the printer, type the pages, and print to a new file.',
-            'Android: the print dialog has a Save as PDF printer and lets you choose pages.',
+            'Android: in Chrome, Share, then Print, offers a Save as PDF printer (Chrome Help, checked 24 November 2026).',
           ],
         },
         {
           heading: 'What carries over',
           paragraphs: [
-            'Split PDF copies pages as they are, so text stays sharp and selectable, and pictures keep their quality. A 150-page PDF splits in seconds, with a progress bar. Printing to PDF, as above, makes the pages again through the print system, so links and form fields may be lost; the tools here copy them instead.',
+            'Split PDF copies pages as they are, so text stays sharp and selectable, and pictures keep their quality. A 150-page PDF splits in seconds, with a progress bar. Printing to PDF, as above, makes the pages again through the print system, so links and form fields may be lost; the tools here copy links with the pages, but form fields may not stay fillable.',
             'Bookmarks and links that jump between pages may not carry over to the new files. A PDF that needs a password to open must have the password removed first with Unlock PDF, if you know it.',
           ],
           links: [{ text: 'Split PDF', path: '/split-pdf' }, { text: 'Unlock PDF', path: '/unlock-pdf' }],
@@ -2340,9 +2360,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Choose the photos',
           paragraphs: [
             'On a phone, open JPG to PDF and tap Choose a file: the phone offers its photo library as well as its files, so you can pick photos straight from the camera roll. On a computer, drop the pictures on the page. You can add more at any time.',
-            'iPhones save photos as HEIC by default. Safari reads them itself; in Chrome, Edge and Firefox a HEIC decoder loads the first time you add one, and the photo is still read on your device. A few photos taken with the newest iPhone settings may not decode; save those as JPG on the phone first, or convert them with HEIC to JPG.',
+            'iPhones save photos as HEIC by default. Safari reads them itself, since Safari 17 (WebKit\'s Safari 17.0 notes, checked 24 November 2026); in Chrome, Edge and Firefox a HEIC decoder loads the first time you add one, and the photo is still read on your device. A few photos taken with the newest iPhone settings may not decode; save those as JPG on the phone first, or convert them with HEIC to JPG.',
           ],
-          links: [{ text: 'HEIC to JPG', path: '/heic-to-jpg' }],
+          links: [{ text: 'HEIC to JPG', path: '/heic-to-jpg' }, { text: 'WebKit\'s Safari 17.0 notes', path: 'https://webkit.org/blog/14445/' }],
         },
         {
           heading: 'Put them in order',
@@ -2368,7 +2388,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Keeping the PDF small',
           paragraphs: [
-            'JPG to PDF puts JPG and PNG photos into the PDF as they are, without compressing them again. Quality is kept, but the PDF is about as large as the photos together, and phone photos are often several megabytes each.',
+            'JPG to PDF puts PNG photos, and JPG photos that are already upright, into the PDF as they are, without compressing them again; a JPG saved sideways is redrawn upright once. Quality is kept, but the PDF is about as large as the photos together, and phone photos are often several megabytes each.',
             'To make it smaller, make the photos smaller first:',
           ],
           list: [
@@ -2392,7 +2412,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'On the phone itself',
-          paragraphs: ['Phones have their own ways too. On an iPhone or iPad, the Files app can make one PDF from pictures you select (Create PDF, in the More menu), and the document scanner in the Files and Notes apps photographs pages straight into a PDF. On Android, the Google Drive app has a scanner that saves PDFs to your Drive. These give fewer choices of page size and margin, and Drive keeps the scan in your online account.'],
+          links: [{ text: 'Scan Documents command', path: 'https://support.apple.com/108963' }, { text: 'Google Drive app has a scanner', path: 'https://support.google.com/drive/answer/3145835?co=GENIE.Platform%3DAndroid' }],
+          paragraphs: ['Phones have their own ways too. On an iPhone or iPad, the Files and Notes apps have a Scan Documents command that photographs pages. On Android, the Google Drive app has a scanner that can save the scan as a PDF in your Drive (Apple\'s and Google\'s help pages, checked 24 November 2026). These give fewer choices of page size and margin, and Drive keeps the scan in your online account.'],
         },
         {
           heading: 'Questions?',
@@ -2456,8 +2477,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Other free ways',
-          paragraphs: ['On a Mac, Preview can add a password when you export the PDF with File, then Export. Word and LibreOffice can encrypt a document with a password when they save it as a PDF, which suits a document you wrote yourself. Protect PDF works with any PDF that opens without a password, on any device, and keeps its text, pictures, links and form fields as they are.'],
-          links: [{ text: 'Protect PDF', path: '/protect-pdf' }],
+          paragraphs: ['On a Mac, Preview can add a password when you export the PDF with File, then Export, then Permissions (Apple\'s Preview guide). Word and LibreOffice can encrypt a document with a password when they save it as a PDF (Microsoft\'s page on saving as PDF, LibreOffice\'s PDF export help; all checked 24 November 2026), which suits a document you wrote yourself. Protect PDF works with any PDF that opens without a password, including one that only restricts printing or copying, on any device, and keeps its text, pictures, links and form fields as they are.'],
+          links: [{ text: 'Protect PDF', path: '/protect-pdf' }, { text: 'Apple\'s Preview guide', path: 'https://support.apple.com/guide/preview/prvw587dd90f/mac' }, { text: 'Microsoft\'s page on saving as PDF', path: 'https://support.microsoft.com/en-us/office/save-or-convert-to-pdf-or-xps-in-office-desktop-apps-d85416c5-7d77-4fd6-a216-6f4bf7c7c110' }, { text: 'LibreOffice\'s PDF export help', path: 'https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export_security.html' }],
         },
         {
           heading: 'Questions?',
@@ -2536,6 +2557,1220 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/split-large-csv': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Cut the file by a number of rows or by a size in MB, and put the header row at the top of every part so each file opens on its own. For Excel, keep each part under 1,048,576 lines, header included. OpenAnyDoc\'s Split CSV does both in your browser: choose rows or MB per file and download all the parts as one ZIP, without uploading the file.'],
+          links: [{ text: 'Split CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'Why every part needs the header row',
+          paragraphs: [
+            'The first line of a CSV names the columns: order_id, order_date, region, amount. A plain cut leaves that line only in the first part. The second part starts in the middle of the data, so Excel shows a row of numbers where the column names should be, an import form maps the columns wrongly or refuses the file, and an AI chat has to guess what each value means.',
+            'The second trap is a field that holds a line break inside quotes, such as an address or a comment. A tool that counts text lines can cut that record in two, leaving half of it at the end of one part and the rest at the top of the next. Splitting by records, not by lines, avoids it.',
+          ],
+        },
+        {
+          heading: 'How to split a CSV in your browser',
+          paragraphs: ['Split CSV reads the file on your device; nothing is sent to a server:'],
+          list: [
+            'Open Split CSV and drop the .csv file on the page, or choose it. Once the table is read, the download dialog opens with "Split into several files (a .zip)" already ticked.',
+            'In "Split by", keep "Rows per file" and type a number (10,000 is filled in), or pick "Size per file" and enter the MB per file. Under the rows box the dialog tells you how many files you will get.',
+            'Press Download. You get one ZIP named after your file, such as orders-parts.zip, holding orders-part-1.csv, orders-part-2.csv and so on, each starting with the header row.',
+            'To split only some of the data, close the dialog, filter the rows or hide the columns you don\'t need, then choose "Download options…" in the More menu, tick the shown-rows option and tick the split option again.',
+            'A file over 50 MB shows a warning that it may be slow, then still opens if your browser has the memory. There is no row limit of its own. To look through a big file before you split it, use the large CSV viewer.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'A worked example: 2,500,000 rows for Excel',
+          paragraphs: ['Say an export has a header and 2,500,000 data rows. An Excel worksheet holds 1,048,576 rows, header included (Microsoft\'s Excel specifications and limits, checked 24 November 2026), so one part can carry at most 1,048,575 data rows. A round 1,000,000 rows per file leaves room and is easy to check:'],
+          list: [
+            '2,500,000 ÷ 1,000,000 = 2.5, so you get 3 files.',
+            'Part 1: the header and rows 1 to 1,000,000, so 1,000,001 lines.',
+            'Part 2: the header and rows 1,000,001 to 2,000,000, so 1,000,001 lines.',
+            'Part 3: the header and rows 2,000,001 to 2,500,000, so 500,001 lines.',
+            'Every part is under 1,048,576 lines, and the parts add up to 2,500,000 data rows: nothing is lost and nothing is counted twice.',
+          ],
+          links: [{ text: 'Excel specifications and limits', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }],
+        },
+        {
+          heading: 'What we measured on a test file',
+          paragraphs: ['We made a synthetic file of orders (order_id, order_date, region, product_code, quantity, amount) with 250,000 data rows and 9.51 MB, and ran it through the same splitting rule the page uses:'],
+          list: [
+            '100,000 rows per file: 3 parts with 100,000, 100,000 and 50,000 data rows, each with the header.',
+            '5 MB per file: 2 parts with 128,221 and 121,779 data rows, 4.88 MB and 4.63 MB. Size mode cuts between rows, so a part ends at the last whole row that fits and usually lands a little under the number you type.',
+            'A plain split -l 100000 of the same file on macOS: 3 parts, and only the first had the header; the other two started with an order row.',
+          ],
+        },
+        {
+          heading: 'Choose the part size for where the file is going',
+          paragraphs: ['The right number depends on what will read the parts:'],
+          list: [
+            'Excel: up to 1,048,575 data rows per part; 1,000,000 is a safe round number. If Excel is slow even below the row limit, CSV too big for Excel covers the other options.',
+            'An upload form with a size limit, such as 10 MB: use "Size per file" and set it a little lower, for example 9 MB, because each part is about that size, not exactly.',
+            'An AI chat: what counts there is tokens, not rows. Count one part with the Token counter, then pick a number of rows that fits. File too large for ChatGPT explains the limits.',
+            'If a part opens in one column in Excel, the split is fine; the separator does not match your PC. CSV opens in one column explains the fix.',
+          ],
+          links: [
+            { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' },
+            { text: 'Token counter', path: '/token-counter' },
+            { text: 'File too large for ChatGPT', path: '/file-too-large-for-chatgpt' },
+            { text: 'CSV opens in one column', path: '/csv-opens-in-one-column' },
+          ],
+        },
+        {
+          heading: 'The command-line alternative',
+          paragraphs: [
+            'On macOS and Linux, split -l 1000000 orders.csv part_ cuts a file into pieces of 1,000,000 lines. It does some things better than a browser: it reads the file as a stream, so the file can be larger than your memory, it is fast, and it fits in a script that runs every night. Two things to know: it does not repeat the header, so only part_aa has the column names, and it counts text lines, not records, so a quoted field with a line break inside can be cut in two. split -b cuts at a byte count and can break a row in the middle.',
+            'To repeat the header, split everything after the first line, then put the header back on each piece. On our test file these two commands gave three .csv parts that each start with the header. They still count lines, so use them only when no field holds a line break:',
+          ],
+          list: [
+            'tail -n +2 orders.csv | split -l 1000000 - part_',
+            'for f in part_*; do (head -n 1 orders.csv; cat "$f") > "$f.csv"; rm "$f"; done',
+          ],
+        },
+        {
+          heading: 'Does every part keep the header row?',
+          paragraphs: ['Yes, every part made by Split CSV starts with the original header row, so each file opens or imports on its own. If the parts go into a system that wants data rows only, untick "Include the header row" in the same dialog before you press Download, and every part then holds just the rows.'],
+        },
+        {
+          heading: 'Can I split a CSV by the values in one column?',
+          paragraphs: ['Not in one step: Split CSV cuts by rows or by size, not by the values in a column. To get one file per region, filter the region column to one value, download the shown rows, and repeat for each value. With a handful of values that takes a few minutes; with hundreds of them, a script is quicker.'],
+        },
+        {
+          heading: 'How do I put the parts back into one file?',
+          paragraphs: ['Use Merge CSV: add the parts in order and it writes one CSV with a single header row. Columns are matched by name, so a part whose columns sit in a different order still lines up. Every part needs the same column names in its header, which is one more reason to keep the header in each part.'],
+          links: [{ text: 'Merge CSV', path: '/merge-csv' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} with the file size, the row count and where the parts need to go (no personal data).`],
+        },
+      ],
+    },
+    '/json-vs-json-lines': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['A JSON file holds one value, usually one object or one list, and a program has to read the whole file before it can use it. A JSON Lines file (.jsonl, also written NDJSON, .ndjson) holds one JSON value on each line, so records can be read, written or appended one at a time. OpenAnyDoc\'s JSON viewer opens both kinds in your browser without uploading the file, and shows a .jsonl or .ndjson file as a list with one item per line.'],
+          links: [{ text: 'JSON viewer', path: '/json-viewer' }],
+        },
+        {
+          heading: 'The same three records, written both ways',
+          paragraphs: ['Here are three synthetic log events. As one JSON document they sit inside square brackets, with a comma between them:'],
+          list: [
+            'JSON: [{"id":1,"event":"login"},{"id":2,"event":"upload"},{"id":3,"event":"logout"}]',
+            'JSON Lines, line 1: {"id":1,"event":"login"}',
+            'JSON Lines, line 2: {"id":2,"event":"upload"}',
+            'JSON Lines, line 3: {"id":3,"event":"logout"}',
+          ],
+        },
+        {
+          heading: 'What the JSON Lines rules say (checked 24 November 2026)',
+          paragraphs: ['jsonlines.org sets three rules and two conventions. The NDJSON specification describes the same layout under another name.'],
+          list: [
+            'The text is UTF-8, without a byte order mark.',
+            'Each line is one valid JSON value. null is a valid line; a blank line is not.',
+            'Lines end with a newline (\\n). Windows line endings (\\r\\n) also work, because spaces around a JSON value are ignored.',
+            'A newline after the last line is strongly recommended but not required.',
+            'Files may use the .jsonl extension, and the media type may be application/jsonl, which is not yet standardized.',
+            'The NDJSON specification asks for the .ndjson extension and the media type application/x-ndjson.',
+          ],
+          links: [{ text: 'jsonlines.org', path: 'https://jsonlines.org/' }, { text: 'NDJSON specification', path: 'https://github.com/ndjson/ndjson-spec' }],
+        },
+        {
+          heading: 'When each one is used',
+          paragraphs: [
+            'In JSON Lines there are no brackets around the file and no commas between records, and each line is complete on its own. A program can add a record by writing one more line at the end, without reading the file first, and the file can be split at any line break with every part still valid.',
+            'So a rough rule: JSON when the data is read as one piece, JSON Lines when it is a stream of separate records.',
+          ],
+          list: [
+            'JSON: API responses, configuration files and small exports that a program loads in one go.',
+            'JSON Lines for logs: jsonlines.org calls it a great format for log files, because each event is one line that can be appended.',
+            'JSON Lines between programs and in shell pipelines, where tools read and write one line at a time.',
+            'JSON Lines for AI batch and training files. OpenAI\'s Batch API guide says batches start with a .jsonl file in which each line holds one request, and its fine-tuning guide asks for training data in JSONL format, one complete JSON structure per line (both checked 24 November 2026).',
+          ],
+          links: [{ text: 'Batch API guide', path: 'https://developers.openai.com/api/docs/guides/batch' }, { text: 'fine-tuning guide', path: 'https://developers.openai.com/api/docs/guides/supervised-fine-tuning' }],
+        },
+        {
+          heading: 'How to open a .jsonl or .ndjson file',
+          paragraphs: ['Drop the file on the JSON viewer, or choose it. It is read on your device; nothing is sent to a server.'],
+          list: [
+            'Each line becomes one item of a list, and a note says "Opened from JSON Lines: each line is an item of the list. Download saves JSON Lines again."',
+            'The tree, table and text views work as they do for any JSON file. A file of records with the same fields reads best in the table.',
+            'Blank lines are skipped rather than refused, so a file with an empty line at the end still opens.',
+            'If one line is not valid JSON, the viewer stops and gives the number of that line, so you know where to look.',
+            'Download saves the file as JSON Lines again, one item per line, with your edits.',
+            'Files up to 10 MB open. The extension decides how the file is read: a JSON Lines file saved with a .json name is read as ordinary JSON and fails, so rename it to .jsonl first.',
+          ],
+        },
+        {
+          heading: 'How to convert between them',
+          paragraphs: ['Once the .jsonl file is open in the JSON viewer:'],
+          list: [
+            'To JSON: open the Copy menu and choose Copy formatted. You get the records as one JSON list, inside square brackets, ready to paste or save.',
+            'To a spreadsheet: open the Convert menu and choose Convert to CSV or Convert to Excel (.xlsx). Each record becomes a row and each field a column.',
+            'From a JSON list to JSON Lines: OpenAnyDoc has no button for this direction yet. A command-line tool such as jq writes one item per line with jq -c ".[]".',
+          ],
+        },
+        {
+          heading: 'Why does my .jsonl file give an "Unexpected non-whitespace character" error?',
+          paragraphs: ['That error means a program read the file as one JSON document and found a second value after the first line. The file is probably fine as JSON Lines. Open it with a tool that reads JSON Lines, or check that it is saved with a .jsonl or .ndjson name. The guide to unexpected token errors explains the other messages.'],
+          links: [{ text: 'guide to unexpected token errors', path: '/json-unexpected-token' }],
+        },
+        {
+          heading: 'Is NDJSON the same as JSON Lines?',
+          paragraphs: ['For everyday use, yes: both put one JSON value on each line and end lines with a newline. They come from two separate write-ups, so the names differ, and so do the suggested extension and media type: .jsonl for JSON Lines, .ndjson and application/x-ndjson for NDJSON. OpenAnyDoc\'s JSON viewer opens both extensions the same way.'],
+        },
+        {
+          heading: 'Can I open a JSON Lines file in Excel?',
+          paragraphs: ['Not directly as a table, because Excel has no reader for one-object-per-line files. Open the .jsonl file in OpenAnyDoc\'s JSON viewer, choose Convert to Excel (.xlsx) from the Convert menu, and download the workbook. Nested fields become their own columns. How to open a JSON file covers the other ways to read JSON.'],
+          links: [{ text: 'How to open a JSON file', path: '/open-json-file' }],
+        },
+        {
+          heading: 'Is my file uploaded when I open it here?',
+          paragraphs: ['No. The JSON viewer reads JSON and JSON Lines files with your own browser, on your device, and keeps them in the page\'s memory until you close the tab. Nothing is sent to a server, which matters for logs and AI batch files that often hold user data. You can check this yourself in the browser\'s network panel.'],
+          links: [{ text: 'check this yourself', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe the file and what you see when you open it (no personal data).`],
+        },
+      ],
+    },
+    '/compare-two-json-files': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Compare the data, not the text: a JSON-aware comparison matches objects key by key and lists position by position, so new indentation or a different key order does not count as a change. OpenAnyDoc\'s Compare JSON does this in your browser without uploading either file, and lists every added, removed and changed value with its path, such as $.settings.language.'],
+          links: [{ text: 'Compare JSON', path: '/json-compare' }],
+        },
+        {
+          heading: 'Why a line-by-line diff misleads',
+          paragraphs: [
+            'A text diff compares lines. If one file was saved on a single line and the other was formatted with 2 spaces, every line differs. If a program wrote the same keys in another order, the diff shows lines removed in one place and added in another, although the data is the same.',
+            'A JSON comparison reads both files first and compares what they hold. Whitespace never counts, and key order counts only if you ask for it.',
+          ],
+        },
+        {
+          heading: 'A worked example',
+          paragraphs: ['Two versions of a synthetic account record. In the second, the plan was upgraded, a feature was added, the language changed, a coupon was used up, a trial date appeared, and the keys came out in another order:'],
+          list: [
+            'Before: {"id":"A-1042","plan":"basic","seats":5,"features":["export","search"],"settings":{"theme":"light","language":"en"},"coupon":"WELCOME"}',
+            'After: {"plan":"pro","id":"A-1042","seats":5,"features":["export","search","share"],"settings":{"language":"ar","theme":"light"},"trialEnds":"2026-12-31"}',
+          ],
+        },
+        {
+          heading: 'What the comparison shows',
+          paragraphs: ['With Ignore key order on, as it is by default, the summary reads "2 added, 1 removed, 2 changed." and the list underneath names each difference:'],
+          list: [
+            'Changed: $.plan ("basic" became "pro").',
+            'Added: $.features[2] ("share").',
+            'Changed: $.settings.language ("en" became "ar").',
+            'Removed: $.coupon.',
+            'Added: $.trialEnds.',
+            'Turn Ignore key order off and the same five stay, followed by "2 objects have their keys in another order.": the whole record ($) and $.settings, each listed as Key order.',
+            'id, seats and settings.theme are not listed, because they did not change.',
+          ],
+        },
+        {
+          heading: 'How to compare two JSON files, step by step',
+          paragraphs: ['Both files are read on your device:'],
+          list: [
+            'Open Compare JSON and choose the first file, drop it on the page or paste the text. It opens on the Compare tab.',
+            'Paste the second document into the box, drop its file on the box, or press Choose a file.',
+            'Read the summary line, then the list of differences. Click one and both sides scroll to it.',
+            'The open document is on the left and the second document on the right, both indented with 2 spaces. With Ignore key order on, keys are shown in alphabetical order on both sides, so equal objects line up.',
+            'The changed lines are marked on each side, so you can read the values around a change.',
+          ],
+        },
+        {
+          heading: 'Lists, limits and invalid files',
+          paragraphs: [
+            'Objects are matched by key, but lists are matched by position: item 0 with item 0, item 1 with item 1. If "share" is put at the start of ["export","search"], the result is not one insertion but three lines: $.features[0] changed, $.features[1] changed and $.features[2] added, because every item moved one place.',
+            'When you see a run of changes at the end of a list, check whether one item was inserted or deleted near its start. The list shows the first 300 differences, and each side shows up to 20,000 lines. The first file can be up to 10 MB.',
+            'The second document is checked as you paste it: if it is not valid JSON, the parser\'s message appears under the box instead of a comparison. Fix it in the JSON validator, which shows the line and column and repairs common mistakes such as trailing commas. The guide to unexpected token errors explains each message.',
+          ],
+          links: [{ text: 'JSON validator', path: '/json-validator' }, { text: 'guide to unexpected token errors', path: '/json-unexpected-token' }],
+        },
+        {
+          heading: 'Does key order matter when comparing JSON?',
+          paragraphs: ['Usually not: in JSON, {"a":1,"b":2} and {"b":2,"a":1} hold the same data, so Compare JSON treats them as equal by default. Order can matter when a person reads the file, or when a test compares raw text. Turn Ignore key order off and every object whose keys moved is reported as Key order.'],
+        },
+        {
+          heading: 'How do I compare an API response with a saved copy?',
+          paragraphs: ['Open the saved .json file in Compare JSON first, so it sits on the left. Then copy the new response from your API client or the browser\'s network panel and paste it into the box on the Compare tab. Every field that was added, removed or changed since the saved copy is listed with its path.'],
+        },
+        {
+          heading: 'Can I compare two JSON Lines files?',
+          paragraphs: ['Yes, with one extra step, because the box reads one JSON document. Open the first .jsonl file in the JSON viewer, which reads each line as an item of a list, then switch to Compare. Open the second file in another tab, choose Copy formatted from the Copy menu and paste it. JSON vs JSON Lines explains the format.'],
+          links: [{ text: 'JSON viewer', path: '/json-viewer' }, { text: 'JSON vs JSON Lines', path: '/json-vs-json-lines' }],
+        },
+        {
+          heading: 'Are my files uploaded when I compare them?',
+          paragraphs: ['No. Both documents are read and compared by your own browser, and nothing is saved or shared, so there is no link to send either. That matters when the files hold API keys or customer records. Our comparison of jsonformatter.org and Code Beautify shows how other JSON sites describe what they send to their servers.'],
+          links: [{ text: 'comparison of jsonformatter.org and Code Beautify', path: '/jsonformatter-alternative' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe the two files and the difference you expected to see (no personal data).`],
+        },
+      ],
+    },
+    '/excel-row-and-column-limits': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['An Excel worksheet holds at most 1,048,576 rows and 16,384 columns, and one cell holds at most 32,767 characters. Numbers keep only 15 digits, and Excel calculates only with dates from 1 January 1900 to 31 December 9999. When your data goes past these limits, OpenAnyDoc\'s large CSV viewer opens it in your browser with no row limit of its own, and Split CSV cuts it into parts Excel can open, without uploading the file.'],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'Split CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'The limits, from Microsoft\'s own list',
+          paragraphs: ['These figures come from Microsoft\'s Excel specifications and limits page (checked 24 November 2026), which applies to Excel for Microsoft 365 and Excel 2016, 2019, 2021 and 2024:'],
+          list: [
+            'Rows on a worksheet: 1,048,576.',
+            'Columns on a worksheet: 16,384, so the last column is XFD.',
+            'Characters in one cell: 32,767.',
+            'Line breaks in one cell: 253.',
+            'Characters in a header or footer: 255.',
+            'Characters in a formula: 8,192; arguments in one function: 255; functions nested inside each other: 64.',
+            'Number precision: 15 digits.',
+            'Dates Excel can calculate with: 1 January 1900 to 31 December 9999.',
+            'Items shown in a filter drop-down list: 10,000.',
+            'Hyperlinks on a worksheet: 65,530.',
+            'Different cell formats and cell styles in a workbook: 65,490.',
+            'Undo levels: 100.',
+            'Sheets in a workbook: limited only by available memory.',
+          ],
+          links: [{ text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }],
+        },
+        {
+          heading: 'What each limit means for a real file',
+          paragraphs: ['Most people only meet the row limit, which the guide on a CSV too big for Excel covers in detail. The other limits catch people out more quietly. The figures are from the Excel specifications and limits page and Microsoft\'s page on keeping leading zeros and large numbers (checked 24 November 2026):'],
+          list: [
+            'Columns: wide exports reach 16,384 long before they get near a million rows. A survey with one column per question and answer option, or sensor data with one column per reading, can be a few thousand rows long and still be too wide.',
+            '15 digits: Excel keeps 15 significant digits of a number, so a 16-digit reference typed or opened as a number, such as 1234567890123456, is stored as 1234567890123450. Order numbers, barcodes and other long codes are safe only as text.',
+            '32,767 characters: long free-text fields, such as comments, descriptions or JSON pasted into a column, can be longer than one cell holds.',
+            '253 line breaks: an address or a note with many lines counts against this limit too, separately from the character limit.',
+            'Dates before 1900: they are earlier than the first date Excel calculates with, so Excel cannot calculate with records from the 1800s as dates.',
+            '10,000 filter items: a column with more different values than that does not show all of them in its filter list, so use a text filter such as Contains instead of ticking values.',
+          ],
+          links: [{ text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }, { text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'keeping leading zeros and large numbers', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+        },
+        {
+          heading: 'Worked example: will this export fit?',
+          paragraphs: ['Do the sums before you open the file. Two synthetic exports, and how to count your own:'],
+          list: [
+            'A sales export of 2,400,000 rows and 12 columns: the columns are fine, the rows are not. Cut into parts of 1,000,000 rows, it becomes three files of 1,000,000, 1,000,000 and 400,000 rows, each with the header row on top, and every part stays below 1,048,576.',
+            'A sensor log of 5,000 rows that stores each second of a five-hour test in its own column: 18,000 columns, more than 16,384, although the row count is small. Hide the columns you do not need before you save it for Excel.',
+            'To read the real size of a file before Excel sees it, drop it on the CSV viewer and choose Issues in the More menu: the File report gives rows × columns, the delimiter and the encoding. A line count from a text editor can be too high, because a quoted cell with a line break inside takes two lines but is one row.',
+          ],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }],
+        },
+        {
+          heading: 'When your data is over a limit',
+          paragraphs: ['All of these run in your browser; the file is not uploaded:'],
+          list: [
+            'Too many rows to look through: open the file in the large CSV viewer. It has no row limit of its own, so the limit is your device\'s memory, and a file over 50 MB shows a warning first. Filter to the rows you need, then choose Download options in the More menu and tick only the shown rows.',
+            'Too many rows for someone who uses Excel: Split CSV cuts the file by a number of rows or by a size in MB per file. Every part keeps the header row, and the parts download together as one ZIP.',
+            'Too many columns: hide the columns you do not need in the CSV viewer, then choose Download options and tick only the shown rows. Hidden columns are left out of that copy.',
+            'Long codes that must keep every digit: CSV to Excel turns only plain numbers into numbers. Values such as 007, phone numbers and whole numbers longer than 15 digits stay text, so no digit is lost.',
+            'A workbook too big to work with: Split Excel cuts it into smaller .xlsx files by sheet, every N rows, or by the values of a column.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'Split CSV', path: '/split-csv' }, { text: 'CSV viewer', path: '/csv-viewer' }, { text: 'CSV to Excel', path: '/csv-to-excel' }, { text: 'Split Excel', path: '/split-excel' }],
+        },
+        {
+          heading: 'Where Excel does more',
+          paragraphs: [
+            'Excel has its own way past the worksheet limit. Power Query and the Data Model load more than 1,048,576 rows without putting them in cells, and a PivotTable can then summarise all of them, as Microsoft\'s page on a data set too large for the Excel grid explains (checked 24 November 2026). On a 64-bit system Excel specifications and limits lists no hard limit on Data Model file size, only available memory and system resources.',
+            'OpenAnyDoc\'s viewers show and edit the rows as a table, with filters, sorting and group by, but they have no PivotTables, and like Excel they are limited by your device\'s memory. If the data has outgrown a spreadsheet altogether, CSV vs Excel vs JSON explains when another format suits it better.',
+          ],
+          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'Excel specifications and limits', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'CSV vs Excel vs JSON', path: '/csv-vs-excel-vs-json' }],
+        },
+        {
+          heading: 'How many rows and columns can Excel have?',
+          paragraphs: ['An Excel worksheet can have 1,048,576 rows and 16,384 columns, according to Microsoft\'s limits for Excel for Microsoft 365 and Excel 2016 to 2024. The older .xls format, used by Excel 97 to 2003, stops at 65,536 rows and 256 columns, according to Microsoft\'s pages on a data set too large for the Excel grid and on using Excel with earlier versions (checked 24 November 2026). A workbook can hold as many sheets as memory allows.'],
+          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'using Excel with earlier versions', path: 'https://support.microsoft.com/office/use-excel-with-earlier-versions-of-excel-2fd9ffcb-6fce-485b-85af-fecfd651a5ac' }],
+        },
+        {
+          heading: 'Why did Excel change the last digits of my long number?',
+          paragraphs: ['Excel keeps only 15 significant digits of any number, so longer numbers are rounded and the extra digits become zeros. It happens to long order numbers, reference codes and IDs. Format the column as Text before you enter the numbers, or bring the file in through Data, From Text/CSV and set that column\'s type to Text, as Microsoft\'s page on keeping leading zeros and large numbers explains (checked 24 November 2026).'],
+          links: [{ text: 'keeping leading zeros and large numbers', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+        },
+        {
+          heading: 'Is there a limit on the number of sheets or the length of a sheet name?',
+          paragraphs: ['Microsoft lists no fixed number of sheets: a workbook can hold as many as your computer\'s memory allows. A sheet name can be at most 31 characters long, as Microsoft\'s page Rename a worksheet says (checked 24 November 2026). If a workbook has grown too big for the person who will receive it, Split Excel saves each sheet as its own file, in your browser.'],
+          links: [{ text: 'Rename a worksheet', path: 'https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9' }, { text: 'Split Excel', path: '/split-excel' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} with the row and column count of your file and what you need from it (no personal data).`],
+        },
+      ],
+    },
+    '/find-hidden-sheets-in-excel': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['A workbook can hide whole sheets, single rows and columns, and the formulas behind its numbers, and a sheet set to very hidden does not even appear in Excel\'s Unhide list. OpenAnyDoc\'s Excel viewer shows all of it at once: it lists hidden and very hidden sheets next to the sheet tabs, counts hidden rows and columns, and lists every formula, in your browser without uploading the file.'],
+          links: [{ text: 'Excel viewer', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'Four places a workbook hides things',
+          paragraphs: ['Check all four before you trust a workbook or share it:'],
+          list: [
+            'Hidden sheets: hidden with Hide on the sheet tab, and shown again with Unhide.',
+            'Very hidden sheets: set in the VBA editor or by a macro. Microsoft\'s reference for sheet visibility (checked 24 November 2026) says the user cannot make such a sheet visible from the menus; only changing its Visible property does it.',
+            'Hidden rows and columns: they keep their data but take no space on screen.',
+            'Formulas: a cell shows a number, and the formula behind it can read from a hidden sheet, another workbook or a defined name.',
+          ],
+          links: [{ text: 'reference for sheet visibility', path: 'https://learn.microsoft.com/en-us/office/vba/api/excel.xlsheetvisibility' }],
+        },
+        {
+          heading: 'Find hidden sheets, rows and columns in your browser',
+          paragraphs: ['Open the workbook in the Excel viewer (.xlsx, .xlsm or .xls). The file is read on your device and nothing is uploaded:'],
+          list: [
+            'If the workbook hides sheets, a message says so when it opens, and a button such as "2 hidden" appears next to the sheet tabs.',
+            'Click that button to list every hidden sheet, each tagged hidden or very hidden. Click one and it gets a tab, so you can read it like any other sheet.',
+            'If the sheet on screen hides rows or columns, the status bar at the bottom shows how many, for example "Hidden rows: 3, columns: 1 · Show". Click Show, or tick Show hidden rows and columns in the View menu.',
+            'For an overview, choose Workbook info in the View menu: the number of sheets, how many are hidden and very hidden, counts of formulas, notes and links, defined names, links to other workbooks, and whether the file contains macros. Macros are never run.',
+          ],
+          links: [{ text: 'Excel viewer', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'See every formula',
+          paragraphs: ['The View menu has three ways to read what is behind the numbers:'],
+          list: [
+            'Show formulas (Ctrl+` on Windows, ⌘` on a Mac) puts each formula in its cell instead of its result.',
+            'Formula list shows every formula in the workbook with its sheet, cell address and current value, and marks the ones on a hidden sheet. Type in the filter box, such as SUM or VLOOKUP, or tick This sheet only. Click a formula to go to its cell. The first 2,000 are listed.',
+            'Search all sheets (Ctrl+Shift+F) searches every sheet, hidden ones included. Tick Look in formulas to search the formulas instead of the values.',
+          ],
+        },
+        {
+          heading: 'Worked example: a total that reads from hidden sheets',
+          paragraphs: [
+            'A synthetic budget workbook has three sheets: Summary, which is visible, Rates, which is hidden, and Lookup, which is very hidden. Summary shows a total of 18,750 in cell B4, and nothing else looks unusual.',
+            'In the viewer, the message on opening says the workbook has 2 hidden sheets. Formula list shows Summary!B4 with =Rates!B2*Lookup!C7 and its value, 18,750. Opening the two hidden sheets shows that Rates!B2 is 1.25 and Lookup!C7 is 15,000. In Excel, Unhide would have offered only Rates: Lookup is very hidden and does not appear there.',
+          ],
+        },
+        {
+          heading: 'The Excel way',
+          paragraphs: [
+            'Excel does some things a viewer cannot: it unhides a sheet for good when you save, and it lets you edit the macros in the file. If you do not have Excel at hand, opening an XLSX file without Excel compares the free options.',
+            'The steps in Excel (Microsoft\'s pages, checked 24 November 2026):',
+          ],
+          list: [
+            'Hidden sheets: right-click any visible sheet tab, choose Unhide, select the sheets and click OK. The steps are in Hide or Unhide worksheets.',
+            'Very hidden sheets: they are not in the Unhide list. Open the VBA editor (Alt+F11 on Windows, as Keyboard shortcuts in Excel lists) and set the sheet\'s Visible property to -1 - xlSheetVisible, the value given in Microsoft\'s reference for sheet visibility.',
+            'Rows and columns: select the rows or columns on both sides, right-click and choose Unhide, or double-click the double line where they are hidden. The steps are in Hide or show rows or columns.',
+            'Formulas: Show Formulas on the Formulas tab switches the sheet between formulas and results. The steps are in Display or hide formulas.',
+          ],
+          links: [
+            { text: 'opening an XLSX file without Excel', path: '/open-xlsx-without-excel' },
+            { text: 'Hide or Unhide worksheets', path: 'https://support.microsoft.com/en-us/office/hide-or-show-worksheets-or-workbooks-69f2701a-21f5-4186-87d7-341a8cf53344' },
+            { text: 'Hide or show rows or columns', path: 'https://support.microsoft.com/en-us/office/hide-or-show-rows-or-columns-659c2cad-802e-44ee-a614-dde8443579f8' },
+            { text: 'Keyboard shortcuts in Excel', path: 'https://support.microsoft.com/en-us/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f' },
+            { text: 'reference for sheet visibility', path: 'https://learn.microsoft.com/en-us/office/vba/api/excel.xlsheetvisibility' },
+            { text: 'Display or hide formulas', path: 'https://support.microsoft.com/en-us/office/display-or-hide-formulas-f7f5ab4e-bf24-4efc-8fc9-0c1b77a5356f' },
+          ],
+        },
+        {
+          heading: 'Showing a sheet is not unhiding it',
+          paragraphs: [
+            'Opening a hidden sheet in the viewer does not change the file. When you download the workbook from the viewer, hidden and very hidden sheets stay as they were, and hidden rows and columns stay hidden, so what you send looks the same as before.',
+            'Hidden is not removed: anyone with the file can find these sheets the same way. Before you share a workbook, delete what the other person should not see, and read anonymizing data before sharing. Note that Every sheet as CSV, under Split, merge and export sheets in the Sheets menu, writes the hidden sheets too.',
+            'Limits: hidden rows and columns are read from .xlsx and .xlsm files only, and the hidden sheets of an .ods file open as ordinary tabs. A workbook that needs a password to open cannot be read. Unprotect Excel removes sheet and workbook structure protection from a file you own, not a password to open it.',
+          ],
+          links: [{ text: 'anonymizing data before sharing', path: '/anonymize-data-before-sharing' }, { text: 'Unprotect Excel', path: '/unprotect-excel' }],
+        },
+        {
+          heading: 'Why is Unhide greyed out in Excel?',
+          paragraphs: ['Two things leave Excel\'s Unhide with nothing to offer. Sheets hidden as very hidden are not listed by the Unhide command, according to Hide or Unhide worksheets, and when the workbook structure is protected, Unhide is unavailable, according to Protect a workbook (Microsoft\'s pages, checked 24 November 2026). Opening the file in a viewer that reads the file itself shows both kinds of hidden sheet.'],
+          links: [{ text: 'Hide or Unhide worksheets', path: 'https://support.microsoft.com/en-us/office/hide-or-show-worksheets-or-workbooks-69f2701a-21f5-4186-87d7-341a8cf53344' }, { text: 'Protect a workbook', path: 'https://support.microsoft.com/en-us/office/protect-a-workbook-7e365a4d-3e89-4616-84ca-1931257c1517' }],
+        },
+        {
+          heading: 'What is a very hidden sheet in Excel?',
+          paragraphs: ['A very hidden sheet is a sheet whose visibility is set to xlSheetVeryHidden, usually by a macro or in the VBA editor. Excel leaves it out of the Unhide list, so most people never know it is there. It still holds data and formulas, and other sheets can read from it.'],
+        },
+        {
+          heading: 'Can a hidden sheet contain personal data?',
+          paragraphs: ['Yes, a hidden sheet travels inside the file with everything on it, so names, phone numbers or salaries on a hidden sheet go wherever the workbook goes. Check the hidden and very hidden sheets before you send a workbook, and delete the ones the recipient should not have instead of hiding them again.'],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe what the workbook hides and what you see (no personal data).`],
+        },
+      ],
+    },
+    '/excel-to-csv-without-breaking-arabic': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['To convert Excel to CSV and keep Arabic readable, save it as UTF-8 with a byte order mark (BOM): UTF-8 holds every Arabic letter, and the three-byte mark at the start of the file tells Excel how to read them. OpenAnyDoc\'s Excel to CSV does both in your browser: it writes UTF-8 and adds the mark whenever the sheet holds any character outside plain English text, such as Arabic letters, and the workbook is never uploaded.'],
+          links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }],
+        },
+        {
+          heading: 'Two ways Arabic gets lost while saving',
+          paragraphs: ['Saving to CSV can break Arabic at two points, and they look different. This guide is about writing the file correctly; if you already have a CSV that opens with broken Arabic, fixing a CSV that already shows broken Arabic covers the repair.'],
+          list: [
+            'The letters are replaced. If the CSV is written in an encoding that has no Arabic letters, they cannot be stored, and each one is usually written as a question mark. Nothing brings them back from that file; only saving from the workbook again helps.',
+            'The letters are stored but read wrongly. A UTF-8 file without the mark keeps every letter, yet Excel can show it garbled when you double-click it: "الرياض" turns into "Ø§Ù„Ø±ÙŠØ§Ø¶". Microsoft\'s note on opening CSV UTF-8 files (checked 24 November 2026) says such a file opens normally if it was saved with a BOM.',
+          ],
+          links: [
+            { text: 'fixing a CSV that already shows broken Arabic', path: '/fix-arabic-csv-in-excel' },
+            { text: 'note on opening CSV UTF-8 files', path: 'https://support.microsoft.com/en-us/office/opening-csv-utf-8-files-correctly-in-excel-8a935af5-3416-4edd-ba7e-3dfd2bc4a032' },
+          ],
+        },
+        {
+          heading: 'What the bytes look like',
+          paragraphs: ['A CSV is only bytes, so you can see the difference for yourself. Take the word الرياض, 6 letters:'],
+          list: [
+            'In UTF-8 it is 12 bytes, two per letter: D8 A7 D9 84 D8 B1 D9 8A D8 A7 D8 B6.',
+            'In Windows-1256, the older Arabic Windows encoding, it is 6 bytes, one per letter.',
+            'Read as Windows-1252, the Western encoding, those 12 UTF-8 bytes become Ø§Ù„Ø±ÙŠØ§Ø¶.',
+            'The byte order mark is the three bytes EF BB BF at the very start of the file. Open the CSV in the CSV viewer and choose Issues in the More menu: the File report says the encoding and whether the file has a byte order mark. Or run node -e "console.log(require(\'fs\').readFileSync(\'file.csv\').subarray(0, 3))" and look for <Buffer ef bb bf>.',
+          ],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }],
+        },
+        {
+          heading: 'Convert in your browser, step by step',
+          paragraphs: ['Excel to CSV reads the workbook on your device:'],
+          list: [
+            'Drop an .xlsx, .xls, .xlsm or .ods file on Excel to CSV. The first sheet is converted at once. For another sheet, open the workbook in the Excel viewer, click the sheet\'s tab, then Convert and Convert to CSV.',
+            'The CSV opens in the CSV viewer: commas between the columns, Windows line endings (CRLF), UTF-8, and the byte order mark if any cell holds a character outside plain English text, such as an Arabic letter. A sheet with only English letters and digits gets no mark, because it does not need one.',
+            'Check it: choose Issues in the More menu. The File report shows the encoding, the byte order mark (yes or no) and the line endings.',
+            'Click Download, and the copy keeps the mark. Download options in the More menu let you pick a semicolon, tab or pipe, LF or CRLF line endings, and untick Add a byte order mark (helps Excel read Arabic) for a system that wants plain UTF-8.',
+            'For every sheet at once, open the workbook in the Excel viewer, choose Split, merge and export sheets in the Sheets menu, then Download CSV files (ZIP). Each sheet, hidden ones included, becomes its own UTF-8 CSV with the mark.',
+          ],
+          links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }, { text: 'Excel viewer', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'What ends up in the CSV',
+          paragraphs: ['A CSV holds text only, so the converter writes each cell as the sheet shows it:'],
+          list: [
+            'Dates, percentages and currencies keep their shown format: 25% stays 25%, not 0.25.',
+            'Formulas are written as the result saved in the workbook.',
+            'Empty rows are left out.',
+            'Long numbers in the General format are written in full: 123456789012 stays 123456789012, not the 1.23457E+11 a narrow column shows, up to the 15 significant digits Excel stores.',
+            'Right-to-left sheet direction, fonts and colours are not kept, because a CSV stores no layout; the Arabic text itself is kept exactly.',
+          ],
+        },
+        {
+          heading: 'Doing it in Excel',
+          paragraphs: [
+            'In Excel, choose File, Save As, and pick a CSV type as the file type. Excel saves only the active sheet to a CSV, so repeat it for each sheet, as Microsoft\'s page on importing and exporting text files explains (checked 24 November 2026).',
+            'Where Excel does more: it writes the CSV straight from the workbook you are already editing, in one step. Where it trips people up: the list of types also has CSV (Comma delimited), CSV (Macintosh) and CSV (MS-DOS), which Microsoft\'s list of text formats (checked 24 November 2026) describes as files for Windows, the Macintosh and MS-DOS, without a word about UTF-8.',
+          ],
+          links: [{ text: 'page on importing and exporting text files', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }, { text: 'list of text formats', path: 'https://support.microsoft.com/en-us/office/save-a-workbook-to-text-format-txt-or-csv-3e9a9d6c-70da-4255-aa28-fcacf1f081e6' }],
+        },
+        {
+          heading: 'When the receiving system wants something else',
+          paragraphs: ['Excel needs the mark, but a CSV is not always for Excel:'],
+          list: [
+            'A database import, a script or an accounting system may expect UTF-8 without the mark, and some read it as part of the first column name. Untick the byte order mark in Download options before you save.',
+            'An older Arabic system may need Windows-1256. Change CSV encoding saves a CSV as UTF-8 with BOM, UTF-8, UTF-16 LE or Windows-1256, shows a preview first, and warns you when a character cannot be written in the encoding you chose.',
+            'A system in a country that writes decimals with a comma may expect semicolons: pick the semicolon in Download options.',
+          ],
+          links: [{ text: 'Change CSV encoding', path: '/change-csv-encoding' }],
+        },
+        {
+          heading: 'Why does my CSV show question marks instead of Arabic?',
+          paragraphs: ['Question marks usually mean the Arabic letters were replaced when the file was saved, because the encoding used had no Arabic letters. If another program shows the same question marks, the letters are gone from that file. Convert the original workbook again as UTF-8 with a byte order mark, with Excel to CSV or with Excel\'s CSV UTF-8 type.'],
+          links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }],
+        },
+        {
+          heading: 'Does a byte order mark cause problems outside Excel?',
+          paragraphs: ['A byte order mark rarely causes problems: most programs that read UTF-8 recognise it and skip it. A few scripts and import tools do not, and show stray characters before the first column name. If the CSV is for such a system rather than for Excel, untick the byte order mark in Download options before you save.'],
+        },
+        {
+          heading: 'Can one CSV file hold every sheet of my workbook?',
+          paragraphs: ['No, a CSV file holds one table, so each sheet becomes its own file. Excel to CSV converts the first sheet or the one you pick in the Excel viewer; Split, merge and export sheets in the viewer\'s Sheets menu downloads them all as CSVs in one ZIP. CSV vs Excel vs JSON covers whether CSV is the right format.'],
+          links: [{ text: 'Excel to CSV', path: '/excel-to-csv' }, { text: 'CSV vs Excel vs JSON', path: '/csv-vs-excel-vs-json' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe what you see in the CSV (no personal data). The first line is usually enough.`],
+        },
+      ],
+    },
+    '/read-speaker-notes-without-powerpoint': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Open the .pptx file in a viewer that reads the notes as well as the slides, and each slide\'s speaker notes appear under it. OpenAnyDoc\'s PowerPoint viewer does this in your browser without uploading the file, and it can also search the notes, read them aloud, show them in a presenter view and export them as text.'],
+          links: [{ text: 'PowerPoint viewer', path: '/powerpoint-viewer' }],
+        },
+        {
+          heading: 'How to read the notes in your browser',
+          paragraphs: [
+            'A .pptx file is a ZIP package of separate parts, and the speaker notes are not stored with the slides: each slide that has notes points to its own notes page, which PowerPoint keeps in the ppt/notesSlides folder. A program that only draws the slides never opens those parts. To see them, rename a copy of a deck from .pptx to .zip and open it; each notesSlide file holds the notes of one slide.',
+            'The PowerPoint viewer reads both the slides and the notes pages, on your device:',
+          ],
+          list: [
+            'Open the PowerPoint viewer and choose a .pptx, .ppsx, .potx or .pptm file, or drop it on the page.',
+            'If the presentation has notes, the Speaker notes pane opens under the slide by itself. A slide without notes says "No notes for this slide.", and a deck with none at all says "This presentation has no speaker notes."',
+            'Move with the thumbnails, the previous and next buttons or the arrow keys; the notes pane always shows the notes of the slide on screen.',
+            'The Speaker notes button in the toolbar, or View, then Speaker notes, hides or shows the pane.',
+          ],
+        },
+        {
+          heading: 'Search the notes, hear them, present with them',
+          paragraphs: ['Three more tools in the viewer use the notes. If you only need to find a word, Search PowerPoint lists every match in the slides and notes with its slide number, without drawing the slides:'],
+          list: [
+            'Search slides and notes (in the View menu) lists every match with its slide number and whether it is on the slide or in the notes. Click a match in the notes and the viewer opens that slide and highlights the words in the notes pane. Tick Match case to tell "Sales" from "sales".',
+            'Read aloud: choose The speaker notes, then This slide only or From this slide to the end. Only the voices installed on your device are used, with an English voice and an Arabic voice and a speed setting.',
+            'Present opens the presenter view: the current slide, the next slide, your notes with Smaller notes and Larger notes buttons, a timer you can pause and reset, and the time now. Open audience window shows the slide alone in a second window; if the browser blocks it, Present in this tab shows the slides full screen instead.',
+          ],
+          links: [{ text: 'Search PowerPoint', path: '/search-pptx' }],
+        },
+        {
+          heading: 'Get the notes out as text',
+          paragraphs: ['File, then Export outline, saves every slide\'s title, text and speaker notes in slide order, as Plain text (.txt) or Markdown (.md). Here is the plain text outline of a three-slide test deck, q3-review.pptx, with notes on the first two slides (in the file, the lines under each slide are indented):'],
+          list: [
+            'q3-review',
+            'Slide 1: Quarterly review',
+            'Sales team, Q3',
+            'Speaker notes:',
+            'Thank everyone for coming.',
+            'Keep this under one minute.',
+            'Slide 2: Results',
+            'Orders up 12%',
+            'Returns down',
+            'Speaker notes:',
+            'Pause here for questions.',
+            'Slide 3: Next steps',
+            'Hire two people',
+          ],
+        },
+        {
+          heading: 'Printing the notes, or giving them to an AI chat',
+          paragraphs: ['Print / Save as PDF in the viewer prints the slides one per page, without the notes, and PowerPoint to PDF leaves the notes out too. For notes on paper, print the exported .txt file from any text editor. To hand the notes to ChatGPT, Claude or Gemini, PowerPoint to Markdown makes the same kind of outline with a token count; see giving a PowerPoint deck to an AI chat.'],
+          links: [{ text: 'PowerPoint to PDF', path: '/pptx-to-pdf' }, { text: 'PowerPoint to Markdown', path: '/pptx-to-markdown' }, { text: 'giving a PowerPoint deck to an AI chat', path: '/powerpoint-to-ai-chat' }],
+        },
+        {
+          heading: 'Other ways to read speaker notes',
+          paragraphs: ['Each of these comes from the maker\'s own help pages (checked 24 November 2026). For a wider comparison of the apps, see how to open a PPTX file without PowerPoint.'],
+          list: [
+            'PowerPoint: the notes pane sits under each slide, and there is also a Notes Page view, on the View tab. Under File, then Print, the Notes Pages layout prints one slide and its notes per page, and File, then Export, then Create Handouts sends the notes to Word, next to or below the slides.',
+            'PowerPoint for the web: you can write notes, but Microsoft says it cannot show them to you while you present; that needs the desktop app.',
+            'Google Slides: Presenter view, then Speaker notes, shows them while you present, and File, then Print settings and preview, then 1 slide with notes prints each slide with its notes.',
+            'Keynote on a Mac: it opens .pptx files, View, then Show Presenter Notes, shows the notes under the slide, and Apple says the notes can be printed along with the slides.',
+          ],
+          links: [
+            { text: 'how to open a PPTX file without PowerPoint', path: '/open-pptx-without-powerpoint' },
+            { text: 'Notes Page view, on the View tab', path: 'https://support.microsoft.com/en-us/office/choose-the-right-view-for-the-task-in-powerpoint-21332d8d-adbc-4717-a2c6-e25a697b40e9' },
+            { text: 'the Notes Pages layout prints one slide and its notes per page', path: 'https://support.microsoft.com/en-us/powerpoint/print-speaker-notes' },
+            { text: 'Microsoft says it cannot show them to you while you present', path: 'https://support.microsoft.com/en-us/office/add-speaker-notes-to-your-slides-26985155-35f5-45ba-812b-e1bd3c48928e' },
+            { text: 'Presenter view, then Speaker notes', path: 'https://support.google.com/docs/answer/1696787' },
+            { text: '1 slide with notes', path: 'https://support.google.com/docs/answer/143346' },
+            { text: 'it opens .pptx files', path: 'https://support.apple.com/guide/keynote/open-or-close-a-presentation-tan72232b56/mac' },
+            { text: 'Show Presenter Notes', path: 'https://support.apple.com/guide/keynote/add-and-view-presenter-notes-tand1a4ee7c/mac' },
+          ],
+        },
+        {
+          heading: 'Where those apps do more',
+          paragraphs: ['OpenAnyDoc\'s viewer is in beta and only reads. PowerPoint and Keynote let you write and change notes; here they can only be read, searched, heard and exported. The viewer shows notes as plain text, one line per paragraph, without bold, colours or bullet marks. PowerPoint, Google Slides and Keynote also print each slide\'s picture together with its notes, which the viewer does not, and the viewer does not play animations or transitions when you present.'],
+        },
+        {
+          heading: 'Can I edit speaker notes without PowerPoint?',
+          paragraphs: ['You can edit speaker notes without the PowerPoint app in PowerPoint for the web, which Microsoft says lets you create notes (checked 24 November 2026), or in Keynote on a Mac, where you type them below the slide. OpenAnyDoc\'s PowerPoint viewer only reads notes: it shows, searches, reads aloud and exports them, and never changes your file.'],
+          links: [{ text: 'which Microsoft says lets you create notes', path: 'https://support.microsoft.com/en-us/office/add-speaker-notes-to-your-slides-26985155-35f5-45ba-812b-e1bd3c48928e' }],
+        },
+        {
+          heading: 'Why does my presentation show no speaker notes?',
+          paragraphs: ['When the viewer says "This presentation has no speaker notes.", the file itself holds no notes text. That happens when the notes were never written, were deleted, or were typed into a text box on the slide instead. A picture pasted into the notes is not shown, and old .ppt files do not open here.'],
+        },
+        {
+          heading: 'Is my presentation uploaded when I read the notes?',
+          paragraphs: ['No, your presentation is not uploaded: your browser opens the .pptx file and reads its slides and notes on your own device. Search, read aloud, the presenter view and the outline export all run there, and they keep working offline once you have opened a presentation here. To check it yourself, see how to check that a website does not upload your file.'],
+          links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe the presentation and what you see in the notes pane (no personal data).`],
+        },
+      ],
+    },
+    '/compress-video-without-upload': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['To make a video small enough to email or send, lower its bitrate, and for a long video lower the picture size too, to 720p or 480p. A video\'s size is roughly its bitrate times its length, so a shorter or lower-bitrate video is a smaller file. Compress video does this in your browser: type the size you need in MB, or pick a quality, and the video never leaves your device.'],
+          links: [{ text: 'Compress video', path: '/compress-video' }],
+        },
+        {
+          heading: 'What makes a video file big',
+          paragraphs: ['A video file is mostly picture data, and its size follows one simple rule: size = bitrate × length. Bitrate is how many bits each second of video uses, counted in megabits per second (Mbps) or kilobits per second (kbps). Divide by 8 to get bytes. These decide how big that gets:'],
+          list: [
+            'Length: twice as long at the same bitrate is twice the size. Cutting the parts nobody needs is the cheapest saving.',
+            'Bitrate: the main dial. Halve it and the file is half the size; go too low and the picture turns blocky when things move fast.',
+            'Resolution: more pixels need more bitrate to look sharp. 1280 × 720 has 44% of the pixels of 1920 × 1080, so 720p looks clean at a much lower bitrate.',
+            'Frame rate: at 60 frames a second the same bitrate is spread over twice as many frames as at 30, so each frame gets less. Compressing keeps the frame rate as it is.',
+            'Sound: small next to the picture. Speech sounds fine at 96 kbps, which is about 0.7 MB a minute.',
+          ],
+        },
+        {
+          heading: 'A worked example: one minute of phone video',
+          paragraphs: ['Take a made-up clip: 60 seconds recorded at 16 Mbps, with sound. The numbers below are arithmetic, not a measurement of any phone.', 'Photos work differently: there you shrink the pixels and lower the JPG quality. For pictures, read how to reduce a photo\'s file size.'],
+          list: [
+            '16,000,000 bits × 60 seconds ÷ 8 = 120,000,000 bytes, about 120 MB. The tool shows it as 114.4 MB, because it counts a megabyte as 1,048,576 bytes.',
+            'To email it under a 25 MB limit, type 20 as the target size. The tool aims 3% under that, keeps 96 kbps for the sound and gives the picture the rest: about 2.6 Mbps, a sixth of the original.',
+            'The same 20 MB for a 3-minute clip leaves about 0.8 Mbps for the picture. That is thin for 1080p, so also choose 720p or 480p.',
+            'The floor: the tool won\'t give the picture less than 150 kbps. With the sound, that is about 1.8 MB for each minute, so a 10-minute video can\'t get under about 17.6 MB. Trim it, or share a link instead.',
+          ],
+          links: [{ text: 'reduce a photo\'s file size', path: '/reduce-photo-file-size' }],
+        },
+        {
+          heading: 'Size limits of common places to send a video',
+          paragraphs: ['Each service sets its own limit and can change it. These numbers come from each service\'s own help page (checked 24 November 2026). Aim a little under the limit.'],
+          list: [
+            'Gmail: 25 MB for personal accounts; bigger attachments are replaced by a Google Drive link (Gmail Help). Work and school accounts follow their administrator\'s limit.',
+            'Outlook.com: 25 MB for attached files, or 2 GB for a file shared from OneDrive (Outlook.com sending limits).',
+            'WhatsApp: a default video limit of 100 MB at 720p on a faster connection and 64 MB at 480p on a slower one; documents can be up to 2 GB (WhatsApp Help Center).',
+            'Discord: free accounts have a smaller limit per file than paid ones; read the current number in Discord\'s File Attachments FAQ before you compress.',
+            'Forms and portals: the page usually states its limit next to the upload button. Use that number.',
+          ],
+          links: [
+            { text: 'Gmail Help', path: 'https://support.google.com/mail/answer/6584' },
+            { text: 'Outlook.com sending limits', path: 'https://support.microsoft.com/en-us/outlook/sending-limits-in-outlook-com' },
+            { text: 'WhatsApp Help Center', path: 'https://faq.whatsapp.com/453914586839706' },
+            { text: 'File Attachments FAQ', path: 'https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ' },
+          ],
+        },
+        {
+          heading: 'How to compress a video in your browser',
+          paragraphs: ['Open Compress video and choose or drop the video: MP4, MOV, WebM, MKV, M4V or 3GP. Only the first video you choose is compressed.'],
+          list: [
+            'To meet a limit: click To a file size and type the size in MB; the box starts at half the original size. The result lands near that size, usually within a few percent, so type a little under the limit, for example 20 for 25 MB. If the size is too small to stay watchable, the page says so and gives the smallest size it can make.',
+            'To keep it simple: click By quality and pick Smallest file, Small file, Balanced or Best picture. Small file is chosen to start with.',
+            'To save the most: under Also make it smaller, choose 1080p, 720p or 480p. Only sizes smaller than your video are offered, and the shape is kept, so a tall phone video stays tall.',
+            'Before you start, the page shows the original size and the new one. With By quality, the new size is measured by compressing the first 3 seconds and scaling up, so a video that gets busier later can come out larger.',
+            'Click Compress video, watch the result on the page, then download it. A long job can be cancelled.',
+          ],
+          links: [{ text: 'Compress video', path: '/compress-video' }],
+        },
+        {
+          heading: 'What file you get, and which browsers work',
+          paragraphs: ['The compressed video keeps its format when it is MP4, MOV, WebM or MKV; M4V and 3GP videos become MP4. It is named after the original with -compressed added, for example clip-compressed.mp4.', 'An MP4 or MOV is made with H.264 video and AAC sound when the browser can make them (otherwise with another codec the format allows), the pair that most phones, computers and chat apps play. A WebM uses VP9 and Opus when the browser can make them. Recent Chrome and Edge read and make the most formats, and Safari and Firefox work with most videos. If your browser can\'t read or make a codec, the page names it and says what to try instead.', 'Long or 4K videos take a while and need free memory, because the new file is built on your device. Afterwards, Trim video cuts a start or end you don\'t need, and Resize video makes it square or a story size.'],
+          links: [{ text: 'Trim video', path: '/trim-video' }, { text: 'Resize video', path: '/resize-video' }],
+        },
+        {
+          heading: 'Should I lower the quality or the picture size?',
+          paragraphs: ['Lowering the picture size usually saves more than lowering the quality, and it looks sharp on a phone screen. With By quality, the bitrate the tool uses follows the number of pixels, so 720p carries far less data than 1080p at the same setting. Keep the full size for short clips or when people will watch on a large screen.'],
+        },
+        {
+          heading: 'Why does it say my video can\'t get that small?',
+          paragraphs: ['The tool won\'t give the picture less than 150 kilobits per second, because below that a video stops being watchable. With 96 kbps for the sound, that floor is about 1.8 MB for every minute of video. If your limit is lower than that, trim the video first, or send a link to the file instead of the file itself.'],
+        },
+        {
+          heading: 'Is my video uploaded when I compress it?',
+          paragraphs: ['No, your video is compressed by your own browser, with the video encoders built into it, and nothing is sent to a server. You can check this yourself: open your browser\'s network panel, compress a video and look for an upload; there is none. The original file on your device is never changed either.'],
+          links: [{ text: 'check this yourself', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} with the video's format, its length and the size you need to reach (no personal data, and please don't attach the video).`],
+        },
+      ],
+    },
+    '/file-too-large-for-chatgpt': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['If a file is too large for ChatGPT, Claude or Gemini, send less of it: keep only the pages, sheets or rows your question needs, split the rest into parts, and paste each part as compact text. First check which limit you hit, because the upload size limit and the chat\'s token limit are fixed in different ways. OpenAnyDoc\'s Token counter measures the file and its split and convert tools cut it down, all in your browser without uploading it.'],
+          links: [{ text: 'Token counter', path: '/token-counter' }],
+        },
+        {
+          heading: 'Two different limits',
+          paragraphs: [
+            'An AI chat can refuse a file for two separate reasons. The first is the upload limit: the size in megabytes, the number of files or the number of pages the service accepts. The second is the context window: how much text, counted in tokens, the model can read at one time. A file can pass the first and still overflow the second.',
+            'This is what each service\'s own help page says (checked 24 November 2026):',
+          ],
+          list: [
+            'ChatGPT: documents up to 512 MB per file, text and document files capped at 2 million tokens per file, and CSV files and spreadsheets about 50 MB, depending on the size of each row. Source: ChatGPT\'s help page on uploading files.',
+            'Claude: in a chat, 500 MB per file, up to 20 files, and PDFs up to 1,000 pages; for a PDF of more than 100 pages it reads the text only. Additional token limits may apply based on the length of the extracted text. Source: Claude\'s help page on uploads.',
+            'Gemini: up to 10 files in one prompt and 100 MB per file other than video. Its help page explains that with a context window of 1 million tokens Gemini can read up to 1,500 pages of text, and that going past the window can lead to answers that miss part of the content. Source: Gemini Apps Help.',
+            'Limits change with the plan and the model, and the help pages change too; check them before you rely on a number.',
+          ],
+          links: [
+            { text: 'ChatGPT\'s help page on uploading files', path: 'https://help.openai.com/en/articles/8555545-file-uploads-faq' },
+            { text: 'Claude\'s help page on uploads', path: 'https://support.claude.com/en/articles/8241126-what-kinds-of-documents-can-i-upload-to-claude-ai' },
+            { text: 'Gemini Apps Help', path: 'https://support.google.com/gemini/answer/14903178?hl=en' },
+          ],
+        },
+        {
+          heading: 'A 1 MB file can still be too long',
+          paragraphs: [
+            'Megabytes say little about tokens. We made a synthetic CSV of 20,000 orders with 7 columns (order number, date, region, product code, quantity, unit price, total) and counted it with the same counter the site uses:',
+            'So the file is far below every upload limit above, yet its text alone would fill more than half of a 1-million-token context window before any question or answer. Other models count tokens their own way, so for them these numbers are estimates. Why tables, Arabic and the model change the count is explained in how many tokens a PDF uses.',
+          ],
+          list: [
+            'The whole file: 1.02 MB and 590,807 tokens, about 29.5 tokens per row.',
+            'The first 1,000 rows: 29,541 tokens. The first 5,000 rows: 147,670 tokens.',
+            'The same 1,000 rows as indented JSON: 70,529 tokens, more than twice the CSV.',
+            'The same 1,000 rows as a Markdown table: 34,559 tokens; as TOON: 30,545 tokens.',
+          ],
+          links: [{ text: 'how many tokens a PDF uses', path: '/how-many-tokens-is-my-pdf' }],
+        },
+        {
+          heading: 'Measure the file first',
+          paragraphs: ['Token counter reads the file on your device and shows the tokens, words and characters of the text you would paste:'],
+          list: [
+            'Open Token counter and drop the file, or paste text. It reads PDF, Word, PowerPoint, Excel, CSV, JSON, TXT and Markdown files.',
+            'Compare the count with the limit of the chat you use, and leave room for your question and the answer.',
+            'Delete what you do not need in the text box; the count updates as you edit.',
+            'If a PDF counts 0 tokens, it is a scan with no text in it. Run OCR PDF first.',
+          ],
+          links: [{ text: 'OCR PDF', path: '/ocr-pdf' }],
+        },
+        {
+          heading: 'Keep only what the question needs',
+          paragraphs: ['The surest fix is to send less. Pick the tool for your file type:'],
+          list: [
+            'PDF: Extract PDF pages saves only the pages you click as a new PDF, such as the one chapter or the three tables you are asking about.',
+            'A long PDF you need in full: Split PDF cuts it by page ranges, every few pages, or one file per page.',
+            'Word: Split Word cuts a .docx at its Heading 1 or Heading 2 titles, or at page breaks, so each part is a whole section.',
+            'Excel: Split Excel makes one file per sheet, one file every N rows, or one file per value of a column, such as one file per region.',
+            'CSV: Split CSV cuts the file by rows per file or by megabytes per file, with the header row in every part. Filter rows or hide columns first, and the parts hold only those.',
+          ],
+          links: [{ text: 'Extract PDF pages', path: '/extract-pdf-pages' }, { text: 'Split PDF', path: '/split-pdf' }, { text: 'Split Word', path: '/split-word' }, { text: 'Split Excel', path: '/split-excel' }, { text: 'Split CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'Make the text smaller',
+          paragraphs: ['The same content can cost very different numbers of tokens depending on its form, and pasting text lets you see exactly what the chat gets:'],
+          list: [
+            'PDF: PDF to Markdown turns the pages into text with headings, lists and tables marked, so you can read what the chat will read and trim it. Giving ChatGPT a PDF without losing the tables covers the tables.',
+            'Spreadsheets: paste CSV rather than JSON; in the test above it took less than half the tokens. Giving an AI chat a spreadsheet compares CSV with Markdown tables.',
+            'JSON records: JSON to TOON writes the same list of records with the field names once at the top, and shows the token count before and after. Deeply nested data saves little.',
+            'Columns nobody asked about cost tokens on every row; remove them before you paste.',
+          ],
+          links: [
+            { text: 'PDF to Markdown', path: '/pdf-to-markdown' },
+            { text: 'Giving ChatGPT a PDF without losing the tables', path: '/pdf-to-ai-chat-with-tables' },
+            { text: 'Giving an AI chat a spreadsheet', path: '/spreadsheet-to-ai-chat' },
+            { text: 'JSON to TOON', path: '/json-to-toon' },
+          ],
+        },
+        {
+          heading: 'Paste it in parts',
+          paragraphs: [
+            'When everything is needed, send it in parts in one conversation. Start with a short message such as "I will send a report in 4 parts. Reply only OK until I send part 4, then answer my question." Label each part ("Part 2 of 4: pages 11 to 20"), keep each one well inside the limit, and ask your question after the last part.',
+            'All the parts sit in the same context window, so splitting does not add room: if the total is too large, the chat may miss details from the early parts. For a question about one section, a new chat with only that section works better. Before you paste, Mask data can replace names, email addresses and other personal data in a CSV, JSON, Excel or text file on your device.',
+          ],
+          links: [{ text: 'Mask data', path: '/mask-data' }],
+        },
+        {
+          heading: 'Why did the chat ignore part of my file?',
+          paragraphs: ['The chat probably read more than its context window holds. When a file is longer than the window, a service may answer from only part of it or miss details spread through it, and Gemini\'s help page says so directly. Count the text first, send only the pages or rows the question needs, and ask again in a new chat.'],
+        },
+        {
+          heading: 'How many rows of a spreadsheet can I paste at once?',
+          paragraphs: ['It depends on the number of columns and the length of the values, so count a sample rather than guess. In our test, a 7-column order table took about 29.5 tokens per row. Divide the room you have by your own tokens per row, then set Split CSV or Split Excel to that many rows per file.'],
+        },
+        {
+          heading: 'Does counting or splitting the file upload it anywhere?',
+          paragraphs: ['No, the file is read and split in your browser, and nothing is sent to a server or to an AI service. The only thing that reaches the chat is the text you paste yourself. You can check for yourself that nothing is uploaded by watching the network panel while a tool runs.'],
+          links: [{ text: 'check for yourself that nothing is uploaded', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and say which kind of file and which chat you are working with (no personal data).`],
+        },
+      ],
+    },
+    '/best-free-csv-viewers': {
+      published: '2026-11-24',
+      updated: '2026-11-25',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['The best free CSV viewer is the one that fits your file: a browser viewer for private or very large files, a spreadsheet app when you need formulas, and a text editor to see the raw text. OpenAnyDoc\'s CSV viewer opens a CSV as a table you can search, sort and edit in your browser, and the file is never uploaded. Below are five other free options and what each one\'s own site says about it.'],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }],
+        },
+        {
+          heading: 'How we chose',
+          paragraphs: ['Each tool here had to pass three tests. The list is in no ranked order, and OpenAnyDoc comes first only because it is our own site, so judge it by the same facts as the others:'],
+          list: [
+            'Free to use for viewing with no time limit, according to its own site.',
+            'Opens a .csv file on a computer, as a table or as plain text.',
+            'For each app or service, its strengths and limits come from its own pages, which are linked below and were checked on 24 November 2026 (the desktop CSV apps again on 25 November 2026). Where a page says nothing, we say so instead of guessing. The text editors that come with Windows and macOS are described from what you see when a CSV opens in them.',
+          ],
+        },
+        {
+          heading: 'OpenAnyDoc CSV viewer, in your browser',
+          paragraphs: [
+            'Drop a .csv, .tsv or .tab file on the CSV viewer. It detects the separator (comma, semicolon, tab or pipe) and the encoding (UTF-8, UTF-16, the older Windows-1256 used for Arabic, or Windows-1252 for Western European letters), and shows the rows as a table you can search, filter, sort and edit, with undo. Every cell is read as text, so leading zeros and long ID numbers stay as written. You can also run SQL queries on the table and download it as CSV or as an Excel workbook.',
+            'Limits: the viewer has no row limit of its own, but the file has to fit in your device\'s memory, and a file over 50 MB shows a warning first. It shows values only, because a CSV holds no formulas or formatting. For very big exports, the large CSV viewer opens the same viewer with a hint on cutting the file down.',
+          ],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }, { text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'Free spreadsheet apps (checked 24 November 2026)',
+          paragraphs: ['Two free spreadsheets open a CSV as a sheet:'],
+          list: [
+            'Google Sheets works in your web browser. Its product page says "Anyone with a Google Account can create in Sheets". To open a CSV, choose File, then Import in a spreadsheet; the import help page lists .csv, .tsv and .txt among the formats and can detect the separator automatically. Google\'s page on files you can store in Google Drive allows up to 20 million cells or 100MB for spreadsheets created in or converted to Google Sheets.',
+            'LibreOffice Calc is part of LibreOffice, which its site calls "free and open source software". Opening a CSV shows a Text Import window first, where you set the character set, the separator and the type of each column, which helps with Arabic text and with files that would land in one column.',
+          ],
+          links: [
+            { text: 'product page', path: 'https://workspace.google.com/products/sheets/' },
+            { text: 'import help page', path: 'https://support.google.com/docs/answer/40608' },
+            { text: 'files you can store in Google Drive', path: 'https://support.google.com/drive/answer/37603' },
+            { text: 'free and open source software', path: 'https://www.libreoffice.org/discover/libreoffice/' },
+            { text: 'Text Import window', path: 'https://help.libreoffice.org/latest/en-US/text/shared/00/00000208.html' },
+          ],
+        },
+        {
+          heading: 'Desktop CSV apps (checked 25 November 2026)',
+          paragraphs: ['Two desktop apps are made for CSV files rather than for spreadsheets:'],
+          list: [
+            'Modern CSV runs on Windows, macOS and Linux. Its buy page says "You may use the Free version as long as you wish", and its home page says it is designed for files that overwhelm most spreadsheet applications. The Free version includes basic filters and hiding rows or columns, and leaves out SQL queries and SQL filters, pivot tables, charts, and merging or splitting files; those come with a paid licence (US$49 a year, or US$69 once).',
+            'Tad runs on macOS, Linux and Windows. Its site describes it as a free desktop application for viewing and analysing tabular data, "a fast viewer for CSV and Parquet files" that supports large files.',
+          ],
+          links: [
+            { text: 'buy page', path: 'https://www.moderncsv.com/buy/' },
+            { text: 'home page', path: 'https://www.moderncsv.com/' },
+            { text: 'Its site', path: 'https://www.tadviewer.com/' },
+          ],
+        },
+        {
+          heading: 'A text editor you already have',
+          paragraphs: ['Notepad on Windows and TextEdit on a Mac show the raw file: one row per line, with the separators visible. It is the quickest way to see which separator a file uses, whether the first line holds the headers, and whether values are wrapped in quotes. A wide table is hard to read this way, and deleting a single separator shifts every later value into the wrong column, so edit with care.'],
+        },
+        {
+          heading: 'Where the others do more',
+          paragraphs: ['To be fair about the choice: Google Sheets lets several people edit the same spreadsheet at the same time, and both it and LibreOffice Calc have formulas, pivot tables and charts, according to the Google Sheets page and LibreOffice\'s help pages on Calc features and on pivot tables (checked 24 November 2026). Modern CSV\'s paid licence adds pivot tables, charts and SQL to a desktop app, and Tad also opens some database files. OpenAnyDoc edits the values in a CSV and saves CSV or Excel files, but it has no formulas and no live copy that a team edits together.'],
+          links: [{ text: 'Google Sheets page', path: 'https://workspace.google.com/products/sheets/' }, { text: 'Calc features', path: 'https://help.libreoffice.org/latest/en-US/text/scalc/main0503.html' }, { text: 'on pivot tables', path: 'https://help.libreoffice.org/latest/en-US/text/scalc/guide/datapilot.html' }],
+        },
+        {
+          heading: 'Which free CSV viewer opens the largest files?',
+          paragraphs: ['No program has one fixed answer, because the real limit is usually your computer\'s memory. Google Sheets stops at 20 million cells per spreadsheet and spreadsheet apps stop at a row limit, while OpenAnyDoc has no row limit of its own and Modern CSV and Tad say they handle large files. Try your own file; CSV too big for Excel explains the other options.'],
+          links: [{ text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'Can I open a CSV without uploading it anywhere?',
+          paragraphs: ['Yes, any program that reads the file on your own device does that: a text editor, LibreOffice Calc, a desktop CSV app, or OpenAnyDoc in your browser. Google Sheets works with spreadsheets kept in Google Drive. To check a website yourself, watch the browser\'s network panel while the file opens, as shown in how to check that a website does not upload your file.'],
+          links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'How do I open a CSV on my phone?',
+          paragraphs: ['Use your phone\'s browser: on OpenAnyDoc\'s CSV viewer, tap Choose a file and pick the CSV from Files or your downloads, and it opens as a table in a phone layout, with the tools in a menu. Nothing is installed and the file stays on the phone. More ways, on every device, are in how to open a CSV file without Excel.'],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }, { text: 'how to open a CSV file without Excel', path: '/open-csv-without-excel' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and tell us which CSV viewer we should look at next (no personal data).`],
+        },
+      ],
+    },
+    '/best-free-json-formatters': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['A JSON formatter that runs on your own computer keeps your JSON there: the JSON viewer built into Firefox, a code editor such as VS Code, or the jq command line. Among websites, JSONLint and JSON Crack say on their own pages that your JSON is processed in your browser, and OpenAnyDoc\'s JSON formatter formats it in your browser with no save or share feature at all. Below is what each one\'s pages say, in their own words where it matters.'],
+          links: [{ text: 'JSON formatter', path: '/json-formatter' }],
+        },
+        {
+          heading: 'How we chose',
+          paragraphs: ['Every tool here is free to use and pretty prints JSON. We report only what each tool\'s own pages say about where pasted JSON goes, checked on 24 November 2026, and say so when a page is silent. The list is in no ranked order; OpenAnyDoc is our own site, so hold it to the same standard.'],
+        },
+        {
+          heading: 'OpenAnyDoc JSON formatter',
+          paragraphs: [
+            'Paste JSON or open a .json file of up to 10 MB, then press Format to pretty print it with 1, 2, 3, 4 or 8 spaces or a tab, or Minify to put it on one line. Sort keys orders every object A to Z, and integers longer than JavaScript can hold are kept digit for digit. If the JSON is invalid, the JSON validator shows the line and column of the error, and Repair fixes trailing commas, comments and single quotes.',
+            'The JSON stays in the page\'s memory until you download a copy. There is no save-online button, no share link, no account and no analytics, and the page\'s security policy only lets it contact its own site. The one exception is Open from a URL, which fetches the https address you type straight from your browser. Once loaded, the page works offline.',
+          ],
+          links: [{ text: 'JSON validator', path: '/json-validator' }],
+        },
+        {
+          heading: 'Built into tools you may already have (checked 24 November 2026)',
+          paragraphs: ['These format JSON on your own computer:'],
+          list: [
+            'Firefox: its documentation says "Firefox includes a JSON viewer". Open a JSON file or address in the browser and it shows a collapsible tree with a filter box, the raw text, and a pretty-printed version. It also reads JSON Lines, though it does not pretty print them.',
+            'VS Code: free "for private or commercial use", says its FAQ. Format Document (Shift+Alt+F on Windows) pretty prints a JSON file, and the editor checks it against a JSON schema as you type. The same FAQ says it sends usage data to Microsoft, which the Telemetry Level setting turns off, and the JSON documentation says it can download schemas from http and https addresses.',
+            'jq: "a lightweight and flexible command-line JSON processor" for Linux, macOS and Windows. Its manual says "By default, jq pretty-prints JSON output", so jq . file.json prints a file formatted; --indent sets up to 7 spaces, --tab uses tabs, and -c puts each object on one line.',
+          ],
+          links: [
+            { text: 'its documentation', path: 'https://firefox-source-docs.mozilla.org/devtools-user/json_viewer/index.html' },
+            { text: 'its FAQ', path: 'https://code.visualstudio.com/docs/supporting/faq' },
+            { text: 'JSON documentation', path: 'https://code.visualstudio.com/docs/languages/json' },
+            { text: 'command-line JSON processor', path: 'https://jqlang.org/' },
+            { text: 'Its manual', path: 'https://jqlang.org/manual/' },
+          ],
+        },
+        {
+          heading: 'JSON formatter websites (checked 24 November 2026)',
+          paragraphs: ['What the sites themselves say:'],
+          list: [
+            'JSONLint, a validator and reformatter: the JSONLint privacy policy says "All JSON validation happens client-side in your browser" and "Your JSON data is never sent to our servers for processing". The same policy names Google Analytics and an advertising partner that may set cookies. The JSONLint home page also accepts a URL and "will scrape it for JSON"; it does not say where that fetch runs.',
+            'JSON Crack, which draws JSON as a graph: the JSON Crack home page says "Your data is never stored on our servers. Everything happens on your device." It supports about 300 KB of data, depending on the data and your hardware, and the JSON Crack privacy policy names Google Analytics.',
+            'jsonformatter.org and Code Beautify both have a save-online feature, and their own pages say saved JSON can become public unless you log in. What each one says is in our jsonformatter.org alternative guide.',
+          ],
+          links: [
+            { text: 'JSONLint privacy policy', path: 'https://jsonlint.com/privacy' },
+            { text: 'JSONLint home page', path: 'https://jsonlint.com/' },
+            { text: 'JSON Crack home page', path: 'https://jsoncrack.com/' },
+            { text: 'JSON Crack privacy policy', path: 'https://jsoncrack.com/legal/privacy' },
+            { text: 'jsonformatter.org alternative guide', path: '/jsonformatter-alternative' },
+          ],
+        },
+        {
+          heading: 'Side by side',
+          paragraphs: ['The main differences, from the pages above:'],
+          list: [
+            'Where the JSON is formatted: Firefox, VS Code and jq on your computer; JSONLint, JSON Crack and OpenAnyDoc in your browser, by their own pages.',
+            'Save-online links: jsonformatter.org and Code Beautify offer them; OpenAnyDoc has none.',
+            'Analytics named in the privacy policy: Google Analytics for JSONLint and JSON Crack; OpenAnyDoc has no analytics.',
+            'Size: JSON Crack about 300 KB; OpenAnyDoc 10 MB; the other pages we checked state no limit.',
+            'Offline: Firefox, VS Code and jq always; OpenAnyDoc once the page has loaded.',
+          ],
+        },
+        {
+          heading: 'Where the others do more',
+          paragraphs: ['To be fair about the choice: jq filters, reshapes and combines JSON inside scripts and pipelines, which no web page does for you. VS Code checks JSON against a schema while you edit and handles JSON next to your code. Firefox shows the request and response headers of JSON from a server. OpenAnyDoc\'s formatter stops at 10 MB and checks syntax only; for schemas there is a separate JSON Schema page, and JSON graph draws a file as connected boxes.'],
+          links: [{ text: 'JSON Schema page', path: '/json-schema' }, { text: 'JSON graph', path: '/json-graph' }],
+        },
+        {
+          heading: 'Is it safe to paste JSON with API keys into an online formatter?',
+          paragraphs: ['It is safe only when the JSON never leaves your device, so check what the site says and what it does. A formatter that runs in your browser keeps the keys on your device, while one with save-online or share links can make them public by mistake. Better still, remove secrets before you paste, and replace any key already pasted somewhere you do not trust.'],
+        },
+        {
+          heading: 'How can I check that a JSON formatter does not upload my data?',
+          paragraphs: ['Open your browser\'s developer tools, switch to the Network tab, then paste and format the JSON: any request that carries your text appears there. A page that keeps the data local makes no such request. How to check that a website does not upload your file walks through it step by step, in Chrome, Edge, Firefox and Safari.'],
+          links: [{ text: 'How to check that a website does not upload your file', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'What is the quickest way to pretty print JSON without a website?',
+          paragraphs: ['If you have Firefox, open the .json file in it and switch to the pretty-printed view. In a terminal, jq . file.json prints the file formatted, and in VS Code, Format Document does the same. All three do the formatting on your own computer, so you never paste the JSON into a web page.'],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} and describe what you need (no personal data, and never paste a real token).`],
+        },
+      ],
+    },
+    '/openanydoc-vs-google-sheets-large-files': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['To open and search a very large CSV, a viewer that reads the file on your own device has the fewest limits: OpenAnyDoc\'s large CSV viewer has no row limit of its own, only your device\'s memory, and nothing is uploaded. Google Sheets holds up to 20 million cells per spreadsheet, a desktop Excel sheet stops at 1,048,576 rows, and Excel for the web opens workbooks of up to 100 MB in the browser, depending on your Microsoft 365 subscription. The spreadsheets still win when you need formulas, charts or a team editing together.'],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'The official limits (checked 24 November 2026)',
+          paragraphs: ['From each product\'s own pages:'],
+          list: [
+            'Google Sheets: "Up to 20 million cells or 100MB for spreadsheets that are created in or converted to Google Sheets", from Google\'s page on files you can store in Google Drive.',
+            'Excel on a computer: a worksheet is 1,048,576 rows by 16,384 columns, and a cell holds up to 32,767 characters, from Excel specifications and limits. 64-bit Excel has no hard limit on the file size of a Data Model workbook; 32-bit Excel shares 2 GB of address space with the workbook and add-ins.',
+            'Excel for the web: the browser limit is 0–100 MB for workbooks in a SharePoint Online library and 0–10 MB for a workbook attached to an email in Outlook Web App, and Microsoft says it depends on your Microsoft 365 subscription, from File size limits for workbooks in SharePoint.',
+            
+            'OpenAnyDoc: no row limit of its own; the file has to fit in your device\'s memory, and a file over 50 MB shows a warning before it opens.',
+          ],
+          links: [
+            { text: 'files you can store in Google Drive', path: 'https://support.google.com/drive/answer/37603' },
+            { text: 'Excel specifications and limits', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' },
+            { text: 'File size limits for workbooks in SharePoint', path: 'https://support.microsoft.com/en-us/office/file-size-limits-for-workbooks-in-sharepoint-9e5bc6f8-018f-415a-b890-5452687b325e' },
+          ],
+        },
+        {
+          heading: 'What OpenAnyDoc does with a large CSV',
+          paragraphs: [
+            'Drop the file on the large CSV viewer and your browser reads it on your device; nothing is sent to a server. The rows are read in the background and arrive in batches of 10,000, and only the rows on screen, plus a few around them, are drawn, so scrolling stays smooth. In OpenAnyDoc\'s own test, a 120,000-row file with 8 columns opened in about half a second on a laptop.',
+            'With the file open you can search every column, filter, sort by several columns, see group-by totals and run SQL queries on the table. To get a file a spreadsheet can take, keep only the filtered rows with Download options in the More menu, or cut the file into parts with Split CSV, each part starting with the header row.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'Split CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'Desktop CSV editors (checked 24 November 2026)',
+          paragraphs: ['Desktop apps made for CSV avoid a spreadsheet\'s grid limits too. The Modern CSV home page says it "handles files beyond Excel\'s million-row limit" and, from its own testing, loads a file 28 times faster than Excel; its Free version can be used for as long as you wish. Tad\'s site calls it a free desktop viewer for CSV and Parquet files that "supports large files". Neither page states a maximum file size. More free programs are listed in how to open a CSV file without Excel.'],
+          links: [
+            { text: 'Modern CSV home page', path: 'https://www.moderncsv.com/' },
+            { text: 'Tad\'s site', path: 'https://www.tadviewer.com/' },
+            { text: 'how to open a CSV file without Excel', path: '/open-csv-without-excel' },
+          ],
+        },
+        {
+          heading: 'A test you can run yourself',
+          paragraphs: ['Make a synthetic CSV and open it in each program. With Node.js installed on macOS or Linux, this one line writes big.csv: a header and 2,000,000 rows of made-up data in 10 columns.'],
+          list: [
+            'node -e "const f=require(\'fs\').createWriteStream(\'big.csv\');f.write(\'id,city,amount,date,code,a,b,c,d,e\\n\');for(let i=1;i<=2e6;i++)f.write(i+\',City\'+i%50+\',\'+i%997+\'.50,2026-01-\'+String(1+i%28).padStart(2,\'0\')+\',C\'+i%10000+\',1,2,3,4,5\\n\');f.end()"',
+            'The file is 96,046,244 bytes (about 96 MB) and holds 20,000,010 cells, counting the header row. That is more rows than an Excel sheet holds and just over Google Sheets\' 20 million cells, while still under its 100MB figure. In OpenAnyDoc it passes 50 MB, so the size warning appears first.',
+            'For each program, write down whether all 2,000,000 rows arrived and how long opening took. Change 2e6 to 1e6 for a file that fits in one Excel sheet.',
+          ],
+        },
+        {
+          heading: 'Where Google Sheets and Excel do more',
+          paragraphs: ['Spreadsheets are built for work a viewer does not do. Google Sheets lets several people edit the same spreadsheet at the same time, with formulas, pivot tables and charts, as the Sheets product page says. Excel has formulas, PivotTables, charts and Power Query, and its Data Model can hold millions of rows, more than a sheet, as Microsoft\'s page on a memory-efficient Data Model says (both checked 24 November 2026); CSV too big for Excel shows the steps. OpenAnyDoc edits values and saves CSV or Excel files, but it has no formulas and no live copy that a team edits together.'],
+          links: [{ text: 'Sheets product page', path: 'https://workspace.google.com/products/sheets/' }, { text: 'memory-efficient Data Model', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'Which one to use',
+          paragraphs: ['Match the tool to the job:'],
+          list: [
+            'Looking through, searching or cutting down a big export: OpenAnyDoc\'s large CSV viewer, or a desktop CSV app.',
+            'A file a team must edit together: Google Sheets, if it fits in 20 million cells.',
+            'Formulas and pivot tables within a sheet\'s row limit: Excel or LibreOffice Calc on a computer.',
+            'More rows than that in Excel: load the CSV into the Data Model, or split it first.',
+            'Customer exports and other private data: a tool that reads the file on your device, within your company\'s rules on where data may go.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'split it first', path: '/split-csv' }],
+        },
+        {
+          heading: 'Can Google Sheets open a CSV with more than a million rows?',
+          paragraphs: ['It can, as long as the whole spreadsheet stays within Google\'s limit of 20 million cells or 100MB. Divide 20 million by the number of columns to find the most rows that fit: a 10-column file fits just under 2 million rows, a 40-column file only 500,000. Other sheets in the same spreadsheet count toward the limit too.'],
+        },
+        {
+          heading: 'Is Excel for the web better than desktop Excel for big files?',
+          paragraphs: ['Usually not. Microsoft lists a browser limit of 0–100 MB for workbooks in SharePoint Online, depending on your subscription, and 10 MB for a workbook opened from an Outlook Web App attachment. Above the limit, its page File size limits for workbooks in SharePoint suggests downloading the workbook and opening it in Excel on your device (checked 24 November 2026).'],
+          links: [{ text: 'File size limits for workbooks in SharePoint', path: 'https://support.microsoft.com/en-us/office/file-size-limits-for-workbooks-in-sharepoint-9e5bc6f8-018f-415a-b890-5452687b325e' }],
+        },
+        {
+          heading: 'Does my CSV leave my computer when I open it in OpenAnyDoc?',
+          paragraphs: ['No. Your browser reads the file on your device, and the page makes no request that carries your file, so there is no upload to wait for, even with a large export. You can watch it yourself in the browser\'s network panel, as described in how to check that a website does not upload your file.'],
+          links: [{ text: 'how to check that a website does not upload your file', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} with the file\'s size, rows and columns (no personal data), and what you need to do with it.`],
+        },
+      ],
+    },
+    '/large-csv-test': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: [
+            'A CSV with 3,000,000 rows does not fit in one Excel worksheet, which stops at 1,048,576 rows, and at 8 columns it is more than Google Sheets\' 20 million cells. Tools with no row limit of their own can open the whole file if the device has the memory, and OpenAnyDoc\'s large CSV viewer is one of them: it reads the file in your browser and uploads nothing. Below are the test file, what each of six tools\' published limits mean for it, and the steps to run the test on your own computer.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'The test file',
+          paragraphs: ['Write the file with a short script, so it holds no real data:'],
+          list: [
+            'Rows: 3,000,000 data rows plus one header row, so 3,000,001 lines.',
+            'Columns (8): order_id, order_date, region, category, product_code, quantity, unit_price, total.',
+            'A typical line: 2,2025-07-10,South,Ink,P-99703,8,25.48,203.84.',
+            'Size: well over 100 MB, depending on the random values; note your own file\'s size.',
+            'Format: UTF-8 without a byte order mark, commas between fields, a line feed at the end of each line, no quoted fields.',
+            'Cells: 3,000,001 lines × 8 columns = 24,000,008 cells.',
+          ],
+        },
+        {
+          heading: 'The computer, the browser and the rules',
+          paragraphs: ['Open the same file on the same computer in every tool, one at a time, with nothing else running. Time each one from dropping or opening the file until the last row can be reached, and write down:'],
+          list: [
+            'Computer: model, processor, memory.',
+            'Operating system.',
+            'Browser for OpenAnyDoc and Google Sheets: name and version.',
+            'Excel: version and build, 32-bit or 64-bit. LibreOffice Calc: version. Text editor: name and version.',
+            'Test date. The official limits below were checked 24 November 2026.',
+          ],
+        },
+        {
+          heading: 'What to expect in each tool',
+          paragraphs: [
+            'The Excel and Google Sheets lines follow from each product\'s published limit; for the rest, write down what you see.',
+          ],
+          list: [
+            'OpenAnyDoc large CSV viewer: a warning first, because the file is over 50 MB. Note how long the file takes to open and how many rows it reports. After it opens, a hint explains how to cut the file down for Excel. Time a sort by one column and a search too.',
+            'OpenAnyDoc CSV viewer: the same viewer without the hint; note how long it takes to open.',
+            'Excel (desktop): a worksheet holds 1,048,576 rows, so Excel can load at most the header and 1,048,575 data rows of this file. 3,000,000 − 1,048,575 = 1,951,425 rows, 65% of the data, are left out. Note the message shown and the time taken.',
+            'Google Sheets (File, Import): a spreadsheet holds up to 20 million cells, so at 8 columns it holds at most 20,000,000 ÷ 8 = 2,500,000 rows, the header included, and 500,001 data rows would not fit. The same limit page also says 100MB per spreadsheet, and this file is over 100 MB. Note whether the import fails outright or loads part of the file.',
+            'LibreOffice Calc: note what it shows and how many rows arrive.',
+            'Text editor: note whether it opens the file, how long it takes, and whether scrolling and search keep up.',
+          ],
+          links: [
+            { text: 'a worksheet holds 1,048,576 rows', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' },
+            { text: 'a spreadsheet holds up to 20 million cells', path: 'https://support.google.com/drive/answer/37603' },
+          ],
+        },
+        {
+          heading: 'How OpenAnyDoc reads a file this big',
+          paragraphs: [
+            'Nothing is sent to a server. The browser reads the whole file into the tab\'s memory, and a background worker splits it into rows so the page stays responsive. The rows come back to the page in batches of 10,000, 301 batches for this file, and only the rows on screen are drawn, so scrolling does not slow down as the table grows. The viewer has no row limit of its own; the limit is the memory your browser can give one tab.',
+            'Opened from the large CSV viewer page, the table shows a hint: filter the rows you need, then choose Download options and tick "only the shown rows". Opened from the CSV viewer, the same table appears without it. To cut the file into parts Excel can open, Split CSV saves it as smaller files of a set number of rows or megabytes, each with the header row.',
+          ],
+          links: [{ text: 'CSV viewer', path: '/csv-viewer' }, { text: 'Split CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'What the other tools do better',
+          paragraphs: ['A viewer is not the right tool for every job, and the others win in clear places (Microsoft\'s and Google\'s pages, checked 24 November 2026):'],
+          list: [
+            'Excel can load the complete data set through Power Query and analyse it with PivotTables, as Microsoft\'s page on a data set too large for the Excel grid explains, and it has formulas, charts and macros a viewer does not.',
+            'Google Sheets keeps a file online for several people to edit at once, and its revision history lets you go back to earlier versions, as the Sheets product page says.',
+            'LibreOffice Calc is a full spreadsheet that works offline, with formulas and charts, at no cost.',
+            'A text editor made for large files shows the raw text exactly as written, which helps when a single line is broken.',
+          ],
+          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'Sheets product page', path: 'https://workspace.google.com/products/sheets/' }],
+        },
+        {
+          heading: 'How to repeat this test',
+          paragraphs: ['Use the same file in every tool, and close other programs first:'],
+          list: [
+            'Write the file with a script of your choice: 3,000,000 rows of the 8 columns above with random values, UTF-8, commas, one header row. Check that it has 3,000,001 lines and note its size.',
+            'Note the computer, operating system, browser and program versions.',
+            'Open the large CSV viewer, drop the file, and time it from the drop until the row count appears. Then sort by one column and search for one product code, and time both.',
+            'Repeat on the CSV viewer page.',
+            'Open the file in Excel by double-clicking it, and note the message, the time and the last row number.',
+            'In Google Sheets, choose File, Import, Upload, and note what happens.',
+            'Open it in LibreOffice Calc and in your text editor, and note the same things.',
+            'Run each tool three times and record the middle time.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'Can Excel open a CSV with 3 million rows?',
+          paragraphs: [
+            'Excel cannot show 3 million rows in one worksheet, because a worksheet stops at 1,048,576 rows. Opened directly, Excel warns that the data set is too large for the Excel grid and that some data was not loaded. Power Query can load the complete data set for PivotTables, or you can split the file first, as Microsoft\'s page on a data set too large for the Excel grid explains (checked 24 November 2026). CSV too big for Excel explains every option.',
+          ],
+          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'Why can\'t Google Sheets import a very large CSV?',
+          paragraphs: [
+            'Google Sheets caps each spreadsheet at 20 million cells or 100MB, so a long file with many columns runs out of room. Divide 20 million by your column count to see how many rows can fit. For a side-by-side look at both ways of working, see OpenAnyDoc vs Google Sheets for large files.',
+          ],
+          links: [{ text: 'OpenAnyDoc vs Google Sheets for large files', path: '/openanydoc-vs-google-sheets-large-files' }],
+        },
+        {
+          heading: 'How do I split a large CSV so each part fits in Excel?',
+          paragraphs: [
+            'Split it into parts of at most 1,048,575 data rows each, so every part plus its header row fits on one worksheet. Split CSV does this in your browser by rows or by megabytes, puts the header in every part and downloads them as one ZIP. How to split a large CSV walks through it.',
+          ],
+          links: [{ text: 'Split CSV', path: '/split-csv' }, { text: 'How to split a large CSV', path: '/split-large-csv' }],
+        },
+        {
+          heading: 'Questions?',
+          paragraphs: [`Write to ${CONTACT_EMAIL} with your own results for this test, the row count and size of the file and the computer you used (no personal data).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
@@ -2580,6 +3815,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'How to remove the location from a photo',
             'How to remove a photo\'s background without uploading it',
             'How to convert an Excel sheet to JSON for an API',
+            'How to split a large CSV file into smaller files',
+            'JSON vs JSON Lines: what is the difference?',
+            'How to compare two JSON files and see what changed',
+            'What are Excel\'s row and column limits?',
+            'How do I find hidden sheets, rows and formulas in an Excel file?',
+            'How do I convert Excel to CSV without breaking Arabic text?',
+            'How to read speaker notes without PowerPoint',
+            'How to compress a video without uploading it',
+            'What to do when a file is too large for ChatGPT',
+            'What is the best free CSV viewer?',
+            'Which free JSON formatters don\'t store your data?',
+            'OpenAnyDoc vs Google Sheets vs Excel: which opens large CSV files?',
+            'How to test a 3-million-row CSV in 6 tools',
           ],
           links: [
             { text: 'Why your CSV shows broken Arabic text in Excel', path: '/fix-arabic-csv-in-excel' },
@@ -2620,6 +3868,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'How to remove the location from a photo', path: '/remove-location-from-photo' },
             { text: 'How to remove a photo\'s background without uploading it', path: '/remove-background-without-upload' },
             { text: 'How to convert an Excel sheet to JSON for an API', path: '/convert-excel-to-json-for-api' },
+            { text: 'How to split a large CSV file into smaller files', path: '/split-large-csv' },
+            { text: 'JSON vs JSON Lines: what is the difference?', path: '/json-vs-json-lines' },
+            { text: 'How to compare two JSON files and see what changed', path: '/compare-two-json-files' },
+            { text: 'What are Excel\'s row and column limits?', path: '/excel-row-and-column-limits' },
+            { text: 'How do I find hidden sheets, rows and formulas in an Excel file?', path: '/find-hidden-sheets-in-excel' },
+            { text: 'How do I convert Excel to CSV without breaking Arabic text?', path: '/excel-to-csv-without-breaking-arabic' },
+            { text: 'How to read speaker notes without PowerPoint', path: '/read-speaker-notes-without-powerpoint' },
+            { text: 'How to compress a video without uploading it', path: '/compress-video-without-upload' },
+            { text: 'What to do when a file is too large for ChatGPT', path: '/file-too-large-for-chatgpt' },
+            { text: 'What is the best free CSV viewer?', path: '/best-free-csv-viewers' },
+            { text: 'Which free JSON formatters don\'t store your data?', path: '/best-free-json-formatters' },
+            { text: 'OpenAnyDoc vs Google Sheets vs Excel: which opens large CSV files?', path: '/openanydoc-vs-google-sheets-large-files' },
+            { text: 'How to test a 3-million-row CSV in 6 tools', path: '/large-csv-test' },
           ],
         },
         {
@@ -2632,7 +3893,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'How these guides are written',
           paragraphs: [
-            'Each guide is checked against the viewers before it is published: every step names a button that exists and every limit is one that was measured. The dates under a title say when it was written and when its text last changed.',
+            'Each guide is checked against the viewers before it is published: every step names a button that exists, and every limit comes from the tool\'s own settings, a test we ran or the maker\'s own page. The dates under a title say when it was written and when its text last changed.',
           ],
         },
         {
@@ -2657,15 +3918,15 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'لماذا يخطئ Excel في الترميز',
           paragraphs: [
             'ملف CSV نص عادي، والنص العادي لا يحمل أي علامة تقول بأي ترميز كُتب. وتكاد كل الأنظمة اليوم تكتب UTF-8، وهو يغطي العربية وكل الكتابات الأخرى.',
-            'عندما تنقر نقرًا مزدوجًا على ملف .csv لا يسألك Excel، بل يفترض صفحة الرموز القديمة لجهازك (Windows-1252 على جهاز إنجليزي، وWindows-1256 على جهاز عربي) ما لم يبدأ الملف بعلامة UTF-8 من ثلاثة بايتات تُسمى علامة ترتيب البايتات (BOM). ومعظم عمليات التصدير تُغفل هذه العلامة، فيقرأ Excel كل حرف عربي على أنه رمزان أو ثلاثة رموز لاتينية. والملفات المفصولة بعلامة جدولة (.tsv) تعاني المشكلة نفسها تمامًا.',
+            'تقول ملاحظة Microsoft عن فتح ملفات CSV UTF-8 (تحققنا منها في 24 نوفمبر 2026) إن ملف CSV بترميز UTF-8 يُفتح في Excel بشكل طبيعي إذا حُفظ مع علامة ترتيب البايتات (BOM)، وهي علامة من ثلاثة بايتات في بداية الملف. ومعظم عمليات التصدير تُغفل هذه العلامة، وعندها تتحول العربية إلى رموز. والملفات المفصولة بعلامة جدولة (.tsv) تعاني المشكلة نفسها تمامًا.',
           ],
-          links: [{ text: 'الملفات المفصولة بعلامة جدولة', path: '/tsv-viewer' }],
+          links: [{ text: 'الملفات المفصولة بعلامة جدولة', path: '/tsv-viewer' }, { text: 'ملاحظة Microsoft عن فتح ملفات CSV UTF-8', path: 'https://support.microsoft.com/en-us/office/opening-csv-utf-8-files-correctly-in-excel-8a935af5-3416-4edd-ba7e-3dfd2bc4a032' }],
         },
         {
           heading: 'الحل الأول: نزّل نسخة جاهزة لبرنامج Excel (مجانًا وبلا رفع)',
           paragraphs: ['يضيف OpenAnyDoc العلامة الناقصة بدلًا عنك، والملف لا يغادر جهازك أبدًا:'],
           list: [
-            'افتح عارض CSV وأفلت الملف على الصفحة. يتحقق العارض من وجود BOM ومن UTF-16 وUTF-8، ويعود إلى Windows-1256 للملفات العربية القديمة؛ ويعرض شريط الحالة أسفل الصفحة الترميز الذي وجده.',
+            'افتح عارض CSV وأفلت الملف على الصفحة. يتحقق العارض من وجود BOM ومن UTF-16 وUTF-8، ويعود إلى Windows-1256 للملفات العربية القديمة، أو إلى Windows-1252 إذا بدت الحروف أوروبية غربية؛ ويعرض شريط الحالة أسفل الصفحة الترميز الذي وجده.',
             'إذا كان في الملف نص عربي بلا BOM، يظهر زر «نسخة Excel» في شريط الحالة. انقر عليه.',
             'تُنزَّل نسخة باسم ملفك مع إضافة «-excel»، تحمل علامة UTF-8 ونهايات أسطر Windows. انقر عليها نقرًا مزدوجًا فيعرض Excel العربية بشكل صحيح.',
           ],
@@ -2674,28 +3935,28 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'الحل الثاني: استورد الملف بدل فتحه',
           paragraphs: [
-            'يقرأ Excel الترميز بشكل صحيح عندما تستورد الملف بدل النقر المزدوج: من تبويب «بيانات» اختر «الحصول على البيانات» ثم «من ملف» ثم «من نص/CSV» (في الإصدارات الأقدم: «بيانات» ثم «من نص»)، واختر الملف، واضبط «أصل الملف» على «65001: Unicode (UTF-8)» ثم حمّله. ينجح هذا في كل مرة، لكن عليك تكراره مع كل ملف، والنتيجة مصنف وليس ملف CSV نفسه.',
-            'ويضيف زر التنزيل العادي في OpenAnyDoc العلامة أيضًا كلما احتوى الملف على نص بغير الإنجليزية، فأي نسخة تعدّلها هناك تُفتح في Excel بلا مشكلة. وإذا رفض Excel الملف كله لأنه يتجاوز نحو مليون صف، فإن عارض ملفات CSV الكبيرة يفتحه في المتصفح.',
+            'تقدّم ملاحظة Microsoft عن فتح ملفات CSV UTF-8 (تحققنا منها في 24 نوفمبر 2026) طريقة لفتح ملف UTF-8 بلا علامة BOM: من تبويب «بيانات» اختر «الحصول على البيانات» ثم «من ملف» ثم «من نص/CSV»، واختر الملف. ينجح هذا، لكن عليك تكراره مع كل ملف، والنتيجة مصنف وليس ملف CSV نفسه.',
+            'ويضيف زر التنزيل العادي في OpenAnyDoc العلامة أيضًا كلما احتوى الملف على نص بغير الإنجليزية، فأي نسخة تعدّلها هناك تُفتح في Excel بلا مشكلة. وإذا كان في الملف صفوف أكثر مما تتسع له ورقة Excel، فإن عارض ملفات CSV الكبيرة يفتحه في المتصفح.',
           ],
-          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+          links: [{ text: 'ملاحظة Microsoft عن فتح ملفات CSV UTF-8', path: 'https://support.microsoft.com/en-us/office/opening-csv-utf-8-files-correctly-in-excel-8a935af5-3416-4edd-ba7e-3dfd2bc4a032' }, { text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
         },
         {
           heading: 'الحل الثالث: اكتب الملف بالطريقة الصحيحة في المرة القادمة',
           paragraphs: [
-            'إذا كان ملف CSV يُنشأ في Excel، فاستخدم «حفظ باسم» واختر «CSV UTF-8 (محدد بفواصل)»: هذه الصيغة تكتب علامة BOM. وإذا كان يأتي من كود أو أداة تصدير، فاكتب UTF-8 مع BOM للملفات التي ستُفتح في Excel، أو صدّر مصنف .xlsx بدلًا منه، فهو يخزّن ترميزه ولا يقع في هذه المشكلة أبدًا. ويمكنك التحقق من ملف XLSX في عارض Excel دون فتح برنامج Excel.',
+            'إذا كان ملف CSV يأتي من كود أو أداة تصدير، فاكتب UTF-8 مع BOM للملفات التي ستُفتح في Excel، أو صدّر مصنف .xlsx بدلًا منه، فهو يخزّن ترميزه ولا يقع في هذه المشكلة أبدًا. ويمكنك التحقق من ملف XLSX في عارض Excel دون فتح برنامج Excel.',
           ],
           links: [{ text: 'عارض Excel', path: '/excel-viewer' }],
         },
         {
-          heading: 'الحالة المعاكسة: ملف لا يقرؤه صحيحًا إلا Excel',
+          heading: 'الحالة المعاكسة: ملف عربي قديم',
           paragraphs: [
-            'كثير من ملفات التصدير من الأنظمة العربية القديمة مكتوبة بترميز Windows-1256 بلا أي UTF-8. يعرضها Excel على جهاز عربي بشكل سليم، بينما تفترض المتصفحات والمحررات ومعظم الأدوات الحديثة UTF-8 فتعرض رموزًا بلا معنى. يقرأ OpenAnyDoc هذا الملف بترميز Windows-1256 تلقائيًا، وإن أخطأ التخمين فاختر الترميز بنفسك من شريط الحالة. وعند التنزيل يُكتب الملف بترميز UTF-8 مع العلامة، فيُفتح بشكل صحيح في كل مكان.',
+            'كثير من ملفات التصدير من الأنظمة العربية القديمة مكتوبة بترميز Windows-1256 بلا أي UTF-8. وتفترض المتصفحات والمحررات ومعظم الأدوات الحديثة UTF-8 فتعرض هذا الملف رموزًا بلا معنى. يقرأ OpenAnyDoc هذا الملف بترميز Windows-1256 تلقائيًا، وإن أخطأ التخمين فاختر الترميز بنفسك من شريط الحالة. وعند التنزيل يُكتب الملف بترميز UTF-8 مع العلامة، فيُفتح بشكل صحيح في كل مكان.',
           ],
         },
         {
           heading: 'عندما تكون الحروف صحيحة والترتيب خاطئًا',
           paragraphs: [
-            'إذا كانت الحروف العربية نفسها صحيحة لكن الأرقام أو الأقواس أو الكلمات الإنجليزية تقف في الجهة الخطأ، فالترميز سليم. المشكلة في اتجاه النص: اضبط الخلية أو الورقة على اليمين إلى اليسار في Excel (تخطيط الصفحة ثم «ورقة من اليمين إلى اليسار»، أو أزرار اتجاه الفقرة). أما في OpenAnyDoc فتُعرض الخلايا ذات النص العربي من اليمين إلى اليسار تلقائيًا.',
+            'إذا كانت الحروف العربية نفسها صحيحة لكن الأرقام أو الأقواس أو الكلمات الإنجليزية تقف في الجهة الخطأ، فالترميز سليم. المشكلة في اتجاه النص. أما في OpenAnyDoc فتُعرض الخلايا ذات النص العربي من اليمين إلى اليسار تلقائيًا.',
           ],
         },
         {
@@ -2717,9 +3978,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'لماذا يضع Excel ملف CSV في عمود واحد',
           paragraphs: [
-            'ملف CSV لا يحمل ترويسة تقول أي حرف يفصل بين الحقول. الاسم يقول "مفصول بفواصل"، لكن Excel لا يبحث عن الفواصل: عند النقر المزدوج يستخدم "فاصل القائمة" المضبوط في إعدادات المنطقة في Windows. وفي البلدان التي تكتب الكسور العشرية بفاصلة (معظم أوروبا وعدد من الإعدادات العربية) يكون هذا الفاصل فاصلة منقوطة، فيستقر ملف مكتوب بالفواصل في عمود واحد. ويحدث العكس أيضًا: ملف مصدَّر بالفاصلة المنقوطة يُفتح في عمود واحد على جهاز إنجليزي.',
-            'والملفات المفصولة بعلامة جدولة (.tsv و.tab) أو بالخط العمودي تصطدم بالحاجز نفسه، لأن Excel لا يقسّمها إلا عبر نافذة الاستيراد.',
+            'ملف CSV لا يحمل ترويسة تقول أي حرف يفصل بين الحقول. الاسم يقول "مفصول بفواصل"، لكن Excel حين تفتح ملف .csv مباشرة يستخدم الإعدادات الحالية لجهازك، و"فاصل القائمة" يُضبط في إعدادات المنطقة في Windows، كما تشرح صفحة Microsoft عن استيراد الملفات النصية وتصديرها (تحققنا منها في 24 نوفمبر 2026). وتقول الصفحة نفسها إن Excel يستخدم الفاصلة المنقوطة فاصلًا للقائمة حين يكون الفاصل العشري فاصلة، فيستقر ملف مكتوب بالفواصل في عمود واحد. ويحدث العكس أيضًا: ملف مصدَّر بالفاصلة المنقوطة يُفتح في عمود واحد على جهاز فاصل القائمة فيه فاصلة.',
           ],
+          links: [{ text: 'صفحة Microsoft عن استيراد الملفات النصية وتصديرها', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }],
         },
         {
           heading: 'الحل الأول: دع العارض يكتشف الفاصل ثم نزّل نسخة يفهمها Excel',
@@ -2737,22 +3998,24 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'الحل الثاني: استورد الملف بدل النقر المزدوج',
           paragraphs: [
-            'في Excel اذهب إلى «بيانات» ثم «الحصول على البيانات» ثم «من ملف» ثم «من نص/CSV» (في الإصدارات الأقدم: «بيانات» ثم «من نص»). تعرض المعاينة البيانات مع خانة «المحدد»: اختر فاصلة أو فاصلة منقوطة أو علامة جدولة أو حرفًا مخصصًا ثم «تحميل». يقرأ Excel الملف صحيحًا في كل مرة، لكن عليك تكرار ذلك مع كل ملف، والنتيجة مصنف وليس ملف CSV نفسه.',
-            'وإذا كانت البيانات في عمود واحد أمامك بالفعل فحدّدها واذهب إلى «بيانات» ثم «تحويل النص إلى أعمدة»، واختر «محدد»، وعلّم على الفاصل، ثم «إنهاء». هذا يصلح الورقة التي أمامك دون إعادة فتح الملف.',
+            'في Excel اذهب إلى «بيانات» ثم «الحصول على البيانات» ثم «من ملف» ثم «من نص/CSV». تعرض المعاينة البيانات مع خانة «المحدد»: اختر فاصلة أو فاصلة منقوطة أو علامة جدولة أو حرفًا مخصصًا ثم «تحميل». والخطوات في صفحة Microsoft عن استيراد الملفات النصية وتصديرها (تحققنا منها في 24 نوفمبر 2026). ينجح هذا، لكن عليك تكرار ذلك مع كل ملف، والنتيجة مصنف وليس ملف CSV نفسه.',
+            'وإذا كانت البيانات في عمود واحد أمامك بالفعل فحدّدها واذهب إلى «بيانات» ثم «تحويل النص إلى أعمدة»، واختر «محدد»، وعلّم على الفاصل، ثم «إنهاء». هذا يصلح الورقة التي أمامك دون إعادة فتح الملف، والخطوات في صفحة Microsoft عن تقسيم النص إلى أعمدة (تحققنا منها في 24 نوفمبر 2026).',
           ],
+          links: [{ text: 'صفحة Microsoft عن استيراد الملفات النصية وتصديرها', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }, { text: 'صفحة Microsoft عن تقسيم النص إلى أعمدة', path: 'https://support.microsoft.com/en-us/office/split-text-into-different-columns-30b14928-5550-41f5-97ca-7a3e9c363ed7' }],
         },
         {
-          heading: 'الحل الثالث: أخبر Excel بالفاصل داخل الملف',
+          heading: 'الحل الثالث: غيّر فاصل القائمة في Windows',
           paragraphs: [
-            'يحترم Excel سطرًا أولًا نصه sep=; (أو sep=, أو sep=| وهكذا). أضفه فوق صف العناوين فيقسّم Excel الملف على ذلك الحرف عند النقر المزدوج. وهي حيلة خاصة بـ Excel: البرامج الأخرى تعرض هذا السطر كبيانات، فاستخدمها للملفات المخصصة لـ Excel فقط.',
-            'أما الحل الدائم لجهاز واحد فهو إعداد المنطقة: إعدادات Windows ثم «الوقت واللغة» ثم «اللغة والمنطقة» ثم «إعدادات اللغة الإدارية» ثم «إعدادات إضافية» ثم «فاصل القائمة». غيّره فقط إذا كانت كل الملفات التي تفتحها تستخدم الفاصل نفسه.',
+            'أما الحل الدائم لجهاز واحد فهو "فاصل القائمة" في Windows. في Windows 11 ابحث عن «إعدادات المنطقة»، واختر «إعدادات اللغة الإدارية»، ثم «إعدادات إضافية» في تبويب «التنسيقات»، واكتب الفاصل في خانة «فاصل القائمة» في تبويب «الأرقام». وتذكر صفحة Microsoft عن استيراد الملفات النصية وتصديرها هذه الخطوات (تحققنا منها في 24 نوفمبر 2026)، وتنبّه إلى أن التغيير يشمل البرامج الأخرى على الجهاز أيضًا، فغيّره فقط إذا كانت كل الملفات التي تفتحها تستخدم الفاصل نفسه.',
           ],
+          links: [{ text: 'صفحة Microsoft عن استيراد الملفات النصية وتصديرها', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }],
         },
         {
           heading: 'علامات الاقتباس وفواصل الأسطر والأرقام',
           paragraphs: [
-            'أي حقل يحتوي على الفاصل نفسه أو فاصل سطر أو علامة اقتباس يجب أن يُحاط بعلامتي اقتباس مزدوجتين ("الرياض، السعودية") مع مضاعفة علامات الاقتباس الداخلية. والملف الذي يلتزم بذلك ينجو مع أي من الحلول أعلاه؛ أما الذي لا يلتزم فيتعطل في العارض أيضًا، لكنه يعرض الصفوف غير المتساوية لترى أين الخلل. وفقدان الأصفار في البداية (الرموز البريدية والمعرّفات) مشكلة منفصلة: يحذفها Excel حين يظنها رقمًا، بينما يبقيها العارض كما كُتبت.',
+            'أي حقل يحتوي على الفاصل نفسه أو فاصل سطر أو علامة اقتباس يجب أن يُحاط بعلامتي اقتباس مزدوجتين ("الرياض، السعودية") مع مضاعفة علامات الاقتباس الداخلية. والملف الذي يلتزم بذلك ينجو مع أي من الحلول أعلاه؛ أما الذي لا يلتزم فيتعطل في العارض أيضًا، لكنه يعرض الصفوف غير المتساوية لترى أين الخلل. وفقدان الأصفار في البداية (الرموز البريدية والمعرّفات) مشكلة منفصلة: يحذفها Excel حين يعامل القيمة رقمًا، كما تشرح صفحة Microsoft عن الاحتفاظ بالأصفار البادئة (تحققنا منها في 24 نوفمبر 2026)، بينما يبقيها العارض كما كُتبت.',
           ],
+          links: [{ text: 'صفحة Microsoft عن الاحتفاظ بالأصفار البادئة', path: 'https://support.microsoft.com/topic/1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
         },
         {
           heading: 'ما زال في عمود واحد؟',
@@ -2762,19 +4025,21 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/csv-too-big-for-excel': {
       published: '2026-10-22',
-      updated: '2026-10-22',
+      updated: '2026-11-24',
       sections: [
         {
           heading: 'ما الذي تراه',
           paragraphs: [
-            'يقول Excel «لم يتم تحميل الملف بالكامل»، أو تتوقف الورقة عند الصف 1,048,576، أو يتجمد Excel دقائق مع ملف بمئات الميغابايتات ثم يفتحه ناقص الصفوف. ملف التصدير سليم؛ هو فقط أكبر مما تتسع له ورقة عمل.',
+            'ينبّه Excel إلى أن مجموعة البيانات أكبر مما تتسع له شبكة Excel وأن حفظ المصنف سيُفقد البيانات التي لم تُحمَّل، وتتوقف الورقة عند الصف 1,048,576، كما تصف صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). ملف التصدير سليم؛ هو فقط أكبر مما تتسع له ورقة عمل.',
           ],
+          links: [{ text: 'صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
           heading: 'لماذا لا يستطيع Excel فتحه',
           paragraphs: [
-            'تتسع ورقة العمل لـ 1,048,576 صفًا و16,384 عمودًا على الأكثر. وملف CSV بصفوف أكثر يُقطع عند ذلك السطر، بصمت في الإصدارات القديمة ومع تحذير في الأحدث. ودون هذا الحد بكثير يبدأ الحجم نفسه بالإيذاء: ملف نصي من 300 ميغابايت يتحول إلى غيغابايتات من الخلايا في الذاكرة، فيقضي Excel دقائق في التحليل وقد تنفد ذاكرته. أما Google Sheets فيتوقف أبكر، عند 10 ملايين خلية في الجدول.',
+            'تتسع ورقة العمل لـ 1,048,576 صفًا و16,384 عمودًا على الأكثر، بحسب صفحة مواصفات Excel وحدوده لدى Microsoft (تحققنا منها في 24 نوفمبر 2026). وملف CSV بصفوف أكثر يُقطع عند ذلك السطر. ولـ Google Sheets حده الخاص: ما يصل إلى 20 مليون خلية أو 100 ميغابايت للجدول المُنشأ في Google Sheets أو المحوَّل إليه، بحسب صفحة Google عن الملفات التي يمكنك تخزينها في Google Drive (تحققنا منها في 24 نوفمبر 2026).',
           ],
+          links: [{ text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الملفات التي يمكنك تخزينها في Google Drive', path: 'https://support.google.com/drive/answer/37603' }],
         },
         {
           heading: 'الخيار الأول: افتحه في المتصفح واقتطع ما تحتاجه',
@@ -2789,8 +4054,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'الخيار الثاني: حمّله في Excel من دون ورقة عمل',
           paragraphs: [
-            'يستطيع Excel الاحتفاظ بأكثر من مليون صف في نموذج البيانات، لكن ليس في الخلايا. اذهب إلى «بيانات» ثم «الحصول على البيانات» ثم «من ملف» ثم «من نص/CSV»، وبدل «تحميل» اختر «تحميل إلى» وعلّم على «إنشاء اتصال فقط» و«إضافة هذه البيانات إلى نموذج البيانات». يمكنك بعدها بناء PivotTable فوق كل الصفوف، والتصفية في Power Query، وتحميل شريحة فقط إلى ورقة.',
+            'يستطيع Excel تحميل كل الصفوف في PivotTable دون وضعها في الخلايا. افتح مصنفًا فارغًا، واذهب إلى «بيانات» ثم «من نص/CSV»، واختر الملف ثم «استيراد»، وفي المعاينة اختر «تحميل إلى» ثم «تقرير PivotTable». والخطوات في صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026).',
           ],
+          links: [{ text: 'صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
           heading: 'الخيار الثالث: قسّم الملف أو لخّصه أولًا',
@@ -2929,15 +4195,17 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'على ويندوز أو ماك دون برامج إضافية',
-          paragraphs: ['كل متصفح يفتح JSON: اسحب الملف إلى نافذة Chrome أو Edge أو Firefox. يعرض Firefox عارضًا مدمجًا بشجرة قابلة للطي، وتعرض المتصفحات الأخرى النص. ويفتحه «المفكرة» على ويندوز وTextEdit على ماك نصًا أيضًا: اضغط بزر الفأرة الأيمن على الملف، واختر «فتح باستخدام»، ثم المحرر. يكفيان للملفات الصغيرة، لكن الأسطر الطويلة والتداخل العميق يصعب تتبعهما.'],
+          paragraphs: ['يفتح Firefox وMicrosoft Edge ملف JSON دون برامج إضافية. يعرضه Firefox في عارض مدمج تُطوى فيه الكائنات والمصفوفات وتُفتح، كما يصف توثيق عارض JSON فيه. ويعرض Edge النص كما هو، مع خانة Pretty-print ترتّب الملف المحفوظ في سطر واحد، كما تصف صفحة Microsoft عن عرض JSON في Edge (تحققنا منهما في 24 نوفمبر 2026).'],
+          links: [{ text: 'توثيق عارض JSON', path: 'https://firefox-source-docs.mozilla.org/devtools-user/json_viewer/index.html' }, { text: 'صفحة Microsoft عن عرض JSON في Edge', path: 'https://learn.microsoft.com/en-us/microsoft-edge/web-platform/json-viewer' }],
         },
         {
           heading: 'في محرر شيفرة',
-          paragraphs: ['إن كنت تتعامل مع JSON كثيرًا، فمحرر شيفرة مثل Visual Studio Code المجاني يلوّن الصياغة ويطوي الكائنات ويُعلّم الأخطاء. ويرتّب أمر Format Document (Shift+Alt+F على ويندوز، وShift+Option+F على ماك) ملفًا محفوظًا في سطر واحد.'],
+          paragraphs: ['إن كنت تتعامل مع JSON كثيرًا، فمحرر شيفرة مثل Visual Studio Code يساعدك. يرتّب أمر Format Document فيه (Shift+Alt+F على ويندوز، وShift+Option+F على ماك) ملفًا محفوظًا في سطر واحد، بحسب توثيق التحرير الأساسي فيه (تحققنا منه في 24 نوفمبر 2026).'],
+          links: [{ text: 'توثيق التحرير الأساسي', path: 'https://code.visualstudio.com/docs/editing/codebasics' }],
         },
         {
           heading: 'اجعل الملف المحفوظ في سطر واحد مقروءًا',
-          paragraphs: ['الملف المحفوظ في سطر واحد صالح لكنه غير مقروء. يضيف منسّق JSON المسافات البادئة بمسافتين أو أربع (أي عدد من 1 إلى 8، أو علامة جدولة)، ويرتّب المفاتيح، ويضغط الملف من جديد حين تحتاج ملفًا صغيرًا.'],
+          paragraphs: ['الملف المحفوظ في سطر واحد صالح لكنه غير مقروء. يضيف منسّق JSON المسافات البادئة بمسافتين أو أربع (أو بمسافة واحدة أو 3 أو 8، أو علامة جدولة)، ويرتّب المفاتيح، ويضغط الملف من جديد حين تحتاج ملفًا صغيرًا.'],
           links: [{ text: 'منسّق JSON', path: '/json-formatter' }],
         },
         {
@@ -2979,17 +4247,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'برامج مجانية للحاسوب',
           paragraphs: ['كلاهما يعمل دون إنترنت ويُبقي الملف على حاسوبك:'],
           list: [
-            'LibreOffice Calc (ويندوز وماك ولينكس) يفتح xlsx ويحفظه، ويحتفظ بالصيغ ومعظم التنسيق. هو أقرب بديل مجاني لبرنامج Excel على الحاسوب.',
-            'Apple Numbers (ماك وآيفون وآيباد) يفتح xlsx ويمكنه التصدير بصيغة Excel من جديد؛ وبعض الميزات الخاصة بـ Excel تُحوَّل أو تُحذف.',
+            'LibreOffice Calc (ويندوز وماك ولينكس) يفتح ملفات xlsx ويحفظها، بحسب متطلبات النظام وصفحة المساعدة عن ملفات Microsoft Office لدى LibreOffice (تحققنا منهما في 24 نوفمبر 2026).',
+            'Apple Numbers يفتح جداول Excel ويمكنه تصدير نسخة بصيغة Excel، بحسب دليل Numbers من Apple (تحققنا منه في 24 نوفمبر 2026).',
           ],
+          links: [{ text: 'متطلبات النظام', path: 'https://www.libreoffice.org/get-help/system-requirements/' }, { text: 'صفحة المساعدة عن ملفات Microsoft Office', path: 'https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html' }, { text: 'دليل Numbers', path: 'https://support.apple.com/guide/numbers/tan9f3c54bdc/mac' }],
         },
         {
           heading: 'الحزم على الإنترنت (يُرفع الملف)',
-          paragraphs: ['يفتح Google Sheets ملف xlsx بعد رفعه إلى Google Drive، ويفعل Excel للويب الشيء نفسه مع OneDrive. كلاهما يحتاج حسابًا، ويُخزَّن المصنف على خوادمهما. هذا مقبول لمعظم الملفات، لكن ليس لكشوف الرواتب أو قوائم العملاء أو أي ملف لا يُسمح لك بمشاركته.'],
+          paragraphs: ['يفتح Google Sheets ملف xlsx الموجود في Google Drive، بحسب صفحة Google عن استخدام ملفات Office (تحققنا منها في 24 نوفمبر 2026). ويحتاج حساب Google، ويُخزَّن المصنف على خوادم Google. هذا مقبول لمعظم الملفات، لكن ليس لكشوف الرواتب أو قوائم العملاء أو أي ملف لا يُسمح لك بمشاركته.'],
+          links: [{ text: 'صفحة Google عن استخدام ملفات Office', path: 'https://support.google.com/docs/answer/6055139' }],
         },
         {
           heading: 'على الهاتف',
-          paragraphs: ['تفتح متصفحات الهاتف OpenAnyDoc بالطريقة نفسها: اضغط «اختر ملفًا» وحدد المصنف من «الملفات» أو التنزيلات. ولتطبيق Excel من مايكروسوفت ولـ Google Sheets تطبيقات للهاتف أيضًا، ويعمل كلاهما بحسابك.'],
+          paragraphs: ['تفتح متصفحات الهاتف OpenAnyDoc بالطريقة نفسها: اضغط «اختر ملفًا» وحدد المصنف من «الملفات» أو التنزيلات.'],
         },
         {
           heading: 'تحتاج البيانات فقط؟',
@@ -3015,9 +4285,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             'xls صيغة Excel من 97 إلى 2003. يفتحها عارض XLS بالقيم والصيغ وتنسيقات الأرقام، دون أنماط الخلايا.',
             'xlsm مصنف فيه وحدات ماكرو. تفتح العارضات البيانات؛ ولا تعمل وحدات الماكرو خارج Excel، ولا يحتفظ بها OpenAnyDoc عند الحفظ.',
-            'ods صيغة جداول OpenDocument التي يحفظ بها LibreOffice افتراضيًا. ويفتحها Excel وOpenAnyDoc كلاهما.',
+            'ods صيغة جداول OpenDocument. ويفتحها Excel، بحسب قائمة Microsoft للصيغ التي يدعمها Excel (تحققنا منها في 24 نوفمبر 2026)، ويفتحها OpenAnyDoc أيضًا.',
           ],
-          links: [{ text: 'عارض XLS', path: '/xls-viewer' }],
+          links: [{ text: 'عارض XLS', path: '/xls-viewer' }, { text: 'قائمة Microsoft للصيغ التي يدعمها Excel', path: 'https://support.microsoft.com/en-us/office/file-formats-that-are-supported-in-excel-0943ff2c-6014-4e8d-aaea-b83d51d46247' }],
         },
         {
           heading: 'ما قد يبدو مختلفًا',
@@ -3063,19 +4333,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'برامج مجانية للحاسوب',
           paragraphs: ['تعمل دون إنترنت وتُبقي الملف على حاسوبك:'],
           list: [
-            'LibreOffice Writer (ويندوز وماك ولينكس) يفتح docx ويحرره ويحفظه، ويحتفظ بمعظم التنسيق. هو أقرب بديل مجاني لبرنامج وورد على الحاسوب.',
-            'Apple Pages (ماك وآيفون وآيباد) يفتح docx ويمكنه التصدير بصيغة وورد من جديد؛ وبعض الميزات الخاصة بوورد تُحوَّل أو تُحذف.',
-            'على الماك، حدد الملف في Finder واضغط مفتاح المسافة لمعاينة سريعة، ويفتحه TextEdit بتنسيق أبسط.',
+            'LibreOffice Writer (ويندوز وماك ولينكس) يفتح ملفات docx ويحفظها، بحسب متطلبات النظام وصفحة المساعدة عن ملفات Microsoft Office لدى LibreOffice (تحققنا منهما في 24 نوفمبر 2026).',
+            'Apple Pages على الماك يفتح ملفات doc وdocx ويمكنه حفظها بصيغة وورد، بحسب دليل Pages من Apple (تحققنا منه في 24 نوفمبر 2026).',
+            'على الماك، حدد الملف في Finder واضغط مفتاح المسافة لمعاينة سريعة، كما تصف صفحة Apple عن معاينة الملفات (تحققنا منها في 24 نوفمبر 2026).',
           ],
+          links: [{ text: 'متطلبات النظام', path: 'https://www.libreoffice.org/get-help/system-requirements/' }, { text: 'صفحة المساعدة عن ملفات Microsoft Office', path: 'https://help.libreoffice.org/latest/en-US/text/shared/guide/ms_user.html' }, { text: 'دليل Pages', path: 'https://support.apple.com/guide/pages/tancdeedb11c/mac' }, { text: 'صفحة Apple عن معاينة الملفات', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }],
         },
         {
           heading: 'الحزم على الإنترنت (يُرفع الملف)',
-          paragraphs: ['يفتح Google Docs ملف docx بعد رفعه إلى Google Drive، ويفعل Word للويب الشيء نفسه مع OneDrive. كلاهما يحتاج حسابًا، ويُخزَّن المستند على خوادمهما. هذا مقبول لمعظم الملفات، لكن ليس للعقود أو خطابات الموارد البشرية أو أي ملف لا يُسمح لك بمشاركته. وإن لم تكن متأكدًا أن موقعًا ما لا يرفع ملفك، يمكنك أن تتحقق بنفسك.'],
-          links: [{ text: 'تتحقق بنفسك', path: '/check-file-upload' }],
+          paragraphs: ['يفتح Google Docs ملف docx الموجود في Google Drive، بحسب صفحة Google عن استخدام ملفات Office (تحققنا منها في 24 نوفمبر 2026). ويحتاج حساب Google، ويُخزَّن المستند على خوادم Google. هذا مقبول لمعظم الملفات، لكن ليس للعقود أو خطابات الموارد البشرية أو أي ملف لا يُسمح لك بمشاركته. وإن لم تكن متأكدًا أن موقعًا ما لا يرفع ملفك، يمكنك أن تتحقق بنفسك.'],
+          links: [{ text: 'تتحقق بنفسك', path: '/check-file-upload' }, { text: 'صفحة Google عن استخدام ملفات Office', path: 'https://support.google.com/docs/answer/6055139' }],
         },
         {
           heading: 'على الهاتف',
-          paragraphs: ['تفتح متصفحات الهاتف OpenAnyDoc بالطريقة نفسها: اضغط «اختر ملفًا» وحدد المستند من «الملفات» أو التنزيلات، فتُلاءم الصفحة عرض الشاشة. ولتطبيق Word من مايكروسوفت ولـ Google Docs تطبيقات للهاتف أيضًا، ويعمل كلاهما بحسابك.'],
+          paragraphs: ['تفتح متصفحات الهاتف OpenAnyDoc بالطريقة نفسها: اضغط «اختر ملفًا» وحدد المستند من «الملفات» أو التنزيلات، فتُلاءم الصفحة عرض الشاشة.'],
         },
         {
           heading: 'الصيغ الأقدم والقريبة',
@@ -3083,7 +4354,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             'doc صيغة وورد من 97 إلى 2003. لا يفتحها OpenAnyDoc؛ ويفتحها LibreOffice وPages ووورد، ويمكنها حفظها بصيغة docx التي تُفتح هنا بعد ذلك.',
             'docm مستند فيه وحدات ماكرو، وdotx قالب. يفتح عارض وورد كليهما؛ ولا تعمل وحدات الماكرو خارج وورد.',
-            'odt صيغة النصوص المفتوحة التي يحفظ بها LibreOffice افتراضيًا، وrtf صيغة نص منسق أقدم. يفتحهما وورد وLibreOffice وPages، ويفتح عارض وورد هنا ملفات odt أيضًا.',
+            'odt صيغة النصوص المفتوحة OpenDocument، وrtf صيغة نص منسق أقدم. ويفتح عارض وورد هنا ملفات odt.',
           ],
         },
         {
@@ -3233,21 +4504,22 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'على Mac: تطبيق Preview',
-          paragraphs: ['يوقّع تطبيق Preview، الموجود في كل جهاز Mac، ملفات PDF دون تنزيل أي شيء. افتح الملف في Preview، وأظهر شريط أدوات Markup، وانقر زر التوقيع. أنشئ توقيعًا بلوحة اللمس، أو بكاميرا Mac (وقّع على ورقة بيضاء وارفعها أمامها)، أو بجهاز iPhone أو iPad، ثم انقر التوقيع لوضعه واسحبه إلى مكانه. وتتوفر التواقيع المحفوظة على أجهزة Mac الأخرى التي تستخدم iCloud Drive. وتشرح Apple الخطوات في دليل Preview.'],
+          paragraphs: ['يوقّع تطبيق Preview، الموجود في كل جهاز Mac، ملفات PDF دون تنزيل أي شيء. افتح الملف في Preview، وأظهر شريط أدوات Markup، وانقر زر التوقيع. أنشئ توقيعًا بلوحة اللمس، أو بكاميرا Mac (وقّع على ورقة بيضاء وارفعها أمامها)، أو بجهاز iPhone أو iPad، ثم انقر التوقيع لوضعه واسحبه إلى مكانه. وتتوفر التواقيع المحفوظة على أجهزة Mac الأخرى التي تستخدم iCloud Drive. وتشرح Apple الخطوات في دليل Preview (تحققنا منه في 24 نوفمبر 2026).'],
           links: [{ text: 'دليل Preview', path: 'https://support.apple.com/ar-ae/guide/preview/prvw35725/mac' }],
         },
         {
           heading: 'على iPhone أو iPad: أداة Markup',
-          paragraphs: ['افتح ملف PDF في تطبيق «الملفات»، واضغط زر Markup (رأس قلم داخل دائرة)، ثم زر الإضافة واختر «إضافة توقيع». ارسم توقيعك بإصبعك، واضغط «تم»، ثم اسحبه وغيّر حجمه على الصفحة. وإن لم يظهر Markup في تطبيق ما، فاحفظ الملف في «الملفات» أولًا وافتحه هناك. ويمكن إعادة استخدام التواقيع المحفوظة في المستند التالي.'],
+          paragraphs: ['افتح ملف PDF في تطبيق «الملفات»، واضغط زر Markup، ثم زر الإضافة واختر «إضافة توقيع». وقّع باسمك بإصبعك واضغط «تم»، ثم اسحب التوقيع إلى مكانه واسحب إحدى النقاط الزرقاء لتغيير حجمه. ويحفظ iPhone التوقيع للمرة التالية التي تضيف فيها توقيعًا بأداة Markup. وتشرح Apple الخطوات في دليل iPhone (تحققنا منه في 24 نوفمبر 2026).'],
+          links: [{ text: 'دليل iPhone', path: 'https://support.apple.com/guide/iphone/fill-forms-sign-documents-create-signatures-iph1d3607e5c/ios' }],
         },
         {
           heading: 'على Windows: متصفح Microsoft Edge',
-          paragraphs: ['يفتح متصفح Microsoft Edge، الموجود مع Windows، ملفات PDF وفيه أداة رسم. افتح الملف في Edge، واختر «رسم»، واكتب توقيعك بالفأرة أو القلم أو الإصبع، ثم احفظ الملف. الطريقة سريعة، لكن التوقيع يُرسم يدويًا في كل مرة؛ أما «توقيع PDF» في المتصفح فيتيح لك كتابته أو رفعه ونسخه إلى كل الصفحات.'],
-          links: [{ text: '«توقيع PDF» في المتصفح', path: '/sign-pdf' }],
+          paragraphs: ['في متصفح Microsoft Edge قارئ PDF مدمج، وتقول صفحة Microsoft عن قارئ PDF في Edge (تحققنا منها في 24 نوفمبر 2026) إنه يتيح الكتابة بالحبر على ملف PDF لتوقيعه أو تعبئة نموذج. افتح الملف في Edge واكتب توقيعك بالحبر بالفأرة أو القلم أو الإصبع. الطريقة سريعة، لكن التوقيع يُرسم يدويًا في كل مرة؛ أما «توقيع PDF» في المتصفح فيتيح لك كتابته أو رفعه ونسخه إلى كل الصفحات.'],
+          links: [{ text: 'صفحة Microsoft عن قارئ PDF في Edge', path: 'https://learn.microsoft.com/en-us/deployedge/microsoft-edge-pdf' }, { text: '«توقيع PDF» في المتصفح', path: '/sign-pdf' }],
         },
         {
           heading: 'صورة التوقيع ليست توقيعًا رقميًا',
-          paragraphs: ['كل الطرق السابقة تضيف توقيعًا مرئيًا: صورة لخط يدك على الصفحة، كالتوقيع على ورقة مطبوعة. وهو لا يثبت هوية الموقّع، ويمكن لمن لديه محرر PDF أن ينسخه.', 'أما التوقيع الرقمي القائم على شهادة فمختلف: يستخدم هوية رقمية صادرة لك (من جهة عملك أو بنك أو خدمة حكومية أو جهة إصدار شهادات) ويختم الملف، فيظهر أي تغيير لاحق. وتشترط بعض العقود والنماذج الحكومية والإجراءات المنظّمة هذا النوع.', 'إن كانت لديك هوية رقمية، يمكن لبرنامج LibreOffice توقيع ملف PDF موجود بها مجانًا: افتح LibreOffice، واختر «ملف» ثم «التوقيعات الرقمية» ثم «توقيع ملف PDF موجود»، واتبع الخطوات. أما كفاية التوقيع المرئي فتعود إلى الجهة التي طلبته؛ وإن كنت غير متأكد فاسألها أو اسأل الفريق القانوني لديك.'],
+          paragraphs: ['كل الطرق السابقة تضيف توقيعًا مرئيًا: صورة لخط يدك على الصفحة، كالتوقيع على ورقة مطبوعة. وهو لا يثبت هوية الموقّع، ويمكن لمن لديه محرر PDF أن ينسخه.', 'أما التوقيع الرقمي القائم على شهادة فمختلف: يستخدم هوية رقمية صادرة لك (من جهة عملك أو بنك أو خدمة حكومية أو جهة إصدار شهادات) ويختم الملف، فيظهر أي تغيير لاحق. وتشترط بعض العقود والنماذج الحكومية والإجراءات المنظّمة هذا النوع.', 'إن كانت لديك هوية رقمية، يمكن لبرنامج LibreOffice توقيع ملف PDF موجود بها مجانًا: افتح LibreOffice، واختر «ملف» ثم «التوقيعات الرقمية» ثم «توقيع ملف PDF موجود» (تحققنا منها في 24 نوفمبر 2026)، واتبع الخطوات. أما كفاية التوقيع المرئي فتعود إلى الجهة التي طلبته؛ وإن كنت غير متأكد فاسألها أو اسأل الفريق القانوني لديك.'],
           links: [{ text: 'توقيع ملف PDF موجود', path: 'https://help.libreoffice.org/latest/ar/text/shared/01/signexistingpdf.html' }],
         },
         {
@@ -3268,30 +4540,36 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/pdf-tools-without-upload': {
       published: '2026-11-17',
-      updated: '2026-11-24',
+      updated: '2026-11-25',
       sections: [
         {
           heading: 'الإجابة المختصرة',
-          paragraphs: ['معظم أدوات PDF المجانية على الإنترنت، ومنها iLovePDF وSmallpdf وموقع PDF24، ترفع ملفك إلى خوادمها وتعالجه هناك ثم تحذفه بعد مدة محددة. وهذا مقبول لكثير من المستندات. أما إن كان الملف لا يجوز أن يغادر جهازك، فاستخدم أداة تعالجه محليًا: OpenAnyDoc في المتصفح، أو تطبيق سطح مكتب يعمل دون اتصال مثل PDF24 Creator على Windows. والمعلومات أدناه من صفحات كل خدمة نفسها، وقد رُوجعت في 24 نوفمبر 2026 (ومعلومات Smallpdf في 17 نوفمبر 2026).'],
+          paragraphs: ['مواقع PDF الشائعة الثلاثة أدناه، iLovePDF وموقع PDF24 وSejda، ترفع ملفك إلى خوادمها وتعالجه هناك ثم تحذفه لاحقًا، بحسب صفحاتها نفسها. وهذا مقبول لكثير من المستندات. أما إن كان الملف لا يجوز أن يغادر جهازك، فاستخدم أداة تعالجه محليًا: OpenAnyDoc في المتصفح، أو تطبيق سطح مكتب يعمل دون اتصال مثل PDF24 Creator على Windows. والمعلومات أدناه من صفحات كل خدمة نفسها، وقد رُوجعت في 25 نوفمبر 2026.'],
         },
         {
-          heading: 'كيف تتعامل مواقع PDF الشائعة مع ملفك (رُوجع في 24 نوفمبر 2026)',
+          heading: 'كيف تتعامل مواقع PDF الشائعة مع ملفك (رُوجع في 25 نوفمبر 2026)',
           paragraphs: ['ما تقوله كل خدمة في صفحاتها؛ اتبع الروابط للاطلاع على النص الحالي:'],
           list: [
-            'iLovePDF: تُرفع الملفات عبر HTTPS وتُحفظ «لمدة أقصاها ساعتان» لتتمكن من تنزيل النتيجة، ثم تُحذف. ويتوفر تطبيق سطح مكتب لـ Mac وWindows.',
-            'Smallpdf (رُوجعت في 17 نوفمبر 2026): تُحذف الملفات نهائيًا من خوادمها بعد ساعة من المعالجة. وتقول Smallpdf إنها حاصلة على شهادة ISO 27001 وإنها تخزّن الملفات داخل الاتحاد الأوروبي.',
-            'أدوات PDF24 (الموقع): تُحذف الملفات المرفوعة من خادم المعالجة خلال ساعة. أما PDF24 Creator، تطبيقها على Windows، فيعمل دون اتصال ويُبقي كل الملفات على حاسوبك.',
-            'Sejda (الموقع): تقول سياسة الخصوصية إن الملفات المرفوعة والناتجة تُخزَّن للمعالجة ثم تُحذف نهائيًا، دون نسخ احتياطية. ولميزات الذكاء الاصطناعي، تقول السياسة إن المحتوى يُرسل إلى معالج فرعي للذكاء الاصطناعي لمعالجة عابرة ولا يُخزَّن.',
+            'iLovePDF: تُرفع الملفات عبر HTTPS وتُحفظ «لمدة أقصاها ساعتان» لتتمكن من تنزيل النتيجة، ثم تُحذف. وتذكر صفحة الأسعار تطبيق سطح مكتب لـ Mac وWindows وتطبيقات للهاتف على iOS وAndroid ضمن خطة Premium (4 دولارات أمريكية شهريًا عند الدفع سنويًا، أو 7 دولارات عند الدفع شهريًا)، لا في الخطة المجانية.',
+            'أدوات PDF24 (الموقع): تُحذف الملفات المرفوعة من الخادم بعد ساعة، وتقول صفحة الأسئلة الشائعة إن كل خوادم المعالجة في مراكز بيانات داخل الاتحاد الأوروبي. والأدوات على الإنترنت مجانية «دون قيود». أما PDF24 Creator، تطبيقها على Windows، فيعمل دون اتصال.',
+            'Sejda (الموقع): تقول سياسة الخصوصية إن الملفات المرفوعة والناتجة تُخزَّن للمعالجة ثم تُحذف نهائيًا، دون نسخ احتياطية. ولميزات الذكاء الاصطناعي، تقول السياسة إن المحتوى يُرسل إلى معالج فرعي للذكاء الاصطناعي لمعالجة عابرة ولا يُخزَّن. وتذكر السياسة أيضًا Sejda Desktop، وهو تطبيق يُنزَّل على الحاسوب.',
           ],
-          links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'Smallpdf', path: 'https://smallpdf.com/blog/is-smallpdf-safe' }, { text: 'PDF24', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
+          links: [{ text: 'iLovePDF', path: 'https://www.ilovepdf.com/help/faq' }, { text: 'صفحة الأسعار', path: 'https://www.ilovepdf.com/pricing' }, { text: 'PDF24', path: 'https://tools.pdf24.org/en/faq' }, { text: 'Sejda', path: 'https://www.sejda.com/privacy' }],
         },
         {
           heading: 'أين تقدّم تلك الخدمات أكثر',
-          paragraphs: ['إنصافًا في المقارنة: يقدّم عدد من هذه المواقع إعدادات أكثر لضغط ملف PDF (الدقة وجودة الصور)، ويحوّل إلى PDF/A، ولها تطبيقات سطح مكتب وحسابات بتخزين سحابي ومعالجة دفعات. فإن احتجت إلى شيء من ذلك ولم يكن المستند حساسًا، فهي خيارات معقولة.'],
+          paragraphs: ['إنصافًا في المقارنة، تقدّم هذه الخدمات أمورًا لا يقدّمها OpenAnyDoc، بحسب صفحاتها المرتبطة أعلاه:'],
+          list: [
+            'تدمج خطة iLovePDF Premium حتى 500 ملف في دفعة واحدة (25 في الخطة المجانية)، وتعالج حتى 4 غيغابايت في المهمة الواحدة، وتضيف مسارات العمل (Workflows) والتحويل إلى PDF/A والتوقيعات الرقمية. وتطبيقات سطح المكتب والهاتف جزء من Premium أيضًا.',
+            'لا حدود لاستخدام أدوات PDF24 المجانية على الإنترنت، ويجلب PDF24 Creator هذه الأدوات إلى حاسوب Windows ويعمل دون اتصال.',
+            'لدى Sejda تطبيق سطح مكتب إلى جانب موقعها.',
+            'أدوات الخادم لا تعتمد على ذاكرة جهازك، فقد تكون الدفعات الكبيرة جدًا أسهل فيها.',
+            'تحافظ أداة ضغط PDF في OpenAnyDoc على دقة الصور، لذلك قد تصغّر أداةٌ تخفّض الدقة ملفَّ PDF الممسوح ضوئيًا أكثر.',
+          ],
         },
         {
           heading: 'ما الذي يفعله OpenAnyDoc بشكل مختلف',
-          paragraphs: ['تعمل كل أدوات PDF في OpenAnyDoc داخل متصفحك. يُقرأ الملف ويُعدَّل ويُحفظ على جهازك، ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه، فلا يوجد رفع يحتاج إلى حذف لاحقًا. ويمكنك التحقق بنفسك من لوحة الشبكة في المتصفح أثناء عمل الأداة. وتعمل الأدوات دون اتصال بعد تحميل الصفحة، بلا حساب ولا علامة مائية ولا حد يومي، وتقرأ ملفات PDF العربية بشكل صحيح، والكود مفتوح المصدر.'],
+          paragraphs: ['تعمل كل أدوات PDF في OpenAnyDoc داخل متصفحك. يُقرأ الملف ويُعدَّل ويُحفظ على جهازك، ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه، فلا يوجد رفع يحتاج إلى حذف لاحقًا. ويمكنك التحقق بنفسك من لوحة الشبكة في المتصفح أثناء عمل الأداة. وتعمل الأدوات بلا حساب ولا علامة مائية ولا حد يومي، وتقرأ ملفات PDF العربية بشكل صحيح، والكود مفتوح المصدر. وتعمل كل أداة دون اتصال بعد أن تستخدمها مرة مع الاتصال؛ وتحمّل «OCR PDF» و«ترجمة PDF» أيضًا بيانات اللغة من هذا الموقع في أول استخدام.'],
           links: [{ text: 'التحقق بنفسك', path: '/check-file-upload' }],
         },
         {
@@ -3336,14 +4614,16 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'على ويندوز',
           paragraphs: ['انقر الملف نقرًا مزدوجًا فيُفتح في المفكرة التي تأتي مع كل إصدارات ويندوز. وإن فتحه برنامج آخر، فانقر الملف بالزر الأيمن واختر «فتح باستخدام» ثم المفكرة، واختر استخدامها دائمًا إن أردتها البرنامج الافتراضي.'],
           list: [
-            'تعرض المفكرة النص كما هو تمامًا، بلا تنسيق. ومن «ملف» ثم «حفظ باسم» تختار ترميز النسخة التي تحفظها.',
-            'يفتح وورد أيضًا ملفات txt، ويسألك عن الترميز حين لا يكون متأكدًا منه.',
-            'محررات الشيفرة المجانية مثل Notepad++ وVisual Studio Code تتعامل مع الملفات الكبيرة وترميزات كثيرة، وترقّم الأسطر.',
+            'تعرض المفكرة النص كما هو تمامًا، بلا تنسيق.',
+            'يفتح وورد أيضًا ملفات txt، وإن ظهر النص مشوّهًا يمكنك اختيار الترميز عند فتح الملف، كما تشرح صفحة Microsoft عن اختيار ترميز النص (تحققنا منها في 24 نوفمبر 2026).',
+            'ومحررات الشيفرة المجانية مثل Notepad++ وVisual Studio Code تفتح الملفات النصية أيضًا.',
           ],
+          links: [{ text: 'صفحة Microsoft عن اختيار ترميز النص', path: 'https://support.microsoft.com/en-us/office/choose-text-encoding-when-you-open-and-save-files-60d59c21-88b5-4006-831c-d536d42fd861' }],
         },
         {
           heading: 'على الماك',
-          paragraphs: ['انقر الملف نقرًا مزدوجًا فيُفتح في TextEdit. ولقراءته دون فتح أي تطبيق، حدده في Finder واضغط مفتاح المسافة لمعاينة سريعة. وإن عرض TextEdit حروفًا خاطئة، فافتح TextEdit ثم «الإعدادات» («التفضيلات» في إصدارات macOS الأقدم) ثم «فتح وحفظ»، واضبط ترميز النص العادي عند فتح الملفات على الترميز الصحيح، مثل Unicode (UTF-8)، ثم افتح الملف من جديد.'],
+          paragraphs: ['يفتح TextEdit ملفات النص العادي. ولقراءة الملف دون فتح أي تطبيق، حدده في Finder واضغط مفتاح المسافة لمعاينة سريعة. وإن عرض TextEdit حروفًا خاطئة، فافتح TextEdit ثم «الإعدادات» («التفضيلات» في إصدارات macOS الأقدم) ثم «فتح وحفظ»، واضبط ترميز النص العادي عند فتح الملفات على الترميز الصحيح، مثل Unicode (UTF-8)، ثم افتح الملف من جديد. وتشرح Apple هذه الخطوات في صفحتها عن معاينة الملفات وفي دليل TextEdit (تحققنا منهما في 24 نوفمبر 2026).'],
+          links: [{ text: 'صفحتها عن معاينة الملفات', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }, { text: 'دليل TextEdit', path: 'https://support.apple.com/guide/textedit/txted1028/mac' }],
         },
         {
           heading: 'على الهاتف أو الجهاز اللوحي',
@@ -3370,7 +4650,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'أصلح الترميز دون رفع الملف',
           paragraphs: [
-            'أفلت الملف على محرر TXT. يتعرف على UTF-8 بعلامة BOM أو دونها، وعلى UTF-16 وWindows-1256، ويعرض الترميز الذي وجده. وإن بقي النص خاطئًا، فاختر ترميزًا آخر في مجموعة «الترميز» وانقر «إعادة الفتح بهذا الترميز».',
+            'أفلت الملف على محرر TXT. يتعرف على UTF-8 بعلامة BOM أو دونها، وعلى UTF-16 وWindows-1256 وWindows-1252، ويعرض الترميز الذي وجده. وإن بقي النص خاطئًا، فاختر ترميزًا آخر في مجموعة «الترميز» وانقر «إعادة الفتح بهذا الترميز».',
             'ولتمرير الملف إلى غيرك بأمان، نزّله بترميز UTF-8 الذي يقرؤه كل برنامج حديث؛ واختر UTF-8 مع BOM إن كان سيُفتح في برامج ويندوز قديمة تخمّن صفحة الترميز القديمة إن لم تجد العلامة.',
           ],
           links: [{ text: 'محرر TXT', path: '/txt-viewer' }],
@@ -3410,7 +4690,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'برامج جداول مجانية',
           paragraphs: ['كلٌّ منها يفتح ملف CSV ورقةً:'],
           list: [
-            'LibreOffice Calc (ويندوز وماك ولينكس) يعرض نافذة استيراد أولًا، تختار فيها مجموعة الأحرف والفاصل قبل تحميل البيانات. ولهذا نادرًا ما يخطئ في النص العربي أو الفواصل المنقوطة.',
+            'LibreOffice Calc (ويندوز وماك ولينكس) يعرض نافذة استيراد أولًا، تختار فيها مجموعة الأحرف والفاصل قبل تحميل البيانات.',
             'Apple Numbers (ماك وآيفون وآيباد) يفتح ملف CSV مباشرة ويمكنه تصديره ملف اكسل.',
             'Google Sheets يفتح ملف CSV بعد رفعه إلى Google Drive أو جلبه عبر «ملف» ثم «استيراد». يحتاج حسابًا ويحفظ الملف على خوادم Google، وهذا مقبول لمعظم الملفات لكن ليس لكشوف الرواتب أو بيانات العملاء.',
           ],
@@ -3426,7 +4706,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ملفات أكبر من أن يفتحها اكسل',
-          paragraphs: ['تتوقف ورقة اكسل عند 1,048,576 صفًا، وقد يجمّده ملف من بضع مئات من الميغابايت قبل ذلك بكثير. أما عارض ملفات CSV الكبيرة فلا حد للصفوف فيه: يُفتح ملف من 120,000 صف في أقل من ثانية، والحد الحقيقي هو ذاكرة جهازك، مع تنبيه فوق 50 ميغابايت. ولماذا يقطع اكسل الملف، وما الطرق الأخرى لتجاوز ذلك، تجده في دليل ملف CSV أكبر من أن يفتحه Excel.'],
+          paragraphs: ['تتوقف ورقة اكسل عند 1,048,576 صفًا. أما عارض ملفات CSV الكبيرة فلا حد للصفوف فيه: يُفتح ملف من 120,000 صف في أقل من ثانية، والحد الحقيقي هو ذاكرة جهازك، مع تنبيه فوق 50 ميغابايت. ولماذا يقطع اكسل الملف، وما الطرق الأخرى لتجاوز ذلك، تجده في دليل ملف CSV أكبر من أن يفتحه Excel.'],
           links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
         },
         {
@@ -3436,7 +4716,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'العربية تتحول إلى رموز',
-          paragraphs: ['حين تظهر العربية على شكل «Ø§Ù„» أو علامات استفهام، فالبرنامج قرأ ملف UTF-8 بترميز خاطئ. يقرأ عارض CSV ملفات UTF-8 وUTF-16 وملفات Windows-1256 القديمة قراءة صحيحة، ويعرض العربية من اليمين إلى اليسار. ولاكسل نفسه، يشرح دليل العربية المشوّهة في ملف CSV كيف تصنع نسخة تُفتح صحيحة بنقرة مزدوجة.'],
+          paragraphs: ['حين تظهر العربية على شكل «Ø§Ù„» أو علامات استفهام، فالبرنامج قرأ ملف UTF-8 بترميز خاطئ. يقرأ عارض CSV ملفات UTF-8 وUTF-16 وملفات Windows-1256 وWindows-1252 القديمة قراءة صحيحة، ويعرض العربية من اليمين إلى اليسار. ولاكسل نفسه، يشرح دليل العربية المشوّهة في ملف CSV كيف تصنع نسخة تُفتح صحيحة بنقرة مزدوجة.'],
           links: [{ text: 'عارض CSV', path: '/csv-viewer' }, { text: 'العربية المشوّهة في ملف CSV', path: '/fix-arabic-csv-in-excel' }],
         },
         {
@@ -3460,7 +4740,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'الجواب المختصر',
-          paragraphs: ['ملف pptx عرض تقديمي من بوربوينت، لكنك لا تحتاج إلى بوربوينت لفتحه. يفتحه مجانًا عارضٌ في المتصفح، وGoogle Slides، وLibreOffice Impress، وApple Keynote. وقد أوقفت مايكروسوفت برنامج PowerPoint Viewer المستقل، فهذه هي الخيارات اليوم. ويختلفون في هل يُرفع الملف، وهل يمكنك تعديله، وما مدى دقة رسمهم للشرائح.'],
+          paragraphs: ['ملف pptx عرض تقديمي من بوربوينت، لكنك لا تحتاج إلى بوربوينت لفتحه. يفتحه مجانًا عارضٌ في المتصفح، وGoogle Slides، وLibreOffice Impress، وApple Keynote. وقد أوقفت مايكروسوفت برنامج PowerPoint Viewer المستقل في 30 أبريل 2018، بحسب صفحة Microsoft عن مشاهدة عرض تقديمي دون PowerPoint (تحققنا منها في 24 نوفمبر 2026)، فهذه هي الخيارات اليوم. ويختلفون في هل يُرفع الملف، وهل يمكنك تعديله، وما مدى دقة رسمهم للشرائح.'],
+          links: [{ text: 'صفحة Microsoft عن مشاهدة عرض تقديمي دون PowerPoint', path: 'https://support.microsoft.com/en-us/office/view-a-presentation-without-powerpoint-2f1077ab-9a4e-41ba-9f75-d55bd9b231a6' }],
         },
         {
           heading: 'في متصفحك، دون رفع أي شيء',
@@ -3479,13 +4760,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['إن احتجت إلى تغيير الشرائح، فهذه تفتح pptx وتحفظه:'],
           list: [
             'LibreOffice Impress (ويندوز وماك ولينكس) يفتح pptx ويعدّله ويحفظه، ويفتح ملفات ppt القديمة أيضًا.',
-            'Apple Keynote (ماك وآيفون وآيباد) يفتح pptx ويمكنه التصدير بصيغة بوربوينت من جديد؛ وتُستبدل بعض التأثيرات والخطوط.',
+            'Apple Keynote (ماك وآيفون وآيباد) يفتح pptx ويمكنه التصدير بصيغة بوربوينت من جديد؛ وقد تُستبدل بعض الخطوط.',
             'يفتح Google Slides ملف pptx بعد رفعه إلى Google Drive، ويفعل PowerPoint للويب الشيء نفسه مع OneDrive. كلاهما يحتاج حسابًا ويخزّن العرض على خوادمه، وهذا مقبول لمعظم العروض لكن ليس للخطط أو الأرقام غير المعلنة.',
           ],
         },
         {
           heading: 'على الهاتف',
-          paragraphs: ['تفتح متصفحات الهاتف عارض PowerPoint بالطريقة نفسها: اضغط «اختر ملفًا» وحدد العرض؛ تملأ الشريحة عرض الشاشة وتنتقل الأزرار بين الشرائح. وعلى الآيفون والآيباد يعرض تطبيق «الملفات» معاينة سريعة ويفتح Keynote الملف. ولتطبيق PowerPoint من مايكروسوفت ولـ Google Slides تطبيقات للهاتف أيضًا، ويعمل كلاهما بحسابك.'],
+          paragraphs: ['تفتح متصفحات الهاتف عارض PowerPoint بالطريقة نفسها: اضغط «اختر ملفًا» وحدد العرض؛ تملأ الشريحة عرض الشاشة وتنتقل الأزرار بين الشرائح. وتقول مايكروسوفت إن تطبيق PowerPoint المجاني للهاتف يفتح العروض أيضًا.'],
           links: [{ text: 'عارض PowerPoint', path: '/powerpoint-viewer' }],
         },
         {
@@ -3542,13 +4823,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'الجواب المختصر',
-          paragraphs: ['لا تحتاج إلى Adobe Acrobat أو Adobe Reader لفتح ملف بي دي اف. يفتحه كل متصفح ويب حديث، ومنها Chrome وEdge وFirefox وSafari: اسحب الملف إلى النافذة. ويفتح الماك ملفات PDF في تطبيق «معاينة» (Preview)، والآيفون والآيباد في تطبيق «الملفات» أو «الكتب»، وهاتف أندرويد في تطبيق Google Drive الذي يأتي مع معظمها. كلها مجانية ومثبتة عادةً من قبل.'],
+          paragraphs: ['لا تحتاج إلى Adobe Acrobat أو Adobe Reader لفتح ملف بي دي اف. يفتحه كل متصفح ويب حديث، ومنها Chrome وEdge وFirefox وSafari: اسحب الملف إلى النافذة. ويفتح الماك ملفات PDF في تطبيق «معاينة» (Preview)، والآيفون والآيباد في تطبيق «الملفات» أو «الكتب»، وهاتف أندرويد في تطبيق Google Drive. كلها مجانية ومثبتة عادةً من قبل.'],
         },
         {
           heading: 'على الحاسوب',
           paragraphs: ['ما يوجد في كل نظام من قبل:'],
           list: [
-            'ويندوز: تُفتح ملفات PDF في Microsoft Edge افتراضيًا. يكبّر ويبحث ويظلّل ويعبّئ النماذج.',
+            'ويندوز: في Microsoft Edge قارئ PDF مدمج؛ وتذكر صفحة Microsoft عن قارئ PDF في Edge التكبير والبحث والتظليل والتعبئة الأساسية للنماذج (تحققنا منها في 24 نوفمبر 2026).',
             'ماك: يفتح تطبيق «معاينة» ملفات PDF، ويعبّئ النماذج، ويضيف نصوصًا وتواقيع، ويعيد ترتيب الصفحات.',
             'لينكس: عارض المستندات الذي يأتي مع معظم أسطح المكتب يفتح ملفات PDF.',
             'أي نظام: يعرض Chrome وFirefox وSafari ملف PDF في تبويب. اسحب الملف إلى النافذة، أو اضغط Ctrl+O (أو Cmd+O على الماك) واختره.',
@@ -3578,19 +4859,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'عبّئ ملف PDF ووقّعه بدون Adobe',
           paragraphs: [
-            'يتيح لك Chrome وEdge وFirefox الكتابة في حقول معظم النماذج القابلة للتعبئة، وكذلك «معاينة» على الماك. ولتعبئة نموذج وحفظ نسخة نظيفة دون رفعه، استخدم أداة تعبئة نموذج PDF: تتعامل مع حقول النص والمربعات متعددة الأسطر ومربعات الاختيار وأزرار الخيارات والقوائم المنسدلة، بالعربية أو الإنجليزية، ويمكنها تثبيت الإجابات على الصفحة. أما نماذج XFA، وهي صيغة قديمة من Adobe، فلا تدعمها الأداة وتحتاج عادةً إلى Adobe Reader.',
+            'يعبّئ Microsoft Edge النماذج الأساسية، وكذلك «معاينة» على الماك. ولتعبئة نموذج وحفظ نسخة نظيفة دون رفعه، استخدم أداة تعبئة نموذج PDF: تتعامل مع حقول النص والمربعات متعددة الأسطر ومربعات الاختيار وأزرار الخيارات والقوائم المنسدلة، بالعربية أو الإنجليزية، ويمكنها تثبيت الإجابات على الصفحة. أما نماذج XFA، وهي صيغة قديمة من Adobe، فلا تدعمها الأداة، وتقول صفحة Microsoft عن قارئ PDF في Edge إن Edge لا يدعمها أيضًا (تحققنا منها في 24 نوفمبر 2026).',
             'وللتوقيع، يشرح دليل توقيع ملف PDF بدون Adobe الخيارات المجانية على الحاسوب والهاتف، ومتى لا تكفي صورة التوقيع.',
           ],
           links: [{ text: 'تعبئة نموذج PDF', path: '/fill-pdf' }, { text: 'توقيع ملف PDF بدون Adobe', path: '/sign-pdf-without-adobe' }],
         },
         {
           heading: 'اختر التطبيق الذي يفتح ملفات PDF',
-          paragraphs: ['إن ظلت ملفات PDF تُفتح في برنامج لا تريده، فغيّر البرنامج الافتراضي. على ويندوز، انقر ملف PDF بالزر الأيمن واختر «فتح باستخدام» ثم «اختيار تطبيق آخر»، وحدد التطبيق الذي تريده واختر استخدامه دائمًا. وعلى الماك، حدد ملف PDF في Finder واختر «ملف» ثم «معلومات»، وحدد التطبيق تحت «فتح باستخدام» وانقر «تغيير الكل». وعلى الهاتف تتيح لك قائمة المشاركة أو الفتح اختيار التطبيق في كل مرة.'],
+          paragraphs: ['إن ظلت ملفات PDF تُفتح في برنامج لا تريده، فغيّر البرنامج الافتراضي. على ويندوز، اختر التطبيق الافتراضي لملفات pdf من «الإعدادات» ضمن «التطبيقات الافتراضية»، كما تصف صفحة Microsoft عن تغيير البرامج الافتراضية. وعلى الماك، حدد ملف PDF في Finder واختر «ملف» ثم «معلومات»، وحدد التطبيق تحت «فتح باستخدام» وانقر «تغيير الكل»، كما يصف دليل مستخدم Mac من Apple (تحققنا منهما في 24 نوفمبر 2026). وعلى الهاتف تتيح لك قائمة المشاركة أو الفتح اختيار التطبيق في كل مرة.'],
+          links: [{ text: 'صفحة Microsoft عن تغيير البرامج الافتراضية', path: 'https://support.microsoft.com/en-gb/windows/change-default-programs-in-windows-27af8dcd-6d1c-44d0-a999-80d2c29b4f15' }, { text: 'دليل مستخدم Mac', path: 'https://support.apple.com/guide/mac-help/mh35597/mac' }],
         },
         {
           heading: 'هل تحتاج إلى Acrobat أصلًا؟',
-          paragraphs: ['برنامج Adobe Acrobat Reader مجاني أيضًا، ويضيف Acrobat المدفوع ميزات مثل تعديل النص الأصلي في ملف PDF. ولا تحتاج إلى أيٍّ منهما لقراءة ملف PDF أو طباعته أو البحث فيه أو تعبئته أو توقيعه، ولا لدمج صفحاته وتقسيمها وتدويرها وترقيمها: المتصفحات وأدوات PDF المجانية هنا تفعل ذلك على جهازك.'],
-          links: [{ text: 'أدوات PDF', path: '/pdf-tools' }],
+          paragraphs: ['برنامج Adobe Acrobat Reader مجاني أيضًا، وتقول صفحة Acrobat Reader لدى Adobe إن تعديل النصوص والصور يحتاج إلى خطة Acrobat مدفوعة (تحققنا منها في 24 نوفمبر 2026). ولا تحتاج إلى أيٍّ منهما لقراءة ملف PDF أو طباعته أو البحث فيه أو تعبئته أو توقيعه، ولا لدمج صفحاته وتقسيمها وتدويرها وترقيمها: المتصفحات وأدوات PDF المجانية هنا تفعل ذلك على جهازك.'],
+          links: [{ text: 'أدوات PDF', path: '/pdf-tools' }, { text: 'صفحة Acrobat Reader لدى Adobe', path: 'https://www.adobe.com/acrobat/pdf-reader.html' }],
         },
         {
           heading: 'أسئلة؟',
@@ -3633,7 +4915,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ملفاتك الخاصة تبقى على جهازك',
-          paragraphs: ['يقرأ متصفحك ملف PDF بنفسه ولا يرفعه أبدًا، فيصلح هذا للعقود وكشوف الحساب وغيرها من المستندات التي لا ترسلها إلى موقع. ويمكنك أن تتحقق من أن الملف لا يُرفع من لوحة الشبكة في متصفحك. وبعد تحميل الصفحة يواصل العارض وأداة تحويل PDF إلى نص العمل دون اتصال بالإنترنت.'],
+          paragraphs: ['يقرأ متصفحك ملف PDF بنفسه ولا يرفعه أبدًا، فيصلح هذا للعقود وكشوف الحساب وغيرها من المستندات التي لا ترسلها إلى موقع. ويمكنك أن تتحقق من أن الملف لا يُرفع من لوحة الشبكة في متصفحك. وبعد تحميل الصفحة يواصل العارض العمل دون اتصال بالإنترنت، وكذلك أداة تحويل PDF إلى نص بعد أن تستخدمها مرة.'],
           links: [{ text: 'تتحقق من أن الملف لا يُرفع', path: '/check-file-upload' }],
         },
         {
@@ -3732,10 +5014,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'خيارات مجانية قد تكون عندك',
           paragraphs: ['بعض البرامج على حاسوبك تساعد أيضًا:'],
           list: [
-            'يفتح Microsoft Word ملف PDF ويحوّله إلى مستند قابل للتعديل. وكأي تحويل، قد يتغير التنسيق المعقد.',
+            'يفتح Microsoft Word ملف PDF ويحوّله إلى مستند قابل للتعديل؛ وتقول صفحة Microsoft عن تعديل ملف PDF إن هذا ينجح أكثر مع ملفات PDF التي يغلب عليها النص (تحققنا منها في 24 نوفمبر 2026).',
             'يضيف تطبيق «معاينة» (Preview) على الماك مربعات نص وأشكالًا وتواقيع إلى ملف PDF من شريط أدوات التعليقات (Markup).',
-            'يستطيع Microsoft Edge إضافة نص ورسوم إلى ملف PDF يفتحه.',
-            'يغيّر Adobe Acrobat المدفوع نص PDF الأصلي سطرًا سطرًا، حين تسمح الخطوط الموجودة في الملف بذلك.',
+            'يستطيع Microsoft Edge إضافة رسوم بالحبر وتظليل إلى ملف PDF يفتحه، بحسب صفحة Microsoft عن قارئ PDF في Edge (تحققنا منها في 24 نوفمبر 2026).',
+            'يعدّل Adobe Acrobat المدفوع نصوص ملف PDF وصوره؛ وتقول صفحة Acrobat Reader لدى Adobe إن Reader المجاني لا يفعل ذلك (تحققنا منها في 24 نوفمبر 2026).',
           ],
         },
         {
@@ -3759,7 +5041,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             'النموذج القابل للتعبئة فيه حقول حقيقية، ويُسمى نوعها القياسي AcroForm. انقر على سطر فيظهر المؤشر، أو على مربع فتظهر فيه علامة. تُحفظ الإجابات في الحقول، فيمكن قراءتها وتغييرها لاحقًا.',
             'النموذج المسطّح يبدو نموذجًا فقط: صفحة ممسوحة ضوئيًا، أو صفحة حُفظت بلا حقول. النقر لا يفعل شيئًا، فتضع النص بنفسك حيث تذهب كل إجابة.',
-            'نموذج XFA صُنع ببرنامج Adobe LiveCycle، وهي صيغة قديمة من Adobe ما زالت بعض الجهات تستخدمها. وخارج برامج Adobe كثيرًا ما يظهر رسالة بدل النموذج. لا تدعم أداة تعبئة نموذج PDF صيغة XFA، وتحتاج هذه النماذج عادةً إلى Adobe Acrobat Reader، وهو مجاني.',
+            'نموذج XFA يستخدم XML Forms Architecture، وتصفها صفحة Microsoft عن قارئ PDF في Edge بأنها صيغة نماذج قديمة لا يدعمها Edge (تحققنا منها في 24 نوفمبر 2026). ولا تدعم أداة تعبئة نموذج PDF صيغة XFA أيضًا.',
           ],
         },
         {
@@ -3782,9 +5064,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           paragraphs: ['افتح أداة تعبئة نموذج PDF في متصفح هاتفك، واختر الملف من التنزيلات أو من تطبيق «الملفات»، ثم المس كل حقل. وتعبّئ تطبيقات الهاتف نفسه كثيرًا من النماذج أيضًا:'],
           list: [
             'الآيفون والآيباد: افتح ملف PDF في تطبيق «الملفات» والمس الحقل لتكتب فيه. وفي النموذج الذي بلا حقول، يضيف زر الترميز (Markup) نصًا وتوقيعًا.',
-            'أندرويد: يفتح تطبيق Google Drive ملفات PDF ويستطيع تعبئة كثير من النماذج القابلة للتعبئة.',
+            'أندرويد: يفتح تطبيق Google Drive ملفات PDF ويستطيع تعبئة كثير من النماذج القابلة للتعبئة، بحسب مساعدة Google Drive (تحققنا منها في 24 نوفمبر 2026).',
           ],
-          links: [{ text: 'تعبئة نموذج PDF', path: '/fill-pdf' }],
+          links: [{ text: 'تعبئة نموذج PDF', path: '/fill-pdf' }, { text: 'مساعدة Google Drive', path: 'https://support.google.com/drive/answer/9463834' }],
         },
         {
           heading: 'نموذج مسطّح: اكتب حيث تذهب الإجابات',
@@ -3810,9 +5092,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'طرق مجانية أخرى على الحاسوب',
           paragraphs: ['قد لا تحتاج إلى موقع أصلًا:'],
           list: [
-            'يعبّئ Chrome وEdge وFirefox حقول معظم النماذج القابلة للتعبئة في تبويب المتصفح، ويحفظ نسخة بإجاباتك.',
+            'يعبّئ Microsoft Edge النماذج الأساسية؛ وتقول صفحة Microsoft عن قارئ PDF فيه إن النماذج التي تستخدم JavaScript غير مدعومة (تحققنا منها في 24 نوفمبر 2026).',
             'يعبّئ تطبيق «معاينة» على الماك الحقول، ويضيف إلى النموذج المسطّح مربعات نص وتواقيع من شريط أدوات التعليقات (Markup).',
-            'برنامج Adobe Acrobat Reader مجاني أيضًا، وهو الخيار الآمن لنماذج XFA.',
+            'برنامج Adobe Acrobat Reader مجاني أيضًا، بحسب صفحة Acrobat Reader لدى Adobe (تحققنا منها في 24 نوفمبر 2026).',
           ],
         },
         {
@@ -3828,22 +5110,22 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/stirling-pdf-alternative': {
       published: '2026-11-20',
-      updated: '2026-11-24',
+      updated: '2026-11-25',
       sections: [
         {
           heading: 'الإجابة المختصرة',
           paragraphs: ['Stirling-PDF مجموعة أدوات بي دي اف تشغّلها على خادمك أنت، فتنتقل الملفات من متصفحات الموظفين إلى جهاز تتحكم فيه وتُعالَج هناك. أما OpenAnyDoc فينجز العمل داخل متصفح كل شخص، فلا خادم تحتاج إلى تشغيله ولا يغادر الملف الجهاز. لدى Stirling-PDF عمليات أكثر بكثير وواجهة برمجية وأتمتة؛ وOpenAnyDoc الخيار الأخف حين يحتاج الناس إلى مهام PDF اليومية.'],
         },
         {
-          heading: 'كيف يعمل Stirling-PDF (رُوجع في 20 نوفمبر 2026)',
+          heading: 'كيف يعمل Stirling-PDF (رُوجع في 25 نوفمبر 2026)',
           paragraphs: ['ما يقوله Stirling-PDF في صفحاته؛ اتبع الروابط للاطلاع على النص الحالي:'],
           list: [
             'خادم تستضيفه بنفسك: يشغّله ملف README على GitHub بأمر Docker واحد، ويصفه بأنه شيء يمكنك نشره «على خوادمك مع واجهة برمجية خاصة». ويذكر دليل Docker ثلاث صور، من صورة للأدوات الأساسية فقط (يُقترح لها نحو 2 غيغابايت من الذاكرة) إلى صورة كاملة بمحرك ذكاء اصطناعي مدمج (يُقترح لها 6 غيغابايت).',
-            'أين تُعالَج الملفات: تقول صفحة أين تعمل الأدوات إن كل أداة في الاستضافة الذاتية «تعمل على خادمك، حتى التي يستطيع حاسوبك تشغيلها». ولتطبيق سطح المكتب وضع محلي فقط لا يُرفع فيه شيء، ويستطيع المسؤول تفعيل المعالجة المحلية.',
-            'الميزات: يذكر ملف README أكثر من 50 أداة PDF، منها التعديل والدمج والتقسيم والتوقيع والتنقيح والتحويل وOCR والضغط، إضافة إلى مسارات عمل دون كود وواجهات REST لمعظم الأدوات.',
+            'أين تُعالَج الملفات: تقول صفحة أين تعمل الأدوات إن كل أداة في الاستضافة الذاتية «تعمل على خادمك، حتى التي يستطيع حاسوبك تشغيلها». ولتطبيق سطح المكتب وضع محلي فقط لا يُرفع فيه شيء. وإذا فعّل المسؤول المعالجة المحلية للمستندات، تبقى المستندات على الجهاز وتُخفى الأدوات التي لا تعمل محليًا.',
+            'الميزات: يذكر ملف README أكثر من 50 أداة PDF، وتذكر صفحة الأسعار أكثر من 60، منها التعديل والدمج والتقسيم والتوقيع والتنقيح والتحويل وOCR والضغط، إضافة إلى مسارات عمل دون كود وواجهات REST لمعظم الأدوات.',
             'الترخيص: يصف ملف README مشروع Stirling-PDF بأنه «open-core» (نواة مفتوحة). وملف LICENSE يجعل معظم الكود بترخيص MIT، مع عدة مجلدات لكلٍّ منها ترخيص منفصل.',
-            'الخطط: تقول صفحة الخطط إن الخادم المستضاف ذاتيًا يعمل بالخطة المجانية (5 مستخدمين و1,000 وحدة معالجة شهريًا) حتى تضيف خطة Team أو Enterprise. وتذكر صفحة الأسعار خطة Team بـ 99 دولارًا شهريًا لـ 100 مستخدم؛ وEnterprise بسعر مخصص وتضيف الدخول الموحد SAML وسجل التدقيق والنشر المعزول عن الشبكة.',
-            'Stirling Cloud: تقول صفحة الملفات والخصوصية إن ملفات الضغط وOCR والتحويل والعلامة المائية تُرسل إلى خوادم Stirling وتُعالَج ثم تُعاد.',
+            'الخطط: تقول صفحة الخطط إن الخادم المستضاف ذاتيًا يعمل بالخطة المجانية (5 مستخدمين، و1,000 وحدة شهريًا للأتمتة والذكاء الاصطناعي واستدعاءات الواجهة البرمجية) حتى تضيف خطة Team أو Enterprise. وتذكر صفحة الأسعار خطة Team بـ 99 دولارًا شهريًا لـ 100 مستخدم؛ وEnterprise بسعر مخصص وتضيف النشر المعزول عن الشبكة وتزويد SCIM وإقامة البيانات وسجلات التدقيق؛ ويُذكر الدخول الموحد بدءًا من خطة Team.',
+            'Stirling Cloud: تقول صفحة الملفات والخصوصية إن ملفات الضغط وOCR والتحويل والعلامة المائية تُرسل إلى خوادم Stirling وتُعالَج ثم تُعاد. أما الملفات التي تفتحها في محرره فتبقى في تخزين متصفحك ما لم تسجّل الدخول وتختر رفعها أو مشاركتها.',
           ],
           links: [{ text: 'README على GitHub', path: 'https://github.com/Stirling-Tools/Stirling-PDF' }, { text: 'دليل Docker', path: 'https://docs.stirlingpdf.com/Server/Install/Docker/' }, { text: 'صفحة أين تعمل الأدوات', path: 'https://docs.stirlingpdf.com/Desktop/Where-Tools-Run/' }, { text: 'ملف LICENSE', path: 'https://github.com/Stirling-Tools/Stirling-PDF/blob/main/LICENSE' }, { text: 'صفحة الخطط', path: 'https://docs.stirlingpdf.com/Server/Licensing/Plans-and-Licences/' }, { text: 'صفحة الأسعار', path: 'https://stirling.com/pricing' }, { text: 'صفحة الملفات والخصوصية', path: 'https://docs.stirlingpdf.com/Cloud/Files-and-Privacy/' }],
         },
@@ -3862,7 +5144,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'ما الذي يفعله OpenAnyDoc بشكل مختلف',
           paragraphs: [
             'لدى OpenAnyDoc أكثر من 40 أداة PDF، وكلها تعمل في متصفح من يستخدمها. يُقرأ الملف ويُعدَّل ويُحفظ على ذلك الجهاز. ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه، فلا يمكن إرسال المستند إلى أي مكان آخر؛ ويستطيع أي شخص التأكد من ذلك في لوحة الشبكة في المتصفح، كما يشرح دليل التحقق بنفسك.',
-            'لذلك لا يحتاج إبقاء الملفات داخل الجهة إلى خادم معالجة. ولأن الموقع مجلد من الملفات الثابتة، تستطيع أي جهة استضافة نسختها الخاصة على شبكتها الداخلية: ابنِه وقدّم المجلد من أي خادم ويب. لا قاعدة بيانات ولا حسابات مستخدمين ولا صورة Docker تحتاج إلى تحديث ولا حد للمعالجة، وتبقى الملفات التي يفتحها الموظفون على أجهزتهم. والكود المصدري منشور على GitHub. وبعد تحميل الصفحة تعمل الأدوات دون اتصال أيضًا.',
+            'لذلك لا يحتاج إبقاء الملفات داخل الجهة إلى خادم معالجة. ولأن الموقع مجلد من الملفات الثابتة، تستطيع أي جهة استضافة نسختها الخاصة على شبكتها الداخلية: ابنِه وقدّم المجلد من خادم ويب يرسل ترويسات الأمان نفسها التي يرسلها هذا الموقع. لا قاعدة بيانات ولا حسابات مستخدمين ولا صورة Docker تحتاج إلى تحديث ولا حد للمعالجة، وتبقى الملفات التي يفتحها الموظفون على أجهزتهم. والكود المصدري منشور على GitHub. وتعمل كل أداة دون اتصال أيضًا بعد أن تستخدمها مرة مع الاتصال؛ وتحمّل «OCR PDF» و«ترجمة PDF» أيضًا بيانات اللغة من الموقع في أول استخدام.',
           ],
           links: [{ text: 'التحقق بنفسك', path: '/check-file-upload' }],
         },
@@ -3870,10 +5152,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'مقارنة سريعة',
           paragraphs: ['أهم الفروق باختصار:'],
           list: [
-            'أين تُعالَج الملفات: Stirling-PDF المستضاف ذاتيًا على خادمك؛ وOpenAnyDoc في متصفح كل مستخدم.',
-            'ما الذي تشغّله: Stirling-PDF حاوية Docker أو تطبيق سطح مكتب، مع 2 إلى 6 غيغابايت ذاكرة مقترحة؛ وOpenAnyDoc لا شيء، أو ملفات ثابتة على أي خادم ويب.',
-            'المستخدمون والحدود: خطة Stirling-PDF المجانية 5 مستخدمين و1,000 وحدة معالجة شهريًا؛ وOpenAnyDoc بلا حسابات ولا حدود.',
-            'العمليات: Stirling-PDF أكثر من 50 أداة مع مسارات عمل وواجهة برمجية؛ وOpenAnyDoc أكثر من 40 أداة PDF دون واجهة برمجية.',
+            'أين تُعالَج الملفات: Stirling-PDF المستضاف ذاتيًا على خادمك افتراضيًا، ويستطيع المسؤول تفعيل المعالجة المحلية فتُخفى الأدوات التي لا تعمل محليًا؛ وOpenAnyDoc في متصفح كل مستخدم.',
+            'ما الذي تشغّله: Stirling-PDF حاوية Docker مع 2 إلى 6 غيغابايت ذاكرة مقترحة، أو تطبيق سطح مكتب؛ وOpenAnyDoc لا شيء، أو ملفات ثابتة على أي خادم ويب.',
+            'المستخدمون والحدود: خطة Stirling-PDF المجانية 5 مستخدمين على خادم مستضاف ذاتيًا، و1,000 وحدة شهريًا للأتمتة والذكاء الاصطناعي واستدعاءات الواجهة البرمجية (صفحة الخطط، رُوجعت في 25 نوفمبر 2026)؛ وOpenAnyDoc بلا حسابات، ولا أتمتة أو واجهة برمجية تُحتسب.',
+            'العمليات: Stirling-PDF أكثر من 50 أداة (أكثر من 60 في صفحة الأسعار) مع مسارات عمل وواجهة برمجية؛ وOpenAnyDoc أكثر من 40 أداة PDF دون واجهة برمجية.',
             'الضغط: كلاهما؛ يحفظ OpenAnyDoc الصور بثلاثة مستويات جودة في المتصفح ولا يخفّض دقتها.',
             'الدفعات الكبيرة: يتولاها خادم Stirling-PDF؛ وفي OpenAnyDoc تحدها ذاكرة كل جهاز.',
           ],
@@ -3958,7 +5240,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'أدوات JSON التي تُبقي بياناتك في المتصفح',
           paragraphs: ['كلٌّ منها يعمل على جهازك:'],
           list: [
-            'منسّق JSON: تنسيق بمسافة إلى 8 مسافات أو Tab، وضغط في سطر واحد، وترتيب المفاتيح؛ وتبقى الأعداد الطويلة كما هي رقمًا رقمًا.',
+            'منسّق JSON: تنسيق بمسافة واحدة أو 2 أو 3 أو 4 أو 8 مسافات أو Tab، وضغط في سطر واحد، وترتيب المفاتيح؛ وتبقى الأعداد الطويلة كما هي رقمًا رقمًا.',
             'مدقق JSON: يعرض السطر والعمود لموضع الخطأ، وزر «إصلاح» يعالج الفواصل الزائدة والتعليقات وعلامات الاقتباس المفردة والمفاتيح بلا علامات اقتباس.',
             'عارض JSON: عرض شجري وجدولي ونصي، مع التعديل والتنزيل.',
             'مقارنة JSON: الفروق حسب المفتاح والمسار، مع تجاهل ترتيب المفاتيح.',
@@ -4056,23 +5338,24 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'الإجابة المختصرة',
-          paragraphs: ['يفتح Windows صور HEIC من iPhone في تطبيق الصور بعد تثبيت إضافة HEIF Image Extensions من Microsoft Store. وإن لم تستطع التثبيت أو لم ترده، فافتح الصورة في متصفحك بـ«عارض الصور» من OpenAnyDoc، أو حوّلها إلى JPG بأداة «تحويل HEIC إلى JPG»؛ كلاهما يعمل في Chrome وEdge وFirefox على Windows، وتبقى الصورة على حاسوبك. ولتتجنب المشكلة لاحقًا، اضبط iPhone ليحفظ الصور بصيغة JPG.'],
+          paragraphs: ['يفتح Windows صور HEIC من iPhone في تطبيق الصور بعد تثبيت إضافتين من Microsoft Store: ‏HEIF Image Extensions وHEVC Video Extensions. وإن لم تستطع التثبيت أو لم ترده، فافتح الصورة في متصفحك بـ«عارض الصور» من OpenAnyDoc، أو حوّلها إلى JPG بأداة «تحويل HEIC إلى JPG»؛ كلاهما يعمل في Chrome وEdge وFirefox على Windows، وتبقى الصورة على حاسوبك. ولتتجنب المشكلة لاحقًا، اضبط iPhone ليحفظ الصور بصيغة JPG.'],
           links: [{ text: 'عارض الصور', path: '/image-viewer' }, { text: 'تحويل HEIC إلى JPG', path: '/heic-to-jpg' }],
         },
         {
           heading: 'ما ملف HEIC؟',
-          paragraphs: ['HEIC هو نوع الملف الذي يحفظ به iPhone الصور افتراضيًا. إنه صورة محفوظة بصيغة HEIF، تأخذ مساحة أقل من JPG بجودة مقاربة، فتتسع ذاكرة الهاتف لصور أكثر. يفتحها Mac في تطبيقي الصور وPreview دون تثبيت شيء، ويفتحها iPhone وiPad في تطبيق الصور، وتفتحها معظم هواتف Android في Google Photos أو في تطبيق المعرض.', 'قد ينتهي اسم الملف بـ .heic أو .heif، وكلاهما النوع نفسه من الصور، ويُفتحان بالخطوات أدناه. وبعض هواتف Android تحفظ الصور بصيغة HEIC أيضًا.'],
+          paragraphs: ['HEIC هو نوع الملف الذي يحفظ به iPhone الصور افتراضيًا. إنه صورة محفوظة بصيغة HEIF، تأخذ مساحة أقل من JPG بجودة مقاربة، فتتسع ذاكرة الهاتف لصور أكثر. يفتحها Mac في تطبيقي الصور وPreview دون تثبيت شيء، ويفتحها iPhone وiPad في تطبيق الصور.', 'قد ينتهي اسم الملف بـ .heic أو .heif، وكلاهما النوع نفسه من الصور، ويُفتحان بالخطوات أدناه. وبعض هواتف Android تحفظ الصور بصيغة HEIC أيضًا.'],
         },
         {
           heading: 'لماذا قد لا يفتحه Windows؟',
-          paragraphs: ['يقرأ Windows صيغة HEIC بإضافة لا من تلقاء نفسه. الإضافة المعتادة هي HEIF Image Extensions، وهي مجانية في Microsoft Store، وبعد تثبيتها يفتح تطبيق الصور ملفات HEIC. وفي بعض الأجهزة لا تُفتح الصور إلا بعد تثبيت HEVC Video Extensions أيضًا، لأن الصورة داخل ملف HEIC مضغوطة بطريقة ضغط فيديو HEVC نفسها؛ وهذه الإضافة تُباع في المتجر، وتأتي مثبتة في بعض الأجهزة.', 'هذا الطريق مناسب على حاسوبك الشخصي، لكنه لا ينفع على حاسوب العمل أو الجامعة حين يكون المتجر محظورًا، ولا على جهاز مشترك أو مستعار، ولا حين تريد فتح صورة واحدة مرة واحدة. والمتصفحات لا تكفي وحدها: فـChrome وEdge وFirefox لا تعرض HEIC بنفسها، ولهذا ترفضها مواقع كثيرة عند الرفع.'],
+          links: [{ text: 'صفحة Microsoft عن ملفات HEIF وHEVC في تطبيق الصور', path: 'https://support.microsoft.com/help/4494024' }],
+          paragraphs: ['يقرأ Windows صيغة HEIC بإضافات لا من تلقاء نفسه. وتقول صفحة Microsoft عن ملفات HEIF وHEVC في تطبيق الصور (تحققنا منها في 24 نوفمبر 2026) إن تطبيق الصور يحتاج إلى إضافتين من Microsoft Store: ‏HEIF Image Extensions وهي مجانية، وHEVC Video Extensions وهي مدفوعة، وإنك تحتاج إلى الاثنتين حتى لو كنت ستستخدم الصور فقط. والصورة داخل ملف HEIC مضغوطة بطريقة ضغط فيديو HEVC نفسها.', 'هذا الطريق مناسب على حاسوبك الشخصي، لكنه لا ينفع على حاسوب العمل أو الجامعة حين يكون المتجر محظورًا، ولا على جهاز مشترك أو مستعار، ولا حين تريد فتح صورة واحدة مرة واحدة. والمتصفحات لا تكفي وحدها: فـChrome وEdge وFirefox لا تعرض HEIC بنفسها، ولهذا ترفضها مواقع كثيرة عند الرفع.'],
         },
         {
           heading: 'افتحها في متصفحك دون تثبيت أي شيء',
           paragraphs: ['يقرأ OpenAnyDoc الصورة على حاسوبك. في أول مرة تفتح فيها ملف HEIC في Chrome أو Edge أو Firefox، يُحمَّل من هذا الموقع برنامج لفك HEIC ويحتفظ به متصفحك؛ أما الصورة نفسها فلا تُرفع أبدًا.'],
           list: [
             'لمشاهدة صورة: افتح «عارض الصور» وأفلت ملف .heic على الصفحة. يمكنك التكبير وملاءمة الصورة للنافذة ورؤية الكاميرا وتاريخ الالتقاط، وموقع GPS إن كانت الصورة تحمله.',
-            'لاستخدامها في مكان آخر: افتح «تحويل HEIC إلى JPG» وأضف صورة واحدة أو مجلدًا كاملًا، واختر الجودة (90 تبقيها بالمظهر نفسه)، ثم نزّل ملف JPG أو ملف ZIP بها جميعًا.',
+            'لاستخدامها في مكان آخر: افتح «تحويل HEIC إلى JPG» وأضف صورة واحدة أو عدة صور معًا، واختر الجودة (90 تبقيها بالمظهر نفسه)، ثم نزّل ملف JPG أو ملف ZIP بها جميعًا.',
             'ومن العارض، تتيح لك الخطوات التالية ضغط الصورة أو تغيير حجمها أو تنظيفها أو تحويلها إلى PDF دون اختيار الملف من جديد.',
           ],
           links: [{ text: 'عارض الصور', path: '/image-viewer' }, { text: 'تحويل HEIC إلى JPG', path: '/heic-to-jpg' }],
@@ -4089,10 +5372,11 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'أوقف إنشاء ملفات HEIC على iPhone',
-          paragraphs: ['يساعدك إعدادان في iPhone، ويغيّران الصور التي تلتقطها أو تنسخها من الآن فصاعدًا، لا الصور المحفوظة من قبل.'],
+          links: [{ text: 'صفحة Apple عن صور HEIF وHEVC', path: 'https://support.apple.com/en-us/116944' }],
+          paragraphs: ['يساعدك إعدادان في iPhone، كما تشرح صفحة Apple عن صور HEIF وHEVC (تحققنا منها في 24 نوفمبر 2026)، ويغيّران الصور التي تلتقطها أو تنسخها من الآن فصاعدًا، لا الصور المحفوظة من قبل.'],
           list: [
             'الإعدادات، الكاميرا، التنسيقات، «الأكثر توافقًا»: تحفظ الكاميرا الصور الجديدة بصيغة JPG بدل HEIC، وتأخذ مساحة أكبر على الهاتف.',
-            'الإعدادات، الصور، «النقل إلى Mac أو PC»، «تلقائي»: تُحوَّل الصور التي تنسخها إلى الحاسوب بالكابل إلى صيغة متوافقة أثناء النقل.',
+            'الإعدادات، التطبيقات، الصور، واترك «الاحتفاظ بالأصول» غير مفعّل: قد تُحوَّل حينها الصور التي تستوردها إلى الحاسوب بالكابل إلى JPEG أثناء النقل.',
           ],
         },
         {
@@ -4147,9 +5431,10 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'امنع الهاتف من إضافته',
+          links: [{ text: 'صفحة Apple عن الموقع في الصور', path: 'https://support.apple.com/guide/personal-safety/manage-location-metadata-in-photos-ips0d7a5df82/web' }],
           paragraphs: ['يمكن لإعدادات الهاتف أن تستبعد الموقع من البداية، أو في مشاركة واحدة. أسماء القوائم تختلف بين الإصدارات والشركات المصنعة، فابحث عن هذه الكلمات:'],
           list: [
-            'iPhone لمشاركة واحدة: في ورقة المشاركة، اضغط «الخيارات» في الأعلى وأوقف «الموقع» قبل الإرسال.',
+            'iPhone لمشاركة واحدة: في ورقة المشاركة، اضغط «الخيارات» وأوقف «الموقع» قبل الإرسال، كما تشرح صفحة Apple عن الموقع في الصور (تحققنا منها في 24 نوفمبر 2026).',
             'iPhone لكل صورة جديدة: الإعدادات، الخصوصية والأمن، خدمات الموقع، الكاميرا، «أبدًا».',
             'Android: افتح إعدادات تطبيق الكاميرا وأوقف خيار وسوم الموقع أو حفظ الموقع؛ ويختلف اسمه بحسب الشركة المصنعة.',
           ],
@@ -4180,7 +5465,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'لماذا يهم أين تذهب الصورة',
-          paragraphs: ['كثير من أدوات إزالة الخلفية على الإنترنت تقص الصورة على خوادمها، فلا بد من رفع الصورة أولًا. قد لا يهم ذلك في صورة منتج، لكنه يهم في صورة عائلية أو صورة طفل أو صورة شخصية لبطاقة هوية.', 'حين يعمل النموذج في متصفحك تبقى الصورة على جهازك. ولا تحتاج إلى أن تصدّق ذلك على الثقة: يمكنك أن تتحقق من أن شيئًا لا يُرفع بمراقبة لوحة الشبكة في متصفحك أثناء استخدام الأداة.'],
+          paragraphs: ['بعض أدوات إزالة الخلفية على الإنترنت تقص الصورة على خوادمها، فلا بد من رفع الصورة أولًا. قد لا يهم ذلك في صورة منتج، لكنه يهم في صورة عائلية أو صورة طفل أو صورة شخصية لبطاقة هوية.', 'حين يعمل النموذج في متصفحك تبقى الصورة على جهازك. ولا تحتاج إلى أن تصدّق ذلك على الثقة: يمكنك أن تتحقق من أن شيئًا لا يُرفع بمراقبة لوحة الشبكة في متصفحك أثناء استخدام الأداة.'],
           links: [{ text: 'تتحقق من أن شيئًا لا يُرفع', path: '/check-file-upload' }],
         },
         {
@@ -4225,7 +5510,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'خيارات موجودة على أجهزتك',
-          paragraphs: ['قد لا تحتاج إلى موقع أصلًا، فهذه الطرق تعمل على الجهاز أيضًا:'],
+          paragraphs: ['قد لا تحتاج إلى موقع أصلًا، فهذه الطرق تعمل على الجهاز أيضًا (صفحات الشركات المصنّعة، تحققنا منها في 24 نوفمبر 2026):'],
+          links: [{ text: 'المس موضوع الصورة مطوّلًا', path: 'https://support.apple.com/102460' }, { text: 'نسخ الموضوع', path: 'https://support.apple.com/guide/safari/ibrw1c2374cd/mac' }, { text: 'زر لإزالة الخلفية', path: 'https://blogs.windows.com/windows-insider/2023/09/07/background-removal-in-paint-begins-rolling-out-to-windows-insiders/' }],
           list: [
             'iPhone وiPad: في تطبيق الصور، المس موضوع الصورة مطوّلًا حتى يرتفع، ثم انسخه أو شاركه.',
             'Mac: في تطبيق الصور أو Preview، انقر الصورة بزر الفأرة الأيمن واختر «نسخ الموضوع»، ثم الصقه في تطبيق آخر.',
@@ -4258,7 +5544,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'جدول Markdown أم CSV؟',
-          paragraphs: ['كلاهما يعمل، والفرق بين سهولة القراءة والحجم. في تجربتنا أخذ جدول تجريبي (100 طلب في 5 أعمدة) 1,759 رمزًا كجدول Markdown و1,367 رمزًا كملف CSV، أي أن نسخة Markdown أكبر بنحو 29%. الرموز الزائدة هي الخطوط العمودية وسطر الفصل.'],
+          paragraphs: ['كلاهما يعمل، والفرق بين سهولة القراءة والحجم. في تجربتنا أخذ جدول تجريبي (100 طلب في 5 أعمدة) 2,449 رمزًا كجدول Markdown و2,148 رمزًا كملف CSV، أي أن نسخة Markdown أكبر بنحو 14%. الرموز الزائدة هي الخطوط العمودية وسطر الفصل.'],
           list: [
             'اختر جدول Markdown حين يكون الجدول صغيرًا أو متوسطًا، أو حين تحتوي الخلايا على فواصل، أو حين تريد أن تعرض لك المحادثة الجدول نفسه في ردها.',
             'اختر CSV حين يكون الجدول كبيرًا وكل رمز محسوبًا. أداة تحويل Excel إلى CSV تعطيك الملف؛ افتحه في أي محرر نصوص والصق نصه.',
@@ -4340,7 +5626,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           list: [
             'فاصل السطر داخل الخلية يُكتب <br>. يعرضه GitHub سطرًا جديدًا داخل الخلية، وبعض المحررات تعرض الوسم نصًا، فاختصر هذه الخلايا إن كان الجدول ذاهبًا إلى مكان آخر.',
             'تنسيق Markdown داخل الخلايا يعمل: *نص* يصبح مائلًا وعلامات backtick تجعله كودًا. إن كانت في خلية نجوم أو شرطات سفلية يجب أن تبقى كما هي، فراجع الجدول بعد عرضه.',
-            'الحروف العربية والحروف ذات العلامات تبقى كما هي. ويُكتشف الفاصل (فاصلة أو فاصلة منقوطة أو Tab أو خط عمودي) والترميز من الملف، فيتحول ملف CSV حفظه اكسل في أوروبا أو ملف CSV عربي من ويندوز دون تعديل.',
+            'الحروف العربية تبقى كما هي في ملف UTF-8 أو ملف CSV عربي من ويندوز، والحروف ذات العلامات تبقى كما هي في ملف UTF-8 أو ملف CSV من ويندوز بلغات أوروبا الغربية. ويُكتشف الفاصل (فاصلة أو فاصلة منقوطة أو Tab أو خط عمودي) من الملف، فيحتفظ ملف CSV مفصول بفواصل منقوطة حفظه اكسل في أوروبا بأعمدته.',
           ],
         },
         {
@@ -4374,7 +5660,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'لصق الجدول في محادثة ذكاء اصطناعي',
-          paragraphs: ['يقرأ ChatGPT وClaude وGemini جداول Markdown جيدًا، لأن كل قيمة تقع تحت اسم عمودها. لكن الجدول يكلّف رموزًا أكثر من البيانات نفسها بصيغة CSV، فعُدّ الجداول الكبيرة أولًا بعدّاد الرموز. وإن كانت البيانات في مصنف، فأداة تحويل Excel إلى Markdown تؤدي العمل نفسه ورقةً ورقة، ويشرح دليل إعطاء محادثة الذكاء الاصطناعي جدول بيانات الحجم والمعادلات وإخفاء البيانات الشخصية.'],
+          paragraphs: ['يسهل على محادثة الذكاء الاصطناعي أن تقرأ جدول Markdown، لأن كل قيمة تقع تحت اسم عمودها. لكن الجدول يكلّف رموزًا أكثر من البيانات نفسها بصيغة CSV، فعُدّ الجداول الكبيرة أولًا بعدّاد الرموز. وإن كانت البيانات في مصنف، فأداة تحويل Excel إلى Markdown تؤدي العمل نفسه ورقةً ورقة، ويشرح دليل إعطاء محادثة الذكاء الاصطناعي جدول بيانات الحجم والمعادلات وإخفاء البيانات الشخصية.'],
           links: [{ text: 'عدّاد الرموز', path: '/token-counter' }, { text: 'تحويل Excel إلى Markdown', path: '/excel-to-markdown' }, { text: 'دليل إعطاء محادثة الذكاء الاصطناعي جدول بيانات', path: '/spreadsheet-to-ai-chat' }],
         },
         {
@@ -4817,24 +6103,18 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
       sections: [
         {
           heading: 'الإجابة المختصرة',
-          paragraphs: ['يدمج جهاز Mac ملفات بي دي اف بتطبيق «معاينة» (Preview)، ويدمجها iPhone وiPad بتطبيق «الملفات» أو باختصار. أما Windows وأندرويد فليس فيهما دمج مدمج، فأسهل طريقة هناك أداة في المتصفح. تعمل أداة «دمج PDF» من OpenAnyDoc في أي متصفح حديث على كل هذه الأجهزة، وتجمع الملفات على جهازك دون رفعها.'],
+          paragraphs: ['يدمج جهاز Mac ملفات بي دي اف بتطبيق «معاينة» (Preview). أما Windows وأندرويد فليس فيهما دمج مدمج، فأسهل طريقة هناك أداة في المتصفح. تعمل أداة «دمج PDF» من OpenAnyDoc في أي متصفح حديث على كل هذه الأجهزة، وتجمع الملفات على جهازك دون رفعها.'],
           links: [{ text: 'دمج PDF', path: '/merge-pdf' }],
         },
         {
           heading: 'على Mac: تطبيق «معاينة»',
-          paragraphs: ['يستطيع تطبيق «معاينة»، الموجود في كل جهاز Mac، أن يضيف ملف PDF إلى آخر. افتح الملف الأول، واختر «عرض» ثم «الصور المصغّرة»، وحدّد الصفحة التي تريد أن يأتي الملف التالي بعدها. ثم اختر «تحرير» ثم «إدراج» ثم «صفحة من ملف»، واختر الملف الآخر. اسحب الصور المصغّرة لتغيير الترتيب. ويغيّر «معاينة» الملف الذي فتحته نفسه، فإن أردت الاحتفاظ بالأصل فاصنع نسخة أولًا من «ملف» ثم «تكرار»، واحفظ النسخة.'],
+          paragraphs: ['يستطيع تطبيق «معاينة»، الموجود في كل جهاز Mac، أن يضيف ملف PDF إلى آخر. افتح الملف الأول، واختر «عرض» ثم «الصور المصغّرة»، وحدّد الصفحة التي تريد أن يأتي الملف التالي بعدها. ثم اختر «تحرير» ثم «إدراج» ثم «صفحة من ملف»، واختر الملف الآخر. اسحب الصور المصغّرة لتغيير الترتيب. ويغيّر «معاينة» الملف الذي فتحته نفسه، فإن أردت الاحتفاظ بالأصل فاصنع نسخة أولًا من «ملف» ثم «تكرار»، واحفظ النسخة. والخطوات في صفحتي Apple ‏Add, delete, or move PDF pages وCombine PDFs in Preview (تحققنا منهما في 24 نوفمبر 2026).'],
+          links: [{ text: 'Add, delete, or move PDF pages', path: 'https://support.apple.com/guide/preview/prvw11793/mac' }, { text: 'Combine PDFs in Preview', path: 'https://support.apple.com/guide/preview/prvw43696/mac' }],
         },
         {
           heading: 'على Windows: لا دمج مدمجًا',
           paragraphs: ['يفتح Windows ملفات PDF ويطبعها في متصفح Microsoft Edge، لكن لا Edge ولا Windows فيه أمر يجمع ملفين. والطباعة إلى Microsoft Print to PDF تصنع ملفًا جديدًا من ملف واحد في كل مرة، فلا تدمج الملفات أيضًا. يمكنك تثبيت برنامج PDF، أو استخدام أداة في المتصفح الذي لديك: افتح أداة دمج PDF في Edge أو Chrome، فلا شيء تثبّته ولا شيء يُرفع.'],
           links: [{ text: 'دمج PDF في Edge أو Chrome', path: '/merge-pdf' }],
-        },
-        {
-          heading: 'على iPhone أو iPad: «الملفات» أو «الاختصارات»',
-          paragraphs: [
-            'في تطبيق «الملفات»، افتح المجلد الذي فيه الملفات، واضغط «تحديد»، ثم اضغط كل ملف، ثم زر «المزيد» (ثلاث نقاط) واختر «إنشاء PDF». يظهر ملف جديد في المجلد نفسه. والتطبيق هو الذي يقرر ترتيب الصفحات، فافتح الناتج وتحقّق منه؛ وإن كان الترتيب خطأ فاستخدم أداة في المتصفح تحدّد فيها الترتيب بنفسك.',
-            'وفي تطبيق «الاختصارات» إجراء «إنشاء PDF» يجمع كل ما يُعطى له في ملف واحد. واختصار يأخذ الملفات من قائمة المشاركة ويمرّرها إلى هذا الإجراء مفيد إن كنت تدمج الملفات كثيرًا.',
-          ],
         },
         {
           heading: 'على أندرويد: استخدم المتصفح',
@@ -4934,16 +6214,17 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'دون موقع ويب',
           paragraphs: ['يستطيع الحاسوب أيضًا حفظ بعض الصفحات في ملف جديد من نافذة الطباعة:'],
+          links: [{ text: 'دليل «معاينة» من Apple', path: 'https://support.apple.com/guide/preview/prvw11793/mac' }, { text: 'مساعدة Chrome', path: 'https://support.google.com/chrome/answer/1069693?co=GENIE.Platform%3DAndroid' }],
           list: [
-            'Mac: افتح الملف في «معاينة»، واختر «ملف» ثم «طباعة»، واكتب الصفحات التي تريدها، ثم اختر «حفظ بتنسيق PDF» من قائمة PDF. ويمكنك أيضًا سحب صورة مصغّرة لصفحة من الشريط الجانبي إلى سطح المكتب لتحصل عليها وحدها.',
+            'Mac: في «معاينة»، حدّد الصور المصغّرة للصفحات التي تريدها في الشريط الجانبي واسحبها إلى سطح المكتب؛ ويقول دليل «معاينة» من Apple إن هذا ينشئ ملف PDF جديدًا (تحققنا منها في 24 نوفمبر 2026). ومن «ملف» ثم «طباعة» ثم «حفظ بتنسيق PDF» من قائمة PDF يُحفظ ملف PDF أيضًا.',
             'Windows: افتح الملف في Microsoft Edge، واختر «طباعة»، واختر Microsoft Print to PDF طابعةً، واكتب الصفحات، واطبعها إلى ملف جديد.',
-            'أندرويد: في نافذة الطباعة طابعة «حفظ بتنسيق PDF»، ويمكنك اختيار الصفحات منها.',
+            'أندرويد: في Chrome، يعرض أمر «طباعة» من «مشاركة» طابعة «حفظ بتنسيق PDF» (مساعدة Chrome، تحققنا منها في 24 نوفمبر 2026).',
           ],
         },
         {
           heading: 'ما الذي ينتقل إلى الملفات الجديدة',
           paragraphs: [
-            'تنسخ أداة «تقسيم PDF» الصفحات كما هي، فيبقى النص حادًّا وقابلًا للتحديد، وتحتفظ الصور بجودتها. ويُقسَّم ملف من 150 صفحة في ثوانٍ، مع شريط تقدّم. أما الطباعة إلى PDF، كما في القسم السابق، فتعيد رسم الصفحات عبر نظام الطباعة، فقد تضيع الروابط وحقول النماذج؛ والأدوات هنا تنسخها بدل ذلك.',
+            'تنسخ أداة «تقسيم PDF» الصفحات كما هي، فيبقى النص حادًّا وقابلًا للتحديد، وتحتفظ الصور بجودتها. ويُقسَّم ملف من 150 صفحة في ثوانٍ، مع شريط تقدّم. أما الطباعة إلى PDF، كما في القسم السابق، فتعيد رسم الصفحات عبر نظام الطباعة، فقد تضيع الروابط وحقول النماذج؛ والأدوات هنا تنسخ الروابط مع الصفحات، لكن حقول النماذج قد لا تبقى قابلة للتعبئة.',
             'وقد لا تنتقل الإشارات المرجعية والروابط التي تقفز بين الصفحات إلى الملفات الجديدة. والملف الذي يحتاج إلى كلمة مرور لفتحه يجب أن تُزال كلمة مروره أولًا بأداة «فتح قفل PDF»، إن كنت تعرفها.',
           ],
           links: [{ text: 'تقسيم PDF', path: '/split-pdf' }, { text: 'فتح قفل PDF', path: '/unlock-pdf' }],
@@ -4972,9 +6253,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'اختر الصور',
           paragraphs: [
             'على الهاتف، افتح «تحويل JPG إلى PDF» واضغط «اختر ملفًا»: يعرض الهاتف مكتبة الصور إلى جانب الملفات، فتختار الصور مباشرة من ألبوم الكاميرا. وعلى الحاسوب، أفلت الصور على الصفحة. ويمكنك إضافة المزيد في أي وقت.',
-            'يحفظ iPhone الصور بصيغة HEIC افتراضيًا. يقرؤها Safari بنفسه، أما في Chrome وEdge وFirefox فيُحمَّل قارئ HEIC أول مرة تضيف فيها صورة منها، وتبقى الصورة تُقرأ على جهازك. وقد لا تُقرأ بعض الصور الملتقطة بأحدث إعدادات iPhone؛ فاحفظها بصيغة JPG على الهاتف أولًا، أو حوّلها بأداة «تحويل HEIC إلى JPG».',
+            'يحفظ iPhone الصور بصيغة HEIC افتراضيًا. يقرؤها Safari بنفسه منذ Safari 17 (ملاحظات WebKit عن Safari 17.0، تحققنا منها في 24 نوفمبر 2026)، أما في Chrome وEdge وFirefox فيُحمَّل قارئ HEIC أول مرة تضيف فيها صورة منها، وتبقى الصورة تُقرأ على جهازك. وقد لا تُقرأ بعض الصور الملتقطة بأحدث إعدادات iPhone؛ فاحفظها بصيغة JPG على الهاتف أولًا، أو حوّلها بأداة «تحويل HEIC إلى JPG».',
           ],
-          links: [{ text: 'تحويل HEIC إلى JPG', path: '/heic-to-jpg' }],
+          links: [{ text: 'تحويل HEIC إلى JPG', path: '/heic-to-jpg' }, { text: 'ملاحظات WebKit عن Safari 17.0', path: 'https://webkit.org/blog/14445/' }],
         },
         {
           heading: 'رتّب الصور',
@@ -4992,7 +6273,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'صور المستندات: استخدم «مسح ضوئي إلى PDF»',
           paragraphs: [
-            'صورة خطاب أو إيصال ملتقطة بزاوية تبدو مائلة في ملف PDF، تحيط بها الطاولة الداكنة. أداة «مسح ضوئي إلى PDF» تصلح ذلك: اسحب الزوايا الأربع إلى زوايا الورقة فتُقوَّم الصفحة كأنها مُسحت مسطّحة، ويجعل «مظهر المستند» الورق أبيض والحبر داكنًا ويخفّف الظلال. ويمكنك التقاط الصور من تلك الصفحة بكاميرا الهاتف.',
+            'صورة خطاب أو إيصال ملتقطة بزاوية تبدو مائلة في ملف PDF، تحيط بها الطاولة الداكنة. أداة «مسح ضوئي إلى PDF» تصلح ذلك: اسحب الزوايا الأربع إلى زوايا الورقة فتُقوَّم الصفحة كأنها مُسحت مسطّحة، ويجعل خيار «مستند (أبيض وأسود)» في «المظهر» الورق أبيض والحبر داكنًا ويخفّف الظلال. ويمكنك التقاط الصور من تلك الصفحة بكاميرا الهاتف.',
             'وفي الحالتين تبقى الصفحات صورًا، فلا يمكن البحث في كلماتها أو نسخها. ولجعلها قابلة للبحث، اقرأ كيف تجعل ملف PDF الممسوح ضوئيًا قابلًا للبحث.',
           ],
           links: [{ text: 'مسح ضوئي إلى PDF', path: '/scan-to-pdf' }, { text: 'كيف تجعل ملف PDF الممسوح ضوئيًا قابلًا للبحث', path: '/make-scanned-pdf-searchable' }],
@@ -5000,7 +6281,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'كيف تُبقي الملف صغيرًا',
           paragraphs: [
-            'تضع أداة «تحويل JPG إلى PDF» صور JPG وPNG في الملف كما هي، دون ضغطها مرة أخرى. فتبقى الجودة، لكن حجم الملف يقارب مجموع أحجام الصور، وصور الهاتف كثيرًا ما تبلغ عدة ميغابايت لكل صورة.',
+            'تضع أداة «تحويل JPG إلى PDF» صور PNG، وصور JPG المعتدلة أصلًا، في الملف كما هي، دون ضغطها مرة أخرى؛ أما صورة JPG المحفوظة على جنبها فيُعاد رسمها معتدلة مرة واحدة. فتبقى الجودة، لكن حجم الملف يقارب مجموع أحجام الصور، وصور الهاتف كثيرًا ما تبلغ عدة ميغابايت لكل صورة.',
             'ولتصغير الملف، صغّر الصور أولًا:',
           ],
           list: [
@@ -5024,8 +6305,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'على الهاتف نفسه',
-          paragraphs: ['للهواتف طرقها أيضًا. على iPhone وiPad، يستطيع تطبيق «الملفات» صنع ملف PDF واحد من صور تحدّدها («إنشاء PDF» من قائمة «المزيد»)، والماسح الضوئي للمستندات في تطبيقي «الملفات» و«الملاحظات» يصوّر الصفحات مباشرة في ملف PDF. وعلى أندرويد، في تطبيق Google Drive ماسح يحفظ ملفات PDF في حسابك على Drive. لكن هذه الطرق تعطي خيارات أقل لمقاس الصفحة والهامش، وDrive يحفظ المسح في حسابك على الإنترنت. أما أداة تحويل JPG إلى PDF فتبقي كل شيء على جهازك.'],
-          links: [{ text: 'تحويل JPG إلى PDF', path: '/jpg-to-pdf' }],
+          paragraphs: ['للهواتف طرقها أيضًا. على iPhone وiPad، في تطبيقي «الملفات» و«الملاحظات» أمر «مسح المستندات» الذي يصوّر الصفحات. وعلى أندرويد، في تطبيق Google Drive ماسح يمكنه حفظ المسح ملف PDF في حسابك على Drive (صفحات المساعدة من Apple وGoogle، تحققنا منها في 24 نوفمبر 2026). لكن هذه الطرق تعطي خيارات أقل لمقاس الصفحة والهامش، وDrive يحفظ المسح في حسابك على الإنترنت. أما أداة تحويل JPG إلى PDF فتبقي كل شيء على جهازك.'],
+          links: [{ text: 'تحويل JPG إلى PDF', path: '/jpg-to-pdf' }, { text: 'أمر «مسح المستندات»', path: 'https://support.apple.com/108963' }, { text: 'تطبيق Google Drive ماسح', path: 'https://support.google.com/drive/answer/3145835?co=GENIE.Platform%3DAndroid' }],
         },
         {
           heading: 'أسئلة؟',
@@ -5087,8 +6368,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'طرق مجانية أخرى',
-          paragraphs: ['على Mac، يستطيع تطبيق «معاينة» إضافة كلمة مرور حين تصدّر الملف من «ملف» ثم «تصدير». ويستطيع Word وLibreOffice تشفير المستند بكلمة مرور حين يحفظانه بصيغة PDF، وهذا يناسب مستندًا كتبته بنفسك. أما «حماية PDF بكلمة مرور» فتعمل مع أي ملف PDF يُفتح دون كلمة مرور، على أي جهاز، وتُبقي نصه وصوره وروابطه وحقول نماذجه كما هي.'],
-          links: [{ text: 'حماية PDF بكلمة مرور', path: '/protect-pdf' }],
+          paragraphs: ['على Mac، يستطيع تطبيق «معاينة» إضافة كلمة مرور حين تصدّر الملف من «ملف» ثم «تصدير» ثم «الأذونات» (دليل «معاينة» من Apple). ويستطيع Word وLibreOffice تشفير المستند بكلمة مرور حين يحفظانه بصيغة PDF (صفحة Microsoft عن الحفظ بصيغة PDF، ومساعدة LibreOffice عن تصدير PDF؛ تحققنا منها في 24 نوفمبر 2026)، وهذا يناسب مستندًا كتبته بنفسك. أما «حماية PDF بكلمة مرور» فتعمل مع أي ملف PDF يُفتح دون كلمة مرور، ومنه الملف الذي يمنع الطباعة أو النسخ فقط، على أي جهاز، وتُبقي نصه وصوره وروابطه وحقول نماذجه كما هي.'],
+          links: [{ text: 'حماية PDF بكلمة مرور', path: '/protect-pdf' }, { text: 'دليل «معاينة» من Apple', path: 'https://support.apple.com/guide/preview/prvw587dd90f/mac' }, { text: 'صفحة Microsoft عن الحفظ بصيغة PDF', path: 'https://support.microsoft.com/en-us/office/save-or-convert-to-pdf-or-xps-in-office-desktop-apps-d85416c5-7d77-4fd6-a216-6f4bf7c7c110' }, { text: 'مساعدة LibreOffice عن تصدير PDF', path: 'https://help.libreoffice.org/latest/en-US/text/shared/01/ref_pdf_export_security.html' }],
         },
         {
           heading: 'أسئلة؟',
@@ -5167,6 +6448,1220 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
       ],
     },
+    '/split-large-csv': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['اقطع الملف حسب عدد من الصفوف أو حسب حجم بالميغابايت، وضع صف العناوين في أول كل جزء ليُفتح كل ملف وحده. ولأجل Excel اجعل كل جزء أقل من 1,048,576 سطرًا مع صف العناوين. تقسيم CSV في OpenAnyDoc يفعل الأمرين داخل متصفحك: اختر عدد الصفوف أو الميغابايت لكل ملف ونزّل الأجزاء كلها في ملف ZIP واحد، دون رفع الملف.'],
+          links: [{ text: 'تقسيم CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'لماذا يحتاج كل جزء إلى صف العناوين',
+          paragraphs: [
+            'السطر الأول في ملف CSV يسمّي الأعمدة: order_id وorder_date وregion وamount. والقطع العادي يُبقي هذا السطر في الجزء الأول وحده. أما الجزء الثاني فيبدأ من وسط البيانات، فيعرض Excel صفًا من الأرقام مكان أسماء الأعمدة، ويربط نموذج الاستيراد الأعمدة خطأً أو يرفض الملف، وتضطر محادثة الذكاء الاصطناعي إلى تخمين معنى كل قيمة.',
+            'والفخ الثاني حقل يحمل سطرًا جديدًا داخل علامات اقتباس، كعنوان أو تعليق. الأداة التي تعدّ أسطر النص قد تقطع هذا السجل نصفين، فيبقى نصفه في آخر جزء وبقيته في أول الجزء التالي. والتقسيم حسب السجلات لا حسب الأسطر يتجنب ذلك.',
+          ],
+        },
+        {
+          heading: 'كيف تقسّم ملف CSV داخل المتصفح',
+          paragraphs: ['يقرأ تقسيم CSV الملف على جهازك، ولا يُرسل شيء إلى خادم:'],
+          list: [
+            'افتح صفحة التقسيم وأفلت ملف .csv عليها أو اختره. وبعد قراءة الجدول تُفتح نافذة التنزيل وخيار «تقسيم إلى عدة ملفات» محدد مسبقًا.',
+            'في «التقسيم حسب» أبقِ «عدد الصفوف في كل ملف» واكتب رقمًا (القيمة المبدئية 10,000)، أو اختر «حجم كل ملف» وأدخل الميغابايت لكل ملف. وتحت خانة الصفوف تخبرك النافذة بعدد الملفات التي ستحصل عليها.',
+            'اضغط «تنزيل». ستحصل على ملف ZIP واحد باسم ملفك، مثل orders-parts.zip، فيه orders-part-1.csv وorders-part-2.csv وهكذا، وكل جزء يبدأ بصف العناوين.',
+            'لتقسيم جزء من البيانات فقط، أغلق النافذة وصفِّ الصفوف أو أخفِ الأعمدة التي لا تحتاجها، ثم اختر «خيارات التنزيل…» من قائمة «المزيد» وعلّم على خيار الصفوف الظاهرة وعلى خيار التقسيم من جديد.',
+            'الملف الذي يتجاوز 50 ميغابايت يعرض تحذيرًا بأنه قد يكون بطيئًا، ثم يُفتح إن كانت ذاكرة متصفحك تكفي. وليس للأداة حد صفوف خاص بها. ولتتصفح ملفًا كبيرًا قبل تقسيمه استخدم عارض ملفات CSV الكبيرة.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'مثال محسوب: 2,500,000 صف لأجل Excel',
+          paragraphs: ['لنفترض أن ملف تصدير فيه صف عناوين و2,500,000 صف بيانات. تتسع ورقة عمل Excel لـ 1,048,576 صفًا بما فيها صف العناوين (صفحة مواصفات Excel وحدوده من Microsoft، تاريخ المراجعة 24 نوفمبر 2026)، فأقصى ما يحمله الجزء الواحد 1,048,575 صف بيانات. والرقم المستدير 1,000,000 صف لكل ملف يترك هامشًا ويسهل التحقق منه:'],
+          list: [
+            '2,500,000 ÷ 1,000,000 = 2.5، إذن ستحصل على 3 ملفات.',
+            'الجزء 1: صف العناوين والصفوف من 1 إلى 1,000,000، أي 1,000,001 سطر.',
+            'الجزء 2: صف العناوين والصفوف من 1,000,001 إلى 2,000,000، أي 1,000,001 سطر.',
+            'الجزء 3: صف العناوين والصفوف من 2,000,001 إلى 2,500,000، أي 500,001 سطر.',
+            'كل جزء أقل من 1,048,576 سطرًا، ومجموع الأجزاء 2,500,000 صف بيانات: لم يضِع صف ولم يُحسب صف مرتين.',
+          ],
+          links: [{ text: 'مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }],
+        },
+        {
+          heading: 'ما الذي قسناه على ملف تجريبي',
+          paragraphs: ['أنشأنا ملف طلبات مصطنعًا (order_id وorder_date وregion وproduct_code وquantity وamount) فيه 250,000 صف بيانات وحجمه 9.51 ميغابايت، ومررناه على قاعدة التقسيم نفسها التي تستخدمها الصفحة:'],
+          list: [
+            '100,000 صف لكل ملف: 3 أجزاء فيها 100,000 و100,000 و50,000 صف بيانات، ومع كل منها صف العناوين.',
+            '5 ميغابايت لكل ملف: جزآن فيهما 128,221 و121,779 صف بيانات، بحجم 4.88 و4.63 ميغابايت. فالتقسيم بالحجم يقطع بين الصفوف، فينتهي الجزء عند آخر صف كامل يتسع له، ويأتي غالبًا أقل قليلًا من الرقم الذي تكتبه.',
+            'أمر split -l 100000 العادي على الملف نفسه في macOS: 3 أجزاء، والأول وحده فيه صف العناوين؛ أما الجزآن الآخران فبدآ بصف طلب.',
+          ],
+        },
+        {
+          heading: 'اختر حجم الجزء حسب وجهة الملف',
+          paragraphs: ['الرقم المناسب يتوقف على ما سيقرأ الأجزاء:'],
+          list: [
+            'Excel: حتى 1,048,575 صف بيانات في الجزء، و1,000,000 رقم مستدير آمن. وإن كان Excel بطيئًا حتى دون حد الصفوف، فدليل ملف CSV أكبر من أن يفتحه Excel يشرح الخيارات الأخرى.',
+            'نموذج رفع له حد للحجم، مثل 10 ميغابايت: استخدم «حجم كل ملف» واجعله أقل قليلًا، 9 ميغابايت مثلًا، لأن حجم كل جزء تقريبي لا دقيق.',
+            'محادثة ذكاء اصطناعي: المهم هناك الرموز لا الصفوف. عُدّ رموز جزء واحد بأداة عدّاد الرموز، ثم اختر عدد صفوف يتسع. ودليل ملف أكبر من أن يقبله ChatGPT يشرح الحدود.',
+            'إن فُتح جزء في عمود واحد في Excel فالتقسيم سليم، لكن الفاصل لا يطابق إعدادات جهازك. ودليل ملف CSV يُفتح في عمود واحد يشرح الحل.',
+          ],
+          links: [
+            { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' },
+            { text: 'عدّاد الرموز', path: '/token-counter' },
+            { text: 'ملف أكبر من أن يقبله ChatGPT', path: '/file-too-large-for-chatgpt' },
+            { text: 'ملف CSV يُفتح في عمود واحد', path: '/csv-opens-in-one-column' },
+          ],
+        },
+        {
+          heading: 'البديل من سطر الأوامر',
+          paragraphs: [
+            'في macOS وLinux يقطع الأمر split -l 1000000 orders.csv part_ الملف إلى قطع من 1,000,000 سطر. وهو يتفوق على المتصفح في أمور: يقرأ الملف تدفقًا، فيمكن أن يكون الملف أكبر من ذاكرتك، وهو سريع، ويدخل في سكربت يعمل كل ليلة. لكن انتبه لأمرين: لا يكرر صف العناوين، فالجزء part_aa وحده فيه أسماء الأعمدة، ويعدّ أسطر النص لا السجلات، فقد يقطع حقلًا مقتبسًا فيه سطر جديد إلى نصفين. أما split -b فيقطع عند عدد من البايتات وقد يكسر الصف من منتصفه.',
+            'لتكرار صف العناوين، قسّم كل ما بعد السطر الأول، ثم أعد صف العناوين إلى أول كل قطعة. على ملفنا التجريبي أعطى هذان الأمران ثلاثة أجزاء .csv يبدأ كل منها بصف العناوين. لكنهما ما زالا يعدّان الأسطر، فاستخدمهما فقط إن لم يكن في أي حقل سطر جديد:',
+          ],
+          list: [
+            'tail -n +2 orders.csv | split -l 1000000 - part_',
+            'for f in part_*; do (head -n 1 orders.csv; cat "$f") > "$f.csv"; rm "$f"; done',
+          ],
+        },
+        {
+          heading: 'هل يحتفظ كل جزء بصف العناوين؟',
+          paragraphs: ['نعم، كل جزء يصنعه تقسيم CSV يبدأ بصف العناوين الأصلي، فيُفتح كل ملف أو يُستورد وحده. وإن كانت الأجزاء ذاهبة إلى نظام يريد صفوف البيانات فقط، فأزل العلامة عن «تضمين صف العناوين» في النافذة نفسها قبل أن تضغط «تنزيل»، فيحمل كل جزء الصفوف وحدها.'],
+        },
+        {
+          heading: 'هل أستطيع تقسيم CSV حسب قيم عمود واحد؟',
+          paragraphs: ['ليس بخطوة واحدة: تقسيم CSV يقطع حسب الصفوف أو الحجم، لا حسب قيم عمود. ولتحصل على ملف لكل منطقة، صفِّ عمود المنطقة على قيمة واحدة، ونزّل الصفوف الظاهرة، وكرر ذلك لكل قيمة. مع قيم قليلة يستغرق الأمر دقائق، ومع مئات القيم يكون السكربت أسرع.'],
+        },
+        {
+          heading: 'كيف أعيد الأجزاء إلى ملف واحد؟',
+          paragraphs: ['استخدم دمج CSV: أضف الأجزاء بترتيبها فيكتب ملف CSV واحدًا بصف عناوين واحد. تُطابَق الأعمدة بأسمائها، فالجزء الذي جاءت أعمدته بترتيب مختلف يصطف مع غيره. ويحتاج كل جزء إلى أسماء الأعمدة نفسها في صف عناوينه، وهذا سبب آخر لإبقاء صف العناوين في كل جزء.'],
+          links: [{ text: 'دمج CSV', path: '/merge-csv' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} واذكر حجم الملف وعدد صفوفه والجهة التي ستذهب إليها الأجزاء (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/json-vs-json-lines': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['ملف JSON يحمل قيمة واحدة، غالبًا كائنًا واحدًا أو قائمة واحدة، ولا بد للبرنامج أن يقرأ الملف كله قبل أن يستعمله. أما ملف JSON Lines ‏(jsonl، ويُسمّى أيضًا NDJSON بامتداد ndjson) فيحمل قيمة JSON واحدة في كل سطر، فتُقرأ السجلات أو تُكتب أو تُضاف واحدًا واحدًا. ويفتح عارض JSON في OpenAnyDoc النوعين داخل متصفحك دون رفع الملف، ويعرض ملف jsonl أو ndjson قائمةً كل سطر فيها عنصر.'],
+          links: [{ text: 'عارض JSON', path: '/json-viewer' }],
+        },
+        {
+          heading: 'السجلات الثلاثة نفسها بالصيغتين',
+          paragraphs: ['هذه ثلاثة أحداث سجل تجريبية. في مستند JSON واحد تقع بين قوسين مربعين وبينها فواصل:'],
+          list: [
+            'JSON: ‏[{"id":1,"event":"login"},{"id":2,"event":"upload"},{"id":3,"event":"logout"}]',
+            'JSON Lines، السطر 1: {"id":1,"event":"login"}',
+            'JSON Lines، السطر 2: {"id":2,"event":"upload"}',
+            'JSON Lines، السطر 3: {"id":3,"event":"logout"}',
+          ],
+        },
+        {
+          heading: 'ما تقوله قواعد JSON Lines (تحققنا في 24 نوفمبر 2026)',
+          paragraphs: ['يضع موقع jsonlines.org ثلاث قواعد واصطلاحين. وتصف مواصفة NDJSON الترتيب نفسه باسم آخر.'],
+          list: [
+            'النص بترميز UTF-8 دون علامة ترتيب البايتات (BOM).',
+            'كل سطر قيمة JSON واحدة صالحة. السطر null صالح، والسطر الفارغ غير صالح.',
+            'ينتهي كل سطر بفاصل أسطر (\\n). وتعمل نهايات أسطر ويندوز (\\r\\n) أيضًا، لأن المسافات حول قيمة JSON تُتجاهل.',
+            'يُستحسن بقوة وجود فاصل أسطر بعد السطر الأخير، لكنه ليس شرطًا.',
+            'يمكن أن تحمل الملفات الامتداد jsonl، وقد يكون نوع الوسائط application/jsonl، وهو لم يُعتمد معيارًا بعد.',
+            'وتطلب مواصفة NDJSON الامتداد ndjson ونوع الوسائط application/x-ndjson.',
+          ],
+          links: [{ text: 'jsonlines.org', path: 'https://jsonlines.org/' }, { text: 'مواصفة NDJSON', path: 'https://github.com/ndjson/ndjson-spec' }],
+        },
+        {
+          heading: 'متى تُستعمل كل صيغة',
+          paragraphs: [
+            'في JSON Lines لا أقواس حول الملف ولا فواصل بين السجلات، وكل سطر كامل بذاته. يستطيع البرنامج أن يضيف سجلًا بكتابة سطر جديد في آخر الملف دون أن يقرأه أولًا، ويمكن تقسيم الملف عند أي فاصل أسطر فيبقى كل جزء صالحًا.',
+            'فالقاعدة التقريبية: JSON حين تُقرأ البيانات قطعة واحدة، وJSON Lines حين تكون سلسلة من سجلات منفصلة.',
+          ],
+          list: [
+            'JSON: ردود واجهات API، وملفات الإعدادات، والتصديرات الصغيرة التي يحمّلها البرنامج دفعة واحدة.',
+            'JSON Lines للسجلات (Logs): يصفها موقع jsonlines.org بأنها صيغة ممتازة لملفات السجل، لأن كل حدث سطر يُضاف إلى آخر الملف.',
+            'JSON Lines بين البرامج وفي سلاسل أوامر الطرفية، حيث تقرأ الأدوات سطرًا وتكتب سطرًا.',
+            'JSON Lines لملفات الدفعات وبيانات التدريب في الذكاء الاصطناعي. يقول دليل Batch API من OpenAI إن الدفعة تبدأ بملف jsonl يحمل كل سطر فيه طلبًا واحدًا، ويطلب دليل الضبط الدقيق بيانات التدريب بصيغة JSONL، بنية JSON كاملة في كل سطر (تحققنا من الاثنين في 24 نوفمبر 2026).',
+          ],
+          links: [{ text: 'دليل Batch API', path: 'https://developers.openai.com/api/docs/guides/batch' }, { text: 'دليل الضبط الدقيق', path: 'https://developers.openai.com/api/docs/guides/supervised-fine-tuning' }],
+        },
+        {
+          heading: 'كيف تفتح ملف jsonl أو ndjson',
+          paragraphs: ['أفلت الملف على عارض JSON أو اختره. يُقرأ الملف على جهازك، ولا يُرسل شيء إلى أي خادم.'],
+          list: [
+            'يصبح كل سطر عنصرًا في قائمة، وتظهر ملاحظة: «فُتح من JSON Lines: كل سطر عنصر في القائمة. يحفظ التنزيل الملف بصيغة JSON Lines مرة أخرى.»',
+            'تعمل طرق العرض كلها، الشجرة والجدول والنص، كما تعمل مع أي ملف JSON. والملف المكوّن من سجلات بالحقول نفسها يُقرأ أفضل في الجدول.',
+            'تُتخطى الأسطر الفارغة ولا تُرفض، فالملف الذي ينتهي بسطر فارغ يُفتح أيضًا.',
+            'إن لم يكن أحد الأسطر JSON صالحًا، يتوقف العارض ويذكر رقم ذلك السطر، فتعرف أين تبحث.',
+            'يحفظ التنزيل الملف بصيغة JSON Lines مرة أخرى، عنصرًا في كل سطر، مع تعديلاتك.',
+            'تُفتح الملفات حتى 10 ميغابايت. والامتداد هو ما يحدد طريقة القراءة: ملف JSON Lines محفوظ باسم ينتهي بـ json يُقرأ JSON عاديًا فيفشل، فغيّر امتداده إلى jsonl أولًا.',
+          ],
+        },
+        {
+          heading: 'كيف تحوّل بين الصيغتين',
+          paragraphs: ['بعد أن يُفتح ملف jsonl في عارض JSON:'],
+          list: [
+            'إلى JSON: افتح قائمة «نسخ» واختر «نسخ منسّقًا». تحصل على السجلات قائمة JSON واحدة بين قوسين مربعين، جاهزة للصق أو الحفظ.',
+            'إلى جدول بيانات: افتح قائمة «تحويل» واختر «تحويل إلى CSV» أو «تحويل إلى Excel». يصبح كل سجل صفًا وكل حقل عمودًا.',
+            'من قائمة JSON إلى JSON Lines: ليس في OpenAnyDoc زر لهذا الاتجاه بعد. وتكتب أداة سطر أوامر مثل jq عنصرًا في كل سطر بالأمر jq -c ".[]".',
+          ],
+        },
+        {
+          heading: 'لماذا يعطي ملف jsonl الخطأ "Unexpected non-whitespace character"؟',
+          paragraphs: ['يعني هذا الخطأ أن برنامجًا قرأ الملف مستند JSON واحدًا، فوجد قيمة ثانية بعد السطر الأول. والأرجح أن الملف سليم بصيغة JSON Lines. افتحه بأداة تقرأ JSON Lines، أو تأكد أنه محفوظ بامتداد jsonl أو ndjson. ويشرح دليل أخطاء unexpected token بقية الرسائل.'],
+          links: [{ text: 'دليل أخطاء unexpected token', path: '/json-unexpected-token' }],
+        },
+        {
+          heading: 'هل NDJSON هو JSON Lines نفسه؟',
+          paragraphs: ['في الاستعمال اليومي نعم: كلاهما يضع قيمة JSON واحدة في كل سطر وينهي الأسطر بفاصل أسطر. لكنهما جاءا من وصفين منفصلين، فاختلف الاسم، واختلف الامتداد ونوع الوسائط المقترحان: jsonl لـ JSON Lines، وndjson مع application/x-ndjson لـ NDJSON. ويفتح عارض JSON في OpenAnyDoc الامتدادين بالطريقة نفسها.'],
+        },
+        {
+          heading: 'هل أستطيع فتح ملف JSON Lines في اكسل؟',
+          paragraphs: ['ليس جدولًا مباشرة، لأن اكسل لا يقرأ ملفات فيها كائن في كل سطر. افتح ملف jsonl في عارض JSON في OpenAnyDoc، واختر «تحويل إلى Excel» من قائمة «تحويل»، ثم نزّل المصنف. تصبح الحقول المتداخلة أعمدة مستقلة. ويشرح دليل كيف تفتح ملف JSON بقية طرق قراءة JSON.'],
+          links: [{ text: 'كيف تفتح ملف JSON', path: '/open-json-file' }],
+        },
+        {
+          heading: 'هل يُرفع ملفي حين أفتحه هنا؟',
+          paragraphs: ['لا. يقرأ عارض JSON ملفات JSON وJSON Lines بمتصفحك أنت، على جهازك، ويبقيها في ذاكرة الصفحة حتى تغلق التبويب. لا يُرسل شيء إلى أي خادم، وهذا مهم لملفات السجل وملفات دفعات الذكاء الاصطناعي التي تحمل غالبًا بيانات مستخدمين. ويمكنك أن تتحقق بنفسك من ذلك في لوحة الشبكة في المتصفح.'],
+          links: [{ text: 'تتحقق بنفسك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصف الملف وما يظهر حين تفتحه (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/compare-two-json-files': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['قارن البيانات لا النص: المقارنة التي تفهم JSON تطابق الكائنات مفتاحًا بمفتاح والقوائم موضعًا بموضع، فلا تُحسب المسافات البادئة الجديدة ولا ترتيب المفاتيح المختلف تغييرًا. وتفعل ذلك أداة مقارنة JSON في OpenAnyDoc داخل متصفحك دون رفع أي من الملفين، وتسرد كل قيمة أُضيفت أو حُذفت أو تغيّرت مع مسارها، مثل $.settings.language.'],
+          links: [{ text: 'مقارنة JSON', path: '/json-compare' }],
+        },
+        {
+          heading: 'لماذا تضلّلك المقارنة سطرًا بسطر',
+          paragraphs: [
+            'المقارنة النصية تقارن الأسطر. إن حُفظ أحد الملفين في سطر واحد ونُسّق الآخر بمسافتين، اختلف كل سطر. وإن كتب برنامج المفاتيح نفسها بترتيب آخر، أظهرت المقارنة أسطرًا محذوفة في مكان ومضافة في مكان آخر، مع أن البيانات واحدة.',
+            'أما مقارنة JSON فتقرأ الملفين أولًا وتقارن ما يحملانه. المسافات لا تُحسب أبدًا، وترتيب المفاتيح لا يُحسب إلا إن طلبت ذلك.',
+          ],
+        },
+        {
+          heading: 'مثال عملي',
+          paragraphs: ['نسختان من سجل حساب تجريبي. في الثانية رُقّيت الخطة، وأُضيفت ميزة، وتغيّرت اللغة، واستُخدم الكوبون، وظهر تاريخ نهاية التجربة، وخرجت المفاتيح بترتيب آخر:'],
+          list: [
+            'قبل: {"id":"A-1042","plan":"basic","seats":5,"features":["export","search"],"settings":{"theme":"light","language":"en"},"coupon":"WELCOME"}',
+            'بعد: {"plan":"pro","id":"A-1042","seats":5,"features":["export","search","share"],"settings":{"language":"ar","theme":"light"},"trialEnds":"2026-12-31"}',
+          ],
+        },
+        {
+          heading: 'ما تُظهره المقارنة',
+          paragraphs: ['حين يكون خيار «تجاهل ترتيب المفاتيح» مفعّلًا، وهو كذلك افتراضيًا، يقول الملخص «أُضيف 2، وحُذف 1، وتغيّر 2.» وتذكر القائمة تحته كل فرق:'],
+          list: [
+            'متغيّر: $.plan (صارت "basic" إلى "pro").',
+            'مُضاف: $.features[2] ‏("share").',
+            'متغيّر: $.settings.language (صارت "en" إلى "ar").',
+            'محذوف: $.coupon.',
+            'مُضاف: $.trialEnds.',
+            'أوقف «تجاهل ترتيب المفاتيح» فتبقى الفروق الخمسة، ويليها «كائنان مفاتيحهما بترتيب آخر.»: السجل كله ($) و$.settings، وكل منهما مذكور بعنوان «ترتيب المفاتيح».',
+            'لا تظهر id وseats وsettings.theme في القائمة، لأنها لم تتغير.',
+          ],
+        },
+        {
+          heading: 'كيف تقارن ملفي JSON خطوة بخطوة',
+          paragraphs: ['يُقرأ الملفان على جهازك:'],
+          list: [
+            'افتح مقارنة JSON واختر الملف الأول، أو أفلته على الصفحة، أو الصق نصه. يُفتح على تبويب «مقارنة».',
+            'الصق المستند الثاني في المربع، أو أفلت ملفه على المربع، أو اضغط «اختر ملفًا».',
+            'اقرأ سطر الملخص، ثم قائمة الفروق. اضغط أي فرق فينتقل الجانبان إليه.',
+            'المستند المفتوح على اليسار والمستند الثاني على اليمين، وكلاهما بمسافتين بادئتين. وحين يكون «تجاهل ترتيب المفاتيح» مفعّلًا، تظهر المفاتيح بالترتيب الأبجدي في الجانبين، فتتقابل الكائنات المتساوية.',
+            'تُعلَّم الأسطر المتغيرة في كل جانب، فتقرأ القيم المحيطة بكل تغيير.',
+          ],
+        },
+        {
+          heading: 'القوائم والحدود والملفات غير الصالحة',
+          paragraphs: [
+            'الكائنات تُطابق بالمفتاح، أما القوائم فتُطابق بالموضع: العنصر 0 مع العنصر 0، والعنصر 1 مع العنصر 1. إن وُضعت "share" في بداية ["export","search"]، فالنتيجة ليست إضافة واحدة بل ثلاثة أسطر: $.features[0] متغيّر، و$.features[1] متغيّر، و$.features[2] مُضاف، لأن كل عنصر انتقل موضعًا واحدًا.',
+            'حين ترى سلسلة تغييرات في آخر قائمة، تحقّق هل أُدرج عنصر أو حُذف قرب بدايتها. تعرض القائمة أول 300 فرق، ويعرض كل جانب حتى 20,000 سطر. ويمكن أن يصل الملف الأول إلى 10 ميغابايت.',
+            'يُفحص المستند الثاني أثناء لصقه: إن لم يكن JSON صالحًا، تظهر رسالة المحلل تحت المربع بدل المقارنة. أصلحه في مدقق JSON، الذي يعرض السطر والعمود ويصلح الأخطاء الشائعة مثل الفواصل الزائدة. ويشرح دليل أخطاء unexpected token كل رسالة.',
+          ],
+          links: [{ text: 'مدقق JSON', path: '/json-validator' }, { text: 'دليل أخطاء unexpected token', path: '/json-unexpected-token' }],
+        },
+        {
+          heading: 'هل يهم ترتيب المفاتيح عند مقارنة JSON؟',
+          paragraphs: ['في الغالب لا: في JSON يحمل {"a":1,"b":2} و{"b":2,"a":1} البيانات نفسها، لذلك تعدّهما مقارنة JSON متساويين افتراضيًا. وقد يهم الترتيب حين يقرأ إنسان الملف، أو حين يقارن اختبار آلي النص الخام. أوقف «تجاهل ترتيب المفاتيح» فيُذكر كل كائن تحركت مفاتيحه بعنوان «ترتيب المفاتيح».'],
+        },
+        {
+          heading: 'كيف أقارن رد API بنسخة محفوظة؟',
+          paragraphs: ['افتح ملف json المحفوظ في مقارنة JSON أولًا، فيكون على اليسار. ثم انسخ الرد الجديد من برنامج API الذي تستعمله أو من لوحة الشبكة في المتصفح، والصقه في المربع على تبويب «مقارنة». يُذكر كل حقل أُضيف أو حُذف أو تغيّر منذ النسخة المحفوظة مع مساره.'],
+        },
+        {
+          heading: 'هل أستطيع مقارنة ملفي JSON Lines؟',
+          paragraphs: ['نعم، بخطوة إضافية واحدة، لأن المربع يقرأ مستند JSON واحدًا. افتح ملف jsonl الأول في عارض JSON، الذي يقرأ كل سطر عنصرًا في قائمة، وانتقل إلى تبويب «مقارنة» فيه. افتح الملف الثاني في تبويب آخر، واختر «نسخ منسّقًا» من قائمة «نسخ»، ثم الصقه. ويشرح دليل الفرق بين JSON وJSON Lines هذه الصيغة.'],
+          links: [{ text: 'عارض JSON', path: '/json-viewer' }, { text: 'الفرق بين JSON وJSON Lines', path: '/json-vs-json-lines' }],
+        },
+        {
+          heading: 'هل يُرفع ملفاي حين أقارنهما؟',
+          paragraphs: ['لا. يقرأ متصفحك أنت المستندين ويقارنهما، ولا يُحفظ شيء ولا يُشارك، فلا يوجد رابط لإرساله أيضًا. وهذا مهم حين يحمل الملفان مفاتيح API أو سجلات عملاء. وتعرض مقارنتنا بين jsonformatter.org وCode Beautify كيف تصف مواقع JSON أخرى ما ترسله إلى خوادمها.'],
+          links: [{ text: 'مقارنتنا بين jsonformatter.org وCode Beautify', path: '/jsonformatter-alternative' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصف الملفين والفرق الذي توقعت أن تراه (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/excel-row-and-column-limits': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['تتسع ورقة Excel الواحدة لـ 1,048,576 صفًا و16,384 عمودًا على الأكثر، وتتسع الخلية الواحدة لـ 32,767 حرفًا. ولا يحتفظ Excel إلا بخمس عشرة خانة من أي رقم، ولا يحسب إلا بالتواريخ من 1 يناير 1900 إلى 31 ديسمبر 9999. وإذا تجاوزت بياناتك هذه الحدود، يفتحها عارض ملفات CSV الكبيرة في OpenAnyDoc داخل متصفحك دون حد للصفوف خاص به، وتقسّمها أداة تقسيم CSV إلى أجزاء يفتحها Excel، دون رفع الملف.'],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'تقسيم CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'الحدود كما تذكرها Microsoft',
+          paragraphs: ['هذه الأرقام منقولة من صفحة مواصفات Excel وحدوده لدى Microsoft (تحققنا منها في 24 نوفمبر 2026)، وهي تنطبق على Excel لـ Microsoft 365 وعلى Excel 2016 و2019 و2021 و2024:'],
+          list: [
+            'الصفوف في الورقة: 1,048,576.',
+            'الأعمدة في الورقة: 16,384، فآخر عمود هو XFD.',
+            'الأحرف في الخلية الواحدة: 32,767.',
+            'فواصل الأسطر في الخلية الواحدة: 253.',
+            'الأحرف في الرأس أو التذييل: 255.',
+            'الأحرف في الصيغة: 8,192؛ والوسائط في الدالة الواحدة: 255؛ ومستويات الدوال المتداخلة: 64.',
+            'دقة الأرقام: 15 خانة.',
+            'التواريخ التي يحسب بها Excel: من 1 يناير 1900 إلى 31 ديسمبر 9999.',
+            'العناصر المعروضة في قائمة التصفية المنسدلة: 10,000.',
+            'الارتباطات التشعبية في الورقة: 65,530.',
+            'تنسيقات الخلايا وأنماطها المختلفة في المصنف: 65,490.',
+            'مستويات التراجع: 100.',
+            'الأوراق في المصنف: لا يحدها إلا حجم الذاكرة المتاحة.',
+          ],
+          links: [{ text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }],
+        },
+        {
+          heading: 'ماذا يعني كل حد لملف حقيقي',
+          paragraphs: ['معظم الناس لا يصطدمون إلا بحد الصفوف، وقد شرحه بالتفصيل دليل ملف CSV أكبر من أن يفتحه Excel. أما الحدود الأخرى فتوقع الناس بهدوء أكبر. والأرقام من صفحة مواصفات Excel وحدوده ومن صفحة Microsoft عن الاحتفاظ بالأصفار البادئة والأرقام الكبيرة (تحققنا منها في 24 نوفمبر 2026):'],
+          list: [
+            'الأعمدة: الملفات العريضة تبلغ 16,384 عمودًا قبل أن تقترب من مليون صف بكثير. فاستبيان فيه عمود لكل سؤال وخيار إجابة، أو بيانات أجهزة استشعار فيها عمود لكل قراءة، قد لا يتجاوز بضعة آلاف من الصفوف ويبقى أعرض من الحد.',
+            'الخانات الخمس عشرة: يحتفظ Excel بخمس عشرة خانة معنوية من الرقم، فالرقم المرجعي المكوّن من 16 خانة مثل 1234567890123456، إذا كُتب أو فُتح رقمًا، يُخزَّن 1234567890123450. ولا تسلم أرقام الطلبات والباركود والرموز الطويلة إلا إذا بقيت نصًا.',
+            '32,767 حرفًا: حقول النص الحر الطويلة، كالتعليقات والأوصاف أو JSON الملصق في عمود، قد تكون أطول مما تتسع له خلية واحدة.',
+            '253 فاصل أسطر: العنوان أو الملاحظة متعددة الأسطر تُحسب على هذا الحد أيضًا، بمعزل عن حد الأحرف.',
+            'التواريخ قبل 1900: هي أقدم من أول تاريخ يحسب به Excel، فلا يستطيع Excel أن يحسب بسجلات القرن التاسع عشر بوصفها تواريخ.',
+            '10,000 عنصر في التصفية: العمود الذي فيه قيم مختلفة أكثر من ذلك لا تظهر كلها في قائمة التصفية، فاستخدم عامل تصفية نصيًا مثل «يحتوي على» بدل تحديد القيم.',
+          ],
+          links: [{ text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }, { text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الاحتفاظ بالأصفار البادئة والأرقام الكبيرة', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+        },
+        {
+          heading: 'مثال عملي: هل يتسع هذا الملف؟',
+          paragraphs: ['احسبها قبل أن تفتح الملف. إليك ملفين تجريبيين، وطريقة عدّ ملفك أنت:'],
+          list: [
+            'ملف مبيعات من 2,400,000 صف و12 عمودًا: الأعمدة لا مشكلة فيها، أما الصفوف فنعم. وإذا قُسّم إلى أجزاء من 1,000,000 صف صار ثلاثة ملفات من 1,000,000 و1,000,000 و400,000 صف، في أعلى كل منها صف العناوين، وكل جزء أقل من 1,048,576.',
+            'سجل أجهزة استشعار من 5,000 صف يحفظ كل ثانية من تجربة مدتها خمس ساعات في عمود خاص بها: 18,000 عمود، أي أكثر من 16,384، مع أن عدد الصفوف صغير. أخفِ الأعمدة التي لا تحتاجها قبل أن تحفظه لبرنامج Excel.',
+            'ولتعرف الحجم الحقيقي للملف قبل أن يراه Excel، أسقطه في عارض CSV واختر «المشكلات» من قائمة «المزيد»: يعرض «تقرير الملف» عدد الصفوف × الأعمدة والفاصل والترميز. أما عدّ الأسطر في محرر نصوص فقد يعطي رقمًا أكبر، لأن الخلية المقتبسة التي فيها فاصل أسطر تشغل سطرين وهي صف واحد.',
+          ],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }],
+        },
+        {
+          heading: 'إذا تجاوزت بياناتك أحد الحدود',
+          paragraphs: ['كل هذا يعمل في متصفحك، ولا يُرفع الملف:'],
+          list: [
+            'صفوف أكثر من أن تتصفحها: افتح الملف في عارض ملفات CSV الكبيرة. ليس له حد للصفوف خاص به، فالحد هو ذاكرة جهازك، وتظهر للملف الأكبر من 50 ميغابايت رسالة تنبيه أولًا. صفِّ الصفوف التي تحتاجها، ثم اختر «خيارات التنزيل» من قائمة «المزيد» وعلّم على «الصفوف الظاهرة فقط».',
+            'صفوف أكثر مما يحتمله Excel لدى من سيستلم الملف: تقسّم أداة تقسيم CSV الملف بعدد من الصفوف أو بحجم بالميغابايت لكل ملف. ويحتفظ كل جزء بصف العناوين، وتُنزَّل الأجزاء معًا في ملف ZIP واحد.',
+            'أعمدة كثيرة: أخفِ الأعمدة التي لا تحتاجها في عارض CSV، ثم اختر «خيارات التنزيل» وعلّم على «الصفوف الظاهرة فقط». الأعمدة المخفية لا تدخل في تلك النسخة.',
+            'رموز طويلة يجب أن تبقى كل خاناتها: أداة تحويل CSV إلى Excel لا تحوّل إلى أرقام إلا الأرقام البسيطة. أما قيم مثل 007 وأرقام الهواتف والأعداد الصحيحة الأطول من 15 خانة فتبقى نصًا، فلا تضيع أي خانة.',
+            'مصنف أكبر من أن تعمل عليه: تقسّم أداة تقسيم ملف Excel المصنف إلى ملفات .xlsx أصغر حسب الورقة، أو كل عدد معيّن من الصفوف، أو حسب قيم عمود.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'تقسيم CSV', path: '/split-csv' }, { text: 'عارض CSV', path: '/csv-viewer' }, { text: 'تحويل CSV إلى Excel', path: '/csv-to-excel' }, { text: 'تقسيم ملف Excel', path: '/split-excel' }],
+        },
+        {
+          heading: 'حيث يقدّم Excel أكثر',
+          paragraphs: [
+            'لدى Excel طريقته الخاصة لتجاوز حد الورقة. فأداة Power Query ونموذج البيانات (Data Model) يحمّلان أكثر من 1,048,576 صفًا دون وضعها في خلايا، ثم يستطيع جدول PivotTable تلخيصها كلها، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). وعلى نظام 64 بت لا تذكر صفحة مواصفات Excel وحدوده حدًا ثابتًا لحجم ملف نموذج البيانات، بل الذاكرة المتاحة وموارد النظام فقط.',
+            'أما عارضات OpenAnyDoc فتعرض الصفوف وتعدّلها في جدول، مع التصفية والترتيب والتجميع، لكن ليس فيها جداول PivotTable، وهي مثل Excel محدودة بذاكرة جهازك. وإن كانت بياناتك قد تجاوزت جدول البيانات أصلًا، فدليل CSV أم Excel أم JSON يشرح متى تناسبها صيغة أخرى.',
+          ],
+          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'CSV أم Excel أم JSON', path: '/csv-vs-excel-vs-json' }],
+        },
+        {
+          heading: 'كم صفًا وعمودًا يتسع Excel؟',
+          paragraphs: ['تتسع ورقة Excel لـ 1,048,576 صفًا و16,384 عمودًا، بحسب حدود Microsoft لبرنامج Excel لـ Microsoft 365 وExcel من 2016 إلى 2024. أما صيغة .xls الأقدم، التي استخدمها Excel من 97 إلى 2003، فتتوقف عند 65,536 صفًا و256 عمودًا، بحسب صفحتي Microsoft عن مجموعة بيانات أكبر من شبكة Excel وعن استخدام Excel مع الإصدارات الأقدم (تحققنا منها في 24 نوفمبر 2026). ويتسع المصنف لأوراق بقدر ما تسمح الذاكرة.'],
+          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'استخدام Excel مع الإصدارات الأقدم', path: 'https://support.microsoft.com/office/use-excel-with-earlier-versions-of-excel-2fd9ffcb-6fce-485b-85af-fecfd651a5ac' }],
+        },
+        {
+          heading: 'لماذا غيّر Excel الخانات الأخيرة من رقمي الطويل؟',
+          paragraphs: ['لا يحتفظ Excel إلا بخمس عشرة خانة معنوية من أي رقم، فتُقرَّب الأرقام الأطول وتصير الخانات الزائدة أصفارًا. ويحدث هذا لأرقام الطلبات الطويلة والرموز المرجعية والمعرّفات. نسّق العمود نصًا قبل إدخال الأرقام، أو استورد الملف من «بيانات» ثم «من نص/CSV» واجعل نوع ذلك العمود نصًا، كما تشرح صفحة Microsoft عن الاحتفاظ بالأصفار البادئة والأرقام الكبيرة (تحققنا منها في 24 نوفمبر 2026).'],
+          links: [{ text: 'الاحتفاظ بالأصفار البادئة والأرقام الكبيرة', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+        },
+        {
+          heading: 'هل هناك حد لعدد الأوراق أو لطول اسم الورقة؟',
+          paragraphs: ['لا تذكر Microsoft عددًا ثابتًا للأوراق: يتسع المصنف لأوراق بقدر ما تسمح ذاكرة جهازك. أما اسم الورقة فحده 31 حرفًا، كما تذكر صفحة Microsoft عن إعادة تسمية ورقة عمل (تحققنا منها في 24 نوفمبر 2026). وإذا كبر المصنف على من سيستلمه، فأداة تقسيم ملف Excel تحفظ كل ورقة في ملف مستقل، داخل متصفحك.'],
+          links: [{ text: 'إعادة تسمية ورقة عمل', path: 'https://support.microsoft.com/en-us/office/rename-a-worksheet-3f1f7148-ee83-404d-8ef0-9ff99fbad1f9' }, { text: 'تقسيم ملف Excel', path: '/split-excel' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} واذكر عدد صفوف ملفك وأعمدته وما تحتاجه منه (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/find-hidden-sheets-in-excel': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['يمكن للمصنف أن يخفي أوراقًا كاملة، وصفوفًا وأعمدة بعينها، والصيغ التي تقف وراء أرقامه، والورقة المضبوطة على «مخفية جدًا» لا تظهر أصلًا في قائمة «إظهار» في Excel. ويعرض عارض Excel في OpenAnyDoc كل ذلك دفعة واحدة: يذكر الأوراق المخفية والمخفية جدًا بجانب ألسنة الأوراق، ويعدّ الصفوف والأعمدة المخفية، ويسرد كل صيغة، داخل متصفحك دون رفع الملف.'],
+          links: [{ text: 'عارض Excel', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'أربعة أماكن يخفي فيها المصنف شيئًا',
+          paragraphs: ['تحقق منها كلها قبل أن تثق بمصنف أو تشاركه:'],
+          list: [
+            'الأوراق المخفية: تُخفى بالأمر «إخفاء» من لسان الورقة، وتعود بالأمر «إظهار».',
+            'الأوراق المخفية جدًا: تُضبط من محرر VBA أو بماكرو. ويقول مرجع Microsoft لحالة ظهور الورقة (تحققنا منه في 24 نوفمبر 2026) إن المستخدم لا يستطيع إظهار هذه الورقة من القوائم؛ لا يُظهرها إلا تغيير خاصية Visible لها.',
+            'الصفوف والأعمدة المخفية: تحتفظ ببياناتها لكنها لا تشغل أي مساحة على الشاشة.',
+            'الصيغ: تعرض الخلية رقمًا، وقد تقرأ الصيغة التي وراءه من ورقة مخفية أو من مصنف آخر أو من اسم معرّف.',
+          ],
+          links: [{ text: 'مرجع Microsoft لحالة ظهور الورقة', path: 'https://learn.microsoft.com/en-us/office/vba/api/excel.xlsheetvisibility' }],
+        },
+        {
+          heading: 'اعثر على الأوراق والصفوف والأعمدة المخفية في متصفحك',
+          paragraphs: ['افتح المصنف في عارض Excel (.xlsx أو .xlsm أو .xls). يُقرأ الملف على جهازك ولا يُرفع شيء:'],
+          list: [
+            'إن كان المصنف يخفي أوراقًا، تخبرك رسالة بذلك عند فتحه، ويظهر زر مثل «ورقتان مخفيتان» بجانب ألسنة الأوراق.',
+            'انقر هذا الزر لترى قائمة بكل ورقة مخفية، وبجانب كل منها «مخفية» أو «مخفية جدًا». انقر إحداها فيصبح لها لسان، فتقرؤها مثل أي ورقة أخرى.',
+            'إن كانت الورقة المعروضة تخفي صفوفًا أو أعمدة، يعرض شريط الحالة أسفل الصفحة عددها، مثل «صفوف مخفية: 3، أعمدة: 1 · إظهار». انقر «إظهار»، أو فعّل «إظهار الصفوف والأعمدة المخفية» من قائمة «عرض».',
+            'وللحصول على نظرة شاملة، اختر «معلومات المصنف» من قائمة «عرض»: عدد الأوراق، وكم منها مخفية ومخفية جدًا، وعدد الصيغ والملاحظات والروابط، والأسماء المعرّفة، والروابط إلى مصنفات أخرى، وهل يحتوي الملف على وحدات ماكرو. ولا تُشغَّل وحدات الماكرو أبدًا.',
+          ],
+          links: [{ text: 'عارض Excel', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'اطّلع على كل صيغة',
+          paragraphs: ['في قائمة «عرض» ثلاث طرق لقراءة ما وراء الأرقام:'],
+          list: [
+            '«إظهار الصيغ» (Ctrl+` في Windows و⌘` في Mac) يضع كل صيغة في خليتها بدل نتيجتها.',
+            '«قائمة الصيغ» تعرض كل صيغة في المصنف مع ورقتها وعنوان خليتها وقيمتها الحالية، وتميّز الصيغ الموجودة في ورقة مخفية. اكتب في مربع التصفية، مثل SUM أو VLOOKUP، أو علّم على «هذه الورقة فقط». وانقر صيغة لتنتقل إلى خليتها. وتُعرض أول 2,000 صيغة.',
+            '«البحث في كل الأوراق» (Ctrl+Shift+F) يبحث في كل ورقة، بما فيها المخفية. علّم على «البحث في الصيغ» لتبحث في الصيغ بدل القيم.',
+          ],
+        },
+        {
+          heading: 'مثال عملي: إجمالي يقرأ من أوراق مخفية',
+          paragraphs: [
+            'مصنف ميزانية تجريبي فيه ثلاث أوراق: Summary وهي ظاهرة، وRates وهي مخفية، وLookup وهي مخفية جدًا. تعرض Summary إجماليًا قدره 18,750 في الخلية B4، ولا شيء آخر يبدو غريبًا.',
+            'في العارض، تقول الرسالة عند الفتح إن في المصنف ورقتين مخفيتين. وتعرض «قائمة الصيغ» الخلية Summary!B4 وفيها =Rates!B2*Lookup!C7 وقيمتها 18,750. وبفتح الورقتين المخفيتين يتبيّن أن Rates!B2 تساوي 1.25 وأن Lookup!C7 تساوي 15,000. أما في Excel فكان الأمر «إظهار» سيعرض Rates وحدها: فالورقة Lookup مخفية جدًا ولا تظهر هناك.',
+          ],
+        },
+        {
+          heading: 'طريقة Excel',
+          paragraphs: [
+            'يقدّم Excel ما لا يقدّمه العارض: يُظهر الورقة نهائيًا عند الحفظ، ويتيح تعديل وحدات الماكرو التي في الملف. وإن لم يكن Excel متاحًا لديك، فدليل فتح ملف XLSX بدون Excel يقارن الخيارات المجانية.',
+            'خطوات Excel نفسها (صفحات Microsoft، تحققنا منها في 24 نوفمبر 2026):',
+          ],
+          list: [
+            'الأوراق المخفية: انقر بزر الفأرة الأيمن على أي لسان ورقة ظاهر، واختر «إظهار»، وحدد الأوراق ثم انقر «موافق». الخطوات في صفحة إخفاء أوراق العمل أو إظهارها.',
+            'الأوراق المخفية جدًا: لا تظهر في قائمة «إظهار». افتح محرر VBA (Alt+F11 في Windows، كما تذكر صفحة اختصارات لوحة المفاتيح في Excel)، واضبط خاصية Visible للورقة على -1 - xlSheetVisible، وهي القيمة الواردة في مرجع Microsoft لحالة ظهور الورقة.',
+            'الصفوف والأعمدة: حدد الصفوف أو الأعمدة على جانبي الجزء المخفي، وانقر بزر الفأرة الأيمن واختر «إظهار»، أو انقر نقرًا مزدوجًا على الخط المزدوج في مكانها. الخطوات في صفحة إخفاء الصفوف أو الأعمدة أو إظهارها.',
+            'الصيغ: الأمر «إظهار الصيغ» في تبويب «الصيغ» يبدّل الورقة بين الصيغ والنتائج. الخطوات في صفحة عرض الصيغ أو إخفاؤها.',
+          ],
+          links: [
+            { text: 'فتح ملف XLSX بدون Excel', path: '/open-xlsx-without-excel' },
+            { text: 'صفحة إخفاء أوراق العمل أو إظهارها', path: 'https://support.microsoft.com/en-us/office/hide-or-show-worksheets-or-workbooks-69f2701a-21f5-4186-87d7-341a8cf53344' },
+            { text: 'صفحة إخفاء الصفوف أو الأعمدة أو إظهارها', path: 'https://support.microsoft.com/en-us/office/hide-or-show-rows-or-columns-659c2cad-802e-44ee-a614-dde8443579f8' },
+            { text: 'اختصارات لوحة المفاتيح في Excel', path: 'https://support.microsoft.com/en-us/office/keyboard-shortcuts-in-excel-1798d9d5-842a-42b8-9c99-9b7213f0040f' },
+            { text: 'مرجع Microsoft لحالة ظهور الورقة', path: 'https://learn.microsoft.com/en-us/office/vba/api/excel.xlsheetvisibility' },
+            { text: 'صفحة عرض الصيغ أو إخفاؤها', path: 'https://support.microsoft.com/en-us/office/display-or-hide-formulas-f7f5ab4e-bf24-4efc-8fc9-0c1b77a5356f' },
+          ],
+        },
+        {
+          heading: 'إظهار الورقة في العارض لا يلغي إخفاءها',
+          paragraphs: [
+            'فتح ورقة مخفية في العارض لا يغيّر الملف. وعندما تنزّل المصنف من العارض، تبقى الأوراق المخفية والمخفية جدًا على حالها، وتبقى الصفوف والأعمدة المخفية مخفية، فيبدو ما ترسله كما كان من قبل.',
+            'والمخفي ليس محذوفًا: كل من لديه الملف يستطيع العثور على هذه الأوراق بالطريقة نفسها. فقبل أن تشارك مصنفًا، احذف ما لا ينبغي أن يراه الطرف الآخر، واقرأ دليل إخفاء البيانات الشخصية قبل المشاركة. وانتبه إلى أن «كل الأوراق بصيغة CSV»، في نافذة «تقسيم الأوراق ودمجها وتصديرها» من قائمة «الأوراق»، يكتب الأوراق المخفية أيضًا.',
+            'الحدود: تُقرأ الصفوف والأعمدة المخفية من ملفات .xlsx و.xlsm فقط، وتُفتح الأوراق المخفية في ملف .ods ألسنةً عادية. والمصنف الذي يحتاج كلمة مرور لفتحه لا يمكن قراءته. أما أداة إزالة حماية Excel فتزيل حماية الأوراق وبنية المصنف من ملف تملكه، لا كلمة مرور الفتح.',
+          ],
+          links: [{ text: 'إخفاء البيانات الشخصية قبل المشاركة', path: '/anonymize-data-before-sharing' }, { text: 'إزالة حماية Excel', path: '/unprotect-excel' }],
+        },
+        {
+          heading: 'لماذا يكون الأمر «إظهار» معطّلًا في Excel؟',
+          paragraphs: ['أمران يتركان الأمر «إظهار» في Excel بلا شيء يعرضه. فالأوراق المخفية جدًا لا يذكرها الأمر «إظهار»، بحسب صفحة إخفاء أوراق العمل أو إظهارها، وحين تكون بنية المصنف محمية يكون «إظهار» غير متاح، بحسب صفحة حماية مصنف (صفحات Microsoft، تحققنا منها في 24 نوفمبر 2026). أما فتح الملف في عارض يقرأ الملف نفسه فيكشف النوعين معًا.'],
+          links: [{ text: 'صفحة إخفاء أوراق العمل أو إظهارها', path: 'https://support.microsoft.com/en-us/office/hide-or-show-worksheets-or-workbooks-69f2701a-21f5-4186-87d7-341a8cf53344' }, { text: 'صفحة حماية مصنف', path: 'https://support.microsoft.com/en-us/office/protect-a-workbook-7e365a4d-3e89-4616-84ca-1931257c1517' }],
+        },
+        {
+          heading: 'ما الورقة المخفية جدًا في Excel؟',
+          paragraphs: ['الورقة المخفية جدًا ورقة ضُبطت حالة ظهورها على xlSheetVeryHidden، غالبًا بماكرو أو من محرر VBA. ويستبعدها Excel من قائمة «إظهار»، فلا يعرف معظم الناس بوجودها. لكنها تظل تحمل بيانات وصيغًا، ويمكن للأوراق الأخرى أن تقرأ منها.'],
+        },
+        {
+          heading: 'هل يمكن أن تحتوي ورقة مخفية على بيانات شخصية؟',
+          paragraphs: ['نعم، فالورقة المخفية تنتقل داخل الملف بكل ما فيها، فالأسماء أو أرقام الهواتف أو الرواتب في ورقة مخفية تذهب حيثما يذهب المصنف. افحص الأوراق المخفية والمخفية جدًا قبل إرسال أي مصنف، واحذف ما لا ينبغي أن يصل إلى المستلم بدل أن تخفيه مرة أخرى.'],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصِف ما يخفيه المصنف وما تراه (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/excel-to-csv-without-breaking-arabic': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['لتحويل ملف Excel إلى CSV مع بقاء العربية مقروءة، احفظه بترميز UTF-8 مع علامة ترتيب البايتات (BOM): فترميز UTF-8 يحمل كل حرف عربي، والعلامة المكوّنة من ثلاثة بايتات في بداية الملف تخبر Excel كيف يقرؤه. وأداة تحويل Excel إلى CSV في OpenAnyDoc تفعل الأمرين داخل متصفحك: تكتب UTF-8 وتضيف العلامة كلما احتوت الورقة على أي حرف خارج النص الإنجليزي البسيط، كالحروف العربية، دون أن يُرفع المصنف.'],
+          links: [{ text: 'تحويل Excel إلى CSV', path: '/excel-to-csv' }],
+        },
+        {
+          heading: 'طريقتان تضيع بهما العربية عند الحفظ',
+          paragraphs: ['قد تتلف العربية عند الحفظ بصيغة CSV في موضعين، ولكل منهما شكل مختلف. يتناول هذا الدليل كتابة الملف بشكل صحيح؛ أما إن كان لديك ملف CSV يُفتح بعربية مشوّهة، فدليل إصلاح ملف CSV تظهر فيه العربية مشوّهة يشرح الإصلاح.'],
+          list: [
+            'تُستبدل الحروف: إذا كُتب ملف CSV بترميز لا حروف عربية فيه، فلا يمكن تخزينها، ويُكتب كل حرف منها غالبًا علامة استفهام. ولا شيء يعيدها من ذلك الملف؛ الحل الوحيد أن تحفظ من المصنف مرة أخرى.',
+            'تُخزَّن الحروف لكن تُقرأ خطأً: ملف UTF-8 بلا علامة يحتفظ بكل حرف، لكن Excel قد يعرضه مشوّهًا عند النقر المزدوج عليه، فتتحول «الرياض» إلى «Ø§Ù„Ø±ÙŠØ§Ø¶». وتقول ملاحظة Microsoft عن فتح ملفات CSV UTF-8 (تحققنا منها في 24 نوفمبر 2026) إن هذا الملف يُفتح بشكل عادي إذا حُفظ مع BOM.',
+          ],
+          links: [
+            { text: 'إصلاح ملف CSV تظهر فيه العربية مشوّهة', path: '/fix-arabic-csv-in-excel' },
+            { text: 'ملاحظة Microsoft عن فتح ملفات CSV UTF-8', path: 'https://support.microsoft.com/en-us/office/opening-csv-utf-8-files-correctly-in-excel-8a935af5-3416-4edd-ba7e-3dfd2bc4a032' },
+          ],
+        },
+        {
+          heading: 'كيف تبدو البايتات',
+          paragraphs: ['ملف CSV مجرد بايتات، فيمكنك أن ترى الفرق بنفسك. خذ كلمة الرياض، وهي 6 حروف:'],
+          list: [
+            'بترميز UTF-8 تشغل 12 بايتًا، اثنين لكل حرف: D8 A7 D9 84 D8 B1 D9 8A D8 A7 D8 B6.',
+            'بترميز Windows-1256، وهو ترميز Windows العربي القديم، تشغل 6 بايتات، واحدًا لكل حرف.',
+            'إذا قُرئت هذه البايتات الاثنا عشر بترميز Windows-1252 الغربي، صارت Ø§Ù„Ø±ÙŠØ§Ø¶.',
+            'علامة ترتيب البايتات هي البايتات الثلاثة EF BB BF في أول الملف تمامًا. افتح الملف في عارض CSV واختر «المشكلات» من قائمة «المزيد»: يذكر «تقرير الملف» الترميز وهل في الملف علامة BOM. أو شغّل الأمر node -e "console.log(require(\'fs\').readFileSync(\'file.csv\').subarray(0, 3))" وابحث عن <Buffer ef bb bf>.',
+          ],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }],
+        },
+        {
+          heading: 'حوّل الملف في متصفحك خطوة بخطوة',
+          paragraphs: ['تقرأ أداة تحويل Excel إلى CSV المصنف على جهازك:'],
+          list: [
+            'أسقط ملف .xlsx أو .xls أو .xlsm أو .ods على الصفحة. تُحوَّل الورقة الأولى فورًا. ولورقة أخرى، افتح المصنف في عارض Excel، وانقر لسان الورقة، ثم «تحويل» و«تحويل إلى CSV».',
+            'يُفتح ملف CSV في عارض CSV: فواصل بين الأعمدة، ونهايات أسطر Windows (CRLF)، وترميز UTF-8، وعلامة BOM إن كان في أي خلية حرف خارج النص الإنجليزي البسيط، كحرف عربي. والورقة التي ليس فيها إلا حروف إنجليزية وأرقام لا تأخذ العلامة، لأنها لا تحتاجها.',
+            'تحقق منه: اختر «المشكلات» من قائمة «المزيد». يعرض «تقرير الملف» الترميز وعلامة BOM (نعم أو لا) ونهايات الأسطر.',
+            'انقر «تنزيل»، فتحتفظ النسخة بالعلامة. ومن «خيارات التنزيل» في قائمة «المزيد» تختار الفاصلة المنقوطة أو علامة الجدولة أو الخط العمودي، ونهايات الأسطر LF أو CRLF، ويمكنك إلغاء «إضافة علامة ترتيب البايت (تساعد Excel على قراءة العربية)» لنظام يريد UTF-8 دون علامة.',
+            'ولكل الأوراق دفعة واحدة، افتح المصنف في عارض Excel واختر «تقسيم الأوراق ودمجها وتصديرها» من قائمة «الأوراق»، ثم «تنزيل ملفات CSV (ZIP)». تصبح كل ورقة، بما فيها المخفية، ملف CSV مستقلًا بترميز UTF-8 مع العلامة.',
+          ],
+          links: [{ text: 'تحويل Excel إلى CSV', path: '/excel-to-csv' }, { text: 'عارض Excel', path: '/excel-viewer' }],
+        },
+        {
+          heading: 'ما الذي يصل إلى ملف CSV',
+          paragraphs: ['ملف CSV يحمل نصًا فقط، فتكتب الأداة كل خلية كما تعرضها الورقة:'],
+          list: [
+            'التواريخ والنسب المئوية والعملات تحتفظ بتنسيقها المعروض: 25% تبقى 25% ولا تصير 0.25.',
+            'الصيغ تُكتب بالنتيجة المحفوظة في المصنف.',
+            'الصفوف الفارغة تُحذف.',
+            'تُكتب الأرقام الطويلة بتنسيق «عام» كاملة: فيبقى 123456789012 كما هو ولا يصير 1.23457E+11 كما يعرضه عمود ضيق، حتى 15 خانة معنوية وهو ما يحفظه Excel.',
+            'اتجاه الورقة من اليمين إلى اليسار والخطوط والألوان لا تُحفظ، لأن ملف CSV لا يخزّن أي تخطيط؛ أما النص العربي نفسه فيُحفظ كما هو تمامًا.',
+          ],
+        },
+        {
+          heading: 'الطريقة في Excel',
+          paragraphs: [
+            'في Excel، اختر «ملف» ثم «حفظ باسم»، واختر نوعًا من أنواع CSV نوعًا للملف. ولا يحفظ Excel في ملف CSV إلا الورقة النشطة، فكرر ذلك لكل ورقة، كما تشرح صفحة Microsoft عن استيراد الملفات النصية وتصديرها (تحققنا منها في 24 نوفمبر 2026).',
+            'ما يتفوق فيه Excel: يكتب ملف CSV مباشرة من المصنف الذي تعدّله، بخطوة واحدة. وما يوقع الناس فيه: قائمة الأنواع فيها أيضًا «CSV (محدد بفواصل)» و«CSV (Macintosh)» و«CSV (MS-DOS)»، وتصفها قائمة Microsoft لصيغ النص (تحققنا منها في 24 نوفمبر 2026) بأنها ملفات لأنظمة Windows وMacintosh وMS-DOS، دون أي ذكر لـ UTF-8.',
+          ],
+          links: [{ text: 'صفحة Microsoft عن استيراد الملفات النصية وتصديرها', path: 'https://support.microsoft.com/en-us/office/import-or-export-text-txt-or-csv-files-5250ac4c-663c-47ce-937b-339e391393ba' }, { text: 'قائمة Microsoft لصيغ النص', path: 'https://support.microsoft.com/en-us/office/save-a-workbook-to-text-format-txt-or-csv-3e9a9d6c-70da-4255-aa28-fcacf1f081e6' }],
+        },
+        {
+          heading: 'عندما يريد النظام المستقبِل شيئًا آخر',
+          paragraphs: ['يحتاج Excel إلى العلامة، لكن ملف CSV ليس دائمًا لبرنامج Excel:'],
+          list: [
+            'قد يتوقع استيراد قاعدة بيانات أو سكربت أو نظام محاسبة UTF-8 بلا علامة، وبعضها يقرأ العلامة جزءًا من اسم العمود الأول. ألغِ علامة BOM من «خيارات التنزيل» قبل الحفظ.',
+            'وقد يحتاج نظام عربي قديم إلى Windows-1256. تحفظ أداة تغيير ترميز CSV الملف بترميز UTF-8 مع BOM أو UTF-8 أو UTF-16 LE أو Windows-1256، وتعرض معاينة أولًا، وتنبّهك عندما يتعذر كتابة حرف بالترميز الذي اخترته.',
+            'وقد يتوقع نظام في بلد يكتب الكسور العشرية بفاصلة أن تكون الفواصل منقوطة: اختر الفاصلة المنقوطة من «خيارات التنزيل».',
+          ],
+          links: [{ text: 'تغيير ترميز CSV', path: '/change-csv-encoding' }],
+        },
+        {
+          heading: 'لماذا يعرض ملف CSV علامات استفهام بدل العربية؟',
+          paragraphs: ['علامات الاستفهام تعني في الغالب أن الحروف العربية استُبدلت عند حفظ الملف، لأن الترميز المستخدم لا حروف عربية فيه. وإن أظهر برنامج آخر علامات الاستفهام نفسها، فالحروف قد ضاعت من ذلك الملف. حوّل المصنف الأصلي مرة أخرى بترميز UTF-8 مع BOM، بأداة تحويل Excel إلى CSV أو بنوع CSV UTF-8 في Excel.'],
+          links: [{ text: 'تحويل Excel إلى CSV', path: '/excel-to-csv' }],
+        },
+        {
+          heading: 'هل تسبب علامة BOM مشكلات خارج Excel؟',
+          paragraphs: ['نادرًا ما تسبب علامة BOM مشكلات: معظم البرامج التي تقرأ UTF-8 تتعرف عليها وتتخطاها. لكن بعض السكربتات وأدوات الاستيراد لا تفعل، فتظهر رموز غريبة قبل اسم العمود الأول. وإن كان ملف CSV لنظام كهذا لا لبرنامج Excel، فألغِ علامة BOM من «خيارات التنزيل» قبل الحفظ.'],
+        },
+        {
+          heading: 'هل يمكن أن يحمل ملف CSV واحد كل أوراق المصنف؟',
+          paragraphs: ['لا، فملف CSV يحمل جدولًا واحدًا، فتصبح كل ورقة ملفًا مستقلًا. تحوّل أداة تحويل Excel إلى CSV الورقة الأولى، أو الورقة التي تختارها في عارض Excel، وينزّل «تقسيم الأوراق ودمجها وتصديرها» في قائمة «الأوراق» كل ورقة ملف CSV داخل ZIP واحد. أما هل CSV هي الصيغة المناسبة أصلًا، فيجيب عنه دليل CSV أم Excel أم JSON.'],
+          links: [{ text: 'تحويل Excel إلى CSV', path: '/excel-to-csv' }, { text: 'CSV أم Excel أم JSON', path: '/csv-vs-excel-vs-json' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصِف ما تراه في ملف CSV (دون بيانات شخصية). يكفي السطر الأول عادةً.`],
+        },
+      ],
+    },
+    '/read-speaker-notes-without-powerpoint': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['افتح ملف ‎.pptx في عارض يقرأ الملاحظات مع الشرائح، فتظهر ملاحظات المتحدث تحت كل شريحة. عارض بوربوينت في OpenAnyDoc يفعل ذلك داخل متصفحك دون رفع الملف، ويتيح لك أيضًا البحث في الملاحظات وسماعها بصوت عالٍ ورؤيتها في عرض المقدِّم وتصديرها نصًا.'],
+          links: [{ text: 'عارض بوربوينت', path: '/powerpoint-viewer' }],
+        },
+        {
+          heading: 'كيف تقرأ الملاحظات في متصفحك',
+          paragraphs: [
+            'ملف ‎.pptx حزمة ZIP من أجزاء منفصلة، وملاحظات المتحدث لا تُحفظ مع الشرائح: كل شريحة لها ملاحظات تشير إلى صفحة ملاحظات خاصة بها، يضعها PowerPoint في مجلد ppt/notesSlides. والبرنامج الذي يرسم الشرائح فقط لا يفتح هذه الأجزاء أبدًا. ولتراها بنفسك، غيّر امتداد نسخة من العرض من ‎.pptx إلى ‎.zip وافتحها؛ كل ملف notesSlide فيها يحمل ملاحظات شريحة واحدة.',
+            'يقرأ العارض الشرائح وصفحات الملاحظات معًا، على جهازك:',
+          ],
+          list: [
+            'افتح العارض واختر ملف ‎.pptx أو ‎.ppsx أو ‎.potx أو ‎.pptm، أو أسقطه على الصفحة.',
+            'إن كان في العرض ملاحظات، تنفتح لوحة «ملاحظات المتحدث» تحت الشريحة تلقائيًا. والشريحة التي لا ملاحظات لها تعرض «لا ملاحظات لهذه الشريحة.»، والعرض الخالي منها كلها يعرض «لا ملاحظات متحدث في هذا العرض.»',
+            'تنقّل بالصور المصغّرة أو بزرّي السابق والتالي أو بمفاتيح الأسهم؛ تعرض اللوحة دائمًا ملاحظات الشريحة الظاهرة.',
+            'زر «ملاحظات المتحدث» في شريط الأدوات، أو «عرض» ثم «ملاحظات المتحدث»، يُخفي اللوحة أو يُظهرها.',
+          ],
+        },
+        {
+          heading: 'ابحث في الملاحظات واستمع إليها وقدِّم بها',
+          paragraphs: ['ثلاث أدوات أخرى في العارض تستخدم الملاحظات. وإن كنت تريد كلمة فقط، فأداة البحث في PowerPoint تسرد كل تطابق في الشرائح والملاحظات برقم شريحته، دون رسم الشرائح:'],
+          list: [
+            '«البحث في الشرائح والملاحظات» (في قائمة «عرض») يسرد كل تطابق برقم شريحته ويبيّن هل هو في الشريحة أم في الملاحظات. اضغط تطابقًا في الملاحظات فيفتح العارض تلك الشريحة ويظلّل الكلمات في لوحة الملاحظات. وفعّل «مطابقة حالة الأحرف» لتفرّق بين Sales وsales.',
+            'القراءة بصوت عالٍ: اختر «ملاحظات المتحدث»، ثم «هذه الشريحة فقط» أو «من هذه الشريحة حتى النهاية». تُستخدم الأصوات المثبتة على جهازك فقط، بصوت عربي وصوت إنجليزي وإعداد للسرعة.',
+            'زر «تقديم» يفتح عرض المقدِّم: الشريحة الحالية والتالية، وملاحظاتك مع زرّي «تصغير الملاحظات» و«تكبير الملاحظات»، ومؤقت تستطيع إيقافه وتصفيره، والساعة الآن. و«فتح نافذة الجمهور» يعرض الشريحة وحدها في نافذة ثانية؛ وإن منعها المتصفح، فإن «التقديم في هذه النافذة» يعرض الشرائح بملء الشاشة.',
+          ],
+          links: [{ text: 'البحث في PowerPoint', path: '/search-pptx' }],
+        },
+        {
+          heading: 'أخرج الملاحظات نصًا',
+          paragraphs: ['«ملف» ثم «تصدير المخطط» يحفظ عنوان كل شريحة ونصها وملاحظات المتحدث بترتيب الشرائح، بصيغة «نص عادي (.txt)» أو Markdown ‏(.md). هذا مخطط نصي لعرض تجريبي من ثلاث شرائح باسم q4-plan.pptx، في أول شريحتين منه ملاحظات (في الملف تكون الأسطر تحت كل شريحة مزاحة):'],
+          list: [
+            'q4-plan',
+            'الشريحة 1: خطة الربع الرابع',
+            'فريق المبيعات',
+            'ملاحظات المتحدث:',
+            'رحّب بالحضور.',
+            'لا تتجاوز دقيقة واحدة هنا.',
+            'الشريحة 2: النتائج',
+            'الطلبات ارتفعت 12%',
+            'المرتجعات انخفضت',
+            'ملاحظات المتحدث:',
+            'توقف هنا للأسئلة.',
+            'الشريحة 3: الخطوات التالية',
+            'توظيف شخصين',
+          ],
+        },
+        {
+          heading: 'طباعة الملاحظات أو إعطاؤها لمحادثة ذكاء اصطناعي',
+          paragraphs: ['«طباعة / حفظ PDF» في العارض يطبع الشرائح شريحةً في كل صفحة دون الملاحظات، وأداة تحويل بوربوينت إلى PDF تترك الملاحظات أيضًا. ولطباعة الملاحظات على الورق، اطبع ملف ‎.txt المصدَّر من أي محرر نصوص. ولإعطاء الملاحظات لـ ChatGPT أو Claude أو Gemini، تصنع أداة تحويل PowerPoint إلى Markdown مخططًا من النوع نفسه مع عدد الرموز؛ راجع دليل إعطاء محادثة ذكاء اصطناعي عرض بوربوينت.'],
+          links: [{ text: 'تحويل بوربوينت إلى PDF', path: '/pptx-to-pdf' }, { text: 'تحويل PowerPoint إلى Markdown', path: '/pptx-to-markdown' }, { text: 'إعطاء محادثة ذكاء اصطناعي عرض بوربوينت', path: '/powerpoint-to-ai-chat' }],
+        },
+        {
+          heading: 'طرق أخرى لقراءة ملاحظات المتحدث',
+          paragraphs: ['كل ما يلي مأخوذ من صفحات المساعدة الرسمية لكل شركة (تحققنا منها في 24 نوفمبر 2026). ولمقارنة أوسع بين البرامج، راجع دليل كيف تفتح ملف PPTX بدون بوربوينت.'],
+          list: [
+            'PowerPoint: لوحة الملاحظات تحت كل شريحة، وهناك أيضًا عرض Notes Page من تبويب View. ومن File ثم Print، يطبع تخطيط Notes Pages شريحة واحدة مع ملاحظاتها في كل صفحة، ومن File ثم Export ثم Create Handouts تُرسل الملاحظات إلى وورد، بجانب الشرائح أو تحتها.',
+            'PowerPoint للويب: تستطيع كتابة الملاحظات، لكن Microsoft تقول إنه لا يعرضها لك أثناء التقديم؛ وهذا يحتاج إلى التطبيق المثبّت.',
+            'Google Slides: من Presenter view ثم Speaker notes تظهر الملاحظات أثناء التقديم، ومن File ثم Print settings and preview ثم 1 slide with notes تُطبع كل شريحة مع ملاحظاتها.',
+            'Keynote على Mac: يفتح ملفات ‎.pptx، ومن View ثم Show Presenter Notes تظهر الملاحظات تحت الشريحة، وتقول Apple إن الملاحظات يمكن طباعتها مع الشرائح.',
+          ],
+          links: [
+            { text: 'كيف تفتح ملف PPTX بدون بوربوينت', path: '/open-pptx-without-powerpoint' },
+            { text: 'عرض Notes Page من تبويب View', path: 'https://support.microsoft.com/en-us/office/choose-the-right-view-for-the-task-in-powerpoint-21332d8d-adbc-4717-a2c6-e25a697b40e9' },
+            { text: 'يطبع تخطيط Notes Pages شريحة واحدة مع ملاحظاتها في كل صفحة', path: 'https://support.microsoft.com/en-us/powerpoint/print-speaker-notes' },
+            { text: 'Microsoft تقول إنه لا يعرضها لك أثناء التقديم', path: 'https://support.microsoft.com/en-us/office/add-speaker-notes-to-your-slides-26985155-35f5-45ba-812b-e1bd3c48928e' },
+            { text: 'من Presenter view ثم Speaker notes', path: 'https://support.google.com/docs/answer/1696787' },
+            { text: '1 slide with notes', path: 'https://support.google.com/docs/answer/143346' },
+            { text: 'يفتح ملفات ‎.pptx', path: 'https://support.apple.com/guide/keynote/open-or-close-a-presentation-tan72232b56/mac' },
+            { text: 'Show Presenter Notes', path: 'https://support.apple.com/guide/keynote/add-and-view-presenter-notes-tand1a4ee7c/mac' },
+          ],
+        },
+        {
+          heading: 'أين تتفوق تلك البرامج',
+          paragraphs: ['عارض OpenAnyDoc تجريبي وللقراءة فقط. PowerPoint وKeynote يتيحان كتابة الملاحظات وتعديلها؛ أما هنا فتُقرأ ويُبحث فيها وتُسمع وتُصدَّر فقط. ويعرض العارض الملاحظات نصًا عاديًا، سطرًا لكل فقرة، دون خط عريض أو ألوان أو علامات تعداد. كما يطبع PowerPoint وGoogle Slides وKeynote صورة كل شريحة مع ملاحظاتها، وهذا لا يفعله العارض، ولا يشغّل العارض الحركات والانتقالات حين تقدّم.'],
+        },
+        {
+          heading: 'هل أستطيع تعديل ملاحظات المتحدث دون بوربوينت؟',
+          paragraphs: ['نعم، تستطيع تعديل ملاحظات المتحدث دون تطبيق بوربوينت في PowerPoint للويب، الذي تقول Microsoft إنه يتيح إنشاء الملاحظات (تحققنا منها في 24 نوفمبر 2026)، أو في Keynote على Mac حيث تكتبها تحت الشريحة. أما عارض بوربوينت في OpenAnyDoc فيقرأ الملاحظات فقط: يعرضها ويبحث فيها ويقرؤها بصوت عالٍ ويصدّرها، ولا يغيّر ملفك أبدًا.'],
+          links: [{ text: 'الذي تقول Microsoft إنه يتيح إنشاء الملاحظات', path: 'https://support.microsoft.com/en-us/office/add-speaker-notes-to-your-slides-26985155-35f5-45ba-812b-e1bd3c48928e' }],
+        },
+        {
+          heading: 'لماذا لا تظهر ملاحظات المتحدث في عرضي؟',
+          paragraphs: ['حين يقول العارض «لا ملاحظات متحدث في هذا العرض.»، فالملف نفسه لا يحمل نص ملاحظات. ويحدث ذلك حين لا تُكتب الملاحظات أصلًا، أو تُحذف، أو تُكتب في مربع نص على الشريحة نفسها. والصورة الملصقة في الملاحظات لا تظهر، وملفات ‎.ppt القديمة لا تُفتح هنا.'],
+        },
+        {
+          heading: 'هل يُرفع العرض حين أقرأ ملاحظاته؟',
+          paragraphs: ['لا، لا يُرفع عرضك: متصفحك يفتح ملف ‎.pptx ويقرأ شرائحه وملاحظاته على جهازك. والبحث والقراءة بصوت عالٍ وعرض المقدِّم وتصدير المخطط كلها تعمل هناك أيضًا، وتستمر دون اتصال بعد أن تفتح عرضًا هنا مرة. ولتتحقق بنفسك، راجع دليل كيف تتأكد أن موقعًا لا يرفع ملفك.'],
+          links: [{ text: 'كيف تتأكد أن موقعًا لا يرفع ملفك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصِف العرض التقديمي وما تراه في لوحة الملاحظات (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/compress-video-without-upload': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['لتجعل الفيديو صغيرًا بما يكفي لإرساله بالبريد أو في محادثة، خفّض معدل البت فيه، وإن كان طويلًا فصغّر أبعاد الصورة أيضًا إلى 720p أو 480p. فحجم الفيديو يساوي تقريبًا معدل البت مضروبًا في المدة، لذلك يصغر الملف حين يقصر الفيديو أو يقل معدل البت. تفعل أداة «ضغط الفيديو» ذلك داخل متصفحك: اكتب الحجم الذي تحتاج إليه بالميغابايت أو اختر جودة، ولا يغادر الفيديو جهازك.'],
+          links: [{ text: 'ضغط الفيديو', path: '/compress-video' }],
+        },
+        {
+          heading: 'ما الذي يجعل ملف الفيديو كبيرًا؟',
+          paragraphs: ['معظم ملف الفيديو بيانات صورة، ويتبع حجمه قاعدة بسيطة: الحجم = معدل البت × المدة. ومعدل البت هو عدد البتات التي تستهلكها كل ثانية من الفيديو، ويُقاس بالميغابت في الثانية (Mbps) أو بالكيلوبت في الثانية (kbps). اقسم الناتج على 8 لتحصل على البايتات. وهذه الأمور تحدد إلى أي حد يكبر الملف:'],
+          list: [
+            'المدة: فيديو بضعف الطول وبمعدل البت نفسه يكون بضعف الحجم. وحذف الأجزاء التي لا يحتاج إليها أحد أرخص طرق التوفير.',
+            'معدل البت: المفتاح الأهم. إن خفّضته إلى النصف صار الملف بنصف الحجم، وإن خفّضته كثيرًا ظهرت المربعات المشوّهة حين تتحرك الأشياء بسرعة.',
+            'الأبعاد: كلما زادت البكسلات احتاجت الصورة إلى معدل بت أعلى لتبقى حادة. وفي 1280 × 720 نحو 44% من بكسلات 1920 × 1080، لذلك تبدو 720p نظيفة بمعدل بت أقل بكثير.',
+            'معدل الإطارات: مع 60 إطارًا في الثانية يتوزع معدل البت نفسه على ضعف عدد الإطارات في 30، فينال كل إطار أقل. والضغط يُبقي معدل الإطارات كما هو.',
+            'الصوت: صغير مقارنةً بالصورة. يبدو الكلام جيدًا بمعدل 96 kbps، أي نحو 0.7 ميغابايت في الدقيقة.',
+          ],
+        },
+        {
+          heading: 'مثال محسوب: دقيقة من فيديو الهاتف',
+          paragraphs: ['خذ مقطعًا مفترضًا: 60 ثانية مسجلة بمعدل 16 Mbps مع الصوت. الأرقام أدناه حساب، لا قياس لأي هاتف.', 'الصور الثابتة تختلف: فيها تصغّر الأبعاد وتخفّض جودة JPG. ولذلك اقرأ كيف تقلل حجم ملف الصورة.'],
+          list: [
+            '16,000,000 بت × 60 ثانية ÷ 8 = 120,000,000 بايت، أي نحو 120 ميغابايت. وتعرضه الأداة 114.4 MB لأنها تحسب الميغابايت 1,048,576 بايت.',
+            'لإرساله بالبريد تحت حد 25 ميغابايت، اكتب 20 حجمًا مطلوبًا. تستهدف الأداة أقل من ذلك بـ3%، وتحجز 96 kbps للصوت، وتعطي الصورة الباقي: نحو 2.6 Mbps، أي سدس الأصل.',
+            'والحجم نفسه، 20 ميغابايت، لمقطع مدته 3 دقائق يترك للصورة نحو 0.8 Mbps. وهذا قليل على 1080p، فاختر معه 720p أو 480p.',
+            'الحد الأدنى: لا تعطي الأداة الصورة أقل من 150 kbps. ومع الصوت يعني ذلك نحو 1.8 ميغابايت لكل دقيقة، فلا يمكن أن يقل فيديو مدته 10 دقائق عن نحو 17.6 ميغابايت. قصّه، أو شارك رابطًا بدلًا منه.',
+          ],
+          links: [{ text: 'كيف تقلل حجم ملف الصورة', path: '/reduce-photo-file-size' }],
+        },
+        {
+          heading: 'حدود الحجم في الأماكن الشائعة لإرسال الفيديو',
+          paragraphs: ['كل خدمة تضع حدها وقد تغيّره. الأرقام التالية من صفحة المساعدة الرسمية لكل خدمة (تحققنا منها في 24 نوفمبر 2026). اجعل الملف أقل من الحد بقليل.'],
+          list: [
+            'Gmail: الحد 25 ميغابايت للحسابات الشخصية، والمرفقات الأكبر تُستبدل برابط في Google Drive (مساعدة Gmail). أما حسابات العمل والجامعة فتتبع الحد الذي يضعه المسؤول عنها.',
+            'Outlook.com: الحد 25 ميغابايت للملفات المرفقة، و2 غيغابايت للملف المشارك من OneDrive (حدود الإرسال في Outlook.com).',
+            'WhatsApp: الحد الافتراضي للفيديو 100 ميغابايت بدقة 720p مع اتصال أسرع، و64 ميغابايت بدقة 480p مع اتصال أبطأ، ويصل حجم المستندات إلى 2 غيغابايت (مركز مساعدة WhatsApp).',
+            'Discord: حد الملف الواحد في الحسابات المجانية أصغر منه في الحسابات المدفوعة؛ اقرأ الرقم الحالي في صفحة الأسئلة الشائعة عن المرفقات في Discord قبل الضغط.',
+            'النماذج والبوابات: تذكر الصفحة حدها عادةً بجوار زر الرفع، فاعتمد ذلك الرقم.',
+          ],
+          links: [
+            { text: 'مساعدة Gmail', path: 'https://support.google.com/mail/answer/6584' },
+            { text: 'حدود الإرسال في Outlook.com', path: 'https://support.microsoft.com/en-us/outlook/sending-limits-in-outlook-com' },
+            { text: 'مركز مساعدة WhatsApp', path: 'https://faq.whatsapp.com/453914586839706' },
+            { text: 'صفحة الأسئلة الشائعة عن المرفقات', path: 'https://support.discord.com/hc/en-us/articles/25444343291031-File-Attachments-FAQ' },
+          ],
+        },
+        {
+          heading: 'كيف تضغط الفيديو داخل متصفحك',
+          paragraphs: ['افتح «ضغط الفيديو» واختر الفيديو أو أفلته على الصفحة: MP4 أو MOV أو WebM أو MKV أو M4V أو 3GP. ولا يُضغط إلا أول فيديو تختاره.'],
+          list: [
+            'للوصول إلى حد معيّن: اضغط «إلى حجم محدد» واكتب الحجم بالميغابايت؛ تبدأ الخانة بنصف الحجم الأصلي. تأتي النتيجة قريبة من هذا الحجم، بفارق بضعة في المئة غالبًا، فاكتب أقل من الحد قليلًا، مثل 20 لحد 25 ميغابايت. وإن كان الحجم أصغر من أن يبقى الفيديو صالحًا للمشاهدة، تخبرك الصفحة بذلك وتذكر أصغر حجم ممكن.',
+            'للطريق الأبسط: اضغط «حسب الجودة» واختر «أصغر ملف» أو «ملف صغير» أو «متوازن» أو «أفضل صورة». والخيار المحدد في البداية «ملف صغير».',
+            'لأكبر توفير: من «وتصغير أبعاد الصورة أيضًا» اختر 1080p أو 720p أو 480p. لا تظهر إلا الأبعاد الأصغر من الفيديو، ويُحفظ شكله، فيبقى فيديو الهاتف الطولي طوليًا.',
+            'قبل البدء تعرض الصفحة الحجم الأصلي والحجم الجديد. وفي «حسب الجودة» يُقاس الحجم الجديد بضغط أول 3 ثوانٍ ثم مدّ النتيجة على المدة كلها، لذلك قد يخرج فيديو تزداد حركته لاحقًا أكبر من التقدير.',
+            'اضغط زر «ضغط الفيديو» وشاهد النتيجة على الصفحة ثم نزّلها. ويمكنك إلغاء العملية الطويلة.',
+          ],
+          links: [{ text: 'ضغط الفيديو', path: '/compress-video' }],
+        },
+        {
+          heading: 'الملف الذي تحصل عليه والمتصفحات التي تعمل',
+          paragraphs: ['يحتفظ الفيديو المضغوط بصيغته إن كان MP4 أو MOV أو WebM أو MKV، أما فيديوهات M4V و3GP فتصبح MP4. ويحمل اسم الأصل مضافًا إليه -compressed، مثل clip-compressed.mp4.', 'يُصنع ملف MP4 أو MOV بفيديو H.264 وصوت AAC حين يستطيع المتصفح إنشاءهما (وإلا فبترميز آخر تسمح به الصيغة)، وهما الثنائي الذي تشغّله معظم الهواتف والحواسيب وتطبيقات المحادثة. أما WebM فيستخدم VP9 وOpus حين يستطيع المتصفح إنتاجهما. يقرأ Chrome وEdge الحديثان أكثر الصيغ وينشئانها، ويعمل Safari وFirefox مع معظم الفيديوهات. وإن لم يستطع متصفحك قراءة ترميز أو إنشاءه، تذكر الصفحة اسمه وتقترح ما تجرّبه بدلًا منه.', 'تستغرق الفيديوهات الطويلة أو التي بدقة 4K وقتًا وتحتاج إلى ذاكرة متاحة، لأن الملف الجديد يُبنى على جهازك. وبعد ذلك تقص أداة «قص الفيديو» البداية أو النهاية التي لا تحتاج إليها، وتجعله أداة «تغيير حجم الفيديو» مربعًا أو بمقاس القصة.'],
+          links: [{ text: 'قص الفيديو', path: '/trim-video' }, { text: 'تغيير حجم الفيديو', path: '/resize-video' }],
+        },
+        {
+          heading: 'هل أخفّض الجودة أم أبعاد الصورة؟',
+          paragraphs: ['تصغير أبعاد الصورة يوفّر عادةً أكثر من خفض الجودة، ويبقى الفيديو حادًا على شاشة الهاتف. ففي «حسب الجودة» يتبع معدل البت الذي تستخدمه الأداة عدد البكسلات، لذلك تحمل 720p بيانات أقل بكثير من 1080p بالإعداد نفسه. أبقِ الأبعاد الكاملة للمقاطع القصيرة، أو حين سيُشاهد الفيديو على شاشة كبيرة.'],
+        },
+        {
+          heading: 'لماذا تقول الأداة إن الفيديو لا يصغر إلى هذا الحد؟',
+          paragraphs: ['لا تعطي الأداة الصورة أقل من 150 كيلوبت في الثانية، لأن الفيديو يصبح دون ذلك غير صالح للمشاهدة. ومع 96 kbps للصوت، يصبح هذا الحد الأدنى نحو 1.8 ميغابايت لكل دقيقة من الفيديو. فإن كان الحد المطلوب أقل من ذلك، فقصّ الفيديو أولًا، أو أرسل رابطًا إلى الملف بدلًا من الملف نفسه.'],
+        },
+        {
+          heading: 'هل يُرفع الفيديو حين أضغطه؟',
+          paragraphs: ['لا، يضغط متصفحك الفيديو بنفسه بأدوات ترميز الفيديو المدمجة فيه، ولا يُرسل شيء إلى أي خادم. ويمكنك أن تتحقق من ذلك بنفسك: افتح لوحة الشبكة في متصفحك واضغط فيديو وابحث عن أي رفع، فلن تجد شيئًا. ولا يتغير الملف الأصلي على جهازك أيضًا.'],
+          links: [{ text: 'تتحقق من ذلك بنفسك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} واذكر صيغة الفيديو ومدته والحجم الذي تحتاج إلى الوصول إليه (دون بيانات شخصية، ورجاءً لا ترفق الفيديو).`],
+        },
+      ],
+    },
+    '/file-too-large-for-chatgpt': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['إذا كان الملف أكبر مما يقبله ChatGPT أو Claude أو Gemini، فأرسل جزءًا أقل منه: احتفظ بالصفحات أو الأوراق أو الصفوف التي يحتاجها سؤالك فقط، وقسّم الباقي إلى أجزاء، والصق كل جزء نصًا مختصرًا. وتحقق أولًا من الحد الذي اصطدمت به، لأن حد حجم الرفع وحد الرموز في المحادثة يُعالَجان بطريقتين مختلفتين. يقيس عدّاد الرموز في OpenAnyDoc الملف، وتختصره أدوات التقسيم والتحويل، وكل ذلك داخل متصفحك دون رفعه.'],
+          links: [{ text: 'عدّاد الرموز', path: '/token-counter' }],
+        },
+        {
+          heading: 'حدّان مختلفان',
+          paragraphs: [
+            'قد ترفض محادثة الذكاء الاصطناعي الملف لسببين منفصلين. الأول حد الرفع: الحجم بالميغابايت أو عدد الملفات أو عدد الصفحات التي تقبلها الخدمة. والثاني نافذة السياق (Context window): مقدار النص، محسوبًا بالرموز، الذي يستطيع النموذج قراءته دفعة واحدة. وقد يجتاز الملف الحد الأول ثم يتجاوز الثاني.',
+            'هذا ما تقوله صفحة المساعدة الرسمية لكل خدمة (راجعناها في 24 نوفمبر 2026):',
+          ],
+          list: [
+            'ChatGPT: المستندات حتى 512 ميغابايت للملف، وملفات النصوص والمستندات بحد أقصى مليوني رمز للملف، وملفات CSV وجداول البيانات نحو 50 ميغابايت بحسب حجم كل صف. المصدر: صفحة مساعدة ChatGPT عن رفع الملفات.',
+            'Claude: في المحادثة 500 ميغابايت للملف، وحتى 20 ملفًا، وملفات PDF حتى 1000 صفحة؛ وفي ملف PDF يزيد على 100 صفحة يقرأ النص وحده. وقد تنطبق حدود رموز إضافية بحسب طول النص المستخرج. المصدر: صفحة مساعدة Claude عن رفع الملفات.',
+            'Gemini: حتى 10 ملفات في الطلب الواحد و100 ميغابايت للملف غير الفيديو. وتشرح صفحة مساعدته أنه بنافذة سياق من مليون رمز يستطيع قراءة ما يصل إلى 1500 صفحة نصية، وأن تجاوز النافذة قد يؤدي إلى إجابات تفوتها أجزاء من المحتوى. المصدر: مركز مساعدة Gemini.',
+            'تتغير الحدود بحسب الخطة والنموذج، وتتغير صفحات المساعدة نفسها أيضًا؛ راجعها قبل أن تعتمد على رقم.',
+          ],
+          links: [
+            { text: 'صفحة مساعدة ChatGPT عن رفع الملفات', path: 'https://help.openai.com/en/articles/8555545-file-uploads-faq' },
+            { text: 'صفحة مساعدة Claude عن رفع الملفات', path: 'https://support.claude.com/en/articles/8241126-what-kinds-of-documents-can-i-upload-to-claude-ai' },
+            { text: 'مركز مساعدة Gemini', path: 'https://support.google.com/gemini/answer/14903178?hl=en' },
+          ],
+        },
+        {
+          heading: 'ملف من 1 ميغابايت قد يبقى أطول من اللازم',
+          paragraphs: [
+            'الميغابايت لا تخبرك بالكثير عن الرموز. أنشأنا ملف CSV تجريبيًا من 20,000 طلب في 7 أعمدة (رقم الطلب، والتاريخ، والمنطقة، ورمز المنتج، والكمية، وسعر الوحدة، والإجمالي)، وعددنا رموزه بالعدّاد نفسه الذي يستخدمه الموقع:',
+            'فالملف أصغر بكثير من كل حدود الرفع أعلاه، ومع ذلك يملأ نصه وحده أكثر من نصف نافذة سياق من مليون رمز قبل أي سؤال أو إجابة. والنماذج الأخرى تعدّ الرموز بطريقتها، فهذه الأرقام تقديرية بالنسبة لها. ويشرح دليل كم رمزًا يستهلك ملف PDF لماذا تغيّر الجداول والعربية والنموذج العدد.',
+          ],
+          list: [
+            'الملف كاملًا: 1.02 ميغابايت و590,807 رموز، أي نحو 29.5 رمزًا لكل صف.',
+            'أول 1,000 صف: 29,541 رمزًا. أول 5,000 صف: 147,670 رمزًا.',
+            'الصفوف الألف نفسها بصيغة JSON مزاحة: 70,529 رمزًا، أي أكثر من ضعف CSV.',
+            'الصفوف الألف نفسها جدولَ Markdown: 34,559 رمزًا، وبصيغة TOON: 30,545 رمزًا.',
+          ],
+          links: [{ text: 'كم رمزًا يستهلك ملف PDF', path: '/how-many-tokens-is-my-pdf' }],
+        },
+        {
+          heading: 'قِس الملف أولًا',
+          paragraphs: ['يقرأ عدّاد الرموز الملف على جهازك، ويعرض عدد الرموز والكلمات والأحرف للنص الذي ستلصقه:'],
+          list: [
+            'افتح عدّاد الرموز وأسقط الملف، أو الصق نصًا. وهو يقرأ ملفات PDF ووورد وبوربوينت واكسل وCSV وJSON وTXT وMarkdown.',
+            'قارن العدد بحد المحادثة التي تستخدمها، واترك مكانًا لسؤالك وللإجابة.',
+            'احذف من مربع النص ما لا تحتاجه، فيتحدّث العدد مع كل تعديل.',
+            'إن أعطى ملف PDF صفر رموز، فهو ممسوح ضوئيًا لا نص فيه. شغّل التعرف الضوئي على النص أولًا.',
+          ],
+          links: [{ text: 'التعرف الضوئي على النص', path: '/ocr-pdf' }],
+        },
+        {
+          heading: 'احتفظ بما يحتاجه السؤال فقط',
+          paragraphs: ['أضمن حل أن ترسل أقل. اختر الأداة بحسب نوع ملفك:'],
+          list: [
+            'PDF: تحفظ أداة استخراج صفحات PDF الصفحات التي تنقر عليها فقط في ملف PDF جديد، مثل الفصل الواحد أو الجداول الثلاثة التي تسأل عنها.',
+            'ملف PDF طويل تحتاجه كله: تقسّمه أداة تقسيم PDF بنطاقات صفحات، أو كل بضع صفحات، أو ملفًا لكل صفحة.',
+            'وورد: تقسّم أداة تقسيم ملف Word ملف ‎.docx عند عناوين «عنوان 1» أو «عنوان 2» أو عند فواصل الصفحات، فيكون كل جزء قسمًا كاملًا.',
+            'اكسل: تصنع أداة تقسيم ملف Excel ملفًا لكل ورقة، أو ملفًا لكل عدد من الصفوف تحدده، أو ملفًا لكل قيمة في عمود، مثل ملف لكل منطقة.',
+            'CSV: تقسّم أداة تقسيم CSV الملف بعدد صفوف لكل ملف أو بحجم بالميغابايت لكل ملف، وفي كل جزء صف العناوين. صفِّ الصفوف أو أخفِ الأعمدة أولًا، فلا تحمل الأجزاء إلا ما بقي.',
+          ],
+          links: [{ text: 'استخراج صفحات PDF', path: '/extract-pdf-pages' }, { text: 'تقسيم PDF', path: '/split-pdf' }, { text: 'تقسيم ملف Word', path: '/split-word' }, { text: 'تقسيم ملف Excel', path: '/split-excel' }, { text: 'تقسيم CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'اجعل النص أصغر',
+          paragraphs: ['المحتوى نفسه قد يكلّف أعدادًا مختلفة جدًا من الرموز بحسب صيغته، واللصق نصًا يريك بالضبط ما ستتلقاه المحادثة:'],
+          list: [
+            'PDF: تحوّل أداة تحويل PDF إلى Markdown الصفحات إلى نص تُعلَّم فيه العناوين والقوائم والجداول، فتقرأ ما ستقرؤه المحادثة وتختصره. ويتناول دليل إعطاء ChatGPT ملف PDF دون فقدان الجداول أمر الجداول.',
+            'جداول البيانات: الصق CSV لا JSON؛ ففي التجربة أعلاه أخذ أقل من نصف الرموز. ويقارن دليل إعطاء محادثة الذكاء الاصطناعي جدول بيانات بين CSV وجداول Markdown.',
+            'سجلات JSON: تكتب أداة تحويل JSON إلى TOON قائمة السجلات نفسها بأسماء الحقول مرة واحدة في أعلاها، وتعرض عدد الرموز قبل التحويل وبعده. والتوفير قليل في البيانات المتداخلة بعمق.',
+            'الأعمدة التي لا يسأل عنها أحد تكلّف رموزًا في كل صف؛ احذفها قبل اللصق.',
+          ],
+          links: [
+            { text: 'تحويل PDF إلى Markdown', path: '/pdf-to-markdown' },
+            { text: 'إعطاء ChatGPT ملف PDF دون فقدان الجداول', path: '/pdf-to-ai-chat-with-tables' },
+            { text: 'إعطاء محادثة الذكاء الاصطناعي جدول بيانات', path: '/spreadsheet-to-ai-chat' },
+            { text: 'تحويل JSON إلى TOON', path: '/json-to-toon' },
+          ],
+        },
+        {
+          heading: 'الصقه على أجزاء',
+          paragraphs: [
+            'حين تحتاج المحتوى كله، أرسله على أجزاء في محادثة واحدة. ابدأ برسالة قصيرة مثل: «سأرسل تقريرًا في 4 أجزاء. ردّ بكلمة تم فقط حتى أرسل الجزء 4، ثم أجب عن سؤالي». وضع عنوانًا لكل جزء («الجزء 2 من 4: الصفحات 11 إلى 20»)، واجعل كل جزء أصغر من الحد بهامش واضح، واطرح سؤالك بعد الجزء الأخير.',
+            'كل الأجزاء تبقى في نافذة السياق نفسها، فالتقسيم لا يزيد المساحة: إن كان المجموع كبيرًا جدًا، فقد تفوت المحادثة تفاصيل من الأجزاء الأولى. وللسؤال عن قسم واحد، تنجح محادثة جديدة فيها ذلك القسم وحده أكثر. وقبل اللصق، تستبدل أداة إخفاء البيانات الأسماء وعناوين البريد وغيرها من البيانات الشخصية في ملف CSV أو JSON أو اكسل أو ملف نصي على جهازك.',
+          ],
+          links: [{ text: 'إخفاء البيانات', path: '/mask-data' }],
+        },
+        {
+          heading: 'لماذا تجاهلت المحادثة جزءًا من ملفي؟',
+          paragraphs: ['الأرجح أن المحادثة قرأت أكثر مما تتسع له نافذة السياق. فحين يكون الملف أطول من النافذة، قد تجيب الخدمة من جزء منه فقط أو تفوتها تفاصيل موزعة فيه، وصفحة مساعدة Gemini تقول ذلك صراحة. عُدّ النص أولًا، وأرسل الصفحات أو الصفوف التي يحتاجها السؤال فقط، ثم اسأل من جديد في محادثة جديدة.'],
+        },
+        {
+          heading: 'كم صفًا من جدول البيانات أستطيع لصقه دفعة واحدة؟',
+          paragraphs: ['يعتمد ذلك على عدد الأعمدة وطول القيم، فعُدّ عينة بدل أن تخمّن. في تجربتنا، أخذ جدول طلبات من 7 أعمدة نحو 29.5 رمزًا لكل صف. اقسم المساحة المتاحة لك على عدد رموز الصف في ملفك، ثم اضبط تقسيم CSV أو تقسيم ملف Excel على هذا العدد من الصفوف لكل ملف.'],
+        },
+        {
+          heading: 'هل يرفع العدّ أو التقسيم ملفي إلى أي مكان؟',
+          paragraphs: ['لا، يُقرأ الملف ويُقسَّم داخل متصفحك، ولا يُرسل شيء إلى خادم أو إلى أي خدمة ذكاء اصطناعي. والشيء الوحيد الذي يصل إلى المحادثة هو النص الذي تلصقه بنفسك. ويمكنك أن تتحقق بنفسك من أن شيئًا لا يُرفع بمراقبة لوحة الشبكة أثناء عمل الأداة.'],
+          links: [{ text: 'تتحقق بنفسك من أن شيئًا لا يُرفع', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} واذكر نوع الملف والمحادثة التي تستخدمها (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/best-free-csv-viewers': {
+      published: '2026-11-24',
+      updated: '2026-11-25',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['أفضل عارض CSV مجاني هو الذي يناسب ملفك: عارض في المتصفح للملفات الخاصة أو الكبيرة جدًا، وتطبيق جداول بيانات حين تحتاج إلى الصيغ، ومحرر نصوص لرؤية النص الخام. يفتح عارض CSV في OpenAnyDoc الملف جدولًا تبحث فيه وترتّبه وتعدّله داخل متصفحك، ولا يُرفع الملف أبدًا. وفيما يلي خمسة خيارات مجانية أخرى وما يقوله موقع كلٍّ منها عنها.'],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }],
+        },
+        {
+          heading: 'كيف اخترنا',
+          paragraphs: ['كان على كل أداة هنا أن تجتاز ثلاثة شروط. القائمة ليست مرتبة حسب الأفضلية، ويأتي OpenAnyDoc أولًا لأنه موقعنا فقط، فاحكم عليه بالحقائق نفسها التي تحكم بها على غيره:'],
+          list: [
+            'مجانية للعرض بلا حد زمني، كما يقول موقعها.',
+            'تفتح ملف .csv على الحاسوب، جدولًا أو نصًا عاديًا.',
+            'نقاط قوة كل تطبيق أو خدمة وحدودها مأخوذة من صفحاتها، وهي مرتبطة أدناه وروجعت في 24 نوفمبر 2026 (وتطبيقات CSV لسطح المكتب مرة أخرى في 25 نوفمبر 2026). وحين لا تذكر الصفحة شيئًا نقول ذلك ولا نخمّن. أما محررات النصوص التي تأتي مع Windows وmacOS فنصفها بما تراه حين يُفتح فيها ملف CSV.',
+          ],
+        },
+        {
+          heading: 'عارض CSV في OpenAnyDoc، داخل متصفحك',
+          paragraphs: [
+            'أفلت ملف .csv أو .tsv أو .tab على عارض CSV. يكتشف الفاصل (فاصلة أو فاصلة منقوطة أو Tab أو خط عمودي) والترميز (UTF-8 أو UTF-16 أو ترميز Windows-1256 القديم للعربية أو Windows-1252 للحروف الأوروبية الغربية)، ويعرض الصفوف جدولًا تبحث فيه وتصفّيه وترتّبه وتعدّله، مع التراجع. تُقرأ كل خلية نصًا كما كُتبت، فتبقى الأصفار في البداية وأرقام المعرّفات الطويلة كما هي. ويمكنك أيضًا تشغيل استعلامات SQL على الجدول وتنزيله ملف CSV أو مصنف Excel.',
+            'الحدود: ليس للعارض حد صفوف خاص به، لكن يجب أن يتسع الملف في ذاكرة جهازك، ويظهر تحذير أولًا للملف الذي يتجاوز 50 ميغابايت. ويعرض القيم فقط، لأن ملف CSV لا يحمل صيغًا ولا تنسيقًا. ولملفات التصدير الكبيرة جدًا، يفتح عارض ملفات CSV الكبيرة العارض نفسه مع تلميح لاقتطاع ما تحتاجه من الملف.',
+          ],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }, { text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'تطبيقات جداول بيانات مجانية (رُوجعت في 24 نوفمبر 2026)',
+          paragraphs: ['تطبيقان مجانيان يفتحان ملف CSV ورقةَ عمل:'],
+          list: [
+            'يعمل Google Sheets في متصفح الويب. تقول صفحة المنتج «Anyone with a Google Account can create in Sheets»، أي يستطيع كل من لديه حساب Google الإنشاء فيه. ولفتح ملف CSV اختر «ملف» ثم «استيراد» داخل جدول بيانات؛ وتذكر صفحة مساعدة الاستيراد صيغ .csv و.tsv و.txt بين الصيغ المدعومة، ويمكنها اكتشاف الفاصل تلقائيًا. وتسمح صفحة Google عن الملفات التي يمكن تخزينها في Google Drive بما يصل إلى 20 مليون خلية أو 100 ميغابايت للجداول المنشأة في Google Sheets أو المحوّلة إليه.',
+            'LibreOffice Calc جزء من LibreOffice، الذي يصفه موقعه بأنه «free and open source software»، أي برنامج مجاني ومفتوح المصدر. وعند فتح ملف CSV تظهر أولًا نافذة استيراد النص، تختار فيها مجموعة المحارف والفاصل ونوع كل عمود، وهذا يساعد مع النص العربي ومع الملفات التي كانت ستنزل في عمود واحد.',
+          ],
+          links: [
+            { text: 'صفحة المنتج', path: 'https://workspace.google.com/products/sheets/' },
+            { text: 'صفحة مساعدة الاستيراد', path: 'https://support.google.com/docs/answer/40608' },
+            { text: 'الملفات التي يمكن تخزينها في Google Drive', path: 'https://support.google.com/drive/answer/37603' },
+            { text: 'يصفه موقعه', path: 'https://www.libreoffice.org/discover/libreoffice/' },
+            { text: 'نافذة استيراد النص', path: 'https://help.libreoffice.org/latest/en-US/text/shared/00/00000208.html' },
+          ],
+        },
+        {
+          heading: 'تطبيقات CSV لسطح المكتب (رُوجعت في 25 نوفمبر 2026)',
+          paragraphs: ['تطبيقان لسطح المكتب صُنعا لملفات CSV لا لجداول البيانات:'],
+          list: [
+            'يعمل Modern CSV على Windows وmacOS وLinux. تقول صفحة الشراء «You may use the Free version as long as you wish»، أي يمكنك استخدام النسخة المجانية ما شئت، وتقول صفحته الرئيسية إنه مصمم لملفات تُثقل معظم تطبيقات جداول البيانات. وتشمل النسخة المجانية التصفية الأساسية وإخفاء الصفوف أو الأعمدة، وتخلو من استعلامات SQL والتصفية بـ SQL والجداول المحورية والمخططات ودمج الملفات أو تقسيمها؛ فهذه مع الترخيص المدفوع (49 دولارًا أمريكيًا سنويًا، أو 69 دولارًا مرة واحدة).',
+            'يعمل Tad على macOS وLinux وWindows. ويصفه موقعه بأنه تطبيق مجاني لسطح المكتب لعرض البيانات الجدولية وتحليلها، و«a fast viewer for CSV and Parquet files»، أي عارض سريع لملفات CSV وParquet، يدعم الملفات الكبيرة.',
+          ],
+          links: [
+            { text: 'صفحة الشراء', path: 'https://www.moderncsv.com/buy/' },
+            { text: 'صفحته الرئيسية', path: 'https://www.moderncsv.com/' },
+            { text: 'ويصفه موقعه', path: 'https://www.tadviewer.com/' },
+          ],
+        },
+        {
+          heading: 'محرر نصوص موجود عندك',
+          paragraphs: ['يعرض Notepad على Windows وTextEdit على Mac الملف الخام: صف في كل سطر، والفواصل ظاهرة. وهي أسرع طريقة لمعرفة الفاصل الذي يستخدمه الملف، وهل السطر الأول يحمل العناوين، وهل القيم محاطة بعلامات اقتباس. لكن قراءة جدول عريض بهذه الطريقة صعبة، وحذف فاصل واحد يزيح كل قيمة بعده إلى العمود الخطأ، فعدّل بحذر.'],
+        },
+        {
+          heading: 'أين تقدّم الأدوات الأخرى أكثر',
+          paragraphs: ['إنصافًا في المقارنة: يتيح Google Sheets لعدة أشخاص تعديل الجدول نفسه في الوقت نفسه، وفيه وفي LibreOffice Calc صيغ وجداول محورية ومخططات، بحسب صفحة Google Sheets وصفحتَي مساعدة LibreOffice عن ميزات Calc وعن الجداول المحورية (تحققنا منها في 24 نوفمبر 2026). ويضيف الترخيص المدفوع في Modern CSV الجداول المحورية والمخططات وSQL إلى تطبيق لسطح المكتب، ويفتح Tad أيضًا بعض ملفات قواعد البيانات. أما OpenAnyDoc فيعدّل القيم في ملف CSV ويحفظ ملفات CSV أو Excel، لكن لا صيغ فيه ولا نسخة حية يعدّلها فريق معًا.'],
+          links: [{ text: 'صفحة Google Sheets', path: 'https://workspace.google.com/products/sheets/' }, { text: 'ميزات Calc', path: 'https://help.libreoffice.org/latest/en-US/text/scalc/main0503.html' }, { text: 'عن الجداول المحورية', path: 'https://help.libreoffice.org/latest/en-US/text/scalc/guide/datapilot.html' }],
+        },
+        {
+          heading: 'أي عارض CSV مجاني يفتح أكبر الملفات؟',
+          paragraphs: ['لا جواب ثابتًا لأي برنامج، لأن الحد الحقيقي عادةً هو ذاكرة حاسوبك. يتوقف Google Sheets عند 20 مليون خلية للجدول الواحد، وتتوقف تطبيقات جداول البيانات عند حد للصفوف، بينما ليس لـ OpenAnyDoc حد صفوف خاص به، ويقول Modern CSV وTad إنهما يتعاملان مع الملفات الكبيرة. جرّب ملفك، ويشرح دليل ملف CSV أكبر من أن يفتحه Excel الخيارات الأخرى.'],
+          links: [{ text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'هل أستطيع فتح ملف CSV دون رفعه إلى أي مكان؟',
+          paragraphs: ['نعم، كل برنامج يقرأ الملف على جهازك يفعل ذلك: محرر نصوص، أو LibreOffice Calc، أو تطبيق CSV لسطح المكتب، أو OpenAnyDoc في متصفحك. أما Google Sheets فيعمل مع جداول محفوظة في Google Drive. وللتحقق من أي موقع بنفسك راقب لوحة الشبكة في المتصفح أثناء فتح الملف، كما يشرح دليل كيف تتحقق من أن موقعًا لا يرفع ملفك.'],
+          links: [{ text: 'كيف تتحقق من أن موقعًا لا يرفع ملفك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'كيف أفتح ملف CSV على هاتفي؟',
+          paragraphs: ['استخدم متصفح الهاتف: في عارض CSV على OpenAnyDoc اضغط «اختر ملفًا» واختر ملف CSV من «الملفات» أو التنزيلات، فيُفتح جدولًا بتخطيط مخصص للهاتف والأدوات في قائمة. لا يُثبَّت شيء ويبقى الملف على الهاتف. وتجد طرقًا أخرى على كل الأجهزة في دليل كيف تفتح ملف CSV من دون Excel.'],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }, { text: 'كيف تفتح ملف CSV من دون Excel', path: '/open-csv-without-excel' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وأخبرنا بعارض CSV الذي تريد أن نراجعه بعد ذلك (دون بيانات شخصية).`],
+        },
+      ],
+    },
+    '/best-free-json-formatters': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['منسّق JSON الذي يعمل على حاسوبك يُبقي بياناتك عليه: عارض JSON المدمج في Firefox، أو محرر برمجي مثل VS Code، أو أداة jq في سطر الأوامر. ومن بين المواقع، يقول JSONLint وJSON Crack في صفحاتهما إن JSON يُعالَج في متصفحك، أما منسّق JSON في OpenAnyDoc فينسّقه داخل متصفحك وليست فيه ميزة حفظ أو مشاركة أصلًا. وفيما يلي ما تقوله صفحات كل أداة، بكلماتها حيث يهم ذلك.'],
+          links: [{ text: 'منسّق JSON', path: '/json-formatter' }],
+        },
+        {
+          heading: 'كيف اخترنا',
+          paragraphs: ['كل أداة هنا مجانية وتنسّق JSON. ننقل فقط ما تقوله صفحات كل أداة عن المكان الذي يذهب إليه JSON الملصوق، وقد رُوجعت في 24 نوفمبر 2026، ونذكر ذلك حين تسكت الصفحة. القائمة ليست مرتبة حسب الأفضلية؛ وOpenAnyDoc موقعنا، فاحكم عليه بالمعيار نفسه.'],
+        },
+        {
+          heading: 'منسّق JSON في OpenAnyDoc',
+          paragraphs: [
+            'الصق JSON أو افتح ملف .json حتى 10 ميغابايت، ثم اضغط «تنسيق» لترتيبه بمسافة واحدة أو 2 أو 3 أو 4 أو 8 مسافات أو Tab، أو «تصغير» لوضعه في سطر واحد. ويرتّب «ترتيب المفاتيح» كل كائن من A إلى Z، وتبقى الأعداد الصحيحة الأطول مما تحتمله JavaScript كما هي رقمًا رقمًا. وإن كان JSON غير صالح، يعرض مدقق JSON سطر الخطأ وعموده، ويعالج «إصلاح» الفواصل الزائدة والتعليقات وعلامات الاقتباس المفردة.',
+            'يبقى JSON في ذاكرة الصفحة حتى تنزّل نسخة. لا يوجد زر حفظ على الإنترنت ولا رابط مشاركة ولا حساب ولا أدوات تحليل للزيارات، ولا تسمح سياسة أمان الصفحة إلا بالاتصال بموقعها نفسه. والاستثناء الوحيد «فتح من عنوان URL»، الذي يجلب عنوان https الذي تكتبه مباشرة من متصفحك. وبعد تحميل الصفحة تعمل دون اتصال.',
+          ],
+          links: [{ text: 'مدقق JSON', path: '/json-validator' }],
+        },
+        {
+          heading: 'مدمجة في أدوات قد تكون عندك (رُوجعت في 24 نوفمبر 2026)',
+          paragraphs: ['هذه تنسّق JSON على حاسوبك:'],
+          list: [
+            'Firefox: تقول وثائقه «Firefox includes a JSON viewer»، أي إن فيه عارض JSON مدمجًا. افتح ملف JSON أو عنوانه في المتصفح فيعرضه شجرة قابلة للطي مع مربع تصفية، والنص الخام، ونسخة منسّقة. ويقرأ أيضًا JSON Lines، لكنه لا ينسّقها.',
+            'VS Code: مجاني «for private or commercial use»، أي للاستخدام الشخصي والتجاري، كما تقول أسئلته الشائعة. ينسّق أمر Format Document ملف JSON (Shift+Alt+F على Windows)، ويتحقق المحرر منه مقابل JSON Schema أثناء الكتابة. وتقول الأسئلة الشائعة نفسها إنه يرسل بيانات استخدام إلى Microsoft، ويوقفها إعداد Telemetry Level، وتقول وثائق JSON فيه إنه قد ينزّل المخططات من عناوين http وhttps.',
+            'jq: «a lightweight and flexible command-line JSON processor»، أي أداة سطر أوامر خفيفة لمعالجة JSON، على Linux وmacOS وWindows. ويقول دليلها «By default, jq pretty-prints JSON output»، أي إنها تنسّق المخرجات افتراضيًا، فالأمر jq . file.json يطبع الملف منسّقًا؛ ويحدد --indent حتى 7 مسافات، ويستخدم --tab علامات Tab، ويضع -c كل كائن في سطر واحد.',
+          ],
+          links: [
+            { text: 'تقول وثائقه', path: 'https://firefox-source-docs.mozilla.org/devtools-user/json_viewer/index.html' },
+            { text: 'أسئلته الشائعة', path: 'https://code.visualstudio.com/docs/supporting/faq' },
+            { text: 'وثائق JSON فيه', path: 'https://code.visualstudio.com/docs/languages/json' },
+            { text: 'أداة سطر أوامر خفيفة لمعالجة JSON', path: 'https://jqlang.org/' },
+            { text: 'دليلها', path: 'https://jqlang.org/manual/' },
+          ],
+        },
+        {
+          heading: 'مواقع تنسيق JSON (رُوجعت في 24 نوفمبر 2026)',
+          paragraphs: ['ما تقوله المواقع نفسها:'],
+          list: [
+            'JSONLint، أداة للتحقق من JSON وإعادة تنسيقه: تقول سياسة خصوصية JSONLint «All JSON validation happens client-side in your browser»، أي إن التحقق كله يجري في متصفحك، و«Your JSON data is never sent to our servers for processing»، أي لا تُرسَل بياناتك إلى خوادمه للمعالجة. وتذكر السياسة نفسها Google Analytics وشريكًا إعلانيًا قد يضع ملفات تعريف الارتباط. وتقبل صفحة JSONLint الرئيسية أيضًا رابطًا و«will scrape it for JSON»، أي تستخرج منه JSON، دون أن تذكر أين يجري هذا الجلب.',
+            'JSON Crack، الذي يرسم JSON مخططًا: تقول صفحة JSON Crack الرئيسية «Your data is never stored on our servers. Everything happens on your device.»، أي لا تُخزَّن بياناتك على خوادمه ويجري كل شيء على جهازك. ويدعم نحو 300 كيلوبايت من البيانات، حسب البيانات وجهازك، وتذكر سياسة خصوصية JSON Crack أداة Google Analytics.',
+            'لدى jsonformatter.org وCode Beautify ميزة حفظ على الإنترنت، وتقول صفحاتهما إن JSON المحفوظ قد يصبح عامًا ما لم تسجّل الدخول. وتجد ما يقوله كلٌّ منهما في دليلنا عن بديل jsonformatter.org.',
+          ],
+          links: [
+            { text: 'سياسة خصوصية JSONLint', path: 'https://jsonlint.com/privacy' },
+            { text: 'صفحة JSONLint الرئيسية', path: 'https://jsonlint.com/' },
+            { text: 'صفحة JSON Crack الرئيسية', path: 'https://jsoncrack.com/' },
+            { text: 'سياسة خصوصية JSON Crack', path: 'https://jsoncrack.com/legal/privacy' },
+            { text: 'دليلنا عن بديل jsonformatter.org', path: '/jsonformatter-alternative' },
+          ],
+        },
+        {
+          heading: 'مقارنة سريعة',
+          paragraphs: ['أهم الفروق، من الصفحات أعلاه:'],
+          list: [
+            'أين يُنسَّق JSON: على حاسوبك في Firefox وVS Code وjq؛ وفي متصفحك في JSONLint وJSON Crack وOpenAnyDoc، كما تقول صفحاتها.',
+            'روابط الحفظ على الإنترنت: يقدّمها jsonformatter.org وCode Beautify؛ ولا يقدّمها OpenAnyDoc.',
+            'أدوات التحليل المذكورة في سياسة الخصوصية: Google Analytics في JSONLint وJSON Crack؛ ولا تحليل في OpenAnyDoc.',
+            'الحجم: نحو 300 كيلوبايت في JSON Crack؛ و10 ميغابايت في OpenAnyDoc؛ ولا تذكر الصفحات الأخرى التي راجعناها حدًا.',
+            'دون اتصال: Firefox وVS Code وjq دائمًا؛ وOpenAnyDoc بعد تحميل الصفحة.',
+          ],
+        },
+        {
+          heading: 'أين تقدّم الأدوات الأخرى أكثر',
+          paragraphs: ['إنصافًا في المقارنة: تصفّي jq ملفات JSON وتعيد تشكيلها وتدمجها داخل السكربتات وسلاسل الأوامر، وهذا ما لا تفعله لك صفحة ويب. ويتحقق VS Code من JSON مقابل مخطط أثناء التعديل ويتعامل معه بجانب الكود. ويعرض Firefox ترويسات الطلب والرد لـ JSON القادم من خادم. أما منسّق OpenAnyDoc فيتوقف عند 10 ميغابايت ويتحقق من الصياغة فقط؛ وللمخططات صفحة JSON Schema مستقلة، ويرسم مخطط JSON الملف صناديق متصلة.'],
+          links: [{ text: 'صفحة JSON Schema', path: '/json-schema' }, { text: 'مخطط JSON', path: '/json-graph' }],
+        },
+        {
+          heading: 'هل لصق JSON فيه مفاتيح API في منسّق على الإنترنت آمن؟',
+          paragraphs: ['يكون آمنًا فقط حين لا يغادر JSON جهازك، فتحقق مما يقوله الموقع ومما يفعله. المنسّق الذي يعمل في متصفحك يُبقي المفاتيح على جهازك، أما الذي فيه حفظ على الإنترنت أو روابط مشاركة فقد يجعلها عامة بالخطأ. والأفضل أن تحذف الأسرار قبل اللصق، وأن تستبدل أي مفتاح لصقته في مكان لا تثق به.'],
+        },
+        {
+          heading: 'كيف أتحقق من أن منسّق JSON لا يرفع بياناتي؟',
+          paragraphs: ['افتح أدوات المطوّر في متصفحك وانتقل إلى تبويب Network، ثم الصق JSON ونسّقه: أي طلب يحمل نصك يظهر هناك. والصفحة التي تُبقي البيانات محلية لا ترسل طلبًا كهذا. ويشرح دليل كيف تتحقق من أن موقعًا لا يرفع ملفك ذلك خطوة خطوة، في Chrome وEdge وFirefox وSafari.'],
+          links: [{ text: 'كيف تتحقق من أن موقعًا لا يرفع ملفك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'ما أسرع طريقة لتنسيق JSON دون موقع؟',
+          paragraphs: ['إن كان عندك Firefox فافتح ملف .json فيه وانتقل إلى العرض المنسّق. وفي الطرفية يطبع الأمر jq . file.json الملف منسّقًا، وفي VS Code يفعل Format Document الشيء نفسه. والثلاثة تنسّق على حاسوبك، فلا تلصق JSON في صفحة ويب أبدًا.'],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} وصف ما تحتاجه (دون بيانات شخصية، ولا تلصق رمز وصول حقيقيًا أبدًا).`],
+        },
+      ],
+    },
+    '/openanydoc-vs-google-sheets-large-files': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['لفتح ملف CSV كبير جدًا والبحث فيه، أقل الأدوات قيودًا هو عارض يقرأ الملف على جهازك: ليس لعارض ملفات CSV الكبيرة في OpenAnyDoc حد صفوف خاص به، والحد الوحيد ذاكرة جهازك، ولا يُرفع شيء. أما Google Sheets فيتسع لـ 20 مليون خلية في الجدول الواحد، وتتوقف ورقة Excel على الحاسوب عند 1,048,576 صفًا، ويفتح Excel للويب مصنفات حتى 100 ميغابايت في المتصفح حسب اشتراكك في Microsoft 365. وتبقى جداول البيانات الخيار الأفضل حين تحتاج إلى الصيغ أو المخططات أو فريق يعدّل معًا.'],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'الحدود الرسمية (رُوجعت في 24 نوفمبر 2026)',
+          paragraphs: ['من صفحات كل منتج:'],
+          list: [
+            'Google Sheets: «Up to 20 million cells or 100MB for spreadsheets that are created in or converted to Google Sheets»، أي حتى 20 مليون خلية أو 100 ميغابايت للجداول المنشأة فيه أو المحوّلة إليه، من صفحة Google عن الملفات التي يمكن تخزينها في Google Drive.',
+            'Excel على الحاسوب: ورقة العمل 1,048,576 صفًا في 16,384 عمودًا، وتتسع الخلية لـ 32,767 حرفًا، من صفحة مواصفات Excel وحدوده. ولا حد صارمًا لحجم ملف نموذج البيانات في Excel بنظام 64 بت؛ أما Excel بنظام 32 بت فيتقاسم 2 غيغابايت من مساحة العناوين مع المصنف والوظائف الإضافية.',
+            'Excel للويب: حد المتصفح من 0 إلى 100 ميغابايت للمصنفات في مكتبة SharePoint Online، ومن 0 إلى 10 ميغابايت للمصنف المرفق برسالة في Outlook Web App، وتقول Microsoft إنه يعتمد على اشتراكك في Microsoft 365، من صفحة حدود حجم المصنفات في SharePoint.',
+            
+            'OpenAnyDoc: لا حد صفوف خاصًا به؛ يجب أن يتسع الملف في ذاكرة جهازك، ويظهر تحذير قبل فتح الملف الذي يتجاوز 50 ميغابايت.',
+          ],
+          links: [
+            { text: 'الملفات التي يمكن تخزينها في Google Drive', path: 'https://support.google.com/drive/answer/37603' },
+            { text: 'مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' },
+            { text: 'حدود حجم المصنفات في SharePoint', path: 'https://support.microsoft.com/en-us/office/file-size-limits-for-workbooks-in-sharepoint-9e5bc6f8-018f-415a-b890-5452687b325e' },
+          ],
+        },
+        {
+          heading: 'ما يفعله OpenAnyDoc بملف CSV كبير',
+          paragraphs: [
+            'أفلت الملف على عارض ملفات CSV الكبيرة فيقرؤه متصفحك على جهازك؛ ولا يُرسَل شيء إلى خادم. تُقرأ الصفوف في الخلفية وتصل على دفعات من 10,000 صف، ولا يُرسم إلا الصفوف الظاهرة على الشاشة وبضعة صفوف حولها، فيبقى التمرير سلسًا. وفي اختبار OpenAnyDoc نفسه فُتح ملف من 120,000 صف و8 أعمدة في نحو نصف ثانية على حاسوب محمول.',
+            'وبعد فتح الملف يمكنك البحث في كل الأعمدة والتصفية والترتيب حسب عدة أعمدة ورؤية المجاميع حسب عمود وتشغيل استعلامات SQL على الجدول. وللحصول على ملف يتسع له برنامج جداول البيانات، أبقِ الصفوف المصفّاة فقط من «خيارات التنزيل» في قائمة «المزيد»، أو قسّم الملف أجزاءً بأداة تقسيم CSV، ويبدأ كل جزء بصف العناوين.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'تقسيم CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'محررات CSV لسطح المكتب (رُوجعت في 24 نوفمبر 2026)',
+          paragraphs: ['التطبيقات المصنوعة لملفات CSV على سطح المكتب تتجنب هي أيضًا حدود شبكة جداول البيانات. تقول صفحة Modern CSV الرئيسية إنه «handles files beyond Excel\'s million-row limit»، أي يتعامل مع ملفات تتجاوز حد المليون صف في Excel، وإنه وفق اختباراته يحمّل الملف أسرع من Excel بـ 28 مرة؛ ويمكن استخدام نسخته المجانية ما شئت. ويصفه موقع Tad بأنه عارض مجاني لسطح المكتب لملفات CSV وParquet «supports large files»، أي يدعم الملفات الكبيرة. ولا تذكر أيٌّ من الصفحتين حدًا أقصى لحجم الملف. وتجد برامج مجانية أخرى في دليل كيف تفتح ملف CSV من دون Excel.'],
+          links: [
+            { text: 'صفحة Modern CSV الرئيسية', path: 'https://www.moderncsv.com/' },
+            { text: 'موقع Tad', path: 'https://www.tadviewer.com/' },
+            { text: 'كيف تفتح ملف CSV من دون Excel', path: '/open-csv-without-excel' },
+          ],
+        },
+        {
+          heading: 'اختبار تجريه بنفسك',
+          paragraphs: ['أنشئ ملف CSV ببيانات مصطنعة وافتحه في كل برنامج. إن كان Node.js مثبتًا على macOS أو Linux، فهذا السطر الواحد يكتب الملف big.csv: صف عناوين و2,000,000 صف من بيانات مختلَقة في 10 أعمدة.'],
+          list: [
+            'node -e "const f=require(\'fs\').createWriteStream(\'big.csv\');f.write(\'id,city,amount,date,code,a,b,c,d,e\\n\');for(let i=1;i<=2e6;i++)f.write(i+\',City\'+i%50+\',\'+i%997+\'.50,2026-01-\'+String(1+i%28).padStart(2,\'0\')+\',C\'+i%10000+\',1,2,3,4,5\\n\');f.end()"',
+            'حجم الملف 96,046,244 بايت (نحو 96 ميغابايت)، وفيه 20,000,010 خلية مع صف العناوين. أي صفوف أكثر مما تتسع له ورقة Excel، وأكثر بقليل من 20 مليون خلية في Google Sheets، مع أنه دون رقم 100 ميغابايت. وفي OpenAnyDoc يتجاوز 50 ميغابايت، فيظهر تحذير الحجم أولًا.',
+            'سجّل لكل برنامج هل وصلت الصفوف الـ 2,000,000 كلها وكم استغرق الفتح. وغيّر 2e6 إلى 1e6 لملف يتسع في ورقة Excel واحدة.',
+          ],
+        },
+        {
+          heading: 'أين يقدّم Google Sheets وExcel أكثر',
+          paragraphs: ['جداول البيانات مصنوعة لعمل لا يؤديه العارض. يتيح Google Sheets لعدة أشخاص تعديل الجدول نفسه في الوقت نفسه، مع الصيغ والجداول المحورية والمخططات، كما تقول صفحة Sheets التعريفية. وفي Excel الصيغ وPivotTable والمخططات وPower Query، ويتسع نموذج البيانات فيه لملايين الصفوف، أي أكثر من الورقة، كما تقول صفحة Microsoft عن نموذج بيانات موفر للذاكرة (تحققنا منها في 24 نوفمبر 2026 كلتيهما)؛ ويشرح دليل ملف CSV أكبر من أن يفتحه Excel الخطوات. أما OpenAnyDoc فيعدّل القيم ويحفظ ملفات CSV أو Excel، لكن لا صيغ فيه ولا نسخة حية يعدّلها فريق معًا.'],
+          links: [{ text: 'صفحة Sheets التعريفية', path: 'https://workspace.google.com/products/sheets/' }, { text: 'نموذج بيانات موفر للذاكرة', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'أيها تستخدم',
+          paragraphs: ['اختر الأداة حسب المهمة:'],
+          list: [
+            'تصفح ملف تصدير كبير أو البحث فيه أو اقتطاع جزء منه: عارض ملفات CSV الكبيرة في OpenAnyDoc، أو تطبيق CSV لسطح المكتب.',
+            'ملف يجب أن يعدّله فريق معًا: Google Sheets، إن اتسع له حد 20 مليون خلية.',
+            'صيغ وجداول محورية ضمن حد الصفوف في الورقة: Excel أو LibreOffice Calc على الحاسوب.',
+            'صفوف أكثر من ذلك في Excel: حمّل ملف CSV في نموذج البيانات، أو قسّمه أولًا.',
+            'ملفات تصدير العملاء وغيرها من البيانات الخاصة: أداة تقرأ الملف على جهازك، ضمن قواعد جهتك بشأن المكان الذي يجوز أن تذهب إليه البيانات.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'قسّمه أولًا', path: '/split-csv' }],
+        },
+        {
+          heading: 'هل يفتح Google Sheets ملف CSV فيه أكثر من مليون صف؟',
+          paragraphs: ['نعم، ما دام الجدول كله ضمن حد Google البالغ 20 مليون خلية أو 100 ميغابايت. اقسم 20 مليونًا على عدد الأعمدة لتعرف أقصى عدد من الصفوف: يتسع ملف من 10 أعمدة لأقل بقليل من مليوني صف، وملف من 40 عمودًا لـ 500,000 صف فقط. وتُحسب الأوراق الأخرى في الجدول نفسه ضمن الحد أيضًا.'],
+        },
+        {
+          heading: 'هل Excel للويب أفضل من Excel على الحاسوب للملفات الكبيرة؟',
+          paragraphs: ['غالبًا لا. تذكر Microsoft حدًا للمتصفح من 0 إلى 100 ميغابايت للمصنفات في SharePoint Online حسب اشتراكك، و10 ميغابايت للمصنف المفتوح من مرفق في Outlook Web App. وفوق الحد تقترح صفحتها عن حدود حجم المصنفات في SharePoint تنزيل المصنف وفتحه في Excel على جهازك (تحققنا منها في 24 نوفمبر 2026).'],
+          links: [{ text: 'حدود حجم المصنفات في SharePoint', path: 'https://support.microsoft.com/en-us/office/file-size-limits-for-workbooks-in-sharepoint-9e5bc6f8-018f-415a-b890-5452687b325e' }],
+        },
+        {
+          heading: 'هل يغادر ملف CSV حاسوبي حين أفتحه في OpenAnyDoc؟',
+          paragraphs: ['لا. يقرأ متصفحك الملف على جهازك، ولا ترسل الصفحة أي طلب يحمل ملفك، فلا رفع تنتظره حتى مع ملف تصدير كبير. ويمكنك مراقبة ذلك بنفسك في لوحة الشبكة في المتصفح، كما يشرح دليل كيف تتحقق من أن موقعًا لا يرفع ملفك.'],
+          links: [{ text: 'كيف تتحقق من أن موقعًا لا يرفع ملفك', path: '/check-file-upload' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} مع حجم الملف وعدد صفوفه وأعمدته (دون بيانات شخصية)، وما تحتاج أن تفعله به.`],
+        },
+      ],
+    },
+    '/large-csv-test': {
+      published: '2026-11-24',
+      updated: '2026-11-24',
+      sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: [
+            'ملف CSV فيه 3,000,000 صف لا يتسع في ورقة عمل واحدة في Excel، لأن الورقة تتوقف عند 1,048,576 صفًا، وبأعمدته الثمانية يتجاوز حد Google Sheets البالغ 20 مليون خلية. أما الأدوات التي لا حد صفوف خاص بها فتفتح الملف كله إن كانت ذاكرة الجهاز تكفي، ومنها عارض ملفات CSV الكبيرة في OpenAnyDoc: يقرأ الملف داخل متصفحك ولا يرفع شيئًا. نعرض أدناه ملف الاختبار، وما تعنيه الحدود المنشورة لكل أداة من الأدوات الست بالنسبة إليه، وخطوات إجراء الاختبار على حاسوبك.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'ملف الاختبار',
+          paragraphs: ['اكتب الملف ببرنامج نصي قصير، فلا يحوي أي بيانات حقيقية:'],
+          list: [
+            'الصفوف: 3,000,000 صف بيانات وصف عناوين واحد، أي 3,000,001 سطر.',
+            'الأعمدة (8): order_id وorder_date وregion وcategory وproduct_code وquantity وunit_price وtotal.',
+            'سطر نموذجي: 2,2025-07-10,South,Ink,P-99703,8,25.48,203.84.',
+            'الحجم: أكثر من 100 ميغابايت بكثير، بحسب القيم العشوائية؛ سجّل حجم ملفك أنت.',
+            'الصيغة: UTF-8 دون علامة ترتيب البايتات (BOM)، وفواصل بين الحقول، وسطر جديد في نهاية كل سطر، ولا حقول بين علامات تنصيص.',
+            'الخلايا: 3,000,001 سطر × 8 أعمدة = 24,000,008 خلية.',
+          ],
+        },
+        {
+          heading: 'الجهاز والمتصفح وقواعد الاختبار',
+          paragraphs: ['افتح الملف نفسه على الجهاز نفسه في كل أداة، أداة بعد أخرى، دون برامج أخرى تعمل. واحسب وقت كل أداة من إسقاط الملف أو فتحه حتى يمكن الوصول إلى آخر صف، وسجّل:'],
+          list: [
+            'الجهاز: الطراز والمعالج والذاكرة.',
+            'نظام التشغيل.',
+            'المتصفح المستخدم مع OpenAnyDoc وGoogle Sheets: الاسم والإصدار.',
+            'Excel: الإصدار ورقم البناء، 32 أو 64 بت. LibreOffice Calc: الإصدار. محرر النصوص: الاسم والإصدار.',
+            'تاريخ الاختبار. والحدود الرسمية أدناه مُراجعة في 24 نوفمبر 2026.',
+          ],
+        },
+        {
+          heading: 'ما تتوقعه في كل أداة',
+          paragraphs: [
+            'سطرا Excel وGoogle Sheets مستمدان من الحد المنشور لكل منتج؛ أما الباقي فسجّل فيه ما تراه.',
+          ],
+          list: [
+            'عارض ملفات CSV الكبيرة في OpenAnyDoc: تحذير أولًا لأن الملف أكبر من 50 ميغابايت. سجّل كم يستغرق فتح الملف وكم صفًا يعرض. وبعد فتحه تظهر إرشادة تشرح كيف تقتطع من الملف ما يناسب Excel. واحسب أيضًا وقت الترتيب حسب عمود واحد ووقت البحث.',
+            'عارض CSV في OpenAnyDoc: العارض نفسه دون الإرشادة؛ سجّل كم يستغرق فتح الملف.',
+            'Excel (نسخة سطح المكتب): تتسع ورقة العمل لـ 1,048,576 صفًا، فلا يحمّل Excel من هذا الملف أكثر من صف العناوين و1,048,575 صف بيانات. أي إن 3,000,000 − 1,048,575 = 1,951,425 صفًا، 65% من البيانات، تبقى خارجه. سجّل الرسالة الظاهرة والوقت المستغرق.',
+            'Google Sheets (ملف، استيراد): يتسع الجدول لما يصل إلى 20 مليون خلية، فبثمانية أعمدة يتسع لـ 20,000,000 ÷ 8 = 2,500,000 صف على الأكثر مع صف العناوين، فلا يتسع لـ 500,001 صف بيانات. وتذكر صفحة الحدود نفسها 100MB لكل جدول، وهذا الملف أكبر من 100 ميغابايت. سجّل هل فشل الاستيراد كليًا أم حمّل جزءًا من الملف.',
+            'LibreOffice Calc: سجّل ما يعرضه وكم صفًا يصل.',
+            'محرر النصوص: سجّل هل يفتح الملف، وكم يستغرق، وهل يواكب التمرير والبحث.',
+          ],
+          links: [
+            { text: 'تتسع ورقة العمل لـ 1,048,576 صفًا', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' },
+            { text: 'يتسع الجدول لما يصل إلى 20 مليون خلية', path: 'https://support.google.com/drive/answer/37603' },
+          ],
+        },
+        {
+          heading: 'كيف يقرأ OpenAnyDoc ملفًا بهذا الحجم',
+          paragraphs: [
+            'لا يُرسل شيء إلى أي خادم. يقرأ المتصفح الملف كله إلى ذاكرة التبويب، ويقسّمه عامل في الخلفية إلى صفوف كي تبقى الصفحة سريعة الاستجابة. وتعود الصفوف إلى الصفحة على دفعات من 10,000 صف، أي 301 دفعة لهذا الملف، ولا يُرسم إلا ما يظهر على الشاشة، فلا يبطؤ التمرير مهما كبر الجدول. وليس للعارض حد صفوف خاص به؛ الحد هو الذاكرة التي يمنحها متصفحك لتبويب واحد.',
+            'إذا فُتح الملف من صفحة عارض ملفات CSV الكبيرة، يعرض الجدول إرشادة: صفِّ الصفوف التي تحتاجها، ثم اختر «خيارات التنزيل» وعلّم على «الصفوف الظاهرة فقط». وإذا فُتح من عارض CSV، يظهر الجدول نفسه دونها. ولتقطيع الملف إلى أجزاء يفتحها Excel، تحفظه أداة تقسيم CSV ملفات أصغر بعدد صفوف أو ميغابايتات تحدده، في كل منها صف العناوين.',
+          ],
+          links: [{ text: 'عارض CSV', path: '/csv-viewer' }, { text: 'تقسيم CSV', path: '/split-csv' }],
+        },
+        {
+          heading: 'أين تتفوق الأدوات الأخرى',
+          paragraphs: ['العارض ليس الأداة المناسبة لكل مهمة، وللأدوات الأخرى مواضع تتفوق فيها بوضوح (صفحات Microsoft وGoogle، تحققنا منها في 24 نوفمبر 2026):'],
+          list: [
+            'يستطيع Excel تحميل مجموعة البيانات كاملة عبر Power Query وتحليلها بجداول PivotTable، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel، وفيه صيغ ومخططات ووحدات ماكرو لا يقدمها العارض.',
+            'يحفظ Google Sheets الملف على الإنترنت ليحرره عدة أشخاص معًا، ويتيح سجل المراجعات الرجوع إلى إصدارات سابقة، كما تقول صفحة Sheets التعريفية.',
+            'LibreOffice Calc جدول بيانات كامل يعمل دون اتصال، بصيغ ومخططات، ودون تكلفة.',
+            'محرر النصوص المصمم للملفات الكبيرة يعرض النص الخام كما كُتب تمامًا، وهذا مفيد حين يكون سطر واحد معطوبًا.',
+          ],
+          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'صفحة Sheets التعريفية', path: 'https://workspace.google.com/products/sheets/' }],
+        },
+        {
+          heading: 'كيف تعيد هذا الاختبار',
+          paragraphs: ['استخدم الملف نفسه في كل أداة، وأغلق البرامج الأخرى أولًا:'],
+          list: [
+            'اكتب الملف ببرنامج نصي تختاره: 3,000,000 صف من الأعمدة الثمانية أعلاه بقيم عشوائية، بترميز UTF-8 وفواصل وصف عناوين واحد. تأكد أن فيه 3,000,001 سطر، وسجّل حجمه.',
+            'سجّل الجهاز ونظام التشغيل والمتصفح وإصدارات البرامج.',
+            'افتح عارض ملفات CSV الكبيرة، وأسقط الملف، واحسب الوقت من الإسقاط حتى يظهر عدد الصفوف. ثم رتّب حسب عمود واحد وابحث عن رمز منتج واحد، واحسب وقت كل منهما.',
+            'كرر ذلك في صفحة عارض CSV.',
+            'افتح الملف في Excel بالنقر المزدوج، وسجّل الرسالة والوقت ورقم آخر صف.',
+            'في Google Sheets اختر ملف ثم استيراد ثم تحميل، وسجّل ما يحدث.',
+            'افتحه في LibreOffice Calc وفي محرر النصوص، وسجّل الأمور نفسها.',
+            'شغّل كل أداة ثلاث مرات وسجّل الوقت الأوسط.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'هل يفتح Excel ملف CSV فيه 3 ملايين صف؟',
+          paragraphs: [
+            'لا يستطيع Excel عرض 3 ملايين صف في ورقة عمل واحدة، لأن الورقة تتوقف عند 1,048,576 صفًا. وإذا فتحت الملف مباشرة يحذّر Excel من أن مجموعة البيانات أكبر من شبكة Excel وأن بعض البيانات لم يُحمَّل. ويمكن لـ Power Query تحميل مجموعة البيانات كاملة لجداول PivotTable، أو يمكنك تقسيم الملف أولًا، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). ويشرح دليل ملف CSV أكبر من أن يفتحه Excel كل الخيارات.',
+          ],
+          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+        },
+        {
+          heading: 'لماذا لا يستورد Google Sheets ملف CSV كبيرًا جدًا؟',
+          paragraphs: [
+            'يحدّ Google Sheets كل جدول بـ 20 مليون خلية أو 100MB، فالملف الطويل الكثير الأعمدة تنفد مساحته. اقسم 20 مليونًا على عدد أعمدتك لتعرف كم صفًا يتسع. ولمقارنة الطريقتين جنبًا إلى جنب، اقرأ دليل OpenAnyDoc مقابل Google Sheets للملفات الكبيرة.',
+          ],
+          links: [{ text: 'OpenAnyDoc مقابل Google Sheets للملفات الكبيرة', path: '/openanydoc-vs-google-sheets-large-files' }],
+        },
+        {
+          heading: 'كيف أقسّم ملف CSV كبيرًا ليتسع كل جزء في Excel؟',
+          paragraphs: [
+            'قسّمه إلى أجزاء لا يزيد كل منها على 1,048,575 صف بيانات، فيتسع كل جزء مع صف عناوينه في ورقة عمل واحدة. تفعل أداة تقسيم CSV ذلك داخل متصفحك بعدد الصفوف أو بالميغابايت، وتضع صف العناوين في كل جزء، وتنزّل الأجزاء في ملف ZIP واحد. ويشرح دليل كيف تقسّم ملف CSV كبيرًا الخطوات.',
+          ],
+          links: [{ text: 'تقسيم CSV', path: '/split-csv' }, { text: 'كيف تقسّم ملف CSV كبيرًا', path: '/split-large-csv' }],
+        },
+        {
+          heading: 'أسئلة؟',
+          paragraphs: [`راسلنا على ${CONTACT_EMAIL} بنتائجك أنت لهذا الاختبار، مع عدد صفوف الملف وحجمه والجهاز الذي استخدمته (دون بيانات شخصية).`],
+        },
+      ],
+    },
     '/guides': {
       sections: [
         {
@@ -5211,6 +7706,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'كيف تحذف الموقع من الصورة',
             'كيف تزيل خلفية الصورة دون رفعها',
             'كيف تحوّل ورقة اكسل إلى JSON لواجهة برمجية',
+            'كيف تقسّم ملف CSV كبيرًا إلى ملفات أصغر',
+            'ما الفرق بين JSON وJSON Lines؟',
+            'كيف تقارن ملفي JSON وتعرف ما الذي تغيّر',
+            'ما حدود الصفوف والأعمدة في Excel؟',
+            'كيف أعثر على الأوراق والصفوف والصيغ المخفية في ملف Excel؟',
+            'كيف أحوّل ملف Excel إلى CSV دون أن تتشوه العربية؟',
+            'كيف تقرأ ملاحظات المتحدث دون بوربوينت',
+            'كيف تضغط فيديو دون رفعه',
+            'ماذا تفعل حين يكون الملف أكبر من أن يقبله ChatGPT',
+            'ما أفضل عارض CSV مجاني؟',
+            'ما منسّقات JSON المجانية التي لا تخزّن بياناتك؟',
+            'OpenAnyDoc أم Google Sheets أم Excel: أيها يفتح ملفات CSV الكبيرة؟',
+            'كيف تختبر ملف CSV من 3 ملايين صف في 6 أدوات',
           ],
           links: [
             { text: 'لماذا تظهر العربية في ملف CSV برموز غريبة في Excel', path: '/fix-arabic-csv-in-excel' },
@@ -5251,6 +7759,19 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             { text: 'كيف تحذف الموقع من الصورة', path: '/remove-location-from-photo' },
             { text: 'كيف تزيل خلفية الصورة دون رفعها', path: '/remove-background-without-upload' },
             { text: 'كيف تحوّل ورقة اكسل إلى JSON لواجهة برمجية', path: '/convert-excel-to-json-for-api' },
+            { text: 'كيف تقسّم ملف CSV كبيرًا إلى ملفات أصغر', path: '/split-large-csv' },
+            { text: 'ما الفرق بين JSON وJSON Lines؟', path: '/json-vs-json-lines' },
+            { text: 'كيف تقارن ملفي JSON وتعرف ما الذي تغيّر', path: '/compare-two-json-files' },
+            { text: 'ما حدود الصفوف والأعمدة في Excel؟', path: '/excel-row-and-column-limits' },
+            { text: 'كيف أعثر على الأوراق والصفوف والصيغ المخفية في ملف Excel؟', path: '/find-hidden-sheets-in-excel' },
+            { text: 'كيف أحوّل ملف Excel إلى CSV دون أن تتشوه العربية؟', path: '/excel-to-csv-without-breaking-arabic' },
+            { text: 'كيف تقرأ ملاحظات المتحدث دون بوربوينت', path: '/read-speaker-notes-without-powerpoint' },
+            { text: 'كيف تضغط فيديو دون رفعه', path: '/compress-video-without-upload' },
+            { text: 'ماذا تفعل حين يكون الملف أكبر من أن يقبله ChatGPT', path: '/file-too-large-for-chatgpt' },
+            { text: 'ما أفضل عارض CSV مجاني؟', path: '/best-free-csv-viewers' },
+            { text: 'ما منسّقات JSON المجانية التي لا تخزّن بياناتك؟', path: '/best-free-json-formatters' },
+            { text: 'OpenAnyDoc أم Google Sheets أم Excel: أيها يفتح ملفات CSV الكبيرة؟', path: '/openanydoc-vs-google-sheets-large-files' },
+            { text: 'كيف تختبر ملف CSV من 3 ملايين صف في 6 أدوات', path: '/large-csv-test' },
           ],
         },
         {
@@ -5263,7 +7784,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'كيف تُكتب هذه الأدلة',
           paragraphs: [
-            'يُراجع كل دليل على العارضات قبل نشره: كل خطوة تسمّي زرًا موجودًا فعلًا، وكل حد هو حد قِيس بالفعل. والتاريخان تحت العنوان يقولان متى كُتب الدليل ومتى تغيّر نصه آخر مرة.',
+            'يُراجع كل دليل على العارضات قبل نشره: كل خطوة تسمّي زرًا موجودًا فعلًا، وكل حد مأخوذ من إعدادات الأداة نفسها أو من تجربة أجريناها أو من صفحة الجهة المصنِّعة نفسها. والتاريخان تحت العنوان يقولان متى كُتب الدليل ومتى تغيّر نصه آخر مرة.',
           ],
         },
         {

@@ -3,7 +3,7 @@
   "description": "Add a text watermark like CONFIDENTIAL or DRAFT behind every page of a Word document, in your browser. A real Word watermark. Free, no upload.",
   "heading": "Add a watermark to Word",
   "subtitle": "Put CONFIDENTIAL, DRAFT or your own text behind every page of a Word document; nothing is uploaded.",
-  "intro": "Watermark a DOCX file without Word: pick CONFIDENTIAL or DRAFT, or type your own text, choose diagonal or horizontal, a colour and a size, and download. The watermark sits behind the text on every page and is a real Word watermark in the header, so it can be removed later in Word under Design → Watermark. Documents with a different first-page header get it on the first page too. The file is changed in your browser and never uploaded.",
+  "intro": "Watermark a DOCX file without Word: keep CONFIDENTIAL or type DRAFT or your own text, choose diagonal or horizontal and a colour, and download. The watermark sits behind the text on every page and is a real Word watermark in the header, so it can be removed later in Word under Design → Watermark. Documents with a different first-page header get it on the first page too. The file is changed in your browser and never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -15,7 +15,7 @@
     },
     {
       "title": "Your text, your look",
-      "text": "CONFIDENTIAL, DRAFT or your own words, diagonal or horizontal, in the colour and size you choose."
+      "text": "CONFIDENTIAL, DRAFT or your own words, diagonal or horizontal, in the colour you choose."
     }
   ],
   "stepsTitle": "How to add a watermark to a Word document",
@@ -26,7 +26,7 @@
     },
     {
       "title": "Set the watermark",
-      "text": "Pick or type the text, then choose diagonal or horizontal, colour and size."
+      "text": "Keep CONFIDENTIAL or type your own text, then choose diagonal or horizontal and a colour."
     },
     {
       "title": "Download",
@@ -37,7 +37,7 @@
   "handles": [
     "Files: .docx documents (Word 2007 and later).",
     "Text: CONFIDENTIAL, DRAFT or your own words.",
-    "Look: diagonal or horizontal, with colour and size choices.",
+    "Look: diagonal or horizontal, in grey, red or blue.",
     "Pages: every page, including a first page with its own header."
   ],
   "limits": [
@@ -63,7 +63,7 @@
     },
     {
       "question": "How do I add a watermark to a Word document?",
-      "answer": "A Word watermark is faint text behind the text on every page, kept in the document's header; in Word it is under Design → Watermark. On this page, choose the .docx, pick CONFIDENTIAL or DRAFT or type your own text, choose its angle, colour and size, and download the document, changed in your browser."
+      "answer": "A Word watermark is faint text behind the text on every page, kept in the document's header; in Word it is under Design → Watermark. On this page, choose the .docx, keep CONFIDENTIAL or type DRAFT or your own text, choose its angle and colour, and download the document, changed in your browser."
     },
     {
       "question": "Can the watermark be removed later?",

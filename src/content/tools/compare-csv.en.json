@@ -40,14 +40,14 @@
   "handlesTitle": "What Compare CSV handles",
   "handles": [
     "Files: two .csv files, old and new, with comma, semicolon, tab or pipe delimiters.",
-    "Encodings: UTF-8 with or without a BOM, UTF-16 and Windows-1256 for older Arabic files.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16 (when the file starts with a byte order mark), Windows-1256 for older Arabic files and Windows-1252 for older Western European files.",
     "Rows: added, removed and changed rows, paired by the key column in any order.",
     "Columns: columns that exist in only one of the files are named.",
     "Problems: rows with an empty key or a key that appears more than once are reported."
   ],
   "limits": [
     "Both files need a header row and a key column they share; without a key, rows can't be paired.",
-    "Rows with an empty or repeated key are reported but not compared.",
+    "Rows with an empty key are reported but not compared; for a repeated key, only its first row is compared.",
     "Values are compared as text, so 1.0 and 1 count as different."
   ],
   "faqTitle": "Compare CSV: questions",
@@ -66,7 +66,7 @@
     },
     {
       "question": "What if a key is empty or appears twice?",
-      "answer": "Those rows can't be paired safely, so they are listed separately and left out of the comparison. Fix the key in the file and compare again."
+      "answer": "A row with an empty key cannot be paired, so it is counted and left out of the comparison. A key that appears more than once is listed, and only the first row with it is compared. Fix the key in the file and compare again."
     },
     {
       "question": "What if the files have different columns?",

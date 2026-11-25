@@ -43,7 +43,7 @@
   "limits": [
     "Pictures from web addresses are left out, because nothing is fetched from the web; only pictures written into the text as data are kept.",
     "Only GitHub-style Markdown is read: maths, diagrams and other editor extensions stay as plain text.",
-    "The document uses Word's default look (Calibri 11); your Markdown editor's theme, fonts and colours are not carried over.",
+    "The document uses a plain look (Calibri 11); your Markdown editor's theme, fonts and colours are not carried over.",
     "Files up to 10 MB are opened; a larger file shows a message instead."
   ],
   "worksBest": [

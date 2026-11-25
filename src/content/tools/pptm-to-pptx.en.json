@@ -63,7 +63,7 @@
     },
     {
       "question": "How do I convert PPTM to PPTX?",
-      "answer": "A .pptm file becomes a .pptx when it is saved again as a PowerPoint Presentation in PowerPoint or LibreOffice Impress, which leaves the macros out. On this page, choose the file and download the .pptx; the macros are removed in your browser without being run."
+      "answer": "A .pptm file becomes a .pptx when it is saved again as a PowerPoint Presentation in PowerPoint, which leaves the macros out (checked 24 November 2026). On this page, choose the file and download the .pptx; the macros are removed in your browser without being run."
     },
     {
       "question": "Are the macros run or read?",

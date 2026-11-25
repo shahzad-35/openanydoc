@@ -21,7 +21,7 @@
     "Output: a tabular with column spec l per column, \\hline rules and the header row first.",
     "Escaping: & % $ # _ { } ~ ^ and \\ written as LaTeX-safe commands.",
     "Quoted CSV fields with commas inside, as Excel and Google Sheets export them.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically."
+    "Encodings: UTF-8, UTF-16 (when the file starts with a byte order mark), Windows-1256 Arabic and Windows-1252 Western European text, detected automatically."
   ],
   "limits": [
     "Arabic text needs XeLaTeX or LuaLaTeX with an Arabic font (polyglossia or babel); the page does not set that up for you.",

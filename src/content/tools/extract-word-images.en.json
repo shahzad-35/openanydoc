@@ -1,9 +1,9 @@
 {
   "title": "Extract Images from Word – Save All DOCX Pictures in a ZIP",
-  "description": "Save every picture in a Word document at its original quality and format, JPG, PNG, GIF and more, in one ZIP, in your browser. Free, no upload.",
+  "description": "Save every picture in a Word document at its original quality and format, JPG, PNG, GIF and more, several in one ZIP, in your browser. Free, no upload.",
   "heading": "Extract images from Word",
-  "subtitle": "Save every picture in a Word document at its original quality, all in one ZIP; nothing is uploaded.",
-  "intro": "Extract images from a DOCX file without opening Word: every picture stored in the document is saved as a file of its own, in its original format (JPG, PNG, GIF, EMF and others) and at its original quality, because nothing is re-compressed. They come in one ZIP. The file is read in your browser and never uploaded.",
+  "subtitle": "Save every picture in a Word document at its original quality, several pictures in one ZIP; nothing is uploaded.",
+  "intro": "Extract images from a DOCX file without opening Word: every picture stored in the document is saved as a file of its own, in its original format (JPG, PNG, GIF, EMF and others) and at its original quality, because nothing is re-compressed. Several pictures come in one ZIP; a single picture downloads on its own. The file is read in your browser and never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -15,7 +15,7 @@
     },
     {
       "title": "All at once",
-      "text": "Every picture in the document comes in one ZIP."
+      "text": "Every picture in the document comes in one ZIP, or on its own when there is only one."
     }
   ],
   "stepsTitle": "How to extract images from a Word document",
@@ -25,12 +25,12 @@
       "text": "Click Choose a file, or drop a .docx file on the page."
     },
     {
-      "title": "Check the pictures",
-      "text": "See the pictures found in the document."
+      "title": "Extract",
+      "text": "Click Extract, then check the list of pictures found in the document."
     },
     {
       "title": "Download",
-      "text": "Download the ZIP with every picture."
+      "text": "Download the ZIP with every picture, or the single picture."
     }
   ],
   "handlesTitle": "What Extract images handles",
@@ -38,7 +38,7 @@
     "Files: .docx documents (Word 2007 and later).",
     "Pictures: every picture stored in the document.",
     "Formats: kept as stored, such as JPG, PNG, GIF and EMF.",
-    "Result: one ZIP; nothing re-compressed."
+    "Result: one ZIP (a single picture on its own); nothing re-compressed."
   ],
   "limits": [
     "Pictures linked from the web are not stored in the file, so they can't be extracted.",
@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I extract images from a Word document?",
-      "answer": "A Word document keeps each picture as a separate file inside it, so the pictures can be saved at their original quality; in Word you can also save them one at a time from the picture's right-click menu. On this page, choose the .docx and download every picture in one ZIP, read in your browser."
+      "answer": "A Word document keeps each picture as a separate file inside it, so the pictures can be saved at their original quality; in Word you can also save them one at a time from the picture's right-click menu. On this page, choose the .docx and download every picture, several in one ZIP, read in your browser."
     },
     {
       "question": "Are the pictures compressed?",

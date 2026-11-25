@@ -7,7 +7,7 @@ export type Locale = 'en' | 'ar'
 
 export const features: Record<Locale, string[]> = {
   en: [
-    'CSV, Excel (XLSX, XLS, XLSM, ODS), JSON, TXT, Word (DOCX) and PowerPoint (PPTX, in beta) files open in your browser today; PDF is coming.',
+    'CSV, Excel (XLSX, XLS, XLSM, ODS), JSON, TXT, Word (DOCX) and PowerPoint (PPTX, in beta) files open in your browser today, and so do PDF files.',
     'Edit as well as view, with undo and redo, then download the file in its own format.',
     'Large files: a 120,000-row CSV opens in under a second, and files over 50 MB show a warning.',
     'Arabic and right-to-left text is shown correctly (UTF-8, UTF-16 and Windows-1256), and the whole site is in English and Arabic.',
@@ -15,7 +15,7 @@ export const features: Record<Locale, string[]> = {
     'Mask sensitive data (names, emails, phone numbers, IDs, IBANs, card numbers) before you share a file, with an optional private key to restore it.',
   ],
   ar: [
-    'تُفتح ملفات CSV وExcel (XLSX وXLS وXLSM وODS) وJSON وTXT وWord (DOCX) وPowerPoint (PPTX، نسخة تجريبية) في متصفحك اليوم، وملفات PDF قادمة.',
+    'تُفتح ملفات CSV وExcel (XLSX وXLS وXLSM وODS) وJSON وTXT وWord (DOCX) وPowerPoint (PPTX، نسخة تجريبية) في متصفحك اليوم، وكذلك ملفات PDF.',
     'عرض وتعديل معًا، مع التراجع والإعادة، ثم تنزيل الملف بصيغته نفسها.',
     'الملفات الكبيرة: يُفتح ملف CSV من 120,000 صف في أقل من ثانية، وتظهر رسالة تحذير للملفات الأكبر من 50 ميغابايت.',
     'يُعرض النص العربي من اليمين إلى اليسار بشكل صحيح (UTF-8 وUTF-16 وWindows-1256)، والموقع كله بالعربية والإنجليزية.',
@@ -68,12 +68,12 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     {
       question: 'How big can a file be?',
       answer:
-        "There is no fixed limit for CSV, TXT and Excel; it depends on your browser's memory. Files over 50 MB show a warning, and OpenAnyDoc still tries to open them. JSON files are the exception: they open up to 10 MB. A 120,000-row CSV file opens in under a second, and a 46 MB text file has been tested.",
+        "There is no fixed limit for CSV and TXT, and an Excel file is refused only when it unpacks to more than 1 GB; otherwise it depends on your browser's memory. Files over 50 MB show a warning, and OpenAnyDoc still tries to open them. JSON files are the exception: they open up to 10 MB. A 120,000-row CSV file opens in under a second, and a 46 MB text file has been tested.",
     },
     {
       question: 'Does it handle Arabic and other Unicode text?',
       answer:
-        'Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256. Arabic cells display right-to-left.',
+        'Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, or as Windows-1252 when its letters look Western European. Arabic cells display right-to-left.',
     },
     {
       question: 'Does it work on my phone?',
@@ -102,12 +102,12 @@ export const faqItems: Record<Locale, { question: string; answer: string }[]> = 
     {
       question: 'ما أكبر حجم يمكن فتحه؟',
       answer:
-        'لا يوجد حد ثابت لملفات CSV وTXT وExcel؛ فالأمر يعتمد على ذاكرة متصفحك. تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك. والاستثناء ملفات JSON: تُفتح حتى 10 ميغابايت. يُفتح ملف CSV من 120,000 صف في أقل من ثانية، وقد جُرّب ملف نصي بحجم 46 ميغابايت.',
+        'لا يوجد حد ثابت لملفات CSV وTXT، ولا يُرفض ملف Excel إلا إذا تجاوز حجمه بعد فك ضغطه 1 غيغابايت؛ وفيما عدا ذلك يعتمد الأمر على ذاكرة متصفحك. تظهر رسالة تحذير للملفات التي يزيد حجمها على 50 ميغابايت، ويحاول OpenAnyDoc فتحها مع ذلك. والاستثناء ملفات JSON: تُفتح حتى 10 ميغابايت. يُفتح ملف CSV من 120,000 صف في أقل من ثانية، وقد جُرّب ملف نصي بحجم 46 ميغابايت.',
     },
     {
       question: 'هل يدعم النص العربي ونصوص Unicode الأخرى؟',
       answer:
-        'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256. وتُعرض الخلايا العربية من اليمين إلى اليسار.',
+        'نعم. تُقرأ ملفات UTF-8 (مع BOM أو بدونه) وUTF-16 مباشرة، ويُقرأ الملف الذي ليس UTF-8 صالحًا بترميز Windows-1256، أو بترميز Windows-1252 إذا بدت حروفه أوروبية غربية. وتُعرض الخلايا العربية من اليمين إلى اليسار.',
     },
     {
       question: 'هل يعمل على الجوال؟',

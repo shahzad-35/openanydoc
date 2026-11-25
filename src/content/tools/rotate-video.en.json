@@ -37,8 +37,8 @@
   "handles": [
     "Turns: 90 degrees left, 90 degrees right and 180 degrees, as many clicks as you like.",
     "Size: a 90-degree turn swaps width and height, so 1920 × 1080 becomes 1080 × 1920.",
-    "Sound: kept as it is.",
-    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+    "Sound: kept when your browser can read it. If it can't, the page tells you the result has no sound.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V and 3GP videos become MP4."
   ],
   "limits": [
     "Only the first chosen video is rotated.",

@@ -3,7 +3,7 @@
   "description": "Count the tokens, words and characters in a PDF, Word, PowerPoint, Excel, CSV or JSON file, or in pasted text, before you paste it into an AI chat.",
   "heading": "Token Counter",
   "subtitle": "See how many tokens a file or text uses before you paste it into an AI chat; nothing is uploaded.",
-  "intro": "Check whether a document will fit in an AI chat before you paste it into ChatGPT, Claude or Gemini. Drop a PDF, Word, PowerPoint, Excel, CSV, JSON, TXT or Markdown file, or paste text, and see its tokens, words and characters. Files are first turned into text the way the AI-ready converters do it: a PDF's or Word document's text, a deck's slide outline, tables as Markdown. Tokens are counted with a standard tokenizer, the same one GPT-4o models use; other models split text their own way, so for them the count is an estimate. Everything is counted in your browser and nothing is uploaded.",
+  "intro": "Check whether a document will fit in an AI chat before you paste it into ChatGPT, Claude or Gemini. Drop a PDF, Word, PowerPoint, Excel, CSV, JSON, TXT or Markdown file, or paste text, and see its tokens, words and characters. Files are first turned into text the way the AI-ready converters do it: a PDF's or Word document's text, a deck's slide outline, tables as Markdown. Tokens are counted with a standard tokenizer, the same one ChatGPT's recent models use; other models split text their own way, so for them the count is an estimate. Everything is counted in your browser and nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the counter keeps working without an internet connection."
+      "text": "After you have counted once, pasted text is counted without an internet connection; files need it the first time you open each kind."
     }
   ],
   "stepsTitle": "How it works: count tokens in a file or text",
@@ -38,7 +38,7 @@
     "Files: PDF, Word (.docx), PowerPoint (.pptx), Excel, CSV, JSON, TXT and Markdown.",
     "Pasted text in any language, Arabic included.",
     "Counts: tokens, words and characters.",
-    "Tokenizer: a standard tokenizer, the same one GPT-4o models use.",
+    "Tokenizer: a standard tokenizer, the same one ChatGPT's recent models use.",
     "Tables from Excel and CSV are counted as Markdown tables, the form they take when pasted."
   ],
   "limits": [
@@ -58,7 +58,7 @@
     },
     {
       "question": "Is the count exact for ChatGPT, Claude and Gemini?",
-      "answer": "It is counted with a standard tokenizer, the same one GPT-4o models use. Claude, Gemini and other models use their own tokenizers, so for them the number is an estimate that is usually close but not exact."
+      "answer": "It is counted with a standard tokenizer, the same one ChatGPT's recent models use. Claude, Gemini and other models use their own tokenizers, so for them the number is an estimate that is usually close but not exact."
     },
     {
       "question": "Why does my PDF show 0 tokens?",

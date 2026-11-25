@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I remove my name from a PowerPoint file?",
-      "answer": "In PowerPoint for Windows, Inspect Document (File, Info, Check for Issues) removes the author and other document properties. On this page, choose the file, check the properties and remove them in one click; the clean copy is made in your browser and the slides are not touched."
+      "answer": "In PowerPoint for Windows, Inspect Document (File, Info, Check for Issues) removes the author and other document properties (checked 24 November 2026). On this page, choose the file, check the properties and remove them in one click; the clean copy is made in your browser and the slides are not touched."
     },
     {
       "question": "What does PowerPoint metadata show?",

@@ -3,14 +3,14 @@
   "description": "Large CSV file viewer: open CSV files with more rows than Excel's 1,048,576 limit in your browser, then search, sort and filter them. Free, no upload.",
   "heading": "Large CSV File Viewer: Open Big CSV Files Fast",
   "subtitle": "Drop a big CSV file to open, search and sort it in seconds; nothing is uploaded.",
-  "intro": "A free large CSV file viewer: view large CSV files in your browser, with no row limit of its own and only the rows on screen drawn. In our tests a 120,000-row file opened in 0.9 s, and sorting it by two columns took 0.9 s. Nothing is uploaded, so big exports stay on your device.",
+  "intro": "A free large CSV file viewer: view large CSV files in your browser, with no row limit of its own and only the rows on screen drawn. In our test a 120,000-row file opened in about half a second. Nothing is uploaded, so big exports stay on your device.",
   "features": [
     {
       "title": "Private",
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -40,14 +40,14 @@
   "handlesTitle": "What the big CSV viewer handles",
   "handles": [
     "Rows: no row limit of its own; the limit is your browser's memory. Excel stops at 1,048,576 rows per sheet.",
-    "Measured on a 120,000-row file: open 0.9 s, sort by two columns 0.9 s, search 0.4 s, filter 0.1 s, download 0.4 s.",
+    "Measured on a 120,000-row file with 8 columns on a laptop: every row is in the table in about half a second.",
     "Files over 50 MB: a warning first, then the file still opens if memory allows.",
     "Column profile: blanks, distinct values, numbers and a chart for the selected column.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256."
+    "Encodings: UTF-8, UTF-16 (found by its byte order mark, or chosen by hand), Windows-1256 and Windows-1252."
   ],
   "limits": [
     "Files are limited by your device's memory; a warning appears above 50 MB.",
-    "It shows and edits the data as a table; there are no charts or pivot tables."
+    "CSV holds no formulas or cell formatting, so there are none to show; use the Excel viewer for workbooks."
   ],
   "faqTitle": "Large CSV files: questions and answers",
   "faq": [
@@ -61,7 +61,7 @@
     },
     {
       "question": "How fast does a large CSV file open?",
-      "answer": "In our tests a 120,000-row file with 8 columns opened in 0.9 seconds, a sort by two columns took 0.9 s, a search 0.4 s and a filter 0.1 s. Times depend on your device."
+      "answer": "In our test on a laptop, a 120,000-row file with 8 columns opened in about half a second. Times depend on your device."
     },
     {
       "question": "What happens with a CSV file over 50 MB?",

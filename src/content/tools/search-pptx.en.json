@@ -3,7 +3,7 @@
   "description": "Search the text of every PowerPoint slide and its speaker notes in your browser, and see each match with its slide number. Free, no upload.",
   "heading": "Search text in a PowerPoint presentation",
   "subtitle": "Find a word in every slide and speaker note of a PowerPoint presentation, with the slide number of each match; nothing is uploaded.",
-  "intro": "Search a PPTX without PowerPoint: choose a presentation, type a word and see every match in the slides and their speaker notes, with the slide number and the words around it. Arabic and English are both found. Nothing is downloaded: the results are listed on the page. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
+  "intro": "Search a PPTX without PowerPoint: choose a presentation, type a word and see every match in the slides and speaker notes, with the slide number and the words around it. Arabic and English are both found. Nothing is downloaded: the results are listed on the page. Works with .pptx, .ppsx, .potx and .pptm files. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -30,7 +30,7 @@
     },
     {
       "title": "Read the results",
-      "text": "Each match is listed with its slide number and the words around it."
+      "text": "Every match is listed with its slide number and the words around it, under a count of all matches."
     }
   ],
   "handlesTitle": "What Search PowerPoint handles",
@@ -38,7 +38,7 @@
     "PowerPoint files: .pptx, .ppsx, .potx and .pptm.",
     "The text on every slide and in its speaker notes.",
     "Arabic and English text.",
-    "Results: the slide number and the words around each match."
+    "Results: every match, with its slide number and the words around it."
   ],
   "limits": [
     "Text inside pictures, such as a screenshot or a scanned page, can't be searched.",
@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I search for a word in a PowerPoint?",
-      "answer": "PowerPoint, Keynote and LibreOffice Impress each have a Find command (Ctrl+F, or Cmd+F on a Mac) for the presentation you have open. On this page, choose the file and type the word; every slide and speaker note is searched in your browser, and each match is listed with its slide number."
+      "answer": "PowerPoint has a Find command for the presentation you have open (checked 24 November 2026). On this page, choose the file and type the word; every slide and speaker note is searched in your browser, and every match is listed with its slide number."
     },
     {
       "question": "Does it search the speaker notes?",

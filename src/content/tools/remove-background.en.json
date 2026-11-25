@@ -45,9 +45,9 @@
     "JPG, PNG, WebP and HEIC photos."
   ],
   "limits": [
-    "The models are small, so they run on your device: fine hair, glass, smoke and busy backgrounds can come out rough. Big commercial tools do better on hard photos.",
+    "The models are small, so they run on your device: fine hair, glass, smoke and busy backgrounds can come out rough.",
     "One photo at a time.",
-    "The first use loads the model and its runtime (up to about 22 MB) from this site; after that it works offline."
+    "Each of the two models loads from this site the first time you use it, with the runtime (up to about 22 MB); after that it works offline."
   ],
   "faqTitle": "Remove background: questions",
   "faq": [
@@ -81,7 +81,7 @@
     },
     {
       "question": "How do I remove the background from a picture for free?",
-      "answer": "Use a background remover that finds the subject and makes the rest transparent; on iPhone and Mac you can also touch and hold, or right-click, the subject of a photo to lift it out. OpenAnyDoc does it in your browser with a small model on your device and saves a PNG, transparent or white, without uploading the photo."
+      "answer": "Use a background remover that finds the subject and makes the rest transparent; on iPhone and Mac you can also touch and hold, or Control-click, the subject of a photo to lift it out (checked 24 November 2026). OpenAnyDoc does it in your browser with a small model on your device and saves a PNG, transparent or white, without uploading the photo."
     }
   ]
 }

@@ -43,12 +43,12 @@
     "Strength: light, medium or strong; strong leaves no readable letters.",
     "Time: the whole video, or only between two times you type.",
     "Formats: MP4, MOV, WebM and MKV keep their format; other videos are saved as MP4.",
-    "Sound: kept as it is."
+    "Sound: kept when your browser can read it. If it can't, the page tells you the result has no sound."
   ],
   "limits": [
     "Boxes stay where you draw them: they do not follow a face or a car that moves.",
     "Boxes are rectangles; there are no round or freehand shapes.",
-    "The video is encoded again, so saving takes about as long as the video plays on slower devices."
+    "The video is encoded again."
   ],
   "faqTitle": "Questions about blurring part of a video",
   "faq": [

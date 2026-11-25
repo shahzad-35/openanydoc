@@ -1,5 +1,5 @@
 import { zipSync } from 'fflate'
-import { EncryptedPDFError, PDFArray, PDFBool, PDFDict, PDFDocument, PDFHexString, PDFName, PDFNull, PDFRef, PDFStream, PDFString, TextRenderingMode, beginText, degrees, endText, popGraphicsState, pushGraphicsState, rgb, setCharacterSqueeze, setFontAndSize, setTextMatrix, setTextRenderingMode, showText } from 'pdf-lib'
+import { EncryptedPDFError, PDFArray, PDFBool, PDFDict, PDFDocument, PDFHexString, PDFName, PDFNull, PDFObjectCopier, PDFRef, PDFStream, PDFString, TextRenderingMode, beginText, degrees, endText, popGraphicsState, pushGraphicsState, rgb, setCharacterSqueeze, setFontAndSize, setTextMatrix, setTextRenderingMode, showText } from 'pdf-lib'
 import type { PDFObject, PDFOperator, PDFPage } from 'pdf-lib'
 import type { LayerWord, NewFormField, OutputPage, PageOrientation, PageShape, PageSize, PageStamp, PdfTaskProgress, PdfTaskRequest, PdfTaskResponse } from './pdfTasks'
 
@@ -58,6 +58,69 @@ function removeLeftOutPages(output: PDFDocument) {
   for (const [ref] of context.enumerateIndirectObjects()) if (!reachableRefs.has(ref)) context.delete(ref)
 }
 
+// A field's parts (kids) that have a widget on a copied page are kept, the others taken out, so a field part shown only on a page
+// left out doesn't come along. Returns whether anything of the field is left.
+function keepFieldPartsOnCopiedPages(context: PDFDocument['context'], fieldRef: PDFRef, copiedWidgetRefs: Set<PDFRef>): boolean {
+  const field = context.lookup(fieldRef, PDFDict)
+  const kids = field.lookup(PDFName.of('Kids'))
+  if (!(kids instanceof PDFArray)) return copiedWidgetRefs.has(fieldRef)
+  const keptKids = kids.asArray().filter((kid): kid is PDFRef => kid instanceof PDFRef && keepFieldPartsOnCopiedPages(context, kid, copiedWidgetRefs))
+  field.set(PDFName.of('Kids'), context.obj(keptKids))
+  return keptKids.length > 0
+}
+
+// copyPages brings a page's form widgets and the fields they belong to, but not the source's form dictionary (AcroForm), and
+// without it readers no longer see the fields. Each field with a widget on a copied page is listed in the output's form. A field
+// whose name an earlier file already uses is renamed "name_2" (then "_3"…), so merged forms keep their own values.
+function addCopiedFormFields(output: PDFDocument, sources: PDFDocument[], copiedPagesBySource: Map<number, PDFPage[]>) {
+  const { context } = output
+  const usedFieldNames = new Set<string>()
+  for (const [sourceIndex, copiedPages] of copiedPagesBySource) {
+    const sourceForm = sources[sourceIndex].catalog.getAcroForm()
+    if (!sourceForm) continue
+    const copiedWidgetRefs = new Set(
+      copiedPages
+        .flatMap((page) => page.node.Annots()?.asArray() ?? [])
+        .filter((annotation): annotation is PDFRef => annotation instanceof PDFRef && context.lookup(annotation, PDFDict).get(PDFName.of('Subtype')) === PDFName.of('Widget')),
+    )
+    const topFieldRefs = new Set<PDFRef>()
+    for (const widgetRef of copiedWidgetRefs) {
+      let fieldRef = widgetRef
+      let parent = context.lookup(fieldRef, PDFDict).get(PDFName.of('Parent'))
+      while (parent instanceof PDFRef) {
+        fieldRef = parent
+        parent = context.lookup(fieldRef, PDFDict).get(PDFName.of('Parent'))
+      }
+      if (context.lookup(fieldRef, PDFDict).has(PDFName.of('T'))) topFieldRefs.add(fieldRef)
+    }
+    if (!topFieldRefs.size) continue
+
+    const outputForm = output.catalog.getOrCreateAcroForm()
+    // The form's default font, text style and fonts, used by readers to draw a field's value again.
+    const copier = PDFObjectCopier.for(sources[sourceIndex].context, context)
+    for (const key of ['DA', 'Q', 'NeedAppearances', 'DR'].map((name) => PDFName.of(name))) {
+      const value = sourceForm.dict.get(key)
+      if (value && !outputForm.dict.has(key)) outputForm.dict.set(key, copier.copy(value))
+    }
+    const outputFonts = outputForm.dict.lookupMaybe(PDFName.of('DR'), PDFDict)?.lookupMaybe(PDFName.of('Font'), PDFDict)
+    const sourceFonts = sourceForm.dict.lookupMaybe(PDFName.of('DR'), PDFDict)?.lookupMaybe(PDFName.of('Font'), PDFDict)
+    for (const [fontName, font] of sourceFonts?.entries() ?? []) if (outputFonts && !outputFonts.has(fontName)) outputFonts.set(fontName, copier.copy(font))
+
+    const sourceFieldNames: string[] = []
+    for (const fieldRef of topFieldRefs) {
+      if (!keepFieldPartsOnCopiedPages(context, fieldRef, copiedWidgetRefs)) continue
+      const field = context.lookup(fieldRef, PDFDict)
+      const fieldName = field.lookup(PDFName.of('T'), PDFString, PDFHexString).decodeText()
+      let newFieldName = fieldName
+      for (let number = 2; usedFieldNames.has(newFieldName); number++) newFieldName = `${fieldName}_${number}`
+      if (newFieldName !== fieldName) field.set(PDFName.of('T'), PDFHexString.fromText(newFieldName))
+      sourceFieldNames.push(newFieldName)
+      outputForm.addField(fieldRef)
+    }
+    for (const fieldName of sourceFieldNames) usedFieldNames.add(fieldName)
+  }
+}
+
 // One output PDF from pages of the sources. Each source's pages are copied in one call (its fonts and pictures are copied once),
 // a page used twice is copied twice, and each page's turn is added to the rotation it already has.
 async function buildPdf(sources: PDFDocument[], pages: OutputPage[]) {
@@ -67,6 +130,7 @@ async function buildPdf(sources: PDFDocument[], pages: OutputPage[]) {
     const pageIndexes = pages.flatMap((page) => ('sourceIndex' in page && page.sourceIndex === sourceIndex ? [page.pageIndex] : []))
     if (pageIndexes.length) copiedPagesBySource.set(sourceIndex, await output.copyPages(source, pageIndexes))
   }
+  addCopiedFormFields(output, sources, copiedPagesBySource)
   for (const page of pages) {
     if ('blankSize' in page) {
       output.addPage(page.blankSize)
@@ -237,6 +301,8 @@ async function drawStamps(pdf: PDFDocument, imageBytes: ArrayBuffer[], stamps: P
   }
 }
 
+// qpdf keeps a file's encryption, so the qpdf tools (Protect, Compress, Flatten, Remove metadata) throw on an encrypted file:
+// `self.onmessage` then takes off restrictions that need no password (`withRestrictionsRemoved`) and runs the task again.
 const isEncryptedPdf = async (pdf: ArrayBuffer) => (await PDFDocument.load(pdf, { ignoreEncryption: true })).isEncrypted
 
 // A permissions password nobody is told, when none is given, so a reader doesn't treat the password to open as the permissions
@@ -401,7 +467,7 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
     return { status: 'ok', pdf: await pdf.save() }
   }
   if (request.type === 'protect-pdf') {
-    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    if (await isEncryptedPdf(request.pdf)) throw new EncryptedPDFError()
     const restrictions = [...(request.canPrint ? [] : ['--print=none']), ...(request.canCopy ? [] : ['--extract=n']), ...(request.canEdit ? [] : ['--modify=none'])]
     const ownerPassword = request.ownerPassword || (restrictions.length ? randomPassword() : request.userPassword)
     const pdf = await runQpdf(['--encrypt', `--user-password=${request.userPassword}`, `--owner-password=${ownerPassword}`, '--bits=256', ...restrictions, '--'], request.pdf)
@@ -413,13 +479,13 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
     return pdf ? { status: 'ok', pdf } : { status: 'error', reason: 'wrong-password' }
   }
   if (request.type === 'compress-pdf') {
-    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    if (await isEncryptedPdf(request.pdf)) throw new EncryptedPDFError()
     // qpdf keeps a picture's new JPEG only when it is smaller, and writes only the objects the document still reaches.
     const pdf = await runQpdf(['--optimize-images', `--jpeg-quality=${request.jpegQuality}`, '--recompress-flate', '--compression-level=9', '--object-streams=generate', '--remove-unreferenced-resources=yes'], request.pdf)
     return pdf ? { status: 'ok', pdf } : { status: 'error', reason: 'unreadable' }
   }
   if (request.type === 'flatten-pdf') {
-    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    if (await isEncryptedPdf(request.pdf)) throw new EncryptedPDFError()
     const document = await PDFDocument.load(request.pdf, { updateMetadata: false })
     // qpdf redraws the fields only when the file says their pictures are out of date; otherwise it keeps them as every reader shows them.
     const needsAppearances = document.catalog.getAcroForm()?.dict.lookup(PDFName.of('NeedAppearances')) === PDFBool.True
@@ -437,7 +503,7 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
     return { status: 'ok', pdf: await flattenedDocument.save() }
   }
   if (request.type === 'remove-pdf-metadata') {
-    if (await isEncryptedPdf(request.pdf)) return { status: 'error', reason: 'encrypted' }
+    if (await isEncryptedPdf(request.pdf)) throw new EncryptedPDFError()
     // qpdf's --remove-info keeps the modification date, so the whole dictionary is taken out first; qpdf then leaves out the objects
     // nothing points at any more.
     const document = await PDFDocument.load(request.pdf, { updateMetadata: false })
@@ -462,12 +528,38 @@ async function runTask(request: PdfTaskRequest): Promise<PdfTaskResponse> {
   return { status: 'ok', pdf: await pdf.save() }
 }
 
+// pdf-lib is compiled to ES5, where a class extending Error loses its prototype, so `instanceof EncryptedPDFError` is always false;
+// its message is the reliable sign.
+const isEncryptedPdfError = (error: unknown) => error instanceof Error && error.message.includes('`PDFDocument.load` is encrypted')
+
+// A PDF encrypted only to restrict printing, copying or editing opens without a password, so the page shows it, but pdf-lib refuses
+// to load it. Its encryption is taken off as Unlock PDF does (no password needed) and the task runs again on the copy; a file that
+// needs a password to open can't be decrypted and stays refused.
+async function withRestrictionsRemoved(request: PdfTaskRequest): Promise<PdfTaskRequest> {
+  const decryptIfEncrypted = async (pdf: ArrayBuffer) => {
+    if (!(await isEncryptedPdf(pdf))) return pdf
+    const decrypted = await runQpdf(['--decrypt'], pdf)
+    if (!decrypted) throw new EncryptedPDFError()
+    return decrypted.slice().buffer
+  }
+  if ('sources' in request) return { ...request, sources: await Promise.all(request.sources.map(decryptIfEncrypted)) }
+  if ('pdf' in request && request.pdf) return { ...request, pdf: await decryptIfEncrypted(request.pdf) }
+  return request
+}
+
 self.onmessage = async (event: MessageEvent<PdfTaskRequest>) => {
   let response: PdfTaskResponse
   try {
     response = await runTask(event.data)
   } catch (error) {
-    response = { status: 'error', reason: error instanceof EncryptedPDFError ? 'encrypted' : 'unreadable' }
+    response = { status: 'error', reason: isEncryptedPdfError(error) ? 'encrypted' : 'unreadable' }
+    if (isEncryptedPdfError(error)) {
+      try {
+        response = await runTask(await withRestrictionsRemoved(event.data))
+      } catch (retryError) {
+        response = { status: 'error', reason: isEncryptedPdfError(retryError) ? 'encrypted' : 'unreadable' }
+      }
+    }
   }
   postMessage(response)
 }

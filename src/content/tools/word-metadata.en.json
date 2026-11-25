@@ -30,14 +30,14 @@
     },
     {
       "title": "Remove and download",
-      "text": "Click Remove and download the clean copy."
+      "text": "Click Remove and download to get the clean copy."
     }
   ],
   "handlesTitle": "What Word metadata handles",
   "handles": [
     "Files: .docx documents (Word 2007 and later).",
     "Shown: title, subject, author, last modified by, created and modified dates, revision, application, company and manager.",
-    "Removed: all of the above and custom properties.",
+    "Removed: all of the above, and custom properties.",
     "Kept: the text and layout, unchanged."
   ],
   "limits": [
@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I remove the author name from a Word document?",
-      "answer": "A Word document stores the author's name, the last person who saved it and its dates in its properties, apart from the text; Word's document inspector and LibreOffice's file properties can clear them. On this page, choose the .docx, see what it holds and click Remove to download a clean copy, cleaned in your browser."
+      "answer": "A Word document stores the author's name, the last person who saved it and its dates in its properties, apart from the text; Word's document inspector and LibreOffice's file properties can clear them. On this page, choose the .docx, see what it holds and click Remove and download to get a clean copy, cleaned in your browser."
     },
     {
       "question": "Is my text changed?",

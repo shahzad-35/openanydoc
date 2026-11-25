@@ -3,7 +3,7 @@
   "description": "Split a Word document into separate .docx files at each Heading 1, Heading 2 or page break, in your browser, and get them in a ZIP. Free, no upload.",
   "heading": "Split a Word document",
   "subtitle": "Cut a Word document into separate .docx files at its headings or page breaks; nothing is uploaded.",
-  "intro": "Split a DOCX file online without Word: choose where to cut, at every Heading 1, at Heading 1 or 2, or at the page breaks and section breaks the author inserted, and download the parts as a ZIP of .docx files. Each part keeps the document's styles, headers and footers, and is named after its first heading, or numbered when it has none. The file is split in your browser and never uploaded.",
+  "intro": "Split a DOCX file online without Word: choose where to cut, at every Heading 1, at Heading 1 or 2, or at the page breaks and section breaks the author inserted, and download the parts as a ZIP of .docx files. Each part keeps the document's styles, headers and footers, and is numbered and named after its first line of text. The file is split in your browser and never uploaded.",
   "features": [
     {
       "title": "Private",
@@ -30,7 +30,7 @@
     },
     {
       "title": "Split and download",
-      "text": "Click Split and download the ZIP with one .docx file per part."
+      "text": "Click Split document and download the ZIP with one .docx file per part."
     }
   ],
   "handlesTitle": "What Split Word handles",
@@ -38,7 +38,7 @@
     "Files: .docx documents (Word 2007 and later).",
     "Split points: every Heading 1, Heading 1 or 2, or inserted page breaks and section breaks.",
     "Each part: the document's styles, headers and footers.",
-    "Result: a ZIP of .docx files named after their first heading, or numbered."
+    "Result: a ZIP of numbered .docx files, each named after its first line of text."
   ],
   "limits": [
     "Pages that end only because they are full are not split points; insert a page break in Word where you want a cut.",
@@ -71,7 +71,7 @@
     },
     {
       "question": "What are the parts called?",
-      "answer": "Each part is named after its first heading; a part without a heading is numbered."
+      "answer": "Each part is numbered in order and named after its first line of text, which is its heading when you split at headings."
     },
     {
       "question": "Do the parts keep headers and footers?",

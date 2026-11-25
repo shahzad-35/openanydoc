@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to convert PDF to JPG",
@@ -38,7 +38,7 @@
     "Pages: all of them, or the ones you click.",
     "Formats: JPG with a quality from 60 to 100, or PNG for sharp text and lines.",
     "Resolution: 72 dpi for screens, 150 dpi for most uses, 300 dpi for printing.",
-    "Long files: page after page with a progress bar; a 150-page PDF works on a laptop."
+    "Long files: page after page with a progress bar."
   ],
   "limits": [
     "PDFs that need a password to open can't be converted; remove the password first.",
@@ -73,7 +73,7 @@
     },
     {
       "question": "How do I convert a PDF to JPG?",
-      "answer": "Save each PDF page as a picture: Preview on a Mac exports a page as JPEG, and a PDF to JPG converter does every page at once. OpenAnyDoc converts every page, or the ones you pick, in your browser at 72, 150 or 300 dpi, with several pages in one ZIP, and nothing is uploaded."
+      "answer": "Save each PDF page as a picture with a PDF to JPG converter, which does every page at once. OpenAnyDoc converts every page, or the ones you pick, in your browser at 72, 150 or 300 dpi, with several pages in one ZIP, and nothing is uploaded."
     }
   ]
 }

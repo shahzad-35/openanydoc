@@ -38,7 +38,7 @@
     "MOV files from iPhone, iPad, Mac screen recordings, QuickTime and most cameras.",
     "H.264 picture: copied into the MP4 without re-encoding.",
     "HEVC (H.265) picture: re-encoded to H.264 when your browser can play HEVC.",
-    "Sound: AAC is kept; other sound is changed to AAC."
+    "Sound: AAC is kept; other sound your browser can play is changed to AAC."
   ],
   "limits": [
     "HEVC MOVs need a browser that can play HEVC, such as Safari or Chrome and Edge on most recent computers.",
@@ -65,7 +65,7 @@
     },
     {
       "question": "Does it keep the sound and the length?",
-      "answer": "Yes. The whole video is kept, with its sound. Sound that MP4 players don't expect is changed to AAC."
+      "answer": "Yes, the whole video is kept. Its sound is kept too when your browser can play it; sound that MP4 players don't expect is changed to AAC. If your browser can't read the sound, the page tells you the MP4 has none."
     }
   ]
 }

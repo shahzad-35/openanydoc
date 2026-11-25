@@ -12,7 +12,7 @@ import { resultFileOf, runVideoTask } from './videoTasks'
 import type { FrameBox, VideoContainer } from './videoTasks'
 
 const VIDEO_CONTAINERS: VideoContainer[] = ['mp4', 'webm', 'mov', 'mkv']
-// The result keeps the chosen file's container when the browser can write it (an .avi or .m4v becomes an MP4).
+// The result keeps the chosen file's container when the browser can write it (an .m4v or .ogv becomes an MP4).
 function containerOf(file: File): VideoContainer {
   const extension = file.name.split('.').pop()?.toLowerCase() as VideoContainer
   return VIDEO_CONTAINERS.includes(extension) ? extension : 'mp4'

@@ -1,6 +1,6 @@
 {
   "title": "Photo Editor Online – Brightness, Filters & Text, No Upload",
-  "description": "Edit a photo in your browser: brightness, contrast, saturation and warmth, seven filters and text you can drag, with undo. Free, and nothing is uploaded.",
+  "description": "Edit a photo in your browser: brightness, contrast, saturation and warmth, six filters and text you can drag, with undo. Free, and nothing is uploaded.",
   "heading": "Free Online Photo Editor",
   "subtitle": "Adjust light and colour, add a filter or text, and save a copy; nothing is uploaded.",
   "intro": "A simple photo editor for quick fixes: brighten a dark photo, add contrast and colour, warm it up or cool it down, or pick a filter such as black and white, sepia or vivid. Add text, Arabic included, and drag it into place. Every change can be undone, the preview updates as you move the sliders, and Save a copy never changes your original file.",
@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "Once you have used the tool, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to edit a photo",
@@ -37,7 +37,7 @@
   "handles": [
     "Light and colour: brightness, contrast, saturation and warmth.",
     "Filters: black and white, sepia, vivid, fade, cool and warm.",
-    "Text: as many lines as you like, in four colours and any size, Arabic included.",
+    "Text: as many lines as you like, in four colours and a size you choose, Arabic included.",
     "Saving: JPG, PNG or WebP at the quality you choose, at the photo's full size."
   ],
   "limits": [

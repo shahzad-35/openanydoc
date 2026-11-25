@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After your first file, the tool keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert PowerPoint to Markdown",
@@ -43,8 +43,8 @@
   ],
   "limits": [
     "Pictures, charts, SmartArt and the slide layout are left out; only the words are kept.",
-    "Old .ppt files are not read; save them as .pptx in PowerPoint first.",
-    "Text inside pictures and charts can't be read, because it is part of the picture."
+    "Old .ppt files are not read; save them as .pptx in PowerPoint first (checked 24 November 2026).",
+    "Text inside pictures can't be read, because it is part of the picture, and the labels and numbers of charts are not read."
   ],
   "faqTitle": "PowerPoint to Markdown: questions",
   "faq": [
@@ -62,7 +62,7 @@
     },
     {
       "question": "Why are charts and pictures missing?",
-      "answer": "The outline carries only the words. A chart's numbers and the text inside a picture are not text in the slide file, so they can't be taken out."
+      "answer": "The outline carries only the words on the slides and in the notes. A chart's labels and numbers are kept in the file apart from the slide text and are not read, and the text inside a picture is part of the picture, so it can't be taken out."
     },
     {
       "question": "Can I see the slides themselves?",

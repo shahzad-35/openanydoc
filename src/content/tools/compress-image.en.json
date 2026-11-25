@@ -35,8 +35,8 @@
   ],
   "handlesTitle": "What Compress image handles",
   "handles": [
-    "JPG: a high-quality JPEG encoder, usually 40–80% smaller at quality 75 with little visible change.",
-    "PNG: lossless optimisation; the pixels stay exactly the same.",
+    "JPG: a high-quality JPEG encoder, with little visible change at quality 75.",
+    "PNG: lossless optimisation with no quality setting; ordinary 8-bit pictures keep their exact pixels.",
     "WebP and AVIF: modern formats that are often much smaller than JPG at the same look.",
     "Batch: every picture in one go, with progress, and the results as one ZIP."
   ],
@@ -53,7 +53,7 @@
     },
     {
       "question": "What quality should I choose?",
-      "answer": "75 is a good start for photos: files are usually less than half the size and the difference is hard to see. Use the before/after slider to check."
+      "answer": "75 is a good start for photos: the difference is hard to see. Use the before/after slider to check."
     },
     {
       "question": "Why did my picture get larger?",
@@ -77,7 +77,7 @@
     },
     {
       "question": "How do I reduce the file size of a photo?",
-      "answer": "Save it again at a lower quality, or in a smaller format such as WebP or AVIF: at quality 75 a photo is usually less than half its size with little visible change. OpenAnyDoc does this in your browser for JPG, PNG, WebP and more, so the pictures are never uploaded."
+      "answer": "Save it again at a lower quality, or in a smaller format such as WebP or AVIF; at quality 75 the change is hard to see. OpenAnyDoc does this in your browser for JPG, PNG, WebP and more, so the pictures are never uploaded."
     }
   ]
 }

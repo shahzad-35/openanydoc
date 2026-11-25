@@ -61,11 +61,11 @@
     },
     {
       "question": "Can I resize many pictures to the same size?",
-      "answer": "Yes. Add them all; each one gets the same size and they download together as a ZIP."
+      "answer": "Yes. Add them all; each one is resized with the same settings and they download together as a ZIP. With Keep aspect ratio on, each fits inside the width and height you type; a ready size gives every picture exactly that size."
     },
     {
       "question": "Does resizing keep the format?",
-      "answer": "Yes by default. You can also choose JPG, PNG, WebP or AVIF for every picture."
+      "answer": "Yes by default for JPG, PNG, WebP and AVIF; HEIC and TIFF are saved as JPG, and GIF, BMP and SVG as PNG. You can also choose JPG, PNG, WebP or AVIF for every picture."
     },
     {
       "question": "Is it really free?",
@@ -73,7 +73,7 @@
     },
     {
       "question": "How do I resize a picture?",
-      "answer": "Set a new width and height, or a percentage, in an image app and save a copy: the Photos app on Windows and Preview on a Mac both can. OpenAnyDoc resizes one or many pictures in your browser on any device, by pixels, percent or a ready size, without uploading them."
+      "answer": "Set a new width and height, or a percentage, in an image app and save a copy: Preview on a Mac can (checked 24 November 2026). OpenAnyDoc resizes one or many pictures in your browser on any device, by pixels, percent or a ready size, without uploading them."
     }
   ]
 }

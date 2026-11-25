@@ -1,8 +1,8 @@
 {
-  "title": "Open TXT File Online – Free Text Editor, No Upload",
+  "title": "TXT Viewer and Editor Online – Edit and Save, No Upload",
   "description": "Open TXT file online and edit it: find and replace, sort lines, remove duplicates and count words, with Arabic and old encodings read. Nothing uploaded.",
   "heading": "Open TXT File Online: Free Text Viewer and Editor",
-  "subtitle": "Drop a text file to read, search and edit it instantly; nothing is uploaded.",
+  "subtitle": "Drop a text file to read, search and edit it; nothing is uploaded.",
   "intro": "Open TXT file online in your browser, on Windows, a Mac, an iPhone or an Android phone, and read or edit it like a notepad online: search, line numbers, and tools for lines, whitespace and case, with Arabic text shown right to left. Your file never leaves your device.",
   "features": [
     {
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -44,7 +44,7 @@
   "handlesTitle": "What the text file viewer handles: TXT files",
   "handles": [
     "Files: plain text .txt files, such as notes, logs and lists.",
-    "Encodings: UTF-8 with or without a BOM, UTF-16, and Windows-1256 for older Arabic text; you can reopen a file with another encoding, and each line shows in its own reading direction.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16, Windows-1256 for older Arabic text and Windows-1252 for older Western European text; you can reopen a file with another encoding, and each line shows in its own reading direction.",
     "Size: a 46 MB text file has been tested; files over 50 MB show a warning first, and above about 2 million characters the file opens in a fast read view.",
     "Editing: typing, plus tools for sorting, duplicates, numbering, whitespace and case, find and replace with regular expressions, statistics and compare.",
     "Saving: UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256, with LF, CRLF or CR line endings."
@@ -54,59 +54,52 @@
     "caption": "A text file open in the editor: line numbers, the tools ribbon and the encoding and line endings in the status bar."
   },
   "comparison": {
-    "title": "Text editor compared with Google Docs, Word for the web and upload-based editors",
+    "title": "Text editor compared with Google Docs and Word for the web",
     "columns": [
       "OpenAnyDoc",
-      "Google Docs or Word for the web",
-      "Upload-based online viewers"
+      "Google Docs or Word for the web (checked 25 November 2026)"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "Yes, to Microsoft or Google servers.",
-          "Yes, to the service's server."
-        ]
-      },
-      {
-        "label": "Account or sign-in",
-        "cells": [
-          "None.",
-          "A Microsoft or Google account.",
-          "Varies by service."
+          "Yes, to Microsoft or Google servers."
         ]
       },
       {
         "label": "Edit and save",
         "cells": [
           "Yes. Download keeps the file's own format.",
-          "Yes, in the cloud copy.",
-          "Varies by service."
+          "Yes, in the cloud copy."
         ]
       },
       {
         "label": "Works without a network once loaded",
         "cells": [
           "Yes.",
-          "Google, only after you turn on offline access in Chrome or Edge; Microsoft's, no.",
-          "No."
+          "Google, only after you turn on offline access in Chrome or Edge."
         ]
       },
       {
         "label": "Size",
         "cells": [
           "A 46 MB file has been tested; a warning above 50 MB; a fast read view above 2 million characters.",
-          "Set by the service.",
           "Set by the service."
         ]
       },
       {
-        "label": "Cost",
+        "label": "Several people editing at once",
         "cells": [
-          "Free, no ads.",
-          "Free with an account; paid plans for more.",
-          "Varies by service."
+          "No. Each person edits a copy on their own device.",
+          "Yes, in the shared cloud copy."
+        ]
+      },
+      {
+        "label": "Cost and account",
+        "cells": [
+          "Free, no account, no ads.",
+          "Free with a Microsoft or Google account; paid plans for more."
         ]
       }
     ]
@@ -167,7 +160,7 @@
     },
     {
       "question": "Can I open text files with Arabic or other non-English characters?",
-      "answer": "Yes. UTF-8 (with or without a BOM) and UTF-16 files are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding. Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it."
+      "answer": "Yes. UTF-8 (with or without a BOM) and UTF-16 files that start with a byte order mark are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding, or as Windows-1252 when its letters look Western European (ä, é, ñ). Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it; a UTF-16 file without a byte order mark opens this way."
     },
     {
       "question": "What program opens a .txt file?",
@@ -183,7 +176,7 @@
     },
     {
       "question": "What is a .txt file?",
-      "answer": "A .txt file is a plain text file: letters, numbers and line breaks with no fonts, colours or pictures, so every computer and phone can read it. Notes, logs, readme files and exported lists are often .txt files, and OpenAnyDoc reads them in UTF-8, UTF-16 or the old Arabic Windows-1256 encoding."
+      "answer": "A .txt file is a plain text file: letters, numbers and line breaks with no fonts, colours or pictures, so every computer and phone can read it. Notes, logs, readme files and exported lists are often .txt files, and OpenAnyDoc reads them in UTF-8, UTF-16, the old Arabic Windows-1256 encoding or the Western European Windows-1252."
     }
   ]
 }

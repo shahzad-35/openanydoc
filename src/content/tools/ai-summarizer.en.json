@@ -3,7 +3,7 @@
   "description": "Summarise a PDF, Word, PowerPoint or text file with AI that runs on your device in Chrome: key points, a short or a long summary. Nothing is uploaded.",
   "heading": "AI summarizer on your device",
   "subtitle": "Summarise a PDF, Word or PowerPoint file as key points or a short summary with desktop Chrome's built-in AI; nothing is uploaded.",
-  "intro": "Get the key points of a long report, contract or slide deck without reading every page. Drop a PDF, Word, PowerPoint, TXT or Markdown file, choose key points, a short summary or a long one, and the summary is written by the AI built into desktop Chrome, on your own computer. The file is read in your browser and never uploaded, and there is no account and no limit. Arabic and other languages the on-device AI can't summarise directly are translated to English on your device, summarised, and the summary translated back. In a browser without on-device AI, the page says so and offers no upload instead.",
+  "intro": "Get the key points of a long report, contract or slide deck without reading every page. Drop a PDF, Word, PowerPoint, TXT or Markdown file, choose key points, a short summary or a long one, and the summary is written by the AI built into desktop Chrome, on your own computer. The file is read in your browser and never uploaded, and there is no account and no daily limit. Arabic and other languages the on-device AI can't summarise directly are translated to English on your device, summarised, and the summary translated back. In a browser without on-device AI, the page says so and offers no upload instead.",
   "features": [
     {
       "title": "Runs on your device",
@@ -15,7 +15,7 @@
     },
     {
       "title": "Long files too",
-      "text": "A document longer than the AI reads at once is summarised in parts, then the parts are summarised together."
+      "text": "A document longer than the AI reads at once is summarised in parts, then the parts are summarised together. Every word is read, even in a very long paragraph."
     }
   ],
   "stepsTitle": "How it works: summarise a document on your device",
@@ -42,7 +42,7 @@
     "Downloads: Markdown (.md) and plain text (.txt)."
   ],
   "limits": [
-    "Works only in a recent desktop Chrome with its on-device AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM; not on phones or in other browsers.",
+    "Works only in a recent desktop Chrome with its on-device AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM and four CPU cores (checked 24 November 2026); not on phones or in other browsers.",
     "Summaries can leave out or get things wrong; check anything important against the document.",
     "Scanned PDFs hold pictures of pages and have no text to summarise; run OCR PDF first."
   ],
@@ -54,7 +54,7 @@
     },
     {
       "question": "Which browsers can summarise files?",
-      "answer": "A recent desktop Chrome with its built-in AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM. In other browsers the page tells you the feature isn't available and offers no upload instead."
+      "answer": "A recent desktop Chrome with its built-in AI, on Windows, macOS, Linux or a Chromebook Plus, with at least 22 GB of free disk space and a graphics card with more than 4 GB of memory or 16 GB of RAM and four CPU cores (checked 24 November 2026). In other browsers the page tells you the feature isn't available and offers no upload instead."
     },
     {
       "question": "Why doesn't it work on my phone?",

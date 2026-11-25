@@ -31,7 +31,7 @@
   "faqTitle": "Questions about minifying JSON",
   "faq": [
     { "question": "Is my file uploaded?", "answer": "No. Your JSON is read and minified by your browser, on your device, and is never sent anywhere. Pasted text stays in this tab. You can check it in your browser's network panel." },
-    { "question": "Does minifying change my data?", "answer": "No. Only the whitespace between keys and values is removed. Keys, values, their order and every digit of long numbers stay the same, so any program reads the minified file exactly as before." },
+    { "question": "Does minifying change my data?", "answer": "No. Only the whitespace between keys and values is removed. Keys, values and every digit of long numbers stay the same, and keys keep their order, including keys that are whole numbers such as \"2024\", so any program reads the minified file as before." },
     { "question": "How much smaller will my file get?", "answer": "It depends on how much indentation it had. Deeply nested files indented with spaces shrink the most; the page shows the exact bytes saved after you press Minify." },
     { "question": "Can I turn minified JSON back into readable JSON?", "answer": "Yes. Press Format and choose 2 spaces, 4 spaces or a tab, or press Undo to get back the exact layout you opened." },
     { "question": "Is there a size limit?", "answer": "Files up to 10 MB. Larger files are refused before they are read, because every step on them would be slow in a browser tab." },

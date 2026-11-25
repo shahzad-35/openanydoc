@@ -77,7 +77,7 @@ function mostCommonLineEnding(counts: LineEndingCounts): TextLineEnding {
   return counts.cr > counts.lf ? '\r' : '\n'
 }
 
-// 'auto' finds the encoding (byte order mark, then UTF-8, else Windows-1256); the others read the bytes as that encoding.
+// 'auto' finds the encoding (byte order mark, then UTF-8, else Windows-1256 or, for Western European text, Windows-1252); the others read the bytes as that encoding.
 export type EncodingChoice = 'auto' | 'utf-8' | 'utf-16le' | 'utf-16be' | 'windows-1256' | 'iso-8859-1'
 
 export const ENCODING_LABELS: Record<Exclude<EncodingChoice, 'auto'>, string> = {
@@ -107,11 +107,33 @@ export function decodeTextBytes(fileContents: ArrayBuffer, encodingChoice: Encod
   try {
     return { text: new TextDecoder('utf-8', { fatal: true }).decode(bytes), encodingLabel: 'UTF-8' }
   } catch {
+    if (looksLikeWindows1252(bytes)) {
+      return { text: new TextDecoder('windows-1252').decode(bytes), encodingLabel: 'Windows-1252 (the file was not valid UTF-8)' }
+    }
     return {
       text: new TextDecoder('windows-1256').decode(bytes),
       encodingLabel: 'Windows-1256 (the file was not valid UTF-8)',
     }
   }
+}
+
+const isAsciiLetter = (byte: number | undefined) => byte !== undefined && ((byte >= 0x41 && byte <= 0x5a) || (byte >= 0x61 && byte <= 0x7a))
+
+// An old Windows file is Arabic (Windows-1256) or Western European (Windows-1252: ä ö ß ñ é). Arabic words are runs of bytes
+// above 0x7F; a Western accented letter is one such byte inside a word of ASCII letters ("Müller"). Windows-1252 is chosen
+// only when that pattern clearly wins, so Arabic files read as before.
+function looksLikeWindows1252(bytes: Uint8Array) {
+  let insideLatinWordCount = 0
+  let nextToHighByteCount = 0
+  const checkedLength = Math.min(bytes.length, 1024 * 1024)
+  for (let position = 0; position < checkedLength; position++) {
+    if (bytes[position] < 0x80) continue
+    const previousByte = position > 0 ? bytes[position - 1] : undefined
+    const nextByte = position + 1 < bytes.length ? bytes[position + 1] : undefined
+    if ((previousByte ?? 0) >= 0x80 || (nextByte ?? 0) >= 0x80) nextToHighByteCount++
+    else if (isAsciiLetter(previousByte) || isAsciiLetter(nextByte)) insideLatinWordCount++
+  }
+  return insideLatinWordCount > 0 && insideLatinWordCount >= 3 * nextToHighByteCount
 }
 
 export function looksLikeBinary(fileContents: ArrayBuffer) {

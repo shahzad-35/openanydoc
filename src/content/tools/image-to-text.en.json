@@ -30,7 +30,7 @@
     },
     {
       "title": "Read the text",
-      "text": "Click Read text; the time left is shown as it goes."
+      "text": "Click Read text; the progress is shown picture by picture."
     },
     {
       "title": "Copy or download",
@@ -46,7 +46,7 @@
   ],
   "limits": [
     "Text recognition makes mistakes, more so on blurry, small, curved or handwritten text; check what matters.",
-    "The first use loads the text reader (about 10 MB) from this site; after that it works offline.",
+    "Each language's text reader loads from this site the first time you use it (about 10 MB for both); after that it works offline.",
     "Tables and columns come out as lines of words, not as a table."
   ],
   "faqTitle": "Image to text: questions",

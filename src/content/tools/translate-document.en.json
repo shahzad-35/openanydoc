@@ -53,7 +53,7 @@
     },
     {
       "question": "Which browsers can translate documents?",
-      "answer": "A recent desktop Chrome on Windows, macOS, Linux or ChromeOS. In other browsers and on phones the page tells you the feature isn't available and offers no upload instead."
+      "answer": "A recent desktop version of Chrome (not on phones). In other browsers and on phones the page tells you the feature isn't available and offers no upload instead."
     },
     {
       "question": "Why doesn't it work on my phone?",

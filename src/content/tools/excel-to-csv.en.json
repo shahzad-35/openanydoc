@@ -10,12 +10,12 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert Excel to CSV",
@@ -40,14 +40,14 @@
   "handlesTitle": "What the Excel to CSV converter handles",
   "handles": [
     "Files: .xlsx, .xls, .xlsm and .ods workbooks.",
-    "Values: each cell as Excel shows it, so dates, percentages and currencies keep their format, and formulas give their saved result.",
+    "Values: each cell as its number format shows it, so dates, percentages and currencies keep their format, and formulas give their saved result. A number in the General format is written in full, so 123456789012 stays 123456789012 and long decimals keep their digits, up to the 15 significant digits Excel stores.",
     "Sheets: the first sheet; for another, open the workbook in the Excel viewer, pick the sheet and use Convert.",
     "Encoding: UTF-8, with the byte order mark Excel needs for Arabic and other non-Latin text whenever the sheet has any.",
     "Delimiters: a comma, or a semicolon, tab or pipe from the CSV viewer's Download options."
   ],
   "limits": [
     "CSV holds values only: formulas, formatting, charts and images are not kept.",
-    "Each sheet becomes its own CSV file."
+    "One sheet becomes one CSV; to save every sheet as its own CSV, use Split, merge and export sheets in the Excel viewer."
   ],
   "faqTitle": "Excel to CSV: questions and answers",
   "faq": [
@@ -61,7 +61,7 @@
     },
     {
       "question": "Why does Arabic text look broken when I open the CSV in Excel?",
-      "answer": "Excel reads a UTF-8 file without a byte order mark as an older Windows encoding. The CSV made here gets that mark whenever the sheet has Arabic or other non-Latin text, so Excel shows it correctly. If a CSV already shows broken Arabic, see Fix broken Arabic in a CSV.",
+      "answer": "Excel opens a UTF-8 CSV normally only if it was saved with a byte order mark. The CSV made here gets that mark whenever the sheet has Arabic or other non-Latin text, so Excel shows it correctly. If a CSV already shows broken Arabic, see Fix broken Arabic in a CSV.",
       "link": {
         "text": "Fix broken Arabic in a CSV",
         "path": "/fix-arabic-csv-in-excel"
@@ -81,7 +81,7 @@
     },
     {
       "question": "Are dates and numbers written the way Excel shows them?",
-      "answer": "Yes. Each cell is written as the text Excel shows, so a date stays 05/01/2026 and a price keeps its currency sign, instead of becoming the number Excel stores behind it."
+      "answer": "Yes. Each cell is written as the text its number format gives, so a date keeps its date format and a price keeps its currency sign, instead of becoming the number Excel stores behind it. A number in the General format is written in full, even when a narrow column shows it as 1.23457E+11, so 123456789012 stays 123456789012."
     },
     {
       "question": "Is my workbook uploaded to convert it?",

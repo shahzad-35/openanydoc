@@ -3,11 +3,11 @@
   "description": "Merge Excel files into one workbook in your browser: every sheet kept as its own tab, with formulas and formatting from .xlsx. Free, no upload.",
   "heading": "Merge Excel files",
   "subtitle": "Combine several Excel workbooks into one .xlsx file, every sheet as its own tab, right in your browser; nothing is uploaded.",
-  "intro": "Merge Excel files online for monthly reports, regional sheets or exports from different systems: choose two or more workbooks, drag them into the order you want, and every sheet of every file becomes its own sheet in one .xlsx file. From .xlsx and .xlsm files the values, formulas, formatting, column widths and merged cells come along; from .xls, .ods and .csv files the values do. Sheets with the same name get a number so nothing is overwritten. Your files never leave your device.",
+  "intro": "Merge Excel files online for monthly reports, regional sheets or exports from different systems: choose two or more workbooks in the order you want, and every sheet of every file becomes its own sheet in one .xlsx file. From .xlsx and .xlsm files the values, formulas, formatting, column widths and merged cells come along; from .xls, .ods and .csv files the values do. Sheets with the same name get a number so nothing is overwritten. Your files never leave your device.",
   "features": [
     {
       "title": "Every sheet kept",
-      "text": "Each sheet of each file becomes its own sheet in the merged workbook, in the order you set."
+      "text": "Each sheet of each file becomes its own sheet in the merged workbook, in the order the files were chosen."
     },
     {
       "title": "Formatting kept",
@@ -25,8 +25,8 @@
       "text": "Click Choose a file, or drop two or more .xlsx, .xlsm, .xls, .ods or .csv files on the page."
     },
     {
-      "title": "Set the order",
-      "text": "Drag the files into the order their sheets should appear in the merged workbook."
+      "title": "Check the order",
+      "text": "The sheets appear in the merged workbook in the order the files are listed, which is the order you chose them in."
     },
     {
       "title": "Merge and download",
@@ -42,7 +42,7 @@
   ],
   "limits": [
     "Charts, pictures, pivot tables and macros are not carried over.",
-    "From .xls, .ods and .csv files only the values are copied, not the formatting.",
+    "From .xls, .ods and .csv files the values, formulas, merged cells and column widths are copied, not the formatting.",
     "Formulas that point to another sheet keep the original sheet name, which may change if that sheet was renamed in the merge."
   ],
   "worksBest": [
@@ -64,7 +64,7 @@
     },
     {
       "question": "How do I merge Excel files into one?",
-      "answer": "To merge Excel files into one, put every sheet in a single workbook, either by copying them yourself or with a tool that copies them for you. In Excel you can do it sheet by sheet with Move or Copy, and LibreOffice Calc and Google Sheets can copy sheets by hand too. On this page, choose all the files, put them in order and click Merge: every sheet lands in one .xlsx file, in your browser."
+      "answer": "To merge Excel files into one, put every sheet in a single workbook, either by copying them yourself or with a tool that copies them for you. In Excel you can do it sheet by sheet with Move or Copy, and LibreOffice Calc and Google Sheets can copy sheets by hand too. On this page, choose all the files in order and click Merge: every sheet lands in one .xlsx file, in your browser."
     },
     {
       "question": "What happens to two sheets with the same name?",
@@ -76,7 +76,7 @@
     },
     {
       "question": "Are charts and pivot tables kept?",
-      "answer": "No. Charts, pictures, pivot tables and macros are not carried over; the cells are. From .xls, .ods and .csv files only the values come along."
+      "answer": "No. Charts, pictures, pivot tables and macros are not carried over; the cells are. From .xls, .ods and .csv files the formatting does not come along."
     },
     {
       "question": "Can I join the rows of several CSV files instead?",

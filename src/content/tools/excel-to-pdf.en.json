@@ -37,14 +37,14 @@
   "handles": [
     "Workbooks: .xlsx, .xlsm, .xls and .ods.",
     "Column widths, row heights, merged cells and hidden rows and columns.",
-    "Colours, borders, bold and alignment from .xlsx and .xlsm files.",
+    "Colours, borders, bold and alignment from .xlsx and .xlsm files of up to 8 MB.",
     "Right-to-left Arabic sheets, set against the right margin."
   ],
   "limits": [
     "Charts, pictures and conditional formatting are not drawn.",
     "Excel's own print settings (print area, page breaks, repeated titles) are not read; sheets are fitted to the page width instead.",
     "Formulas show the value saved in the file.",
-    "Colours and borders are read from .xlsx and .xlsm files only; other formats keep their values and layout.",
+    "Colours and borders are read from .xlsx and .xlsm files of up to 8 MB only; other formats keep their values and layout.",
     "Pages are pictures at 200 dpi with their text laid over them: the text can be selected and searched, but zooming in far is less sharp than type."
   ],
   "worksBest": [
@@ -70,7 +70,7 @@
     },
     {
       "question": "Are colours and borders kept?",
-      "answer": "Yes, for .xlsx and .xlsm files: fills, font colours, bold, borders and alignment. Other formats keep their values and layout."
+      "answer": "Yes, for .xlsx and .xlsm files of up to 8 MB: fills, font colours, bold, borders and alignment. Other formats keep their values and layout."
     },
     {
       "question": "Can I convert only one sheet?",

@@ -3,7 +3,7 @@
   "description": "Convert a CSV file to SQL: a CREATE TABLE plus one INSERT per row, with number columns typed as REAL and text safely quoted. Free, nothing uploaded.",
   "heading": "CSV to SQL Converter",
   "subtitle": "Drop a CSV and get CREATE TABLE and INSERT statements at once, ready to copy or download as .sql.",
-  "intro": "Load a CSV export into a database without writing the statements by hand. Choose, drop or paste a CSV or TSV file and the SQL appears at once: a CREATE TABLE with one column per header, then one INSERT per row. The delimiter and encoding (UTF-8, UTF-16 or Windows-1256 Arabic) are detected for you. The table name comes from the file name and you can change it. Identifiers are in double quotes, as standard SQL writes them, so the script runs in PostgreSQL as it is. Copy the result or download it as a .sql file; the file is read in your browser and never uploaded.",
+  "intro": "Load a CSV export into a database without writing the statements by hand. Choose, drop or paste a CSV or TSV file and the SQL appears at once: a CREATE TABLE with one column per header, then one INSERT per row. The delimiter and encoding (UTF-8, UTF-16 with a byte order mark, Windows-1256 Arabic or Windows-1252) are detected for you. The table name comes from the file name and you can change it. Identifiers are in double quotes, as standard SQL writes them, so the script runs in PostgreSQL as it is. Copy the result or download it as a .sql file; the file is read in your browser and never uploaded.",
   "features": [
     { "title": "Private", "text": "Your CSV is read and turned into SQL by your own browser and never sent to a server, so customer exports stay on your device." },
     { "title": "Typed columns", "text": "A column whose filled cells are all numbers becomes REAL with unquoted values; everything else is text with quotes escaped." },
@@ -18,7 +18,7 @@
   "handlesTitle": "What the CSV to SQL converter handles",
   "handles": [
     "Files: .csv and .tsv, or CSV text you paste; comma, semicolon, tab and pipe delimiters.",
-    "Encodings: UTF-8, UTF-16 and Windows-1256 Arabic, detected automatically.",
+    "Encodings: UTF-8, UTF-16 (when the file starts with a byte order mark), Windows-1256 Arabic and Windows-1252 Western European text, detected automatically.",
     "Output: one CREATE TABLE with a column per header, then one INSERT per row.",
     "Types: all-number columns become REAL with unquoted values, and an empty number becomes NULL.",
     "Text: wrapped in single quotes, with any ' inside doubled, so names like O'Brien load safely.",

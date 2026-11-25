@@ -3,15 +3,15 @@
   "description": "Save each page of a Word document as a JPG image in your browser, with Word's page size, headers and pictures. Several pages in a ZIP. No upload.",
   "heading": "Word to JPG",
   "subtitle": "Turn each page of a Word document into a JPG picture, several at once in a ZIP; nothing is uploaded.",
-  "intro": "Convert DOCX to JPG online without Word: the document is laid out the way this site's Word viewer shows it, with Word's own page size and page breaks, headers, footers, tables and pictures, and each page is saved as a JPG at 200 dpi. One page gives one .jpg; a longer document gives a ZIP with the pages numbered in order. Handy for posting a page, adding it to slides or sending it as a picture. Works with .docx, .dotx, .docm and OpenDocument .odt files. Your file never leaves your device.",
+  "intro": "Convert DOCX to JPG online without Word: each page of the document becomes its own picture, taken from the layout this site's Word viewer draws, so the page keeps Word's size and the breaks Word saved, along with its header, footer, tables and images. Pages are drawn at 200 dpi on white and saved as JPG; a one-page document gives a single .jpg, and a longer one gives a ZIP with the pages numbered in order. Use a page as a picture in a chat, on a slide or on a website. Works with .docx, .dotx, .docm and OpenDocument .odt files. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
-      "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
+      "text": "The pages are turned into pictures on your device, and the document is not sent to any server."
     },
     {
-      "title": "Word's pages",
-      "text": "Word's page size and the page breaks it saved are kept, with headers, footers, tables and pictures."
+      "title": "One picture per page",
+      "text": "Each page Word marked becomes its own JPG, the same shape as the page, with its header, footer, tables and images in place."
     },
     {
       "title": "Numbered in order",
@@ -21,12 +21,12 @@
   "stepsTitle": "How to convert Word to JPG",
   "steps": [
     {
-      "title": "Choose your document",
-      "text": "Click Choose a file, or drop a .docx or .odt file on the page."
+      "title": "Add the Word file",
+      "text": "Drop a .docx, .dotx, .docm or .odt file here, or click Choose a file to pick one from your device."
     },
     {
       "title": "Convert",
-      "text": "Click Convert to JPG."
+      "text": "Click Convert to JPG; a counter shows which page is being drawn."
     },
     {
       "title": "Download",
@@ -35,15 +35,17 @@
   ],
   "handlesTitle": "What Word to JPG handles",
   "handles": [
-    "Word files: .docx, .dotx and .docm; OpenDocument .odt.",
-    "Headers, footers, page numbers, tables, lists and pictures.",
-    "Arabic and English, each in its own direction.",
+    "Input: Word documents and templates (.docx, .dotx, .docm) and OpenDocument text (.odt).",
+    "What is drawn on the page: headers and footers, tables, lists and images.",
+    "Arabic pages drawn right to left and English pages left to right, as the viewer shows them.",
+    "A page longer than Word's page size goes on to the next picture, cut between lines; an .odt file is cut into A4-shaped pictures.",
     "Output: one .jpg for a single page, a ZIP for several."
   ],
   "limits": [
-    "The pages follow this site's Word viewer, which is close to Word but not identical; fonts your browser doesn't have are replaced.",
+    "Each picture shows the page as this site's Word viewer lays it out, which can differ a little from Word; a font missing from your browser is drawn in a stand-in font.",
     "The pictures hold no text: words in a JPG can't be selected or searched.",
-    "Old .doc files can't be read; save them as .docx first."
+    "There is no setting for picture size or quality: pages always come out at 200 dpi and 90% JPG quality.",
+    "The older .doc format is not supported; open it in Word or LibreOffice and save it as .docx."
   ],
   "worksBest": [
     "One-page letters, flyers and certificates",
@@ -51,7 +53,7 @@
     "Pages to add to slides or a website"
   ],
   "mayNotKeep": [
-    "Fonts your browser doesn't have",
+    "Fonts missing from your browser",
     "Selectable and searchable text",
     "Comments and tracked changes",
     "Exact line breaks in complex layouts"
@@ -67,16 +69,16 @@
       "answer": "Without Word, a common free way is to save the document as PDF in Google Docs, LibreOffice or Pages, then turn the PDF into pictures. In OpenAnyDoc, choose the .docx file and download a JPG of every page straight away; it is converted in your browser and never uploaded."
     },
     {
-      "question": "Will it look exactly like Word?",
-      "answer": "Close, not identical: the layout follows this site's Word viewer, and fonts your browser doesn't have are replaced. Open the file in the Word viewer to see how it will come out.",
+      "question": "Will the pictures match the pages in Word?",
+      "answer": "Nearly. The pictures come from the layout this site's Word viewer makes, and any font your browser lacks is swapped for another. To see the result first, open the file in the Word viewer.",
       "link": {
         "text": "Word viewer",
         "path": "/word-viewer"
       }
     },
     {
-      "question": "How sharp are the pictures?",
-      "answer": "Each page is drawn at 200 dpi, sharp enough to read on screen and to print. To make the files smaller, use Compress image.",
+      "question": "How big and sharp are the pictures?",
+      "answer": "Each page is drawn at 200 dpi and saved at 90% JPG quality, so an A4 page is about 1654 × 2339 pixels and a Letter page about 1700 × 2200: clear on a screen and fine to print. To make the files smaller, use Compress image.",
       "link": {
         "text": "Compress image",
         "path": "/compress-image"
@@ -91,8 +93,8 @@
       }
     },
     {
-      "question": "Does it work with .doc files?",
-      "answer": "No. Old .doc files can't be read; save them as .docx in Word or LibreOffice first."
+      "question": "Can I convert an old .doc file?",
+      "answer": "Not here. The older .doc format can't be opened; save the file as .docx in Word or LibreOffice, then convert that."
     },
     {
       "question": "Is it really free?",

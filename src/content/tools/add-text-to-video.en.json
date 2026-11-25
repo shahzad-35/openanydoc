@@ -48,7 +48,7 @@
   "limits": [
     "One text per video; to add a second one, run the saved video through the tool again.",
     "The text stays still: it does not move or fade in.",
-    "The video is encoded again, so saving takes about as long as the video plays on slower devices."
+    "The video is encoded again."
   ],
   "faqTitle": "Questions about adding text to a video",
   "faq": [
@@ -74,7 +74,7 @@
     },
     {
       "question": "How do I add text to a video?",
-      "answer": "A video editor can put a title over a clip; phone editors and desktop apps all have a text tool. OpenAnyDoc does it in your browser: type the words, place them on the preview, choose when they show and save, without an account or an upload."
+      "answer": "A video editor can put a title over a clip. OpenAnyDoc does it in your browser: type the words, place them on the preview, choose when they show and save, without an account or an upload."
     }
   ]
 }

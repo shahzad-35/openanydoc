@@ -3,19 +3,19 @@
   "description": "PowerPoint viewer online: open PPTX slides with their text, images and tables, flip through thumbnails and present them full screen. No upload.",
   "heading": "PowerPoint Viewer Online (Beta)",
   "subtitle": "Drop a PowerPoint file to flip through its slides and present them full screen; nothing is uploaded.",
-  "intro": "Open a PowerPoint presentation in your browser: a free PPTX viewer, in beta, that shows your slides with their text, images, tables and shapes. Move between them with thumbnails, buttons or the arrow keys, and present them full screen. Animations and some effects are simplified. Microsoft's standalone PowerPoint Viewer has been retired; this page opens .pptx files without installing anything. Your file never leaves your device.",
+  "intro": "Open a PowerPoint presentation in your browser: a free PPTX viewer, in beta, that shows your slides with their text, images, tables and shapes. Move between them with thumbnails, buttons or the arrow keys, and present them full screen. Animations and some effects are simplified. Microsoft's standalone PowerPoint Viewer has been retired (checked 24 November 2026); this page opens .pptx files without installing anything. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: open a PowerPoint presentation online",
@@ -53,59 +53,52 @@
     "caption": "A PowerPoint presentation open one slide at a time: thumbnails on the side, the slide counter, and Full screen in the toolbar."
   },
   "comparison": {
-    "title": "PowerPoint viewer compared with PowerPoint Online, Google Slides and upload-based viewers",
+    "title": "PowerPoint viewer compared with PowerPoint Online and Google Slides",
     "columns": [
       "OpenAnyDoc",
-      "PowerPoint Online or Google Slides",
-      "Upload-based online viewers"
+      "PowerPoint Online or Google Slides (checked 24 November 2026)"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "Yes, to Microsoft or Google servers.",
-          "Yes, to the service's server."
+          "Yes, to Microsoft or Google servers."
         ]
       },
       {
         "label": "Account or sign-in",
         "cells": [
           "None.",
-          "A Microsoft or Google account.",
-          "Varies by service."
+          "A Microsoft or Google account."
         ]
       },
       {
         "label": "Edit and save",
         "cells": [
           "View only (beta); separate tools merge, split and watermark a .pptx.",
-          "Yes, in the cloud copy.",
-          "Varies by service."
+          "Yes, in the cloud copy."
         ]
       },
       {
         "label": "Animations and transitions",
         "cells": [
           "Not played; each slide is shown in its final state.",
-          "Played.",
-          "Varies by service."
+          "Google Slides plays both; PowerPoint Online plays animations, but transitions added in desktop PowerPoint play only there."
         ]
       },
       {
-        "label": "Works without a network once loaded",
+        "label": "Works without a network once you have opened a file",
         "cells": [
           "Yes.",
-          "Google, only after you turn on offline access in Chrome or Edge; Microsoft's, no.",
-          "No."
+          "Google, only after you turn on offline access in Chrome or Edge."
         ]
       },
       {
         "label": "Cost",
         "cells": [
           "Free, no ads.",
-          "Free with an account; paid plans for more.",
-          "Varies by service."
+          "Free with an account; paid plans for more."
         ]
       }
     ]
@@ -141,7 +134,7 @@
     },
     {
       "question": "Is there a file size limit?",
-      "answer": "There is no fixed limit: the limit is your browser's memory, and files over 50 MB show a warning first. Presentations with many large pictures take longer to open."
+      "answer": "There is no fixed file-size limit, except that a file that unpacks to more than 1 GB is refused; otherwise your browser's memory sets the limit, and files over 50 MB show a warning first. Presentations with many large pictures take longer to open."
     },
     {
       "question": "Does it work on mobile?",
@@ -149,7 +142,7 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Yes. After your first visit, the page and its PowerPoint viewer are kept on your device, so opening presentations needs no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
+      "answer": "Yes. After you have opened one file here, the page and its PowerPoint viewer are kept on your device, so opening presentations needs no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
@@ -173,7 +166,7 @@
     },
     {
       "question": "Do I need Microsoft's PowerPoint Viewer?",
-      "answer": "No. Microsoft's standalone PowerPoint Viewer has been retired. This page opens .pptx, .ppsx, .potx and .pptm files in your browser without installing anything, and the file stays on your device."
+      "answer": "No. Microsoft's standalone PowerPoint Viewer has been retired (checked 24 November 2026). This page opens .pptx, .ppsx, .potx and .pptm files in your browser without installing anything, and the file stays on your device."
     },
     {
       "question": "Can I open an old .ppt file?",

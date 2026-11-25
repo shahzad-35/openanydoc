@@ -3,7 +3,7 @@
   "description": "Convert WebM screen recordings and web videos to MP4 with H.264 and AAC, for PowerPoint, iPhone and editors. In your browser, with no upload.",
   "heading": "Convert WebM to MP4",
   "subtitle": "Make a WebM screen recording or web video into an MP4 that PowerPoint, iPhones and editors accept; nothing is uploaded.",
-  "intro": "Browser screen recorders, meeting tools and many websites save video as WebM. It plays in a browser, but PowerPoint, iMovie, older TVs and some upload forms want MP4. WebM holds VP8, VP9 or AV1 picture and Opus sound, none of which an MP4 player expects, so this page always re-encodes: the picture becomes H.264 and the sound AAC. A screen recording with sharp text keeps it sharp, and the progress bar shows how far along it is.",
+  "intro": "Browser screen recorders, meeting tools and many websites save video as WebM. It plays in a browser, but PowerPoint, iMovie, older TVs and some upload forms want MP4. WebM holds VP8, VP9 or AV1 picture and Opus sound, none of which an MP4 player expects, so this page re-encodes a standard WebM (VP8, VP9 or AV1): the picture becomes H.264 and the sound AAC. A screen recording with sharp text keeps it sharp, and the progress bar shows how far along it is.",
   "features": [
     {
       "title": "Private",
@@ -40,7 +40,7 @@
     "Opus and Vorbis sound, re-encoded to AAC; silent recordings stay silent."
   ],
   "limits": [
-    "The picture is always re-encoded, so a long recording takes longer than a copy would.",
+    "The picture of a standard WebM (VP8, VP9 or AV1) is re-encoded, so a long recording takes longer than a copy would.",
     "Transparent WebM video loses its transparency, because H.264 has none.",
     "One video at a time."
   ],
@@ -64,7 +64,7 @@
     },
     {
       "question": "Which browsers can do this?",
-      "answer": "Up-to-date Chrome, Edge and Safari can make H.264. If your browser can't, the page says so and names one it can make."
+      "answer": "Up-to-date Chrome, Edge and Safari can make H.264. If your browser can't, the line above the button names the codec it will use instead."
     }
   ]
 }

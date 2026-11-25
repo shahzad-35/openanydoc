@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: run SQL on a CSV file",
@@ -39,7 +39,7 @@
   ],
   "handlesTitle": "What SQL on CSV handles",
   "handles": [
-    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet, with a notice).",
+    "Input: CSV files, and Excel .xlsx and .xls files (the first sheet).",
     "Table: one table per file, named data.",
     "Queries: SELECT with WHERE, GROUP BY, ORDER BY, aggregates and joins of data with itself (standard SQL, run in your browser).",
     "Types: columns of numbers are stored as REAL, so sums and comparisons work on numbers.",
@@ -70,7 +70,7 @@
     },
     {
       "question": "Can I query an Excel file?",
-      "answer": "Yes. Its first sheet is loaded as the table data, and a notice says so."
+      "answer": "Yes. Its first sheet is loaded as the table data."
     },
     {
       "question": "How are number columns typed?",

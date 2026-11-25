@@ -25,9 +25,12 @@ type ReadCsv = { fileName: string; rows: string[][]; delimiter: string; encoding
 async function readCsvFile(file: File, delimiterChoice: DelimiterChoice = 'auto', encodingChoice: EncodingChoice = 'auto'): Promise<ReadCsv> {
   if (/\.(xlsx|xlsm|xls|ods)$/i.test(file.name)) {
     try {
-      const XLSX = await import('xlsx')
-      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true })
-      const sheets = workbook.SheetNames.map((name) => ({ name, rows: XLSX.utils.sheet_to_json<string[]>(workbook.Sheets[name], { header: 1, raw: false, defval: '', blankrows: false }) })).filter((sheet) => sheet.rows.length > 0)
+      const [XLSX, { showFullGeneralNumbers }] = await Promise.all([import('xlsx'), import('../../formats/conversion')])
+      const workbook = XLSX.read(await file.arrayBuffer(), { type: 'array', cellDates: true, cellNF: true })
+      const sheets = workbook.SheetNames.map((name) => {
+        showFullGeneralNumbers(workbook.Sheets[name])
+        return { name, rows: XLSX.utils.sheet_to_json<string[]>(workbook.Sheets[name], { header: 1, raw: false, defval: '', blankrows: false }) }
+      }).filter((sheet) => sheet.rows.length > 0)
       if (sheets.length === 0) return { fileName: file.name, error: true }
       return { fileName: file.name, rows: sheets[0].rows, delimiter: '', encodingLabel: '', usesCrlf: false, sheets }
     } catch {

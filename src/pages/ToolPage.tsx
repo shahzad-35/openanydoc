@@ -9,7 +9,7 @@ import NextSteps from '../components/NextSteps'
 import SiteFooter, { PageBreadcrumb, PageLink } from '../components/SiteFooter'
 import SiteNav from '../components/SiteNav'
 import ThemeToggle from '../components/ThemeToggle'
-import { downloadTextFile } from '../formats/registry'
+import { downloadTextFile, formatDefinitions } from '../formats/registry'
 import { isolateLeftToRight, localizePath, useT } from '../i18n'
 import { samplesByPage } from '../samples/toolSamples'
 import { pageSeo } from '../seo'
@@ -128,6 +128,7 @@ export default function ToolPage({
     onHandoffConsumed,
     allowsSeveralFiles: tool.takesSeveralFiles,
     acceptsComingSoonFormats: hasToolComponent,
+    pageMaxFileBytes: formatDefinitions.find((definition) => definition.viewerId === toolViewer?.id)?.maxFileBytes,
   })
 
   // An editing tool's edits count as saved once their copy is downloaded; going back to edit makes them unsaved again.

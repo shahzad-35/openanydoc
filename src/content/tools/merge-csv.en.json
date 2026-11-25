@@ -42,7 +42,7 @@
     "Files: any number of .csv files, added at once or a few at a time.",
     "Columns: matched by header name, in any order; the result keeps the first file's column order.",
     "Delimiters: comma, semicolon, tab or pipe, detected in each file.",
-    "Encodings: UTF-8 with or without a BOM, UTF-16 and Windows-1256 for older Arabic files, detected in each file.",
+    "Encodings: UTF-8 with or without a BOM, UTF-16 (when the file starts with a byte order mark), Windows-1256 for older Arabic files and Windows-1252 for older Western European files, detected in each file.",
     "Result: one CSV with one header row, ready to download or open in the CSV viewer."
   ],
   "limits": [

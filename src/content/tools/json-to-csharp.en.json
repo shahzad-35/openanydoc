@@ -7,7 +7,7 @@
   "features": [
     { "title": "Private", "text": "Your JSON is read and the classes are written by your own browser; nothing is sent to a server." },
     { "title": "Plain .NET classes", "text": "Partial classes with PascalCase get/set properties and no attributes, ready for System.Text.Json." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: generate C# classes from JSON",
   "steps": [

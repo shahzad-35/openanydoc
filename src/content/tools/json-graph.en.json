@@ -7,7 +7,7 @@
   "features": [
     { "title": "PNG or SVG", "text": "Export the drawn graph as a PNG picture or a sharp SVG for slides and documentation." },
     { "title": "Private and free", "text": "Your JSON is drawn by your own browser and never sent to a server. No account, no watermark." },
-    { "title": "Works offline", "text": "Once this page has loaded, it keeps working without an internet connection." }
+    { "title": "Works offline", "text": "After you have used it once, it keeps working without an internet connection." }
   ],
   "stepsTitle": "How it works: draw JSON as a graph",
   "steps": [

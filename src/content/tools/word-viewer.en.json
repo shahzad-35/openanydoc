@@ -10,12 +10,12 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: open a Word document online",
@@ -52,50 +52,44 @@
     "caption": "A Word document open as pages: its table, lists and picture, with zoom, fit to width and Print / Save as PDF in the toolbar."
   },
   "comparison": {
-    "title": "Word viewer compared with Word Online, Google Docs and upload-based viewers",
+    "title": "Word viewer compared with Word Online and Google Docs",
     "columns": [
       "OpenAnyDoc",
-      "Word Online or Google Docs",
-      "Upload-based online viewers"
+      "Word Online or Google Docs (checked 25 November 2026)"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "Yes, to Microsoft or Google servers.",
-          "Yes, to the service's server."
+          "Yes, to Microsoft or Google servers."
         ]
       },
       {
         "label": "Account or sign-in",
         "cells": [
           "None.",
-          "A Microsoft or Google account.",
-          "Varies by service."
+          "A Microsoft or Google account."
         ]
       },
       {
         "label": "Edit and save",
         "cells": [
           "View only; separate tools find and replace, merge, split and watermark a .docx. Print or save as PDF works.",
-          "Yes, in the cloud copy.",
-          "Varies by service."
+          "Yes, in the cloud copy."
         ]
       },
       {
-        "label": "Works without a network once loaded",
+        "label": "Works without a network once you have opened a file",
         "cells": [
           "Yes.",
-          "Google, only after you turn on offline access in Chrome or Edge; Microsoft's, no.",
-          "No."
+          "Google, only after you turn on offline access in Chrome or Edge."
         ]
       },
       {
         "label": "Size",
         "cells": [
-          "No fixed limit; it depends on your browser's memory.",
-          "Set by the service.",
+          "No fixed limit, except that a file that unpacks to more than 1 GB is refused; otherwise it depends on your browser's memory.",
           "Set by the service."
         ]
       },
@@ -103,8 +97,7 @@
         "label": "Cost",
         "cells": [
           "Free, no ads.",
-          "Free with an account; paid plans for more.",
-          "Varies by service."
+          "Free with an account; paid plans for more."
         ]
       }
     ]
@@ -138,7 +131,7 @@
     },
     {
       "question": "Is there a file size limit?",
-      "answer": "There is no fixed limit: the limit is your browser's memory, and files over 50 MB show a warning first. Long documents with many pictures take longer to lay out."
+      "answer": "There is no fixed file-size limit, except that a file that unpacks to more than 1 GB is refused; otherwise your browser's memory sets the limit, and files over 50 MB show a warning first. Long documents with many pictures take longer to lay out."
     },
     {
       "question": "Does it work on mobile?",
@@ -146,7 +139,7 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Yes. After your first visit, the page and its Word viewer are kept on your device, so opening documents needs no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
+      "answer": "Yes. After you have opened one file here, the page and its Word viewer are kept on your device, so opening documents needs no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",
@@ -162,7 +155,7 @@
     },
     {
       "question": "Can I open an old .doc file?",
-      "answer": "No. Only .docx is supported; a .doc file shows a message instead. Open it in Word, Pages or LibreOffice, choose Save As and pick Word Document (.docx), then open the new file here."
+      "answer": "No. The viewer opens .docx, .dotx, .docm and .odt files; a .doc file shows a message instead. Open it in Word, Pages or LibreOffice, choose Save As and pick Word Document (.docx), then open the new file here."
     },
     {
       "question": "Can it open .dotx, .docm and .odt files?",

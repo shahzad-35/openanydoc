@@ -3,7 +3,7 @@
   "description": "Split a PowerPoint presentation in your browser: one file per slide or the ranges you type, each with its notes and theme, in one ZIP. No upload.",
   "heading": "Split a PowerPoint presentation",
   "subtitle": "Split one PowerPoint presentation into several .pptx files, one per slide or by the slide ranges you type; nothing is uploaded.",
-  "intro": "Split PPTX files online without PowerPoint: choose a presentation, then save each slide as its own presentation or type ranges such as 1-3, 4-8. The file is edited directly rather than redrawn, so each part keeps its slides' speaker notes and pictures and the original theme. The parts come together in one ZIP of .pptx files. Works with .pptx, .ppsx and .potx files. Your file never leaves your device.",
+  "intro": "Split PPTX files online without PowerPoint: choose a presentation, then save each slide as its own presentation or type ranges such as 1-3, 4-8. The file is edited directly rather than redrawn, so each part keeps its slides' speaker notes and pictures and the original theme. Several parts come together in one ZIP of .pptx files. Works with .pptx, .ppsx and .potx files. Your file never leaves your device.",
   "features": [
     {
       "title": "Private",
@@ -26,11 +26,11 @@
     },
     {
       "title": "Choose how to split",
-      "text": "Pick one file per slide, or type slide ranges such as 1-3, 4-8."
+      "text": "Leave the Slide ranges box empty for one file per slide, or type ranges such as 1-3, 4-8."
     },
     {
       "title": "Split and download",
-      "text": "Click Split, then download the ZIP with one .pptx file per part."
+      "text": "Click Split presentation, then download the ZIP with one .pptx file per part."
     }
   ],
   "handlesTitle": "What Split PowerPoint handles",
@@ -38,7 +38,7 @@
     "PowerPoint files: .pptx, .ppsx and .potx.",
     "Split by: one file per slide, or the ranges you type, such as 1-3, 4-8.",
     "Each part: its slides with their speaker notes and pictures, in the original theme.",
-    "Result: a ZIP of .pptx files."
+    "Result: a ZIP of .pptx files, or one .pptx when there is a single part."
   ],
   "limits": [
     "Comments go with their slides, so each part keeps only the comments of its own slides.",
@@ -63,7 +63,7 @@
     },
     {
       "question": "How do I split a PowerPoint into separate files?",
-      "answer": "A PowerPoint presentation can be split by saving copies and deleting the slides each copy doesn't need, in PowerPoint, Keynote, LibreOffice Impress or Google Slides. On this page, pick one file per slide or type the ranges, and every part is made at once in your browser and saved in one ZIP."
+      "answer": "A PowerPoint presentation can be split by saving copies and deleting the slides each copy doesn't need. On this page, leave the ranges box empty for one file per slide or type the ranges, and every part is made at once in your browser and saved in one ZIP."
     },
     {
       "question": "Does each part keep the speaker notes and theme?",
@@ -83,7 +83,7 @@
     },
     {
       "question": "Can I put the parts back together?",
-      "answer": "Yes. Add the parts to Merge PowerPoint, drag them into order and download one presentation.",
+      "answer": "Yes. Add the parts to Merge PowerPoint in the order you want and download one presentation.",
       "link": {
         "text": "Merge PowerPoint",
         "path": "/merge-pptx"

@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "Once this page has loaded, the viewer keeps working without an internet connection; only the first HEIC or TIFF file you open needs one."
     }
   ],
   "stepsTitle": "How it works: open a picture online",
@@ -53,7 +53,7 @@
     },
     {
       "question": "How do I open a HEIC photo on Windows?",
-      "answer": "Windows opens HEIC photos in its Photos app once the HEIF Image Extensions from the Microsoft Store are installed. Without them, open the photo in OpenAnyDoc's image viewer: Chrome, Edge and Firefox can't show HEIC themselves, so a HEIC decoder loads the first time you open one, and the photo is still read on your device."
+      "answer": "Windows opens HEIC photos in its Photos app once the HEIF Image Extensions and the HEVC Video Extensions from the Microsoft Store are installed (checked 24 November 2026). Without them, open the photo in OpenAnyDoc's image viewer: Chrome, Edge and Firefox can't show HEIC themselves, so a HEIC decoder loads the first time you open one, and the photo is still read on your device."
     },
     {
       "question": "Why does it say my photo contains my location?",
@@ -65,7 +65,7 @@
     },
     {
       "question": "Can I edit the picture here?",
-      "answer": "The viewer only shows it. Use the next steps above the picture to compress, resize, crop or clean it; the file moves over without being chosen again."
+      "answer": "The viewer only shows it. Use the next steps above the picture to compress, resize or clean it, or make a PDF; the file moves over without being chosen again."
     },
     {
       "question": "Why does an animated GIF not move?",
@@ -77,7 +77,7 @@
     },
     {
       "question": "How do I open a HEIC photo on a Mac or an Android phone?",
-      "answer": "A Mac opens HEIC photos in Photos and Preview with nothing to install, and most Android phones open them in Google Photos or the phone's own gallery app. When an app or website still refuses one, open it in OpenAnyDoc's image viewer in any browser, or turn it into a JPG with the HEIC to JPG converter.",
+      "answer": "A Mac opens HEIC photos in Photos and Preview with nothing to install, and Google Photos opens them on Android (checked 24 November 2026). When an app or website still refuses one, open it in OpenAnyDoc's image viewer in any browser, or turn it into a JPG with the HEIC to JPG converter.",
       "link": {
         "text": "HEIC to JPG converter",
         "path": "/heic-to-jpg"
@@ -85,7 +85,7 @@
     },
     {
       "question": "What program opens a .webp file?",
-      "answer": "Every current web browser opens .webp pictures: Chrome, Edge, Firefox and Safari, and so do Photos on Windows and Preview on a Mac. OpenAnyDoc's image viewer shows a WebP file with zoom and its details, and the next steps can turn it into a JPG or PNG without uploading it."
+      "answer": "Every current web browser opens .webp pictures: Chrome, Edge, Firefox and Safari (checked 24 November 2026). OpenAnyDoc's image viewer shows a WebP file with zoom and its details, and the next steps can turn it into a JPG or PNG without uploading it."
     }
   ]
 }

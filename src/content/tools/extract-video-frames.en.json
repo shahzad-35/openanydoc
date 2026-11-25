@@ -42,7 +42,7 @@
     "Videos: MP4, MOV, WebM, MKV and other files your browser can play.",
     "Pictures: PNG (lossless) or JPG, at the video's size or at most 1920, 1280, 640 or 320 pixels wide.",
     "Choices: the paused frame, one picture every 1 to 60 seconds, or 1 to 500 pictures spread evenly.",
-    "Names: each picture's name holds its number and its time in the video, like clip-0003-2_00s.png."
+    "Names: each picture in the ZIP is named with its number and its time in the video, like clip-0003-2_00s.png."
   ],
   "limits": [
     "At most 500 pictures at a time; choose a longer gap or fewer pictures for long videos.",
@@ -65,7 +65,7 @@
     },
     {
       "question": "Why at most 500 pictures?",
-      "answer": "Every picture is kept in memory until the ZIP is made, and full-size frames are large. Five hundred is a safe limit for phones and laptops; for long videos choose a gap of a few seconds."
+      "answer": "Every picture is kept in memory until the ZIP is made, and full-size frames are large. For long videos, choose a gap of a few seconds."
     },
     {
       "question": "What resolution are the frames?",

@@ -38,7 +38,7 @@
     "From: JPG, PNG, AVIF, GIF, BMP, TIFF, SVG and HEIC.",
     "Encoding: done on your device, at the quality you choose.",
     "Transparency: kept.",
-    "Batch: a whole folder of site pictures in one ZIP."
+    "Batch: many site pictures at once, downloaded in one ZIP."
   ],
   "limits": [
     "Animated GIFs become a still WebP of their first frame.",
@@ -53,7 +53,7 @@
     },
     {
       "question": "Do all browsers show WebP?",
-      "answer": "Yes. Chrome, Edge, Firefox and Safari all show WebP pictures."
+      "answer": "Yes. Chrome, Edge, Firefox and Safari all show WebP pictures (checked 24 November 2026)."
     },
     {
       "question": "Is WebP better than AVIF?",

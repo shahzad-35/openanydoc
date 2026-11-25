@@ -14,8 +14,8 @@
       "text": "A short sound repeats if you want, and a long one is cut where the video ends."
     },
     {
-      "title": "Picture unchanged",
-      "text": "The picture is copied as it is; only the sound is new."
+      "title": "Picture copied when it can be",
+      "text": "H.264, HEVC, VP9 and AV1 pictures are copied as they are; only the sound is new."
     }
   ],
   "stepsTitle": "How to add audio to a video",

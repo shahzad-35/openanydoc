@@ -1,4 +1,4 @@
-/* The JSON file page: design option 1, "Studio split" (.claude/design-options/json-viewer/option-1-studio-split.html), ported as
+/* The JSON file page: the "Studio split" design, ported as
    it is. Everything is scoped to #json-workbench, so no other page gets these rules. Light and dark follow the site's .dark class.
    Physical sides (left, right) became logical ones (start, end) so the page mirrors in Arabic; the code and the tree stay
    left-to-right. The site's own tokens are pointed at the studio's colours, so shared parts (the table) match. */

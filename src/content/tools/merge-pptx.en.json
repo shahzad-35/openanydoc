@@ -1,21 +1,21 @@
 {
   "title": "Merge PowerPoint – Combine PPTX Files Free, No Upload",
-  "description": "Merge PowerPoint presentations into one PPTX in your browser: put the decks in order and keep text, pictures, charts and notes. Free, no upload.",
+  "description": "Merge PowerPoint presentations into one PPTX in your browser, in the order you add them, keeping text, pictures, charts and video. Free, no upload.",
   "heading": "Merge PowerPoint presentations",
   "subtitle": "Combine two or more PowerPoint presentations into one .pptx file, in the order you choose; nothing is uploaded.",
-  "intro": "Merge PPTX files online without PowerPoint (beta): add two or more presentations, drag them into order and download one .pptx. The files are edited directly rather than redrawn, so the slides keep their text, pictures, tables, charts, video and speaker notes. Every slide takes the first presentation's theme and slide size. Works with .pptx, .ppsx and .potx files. Your files never leave your device.",
+  "intro": "Merge PPTX files online without PowerPoint (beta): add two or more presentations in the order their slides should follow and download one .pptx. The files are edited directly rather than redrawn, so the slides keep their text, pictures, tables, charts, video and speaker notes. Every slide takes the first presentation's theme and slide size. Works with .pptx, .ppsx and .potx files. Your files never leave your device.",
   "features": [
     {
       "title": "Private",
       "text": "Your file is handled by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Notes and media kept",
+      "title": "Pictures and media kept",
       "text": "Slides keep their text, pictures, tables, charts, video and speaker notes."
     },
     {
       "title": "Your order",
-      "text": "Drag the presentations into the order you want; the slides follow it."
+      "text": "Add the presentations in the order you want; the slides follow it."
     }
   ],
   "stepsTitle": "How to merge PowerPoint presentations",
@@ -25,19 +25,19 @@
       "text": "Click Choose a file, or drop two or more .pptx, .ppsx or .potx files on the page."
     },
     {
-      "title": "Put them in order",
-      "text": "Drag the presentations into order. The first one sets the theme and slide size."
+      "title": "Mind the order",
+      "text": "Add the presentations in the order the slides should follow. The first one sets the theme and slide size."
     },
     {
       "title": "Merge and download",
-      "text": "Click Merge, then download the combined .pptx file."
+      "text": "Click Merge presentations, then download the combined .pptx file."
     }
   ],
   "handlesTitle": "What Merge PowerPoint handles",
   "handles": [
     "PowerPoint files: .pptx, .ppsx and .potx, two or more at a time.",
     "Text, pictures, tables, charts, video and speaker notes on every slide.",
-    "Order: drag the presentations into the order the slides should follow.",
+    "Order: the slides follow the order in which you add the presentations.",
     "Result: one .pptx file with every slide."
   ],
   "limits": [
@@ -63,7 +63,7 @@
     },
     {
       "question": "How do I combine two PowerPoint presentations?",
-      "answer": "Two presentations are combined by copying the slides of one into the other: PowerPoint's Reuse Slides does this, and Keynote, LibreOffice Impress and Google Slides' slide import can do the same. On this page, add both files, drag them into order and click Merge; you get one .pptx, made in your browser without uploading."
+      "answer": "Two presentations are combined by copying the slides of one into the other: PowerPoint's Reuse Slides does this, and Keynote, LibreOffice Impress and Google Slides' slide import can do the same (checked 24 November 2026). On this page, add both files in the order you want and click Merge presentations; you get one .pptx, made in your browser without uploading."
     },
     {
       "question": "Will the slides keep their design?",
@@ -79,7 +79,7 @@
     },
     {
       "question": "Are speaker notes and videos kept?",
-      "answer": "Yes. The files are edited directly, so each slide keeps its speaker notes, pictures, tables, charts and video."
+      "answer": "Yes. Speaker notes, videos, pictures, tables and charts are kept, because the files are edited directly."
     },
     {
       "question": "Can I merge the slides into one PDF instead?",

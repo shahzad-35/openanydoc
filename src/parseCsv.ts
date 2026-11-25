@@ -72,7 +72,8 @@ export function parseCsv(fileContents: ArrayBuffer, delimiterChoice: DelimiterCh
   if (fileContents.byteLength === 0) {
     return { status: 'error', reason: 'empty' }
   }
-  if (looksLikeBinary(fileContents)) return { status: 'error', reason: 'binary' }
+  // UTF-16 without a byte order mark is full of zero bytes, so a chosen UTF-16 is not checked for binary.
+  if (!encodingChoice.startsWith('utf-16') && looksLikeBinary(fileContents)) return { status: 'error', reason: 'binary' }
 
   const { text, encodingLabel } = decodeTextBytes(fileContents, encodingChoice)
   if (text.trim() === '') {

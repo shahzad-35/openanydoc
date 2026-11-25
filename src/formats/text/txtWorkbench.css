@@ -1,4 +1,4 @@
-/* The TXT file page: "Compact ribbon" (.claude/design-options/txt-viewer/option-7-compact-ribbon.html) in its ocean palette, the
+/* The TXT file page: the "Compact ribbon" design in its ocean palette, the
    only one kept. Every rule is scoped to #txt-workbench, so no other page gets them. Light and dark follow the site's .dark class.
    The editor is a real <textarea> over a mirror of its lines (#text-mirror) that draws the line numbers, the current line,
    bookmarks, find marks and hidden characters; both must lay the text out the same way, so they share every text property. */

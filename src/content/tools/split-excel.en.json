@@ -40,8 +40,8 @@
     "One file per value of a column, for example one file per region."
   ],
   "limits": [
-    "Splitting by rows or by value writes the values; that sheet's formatting is not kept.",
-    "Formulas that refer to other sheets may break in a file that holds only one sheet.",
+    "Splitting by rows or by value keeps the cells' formatting and the merged cells whose rows all go into the same file. Formulas follow their rows; a formula that needs a row in another file keeps its last calculated value instead.",
+    "When you split by sheet, formulas that refer to other sheets may break in a file that holds only one sheet; when you split by rows or by value, they keep their last calculated value.",
     "The parts come as one ZIP; unzip it to get the separate files."
   ],
   "worksBest": [
@@ -50,8 +50,8 @@
     "Sales or contact lists split by region"
   ],
   "mayNotKeep": [
-    "Formatting, when splitting by rows or by value",
-    "Formulas that refer to other sheets",
+    "Merged cells whose rows go to different files",
+    "Formulas that refer to other sheets or to rows in another file",
     "The workbook as one file (each part is its own .xlsx)"
   ],
   "faqTitle": "Split Excel: questions",
@@ -74,7 +74,7 @@
     },
     {
       "question": "Is the formatting kept?",
-      "answer": "When you split by sheet, yes. When you split by rows or by value, the values are written and that sheet's formatting is not kept. Formulas that refer to other sheets may break in a one-sheet file."
+      "answer": "Yes. Cells keep their formatting however you split. When you split by rows or by value, merged cells are kept when all their rows land in the same file, and formulas are updated to their rows' new places; a formula that needs a row in another file, or another sheet, keeps its last calculated value. When you split by sheet, formulas that refer to other sheets may break in a one-sheet file."
     },
     {
       "question": "Can I split a CSV file?",

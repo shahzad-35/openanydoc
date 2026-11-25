@@ -65,7 +65,7 @@
     },
     {
       "question": "Is the photo's location data removed too?",
-      "answer": "No, this tool only changes the pixels. Remove image metadata takes out GPS, camera and date data.",
+      "answer": "Yes, as a side effect: the photo is saved again from its pixels, so GPS, camera and date data are not copied into the new file. Remove image metadata cleans a photo without changing its pixels.",
       "link": {
         "text": "Remove image metadata",
         "path": "/remove-image-metadata"

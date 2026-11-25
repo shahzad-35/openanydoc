@@ -73,8 +73,36 @@ async function readWorkbook(file: File) {
   return workbook
 }
 
+// A string, or a reference with an optional sheet name: a cell or cell range (B5, $A$1:C9), whole rows (5:7) or whole columns (A:C).
+const FORMULA_STRING_OR_REFERENCE = /"(?:[^"]|"")*"|(?<![\w.$])(?:('(?:[^']|'')+'|[A-Za-z_][\w.]*)!)?(\$?[A-Z]{1,3}\$?\d+(?::\$?[A-Z]{1,3}\$?\d+)?|\$?\d+:\$?\d+|\$?[A-Z]{1,3}:\$?[A-Z]{1,3})(?![\w(!])/g
+const ROW_OF_REFERENCE_END = /^(\$?[A-Z]{0,3}\$?)(\d+)$/
+
+// A formula (or a range such as a merged area) of a sheet whose rows were copied to new positions in a part of it, with each
+// row number changed to the row's new position, as Excel does when rows move. Null when it refers to a row not in the part,
+// a whole column or another sheet, since the part cannot compute it.
+function formulaForMovedRows(formula: string, sheetName: string, partRowBySourceRow: Map<number, number>) {
+  let refersOutsidePart = false
+  const moved = formula.replace(FORMULA_STRING_OR_REFERENCE, (match, quotedOrPlainSheet: string | undefined, reference: string | undefined) => {
+    if (!reference) return match
+    const referencedSheet = quotedOrPlainSheet?.replace(/^'|'$/g, '').replace(/''/g, "'")
+    const ends = reference.split(':').map((end) => ROW_OF_REFERENCE_END.exec(end))
+    const sourceRows = ends.map((end) => Number(end?.[2]))
+    const partRows = sourceRows.map((row) => partRowBySourceRow.get(row))
+    // Rows in the part keep their order, so equal spans mean every row of a range came along.
+    const isWholeInPart = partRows.every((row) => row !== undefined) && partRows.at(-1)! - partRows[0]! === sourceRows.at(-1)! - sourceRows[0]
+    if (!isWholeInPart || (referencedSheet !== undefined && referencedSheet.toLowerCase() !== sheetName.toLowerCase())) {
+      refersOutsidePart = true
+      return match
+    }
+    return `${quotedOrPlainSheet ? `${quotedOrPlainSheet}!` : ''}${ends.map((end, index) => `${end![1]}${partRows[index]}`).join(':')}`
+  })
+  return refersOutsidePart ? null : moved
+}
+
 // Rows copied cell by cell with their values (formulas as formulas) and formatting; `rowNumbers` are the source rows in order.
-function copyRows(source: Worksheet, target: Worksheet, rowNumbers: number[]) {
+// For a part of a sheet (`isSheetPart`), formulas follow their rows, and one that needs a row left out keeps its last result.
+function copyRows(source: Worksheet, target: Worksheet, rowNumbers: number[], isSheetPart = false) {
+  const partRowBySourceRow = new Map(rowNumbers.map((rowNumber, position) => [rowNumber, position + 1]))
   for (const [position, rowNumber] of rowNumbers.entries()) {
     const sourceRow = source.getRow(rowNumber)
     const targetRow = target.getRow(position + 1)
@@ -82,9 +110,17 @@ function copyRows(source: Worksheet, target: Worksheet, rowNumbers: number[]) {
     sourceRow.eachCell((cell, column) => {
       if (cell.isMerged && cell.master.address !== cell.address) return
       const targetCell = targetRow.getCell(column)
-      targetCell.value = cell.formula ? ({ formula: cell.formula, result: cell.result } as CellValue) : (structuredClone(cell.value) as CellValue)
+      if (cell.formula) {
+        const formula = isSheetPart ? formulaForMovedRows(cell.formula, source.name, partRowBySourceRow) : cell.formula
+        targetCell.value = formula === null ? ((cell.result ?? null) as CellValue) : ({ formula, result: cell.result } as CellValue)
+      } else targetCell.value = structuredClone(cell.value) as CellValue
       targetCell.style = structuredClone(cell.style)
     })
+  }
+  if (!isSheetPart) return
+  for (const range of (source.model as { merges?: string[] }).merges ?? []) {
+    const movedRange = formulaForMovedRows(range, source.name, partRowBySourceRow)
+    if (movedRange) target.mergeCells(movedRange)
   }
 }
 
@@ -161,7 +197,7 @@ async function splitWorkbook(file: File, workbook: Workbook, mode: SplitExcelMod
       const part = await newWorkbook()
       const target = part.addWorksheet(uniqueSheetName(sheet.name, part), { views: structuredClone(sheet.views) })
       copyColumnWidths(sheet, target)
-      copyRows(sheet, target, [1, ...rowNumbers])
+      copyRows(sheet, target, [1, ...rowNumbers], true)
       let fileName = safeFileName(name, 'empty')
       while (usedNames.has(fileName.toLowerCase())) fileName = `${fileName}-2`
       usedNames.add(fileName.toLowerCase())

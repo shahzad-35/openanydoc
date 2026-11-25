@@ -1,8 +1,8 @@
 {
-  "title": "Excel Viewer Online – Open XLSX Files Without Excel",
+  "title": "Excel Viewer Online – Open and Edit XLSX, XLS, ODS",
   "description": "Excel viewer online: open XLSX, XLS and ODS files without Excel, switch between sheet tabs, and edit cells with formulas that recalculate. Free, no upload.",
   "heading": "Excel Viewer Online: Open and Edit XLSX Files",
-  "subtitle": "Drop an Excel file to view every sheet, edit cells and save it instantly; nothing is uploaded.",
+  "subtitle": "Drop an Excel file to view every sheet, edit cells and save it; nothing is uploaded.",
   "intro": "A free Excel viewer online: open an XLSX file without Excel, with all its sheets, formats and merged cells, edit cells and formulas, and save the workbook in the same format. XLS, XLSM and ODS files open too, and your file never leaves your device.",
   "features": [
     {
@@ -10,12 +10,12 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, it keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: view an Excel file in your browser and edit it",
@@ -49,66 +49,59 @@
     "Tools: column filters and a column profile, Show formulas and a list of every formula, search across all sheets, compare two sheets or two workbooks, one file per sheet, merging sheets from several workbooks, every sheet as CSV in one ZIP, print or save as PDF, and Workbook info (macros are detected, never run).",
     "Kept on save: values, formulas with their results, number formats, merged cells, column widths, notes, hidden sheets and hidden rows and columns, in the file's own format. Cell styles and frozen panes are saved only in .xlsx files.",
     "Not kept on save: charts, images, pivot tables, conditional formats, data validation, defined names and macros.",
-    "Size: no fixed limit; files over 50 MB show a warning first, and cell styles are read only for files up to 8 MB."
+    "Size: no fixed limit, except that a file that unpacks to more than 1 GB is refused; files over 50 MB show a warning first, and cell styles are read only for files up to 8 MB."
   ],
   "screenshot": {
     "alt": "The Excel viewer showing a workbook with its sheet tabs, formulas and merged cells, and the formatting toolbar",
     "caption": "An XLSX workbook open in the viewer: sheet tabs, number formats and the formatting toolbar."
   },
   "comparison": {
-    "title": "Excel viewer compared with Excel Online, Google Sheets and upload-based viewers",
+    "title": "Excel viewer compared with Excel Online and Google Sheets",
     "columns": [
       "OpenAnyDoc",
-      "Excel Online or Google Sheets",
-      "Upload-based online viewers"
+      "Excel Online or Google Sheets (checked 25 November 2026)"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "Yes, to Microsoft or Google servers.",
-          "Yes, to the service's server."
-        ]
-      },
-      {
-        "label": "Account or sign-in",
-        "cells": [
-          "None.",
-          "A Microsoft or Google account.",
-          "Varies by service."
+          "Yes, to Microsoft or Google servers."
         ]
       },
       {
         "label": "Edit and save",
         "cells": [
           "Yes. Download keeps the file's own format.",
-          "Yes, in the cloud copy.",
-          "Varies by service."
+          "Yes, in the cloud copy."
         ]
       },
       {
-        "label": "Works without a network once loaded",
+        "label": "Works without a network once you have opened a file",
         "cells": [
           "Yes.",
-          "Google, only after you turn on offline access in Chrome or Edge; Microsoft's, no.",
-          "No."
+          "Google, only after you turn on offline access in Chrome or Edge."
         ]
       },
       {
         "label": "Size",
         "cells": [
           "Your device's memory; a warning above 50 MB. Cell styles are read up to 8 MB.",
-          "Set by the service.",
           "Set by the service."
         ]
       },
       {
-        "label": "Cost",
+        "label": "Several people editing at once",
         "cells": [
-          "Free, no ads.",
-          "Free with an account; paid plans for more.",
-          "Varies by service."
+          "No. Each person edits a copy on their own device.",
+          "Yes, in the shared cloud copy."
+        ]
+      },
+      {
+        "label": "Cost and account",
+        "cells": [
+          "Free, no account, no ads.",
+          "Free with a Microsoft or Google account; paid plans for more."
         ]
       }
     ]
@@ -137,7 +130,7 @@
     },
     {
       "question": "Is there a file size limit?",
-      "answer": "There is no fixed limit: the limit is your browser's memory. A sheet with 100,000 rows opens in about two seconds, and files over 50 MB show a warning first. Cell styles are read only for files up to 8 MB, so larger workbooks open as values and formulas."
+      "answer": "There is no fixed file-size limit, except that a file that unpacks to more than 1 GB is refused; otherwise your browser's memory sets the limit. A sheet with 100,000 rows opened in about three seconds in our test, and files over 50 MB show a warning first. Cell styles are read only for files up to 8 MB, so larger workbooks open as values and formulas."
     },
     {
       "question": "Does it work on mobile?",
@@ -145,7 +138,7 @@
     },
     {
       "question": "Does it work offline?",
-      "answer": "Yes. After your first visit, the page and its Excel viewer are kept on your device, so opening and editing files need no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
+      "answer": "Yes. After you have opened one file here, the page and its Excel viewer are kept on your device, so opening and editing files need no network. You can also install OpenAnyDoc as an app with Install app at the bottom of the page (on iPhone and iPad: Share, then Add to Home Screen); on a computer, the installed app opens files straight from your file manager."
     },
     {
       "question": "Can my company host its own copy?",

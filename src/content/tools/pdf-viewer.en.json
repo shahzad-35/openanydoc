@@ -52,65 +52,65 @@
     "caption": "A PDF open as one scroll of pages, with thumbnails, the page counter, zoom, rotation and search in the toolbar."
   },
   "comparison": {
-    "title": "PDF viewer compared with your browser's PDF viewer and upload-based viewers",
+    "title": "PDF viewer compared with your browser's built-in PDF viewer",
     "columns": [
       "OpenAnyDoc",
-      "Your browser's built-in PDF viewer",
-      "Upload-based online viewers"
+      "Your browser's built-in PDF viewer (checked 24 November 2026)"
     ],
     "rows": [
       {
         "label": "Your file is uploaded",
         "cells": [
           "No. It is read in your browser.",
-          "No.",
-          "Yes, to the service's server."
+          "No."
         ]
       },
       {
         "label": "Account or sign-in",
         "cells": [
           "None.",
-          "None.",
-          "Varies by service."
+          "None."
         ]
       },
       {
         "label": "Arabic interface",
         "cells": [
           "Yes, the page and viewer are in Arabic too.",
-          "Follows the browser's language.",
-          "Varies."
+          "Follows the browser's language."
         ]
       },
       {
         "label": "Opens next to CSV, Excel, Word and PowerPoint files",
         "cells": [
           "Yes, one page for every format.",
-          "No, PDF only.",
-          "Varies."
+          "No, PDF only."
         ]
       },
       {
         "label": "Works without a network once loaded",
         "cells": [
           "Yes.",
-          "Yes.",
-          "No."
+          "Yes."
+        ]
+      },
+      {
+        "label": "Ink, highlights and form filling in the viewer",
+        "cells": [
+          "No. Form fields can be typed into but are not saved; Edit PDF, Sign PDF and Fill PDF form are separate tools.",
+          "Depends on the browser; Microsoft's page on the Edge PDF reader lists ink, highlights and form filling."
         ]
       },
       {
         "label": "Cost",
         "cells": [
           "Free, no ads.",
-          "Free.",
-          "Varies by service."
+          "Free."
         ]
       }
     ]
   },
   "limits": [
-    "View only: PDFs can't be edited or filled in here.",
+    "View only: PDFs can't be edited here; form fields can be typed into, but the entries are not saved into the file.",
     "Scanned PDFs show their pictures; with no text layer there is nothing to select or search until you run OCR PDF.",
     "Very large PDFs are limited by your device's memory."
   ],
@@ -138,7 +138,7 @@
     },
     {
       "question": "Can I fill in or edit the PDF?",
-      "answer": "The OpenAnyDoc PDF viewer only shows the PDF, with any form fields and their values, and does not change it. To combine PDFs or number their pages, use Merge PDF or Add page numbers."
+      "answer": "The OpenAnyDoc PDF viewer shows the PDF and does not change it: you can type into its form fields, but the entries are not saved into the file. To combine PDFs or number their pages, use Merge PDF or Add page numbers."
     },
     {
       "question": "Does it work on my phone?",

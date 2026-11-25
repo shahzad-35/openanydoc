@@ -212,7 +212,7 @@ export async function copyPartTree(source: JSZip, sourcePath: string, target: JS
 export type OfficeProperties = { title: string; subject: string; author: string; keywords: string; lastModifiedBy: string; created: string; modified: string; revision: string; application: string; company: string; manager: string; customCount: number }
 
 const CORE_FIELDS = ['title', 'subject', 'creator', 'keywords', 'description', 'lastModifiedBy', 'revision', 'created', 'modified', 'lastPrinted', 'category', 'contentStatus', 'identifier', 'language', 'version']
-const APP_FIELDS = ['Company', 'Manager', 'HyperlinkBase', 'Template']
+const APP_FIELDS = ['Application', 'AppVersion', 'Company', 'Manager', 'HyperlinkBase', 'Template']
 
 const firstText = (xml: XMLDocument | null, localName: string) => (xml ? (Array.from(xml.getElementsByTagName('*')).find((element) => element.localName === localName)?.textContent?.trim() ?? '') : '')
 
@@ -236,8 +236,8 @@ export async function readOfficeProperties(zip: JSZip): Promise<OfficeProperties
   }
 }
 
-// Empties the document's own properties (author, dates, company…) and removes its custom properties. The application's name and
-// the statistics Office recomputes on save stay.
+// Empties the document's own properties (author, dates, application, company…) and removes its custom properties. The
+// application's name is optional and Office writes it again on save; the statistics it recomputes on save stay.
 export async function removeOfficeMetadata(zip: JSZip) {
   const core = await readXmlPart(zip, 'docProps/core.xml')
   if (core) {

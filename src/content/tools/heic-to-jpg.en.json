@@ -65,7 +65,7 @@
     },
     {
       "question": "Can I stop my iPhone saving HEIC?",
-      "answer": "Yes: Settings, Camera, Formats, Most Compatible. New photos are then saved as JPG."
+      "answer": "Yes: Settings, Camera, Formats, Most Compatible (checked 24 November 2026). New photos are then saved as JPG."
     },
     {
       "question": "Is it really free?",
@@ -77,7 +77,7 @@
     },
     {
       "question": "What program opens a .heic file?",
-      "answer": "Photos and Preview open .heic files on a Mac, the Photos app opens them on an iPhone, Google Photos opens them on most Android phones, and Windows opens them in Photos once the HEIF Image Extensions from the Microsoft Store are installed. OpenAnyDoc's image viewer opens them in any browser without uploading them.",
+      "answer": "Photos and Preview open .heic files on a Mac, the Photos app opens them on an iPhone, Google Photos opens them on Android, and Windows opens them in Photos once the HEIF Image Extensions and the HEVC Video Extensions from the Microsoft Store are installed (checked 24 November 2026). OpenAnyDoc's image viewer opens them in any browser without uploading them.",
       "link": {
         "text": "image viewer",
         "path": "/image-viewer"

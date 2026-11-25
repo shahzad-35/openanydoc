@@ -37,8 +37,8 @@
   "handles": [
     "Shapes: free, square 1:1, upright 9:16, wide 16:9 and portrait 4:5.",
     "Sizes: the crop is made in the video's own pixels, with even widths and heights for every player.",
-    "Sound: kept as it is.",
-    "Formats: MP4, WebM, MOV and MKV keep their format; M4V, AVI, OGV and 3GP videos become MP4."
+    "Sound: kept when your browser can read it. If it can't, the page tells you the result has no sound.",
+    "Formats: MP4, WebM, MOV and MKV keep their format; M4V and 3GP videos become MP4."
   ],
   "limits": [
     "Only the first chosen video is cropped.",
@@ -65,7 +65,7 @@
     },
     {
       "question": "Can I remove black bars?",
-      "answer": "Yes. Choose Free and drag the box's edges to the picture inside the bars."
+      "answer": "Yes. Choose Free, move the box onto the picture inside the bars and drag its corner until it covers that picture."
     },
     {
       "question": "Which browsers does it work in?",

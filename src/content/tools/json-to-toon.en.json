@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the converter keeps working without an internet connection."
+      "text": "After your first conversion, the converter keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How it works: convert JSON to TOON",
@@ -42,7 +42,7 @@
     "Input: pasted JSON or TOON, or a .json file.",
     "Both directions: JSON to TOON and TOON back to JSON.",
     "Lists of objects with the same keys, written as a header line and one row per item.",
-    "Token counts before and after, counted the way recent GPT models count them.",
+    "Token counts before and after, counted with the same tokenizer as the token counter.",
     "Errors: invalid JSON or TOON shows its error instead of a result."
   ],
   "limits": [

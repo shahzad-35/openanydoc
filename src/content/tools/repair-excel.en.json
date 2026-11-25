@@ -3,15 +3,15 @@
   "description": "Recover data from a damaged Excel file in your browser: values, formulas, merged cells and column widths saved into a new .xlsx. Free, no upload.",
   "heading": "Repair an Excel file",
   "subtitle": "Read a damaged Excel file leniently and save its sheets' data into a new, clean .xlsx file, in your browser; nothing is uploaded.",
-  "intro": "Repair an Excel file that Excel says is damaged or that won't open: the .xlsx, .xls or .ods file is read leniently, and every sheet's values, formulas, merged cells and column widths are written into a new, clean .xlsx file. You see how many sheets and cells were recovered before you download it. Your file never leaves your device.",
+  "intro": "Repair an Excel file that Excel says is damaged or that won't open: the .xlsx, .xls or .ods file is read leniently, and every sheet's values, formulas, merged cells and column widths are written into a new, clean .xlsx file. Your file never leaves your device.",
   "features": [
     {
       "title": "Lenient reading",
       "text": "The file is read with tolerance for damage, so the data that is still there can be saved."
     },
     {
-      "title": "See what was recovered",
-      "text": "The number of sheets and cells recovered is shown before you download."
+      "title": "What goes into the new file",
+      "text": "Values, formulas, merged cells and column widths of every readable sheet go into a new .xlsx file."
     },
     {
       "title": "Private",
@@ -25,8 +25,8 @@
       "text": "Click Choose a file, or drop the .xlsx, .xls or .ods file that won't open."
     },
     {
-      "title": "Check what was recovered",
-      "text": "See how many sheets and cells were read from the file."
+      "title": "Repair the workbook",
+      "text": "Click Repair workbook: the sheets that can still be read are written into a new .xlsx file."
     },
     {
       "title": "Download the repaired copy",
@@ -36,8 +36,7 @@
   "handlesTitle": "What Repair Excel handles",
   "handles": [
     "Files: .xlsx, .xls and .ods that Excel reports as damaged or won't open.",
-    "Values, formulas, merged cells and column widths of every sheet.",
-    "A count of the sheets and cells recovered."
+    "Values, formulas, merged cells and column widths of every sheet."
   ],
   "limits": [
     "Formatting, charts, pictures, pivot tables and macros are not recovered.",
@@ -63,11 +62,11 @@
     },
     {
       "question": "How do I repair a corrupted Excel file?",
-      "answer": "A corrupted Excel file can often be saved by reading what is still readable and writing it into a new workbook. Excel's Open and Repair, in the Open dialog, tries this first, and LibreOffice Calc can sometimes open a file Excel refuses. On this page, choose the file and download a clean .xlsx with the sheets' values, formulas, merged cells and column widths."
+      "answer": "A corrupted Excel file can often be saved by reading what is still readable and writing it into a new workbook. Excel's Open and Repair, in the Open dialog, tries this first. On this page, choose the file and download a clean .xlsx with the sheets' values, formulas, merged cells and column widths."
     },
     {
       "question": "What is recovered?",
-      "answer": "The values, formulas, merged cells and column widths of every sheet that can still be read. The number of sheets and cells recovered is shown."
+      "answer": "The values, formulas, merged cells and column widths of every sheet that can still be read."
     },
     {
       "question": "Is the formatting recovered?",

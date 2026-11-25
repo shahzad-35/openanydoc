@@ -3,7 +3,7 @@
   "description": "Convert JPG, PNG, WebP, TIFF, SVG and HEIC images to PDF in your browser, with page size and margins. Free, no watermark, and nothing is uploaded.",
   "heading": "JPG to PDF",
   "subtitle": "Turn photos and pictures into one PDF, or one PDF each, with the page size and margin you choose; nothing is uploaded.",
-  "intro": "Convert JPG to PDF online, along with PNG, WebP, TIFF and SVG pictures: drag them into order, choose A4, Letter or the picture's own size, pick a margin, and make one PDF or one PDF per picture. JPG and PNG photos go in without being compressed again, and nothing is uploaded.",
+  "intro": "Convert JPG to PDF online, along with PNG, WebP, TIFF and SVG pictures: drag them into order, choose A4, Letter or the picture's own size, pick a margin, and make one PDF or one PDF per picture. JPG and PNG photos go in without being compressed again (a JPG turned by its EXIF data is redrawn upright first), and nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -11,11 +11,11 @@
     },
     {
       "title": "Many picture formats",
-      "text": "JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and iPhone HEIC photos, in any browser."
+      "text": "JPG, PNG, WebP, TIFF, SVG and iPhone HEIC photos, in any browser."
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to convert JPG to PDF",
@@ -35,7 +35,7 @@
   ],
   "handlesTitle": "What JPG to PDF handles",
   "handles": [
-    "Pictures: JPG, PNG, WebP, AVIF, GIF, BMP, TIFF, SVG and HEIC.",
+    "Pictures: JPG, PNG, WebP, TIFF, SVG and HEIC.",
     "Page: A4, Letter or fit to the picture; portrait, landscape or following each picture; no, small or large margin.",
     "Orientation: phone photos turned by their EXIF data are drawn upright.",
     "Output: one PDF, or a ZIP with one PDF per picture."
@@ -53,7 +53,7 @@
     },
     {
       "question": "Is the quality of my photos kept?",
-      "answer": "Yes. JPG and PNG pictures go into the PDF as they are, without being compressed again."
+      "answer": "Yes. JPG and PNG pictures go into the PDF as they are, without being compressed again; only a JPG photo turned by its EXIF data is redrawn upright first."
     },
     {
       "question": "Can I add iPhone HEIC photos?",

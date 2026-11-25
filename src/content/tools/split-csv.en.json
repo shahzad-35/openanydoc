@@ -3,7 +3,7 @@
   "description": "Split a CSV file into smaller files in your browser: by rows per file or by size in MB, each part with the header row, all in one ZIP. No upload.",
   "heading": "Split CSV: Cut a Big File into Parts",
   "subtitle": "Drop a CSV and download it as smaller files, each with the header row; nothing is uploaded.",
-  "intro": "Split a CSV file in your browser: it opens with the download dialog set to split, by a number of rows per file (for example 10,000) or by a size per file in MB. Every part keeps the header row, and all the parts download together as one ZIP. Filter rows or hide columns first to split only what you need. Nothing is uploaded.",
+  "intro": "Split a CSV file in your browser: it opens with the download dialog set to split, by a number of rows per file (for example 10,000) or by a size per file in MB. Every part keeps the header row, and all the parts download together as one ZIP. To split only some rows and columns, filter rows or hide columns, then choose only the shown rows in Download options. Nothing is uploaded.",
   "features": [
     {
       "title": "Private",
@@ -30,7 +30,7 @@
     },
     {
       "title": "Narrow it down first",
-      "text": "Optionally filter rows or hide columns before splitting, so the parts hold only what you need."
+      "text": "Optionally filter rows or hide columns, then choose only the shown rows in Download options, so the parts hold only what you need."
     },
     {
       "title": "Download the ZIP",
@@ -70,7 +70,7 @@
     },
     {
       "question": "Can I split only some rows or columns?",
-      "answer": "Yes. Filter the rows or hide the columns you don't want first; the split then uses only what is shown."
+      "answer": "Yes. Filter the rows or hide the columns you don't want, then choose only the shown rows in Download options; the split then uses only what is shown."
     },
     {
       "question": "Can I split a CSV by the values of a column?",

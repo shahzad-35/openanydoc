@@ -2,7 +2,7 @@
   "title": "XLS Viewer Online – Open Old Excel 97-2003 Files, No Upload",
   "description": "XLS viewer online: open old Excel 97-2003 .xls files without Excel, see every sheet tab, edit cells and formulas and save as .xls again. Free, no upload.",
   "heading": "XLS Viewer Online: Open Excel 97-2003 Files",
-  "subtitle": "Drop an old .xls file to open every sheet and edit it instantly; nothing is uploaded.",
+  "subtitle": "Drop an old .xls file to open every sheet and edit it; nothing is uploaded.",
   "intro": "A free XLS viewer online: open an XLS file online, the older Excel 97-2003 format, without Excel and without an account. See every sheet with its values, formulas, number formats and merged cells, edit it and save it as .xls again. Fonts and colours are not shown for .xls files.",
   "features": [
     {
@@ -10,7 +10,7 @@
       "text": "Your file is opened by your own browser and never sent to a server, so nobody else sees it."
     },
     {
-      "title": "Free with no limits",
+      "title": "Free, no daily cap",
       "text": "No account, no watermark and no daily cap on files."
     },
     {
@@ -69,7 +69,7 @@
     },
     {
       "question": "Can I convert XLS to XLSX here?",
-      "answer": "No. Saving keeps the file's own format, so an .xls file is saved as .xls."
+      "answer": "Saving keeps the file's own format, so an .xls file is saved as .xls. For an .xlsx copy, open Split, merge and export sheets and merge this workbook's sheets: the merged file is .xlsx, with values, formulas, number formats, column widths, merged cells, notes and links, but no fonts, colours or borders."
     },
     {
       "question": "Do the formulas in an XLS file still work?",

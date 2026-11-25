@@ -15,7 +15,7 @@
     },
     {
       "title": "Works offline",
-      "text": "Once this page has loaded, the tool keeps working without an internet connection."
+      "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
   "stepsTitle": "How to split a PDF",
@@ -38,7 +38,7 @@
     "Page ranges: 1-3, 5, 8-10 makes three PDFs; Arabic digits and the Arabic comma work too.",
     "Every N pages: cut a long PDF into equal parts.",
     "One file per page: every page as its own PDF, all in one ZIP.",
-    "Long files: a 150-page PDF splits in seconds, with a progress bar."
+    "Long files: a progress bar shows how far the split has got."
   ],
   "limits": [
     "PDFs that need a password to open can't be split; remove the password first.",
