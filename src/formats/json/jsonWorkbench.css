@@ -119,6 +119,10 @@
 #json-workbench #editor-notice { margin: 10px 12px 0; flex: none }
 #json-workbench .notice { display: flex; align-items: center; gap: 10px; padding-block: 7px; padding-inline: 11px 8px; border: 1px solid var(--line); border-radius: 8px; font-size: 12.5px; background: var(--panel-2) }
 #json-workbench .notice .ico { color: var(--accent-text) }
+#json-workbench .notice.error { animation: json-workbench-error-flash .5s ease }
+@keyframes json-workbench-error-flash { 30% { box-shadow: 0 0 0 3px color-mix(in srgb, var(--err) 35%, transparent) } }
+#json-workbench .notice .repair-nothing { display: block; margin-top: 2px; color: var(--muted) }
+@media (prefers-reduced-motion: reduce) { #json-workbench .notice.error { animation: none } }
 #json-workbench .notice.info { border-color: var(--accent-line); background: var(--accent-soft) }
 #json-workbench .notice.ok { border-color: color-mix(in srgb, var(--ok) 40%, transparent); background: var(--ok-soft) }
 #json-workbench .notice.ok .ico { color: var(--ok) }

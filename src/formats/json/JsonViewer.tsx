@@ -27,6 +27,7 @@ import {
   isBigNumber,
   parseValueExactly,
   readJsonKeepingOrder,
+  INVISIBLE_SPACE,
   repairJson,
   runPathQuery,
 } from './jsonTools'
@@ -658,6 +659,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
     const sourceText = showText ? latestDraftRef.current : originalText
     const { text: repairedText, fixes } = repairJson(sourceText)
     if (countRepairFixes(fixes) === 0) {
+      setValidityPulseCount((count) => count + 1)
       setNotice({ kind: 'nothingToRepair' })
       return
     }
@@ -1082,6 +1084,8 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         : t('json.status.invalid')
       : t('json.viewer.valid')
   const errorPosition = validationError?.line != null ? { line: validationError.line, column: validationError.column ?? 1 } : null
+  const isErrorAtInvisibleSpace =
+    errorPosition !== null && INVISIBLE_SPACE.test((showText ? draftText : originalText).split('\n')[errorPosition.line - 1]?.[errorPosition.column - 1] ?? '')
   const shortcutLabel = (key: string) => `${modifierKeyLabel}${key}`
   const queryResultCount = queryPaths?.length ?? 0
 
@@ -1337,12 +1341,14 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
         </div>
       )}
       {validationError ? (
-        <div id="editor-notice" className="notice error" role="alert">
+        <div key={validityPulseCount} id="editor-notice" className="notice error" role="alert">
           <SpriteIcon name="alert" isSmall />
           <span className="msg">
             {errorPosition && <strong>{t('json.wb.errorAt', { line: errorPosition.line, column: errorPosition.column })}</strong>}
             {' '}
             <bdi dir="ltr">{validationError.message}</bdi>
+            {isErrorAtInvisibleSpace && <span className="repair-nothing">{t('json.repair.invisibleSpaceHint')}</span>}
+            {notice?.kind === 'nothingToRepair' && <span className="repair-nothing">{t('json.repair.cannotFix')}</span>}
           </span>
           {errorPosition && showText && (
             <button className="btn sm outline" type="button" id="go-to-error-button" onClick={selectErrorInTextBox}>
@@ -1712,7 +1718,7 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
             <span className="cmd-label">{t('json.wb.repair')}</span>
           </button>
           <span className="split-btn">
-            <button className="btn main" type="button" id="format-button" title={t('json.wb.formatTip')} disabled={!canChangeDocument} onClick={() => void formatDocument(chosenIndent)}>
+            <button className="btn main" type="button" id="format-button" title={t(validationError ? 'disabled.invalidJson' : 'json.wb.formatTip')} disabled={!canChangeDocument} onClick={() => void formatDocument(chosenIndent)}>
               <SpriteIcon name="indent" />
               <span className="cmd-label">{t('json.toolbar.format')}</span>
             </button>
@@ -1750,11 +1756,11 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
               </div>
             )}
           </span>
-          <button className="btn" type="button" id="minify-button" title={t('json.wb.minifyTip')} disabled={!canChangeDocument} onClick={() => void minifyDocument()}>
+          <button className="btn" type="button" id="minify-button" title={t(validationError ? 'disabled.invalidJson' : 'json.wb.minifyTip')} disabled={!canChangeDocument} onClick={() => void minifyDocument()}>
             <SpriteIcon name="minify" />
             <span className="cmd-label">{t('json.toolbar.minifyShort')}</span>
           </button>
-          <button className="btn" type="button" id="sort-keys-button" title={t('json.wb.sortTip')} disabled={!canChangeDocument} onClick={() => void sortDocumentKeys()}>
+          <button className="btn" type="button" id="sort-keys-button" title={t(validationError ? 'disabled.invalidJson' : 'json.wb.sortTip')} disabled={!canChangeDocument} onClick={() => void sortDocumentKeys()}>
             <SpriteIcon name="sort" />
             <span className="cmd-label">
               {t('json.wb.sort')}
@@ -2092,23 +2098,23 @@ export default function JsonViewer({ openedFile, session: untypedSession, onOpen
       </footer>
 
       <nav id="mobile-action-bar" aria-label={t('json.wb.actions')}>
-        <button type="button" id="mobile-validate-button" className="accent" disabled={isEmpty} onClick={() => void validateNow()}>
+        <button type="button" id="mobile-validate-button" className="accent" disabled={isEmpty} onClick={() => { setMobileTab('text'); void validateNow() }}>
           <SpriteIcon name="check" />
           {t('json.toolbar.validate')}
         </button>
-        <button type="button" id="mobile-repair-button" disabled={isEmpty} onClick={() => void repairText()}>
+        <button type="button" id="mobile-repair-button" disabled={isEmpty} onClick={() => { setMobileTab('text'); void repairText() }}>
           <SpriteIcon name="wrench" />
           {t('json.wb.repair')}
         </button>
-        <button type="button" id="mobile-format-button" disabled={!canChangeDocument} onClick={() => void formatDocument(chosenIndent)}>
+        <button type="button" id="mobile-format-button" disabled={!canChangeDocument} onClick={() => { setMobileTab('text'); void formatDocument(chosenIndent) }}>
           <SpriteIcon name="indent" />
           {t('json.toolbar.format')}
         </button>
-        <button type="button" id="mobile-minify-button" disabled={!canChangeDocument} onClick={() => void minifyDocument()}>
+        <button type="button" id="mobile-minify-button" disabled={!canChangeDocument} onClick={() => { setMobileTab('text'); void minifyDocument() }}>
           <SpriteIcon name="minify" />
           {t('json.toolbar.minifyShort')}
         </button>
-        <button type="button" id="mobile-sort-keys-button" disabled={!canChangeDocument} onClick={() => void sortDocumentKeys()}>
+        <button type="button" id="mobile-sort-keys-button" disabled={!canChangeDocument} onClick={() => { setMobileTab('text'); void sortDocumentKeys() }}>
           <SpriteIcon name="sort" />
           {t('json.toolbar.sortKeysShort')}
         </button>

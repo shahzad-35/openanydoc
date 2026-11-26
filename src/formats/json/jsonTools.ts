@@ -206,16 +206,20 @@ export type RepairFixes = {
   smartQuotes: number
   unquotedKeys: number
   otherLiterals: number
+  invisibleSpaces: number
 }
 
 const LITERAL_REPLACEMENTS: Record<string, string> = { True: 'true', False: 'false', None: 'null', NaN: 'null', undefined: 'null', Infinity: 'null' }
 const OPENING_QUOTES: Record<string, string> = { '"': '"', "'": "'", '“': '”', '‘': '’' }
+// Spaces that look like a normal space but are not JSON whitespace; copying from a web page or a chat often brings them.
+export const INVISIBLE_SPACE = /[\u00A0\u1680\u2000-\u200B\u202F\u205F\u3000\uFEFF]/
 
 // Fixes the mistakes people make when writing JSON by hand or copying it from code: comments, trailing commas, missing commas
-// between values, single or curly quotes, unquoted keys, and True / False / None / NaN / undefined. Text inside strings is never
+// between values, single or curly quotes, unquoted keys, True / False / None / NaN / undefined, and invisible spaces (no-break,
+// zero-width) copied from web pages or chats. Text inside strings is never
 // changed. The result may still be invalid if something else is wrong; the caller checks it.
 export function repairJson(text: string): { text: string; fixes: RepairFixes } {
-  const fixes: RepairFixes = { trailingCommas: 0, missingCommas: 0, comments: 0, singleQuotes: 0, smartQuotes: 0, unquotedKeys: 0, otherLiterals: 0 }
+  const fixes: RepairFixes = { trailingCommas: 0, missingCommas: 0, comments: 0, singleQuotes: 0, smartQuotes: 0, unquotedKeys: 0, otherLiterals: 0, invisibleSpaces: 0 }
   let output = ''
   // What the last meaningful thing written was: a whole value (so another value needs a comma first) or something else.
   let lastToken: 'value' | 'colon' | 'comma' | 'open' | 'start' = 'start'
@@ -242,6 +246,12 @@ export function repairJson(text: string): { text: string; fixes: RepairFixes } {
       const commentEnd = text.indexOf('*/', position + 2)
       position = commentEnd === -1 ? text.length : commentEnd + 2
       fixes.comments++
+      continue
+    }
+    if (INVISIBLE_SPACE.test(character)) {
+      output += ' '
+      fixes.invisibleSpaces++
+      position++
       continue
     }
     if (character in OPENING_QUOTES) {
