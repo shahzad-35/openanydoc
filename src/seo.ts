@@ -153,9 +153,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/open-txt-file': {
       title: 'How to Open a TXT File: Which Program to Use on Any Device',
-      description: 'Which program opens a .txt file: Notepad on Windows, TextEdit on a Mac, Files on iPhone, Android apps or a browser, and how to fix text with strange characters.',
+      description: 'Which program opens a .txt file on Windows, Mac, Linux, ChromeOS, iPhone, Android or in any browser, and how to fix text that shows strange characters.',
       heading: 'How to open a TXT file: which program to use on any device',
-      intro: 'The program that opens a text file on Windows, Mac, iPhone and Android, how to read one in a browser, and how to fix text that shows strange characters.',
+      intro: 'The program that opens a text file on Windows, Mac, Linux, ChromeOS, iPhone and Android, how to read one in a browser, and how to fix text that shows strange characters.',
       linkText: 'How to open a TXT file',
     },
     '/open-csv-without-excel': {
@@ -635,9 +635,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/open-txt-file': {
       title: 'كيف تفتح ملف TXT النصي: أي برنامج تستخدم على أي جهاز',
-      description: 'أي برنامج يفتح ملف txt: المفكرة على ويندوز، وTextEdit على الماك، و«الملفات» على الآيفون، وتطبيقات أندرويد، وأي متصفح، وكيف تصلح النص الذي يظهر برموز غريبة.',
+      description: 'أي برنامج يفتح ملف txt على ويندوز والماك ولينكس وChromeOS والآيفون وأندرويد أو في المتصفح، وكيف تصلح النص الذي يظهر برموز غريبة بسبب ترميز خاطئ عند الفتح.',
       heading: 'كيف تفتح ملف TXT: أي برنامج تستخدم على أي جهاز',
-      intro: 'البرنامج الذي يفتح الملف النصي على ويندوز والماك والآيفون وأندرويد، وكيف تقرؤه في المتصفح، وكيف تصلح النص الذي يظهر برموز غريبة.',
+      intro: 'البرنامج الذي يفتح الملف النصي على ويندوز والماك ولينكس وChromeOS والآيفون وأندرويد، وكيف تقرؤه في المتصفح، وكيف تصلح النص الذي يظهر برموز غريبة.',
       linkText: 'كيف تفتح ملف TXT',
     },
     '/open-csv-without-excel': {

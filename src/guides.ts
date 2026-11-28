@@ -805,11 +805,29 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-txt-file': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
           paragraphs: ['A .txt file is plain text, so any text editor opens it and you do not need to install anything. On Windows it opens in Notepad, on a Mac in TextEdit, on an iPhone or iPad in the Files app, and on Android in Google Docs, Google Drive or the text viewer of your file manager. Every web browser can show one too. If the text appears as strange symbols, the program has guessed the wrong encoding; the fix is further down.'],
+        },
+        {
+          heading: 'Which program is used to open .txt files?',
+          paragraphs: ['Every computer and phone comes with a program that opens .txt files, so you rarely need to install one. Double-click or tap the file and it opens in the program below; in any browser, the OpenAnyDoc TXT editor opens and edits it with nothing to install.'],
+          table: {
+            columns: ['Device', 'Program that opens a .txt file'],
+            rows: [
+              ['Windows', 'Notepad'],
+              ['Mac', 'TextEdit'],
+              ['Linux', 'The desktop\'s text editor, such as GNOME Text Editor or KDE\'s KWrite'],
+              // TODO(check): no Google help page names the app that opens .txt on ChromeOS; only the Files app double-click is confirmed.
+              ['ChromeOS', 'The Files app: double-click the file'],
+              ['iPhone or iPad', 'Files'],
+              ['Android', 'Your file manager, Google Docs or Google Drive'],
+              ['Any browser', 'OpenAnyDoc TXT editor'],
+            ],
+          },
+          links: [{ text: 'OpenAnyDoc TXT editor', path: '/txt-viewer' }],
         },
         {
           heading: 'On Windows',
@@ -825,6 +843,21 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'On a Mac',
           paragraphs: ['TextEdit opens plain text files. To read one without opening any app, select it in Finder and press the Space bar for a quick preview. If TextEdit shows the wrong characters, open TextEdit, Settings (Preferences on older versions of macOS), Open and Save, set the plain text encoding for opening files to the right one, for example Unicode (UTF-8), and open the file again. Apple describes these steps in its page on previewing files and its TextEdit guide (checked 24 November 2026).'],
           links: [{ text: 'page on previewing files', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }, { text: 'TextEdit guide', path: 'https://support.apple.com/guide/textedit/txted1028/mac' }],
+        },
+        {
+          heading: 'On Linux',
+          paragraphs: [
+            'Every Linux desktop comes with a plain text editor. GNOME has Text Editor, described on its app page as a simple text editor, and KDE has KWrite, a text editor based on the editor component of Kate, according to KDE\'s app page (both checked 28 November 2026). Double-click the file in the file manager and it opens in the default application for its type.',
+            'To use another program on GNOME, right-click the file and pick the application from the top of the menu, or choose Open With… to see the others. To make that choice stick, right-click the file, select Properties, open the Open With tab, choose the application and click Set as default. GNOME\'s help page on opening files with other applications gives these steps (checked 28 November 2026). In KDE\'s file manager, Dolphin, right-clicking a file opens a menu of actions for it, as the Dolphin handbook says (checked 28 November 2026).',
+          ],
+          // TODO(check): the Dolphin handbook pages read so far do not name its "Open With" menu item; confirm before giving KDE steps.
+          links: [{ text: 'its app page', path: 'https://apps.gnome.org/TextEditor/' }, { text: 'KDE\'s app page', path: 'https://apps.kde.org/kwrite/' }, { text: 'help page on opening files with other applications', path: 'https://help.gnome.org/users/gnome-help/stable/files-open.html.en' }, { text: 'Dolphin handbook', path: 'https://docs.kde.org/stable_kf6/en/dolphin/dolphin/dolphin-view.html' }],
+        },
+        {
+          heading: 'On ChromeOS',
+          paragraphs: ['On a Chromebook, open the Files app, find the file and double-click it. Google\'s list of file types supported on a Chromebook includes .txt, and its page on opening files gives the double-click step (both checked 28 November 2026). To edit the text and save a copy in the encoding you choose, open the TXT editor in Chrome and pick the file there.'],
+          // TODO(check): no Google help page found that names the default .txt app or gives "Open with" steps on ChromeOS.
+          links: [{ text: 'list of file types supported on a Chromebook', path: 'https://support.google.com/chromebook/answer/183093' }, { text: 'page on opening files', path: 'https://support.google.com/chromebook/answer/1700055' }, { text: 'TXT editor', path: '/txt-viewer' }],
         },
         {
           heading: 'On a phone or tablet',
@@ -4792,11 +4825,29 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-txt-file': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الجواب المختصر',
           paragraphs: ['ملف txt نص عادي، فيفتحه أي محرر نصوص ولا تحتاج إلى تثبيت شيء. على ويندوز يُفتح في المفكرة (Notepad)، وعلى الماك في TextEdit، وعلى الآيفون والآيباد في تطبيق «الملفات»، وعلى أندرويد في Google Docs أو Google Drive أو عارض النصوص في مدير الملفات. ويعرضه أيضًا أي متصفح ويب. وإن ظهر النص رموزًا غريبة، فالبرنامج خمّن ترميزًا خاطئًا؛ والحل في الأسفل.'],
+        },
+        {
+          heading: 'أي برنامج يُستخدم لفتح ملفات txt؟',
+          paragraphs: ['كل حاسوب وهاتف يأتي ببرنامج يفتح ملفات txt، فنادرًا ما تحتاج إلى تثبيت شيء. انقر الملف نقرًا مزدوجًا أو اضغطه فيُفتح في البرنامج المذكور أدناه؛ وفي أي متصفح يفتحه محرر TXT من OpenAnyDoc ويعدّله دون تثبيت أي شيء.'],
+          table: {
+            columns: ['الجهاز', 'البرنامج الذي يفتح ملف txt'],
+            rows: [
+              ['ويندوز', 'المفكرة (Notepad)'],
+              ['الماك', 'TextEdit'],
+              ['لينكس', 'محرر النصوص في سطح المكتب، مثل Text Editor في GNOME أو KWrite في KDE'],
+              // TODO(check): no Google help page names the app that opens .txt on ChromeOS; only the Files app double-click is confirmed.
+              ['ChromeOS', 'تطبيق «الملفات»: انقر الملف نقرًا مزدوجًا'],
+              ['الآيفون أو الآيباد', '«الملفات»'],
+              ['أندرويد', 'مدير الملفات أو Google Docs أو Google Drive'],
+              ['أي متصفح', 'محرر TXT من OpenAnyDoc'],
+            ],
+          },
+          links: [{ text: 'محرر TXT من OpenAnyDoc', path: '/txt-viewer' }],
         },
         {
           heading: 'على ويندوز',
@@ -4812,6 +4863,21 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'على الماك',
           paragraphs: ['يفتح TextEdit ملفات النص العادي. ولقراءة الملف دون فتح أي تطبيق، حدده في Finder واضغط مفتاح المسافة لمعاينة سريعة. وإن عرض TextEdit حروفًا خاطئة، فافتح TextEdit ثم «الإعدادات» («التفضيلات» في إصدارات macOS الأقدم) ثم «فتح وحفظ»، واضبط ترميز النص العادي عند فتح الملفات على الترميز الصحيح، مثل Unicode (UTF-8)، ثم افتح الملف من جديد. وتشرح Apple هذه الخطوات في صفحتها عن معاينة الملفات وفي دليل TextEdit (تحققنا منهما في 24 نوفمبر 2026).'],
           links: [{ text: 'صفحتها عن معاينة الملفات', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }, { text: 'دليل TextEdit', path: 'https://support.apple.com/guide/textedit/txted1028/mac' }],
+        },
+        {
+          heading: 'على لينكس',
+          paragraphs: [
+            'كل أسطح مكتب لينكس تأتي بمحرر للنص العادي. في GNOME يوجد Text Editor، وتصفه صفحة التطبيق الخاصة به بأنه محرر نصوص بسيط، وفي KDE يوجد KWrite، وهو محرر نصوص مبني على مكوّن التحرير في Kate، بحسب صفحة تطبيقات KDE (تحققنا منهما في 28 نوفمبر 2026). انقر الملف نقرًا مزدوجًا في مدير الملفات فيُفتح في التطبيق الافتراضي لنوعه.',
+            'لاستخدام برنامج آخر في GNOME، انقر الملف بالزر الأيمن واختر التطبيق من أعلى القائمة، أو اختر «Open With…» لترى البقية. ولتثبيت هذا الاختيار، انقر الملف بالزر الأيمن واختر «Properties» ثم تبويب «Open With»، واختر التطبيق وانقر «Set as default». وتعطي هذه الخطوات صفحة مساعدة GNOME عن فتح الملفات بتطبيقات أخرى (تحققنا منها في 28 نوفمبر 2026). وفي مدير ملفات KDE، Dolphin، يفتح النقر بالزر الأيمن على الملف قائمة بالإجراءات المتاحة له، كما يقول دليل Dolphin (تحققنا منه في 28 نوفمبر 2026).',
+          ],
+          // TODO(check): the Dolphin handbook pages read so far do not name its "Open With" menu item; confirm before giving KDE steps.
+          links: [{ text: 'صفحة التطبيق الخاصة به', path: 'https://apps.gnome.org/TextEditor/' }, { text: 'صفحة تطبيقات KDE', path: 'https://apps.kde.org/kwrite/' }, { text: 'صفحة مساعدة GNOME عن فتح الملفات بتطبيقات أخرى', path: 'https://help.gnome.org/users/gnome-help/stable/files-open.html.en' }, { text: 'دليل Dolphin', path: 'https://docs.kde.org/stable_kf6/en/dolphin/dolphin/dolphin-view.html' }],
+        },
+        {
+          heading: 'على ChromeOS',
+          paragraphs: ['على جهاز Chromebook، افتح تطبيق «الملفات» وابحث عن الملف وانقره نقرًا مزدوجًا. وتضم قائمة Google لأنواع الملفات المدعومة على Chromebook صيغة txt، وتعطي صفحتها عن فتح الملفات خطوة النقر المزدوج (تحققنا منهما في 28 نوفمبر 2026). ولتعديل النص وحفظ نسخة بالترميز الذي تختاره، افتح محرر TXT في Chrome واختر الملف هناك.'],
+          // TODO(check): no Google help page found that names the default .txt app or gives "Open with" steps on ChromeOS.
+          links: [{ text: 'قائمة Google لأنواع الملفات المدعومة على Chromebook', path: 'https://support.google.com/chromebook/answer/183093' }, { text: 'صفحتها عن فتح الملفات', path: 'https://support.google.com/chromebook/answer/1700055' }, { text: 'محرر TXT', path: '/txt-viewer' }],
         },
         {
           heading: 'على الهاتف أو الجهاز اللوحي',
