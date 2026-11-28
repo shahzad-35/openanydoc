@@ -432,7 +432,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-xlsx-without-excel': {
       published: '2026-10-30',
-      updated: '2026-11-23',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -456,6 +456,27 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Online suites (the file is uploaded)',
           paragraphs: ['Google Sheets opens an .xlsx file that is in Google Drive, according to Google\'s page on using Office files (checked 24 November 2026). It needs a Google account, and the workbook is stored on Google\'s servers. That is fine for most files, but not for payroll, customer lists or anything you are not allowed to share.'],
           links: [{ text: 'page on using Office files', path: 'https://support.google.com/docs/answer/6055139' }],
+        },
+        {
+          heading: 'Excel for the web',
+          paragraphs: [
+            'Microsoft offers Word, Excel and PowerPoint free on the web, according to its page on Microsoft 365 for the web (checked 28 November 2026). You sign in with a free Microsoft account, and the same page notes that files must be saved in and shared from OneDrive, so a workbook from your computer is uploaded to Microsoft\'s servers before it opens.',
+            'Cell formats and number formats look much as they do in the desktop app, but not everything works: macros in .xlsm files do not run in the browser, and protected sheets can only be viewed, according to Microsoft\'s page on the differences between a workbook in the browser and in Excel (checked 28 November 2026).',
+          ],
+          links: [{ text: 'page on Microsoft 365 for the web', path: 'https://www.microsoft.com/en-us/microsoft-365/free-office-online-for-the-web' }, { text: 'differences between a workbook in the browser and in Excel', path: 'https://support.microsoft.com/en-us/office/differences-between-using-a-workbook-in-the-browser-and-in-excel-f0dc28ed-b85d-4e1d-be6d-5878005db3b6' }],
+        },
+        {
+          heading: 'The online options compared',
+          paragraphs: ['All three open an .xlsx file in a browser and let you edit it. The difference is where the file goes and what you need to sign in with. Google\'s page on working with Office files lists macros and linked spreadsheets among the features Sheets does not support (checked 28 November 2026).'],
+          table: {
+            columns: ['Option', 'Uploads the file', 'Account needed', 'Can edit', 'Formatting kept'],
+            rows: [
+              ['OpenAnyDoc Excel viewer', 'No', 'No', 'Yes', 'Values, formulas, number formats, merged cells and column widths; cell styles in .xlsx files. Not charts, images, pivot tables or conditional formats.'],
+              ['Excel for the web', 'Yes, to OneDrive', 'Yes, a Microsoft account', 'Yes', 'Cell and number formats show much as in Excel; macros do not run.'],
+              ['Google Sheets', 'Yes, to Google Drive', 'Yes, a Google account', 'Yes', 'Macros and linked spreadsheets are not supported.'],
+            ],
+          },
+          links: [{ text: 'page on working with Office files', path: 'https://support.google.com/docs/answer/6055139' }, { text: 'OpenAnyDoc Excel viewer', path: '/excel-viewer' }],
         },
         {
           heading: 'On a phone',
@@ -4453,7 +4474,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-xlsx-without-excel': {
       published: '2026-10-30',
-      updated: '2026-11-23',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -4477,6 +4498,27 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'الحزم على الإنترنت (يُرفع الملف)',
           paragraphs: ['يفتح Google Sheets ملف xlsx الموجود في Google Drive، بحسب صفحة Google عن استخدام ملفات Office (تحققنا منها في 24 نوفمبر 2026). ويحتاج حساب Google، ويُخزَّن المصنف على خوادم Google. هذا مقبول لمعظم الملفات، لكن ليس لكشوف الرواتب أو قوائم العملاء أو أي ملف لا يُسمح لك بمشاركته.'],
           links: [{ text: 'صفحة Google عن استخدام ملفات Office', path: 'https://support.google.com/docs/answer/6055139' }],
+        },
+        {
+          heading: 'Excel للويب',
+          paragraphs: [
+            'تتيح Microsoft برامج Word وExcel وPowerPoint مجانًا على الويب، بحسب صفحتها عن Microsoft 365 للويب (تحققنا منها في 28 نوفمبر 2026). تسجّل الدخول بحساب Microsoft مجاني، وتذكر الصفحة نفسها أن الملفات يجب أن تُحفظ في OneDrive وتُشارك منه، أي أن المصنف الموجود على حاسوبك يُرفع إلى خوادم Microsoft قبل أن يُفتح.',
+            'تظهر تنسيقات الخلايا والأرقام كما تظهر تقريبًا في برنامج سطح المكتب، لكن ليس كل شيء يعمل: وحدات الماكرو في ملفات .xlsm لا تعمل في المتصفح، والأوراق المحمية تُعرض فقط، بحسب صفحة Microsoft عن الفروق بين المصنف في المتصفح وفي Excel (تحققنا منها في 28 نوفمبر 2026).',
+          ],
+          links: [{ text: 'صفحتها عن Microsoft 365 للويب', path: 'https://www.microsoft.com/en-us/microsoft-365/free-office-online-for-the-web' }, { text: 'الفروق بين المصنف في المتصفح وفي Excel', path: 'https://support.microsoft.com/en-us/office/differences-between-using-a-workbook-in-the-browser-and-in-excel-f0dc28ed-b85d-4e1d-be6d-5878005db3b6' }],
+        },
+        {
+          heading: 'مقارنة الخيارات على الإنترنت',
+          paragraphs: ['الثلاثة تفتح ملف xlsx في المتصفح وتتيح لك تعديله. والفرق في المكان الذي يذهب إليه الملف والحساب الذي تحتاجه. وتذكر صفحة Google عن العمل مع ملفات Office أن Sheets لا يدعم وحدات الماكرو والجداول المرتبطة (تحققنا منها في 28 نوفمبر 2026).'],
+          table: {
+            columns: ['الخيار', 'هل يُرفع الملف', 'هل يلزم حساب', 'التعديل', 'ما يبقى من التنسيق'],
+            rows: [
+              ['عارض Excel من OpenAnyDoc', 'لا', 'لا', 'نعم', 'القيم والصيغ وتنسيقات الأرقام والخلايا المدمجة وعرض الأعمدة، وأنماط الخلايا في ملفات .xlsx. لا المخططات ولا الصور ولا الجداول المحورية ولا التنسيق الشرطي.'],
+              ['Excel للويب', 'نعم، إلى OneDrive', 'نعم، حساب Microsoft', 'نعم', 'تظهر تنسيقات الخلايا والأرقام كما في Excel تقريبًا؛ ولا تعمل وحدات الماكرو.'],
+              ['Google Sheets', 'نعم، إلى Google Drive', 'نعم، حساب Google', 'نعم', 'لا يدعم وحدات الماكرو والجداول المرتبطة.'],
+            ],
+          },
+          links: [{ text: 'صفحة Google عن العمل مع ملفات Office', path: 'https://support.google.com/docs/answer/6055139' }, { text: 'عارض Excel من OpenAnyDoc', path: '/excel-viewer' }],
         },
         {
           heading: 'على الهاتف',
