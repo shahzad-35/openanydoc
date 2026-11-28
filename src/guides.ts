@@ -876,7 +876,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-csv-without-excel': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -907,8 +907,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Files too big for Excel',
-          paragraphs: ['An Excel sheet stops at 1,048,576 rows. The large CSV viewer has no row limit of its own: a 120,000-row file opens in under a second, and the real limit is your device\'s memory, with a warning above 50 MB. Why Excel cuts the file short, and other ways around it, are explained in CSV too big for Excel.'],
-          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['An Excel sheet stops at 1,048,576 rows. The large CSV viewer has no row limit of its own: a 120,000-row file opens in under a second, and the real limit is your device\'s memory, with a warning above 50 MB. Why Excel cuts the file short, and other ways around it, are explained in how to open a large CSV file.'],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'The file opens in one column',
@@ -2653,7 +2653,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/split-large-csv': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -2704,13 +2704,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Choose the part size for where the file is going',
           paragraphs: ['The right number depends on what will read the parts:'],
           list: [
-            'Excel: up to 1,048,575 data rows per part; 1,000,000 is a safe round number. If Excel is slow even below the row limit, CSV too big for Excel covers the other options.',
+            'Excel: up to 1,048,575 data rows per part; 1,000,000 is a safe round number. If Excel is slow even below the row limit, the guide on how to open a large CSV file covers the other options.',
             'An upload form with a size limit, such as 10 MB: use "Size per file" and set it a little lower, for example 9 MB, because each part is about that size, not exactly.',
             'An AI chat: what counts there is tokens, not rows. Count one part with the Token counter, then pick a number of rows that fits. File too large for ChatGPT explains the limits.',
             'If a part opens in one column in Excel, the split is fine; the separator does not match your PC. CSV opens in one column explains the fix.',
           ],
           links: [
-            { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' },
+            { text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' },
             { text: 'Token counter', path: '/token-counter' },
             { text: 'File too large for ChatGPT', path: '/file-too-large-for-chatgpt' },
             { text: 'CSV opens in one column', path: '/csv-opens-in-one-column' },
@@ -2921,7 +2921,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/excel-row-and-column-limits': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -2950,7 +2950,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'What each limit means for a real file',
-          paragraphs: ['Most people only meet the row limit, which the guide on a CSV too big for Excel covers in detail. The other limits catch people out more quietly. The figures are from the Excel specifications and limits page and Microsoft\'s page on keeping leading zeros and large numbers (checked 24 November 2026):'],
+          paragraphs: ['Most people only meet the row limit, which the guide on how to open a large CSV file covers in detail. The other limits catch people out more quietly. The figures are from the Excel specifications and limits page and Microsoft\'s page on keeping leading zeros and large numbers (checked 24 November 2026):'],
           list: [
             'Columns: wide exports reach 16,384 long before they get near a million rows. A survey with one column per question and answer option, or sensor data with one column per reading, can be a few thousand rows long and still be too wide.',
             '15 digits: Excel keeps 15 significant digits of a number, so a 16-digit reference typed or opened as a number, such as 1234567890123456, is stored as 1234567890123450. Order numbers, barcodes and other long codes are safe only as text.',
@@ -2959,7 +2959,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'Dates before 1900: they are earlier than the first date Excel calculates with, so Excel cannot calculate with records from the 1800s as dates.',
             '10,000 filter items: a column with more different values than that does not show all of them in its filter list, so use a text filter such as Contains instead of ticking values.',
           ],
-          links: [{ text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }, { text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'keeping leading zeros and large numbers', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+          links: [{ text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }, { text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'keeping leading zeros and large numbers', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
         },
         {
           heading: 'Worked example: will this export fit?',
@@ -3494,7 +3494,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/best-free-csv-viewers': {
       published: '2026-11-24',
-      updated: '2026-11-25',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -3557,8 +3557,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Which free CSV viewer opens the largest files?',
-          paragraphs: ['No program has one fixed answer, because the real limit is usually your computer\'s memory. Google Sheets stops at 20 million cells per spreadsheet and spreadsheet apps stop at a row limit, while OpenAnyDoc has no row limit of its own and Modern CSV and Tad say they handle large files. Try your own file; CSV too big for Excel explains the other options.'],
-          links: [{ text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['No program has one fixed answer, because the real limit is usually your computer\'s memory. Google Sheets stops at 20 million cells per spreadsheet and spreadsheet apps stop at a row limit, while OpenAnyDoc has no row limit of its own and Modern CSV and Tad say they handle large files. Try your own file; how to open a large CSV file explains the other options.'],
+          links: [{ text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'Can I open a CSV without uploading it anywhere?',
@@ -3666,7 +3666,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/openanydoc-vs-google-sheets-large-files': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -3717,8 +3717,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Where Google Sheets and Excel do more',
-          paragraphs: ['Spreadsheets are built for work a viewer does not do. Google Sheets lets several people edit the same spreadsheet at the same time, with formulas, pivot tables and charts, as the Sheets product page says. Excel has formulas, PivotTables, charts and Power Query, and its Data Model can hold millions of rows, more than a sheet, as Microsoft\'s page on a memory-efficient Data Model says (both checked 24 November 2026); CSV too big for Excel shows the steps. OpenAnyDoc edits values and saves CSV or Excel files, but it has no formulas and no live copy that a team edits together.'],
-          links: [{ text: 'Sheets product page', path: 'https://workspace.google.com/products/sheets/' }, { text: 'memory-efficient Data Model', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['Spreadsheets are built for work a viewer does not do. Google Sheets lets several people edit the same spreadsheet at the same time, with formulas, pivot tables and charts, as the Sheets product page says. Excel has formulas, PivotTables, charts and Power Query, and its Data Model can hold millions of rows, more than a sheet, as Microsoft\'s page on a memory-efficient Data Model says (both checked 24 November 2026); the guide on how to open a large CSV file shows the steps. OpenAnyDoc edits values and saves CSV or Excel files, but it has no formulas and no live copy that a team edits together.'],
+          links: [{ text: 'Sheets product page', path: 'https://workspace.google.com/products/sheets/' }, { text: 'memory-efficient Data Model', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'Which one to use',
@@ -3754,7 +3754,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/large-csv-test': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -3841,9 +3841,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Can Excel open a CSV with 3 million rows?',
           paragraphs: [
-            'Excel cannot show 3 million rows in one worksheet, because a worksheet stops at 1,048,576 rows. Opened directly, Excel warns that the data set is too large for the Excel grid and that some data was not loaded. Power Query can load the complete data set for PivotTables, or you can split the file first, as Microsoft\'s page on a data set too large for the Excel grid explains (checked 24 November 2026). CSV too big for Excel explains every option.',
+            'Excel cannot show 3 million rows in one worksheet, because a worksheet stops at 1,048,576 rows. Opened directly, Excel warns that the data set is too large for the Excel grid and that some data was not loaded. Power Query can load the complete data set for PivotTables, or you can split the file first, as Microsoft\'s page on a data set too large for the Excel grid explains (checked 24 November 2026). How to open a large CSV file explains every option.',
           ],
-          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'How to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'Why can\'t Google Sheets import a very large CSV?',
@@ -4863,7 +4863,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-csv-without-excel': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -4894,8 +4894,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ملفات أكبر من أن يفتحها اكسل',
-          paragraphs: ['تتوقف ورقة اكسل عند 1,048,576 صفًا. أما عارض ملفات CSV الكبيرة فلا حد للصفوف فيه: يُفتح ملف من 120,000 صف في أقل من ثانية، والحد الحقيقي هو ذاكرة جهازك، مع تنبيه فوق 50 ميغابايت. ولماذا يقطع اكسل الملف، وما الطرق الأخرى لتجاوز ذلك، تجده في دليل ملف CSV أكبر من أن يفتحه Excel.'],
-          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['تتوقف ورقة اكسل عند 1,048,576 صفًا. أما عارض ملفات CSV الكبيرة فلا حد للصفوف فيه: يُفتح ملف من 120,000 صف في أقل من ثانية، والحد الحقيقي هو ذاكرة جهازك، مع تنبيه فوق 50 ميغابايت. ولماذا يقطع اكسل الملف، وما الطرق الأخرى لتجاوز ذلك، تجده في دليل كيف تفتح ملف CSV كبيرًا.'],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'الملف يُفتح في عمود واحد',
@@ -6638,7 +6638,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/split-large-csv': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -6689,13 +6689,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'اختر حجم الجزء حسب وجهة الملف',
           paragraphs: ['الرقم المناسب يتوقف على ما سيقرأ الأجزاء:'],
           list: [
-            'Excel: حتى 1,048,575 صف بيانات في الجزء، و1,000,000 رقم مستدير آمن. وإن كان Excel بطيئًا حتى دون حد الصفوف، فدليل ملف CSV أكبر من أن يفتحه Excel يشرح الخيارات الأخرى.',
+            'Excel: حتى 1,048,575 صف بيانات في الجزء، و1,000,000 رقم مستدير آمن. وإن كان Excel بطيئًا حتى دون حد الصفوف، فدليل كيف تفتح ملف CSV كبيرًا يشرح الخيارات الأخرى.',
             'نموذج رفع له حد للحجم، مثل 10 ميغابايت: استخدم «حجم كل ملف» واجعله أقل قليلًا، 9 ميغابايت مثلًا، لأن حجم كل جزء تقريبي لا دقيق.',
             'محادثة ذكاء اصطناعي: المهم هناك الرموز لا الصفوف. عُدّ رموز جزء واحد بأداة عدّاد الرموز، ثم اختر عدد صفوف يتسع. ودليل ملف أكبر من أن يقبله ChatGPT يشرح الحدود.',
             'إن فُتح جزء في عمود واحد في Excel فالتقسيم سليم، لكن الفاصل لا يطابق إعدادات جهازك. ودليل ملف CSV يُفتح في عمود واحد يشرح الحل.',
           ],
           links: [
-            { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' },
+            { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' },
             { text: 'عدّاد الرموز', path: '/token-counter' },
             { text: 'ملف أكبر من أن يقبله ChatGPT', path: '/file-too-large-for-chatgpt' },
             { text: 'ملف CSV يُفتح في عمود واحد', path: '/csv-opens-in-one-column' },
@@ -6906,7 +6906,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/excel-row-and-column-limits': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -6935,7 +6935,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ماذا يعني كل حد لملف حقيقي',
-          paragraphs: ['معظم الناس لا يصطدمون إلا بحد الصفوف، وقد شرحه بالتفصيل دليل ملف CSV أكبر من أن يفتحه Excel. أما الحدود الأخرى فتوقع الناس بهدوء أكبر. والأرقام من صفحة مواصفات Excel وحدوده ومن صفحة Microsoft عن الاحتفاظ بالأصفار البادئة والأرقام الكبيرة (تحققنا منها في 24 نوفمبر 2026):'],
+          paragraphs: ['معظم الناس لا يصطدمون إلا بحد الصفوف، وقد شرحه بالتفصيل دليل كيف تفتح ملف CSV كبيرًا. أما الحدود الأخرى فتوقع الناس بهدوء أكبر. والأرقام من صفحة مواصفات Excel وحدوده ومن صفحة Microsoft عن الاحتفاظ بالأصفار البادئة والأرقام الكبيرة (تحققنا منها في 24 نوفمبر 2026):'],
           list: [
             'الأعمدة: الملفات العريضة تبلغ 16,384 عمودًا قبل أن تقترب من مليون صف بكثير. فاستبيان فيه عمود لكل سؤال وخيار إجابة، أو بيانات أجهزة استشعار فيها عمود لكل قراءة، قد لا يتجاوز بضعة آلاف من الصفوف ويبقى أعرض من الحد.',
             'الخانات الخمس عشرة: يحتفظ Excel بخمس عشرة خانة معنوية من الرقم، فالرقم المرجعي المكوّن من 16 خانة مثل 1234567890123456، إذا كُتب أو فُتح رقمًا، يُخزَّن 1234567890123450. ولا تسلم أرقام الطلبات والباركود والرموز الطويلة إلا إذا بقيت نصًا.',
@@ -6944,7 +6944,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'التواريخ قبل 1900: هي أقدم من أول تاريخ يحسب به Excel، فلا يستطيع Excel أن يحسب بسجلات القرن التاسع عشر بوصفها تواريخ.',
             '10,000 عنصر في التصفية: العمود الذي فيه قيم مختلفة أكثر من ذلك لا تظهر كلها في قائمة التصفية، فاستخدم عامل تصفية نصيًا مثل «يحتوي على» بدل تحديد القيم.',
           ],
-          links: [{ text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }, { text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الاحتفاظ بالأصفار البادئة والأرقام الكبيرة', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+          links: [{ text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }, { text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الاحتفاظ بالأصفار البادئة والأرقام الكبيرة', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
         },
         {
           heading: 'مثال عملي: هل يتسع هذا الملف؟',
@@ -7479,7 +7479,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/best-free-csv-viewers': {
       published: '2026-11-24',
-      updated: '2026-11-25',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -7542,8 +7542,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'أي عارض CSV مجاني يفتح أكبر الملفات؟',
-          paragraphs: ['لا جواب ثابتًا لأي برنامج، لأن الحد الحقيقي عادةً هو ذاكرة حاسوبك. يتوقف Google Sheets عند 20 مليون خلية للجدول الواحد، وتتوقف تطبيقات جداول البيانات عند حد للصفوف، بينما ليس لـ OpenAnyDoc حد صفوف خاص به، ويقول Modern CSV وTad إنهما يتعاملان مع الملفات الكبيرة. جرّب ملفك، ويشرح دليل ملف CSV أكبر من أن يفتحه Excel الخيارات الأخرى.'],
-          links: [{ text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['لا جواب ثابتًا لأي برنامج، لأن الحد الحقيقي عادةً هو ذاكرة حاسوبك. يتوقف Google Sheets عند 20 مليون خلية للجدول الواحد، وتتوقف تطبيقات جداول البيانات عند حد للصفوف، بينما ليس لـ OpenAnyDoc حد صفوف خاص به، ويقول Modern CSV وTad إنهما يتعاملان مع الملفات الكبيرة. جرّب ملفك، ويشرح دليل كيف تفتح ملف CSV كبيرًا الخيارات الأخرى.'],
+          links: [{ text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'هل أستطيع فتح ملف CSV دون رفعه إلى أي مكان؟',
@@ -7651,7 +7651,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/openanydoc-vs-google-sheets-large-files': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -7702,8 +7702,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'أين يقدّم Google Sheets وExcel أكثر',
-          paragraphs: ['جداول البيانات مصنوعة لعمل لا يؤديه العارض. يتيح Google Sheets لعدة أشخاص تعديل الجدول نفسه في الوقت نفسه، مع الصيغ والجداول المحورية والمخططات، كما تقول صفحة Sheets التعريفية. وفي Excel الصيغ وPivotTable والمخططات وPower Query، ويتسع نموذج البيانات فيه لملايين الصفوف، أي أكثر من الورقة، كما تقول صفحة Microsoft عن نموذج بيانات موفر للذاكرة (تحققنا منها في 24 نوفمبر 2026 كلتيهما)؛ ويشرح دليل ملف CSV أكبر من أن يفتحه Excel الخطوات. أما OpenAnyDoc فيعدّل القيم ويحفظ ملفات CSV أو Excel، لكن لا صيغ فيه ولا نسخة حية يعدّلها فريق معًا.'],
-          links: [{ text: 'صفحة Sheets التعريفية', path: 'https://workspace.google.com/products/sheets/' }, { text: 'نموذج بيانات موفر للذاكرة', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['جداول البيانات مصنوعة لعمل لا يؤديه العارض. يتيح Google Sheets لعدة أشخاص تعديل الجدول نفسه في الوقت نفسه، مع الصيغ والجداول المحورية والمخططات، كما تقول صفحة Sheets التعريفية. وفي Excel الصيغ وPivotTable والمخططات وPower Query، ويتسع نموذج البيانات فيه لملايين الصفوف، أي أكثر من الورقة، كما تقول صفحة Microsoft عن نموذج بيانات موفر للذاكرة (تحققنا منها في 24 نوفمبر 2026 كلتيهما)؛ ويشرح دليل كيف تفتح ملف CSV كبيرًا الخطوات. أما OpenAnyDoc فيعدّل القيم ويحفظ ملفات CSV أو Excel، لكن لا صيغ فيه ولا نسخة حية يعدّلها فريق معًا.'],
+          links: [{ text: 'صفحة Sheets التعريفية', path: 'https://workspace.google.com/products/sheets/' }, { text: 'نموذج بيانات موفر للذاكرة', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'أيها تستخدم',
@@ -7739,7 +7739,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/large-csv-test': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -7826,9 +7826,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'هل يفتح Excel ملف CSV فيه 3 ملايين صف؟',
           paragraphs: [
-            'لا يستطيع Excel عرض 3 ملايين صف في ورقة عمل واحدة، لأن الورقة تتوقف عند 1,048,576 صفًا. وإذا فتحت الملف مباشرة يحذّر Excel من أن مجموعة البيانات أكبر من شبكة Excel وأن بعض البيانات لم يُحمَّل. ويمكن لـ Power Query تحميل مجموعة البيانات كاملة لجداول PivotTable، أو يمكنك تقسيم الملف أولًا، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). ويشرح دليل ملف CSV أكبر من أن يفتحه Excel كل الخيارات.',
+            'لا يستطيع Excel عرض 3 ملايين صف في ورقة عمل واحدة، لأن الورقة تتوقف عند 1,048,576 صفًا. وإذا فتحت الملف مباشرة يحذّر Excel من أن مجموعة البيانات أكبر من شبكة Excel وأن بعض البيانات لم يُحمَّل. ويمكن لـ Power Query تحميل مجموعة البيانات كاملة لجداول PivotTable، أو يمكنك تقسيم الملف أولًا، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). ويشرح دليل كيف تفتح ملف CSV كبيرًا كل الخيارات.',
           ],
-          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'لماذا لا يستورد Google Sheets ملف CSV كبيرًا جدًا؟',

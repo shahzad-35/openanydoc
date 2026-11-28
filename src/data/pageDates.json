@@ -68,8 +68,8 @@
     "date": "2026-11-25"
   },
   "/en/open-csv-without-excel": {
-    "hash": "bf90cf131558472a13e6416732ed96e88568fbd7",
-    "date": "2026-11-25"
+    "hash": "93d63e029503818fed737249ea1343667404de16",
+    "date": "2026-11-28"
   },
   "/en/open-pptx-without-powerpoint": {
     "hash": "fa59b8fb672bc5e310f776c963b34b20589345fb",
@@ -132,8 +132,8 @@
     "date": "2026-11-19"
   },
   "/en/split-large-csv": {
-    "hash": "63d360c443ceaa8af17c8a30aaef66c91cea8a74",
-    "date": "2026-11-25"
+    "hash": "1f2f21459761ced2845143600100f52d0445b830",
+    "date": "2026-11-28"
   },
   "/en/json-vs-json-lines": {
     "hash": "d258ed8570b89f037d9fd594994dee54ce01f465",
@@ -144,8 +144,8 @@
     "date": "2026-11-25"
   },
   "/en/excel-row-and-column-limits": {
-    "hash": "300012036760a22c624dcf479c38205dad78ebf0",
-    "date": "2026-11-25"
+    "hash": "4494960aae0d2ddfddcd766496d306d29dec1936",
+    "date": "2026-11-28"
   },
   "/en/find-hidden-sheets-in-excel": {
     "hash": "013a94c94de0bfaa15fe7733a71140965a647adb",
@@ -168,20 +168,20 @@
     "date": "2026-11-24"
   },
   "/en/best-free-csv-viewers": {
-    "hash": "4823ba07d6334c7c7a591ba760519d2301bc5e6f",
-    "date": "2026-11-25"
+    "hash": "2ff766280866131f6373475831cb39d2ace735fe",
+    "date": "2026-11-28"
   },
   "/en/best-free-json-formatters": {
     "hash": "e0fbffab3eaa76769f70fc8e389b6b5847c5fb0a",
     "date": "2026-11-24"
   },
   "/en/openanydoc-vs-google-sheets-large-files": {
-    "hash": "61f1a2f8fb4b2b532dfaf713a3ba9b271c62ba9f",
-    "date": "2026-11-25"
+    "hash": "311358e6a988cb5012d603f4d90d80d51a931226",
+    "date": "2026-11-28"
   },
   "/en/large-csv-test": {
-    "hash": "92466f347f1aeca15aa3ed1dffbab33b42846af6",
-    "date": "2026-11-25"
+    "hash": "c621a3b11ad5040a6eb0c4ce65295eab6241be86",
+    "date": "2026-11-28"
   },
   "/en/pdf-to-ai-chat-with-tables": {
     "hash": "8372300e85fa0b63203c9faaf8778507d0200288",
@@ -1096,8 +1096,8 @@
     "date": "2026-11-25"
   },
   "/ar/open-csv-without-excel": {
-    "hash": "4aceff2f91a1745cf061ece44cfc6237dbcbf53c",
-    "date": "2026-11-25"
+    "hash": "934510cee3616ad2938fc0b3259aa6628dac01f1",
+    "date": "2026-11-28"
   },
   "/ar/open-pptx-without-powerpoint": {
     "hash": "40bb6305b17ba0f5de7652f4ca4e120f5fbae1a4",
@@ -1160,8 +1160,8 @@
     "date": "2026-11-19"
   },
   "/ar/split-large-csv": {
-    "hash": "38a019d9815e1ce86b8c5981b6f7e002298995b1",
-    "date": "2026-11-25"
+    "hash": "87bacda101e10202dd44530bfd49a020725aa251",
+    "date": "2026-11-28"
   },
   "/ar/json-vs-json-lines": {
     "hash": "92e42f5ad2f105b56ac526545e01069b1169e787",
@@ -1172,8 +1172,8 @@
     "date": "2026-11-25"
   },
   "/ar/excel-row-and-column-limits": {
-    "hash": "d9cafb88afaa329233904c25cd04b4cb760d5e93",
-    "date": "2026-11-25"
+    "hash": "fc5696b4adcdddec1132bbbcbb792e5711a4b430",
+    "date": "2026-11-28"
   },
   "/ar/find-hidden-sheets-in-excel": {
     "hash": "77e0a7093461ee809ad489a725c8b22526034b85",
@@ -1196,20 +1196,20 @@
     "date": "2026-11-24"
   },
   "/ar/best-free-csv-viewers": {
-    "hash": "f2d332c3ba2b2d3202342b3cd0753b8cd7525642",
-    "date": "2026-11-25"
+    "hash": "4bd811fc546bf7512b84a2a7c745fde479578d35",
+    "date": "2026-11-28"
   },
   "/ar/best-free-json-formatters": {
     "hash": "b038f63da68d55c08b9e4f14cb3d5212b436b7d4",
     "date": "2026-11-25"
   },
   "/ar/openanydoc-vs-google-sheets-large-files": {
-    "hash": "13131a818967320f79e562b953e596e750b717ea",
-    "date": "2026-11-25"
+    "hash": "38c305a8b89ff1053f7aaccaca55288a8e7dc07d",
+    "date": "2026-11-28"
   },
   "/ar/large-csv-test": {
-    "hash": "89e16617b93458f8a38ce10ab23f885094fb2ad4",
-    "date": "2026-11-25"
+    "hash": "68dd8a72a458e13d94894fa318acbbb86be1d842",
+    "date": "2026-11-28"
   },
   "/ar/pdf-to-ai-chat-with-tables": {
     "hash": "1d397e679c90e76f2916cc3df1d98dcadb5a8ec2",
