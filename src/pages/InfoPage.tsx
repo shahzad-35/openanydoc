@@ -133,7 +133,7 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
                 )}
                 {section.table && (
                   <div className="mt-4 overflow-x-auto">
-                    <table id={`info-table-${position + 1}`} className="w-full min-w-[560px] border-collapse text-[15px]">
+                    <table id={`info-table-${position + 1}`} className={`w-full border-collapse text-[15px] ${section.table.columns.length > 2 ? 'min-w-[560px]' : ''}`}>
                       <thead>
                         <tr>
                           {section.table.columns.map((column) => (
