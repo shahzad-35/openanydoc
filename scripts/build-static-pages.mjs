@@ -433,7 +433,7 @@ function renderSeoPage(locale, address, rootMarkup, shellOptions) {
       isAccessibleForFree: true,
       offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
       featureList: viewerFeatures ?? content.handles ?? content.features.map((feature) => feature.title),
-      ...(content.screenshot && { screenshot: `${SITE_ORIGIN}/screenshots/${locale}-${viewer.id}.webp` }),
+      ...(content.screenshot && { screenshot: `${SITE_ORIGIN}/screenshots/${locale}-${content.screenshot.image ?? viewer.id}.webp` }),
       dateModified: PAGE_DATE_MARK,
       isPartOf: { '@id': websiteId },
       publisher: { '@id': organizationId },

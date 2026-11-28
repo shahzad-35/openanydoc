@@ -1,5 +1,5 @@
 // Draws the pictures the format pages show (public/screenshots/<locale>-<viewer>.webp, 1200 x 750): each viewer with a small synthetic
-// file, in English and Arabic, light theme. Run after `npm run build` (it serves dist/) with Chrome and cwebp installed
+// file (the large CSV page: 120,000 rows), in English and Arabic, light theme. Run after `npm run build` (it serves dist/) with Chrome and cwebp installed
 // (`brew install webp`); commit the files (Cloudflare has no Chrome). Set CHROME_PATH if Chrome is not in its usual macOS place.
 
 import { execFileSync, spawn } from 'node:child_process'
@@ -20,6 +20,10 @@ const HEIGHT = 750
 
 // ---------------------------------------------------------------- synthetic files, one per viewer and language
 
+// The large CSV page shows a file of 120,000 rows, the size its speed claim was measured with.
+const largeCsvText = (header, cities, statuses) =>
+  [header, ...Array.from({ length: 120_000 }, (_, index) => `${100001 + index},${cities[index % cities.length]},${(10 + ((index * 37) % 4990)).toFixed(2)},${statuses[index % statuses.length]}`)].join('\n') + '\n'
+
 const sampleFiles = {
   en: {
     csv: ['orders.csv', 'order_id,customer,city,amount,status\n1001,Northwind Ltd,Riyadh,1250.00,paid\n1002,Acme Trading,Jeddah,310.50,pending\n1003,Globex,Dammam,980.00,paid\n1004,Initech,Riyadh,45.90,refunded\n1005,Umbrella Co,Mecca,2210.00,paid\n'],
@@ -29,6 +33,7 @@ const sampleFiles = {
     word: ['report.docx', 'test-files/word-rich.docx'],
     powerpoint: ['review.pptx', 'test-files/powerpoint-rich.pptx'],
     pdf: ['report.pdf', 'src/samples/report-3-pages.pdf'],
+    'large-csv': ['orders-120000.csv', largeCsvText('order_id,city,amount,status', ['Riyadh', 'Jeddah', 'Dammam', 'Mecca'], ['paid', 'pending', 'refunded'])],
     excel: ['budget.xlsx', [['Item', 'Qty', 'Unit price', 'Total'], ['Desks', 4, 320, { t: 'n', f: 'B2*C2', v: 1280 }], ['Chairs', 8, 95, { t: 'n', f: 'B3*C3', v: 760 }], ['Monitors', 6, 210, { t: 'n', f: 'B4*C4', v: 1260 }], ['Total', '', '', { t: 'n', f: 'SUM(D2:D4)', v: 3300 }]]],
   },
   ar: {
@@ -38,11 +43,12 @@ const sampleFiles = {
     word: ['تقرير.docx', 'test-files/word-arabic.docx'],
     powerpoint: ['مراجعة.pptx', 'test-files/powerpoint-rich.pptx'],
     pdf: ['دليل.pdf', 'src/samples/arabic-english-guide.pdf'],
+    'large-csv': ['طلبات-120000.csv', largeCsvText('رقم الطلب,المدينة,المبلغ,الحالة', ['الرياض', 'جدة', 'الدمام', 'مكة'], ['مدفوع', 'قيد الانتظار', 'مسترد'])],
     excel: ['الميزانية.xlsx', [['البند', 'الكمية', 'سعر الوحدة', 'الإجمالي'], ['مكاتب', 4, 320, { t: 'n', f: 'B2*C2', v: 1280 }], ['كراسي', 8, 95, { t: 'n', f: 'B3*C3', v: 760 }], ['شاشات', 6, 210, { t: 'n', f: 'B4*C4', v: 1260 }], ['الإجمالي', '', '', { t: 'n', f: 'SUM(D2:D4)', v: 3300 }]]],
   },
 }
-const pagePath = { csv: '/csv-viewer', json: '/json-viewer', text: '/txt-viewer', excel: '/excel-viewer', word: '/word-viewer', powerpoint: '/powerpoint-viewer', pdf: '/pdf-viewer' }
-const readySelector = { csv: '#data-table [id^="cell-"]', json: '#tree-view .row', text: '#text-editor', excel: '#data-table [id^="cell-"]', word: '#word-document section.docx', powerpoint: '#slide-thumbnail-4 .slide-thumbnail-picture > *', pdf: '#pdf-pages .page[data-loaded] canvas' }
+const pagePath = { csv: '/csv-viewer', json: '/json-viewer', text: '/txt-viewer', excel: '/excel-viewer', word: '/word-viewer', powerpoint: '/powerpoint-viewer', pdf: '/pdf-viewer', 'large-csv': '/large-csv-viewer' }
+const readySelector = { csv: '#data-table [id^="cell-"]', json: '#tree-view .row', text: '#text-editor', excel: '#data-table [id^="cell-"]', word: '#word-document section.docx', powerpoint: '#slide-thumbnail-4 .slide-thumbnail-picture > *', pdf: '#pdf-pages .page[data-loaded] canvas', 'large-csv': '#data-table [id^="cell-"]' }
 
 function writeSampleFile(locale, viewerId) {
   const [name, content] = sampleFiles[locale][viewerId]
