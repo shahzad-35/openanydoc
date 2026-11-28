@@ -82,10 +82,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'CSV opens in one column',
     },
     '/csv-too-big-for-excel': {
-      title: 'CSV Too Big for Excel? The Row Limit and What to Do',
-      description: 'A worksheet stops at 1,048,576 rows and big CSV files freeze Excel. Three ways to open, cut down or load a large CSV, one of them free with nothing uploaded.',
-      heading: 'CSV too big for Excel: the 1,048,576-row limit and what to do',
-      intro: 'A worksheet holds 1,048,576 rows and large files freeze Excel long before that. Here is why, and how to open, cut down or load the file anyway.',
+      title: 'How to Open a Large CSV File (Too Big for Excel)',
+      description: 'Excel stops at 1,048,576 rows. How to open a large CSV file anyway: a viewer with no row limit, SQLite, DuckDB or Python, compared on cost and upload.',
+      heading: 'How to open a large CSV file that is too big for Excel',
+      intro: 'Why Excel cuts a big CSV short, and seven ways to open every row, with exact commands and a table that compares them.',
       linkText: 'CSV too big for Excel',
     },
     '/json-unexpected-token': {
@@ -564,10 +564,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'ملف CSV في عمود واحد',
     },
     '/csv-too-big-for-excel': {
-      title: 'ملف CSV أكبر من أن يفتحه Excel؟ حد الصفوف وما تفعله',
-      description: 'تتوقف ورقة العمل عند 1,048,576 صفًا وتجمّد ملفات CSV الكبيرة Excel. ثلاث طرق لفتح ملف CSV كبير أو اقتطاعه أو تحميله، إحداها مجانية في متصفحك ولا ترفع شيئًا.',
-      heading: 'ملف CSV أكبر من أن يفتحه Excel: حد 1,048,576 صفًا وما تفعله',
-      intro: 'تتسع ورقة العمل لـ 1,048,576 صفًا، وتجمّد الملفات الكبيرة Excel قبل ذلك بكثير. إليك السبب وكيف تفتح الملف أو تقتطعه أو تحمّله.',
+      title: 'كيف تفتح ملف CSV كبيرًا لا يتسع له Excel',
+      description: 'يتوقف Excel عند 1,048,576 صفًا. كيف تفتح ملف CSV كبيرًا رغم ذلك: عارض بلا حد للصفوف أو SQLite أو DuckDB أو Python، مع جدول يقارن التكلفة ورفع الملف والتعديل.',
+      heading: 'كيف تفتح ملف CSV كبيرًا لا يتسع له Excel',
+      intro: 'لماذا يقطع Excel ملف CSV الكبير، وسبع طرق لفتح كل صفوفه، مع الأوامر بالضبط وجدول يقارن بينها.',
       linkText: 'ملف CSV أكبر من Excel',
     },
     '/json-unexpected-token': {

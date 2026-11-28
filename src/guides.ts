@@ -131,8 +131,12 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/csv-too-big-for-excel': {
       published: '2026-10-22',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Excel stops at 1,048,576 rows per sheet, so a longer CSV is cut off when you open it. To see every row, open the file in a viewer with no row limit, load it into a database such as SQLite or DuckDB, or read it in chunks with Python.'],
+        },
         {
           heading: 'What you see',
           paragraphs: [
@@ -144,11 +148,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Why Excel cannot open it',
           paragraphs: [
             'A worksheet holds at most 1,048,576 rows and 16,384 columns, according to Microsoft\'s Excel specifications and limits page (checked 24 November 2026). A CSV with more rows is cut at that line. Google Sheets has its own limit: up to 20 million cells or 100MB for a spreadsheet created in or converted to Google Sheets, according to Google\'s page on files you can store in Google Drive (checked 24 November 2026).',
+            'Size in megabytes is only a rough guide. A file with a few short columns can pass a million rows at well under 100 MB, while a wide export with long text reaches the same size with far fewer rows. What counts for Excel is the number of lines.',
           ],
           links: [{ text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'files you can store in Google Drive', path: 'https://support.google.com/drive/answer/37603' }],
         },
         {
-          heading: 'Option 1: open it in the browser and cut it down',
+          heading: 'First, find out how big the file really is',
+          paragraphs: [
+            'Before you pick a method, check two numbers: the size of the file and the number of rows. File Explorer or Finder shows the size. For the rows, the command wc -l in Option 2 counts them on macOS and Linux, and the large CSV viewer shows the row count in its status bar as soon as the file is open.',
+            'If the file has fewer than 1,048,576 rows and Excel still freezes, the row limit is not the problem. The file is probably very wide or holds long text, and Excel runs short of memory. A copy with only the columns you need is often enough, and every method below can make one.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'Option 1: open it in a big-file viewer in your browser',
           paragraphs: ['The large CSV viewer reads the file on your device, draws only the rows on screen, and never uploads it:'],
           list: [
             'Drop the file on that page. A 120,000-row file opens in under a second; the viewer has no row limit of its own, and a file over 50 MB shows a warning first because the limit is your device\'s memory, not the tool.',
@@ -158,17 +171,98 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
         },
         {
-          heading: 'Option 2: load it into Excel without a worksheet',
+          heading: 'Option 2: a text editor or the command line',
+          paragraphs: ['A CSV file is plain text, so you can read it without any spreadsheet. On macOS and Linux, the terminal shows the first lines and pages through the rest without loading the whole file:'],
+          code: 'head -n 20 big.csv\nless big.csv\nwc -l big.csv',
+          list: [
+            'head prints the first 20 lines, which is enough to see the header, the separator and whether values are quoted.',
+            'less scrolls through the file one screen at a time; press q to quit.',
+            'wc -l counts the lines. That is the number of rows plus the header, unless some values contain line breaks.',
+            'Many desktop text editors load the whole file at once and slow down with files of hundreds of megabytes. The TXT editor here opens a very large text file in a fast read view that draws only the lines on screen.',
+          ],
+          links: [{ text: 'TXT editor', path: '/txt-viewer' }],
+        },
+        {
+          heading: 'Option 3: load it into SQLite',
           paragraphs: [
-            'Excel can load all the rows for a PivotTable without putting them in cells. Open a blank workbook, go to Data, From Text/CSV, pick the file and select Import, then in the preview choose Load To and PivotTable Report. The steps are in Microsoft\'s page on a data set too large for the Excel grid (checked 24 November 2026).',
+            'SQLite is a database that lives in a single file on your computer, and its code is in the public domain, according to its copyright page (checked 28 November 2026). Its command-line program, sqlite3, imports a CSV file into a table. If the table does not exist yet, it is created and the first row gives the column names, as the SQLite command-line documentation explains (checked 28 November 2026). In a terminal:',
+          ],
+          code: "sqlite3 orders.db\n.import --csv big.csv orders\nSELECT count(*) FROM orders;\n.mode csv --titles on\n.once riyadh.csv\nSELECT * FROM orders WHERE city = 'Riyadh';\n.quit",
+          list: [
+            'The first line creates a database file called orders.db, or opens it if it is already there.',
+            '.import reads every row of big.csv into a table called orders, and SELECT count(*) tells you how many rows arrived.',
+            'The next three lines write the rows for one city to riyadh.csv, with a header row, in a size Excel can open.',
+            'There is no practical row limit: SQLite\'s limits page gives a theoretical maximum of about 1.8e+19 rows per table and says the maximum database size is reached first (checked 28 November 2026).',
+          ],
+          links: [{ text: 'copyright page', path: 'https://sqlite.org/copyright.html' }, { text: 'SQLite command-line documentation', path: 'https://sqlite.org/cli.html' }, { text: 'SQLite\'s limits page', path: 'https://sqlite.org/limits.html' }],
+        },
+        {
+          heading: 'Option 4: query it with DuckDB',
+          paragraphs: [
+            'DuckDB is a database made for analysing data, and it is MIT-licensed, according to its home page (checked 28 November 2026). It can query a CSV file directly, without importing it first, and it uses the header to name the columns, as its CSV documentation explains (checked 28 November 2026). Start duckdb in a terminal, then run:',
+          ],
+          code: "SELECT count(*) FROM 'big.csv';\nSELECT city, count(*) AS orders, sum(amount) AS total\nFROM 'big.csv' GROUP BY city ORDER BY total DESC;\nCOPY (SELECT * FROM 'big.csv' WHERE city = 'Riyadh') TO 'riyadh.csv' (FORMAT csv, HEADER);",
+          list: [
+            'The first query counts the rows.',
+            'The second totals a column per city, the kind of summary that would need a PivotTable in Excel.',
+            'COPY ... TO writes the rows you choose to a new CSV with a header. It overwrites a file of the same name without asking, according to the COPY documentation (checked 28 November 2026).',
+            'To keep the data in a database instead of reading the CSV each time, run CREATE TABLE orders AS FROM \'big.csv\';',
+          ],
+          links: [{ text: 'home page', path: 'https://duckdb.org/' }, { text: 'CSV documentation', path: 'https://duckdb.org/docs/stable/data/csv/overview' }, { text: 'COPY documentation', path: 'https://duckdb.org/docs/stable/sql/statements/copy' }],
+        },
+        {
+          heading: 'Option 5: read it in chunks with Python and pandas',
+          paragraphs: [
+            'pandas is a Python library for tables, and its About page describes it as free for users to use and modify (checked 28 November 2026). A plain pd.read_csv loads the whole file into memory, which fails when the file is bigger than your computer\'s memory. With chunksize, it hands you the file a fixed number of lines at a time, as the pandas read_csv reference and its guide on iterating through files chunk by chunk explain (checked 28 November 2026). This keeps only the rows you want:',
+          ],
+          code: "import pandas as pd\n\nparts = []\nfor chunk in pd.read_csv('big.csv', chunksize=100_000):\n    parts.append(chunk[chunk['city'] == 'Riyadh'])\npd.concat(parts).to_csv('riyadh.csv', index=False)",
+          list: [
+            'Each chunk is an ordinary table of 100,000 rows, so only one chunk and the rows you keep are in memory at a time.',
+            'The last line joins the kept rows and writes them to riyadh.csv without the extra index column.',
+            'To total a column instead, add each chunk\'s sum to a running total and skip the list.',
+          ],
+          links: [{ text: 'About page', path: 'https://pandas.pydata.org/about/' }, { text: 'pandas read_csv reference', path: 'https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html' }, { text: 'guide on iterating through files chunk by chunk', path: 'https://pandas.pydata.org/docs/user_guide/io.html' }],
+        },
+        {
+          heading: 'Option 6: load it into Excel without a worksheet',
+          paragraphs: [
+            'Excel can load all the rows for a PivotTable without putting them in cells. Open a blank workbook, go to Data, From Text/CSV, pick the file and select Import, then in the preview choose Load To and PivotTable Report. The steps are in Microsoft\'s page on a data set too large for the Excel grid (checked 24 November 2026). You can summarise the data this way, but you still cannot scroll through every row.',
           ],
           links: [{ text: 'page on a data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
-          heading: 'Option 3: split or summarise the file first',
+          heading: 'Option 7: split the file into parts Excel can open',
           paragraphs: [
-            'If the goal is a report, aggregate before Excel: a database (most can import a CSV directly), a few lines of Python with pandas, or the command line (split -l 1000000 file.csv part_ on macOS and Linux) cut the file into pieces Excel can open. For a one-off look at the data, the browser viewer above is faster than any of these.',
+            'If someone needs the rows in Excel, cut the file into pieces under the limit. On macOS and Linux, split -l 1000000 big.csv part_ writes files of one million lines each, but only the first part keeps the header row. Split CSV does the same in your browser and repeats the header in every part, and the guide on how to split a large CSV covers the other ways.',
           ],
+          links: [{ text: 'Split CSV', path: '/split-csv' }, { text: 'how to split a large CSV', path: '/split-large-csv' }],
+        },
+        {
+          heading: 'Keep the data on your computer',
+          paragraphs: [
+            'Big CSV files are often exports of customers, orders or payroll. Many online converters and spreadsheet suites upload the file to their servers before they open it. Every method in this guide except Google Sheets keeps the file on your computer: the browser viewer reads it with your own browser, and SQLite, DuckDB and Python run locally.',
+            'If you send a cut-down copy to someone, take out the personal columns first. Mask data finds names, emails, phone numbers and IDs in a CSV and replaces them in your browser, so the copy you share holds only what the other person needs.',
+          ],
+          links: [{ text: 'Mask data', path: '/mask-data' }],
+        },
+        {
+          heading: 'Which method to choose',
+          paragraphs: [
+            'For a quick look or a filtered copy, the browser viewer is the fastest and needs nothing installed. For reports, totals and repeated work, a database or a few lines of Python do more. The table sums up the options in this guide:',
+          ],
+          table: {
+            columns: ['Method', 'Row limit', 'Uploads the file', 'Cost', 'Can edit'],
+            rows: [
+              ['Excel worksheet', '1,048,576 rows per sheet', 'No', 'Paid', 'Yes'],
+              ['Google Sheets', '20 million cells or 100MB', 'Yes, to Google Drive', 'Free with a Google account', 'Yes'],
+              ['OpenAnyDoc large CSV viewer', 'None of its own; your device\'s memory', 'No', 'Free', 'Yes'],
+              ['Text editor or command line', 'None of its own; big files can be slow', 'No', 'Free, built in', 'Yes, but one lost comma shifts a row'],
+              ['SQLite', 'About 1.8e+19 rows per table', 'No', 'Free, public domain', 'Yes, with SQL'],
+              ['DuckDB', 'No sheet limit; reads the CSV directly', 'No', 'Free, MIT licence', 'Yes, with SQL'],
+              ['Python with pandas', 'No sheet limit when read in chunks', 'No', 'Free', 'Yes, in code'],
+            ],
+          },
+          links: [{ text: 'OpenAnyDoc large CSV viewer', path: '/large-csv-viewer' }],
         },
         {
           heading: 'What to check before you blame the size',
@@ -4025,8 +4119,12 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/csv-too-big-for-excel': {
       published: '2026-10-22',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['يتوقف Excel عند 1,048,576 صفًا في الورقة، فيُقطع ملف CSV الأطول عند فتحه. لترى كل الصفوف، افتح الملف في عارض بلا حد للصفوف، أو حمّله في قاعدة بيانات مثل SQLite أو DuckDB، أو اقرأه على دفعات باستخدام Python.'],
+        },
         {
           heading: 'ما الذي تراه',
           paragraphs: [
@@ -4038,11 +4136,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'لماذا لا يستطيع Excel فتحه',
           paragraphs: [
             'تتسع ورقة العمل لـ 1,048,576 صفًا و16,384 عمودًا على الأكثر، بحسب صفحة مواصفات Excel وحدوده لدى Microsoft (تحققنا منها في 24 نوفمبر 2026). وملف CSV بصفوف أكثر يُقطع عند ذلك السطر. ولـ Google Sheets حده الخاص: ما يصل إلى 20 مليون خلية أو 100 ميغابايت للجدول المُنشأ في Google Sheets أو المحوَّل إليه، بحسب صفحة Google عن الملفات التي يمكنك تخزينها في Google Drive (تحققنا منها في 24 نوفمبر 2026).',
+            'الحجم بالميغابايت دليل تقريبي فقط. ملف بأعمدة قليلة وقصيرة قد يتجاوز مليون صف وهو أقل بكثير من 100 ميغابايت، بينما يبلغ تصدير عريض بنصوص طويلة الحجم نفسه بصفوف أقل بكثير. ما يهم Excel هو عدد الأسطر.',
           ],
           links: [{ text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الملفات التي يمكنك تخزينها في Google Drive', path: 'https://support.google.com/drive/answer/37603' }],
         },
         {
-          heading: 'الخيار الأول: افتحه في المتصفح واقتطع ما تحتاجه',
+          heading: 'أولًا، اعرف حجم الملف الحقيقي',
+          paragraphs: [
+            'قبل أن تختار طريقة، تحقق من رقمين: حجم الملف وعدد صفوفه. يعرض مستكشف الملفات أو Finder الحجم. أما الصفوف فيعدّها الأمر wc -l في الخيار الثاني على macOS وLinux، ويعرض عارض ملفات CSV الكبيرة عددها في شريط الحالة بمجرد فتح الملف.',
+            'إذا كان في الملف أقل من 1,048,576 صفًا وما زال Excel يتجمد، فحد الصفوف ليس المشكلة. الأرجح أن الملف عريض جدًا أو فيه نصوص طويلة، فتنفد ذاكرة Excel. وكثيرًا ما تكفي نسخة فيها الأعمدة التي تحتاجها فقط، وكل طريقة أدناه تستطيع صنعها.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'الخيار الأول: افتحه في عارض للملفات الكبيرة في متصفحك',
           paragraphs: ['يقرأ عارض ملفات CSV الكبيرة الملف على جهازك، ويرسم الصفوف الظاهرة على الشاشة فقط، ولا يرفعه أبدًا:'],
           list: [
             'أفلت الملف على تلك الصفحة. يُفتح ملف من 120,000 صف في أقل من ثانية؛ وليس للعارض حد صفوف خاص به، ويعرض الملف الذي يتجاوز 50 ميغابايت تحذيرًا أولًا لأن الحد هو ذاكرة جهازك لا الأداة.',
@@ -4052,17 +4159,98 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
         },
         {
-          heading: 'الخيار الثاني: حمّله في Excel من دون ورقة عمل',
+          heading: 'الخيار الثاني: محرر نصوص أو سطر الأوامر',
+          paragraphs: ['ملف CSV نص عادي، فيمكنك قراءته من دون أي برنامج جداول. على macOS وLinux تعرض الطرفية الأسطر الأولى وتتصفح الباقي دون تحميل الملف كله:'],
+          code: 'head -n 20 big.csv\nless big.csv\nwc -l big.csv',
+          list: [
+            'يطبع head أول 20 سطرًا، وهذا يكفي لترى سطر العناوين والفاصل وهل القيم بين علامات اقتباس.',
+            'يتصفح less الملف شاشة بعد شاشة؛ اضغط q للخروج.',
+            'يعدّ wc -l الأسطر، وهي عدد الصفوف مع سطر العناوين، إلا إذا احتوت بعض القيم على فواصل أسطر.',
+            'كثير من محررات النصوص المكتبية تحمّل الملف كله دفعة واحدة وتبطؤ مع ملفات بمئات الميغابايت. أما محرر TXT هنا فيفتح الملف النصي الكبير جدًا في عرض قراءة سريع يرسم الأسطر الظاهرة على الشاشة فقط.',
+          ],
+          links: [{ text: 'محرر TXT', path: '/txt-viewer' }],
+        },
+        {
+          heading: 'الخيار الثالث: حمّله في SQLite',
           paragraphs: [
-            'يستطيع Excel تحميل كل الصفوف في PivotTable دون وضعها في الخلايا. افتح مصنفًا فارغًا، واذهب إلى «بيانات» ثم «من نص/CSV»، واختر الملف ثم «استيراد»، وفي المعاينة اختر «تحميل إلى» ثم «تقرير PivotTable». والخطوات في صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026).',
+            'SQLite قاعدة بيانات تعيش في ملف واحد على جهازك، وشيفرتها في الملكية العامة، بحسب صفحة حقوق النشر الخاصة بها (تحققنا منها في 28 نوفمبر 2026). يستورد برنامج سطر الأوامر الخاص بها، sqlite3، ملف CSV إلى جدول. وإن لم يكن الجدول موجودًا يُنشأ، ويعطي الصف الأول أسماء الأعمدة، كما يشرح توثيق سطر أوامر SQLite (تحققنا منه في 28 نوفمبر 2026). في الطرفية:',
+          ],
+          code: "sqlite3 orders.db\n.import --csv big.csv orders\nSELECT count(*) FROM orders;\n.mode csv --titles on\n.once riyadh.csv\nSELECT * FROM orders WHERE city = 'Riyadh';\n.quit",
+          list: [
+            'السطر الأول ينشئ ملف قاعدة بيانات اسمه orders.db، أو يفتحه إن كان موجودًا.',
+            'يقرأ ‎.import كل صفوف big.csv إلى جدول اسمه orders، ويخبرك SELECT count(*)‎ بعدد الصفوف التي وصلت.',
+            'الأسطر الثلاثة التالية تكتب صفوف مدينة واحدة إلى riyadh.csv مع سطر العناوين، بحجم يفتحه Excel.',
+            'لا يوجد حد عملي للصفوف: تذكر صفحة حدود SQLite حدًا نظريًا يقارب 1.8e+19 صف للجدول، وتقول إن الحد الأقصى لحجم قاعدة البيانات يُبلغ قبله (تحققنا منها في 28 نوفمبر 2026).',
+          ],
+          links: [{ text: 'صفحة حقوق النشر الخاصة بها', path: 'https://sqlite.org/copyright.html' }, { text: 'توثيق سطر أوامر SQLite', path: 'https://sqlite.org/cli.html' }, { text: 'صفحة حدود SQLite', path: 'https://sqlite.org/limits.html' }],
+        },
+        {
+          heading: 'الخيار الرابع: استعلم عنه باستخدام DuckDB',
+          paragraphs: [
+            'DuckDB قاعدة بيانات مصممة لتحليل البيانات، ورخصتها MIT، بحسب صفحتها الرئيسية (تحققنا منها في 28 نوفمبر 2026). تستطيع الاستعلام عن ملف CSV مباشرة دون استيراده أولًا، وتستخدم سطر العناوين لتسمية الأعمدة، كما يشرح توثيق CSV الخاص بها (تحققنا منه في 28 نوفمبر 2026). شغّل duckdb في الطرفية، ثم:',
+          ],
+          code: "SELECT count(*) FROM 'big.csv';\nSELECT city, count(*) AS orders, sum(amount) AS total\nFROM 'big.csv' GROUP BY city ORDER BY total DESC;\nCOPY (SELECT * FROM 'big.csv' WHERE city = 'Riyadh') TO 'riyadh.csv' (FORMAT csv, HEADER);",
+          list: [
+            'الاستعلام الأول يعدّ الصفوف.',
+            'الثاني يجمع عمودًا لكل مدينة، وهو نوع الملخص الذي يحتاج إلى PivotTable في Excel.',
+            'يكتب COPY ... TO الصفوف التي تختارها إلى ملف CSV جديد مع سطر العناوين. ويستبدل الملف الذي يحمل الاسم نفسه دون أن يسأل، بحسب توثيق COPY (تحققنا منه في 28 نوفمبر 2026).',
+            'لتحفظ البيانات في قاعدة بيانات بدل قراءة ملف CSV في كل مرة، شغّل ‎CREATE TABLE orders AS FROM \'big.csv\';',
+          ],
+          links: [{ text: 'صفحتها الرئيسية', path: 'https://duckdb.org/' }, { text: 'توثيق CSV الخاص بها', path: 'https://duckdb.org/docs/stable/data/csv/overview' }, { text: 'توثيق COPY', path: 'https://duckdb.org/docs/stable/sql/statements/copy' }],
+        },
+        {
+          heading: 'الخيار الخامس: اقرأه على دفعات باستخدام Python وpandas',
+          paragraphs: [
+            'pandas مكتبة Python للجداول، وتصفها صفحة «حول» الخاصة بها بأنها مجانية للمستخدمين ليستعملوها ويعدّلوها (تحققنا منها في 28 نوفمبر 2026). يحمّل pd.read_csv العادي الملف كله في الذاكرة، فيفشل حين يكون الملف أكبر من ذاكرة جهازك. ومع chunksize يعطيك الملف عددًا ثابتًا من الأسطر في كل مرة، كما يشرح مرجع read_csv في pandas ودليلها عن المرور على الملفات دفعة بعد دفعة (تحققنا منهما في 28 نوفمبر 2026). هذا يُبقي الصفوف التي تريدها فقط:',
+          ],
+          code: "import pandas as pd\n\nparts = []\nfor chunk in pd.read_csv('big.csv', chunksize=100_000):\n    parts.append(chunk[chunk['city'] == 'Riyadh'])\npd.concat(parts).to_csv('riyadh.csv', index=False)",
+          list: [
+            'كل دفعة جدول عادي من 100,000 صف، فلا يكون في الذاكرة إلا دفعة واحدة والصفوف التي تحتفظ بها.',
+            'السطر الأخير يجمع الصفوف المحفوظة ويكتبها إلى riyadh.csv دون عمود الفهرس الإضافي.',
+            'لتجمع عمودًا بدلًا من ذلك، أضف مجموع كل دفعة إلى مجموع متراكم واستغنِ عن القائمة.',
+          ],
+          links: [{ text: 'صفحة «حول» الخاصة بها', path: 'https://pandas.pydata.org/about/' }, { text: 'مرجع read_csv في pandas', path: 'https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html' }, { text: 'دليلها عن المرور على الملفات دفعة بعد دفعة', path: 'https://pandas.pydata.org/docs/user_guide/io.html' }],
+        },
+        {
+          heading: 'الخيار السادس: حمّله في Excel من دون ورقة عمل',
+          paragraphs: [
+            'يستطيع Excel تحميل كل الصفوف في PivotTable دون وضعها في الخلايا. افتح مصنفًا فارغًا، واذهب إلى «بيانات» ثم «من نص/CSV»، واختر الملف ثم «استيراد»، وفي المعاينة اختر «تحميل إلى» ثم «تقرير PivotTable». والخطوات في صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). تستطيع بهذا تلخيص البيانات، لكنك لا تستطيع التمرير عبر كل الصفوف.',
           ],
           links: [{ text: 'صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
-          heading: 'الخيار الثالث: قسّم الملف أو لخّصه أولًا',
+          heading: 'الخيار السابع: قسّم الملف إلى أجزاء يفتحها Excel',
           paragraphs: [
-            'إذا كان الهدف تقريرًا فجمّع البيانات قبل Excel: قاعدة بيانات (معظمها يستورد ملف CSV مباشرة)، أو بضعة أسطر Python مع pandas، أو سطر الأوامر (split -l 1000000 file.csv part_ على macOS وLinux) تقطع الملف إلى أجزاء يفتحها Excel. ولإلقاء نظرة واحدة على البيانات، عارض المتصفح أعلاه أسرع من كل هذه.',
+            'إذا احتاج أحد الصفوف في Excel، فاقطع الملف إلى أجزاء أصغر من الحد. على macOS وLinux يكتب الأمر split -l 1000000 big.csv part_ ملفات من مليون سطر لكل منها، لكن الجزء الأول وحده يحتفظ بسطر العناوين. وأداة تقسيم CSV تفعل ذلك في متصفحك وتكرر سطر العناوين في كل جزء، ويشرح دليل تقسيم ملف CSV كبير الطرق الأخرى.',
           ],
+          links: [{ text: 'تقسيم CSV', path: '/split-csv' }, { text: 'دليل تقسيم ملف CSV كبير', path: '/split-large-csv' }],
+        },
+        {
+          heading: 'أبقِ البيانات على جهازك',
+          paragraphs: [
+            'ملفات CSV الكبيرة كثيرًا ما تكون تصديرًا للعملاء أو الطلبات أو الرواتب. وكثير من أدوات التحويل وحزم الجداول على الإنترنت ترفع الملف إلى خوادمها قبل فتحه. كل طريقة في هذا الدليل، ما عدا Google Sheets، تُبقي الملف على جهازك: يقرأه عارض المتصفح بمتصفحك نفسه، وتعمل SQLite وDuckDB وPython محليًا.',
+            'إذا أرسلت نسخة مختصرة إلى أحد، فأزل الأعمدة الشخصية أولًا. تجد أداة إخفاء البيانات الأسماء والبريد الإلكتروني وأرقام الهواتف والهويات في ملف CSV وتستبدلها في متصفحك، فلا تحمل النسخة التي تشاركها إلا ما يحتاجه الطرف الآخر.',
+          ],
+          links: [{ text: 'إخفاء البيانات', path: '/mask-data' }],
+        },
+        {
+          heading: 'أي طريقة تختار',
+          paragraphs: [
+            'لإلقاء نظرة سريعة أو لنسخة مصفّاة، عارض المتصفح هو الأسرع ولا يحتاج إلى تثبيت شيء. وللتقارير والمجاميع والعمل المتكرر، تفعل قاعدة البيانات أو بضعة أسطر Python أكثر. يلخص الجدول الخيارات في هذا الدليل:',
+          ],
+          table: {
+            columns: ['الطريقة', 'حد الصفوف', 'هل يُرفع الملف', 'التكلفة', 'التعديل'],
+            rows: [
+              ['ورقة عمل Excel', '1,048,576 صفًا في الورقة', 'لا', 'مدفوع', 'نعم'],
+              ['Google Sheets', '20 مليون خلية أو 100 ميغابايت', 'نعم، إلى Google Drive', 'مجاني مع حساب Google', 'نعم'],
+              ['عارض ملفات CSV الكبيرة من OpenAnyDoc', 'لا حد خاص به؛ ذاكرة جهازك', 'لا', 'مجاني', 'نعم'],
+              ['محرر نصوص أو سطر الأوامر', 'لا حد خاص به؛ الملفات الكبيرة قد تبطؤ', 'لا', 'مجاني ومدمج', 'نعم، لكن فاصلة ضائعة تزيح الصف'],
+              ['SQLite', 'نحو 1.8e+19 صف للجدول', 'لا', 'مجاني، ملكية عامة', 'نعم، باستخدام SQL'],
+              ['DuckDB', 'لا حد للورقة؛ يقرأ ملف CSV مباشرة', 'لا', 'مجاني، رخصة MIT', 'نعم، باستخدام SQL'],
+              ['Python مع pandas', 'لا حد للورقة عند القراءة على دفعات', 'لا', 'مجاني', 'نعم، بالشيفرة'],
+            ],
+          },
+          links: [{ text: 'عارض ملفات CSV الكبيرة من OpenAnyDoc', path: '/large-csv-viewer' }],
         },
         {
           heading: 'ما الذي تتحقق منه قبل أن تلوم الحجم',
