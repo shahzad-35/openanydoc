@@ -119,12 +119,40 @@ export default function InfoPage({ address, onNavigate }: { address: string; onN
                 {section.paragraphs.map((paragraph) => (
                   <p key={paragraph} className="mt-2">{withInlineLinks(paragraph, section.links, onNavigate, linkedPhrases, usedLinkIds)}</p>
                 ))}
+                {section.code && (
+                  <pre id={`info-code-${position + 1}`} dir="ltr" className="mt-3 overflow-x-auto rounded-xl border-2 border-rule bg-surface p-4 text-[14px] leading-relaxed">
+                    <code>{section.code}</code>
+                  </pre>
+                )}
                 {section.list && (
                   <ul className="mt-2 list-disc space-y-1 ps-6">
                     {section.list.map((item) => (
                       <li key={item}>{withInlineLinks(item, section.links, onNavigate, linkedPhrases, usedLinkIds)}</li>
                     ))}
                   </ul>
+                )}
+                {section.table && (
+                  <div className="mt-4 overflow-x-auto">
+                    <table id={`info-table-${position + 1}`} className={`w-full border-collapse text-[15px] ${section.table.columns.length > 2 ? 'min-w-[560px]' : ''}`}>
+                      <thead>
+                        <tr>
+                          {section.table.columns.map((column) => (
+                            <th key={column} scope="col" className="border-b-2 border-rule py-2 pe-3 text-start font-semibold">{column}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {section.table.rows.map((row) => (
+                          <tr key={row[0]}>
+                            <th scope="row" className="border-b border-rule py-2 pe-3 text-start align-top font-medium">{withInlineLinks(row[0], section.links, onNavigate, linkedPhrases, usedLinkIds)}</th>
+                            {row.slice(1).map((cell, cellPosition) => (
+                              <td key={cellPosition} className="border-b border-rule py-2 pe-3 align-top text-ink-soft">{cell}</td>
+                            ))}
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 )}
               </section>
             )

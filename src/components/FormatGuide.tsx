@@ -48,7 +48,7 @@ export default function FormatGuide({ content, toolName, fileType, relatedPages,
       </section>
       {content.screenshot && (
         <figure id="viewer-screenshot" className="overflow-hidden rounded-[22px] border-2 border-rule bg-paper-raised">
-          <img src={`/screenshots/${locale}-${fileType}.webp`} width="1200" height="750" loading="lazy" decoding="async" alt={content.screenshot.alt} className="block h-auto w-full" />
+          <img src={`/screenshots/${locale}-${content.screenshot.image ?? fileType}.webp`} width="1200" height="750" loading="lazy" decoding="async" alt={content.screenshot.alt} className="block h-auto w-full" />
           <figcaption className="border-t border-rule px-4 py-3 text-sm text-ink-soft">{content.screenshot.caption}</figcaption>
         </figure>
       )}

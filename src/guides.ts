@@ -131,8 +131,12 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/csv-too-big-for-excel': {
       published: '2026-10-22',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
+        {
+          heading: 'The short answer',
+          paragraphs: ['Excel stops at 1,048,576 rows per sheet, so a longer CSV is cut off when you open it. To see every row, open the file in a viewer with no row limit, load it into a database such as SQLite or DuckDB, or read it in chunks with Python.'],
+        },
         {
           heading: 'What you see',
           paragraphs: [
@@ -144,11 +148,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Why Excel cannot open it',
           paragraphs: [
             'A worksheet holds at most 1,048,576 rows and 16,384 columns, according to Microsoft\'s Excel specifications and limits page (checked 24 November 2026). A CSV with more rows is cut at that line. Google Sheets has its own limit: up to 20 million cells or 100MB for a spreadsheet created in or converted to Google Sheets, according to Google\'s page on files you can store in Google Drive (checked 24 November 2026).',
+            'Size in megabytes is only a rough guide. A file with a few short columns can pass a million rows at well under 100 MB, while a wide export with long text reaches the same size with far fewer rows. What counts for Excel is the number of lines.',
           ],
           links: [{ text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'files you can store in Google Drive', path: 'https://support.google.com/drive/answer/37603' }],
         },
         {
-          heading: 'Option 1: open it in the browser and cut it down',
+          heading: 'First, find out how big the file really is',
+          paragraphs: [
+            'Before you pick a method, check two numbers: the size of the file and the number of rows. File Explorer or Finder shows the size. For the rows, the command wc -l in Option 2 counts them on macOS and Linux, and the large CSV viewer shows the row count in its status bar as soon as the file is open.',
+            'If the file has fewer than 1,048,576 rows and Excel still freezes, the row limit is not the problem. The file is probably very wide or holds long text, and Excel runs short of memory. A copy with only the columns you need is often enough, and every method below can make one.',
+          ],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'Option 1: open it in a big-file viewer in your browser',
           paragraphs: ['The large CSV viewer reads the file on your device, draws only the rows on screen, and never uploads it:'],
           list: [
             'Drop the file on that page. A 120,000-row file opens in under a second; the viewer has no row limit of its own, and a file over 50 MB shows a warning first because the limit is your device\'s memory, not the tool.',
@@ -158,17 +171,98 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }],
         },
         {
-          heading: 'Option 2: load it into Excel without a worksheet',
+          heading: 'Option 2: a text editor or the command line',
+          paragraphs: ['A CSV file is plain text, so you can read it without any spreadsheet. On macOS and Linux, the terminal shows the first lines and pages through the rest without loading the whole file:'],
+          code: 'head -n 20 big.csv\nless big.csv\nwc -l big.csv',
+          list: [
+            'head prints the first 20 lines, which is enough to see the header, the separator and whether values are quoted.',
+            'less scrolls through the file one screen at a time; press q to quit.',
+            'wc -l counts the lines. That is the number of rows plus the header, unless some values contain line breaks.',
+            'Many desktop text editors load the whole file at once and slow down with files of hundreds of megabytes. The TXT editor here opens a very large text file in a fast read view that draws only the lines on screen.',
+          ],
+          links: [{ text: 'TXT editor', path: '/txt-viewer' }],
+        },
+        {
+          heading: 'Option 3: load it into SQLite',
           paragraphs: [
-            'Excel can load all the rows for a PivotTable without putting them in cells. Open a blank workbook, go to Data, From Text/CSV, pick the file and select Import, then in the preview choose Load To and PivotTable Report. The steps are in Microsoft\'s page on a data set too large for the Excel grid (checked 24 November 2026).',
+            'SQLite is a database that lives in a single file on your computer, and its code is in the public domain, according to its copyright page (checked 28 November 2026). Its command-line program, sqlite3, imports a CSV file into a table. If the table does not exist yet, it is created and the first row gives the column names, as the SQLite command-line documentation explains (checked 28 November 2026). In a terminal:',
+          ],
+          code: "sqlite3 orders.db\n.import --csv big.csv orders\nSELECT count(*) FROM orders;\n.mode csv --titles on\n.once riyadh.csv\nSELECT * FROM orders WHERE city = 'Riyadh';\n.quit",
+          list: [
+            'The first line creates a database file called orders.db, or opens it if it is already there.',
+            '.import reads every row of big.csv into a table called orders, and SELECT count(*) tells you how many rows arrived.',
+            'The next three lines write the rows for one city to riyadh.csv, with a header row, in a size Excel can open.',
+            'There is no practical row limit: SQLite\'s limits page gives a theoretical maximum of about 1.8e+19 rows per table and says the maximum database size is reached first (checked 28 November 2026).',
+          ],
+          links: [{ text: 'copyright page', path: 'https://sqlite.org/copyright.html' }, { text: 'SQLite command-line documentation', path: 'https://sqlite.org/cli.html' }, { text: 'SQLite\'s limits page', path: 'https://sqlite.org/limits.html' }],
+        },
+        {
+          heading: 'Option 4: query it with DuckDB',
+          paragraphs: [
+            'DuckDB is a database made for analysing data, and it is MIT-licensed, according to its home page (checked 28 November 2026). It can query a CSV file directly, without importing it first, and it uses the header to name the columns, as its CSV documentation explains (checked 28 November 2026). Start duckdb in a terminal, then run:',
+          ],
+          code: "SELECT count(*) FROM 'big.csv';\nSELECT city, count(*) AS orders, sum(amount) AS total\nFROM 'big.csv' GROUP BY city ORDER BY total DESC;\nCOPY (SELECT * FROM 'big.csv' WHERE city = 'Riyadh') TO 'riyadh.csv' (FORMAT csv, HEADER);",
+          list: [
+            'The first query counts the rows.',
+            'The second totals a column per city, the kind of summary that would need a PivotTable in Excel.',
+            'COPY ... TO writes the rows you choose to a new CSV with a header. It overwrites a file of the same name without asking, according to the COPY documentation (checked 28 November 2026).',
+            'To keep the data in a database instead of reading the CSV each time, run CREATE TABLE orders AS FROM \'big.csv\';',
+          ],
+          links: [{ text: 'home page', path: 'https://duckdb.org/' }, { text: 'CSV documentation', path: 'https://duckdb.org/docs/stable/data/csv/overview' }, { text: 'COPY documentation', path: 'https://duckdb.org/docs/stable/sql/statements/copy' }],
+        },
+        {
+          heading: 'Option 5: read it in chunks with Python and pandas',
+          paragraphs: [
+            'pandas is a Python library for tables, and its About page describes it as free for users to use and modify (checked 28 November 2026). A plain pd.read_csv loads the whole file into memory, which fails when the file is bigger than your computer\'s memory. With chunksize, it hands you the file a fixed number of lines at a time, as the pandas read_csv reference and its guide on iterating through files chunk by chunk explain (checked 28 November 2026). This keeps only the rows you want:',
+          ],
+          code: "import pandas as pd\n\nparts = []\nfor chunk in pd.read_csv('big.csv', chunksize=100_000):\n    parts.append(chunk[chunk['city'] == 'Riyadh'])\npd.concat(parts).to_csv('riyadh.csv', index=False)",
+          list: [
+            'Each chunk is an ordinary table of 100,000 rows, so only one chunk and the rows you keep are in memory at a time.',
+            'The last line joins the kept rows and writes them to riyadh.csv without the extra index column.',
+            'To total a column instead, add each chunk\'s sum to a running total and skip the list.',
+          ],
+          links: [{ text: 'About page', path: 'https://pandas.pydata.org/about/' }, { text: 'pandas read_csv reference', path: 'https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html' }, { text: 'guide on iterating through files chunk by chunk', path: 'https://pandas.pydata.org/docs/user_guide/io.html' }],
+        },
+        {
+          heading: 'Option 6: load it into Excel without a worksheet',
+          paragraphs: [
+            'Excel can load all the rows for a PivotTable without putting them in cells. Open a blank workbook, go to Data, From Text/CSV, pick the file and select Import, then in the preview choose Load To and PivotTable Report. The steps are in Microsoft\'s page on a data set too large for the Excel grid (checked 24 November 2026). You can summarise the data this way, but you still cannot scroll through every row.',
           ],
           links: [{ text: 'page on a data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
-          heading: 'Option 3: split or summarise the file first',
+          heading: 'Option 7: split the file into parts Excel can open',
           paragraphs: [
-            'If the goal is a report, aggregate before Excel: a database (most can import a CSV directly), a few lines of Python with pandas, or the command line (split -l 1000000 file.csv part_ on macOS and Linux) cut the file into pieces Excel can open. For a one-off look at the data, the browser viewer above is faster than any of these.',
+            'If someone needs the rows in Excel, cut the file into pieces under the limit. On macOS and Linux, split -l 1000000 big.csv part_ writes files of one million lines each, but only the first part keeps the header row. Split CSV does the same in your browser and repeats the header in every part, and the guide on how to split a large CSV covers the other ways.',
           ],
+          links: [{ text: 'Split CSV', path: '/split-csv' }, { text: 'how to split a large CSV', path: '/split-large-csv' }],
+        },
+        {
+          heading: 'Keep the data on your computer',
+          paragraphs: [
+            'Big CSV files are often exports of customers, orders or payroll. Many online converters and spreadsheet suites upload the file to their servers before they open it. Every method in this guide except Google Sheets keeps the file on your computer: the browser viewer reads it with your own browser, and SQLite, DuckDB and Python run locally.',
+            'If you send a cut-down copy to someone, take out the personal columns first. Mask data finds names, emails, phone numbers and IDs in a CSV and replaces them in your browser, so the copy you share holds only what the other person needs.',
+          ],
+          links: [{ text: 'Mask data', path: '/mask-data' }],
+        },
+        {
+          heading: 'Which method to choose',
+          paragraphs: [
+            'For a quick look or a filtered copy, the browser viewer is the fastest and needs nothing installed. For reports, totals and repeated work, a database or a few lines of Python do more. The table sums up the options in this guide:',
+          ],
+          table: {
+            columns: ['Method', 'Row limit', 'Uploads the file', 'Cost', 'Can edit'],
+            rows: [
+              ['Excel worksheet', '1,048,576 rows per sheet', 'No', 'Paid', 'Yes'],
+              ['Google Sheets', '20 million cells or 100MB', 'Yes, to Google Drive', 'Free with a Google account', 'Yes'],
+              ['OpenAnyDoc large CSV viewer', 'None of its own; your device\'s memory', 'No', 'Free', 'Yes'],
+              ['Text editor or command line', 'None of its own; big files can be slow', 'No', 'Free, built in', 'Yes, but one lost comma shifts a row'],
+              ['SQLite', 'About 1.8e+19 rows per table', 'No', 'Free, public domain', 'Yes, with SQL'],
+              ['DuckDB', 'No sheet limit; reads the CSV directly', 'No', 'Free, MIT licence', 'Yes, with SQL'],
+              ['Python with pandas', 'No sheet limit when read in chunks', 'No', 'Free', 'Yes, in code'],
+            ],
+          },
+          links: [{ text: 'OpenAnyDoc large CSV viewer', path: '/large-csv-viewer' }],
         },
         {
           heading: 'What to check before you blame the size',
@@ -338,7 +432,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-xlsx-without-excel': {
       published: '2026-10-30',
-      updated: '2026-11-23',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -362,6 +456,27 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Online suites (the file is uploaded)',
           paragraphs: ['Google Sheets opens an .xlsx file that is in Google Drive, according to Google\'s page on using Office files (checked 24 November 2026). It needs a Google account, and the workbook is stored on Google\'s servers. That is fine for most files, but not for payroll, customer lists or anything you are not allowed to share.'],
           links: [{ text: 'page on using Office files', path: 'https://support.google.com/docs/answer/6055139' }],
+        },
+        {
+          heading: 'Excel for the web',
+          paragraphs: [
+            'Microsoft offers Word, Excel and PowerPoint free on the web, according to its page on Microsoft 365 for the web (checked 28 November 2026). You sign in with a free Microsoft account, and the same page notes that files must be saved in and shared from OneDrive, so a workbook from your computer is uploaded to Microsoft\'s servers before it opens.',
+            'Cell formats and number formats look much as they do in the desktop app, but not everything works: macros in .xlsm files do not run in the browser, and protected sheets can only be viewed, according to Microsoft\'s page on the differences between a workbook in the browser and in Excel (checked 28 November 2026).',
+          ],
+          links: [{ text: 'page on Microsoft 365 for the web', path: 'https://www.microsoft.com/en-us/microsoft-365/free-office-online-for-the-web' }, { text: 'differences between a workbook in the browser and in Excel', path: 'https://support.microsoft.com/en-us/office/differences-between-using-a-workbook-in-the-browser-and-in-excel-f0dc28ed-b85d-4e1d-be6d-5878005db3b6' }],
+        },
+        {
+          heading: 'The online options compared',
+          paragraphs: ['All three open an .xlsx file in a browser and let you edit it. The difference is where the file goes and what you need to sign in with. Google\'s page on working with Office files lists macros and linked spreadsheets among the features Sheets does not support (checked 28 November 2026).'],
+          table: {
+            columns: ['Option', 'Uploads the file', 'Account needed', 'Can edit', 'Formatting kept'],
+            rows: [
+              ['OpenAnyDoc Excel viewer', 'No', 'No', 'Yes', 'Values, formulas, number formats, merged cells and column widths; cell styles in .xlsx files. Not charts, images, pivot tables or conditional formats.'],
+              ['Excel for the web', 'Yes, to OneDrive', 'Yes, a Microsoft account', 'Yes', 'Cell and number formats show much as in Excel; macros do not run.'],
+              ['Google Sheets', 'Yes, to Google Drive', 'Yes, a Google account', 'Yes', 'Macros and linked spreadsheets are not supported.'],
+            ],
+          },
+          links: [{ text: 'page on working with Office files', path: 'https://support.google.com/docs/answer/6055139' }, { text: 'OpenAnyDoc Excel viewer', path: '/excel-viewer' }],
         },
         {
           heading: 'On a phone',
@@ -711,11 +826,29 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-txt-file': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
           paragraphs: ['A .txt file is plain text, so any text editor opens it and you do not need to install anything. On Windows it opens in Notepad, on a Mac in TextEdit, on an iPhone or iPad in the Files app, and on Android in Google Docs, Google Drive or the text viewer of your file manager. Every web browser can show one too. If the text appears as strange symbols, the program has guessed the wrong encoding; the fix is further down.'],
+        },
+        {
+          heading: 'Which program is used to open .txt files?',
+          paragraphs: ['Every computer and phone comes with a program that opens .txt files, so you rarely need to install one. Double-click or tap the file and it opens in the program below; in any browser, the OpenAnyDoc TXT editor opens and edits it with nothing to install.'],
+          table: {
+            columns: ['Device', 'Program that opens a .txt file'],
+            rows: [
+              ['Windows', 'Notepad'],
+              ['Mac', 'TextEdit'],
+              ['Linux', 'The desktop\'s text editor, such as GNOME Text Editor or KDE\'s KWrite'],
+              // TODO(check): no Google help page names the app that opens .txt on ChromeOS; only the Files app double-click is confirmed.
+              ['ChromeOS', 'The Files app: double-click the file'],
+              ['iPhone or iPad', 'Files'],
+              ['Android', 'Your file manager, Google Docs or Google Drive'],
+              ['Any browser', 'OpenAnyDoc TXT editor'],
+            ],
+          },
+          links: [{ text: 'OpenAnyDoc TXT editor', path: '/txt-viewer' }],
         },
         {
           heading: 'On Windows',
@@ -731,6 +864,21 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'On a Mac',
           paragraphs: ['TextEdit opens plain text files. To read one without opening any app, select it in Finder and press the Space bar for a quick preview. If TextEdit shows the wrong characters, open TextEdit, Settings (Preferences on older versions of macOS), Open and Save, set the plain text encoding for opening files to the right one, for example Unicode (UTF-8), and open the file again. Apple describes these steps in its page on previewing files and its TextEdit guide (checked 24 November 2026).'],
           links: [{ text: 'page on previewing files', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }, { text: 'TextEdit guide', path: 'https://support.apple.com/guide/textedit/txted1028/mac' }],
+        },
+        {
+          heading: 'On Linux',
+          paragraphs: [
+            'Every Linux desktop comes with a plain text editor. GNOME has Text Editor, described on its app page as a simple text editor, and KDE has KWrite, a text editor based on the editor component of Kate, according to KDE\'s app page (both checked 28 November 2026). Double-click the file in the file manager and it opens in the default application for its type.',
+            'To use another program on GNOME, right-click the file and pick the application from the top of the menu, or choose Open With… to see the others. To make that choice stick, right-click the file, select Properties, open the Open With tab, choose the application and click Set as default. GNOME\'s help page on opening files with other applications gives these steps (checked 28 November 2026). In KDE\'s file manager, Dolphin, right-clicking a file opens a menu of actions for it, as the Dolphin handbook says (checked 28 November 2026).',
+          ],
+          // TODO(check): the Dolphin handbook pages read so far do not name its "Open With" menu item; confirm before giving KDE steps.
+          links: [{ text: 'its app page', path: 'https://apps.gnome.org/TextEditor/' }, { text: 'KDE\'s app page', path: 'https://apps.kde.org/kwrite/' }, { text: 'help page on opening files with other applications', path: 'https://help.gnome.org/users/gnome-help/stable/files-open.html.en' }, { text: 'Dolphin handbook', path: 'https://docs.kde.org/stable_kf6/en/dolphin/dolphin/dolphin-view.html' }],
+        },
+        {
+          heading: 'On ChromeOS',
+          paragraphs: ['On a Chromebook, open the Files app, find the file and double-click it. Google\'s list of file types supported on a Chromebook includes .txt, and its page on opening files gives the double-click step (both checked 28 November 2026). To edit the text and save a copy in the encoding you choose, open the TXT editor in Chrome and pick the file there.'],
+          // TODO(check): no Google help page found that names the default .txt app or gives "Open with" steps on ChromeOS.
+          links: [{ text: 'list of file types supported on a Chromebook', path: 'https://support.google.com/chromebook/answer/183093' }, { text: 'page on opening files', path: 'https://support.google.com/chromebook/answer/1700055' }, { text: 'TXT editor', path: '/txt-viewer' }],
         },
         {
           heading: 'On a phone or tablet',
@@ -782,7 +930,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-csv-without-excel': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -813,8 +961,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Files too big for Excel',
-          paragraphs: ['An Excel sheet stops at 1,048,576 rows. The large CSV viewer has no row limit of its own: a 120,000-row file opens in under a second, and the real limit is your device\'s memory, with a warning above 50 MB. Why Excel cuts the file short, and other ways around it, are explained in CSV too big for Excel.'],
-          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['An Excel sheet stops at 1,048,576 rows. The large CSV viewer has no row limit of its own: a 120,000-row file opens in under a second, and the real limit is your device\'s memory, with a warning above 50 MB. Why Excel cuts the file short, and other ways around it, are explained in how to open a large CSV file.'],
+          links: [{ text: 'large CSV viewer', path: '/large-csv-viewer' }, { text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'The file opens in one column',
@@ -2559,7 +2707,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/split-large-csv': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -2610,13 +2758,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'Choose the part size for where the file is going',
           paragraphs: ['The right number depends on what will read the parts:'],
           list: [
-            'Excel: up to 1,048,575 data rows per part; 1,000,000 is a safe round number. If Excel is slow even below the row limit, CSV too big for Excel covers the other options.',
+            'Excel: up to 1,048,575 data rows per part; 1,000,000 is a safe round number. If Excel is slow even below the row limit, the guide on how to open a large CSV file covers the other options.',
             'An upload form with a size limit, such as 10 MB: use "Size per file" and set it a little lower, for example 9 MB, because each part is about that size, not exactly.',
             'An AI chat: what counts there is tokens, not rows. Count one part with the Token counter, then pick a number of rows that fits. File too large for ChatGPT explains the limits.',
             'If a part opens in one column in Excel, the split is fine; the separator does not match your PC. CSV opens in one column explains the fix.',
           ],
           links: [
-            { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' },
+            { text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' },
             { text: 'Token counter', path: '/token-counter' },
             { text: 'File too large for ChatGPT', path: '/file-too-large-for-chatgpt' },
             { text: 'CSV opens in one column', path: '/csv-opens-in-one-column' },
@@ -2827,7 +2975,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/excel-row-and-column-limits': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -2856,7 +3004,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'What each limit means for a real file',
-          paragraphs: ['Most people only meet the row limit, which the guide on a CSV too big for Excel covers in detail. The other limits catch people out more quietly. The figures are from the Excel specifications and limits page and Microsoft\'s page on keeping leading zeros and large numbers (checked 24 November 2026):'],
+          paragraphs: ['Most people only meet the row limit, which the guide on how to open a large CSV file covers in detail. The other limits catch people out more quietly. The figures are from the Excel specifications and limits page and Microsoft\'s page on keeping leading zeros and large numbers (checked 24 November 2026):'],
           list: [
             'Columns: wide exports reach 16,384 long before they get near a million rows. A survey with one column per question and answer option, or sensor data with one column per reading, can be a few thousand rows long and still be too wide.',
             '15 digits: Excel keeps 15 significant digits of a number, so a 16-digit reference typed or opened as a number, such as 1234567890123456, is stored as 1234567890123450. Order numbers, barcodes and other long codes are safe only as text.',
@@ -2865,7 +3013,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'Dates before 1900: they are earlier than the first date Excel calculates with, so Excel cannot calculate with records from the 1800s as dates.',
             '10,000 filter items: a column with more different values than that does not show all of them in its filter list, so use a text filter such as Contains instead of ticking values.',
           ],
-          links: [{ text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }, { text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'keeping leading zeros and large numbers', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+          links: [{ text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }, { text: 'Excel specifications and limits page', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'keeping leading zeros and large numbers', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
         },
         {
           heading: 'Worked example: will this export fit?',
@@ -3400,7 +3548,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/best-free-csv-viewers': {
       published: '2026-11-24',
-      updated: '2026-11-25',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -3463,8 +3611,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Which free CSV viewer opens the largest files?',
-          paragraphs: ['No program has one fixed answer, because the real limit is usually your computer\'s memory. Google Sheets stops at 20 million cells per spreadsheet and spreadsheet apps stop at a row limit, while OpenAnyDoc has no row limit of its own and Modern CSV and Tad say they handle large files. Try your own file; CSV too big for Excel explains the other options.'],
-          links: [{ text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['No program has one fixed answer, because the real limit is usually your computer\'s memory. Google Sheets stops at 20 million cells per spreadsheet and spreadsheet apps stop at a row limit, while OpenAnyDoc has no row limit of its own and Modern CSV and Tad say they handle large files. Try your own file; how to open a large CSV file explains the other options.'],
+          links: [{ text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'Can I open a CSV without uploading it anywhere?',
@@ -3572,7 +3720,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/openanydoc-vs-google-sheets-large-files': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -3623,8 +3771,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'Where Google Sheets and Excel do more',
-          paragraphs: ['Spreadsheets are built for work a viewer does not do. Google Sheets lets several people edit the same spreadsheet at the same time, with formulas, pivot tables and charts, as the Sheets product page says. Excel has formulas, PivotTables, charts and Power Query, and its Data Model can hold millions of rows, more than a sheet, as Microsoft\'s page on a memory-efficient Data Model says (both checked 24 November 2026); CSV too big for Excel shows the steps. OpenAnyDoc edits values and saves CSV or Excel files, but it has no formulas and no live copy that a team edits together.'],
-          links: [{ text: 'Sheets product page', path: 'https://workspace.google.com/products/sheets/' }, { text: 'memory-efficient Data Model', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['Spreadsheets are built for work a viewer does not do. Google Sheets lets several people edit the same spreadsheet at the same time, with formulas, pivot tables and charts, as the Sheets product page says. Excel has formulas, PivotTables, charts and Power Query, and its Data Model can hold millions of rows, more than a sheet, as Microsoft\'s page on a memory-efficient Data Model says (both checked 24 November 2026); the guide on how to open a large CSV file shows the steps. OpenAnyDoc edits values and saves CSV or Excel files, but it has no formulas and no live copy that a team edits together.'],
+          links: [{ text: 'Sheets product page', path: 'https://workspace.google.com/products/sheets/' }, { text: 'memory-efficient Data Model', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'how to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'Which one to use',
@@ -3660,7 +3808,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/large-csv-test': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'The short answer',
@@ -3747,9 +3895,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'Can Excel open a CSV with 3 million rows?',
           paragraphs: [
-            'Excel cannot show 3 million rows in one worksheet, because a worksheet stops at 1,048,576 rows. Opened directly, Excel warns that the data set is too large for the Excel grid and that some data was not loaded. Power Query can load the complete data set for PivotTables, or you can split the file first, as Microsoft\'s page on a data set too large for the Excel grid explains (checked 24 November 2026). CSV too big for Excel explains every option.',
+            'Excel cannot show 3 million rows in one worksheet, because a worksheet stops at 1,048,576 rows. Opened directly, Excel warns that the data set is too large for the Excel grid and that some data was not loaded. Power Query can load the complete data set for PivotTables, or you can split the file first, as Microsoft\'s page on a data set too large for the Excel grid explains (checked 24 November 2026). How to open a large CSV file explains every option.',
           ],
-          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'CSV too big for Excel', path: '/csv-too-big-for-excel' }],
+          links: [{ text: 'data set too large for the Excel grid', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'How to open a large CSV file', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'Why can\'t Google Sheets import a very large CSV?',
@@ -4025,8 +4173,12 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/csv-too-big-for-excel': {
       published: '2026-10-22',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
+        {
+          heading: 'الإجابة المختصرة',
+          paragraphs: ['يتوقف Excel عند 1,048,576 صفًا في الورقة، فيُقطع ملف CSV الأطول عند فتحه. لترى كل الصفوف، افتح الملف في عارض بلا حد للصفوف، أو حمّله في قاعدة بيانات مثل SQLite أو DuckDB، أو اقرأه على دفعات باستخدام Python.'],
+        },
         {
           heading: 'ما الذي تراه',
           paragraphs: [
@@ -4038,11 +4190,20 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'لماذا لا يستطيع Excel فتحه',
           paragraphs: [
             'تتسع ورقة العمل لـ 1,048,576 صفًا و16,384 عمودًا على الأكثر، بحسب صفحة مواصفات Excel وحدوده لدى Microsoft (تحققنا منها في 24 نوفمبر 2026). وملف CSV بصفوف أكثر يُقطع عند ذلك السطر. ولـ Google Sheets حده الخاص: ما يصل إلى 20 مليون خلية أو 100 ميغابايت للجدول المُنشأ في Google Sheets أو المحوَّل إليه، بحسب صفحة Google عن الملفات التي يمكنك تخزينها في Google Drive (تحققنا منها في 24 نوفمبر 2026).',
+            'الحجم بالميغابايت دليل تقريبي فقط. ملف بأعمدة قليلة وقصيرة قد يتجاوز مليون صف وهو أقل بكثير من 100 ميغابايت، بينما يبلغ تصدير عريض بنصوص طويلة الحجم نفسه بصفوف أقل بكثير. ما يهم Excel هو عدد الأسطر.',
           ],
           links: [{ text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الملفات التي يمكنك تخزينها في Google Drive', path: 'https://support.google.com/drive/answer/37603' }],
         },
         {
-          heading: 'الخيار الأول: افتحه في المتصفح واقتطع ما تحتاجه',
+          heading: 'أولًا، اعرف حجم الملف الحقيقي',
+          paragraphs: [
+            'قبل أن تختار طريقة، تحقق من رقمين: حجم الملف وعدد صفوفه. يعرض مستكشف الملفات أو Finder الحجم. أما الصفوف فيعدّها الأمر wc -l في الخيار الثاني على macOS وLinux، ويعرض عارض ملفات CSV الكبيرة عددها في شريط الحالة بمجرد فتح الملف.',
+            'إذا كان في الملف أقل من 1,048,576 صفًا وما زال Excel يتجمد، فحد الصفوف ليس المشكلة. الأرجح أن الملف عريض جدًا أو فيه نصوص طويلة، فتنفد ذاكرة Excel. وكثيرًا ما تكفي نسخة فيها الأعمدة التي تحتاجها فقط، وكل طريقة أدناه تستطيع صنعها.',
+          ],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
+        },
+        {
+          heading: 'الخيار الأول: افتحه في عارض للملفات الكبيرة في متصفحك',
           paragraphs: ['يقرأ عارض ملفات CSV الكبيرة الملف على جهازك، ويرسم الصفوف الظاهرة على الشاشة فقط، ولا يرفعه أبدًا:'],
           list: [
             'أفلت الملف على تلك الصفحة. يُفتح ملف من 120,000 صف في أقل من ثانية؛ وليس للعارض حد صفوف خاص به، ويعرض الملف الذي يتجاوز 50 ميغابايت تحذيرًا أولًا لأن الحد هو ذاكرة جهازك لا الأداة.',
@@ -4052,17 +4213,98 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }],
         },
         {
-          heading: 'الخيار الثاني: حمّله في Excel من دون ورقة عمل',
+          heading: 'الخيار الثاني: محرر نصوص أو سطر الأوامر',
+          paragraphs: ['ملف CSV نص عادي، فيمكنك قراءته من دون أي برنامج جداول. على macOS وLinux تعرض الطرفية الأسطر الأولى وتتصفح الباقي دون تحميل الملف كله:'],
+          code: 'head -n 20 big.csv\nless big.csv\nwc -l big.csv',
+          list: [
+            'يطبع head أول 20 سطرًا، وهذا يكفي لترى سطر العناوين والفاصل وهل القيم بين علامات اقتباس.',
+            'يتصفح less الملف شاشة بعد شاشة؛ اضغط q للخروج.',
+            'يعدّ wc -l الأسطر، وهي عدد الصفوف مع سطر العناوين، إلا إذا احتوت بعض القيم على فواصل أسطر.',
+            'كثير من محررات النصوص المكتبية تحمّل الملف كله دفعة واحدة وتبطؤ مع ملفات بمئات الميغابايت. أما محرر TXT هنا فيفتح الملف النصي الكبير جدًا في عرض قراءة سريع يرسم الأسطر الظاهرة على الشاشة فقط.',
+          ],
+          links: [{ text: 'محرر TXT', path: '/txt-viewer' }],
+        },
+        {
+          heading: 'الخيار الثالث: حمّله في SQLite',
           paragraphs: [
-            'يستطيع Excel تحميل كل الصفوف في PivotTable دون وضعها في الخلايا. افتح مصنفًا فارغًا، واذهب إلى «بيانات» ثم «من نص/CSV»، واختر الملف ثم «استيراد»، وفي المعاينة اختر «تحميل إلى» ثم «تقرير PivotTable». والخطوات في صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026).',
+            'SQLite قاعدة بيانات تعيش في ملف واحد على جهازك، وشيفرتها في الملكية العامة، بحسب صفحة حقوق النشر الخاصة بها (تحققنا منها في 28 نوفمبر 2026). يستورد برنامج سطر الأوامر الخاص بها، sqlite3، ملف CSV إلى جدول. وإن لم يكن الجدول موجودًا يُنشأ، ويعطي الصف الأول أسماء الأعمدة، كما يشرح توثيق سطر أوامر SQLite (تحققنا منه في 28 نوفمبر 2026). في الطرفية:',
+          ],
+          code: "sqlite3 orders.db\n.import --csv big.csv orders\nSELECT count(*) FROM orders;\n.mode csv --titles on\n.once riyadh.csv\nSELECT * FROM orders WHERE city = 'Riyadh';\n.quit",
+          list: [
+            'السطر الأول ينشئ ملف قاعدة بيانات اسمه orders.db، أو يفتحه إن كان موجودًا.',
+            'يقرأ ‎.import كل صفوف big.csv إلى جدول اسمه orders، ويخبرك SELECT count(*)‎ بعدد الصفوف التي وصلت.',
+            'الأسطر الثلاثة التالية تكتب صفوف مدينة واحدة إلى riyadh.csv مع سطر العناوين، بحجم يفتحه Excel.',
+            'لا يوجد حد عملي للصفوف: تذكر صفحة حدود SQLite حدًا نظريًا يقارب 1.8e+19 صف للجدول، وتقول إن الحد الأقصى لحجم قاعدة البيانات يُبلغ قبله (تحققنا منها في 28 نوفمبر 2026).',
+          ],
+          links: [{ text: 'صفحة حقوق النشر الخاصة بها', path: 'https://sqlite.org/copyright.html' }, { text: 'توثيق سطر أوامر SQLite', path: 'https://sqlite.org/cli.html' }, { text: 'صفحة حدود SQLite', path: 'https://sqlite.org/limits.html' }],
+        },
+        {
+          heading: 'الخيار الرابع: استعلم عنه باستخدام DuckDB',
+          paragraphs: [
+            'DuckDB قاعدة بيانات مصممة لتحليل البيانات، ورخصتها MIT، بحسب صفحتها الرئيسية (تحققنا منها في 28 نوفمبر 2026). تستطيع الاستعلام عن ملف CSV مباشرة دون استيراده أولًا، وتستخدم سطر العناوين لتسمية الأعمدة، كما يشرح توثيق CSV الخاص بها (تحققنا منه في 28 نوفمبر 2026). شغّل duckdb في الطرفية، ثم:',
+          ],
+          code: "SELECT count(*) FROM 'big.csv';\nSELECT city, count(*) AS orders, sum(amount) AS total\nFROM 'big.csv' GROUP BY city ORDER BY total DESC;\nCOPY (SELECT * FROM 'big.csv' WHERE city = 'Riyadh') TO 'riyadh.csv' (FORMAT csv, HEADER);",
+          list: [
+            'الاستعلام الأول يعدّ الصفوف.',
+            'الثاني يجمع عمودًا لكل مدينة، وهو نوع الملخص الذي يحتاج إلى PivotTable في Excel.',
+            'يكتب COPY ... TO الصفوف التي تختارها إلى ملف CSV جديد مع سطر العناوين. ويستبدل الملف الذي يحمل الاسم نفسه دون أن يسأل، بحسب توثيق COPY (تحققنا منه في 28 نوفمبر 2026).',
+            'لتحفظ البيانات في قاعدة بيانات بدل قراءة ملف CSV في كل مرة، شغّل ‎CREATE TABLE orders AS FROM \'big.csv\';',
+          ],
+          links: [{ text: 'صفحتها الرئيسية', path: 'https://duckdb.org/' }, { text: 'توثيق CSV الخاص بها', path: 'https://duckdb.org/docs/stable/data/csv/overview' }, { text: 'توثيق COPY', path: 'https://duckdb.org/docs/stable/sql/statements/copy' }],
+        },
+        {
+          heading: 'الخيار الخامس: اقرأه على دفعات باستخدام Python وpandas',
+          paragraphs: [
+            'pandas مكتبة Python للجداول، وتصفها صفحة «حول» الخاصة بها بأنها مجانية للمستخدمين ليستعملوها ويعدّلوها (تحققنا منها في 28 نوفمبر 2026). يحمّل pd.read_csv العادي الملف كله في الذاكرة، فيفشل حين يكون الملف أكبر من ذاكرة جهازك. ومع chunksize يعطيك الملف عددًا ثابتًا من الأسطر في كل مرة، كما يشرح مرجع read_csv في pandas ودليلها عن المرور على الملفات دفعة بعد دفعة (تحققنا منهما في 28 نوفمبر 2026). هذا يُبقي الصفوف التي تريدها فقط:',
+          ],
+          code: "import pandas as pd\n\nparts = []\nfor chunk in pd.read_csv('big.csv', chunksize=100_000):\n    parts.append(chunk[chunk['city'] == 'Riyadh'])\npd.concat(parts).to_csv('riyadh.csv', index=False)",
+          list: [
+            'كل دفعة جدول عادي من 100,000 صف، فلا يكون في الذاكرة إلا دفعة واحدة والصفوف التي تحتفظ بها.',
+            'السطر الأخير يجمع الصفوف المحفوظة ويكتبها إلى riyadh.csv دون عمود الفهرس الإضافي.',
+            'لتجمع عمودًا بدلًا من ذلك، أضف مجموع كل دفعة إلى مجموع متراكم واستغنِ عن القائمة.',
+          ],
+          links: [{ text: 'صفحة «حول» الخاصة بها', path: 'https://pandas.pydata.org/about/' }, { text: 'مرجع read_csv في pandas', path: 'https://pandas.pydata.org/docs/reference/api/pandas.read_csv.html' }, { text: 'دليلها عن المرور على الملفات دفعة بعد دفعة', path: 'https://pandas.pydata.org/docs/user_guide/io.html' }],
+        },
+        {
+          heading: 'الخيار السادس: حمّله في Excel من دون ورقة عمل',
+          paragraphs: [
+            'يستطيع Excel تحميل كل الصفوف في PivotTable دون وضعها في الخلايا. افتح مصنفًا فارغًا، واذهب إلى «بيانات» ثم «من نص/CSV»، واختر الملف ثم «استيراد»، وفي المعاينة اختر «تحميل إلى» ثم «تقرير PivotTable». والخطوات في صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). تستطيع بهذا تلخيص البيانات، لكنك لا تستطيع التمرير عبر كل الصفوف.',
           ],
           links: [{ text: 'صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }],
         },
         {
-          heading: 'الخيار الثالث: قسّم الملف أو لخّصه أولًا',
+          heading: 'الخيار السابع: قسّم الملف إلى أجزاء يفتحها Excel',
           paragraphs: [
-            'إذا كان الهدف تقريرًا فجمّع البيانات قبل Excel: قاعدة بيانات (معظمها يستورد ملف CSV مباشرة)، أو بضعة أسطر Python مع pandas، أو سطر الأوامر (split -l 1000000 file.csv part_ على macOS وLinux) تقطع الملف إلى أجزاء يفتحها Excel. ولإلقاء نظرة واحدة على البيانات، عارض المتصفح أعلاه أسرع من كل هذه.',
+            'إذا احتاج أحد الصفوف في Excel، فاقطع الملف إلى أجزاء أصغر من الحد. على macOS وLinux يكتب الأمر split -l 1000000 big.csv part_ ملفات من مليون سطر لكل منها، لكن الجزء الأول وحده يحتفظ بسطر العناوين. وأداة تقسيم CSV تفعل ذلك في متصفحك وتكرر سطر العناوين في كل جزء، ويشرح دليل تقسيم ملف CSV كبير الطرق الأخرى.',
           ],
+          links: [{ text: 'تقسيم CSV', path: '/split-csv' }, { text: 'دليل تقسيم ملف CSV كبير', path: '/split-large-csv' }],
+        },
+        {
+          heading: 'أبقِ البيانات على جهازك',
+          paragraphs: [
+            'ملفات CSV الكبيرة كثيرًا ما تكون تصديرًا للعملاء أو الطلبات أو الرواتب. وكثير من أدوات التحويل وحزم الجداول على الإنترنت ترفع الملف إلى خوادمها قبل فتحه. كل طريقة في هذا الدليل، ما عدا Google Sheets، تُبقي الملف على جهازك: يقرأه عارض المتصفح بمتصفحك نفسه، وتعمل SQLite وDuckDB وPython محليًا.',
+            'إذا أرسلت نسخة مختصرة إلى أحد، فأزل الأعمدة الشخصية أولًا. تجد أداة إخفاء البيانات الأسماء والبريد الإلكتروني وأرقام الهواتف والهويات في ملف CSV وتستبدلها في متصفحك، فلا تحمل النسخة التي تشاركها إلا ما يحتاجه الطرف الآخر.',
+          ],
+          links: [{ text: 'إخفاء البيانات', path: '/mask-data' }],
+        },
+        {
+          heading: 'أي طريقة تختار',
+          paragraphs: [
+            'لإلقاء نظرة سريعة أو لنسخة مصفّاة، عارض المتصفح هو الأسرع ولا يحتاج إلى تثبيت شيء. وللتقارير والمجاميع والعمل المتكرر، تفعل قاعدة البيانات أو بضعة أسطر Python أكثر. يلخص الجدول الخيارات في هذا الدليل:',
+          ],
+          table: {
+            columns: ['الطريقة', 'حد الصفوف', 'هل يُرفع الملف', 'التكلفة', 'التعديل'],
+            rows: [
+              ['ورقة عمل Excel', '1,048,576 صفًا في الورقة', 'لا', 'مدفوع', 'نعم'],
+              ['Google Sheets', '20 مليون خلية أو 100 ميغابايت', 'نعم، إلى Google Drive', 'مجاني مع حساب Google', 'نعم'],
+              ['عارض ملفات CSV الكبيرة من OpenAnyDoc', 'لا حد خاص به؛ ذاكرة جهازك', 'لا', 'مجاني', 'نعم'],
+              ['محرر نصوص أو سطر الأوامر', 'لا حد خاص به؛ الملفات الكبيرة قد تبطؤ', 'لا', 'مجاني ومدمج', 'نعم، لكن فاصلة ضائعة تزيح الصف'],
+              ['SQLite', 'نحو 1.8e+19 صف للجدول', 'لا', 'مجاني، ملكية عامة', 'نعم، باستخدام SQL'],
+              ['DuckDB', 'لا حد للورقة؛ يقرأ ملف CSV مباشرة', 'لا', 'مجاني، رخصة MIT', 'نعم، باستخدام SQL'],
+              ['Python مع pandas', 'لا حد للورقة عند القراءة على دفعات', 'لا', 'مجاني', 'نعم، بالشيفرة'],
+            ],
+          },
+          links: [{ text: 'عارض ملفات CSV الكبيرة من OpenAnyDoc', path: '/large-csv-viewer' }],
         },
         {
           heading: 'ما الذي تتحقق منه قبل أن تلوم الحجم',
@@ -4232,7 +4474,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-xlsx-without-excel': {
       published: '2026-10-30',
-      updated: '2026-11-23',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -4256,6 +4498,27 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'الحزم على الإنترنت (يُرفع الملف)',
           paragraphs: ['يفتح Google Sheets ملف xlsx الموجود في Google Drive، بحسب صفحة Google عن استخدام ملفات Office (تحققنا منها في 24 نوفمبر 2026). ويحتاج حساب Google، ويُخزَّن المصنف على خوادم Google. هذا مقبول لمعظم الملفات، لكن ليس لكشوف الرواتب أو قوائم العملاء أو أي ملف لا يُسمح لك بمشاركته.'],
           links: [{ text: 'صفحة Google عن استخدام ملفات Office', path: 'https://support.google.com/docs/answer/6055139' }],
+        },
+        {
+          heading: 'Excel للويب',
+          paragraphs: [
+            'تتيح Microsoft برامج Word وExcel وPowerPoint مجانًا على الويب، بحسب صفحتها عن Microsoft 365 للويب (تحققنا منها في 28 نوفمبر 2026). تسجّل الدخول بحساب Microsoft مجاني، وتذكر الصفحة نفسها أن الملفات يجب أن تُحفظ في OneDrive وتُشارك منه، أي أن المصنف الموجود على حاسوبك يُرفع إلى خوادم Microsoft قبل أن يُفتح.',
+            'تظهر تنسيقات الخلايا والأرقام كما تظهر تقريبًا في برنامج سطح المكتب، لكن ليس كل شيء يعمل: وحدات الماكرو في ملفات .xlsm لا تعمل في المتصفح، والأوراق المحمية تُعرض فقط، بحسب صفحة Microsoft عن الفروق بين المصنف في المتصفح وفي Excel (تحققنا منها في 28 نوفمبر 2026).',
+          ],
+          links: [{ text: 'صفحتها عن Microsoft 365 للويب', path: 'https://www.microsoft.com/en-us/microsoft-365/free-office-online-for-the-web' }, { text: 'الفروق بين المصنف في المتصفح وفي Excel', path: 'https://support.microsoft.com/en-us/office/differences-between-using-a-workbook-in-the-browser-and-in-excel-f0dc28ed-b85d-4e1d-be6d-5878005db3b6' }],
+        },
+        {
+          heading: 'مقارنة الخيارات على الإنترنت',
+          paragraphs: ['الثلاثة تفتح ملف xlsx في المتصفح وتتيح لك تعديله. والفرق في المكان الذي يذهب إليه الملف والحساب الذي تحتاجه. وتذكر صفحة Google عن العمل مع ملفات Office أن Sheets لا يدعم وحدات الماكرو والجداول المرتبطة (تحققنا منها في 28 نوفمبر 2026).'],
+          table: {
+            columns: ['الخيار', 'هل يُرفع الملف', 'هل يلزم حساب', 'التعديل', 'ما يبقى من التنسيق'],
+            rows: [
+              ['عارض Excel من OpenAnyDoc', 'لا', 'لا', 'نعم', 'القيم والصيغ وتنسيقات الأرقام والخلايا المدمجة وعرض الأعمدة، وأنماط الخلايا في ملفات .xlsx. لا المخططات ولا الصور ولا الجداول المحورية ولا التنسيق الشرطي.'],
+              ['Excel للويب', 'نعم، إلى OneDrive', 'نعم، حساب Microsoft', 'نعم', 'تظهر تنسيقات الخلايا والأرقام كما في Excel تقريبًا؛ ولا تعمل وحدات الماكرو.'],
+              ['Google Sheets', 'نعم، إلى Google Drive', 'نعم، حساب Google', 'نعم', 'لا يدعم وحدات الماكرو والجداول المرتبطة.'],
+            ],
+          },
+          links: [{ text: 'صفحة Google عن العمل مع ملفات Office', path: 'https://support.google.com/docs/answer/6055139' }, { text: 'عارض Excel من OpenAnyDoc', path: '/excel-viewer' }],
         },
         {
           heading: 'على الهاتف',
@@ -4604,11 +4867,29 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-txt-file': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الجواب المختصر',
           paragraphs: ['ملف txt نص عادي، فيفتحه أي محرر نصوص ولا تحتاج إلى تثبيت شيء. على ويندوز يُفتح في المفكرة (Notepad)، وعلى الماك في TextEdit، وعلى الآيفون والآيباد في تطبيق «الملفات»، وعلى أندرويد في Google Docs أو Google Drive أو عارض النصوص في مدير الملفات. ويعرضه أيضًا أي متصفح ويب. وإن ظهر النص رموزًا غريبة، فالبرنامج خمّن ترميزًا خاطئًا؛ والحل في الأسفل.'],
+        },
+        {
+          heading: 'أي برنامج يُستخدم لفتح ملفات txt؟',
+          paragraphs: ['كل حاسوب وهاتف يأتي ببرنامج يفتح ملفات txt، فنادرًا ما تحتاج إلى تثبيت شيء. انقر الملف نقرًا مزدوجًا أو اضغطه فيُفتح في البرنامج المذكور أدناه؛ وفي أي متصفح يفتحه محرر TXT من OpenAnyDoc ويعدّله دون تثبيت أي شيء.'],
+          table: {
+            columns: ['الجهاز', 'البرنامج الذي يفتح ملف txt'],
+            rows: [
+              ['ويندوز', 'المفكرة (Notepad)'],
+              ['الماك', 'TextEdit'],
+              ['لينكس', 'محرر النصوص في سطح المكتب، مثل Text Editor في GNOME أو KWrite في KDE'],
+              // TODO(check): no Google help page names the app that opens .txt on ChromeOS; only the Files app double-click is confirmed.
+              ['ChromeOS', 'تطبيق «الملفات»: انقر الملف نقرًا مزدوجًا'],
+              ['الآيفون أو الآيباد', '«الملفات»'],
+              ['أندرويد', 'مدير الملفات أو Google Docs أو Google Drive'],
+              ['أي متصفح', 'محرر TXT من OpenAnyDoc'],
+            ],
+          },
+          links: [{ text: 'محرر TXT من OpenAnyDoc', path: '/txt-viewer' }],
         },
         {
           heading: 'على ويندوز',
@@ -4624,6 +4905,21 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'على الماك',
           paragraphs: ['يفتح TextEdit ملفات النص العادي. ولقراءة الملف دون فتح أي تطبيق، حدده في Finder واضغط مفتاح المسافة لمعاينة سريعة. وإن عرض TextEdit حروفًا خاطئة، فافتح TextEdit ثم «الإعدادات» («التفضيلات» في إصدارات macOS الأقدم) ثم «فتح وحفظ»، واضبط ترميز النص العادي عند فتح الملفات على الترميز الصحيح، مثل Unicode (UTF-8)، ثم افتح الملف من جديد. وتشرح Apple هذه الخطوات في صفحتها عن معاينة الملفات وفي دليل TextEdit (تحققنا منهما في 24 نوفمبر 2026).'],
           links: [{ text: 'صفحتها عن معاينة الملفات', path: 'https://support.apple.com/guide/mac-help/mchlgtd_prev01/mac' }, { text: 'دليل TextEdit', path: 'https://support.apple.com/guide/textedit/txted1028/mac' }],
+        },
+        {
+          heading: 'على لينكس',
+          paragraphs: [
+            'كل أسطح مكتب لينكس تأتي بمحرر للنص العادي. في GNOME يوجد Text Editor، وتصفه صفحة التطبيق الخاصة به بأنه محرر نصوص بسيط، وفي KDE يوجد KWrite، وهو محرر نصوص مبني على مكوّن التحرير في Kate، بحسب صفحة تطبيقات KDE (تحققنا منهما في 28 نوفمبر 2026). انقر الملف نقرًا مزدوجًا في مدير الملفات فيُفتح في التطبيق الافتراضي لنوعه.',
+            'لاستخدام برنامج آخر في GNOME، انقر الملف بالزر الأيمن واختر التطبيق من أعلى القائمة، أو اختر «Open With…» لترى البقية. ولتثبيت هذا الاختيار، انقر الملف بالزر الأيمن واختر «Properties» ثم تبويب «Open With»، واختر التطبيق وانقر «Set as default». وتعطي هذه الخطوات صفحة مساعدة GNOME عن فتح الملفات بتطبيقات أخرى (تحققنا منها في 28 نوفمبر 2026). وفي مدير ملفات KDE، Dolphin، يفتح النقر بالزر الأيمن على الملف قائمة بالإجراءات المتاحة له، كما يقول دليل Dolphin (تحققنا منه في 28 نوفمبر 2026).',
+          ],
+          // TODO(check): the Dolphin handbook pages read so far do not name its "Open With" menu item; confirm before giving KDE steps.
+          links: [{ text: 'صفحة التطبيق الخاصة به', path: 'https://apps.gnome.org/TextEditor/' }, { text: 'صفحة تطبيقات KDE', path: 'https://apps.kde.org/kwrite/' }, { text: 'صفحة مساعدة GNOME عن فتح الملفات بتطبيقات أخرى', path: 'https://help.gnome.org/users/gnome-help/stable/files-open.html.en' }, { text: 'دليل Dolphin', path: 'https://docs.kde.org/stable_kf6/en/dolphin/dolphin/dolphin-view.html' }],
+        },
+        {
+          heading: 'على ChromeOS',
+          paragraphs: ['على جهاز Chromebook، افتح تطبيق «الملفات» وابحث عن الملف وانقره نقرًا مزدوجًا. وتضم قائمة Google لأنواع الملفات المدعومة على Chromebook صيغة txt، وتعطي صفحتها عن فتح الملفات خطوة النقر المزدوج (تحققنا منهما في 28 نوفمبر 2026). ولتعديل النص وحفظ نسخة بالترميز الذي تختاره، افتح محرر TXT في Chrome واختر الملف هناك.'],
+          // TODO(check): no Google help page found that names the default .txt app or gives "Open with" steps on ChromeOS.
+          links: [{ text: 'قائمة Google لأنواع الملفات المدعومة على Chromebook', path: 'https://support.google.com/chromebook/answer/183093' }, { text: 'صفحتها عن فتح الملفات', path: 'https://support.google.com/chromebook/answer/1700055' }, { text: 'محرر TXT', path: '/txt-viewer' }],
         },
         {
           heading: 'على الهاتف أو الجهاز اللوحي',
@@ -4675,7 +4971,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/open-csv-without-excel': {
       published: '2026-11-20',
-      updated: '2026-11-20',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الجواب المختصر',
@@ -4706,8 +5002,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ملفات أكبر من أن يفتحها اكسل',
-          paragraphs: ['تتوقف ورقة اكسل عند 1,048,576 صفًا. أما عارض ملفات CSV الكبيرة فلا حد للصفوف فيه: يُفتح ملف من 120,000 صف في أقل من ثانية، والحد الحقيقي هو ذاكرة جهازك، مع تنبيه فوق 50 ميغابايت. ولماذا يقطع اكسل الملف، وما الطرق الأخرى لتجاوز ذلك، تجده في دليل ملف CSV أكبر من أن يفتحه Excel.'],
-          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['تتوقف ورقة اكسل عند 1,048,576 صفًا. أما عارض ملفات CSV الكبيرة فلا حد للصفوف فيه: يُفتح ملف من 120,000 صف في أقل من ثانية، والحد الحقيقي هو ذاكرة جهازك، مع تنبيه فوق 50 ميغابايت. ولماذا يقطع اكسل الملف، وما الطرق الأخرى لتجاوز ذلك، تجده في دليل كيف تفتح ملف CSV كبيرًا.'],
+          links: [{ text: 'عارض ملفات CSV الكبيرة', path: '/large-csv-viewer' }, { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'الملف يُفتح في عمود واحد',
@@ -6450,7 +6746,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/split-large-csv': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -6501,13 +6797,13 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
           heading: 'اختر حجم الجزء حسب وجهة الملف',
           paragraphs: ['الرقم المناسب يتوقف على ما سيقرأ الأجزاء:'],
           list: [
-            'Excel: حتى 1,048,575 صف بيانات في الجزء، و1,000,000 رقم مستدير آمن. وإن كان Excel بطيئًا حتى دون حد الصفوف، فدليل ملف CSV أكبر من أن يفتحه Excel يشرح الخيارات الأخرى.',
+            'Excel: حتى 1,048,575 صف بيانات في الجزء، و1,000,000 رقم مستدير آمن. وإن كان Excel بطيئًا حتى دون حد الصفوف، فدليل كيف تفتح ملف CSV كبيرًا يشرح الخيارات الأخرى.',
             'نموذج رفع له حد للحجم، مثل 10 ميغابايت: استخدم «حجم كل ملف» واجعله أقل قليلًا، 9 ميغابايت مثلًا، لأن حجم كل جزء تقريبي لا دقيق.',
             'محادثة ذكاء اصطناعي: المهم هناك الرموز لا الصفوف. عُدّ رموز جزء واحد بأداة عدّاد الرموز، ثم اختر عدد صفوف يتسع. ودليل ملف أكبر من أن يقبله ChatGPT يشرح الحدود.',
             'إن فُتح جزء في عمود واحد في Excel فالتقسيم سليم، لكن الفاصل لا يطابق إعدادات جهازك. ودليل ملف CSV يُفتح في عمود واحد يشرح الحل.',
           ],
           links: [
-            { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' },
+            { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' },
             { text: 'عدّاد الرموز', path: '/token-counter' },
             { text: 'ملف أكبر من أن يقبله ChatGPT', path: '/file-too-large-for-chatgpt' },
             { text: 'ملف CSV يُفتح في عمود واحد', path: '/csv-opens-in-one-column' },
@@ -6718,7 +7014,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/excel-row-and-column-limits': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -6747,7 +7043,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'ماذا يعني كل حد لملف حقيقي',
-          paragraphs: ['معظم الناس لا يصطدمون إلا بحد الصفوف، وقد شرحه بالتفصيل دليل ملف CSV أكبر من أن يفتحه Excel. أما الحدود الأخرى فتوقع الناس بهدوء أكبر. والأرقام من صفحة مواصفات Excel وحدوده ومن صفحة Microsoft عن الاحتفاظ بالأصفار البادئة والأرقام الكبيرة (تحققنا منها في 24 نوفمبر 2026):'],
+          paragraphs: ['معظم الناس لا يصطدمون إلا بحد الصفوف، وقد شرحه بالتفصيل دليل كيف تفتح ملف CSV كبيرًا. أما الحدود الأخرى فتوقع الناس بهدوء أكبر. والأرقام من صفحة مواصفات Excel وحدوده ومن صفحة Microsoft عن الاحتفاظ بالأصفار البادئة والأرقام الكبيرة (تحققنا منها في 24 نوفمبر 2026):'],
           list: [
             'الأعمدة: الملفات العريضة تبلغ 16,384 عمودًا قبل أن تقترب من مليون صف بكثير. فاستبيان فيه عمود لكل سؤال وخيار إجابة، أو بيانات أجهزة استشعار فيها عمود لكل قراءة، قد لا يتجاوز بضعة آلاف من الصفوف ويبقى أعرض من الحد.',
             'الخانات الخمس عشرة: يحتفظ Excel بخمس عشرة خانة معنوية من الرقم، فالرقم المرجعي المكوّن من 16 خانة مثل 1234567890123456، إذا كُتب أو فُتح رقمًا، يُخزَّن 1234567890123450. ولا تسلم أرقام الطلبات والباركود والرموز الطويلة إلا إذا بقيت نصًا.',
@@ -6756,7 +7052,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
             'التواريخ قبل 1900: هي أقدم من أول تاريخ يحسب به Excel، فلا يستطيع Excel أن يحسب بسجلات القرن التاسع عشر بوصفها تواريخ.',
             '10,000 عنصر في التصفية: العمود الذي فيه قيم مختلفة أكثر من ذلك لا تظهر كلها في قائمة التصفية، فاستخدم عامل تصفية نصيًا مثل «يحتوي على» بدل تحديد القيم.',
           ],
-          links: [{ text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }, { text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الاحتفاظ بالأصفار البادئة والأرقام الكبيرة', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
+          links: [{ text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }, { text: 'صفحة مواصفات Excel وحدوده', path: 'https://support.microsoft.com/en-us/office/excel-specifications-and-limits-1672b34d-7043-467e-8e27-269d656771c3' }, { text: 'الاحتفاظ بالأصفار البادئة والأرقام الكبيرة', path: 'https://support.microsoft.com/en-us/office/keeping-leading-zeros-and-large-numbers-1bf7b935-36e1-4985-842f-5dfa51f85fe7' }],
         },
         {
           heading: 'مثال عملي: هل يتسع هذا الملف؟',
@@ -7291,7 +7587,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/best-free-csv-viewers': {
       published: '2026-11-24',
-      updated: '2026-11-25',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -7354,8 +7650,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'أي عارض CSV مجاني يفتح أكبر الملفات؟',
-          paragraphs: ['لا جواب ثابتًا لأي برنامج، لأن الحد الحقيقي عادةً هو ذاكرة حاسوبك. يتوقف Google Sheets عند 20 مليون خلية للجدول الواحد، وتتوقف تطبيقات جداول البيانات عند حد للصفوف، بينما ليس لـ OpenAnyDoc حد صفوف خاص به، ويقول Modern CSV وTad إنهما يتعاملان مع الملفات الكبيرة. جرّب ملفك، ويشرح دليل ملف CSV أكبر من أن يفتحه Excel الخيارات الأخرى.'],
-          links: [{ text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['لا جواب ثابتًا لأي برنامج، لأن الحد الحقيقي عادةً هو ذاكرة حاسوبك. يتوقف Google Sheets عند 20 مليون خلية للجدول الواحد، وتتوقف تطبيقات جداول البيانات عند حد للصفوف، بينما ليس لـ OpenAnyDoc حد صفوف خاص به، ويقول Modern CSV وTad إنهما يتعاملان مع الملفات الكبيرة. جرّب ملفك، ويشرح دليل كيف تفتح ملف CSV كبيرًا الخيارات الأخرى.'],
+          links: [{ text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'هل أستطيع فتح ملف CSV دون رفعه إلى أي مكان؟',
@@ -7463,7 +7759,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/openanydoc-vs-google-sheets-large-files': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -7514,8 +7810,8 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         },
         {
           heading: 'أين يقدّم Google Sheets وExcel أكثر',
-          paragraphs: ['جداول البيانات مصنوعة لعمل لا يؤديه العارض. يتيح Google Sheets لعدة أشخاص تعديل الجدول نفسه في الوقت نفسه، مع الصيغ والجداول المحورية والمخططات، كما تقول صفحة Sheets التعريفية. وفي Excel الصيغ وPivotTable والمخططات وPower Query، ويتسع نموذج البيانات فيه لملايين الصفوف، أي أكثر من الورقة، كما تقول صفحة Microsoft عن نموذج بيانات موفر للذاكرة (تحققنا منها في 24 نوفمبر 2026 كلتيهما)؛ ويشرح دليل ملف CSV أكبر من أن يفتحه Excel الخطوات. أما OpenAnyDoc فيعدّل القيم ويحفظ ملفات CSV أو Excel، لكن لا صيغ فيه ولا نسخة حية يعدّلها فريق معًا.'],
-          links: [{ text: 'صفحة Sheets التعريفية', path: 'https://workspace.google.com/products/sheets/' }, { text: 'نموذج بيانات موفر للذاكرة', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          paragraphs: ['جداول البيانات مصنوعة لعمل لا يؤديه العارض. يتيح Google Sheets لعدة أشخاص تعديل الجدول نفسه في الوقت نفسه، مع الصيغ والجداول المحورية والمخططات، كما تقول صفحة Sheets التعريفية. وفي Excel الصيغ وPivotTable والمخططات وPower Query، ويتسع نموذج البيانات فيه لملايين الصفوف، أي أكثر من الورقة، كما تقول صفحة Microsoft عن نموذج بيانات موفر للذاكرة (تحققنا منها في 24 نوفمبر 2026 كلتيهما)؛ ويشرح دليل كيف تفتح ملف CSV كبيرًا الخطوات. أما OpenAnyDoc فيعدّل القيم ويحفظ ملفات CSV أو Excel، لكن لا صيغ فيه ولا نسخة حية يعدّلها فريق معًا.'],
+          links: [{ text: 'صفحة Sheets التعريفية', path: 'https://workspace.google.com/products/sheets/' }, { text: 'نموذج بيانات موفر للذاكرة', path: 'https://support.microsoft.com/topic/951c73a9-21c4-46ab-9f5e-14a2833b6a70' }, { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'أيها تستخدم',
@@ -7551,7 +7847,7 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
     },
     '/large-csv-test': {
       published: '2026-11-24',
-      updated: '2026-11-24',
+      updated: '2026-11-28',
       sections: [
         {
           heading: 'الإجابة المختصرة',
@@ -7638,9 +7934,9 @@ export const guidePages: Record<Locale, Record<string, InfoPageContent>> = {
         {
           heading: 'هل يفتح Excel ملف CSV فيه 3 ملايين صف؟',
           paragraphs: [
-            'لا يستطيع Excel عرض 3 ملايين صف في ورقة عمل واحدة، لأن الورقة تتوقف عند 1,048,576 صفًا. وإذا فتحت الملف مباشرة يحذّر Excel من أن مجموعة البيانات أكبر من شبكة Excel وأن بعض البيانات لم يُحمَّل. ويمكن لـ Power Query تحميل مجموعة البيانات كاملة لجداول PivotTable، أو يمكنك تقسيم الملف أولًا، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). ويشرح دليل ملف CSV أكبر من أن يفتحه Excel كل الخيارات.',
+            'لا يستطيع Excel عرض 3 ملايين صف في ورقة عمل واحدة، لأن الورقة تتوقف عند 1,048,576 صفًا. وإذا فتحت الملف مباشرة يحذّر Excel من أن مجموعة البيانات أكبر من شبكة Excel وأن بعض البيانات لم يُحمَّل. ويمكن لـ Power Query تحميل مجموعة البيانات كاملة لجداول PivotTable، أو يمكنك تقسيم الملف أولًا، كما تشرح صفحة Microsoft عن مجموعة بيانات أكبر من شبكة Excel (تحققنا منها في 24 نوفمبر 2026). ويشرح دليل كيف تفتح ملف CSV كبيرًا كل الخيارات.',
           ],
-          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'ملف CSV أكبر من أن يفتحه Excel', path: '/csv-too-big-for-excel' }],
+          links: [{ text: 'مجموعة بيانات أكبر من شبكة Excel', path: 'https://support.microsoft.com/en-us/excel/what-to-do-if-a-data-set-is-too-large-for-the-excel-grid' }, { text: 'كيف تفتح ملف CSV كبيرًا', path: '/csv-too-big-for-excel' }],
         },
         {
           heading: 'لماذا لا يستورد Google Sheets ملف CSV كبيرًا جدًا؟',

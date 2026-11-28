@@ -45,6 +45,11 @@
     "Column profile: blanks, distinct values, numbers and a chart for the selected column.",
     "Encodings: UTF-8, UTF-16 (found by its byte order mark, or chosen by hand), Windows-1256 and Windows-1252."
   ],
+  "screenshot": {
+    "image": "large-csv",
+    "alt": "The large CSV viewer showing a 120,000-row orders file, with the row count in the status bar",
+    "caption": "A CSV file of 120,000 rows open in the viewer, with the row count in the status bar."
+  },
   "limits": [
     "Files are limited by your device's memory; a warning appears above 50 MB.",
     "CSV holds no formulas or cell formatting, so there are none to show; use the Excel viewer for workbooks."
@@ -53,9 +58,9 @@
   "faq": [
     {
       "question": "How do I open a CSV file that is too large for Excel?",
-      "answer": "Open it in a viewer with no row limit, such as the OpenAnyDoc large CSV viewer in your browser: Excel shows at most 1,048,576 rows per sheet and leaves out the rest. This viewer has no row limit of its own, only your browser's memory. The largest file we have measured has 120,000 rows, so try yours and watch for the 50 MB warning. The guide CSV too big for Excel covers the other options.",
+      "answer": "Excel shows at most 1,048,576 rows per sheet, while this viewer has no row limit of its own and opens the whole file in your browser. Other ways, from SQLite to Python, are in how to open a large CSV file.",
       "link": {
-        "text": "CSV too big for Excel",
+        "text": "how to open a large CSV file",
         "path": "/csv-too-big-for-excel"
       }
     },

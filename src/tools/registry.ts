@@ -72,7 +72,8 @@ export type ToolContent = {
   steps: { title: string; text: string }[]
   handlesTitle?: string
   handles?: string[]
-  screenshot?: { alt: string; caption: string }
+  // `image` names a page's own picture (public/screenshots/<locale>-<image>.webp) instead of its viewer's.
+  screenshot?: { alt: string; caption: string; image?: string }
   comparison?: ComparisonTable
   limits: string[]
   // Office conversion pages: what converts well and what may be lost, drawn with a link to report a file that converted badly.

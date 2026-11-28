@@ -24,8 +24,8 @@
     "date": "2026-11-25"
   },
   "/en/csv-too-big-for-excel": {
-    "hash": "6608d661218baa30d8ce8aa5d042e2659c6fb410",
-    "date": "2026-11-25"
+    "hash": "2a62b05d7197b57672907796a39a55769dc7f964",
+    "date": "2026-11-28"
   },
   "/en/json-unexpected-token": {
     "hash": "9ab8b570451ecaa303abe672f86ced98269cb7a8",
@@ -40,8 +40,8 @@
     "date": "2026-11-25"
   },
   "/en/open-xlsx-without-excel": {
-    "hash": "0303fdb86741bcedb6cb835ad2a4a13560ab85ea",
-    "date": "2026-11-25"
+    "hash": "4d877247f41fb337606c571343d4ffcca8760f11",
+    "date": "2026-11-28"
   },
   "/en/open-docx-without-word": {
     "hash": "b5d0c202c00c8fb35e45081195f76ef0cf5d4441",
@@ -64,12 +64,12 @@
     "date": "2026-11-25"
   },
   "/en/open-txt-file": {
-    "hash": "00230cc3a3d0b4cf665e3ed6daa6e0e8dffc030c",
-    "date": "2026-11-25"
+    "hash": "6418ba9d606eff12cf163018e8e3f57463d1f16b",
+    "date": "2026-11-28"
   },
   "/en/open-csv-without-excel": {
-    "hash": "bf90cf131558472a13e6416732ed96e88568fbd7",
-    "date": "2026-11-25"
+    "hash": "93d63e029503818fed737249ea1343667404de16",
+    "date": "2026-11-28"
   },
   "/en/open-pptx-without-powerpoint": {
     "hash": "fa59b8fb672bc5e310f776c963b34b20589345fb",
@@ -132,8 +132,8 @@
     "date": "2026-11-19"
   },
   "/en/split-large-csv": {
-    "hash": "63d360c443ceaa8af17c8a30aaef66c91cea8a74",
-    "date": "2026-11-25"
+    "hash": "1f2f21459761ced2845143600100f52d0445b830",
+    "date": "2026-11-28"
   },
   "/en/json-vs-json-lines": {
     "hash": "d258ed8570b89f037d9fd594994dee54ce01f465",
@@ -144,8 +144,8 @@
     "date": "2026-11-25"
   },
   "/en/excel-row-and-column-limits": {
-    "hash": "300012036760a22c624dcf479c38205dad78ebf0",
-    "date": "2026-11-25"
+    "hash": "4494960aae0d2ddfddcd766496d306d29dec1936",
+    "date": "2026-11-28"
   },
   "/en/find-hidden-sheets-in-excel": {
     "hash": "013a94c94de0bfaa15fe7733a71140965a647adb",
@@ -168,20 +168,20 @@
     "date": "2026-11-24"
   },
   "/en/best-free-csv-viewers": {
-    "hash": "4823ba07d6334c7c7a591ba760519d2301bc5e6f",
-    "date": "2026-11-25"
+    "hash": "2ff766280866131f6373475831cb39d2ace735fe",
+    "date": "2026-11-28"
   },
   "/en/best-free-json-formatters": {
     "hash": "e0fbffab3eaa76769f70fc8e389b6b5847c5fb0a",
     "date": "2026-11-24"
   },
   "/en/openanydoc-vs-google-sheets-large-files": {
-    "hash": "61f1a2f8fb4b2b532dfaf713a3ba9b271c62ba9f",
-    "date": "2026-11-25"
+    "hash": "311358e6a988cb5012d603f4d90d80d51a931226",
+    "date": "2026-11-28"
   },
   "/en/large-csv-test": {
-    "hash": "92466f347f1aeca15aa3ed1dffbab33b42846af6",
-    "date": "2026-11-25"
+    "hash": "c621a3b11ad5040a6eb0c4ce65295eab6241be86",
+    "date": "2026-11-28"
   },
   "/en/pdf-to-ai-chat-with-tables": {
     "hash": "8372300e85fa0b63203c9faaf8778507d0200288",
@@ -600,8 +600,8 @@
     "date": "2026-11-25"
   },
   "/en/large-csv-viewer": {
-    "hash": "230a9791457f82170ee773c9ab7e0a0fb2736394",
-    "date": "2026-11-25"
+    "hash": "691f811ea9a2fb188800d82bdcd0008893e4e57f",
+    "date": "2026-11-28"
   },
   "/en/tsv-viewer": {
     "hash": "c894c9b84df0c7ba3d03d296a27d1e0c94965cef",
@@ -884,8 +884,8 @@
     "date": "2026-11-25"
   },
   "/en/excel-viewer": {
-    "hash": "95487fc2d184bde8169b48fff8008705a517a026",
-    "date": "2026-11-25"
+    "hash": "74d4b9e9961d4e003e0a583d096a4ca16855113b",
+    "date": "2026-11-28"
   },
   "/en/xls-viewer": {
     "hash": "3139f5a9b515a7380da2a725a15ede5e586960d6",
@@ -900,8 +900,8 @@
     "date": "2026-11-25"
   },
   "/en/txt-viewer": {
-    "hash": "0e94f54044b0ba86d9af7800b0387ce0ae856673",
-    "date": "2026-11-25"
+    "hash": "fa563f1e29f149c25cda50bb4aaaffbf90e2ff62",
+    "date": "2026-11-28"
   },
   "/en/pptx-to-jpg": {
     "hash": "44a257c1615093f4d83c069dd5449a6fcdb6b2a0",
@@ -1052,8 +1052,8 @@
     "date": "2026-11-25"
   },
   "/ar/csv-too-big-for-excel": {
-    "hash": "9f39f504849d2db0651d39dc24627ce98de482b8",
-    "date": "2026-11-25"
+    "hash": "d4fcb7b6012d20a94281b959461b2f5059b36532",
+    "date": "2026-11-28"
   },
   "/ar/json-unexpected-token": {
     "hash": "0c207fb06fdbbed53fe9619585c6a658798188e6",
@@ -1068,8 +1068,8 @@
     "date": "2026-11-25"
   },
   "/ar/open-xlsx-without-excel": {
-    "hash": "eea0cb9dcffcb4ab37d5724708118e8a902460b1",
-    "date": "2026-11-25"
+    "hash": "f700eaddca86bcffa2aaa67e438506c89398f5ff",
+    "date": "2026-11-28"
   },
   "/ar/open-docx-without-word": {
     "hash": "fb16366307da279e5db82ce7613b3669984fa687",
@@ -1092,12 +1092,12 @@
     "date": "2026-11-25"
   },
   "/ar/open-txt-file": {
-    "hash": "e46c25947cb5b1895bf17cc36333637688809ead",
-    "date": "2026-11-25"
+    "hash": "9083bd0b91d8dd6335c9a5e75c0f78d467e6b93e",
+    "date": "2026-11-28"
   },
   "/ar/open-csv-without-excel": {
-    "hash": "4aceff2f91a1745cf061ece44cfc6237dbcbf53c",
-    "date": "2026-11-25"
+    "hash": "934510cee3616ad2938fc0b3259aa6628dac01f1",
+    "date": "2026-11-28"
   },
   "/ar/open-pptx-without-powerpoint": {
     "hash": "40bb6305b17ba0f5de7652f4ca4e120f5fbae1a4",
@@ -1160,8 +1160,8 @@
     "date": "2026-11-19"
   },
   "/ar/split-large-csv": {
-    "hash": "38a019d9815e1ce86b8c5981b6f7e002298995b1",
-    "date": "2026-11-25"
+    "hash": "87bacda101e10202dd44530bfd49a020725aa251",
+    "date": "2026-11-28"
   },
   "/ar/json-vs-json-lines": {
     "hash": "92e42f5ad2f105b56ac526545e01069b1169e787",
@@ -1172,8 +1172,8 @@
     "date": "2026-11-25"
   },
   "/ar/excel-row-and-column-limits": {
-    "hash": "d9cafb88afaa329233904c25cd04b4cb760d5e93",
-    "date": "2026-11-25"
+    "hash": "fc5696b4adcdddec1132bbbcbb792e5711a4b430",
+    "date": "2026-11-28"
   },
   "/ar/find-hidden-sheets-in-excel": {
     "hash": "77e0a7093461ee809ad489a725c8b22526034b85",
@@ -1196,20 +1196,20 @@
     "date": "2026-11-24"
   },
   "/ar/best-free-csv-viewers": {
-    "hash": "f2d332c3ba2b2d3202342b3cd0753b8cd7525642",
-    "date": "2026-11-25"
+    "hash": "4bd811fc546bf7512b84a2a7c745fde479578d35",
+    "date": "2026-11-28"
   },
   "/ar/best-free-json-formatters": {
     "hash": "b038f63da68d55c08b9e4f14cb3d5212b436b7d4",
     "date": "2026-11-25"
   },
   "/ar/openanydoc-vs-google-sheets-large-files": {
-    "hash": "13131a818967320f79e562b953e596e750b717ea",
-    "date": "2026-11-25"
+    "hash": "38c305a8b89ff1053f7aaccaca55288a8e7dc07d",
+    "date": "2026-11-28"
   },
   "/ar/large-csv-test": {
-    "hash": "89e16617b93458f8a38ce10ab23f885094fb2ad4",
-    "date": "2026-11-25"
+    "hash": "68dd8a72a458e13d94894fa318acbbb86be1d842",
+    "date": "2026-11-28"
   },
   "/ar/pdf-to-ai-chat-with-tables": {
     "hash": "1d397e679c90e76f2916cc3df1d98dcadb5a8ec2",
@@ -1628,8 +1628,8 @@
     "date": "2026-11-25"
   },
   "/ar/large-csv-viewer": {
-    "hash": "124fdfc56f2cbc7c283d70d6764dafeb68e1f361",
-    "date": "2026-11-25"
+    "hash": "4e7e892ac8ad6bba1df9219ea297ccad6e1bb9bf",
+    "date": "2026-11-28"
   },
   "/ar/tsv-viewer": {
     "hash": "e576b2b3061edc0f784e68197c96ad2dd50ba833",
@@ -1912,8 +1912,8 @@
     "date": "2026-11-25"
   },
   "/ar/excel-viewer": {
-    "hash": "76d6fdfb70adc7aceca03e49d9c09cfe789d363d",
-    "date": "2026-11-25"
+    "hash": "bdb99a248ac3af6700d2c4ad64a20b1cba51ff8d",
+    "date": "2026-11-28"
   },
   "/ar/xls-viewer": {
     "hash": "cac9ed1298324e74a3476bb14dc8959b0cd236b9",
@@ -1928,8 +1928,8 @@
     "date": "2026-11-25"
   },
   "/ar/txt-viewer": {
-    "hash": "04dd9f75aa4375db23afa8d410df5d65b8265a3a",
-    "date": "2026-11-25"
+    "hash": "e39ff24011c0e4e8234e0b66087c332f72fe849c",
+    "date": "2026-11-28"
   },
   "/ar/pptx-to-jpg": {
     "hash": "086e3af50634b0efb576eaf56b8834138036c22f",

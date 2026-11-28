@@ -119,6 +119,14 @@
       }
     },
     {
+      "question": "What program opens a .txt file?",
+      "answer": "Any text editor opens a .txt file: Notepad on Windows, TextEdit on a Mac, the Files app on iPhone and iPad, Google Docs or a file manager on Android, and any web browser. OpenAnyDoc opens it in your browser as an editor with search, line numbers and Arabic shown right to left, without uploading it. For each system step by step, see how to open a TXT file.",
+      "link": {
+        "text": "how to open a TXT file",
+        "path": "/open-txt-file"
+      }
+    },
+    {
       "question": "Can I edit and save it?",
       "answer": "Yes. The file opens ready to edit: type, or use the ribbon tools for lines, whitespace and case, then click Download and choose the encoding (UTF-8, UTF-8 with BOM, UTF-16 or Windows-1256) and the line endings (LF, CRLF or CR)."
     },
@@ -161,14 +169,6 @@
     {
       "question": "Can I open text files with Arabic or other non-English characters?",
       "answer": "Yes. UTF-8 (with or without a BOM) and UTF-16 files that start with a byte order mark are read directly, and a file that is not valid UTF-8 is read as Windows-1256, the old Arabic encoding, or as Windows-1252 when its letters look Western European (ä, é, ñ). Each line is shown in its own reading direction. If the text looks wrong, choose another encoding in the File tab and reopen it; a UTF-16 file without a byte order mark opens this way."
-    },
-    {
-      "question": "What program opens a .txt file?",
-      "answer": "Any text editor opens a .txt file: Notepad on Windows, TextEdit on a Mac, the Files app on iPhone and iPad, Google Docs or a file manager on Android, and any web browser. OpenAnyDoc opens it in your browser as an editor with search, line numbers and Arabic shown right to left, without uploading it. For each system step by step, see how to open a TXT file.",
-      "link": {
-        "text": "how to open a TXT file",
-        "path": "/open-txt-file"
-      }
     },
     {
       "question": "How do I open a .txt file on my phone?",

@@ -16,7 +16,7 @@ function profileLinks(names: string[]) {
 export const CONTACT_EMAIL = 'support@openanydoc.com'
 
 // `links`: phrases of this section's text that become links to other pages (each page linked once per page, its id is made from the path).
-export type InfoSection = { heading: string; paragraphs: string[]; list?: string[]; links?: { text: string; path: string }[] }
+export type InfoSection = { heading: string; paragraphs: string[]; code?: string; list?: string[]; table?: { columns: string[]; rows: string[][] }; links?: { text: string; path: string }[] }
 // `published` and `updated` (YYYY-MM-DD) draw a byline with dates and give the page Article data; `links` paths may also be full https addresses.
 export type InfoPageContent = { lastUpdated?: string; published?: string; updated?: string; sections: InfoSection[] }
 

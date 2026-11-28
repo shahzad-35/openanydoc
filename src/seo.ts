@@ -82,10 +82,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'CSV opens in one column',
     },
     '/csv-too-big-for-excel': {
-      title: 'CSV Too Big for Excel? The Row Limit and What to Do',
-      description: 'A worksheet stops at 1,048,576 rows and big CSV files freeze Excel. Three ways to open, cut down or load a large CSV, one of them free with nothing uploaded.',
-      heading: 'CSV too big for Excel: the 1,048,576-row limit and what to do',
-      intro: 'A worksheet holds 1,048,576 rows and large files freeze Excel long before that. Here is why, and how to open, cut down or load the file anyway.',
+      title: 'How to Open a Large CSV File (Too Big for Excel)',
+      description: 'Excel stops at 1,048,576 rows. How to open a large CSV file anyway: a viewer with no row limit, SQLite, DuckDB or Python, compared on cost and upload.',
+      heading: 'How to open a large CSV file that is too big for Excel',
+      intro: 'Why Excel cuts a big CSV short, and seven ways to open every row, with exact commands and a table that compares them.',
       linkText: 'CSV too big for Excel',
     },
     '/json-unexpected-token': {
@@ -153,9 +153,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/open-txt-file': {
       title: 'How to Open a TXT File: Which Program to Use on Any Device',
-      description: 'Which program opens a .txt file: Notepad on Windows, TextEdit on a Mac, Files on iPhone, Android apps or a browser, and how to fix text with strange characters.',
+      description: 'Which program opens a .txt file on Windows, Mac, Linux, ChromeOS, iPhone, Android or in any browser, and how to fix text that shows strange characters.',
       heading: 'How to open a TXT file: which program to use on any device',
-      intro: 'The program that opens a text file on Windows, Mac, iPhone and Android, how to read one in a browser, and how to fix text that shows strange characters.',
+      intro: 'The program that opens a text file on Windows, Mac, Linux, ChromeOS, iPhone and Android, how to read one in a browser, and how to fix text that shows strange characters.',
       linkText: 'How to open a TXT file',
     },
     '/open-csv-without-excel': {
@@ -564,10 +564,10 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
       linkText: 'ملف CSV في عمود واحد',
     },
     '/csv-too-big-for-excel': {
-      title: 'ملف CSV أكبر من أن يفتحه Excel؟ حد الصفوف وما تفعله',
-      description: 'تتوقف ورقة العمل عند 1,048,576 صفًا وتجمّد ملفات CSV الكبيرة Excel. ثلاث طرق لفتح ملف CSV كبير أو اقتطاعه أو تحميله، إحداها مجانية في متصفحك ولا ترفع شيئًا.',
-      heading: 'ملف CSV أكبر من أن يفتحه Excel: حد 1,048,576 صفًا وما تفعله',
-      intro: 'تتسع ورقة العمل لـ 1,048,576 صفًا، وتجمّد الملفات الكبيرة Excel قبل ذلك بكثير. إليك السبب وكيف تفتح الملف أو تقتطعه أو تحمّله.',
+      title: 'كيف تفتح ملف CSV كبيرًا لا يتسع له Excel',
+      description: 'يتوقف Excel عند 1,048,576 صفًا. كيف تفتح ملف CSV كبيرًا رغم ذلك: عارض بلا حد للصفوف أو SQLite أو DuckDB أو Python، مع جدول يقارن التكلفة ورفع الملف والتعديل.',
+      heading: 'كيف تفتح ملف CSV كبيرًا لا يتسع له Excel',
+      intro: 'لماذا يقطع Excel ملف CSV الكبير، وسبع طرق لفتح كل صفوفه، مع الأوامر بالضبط وجدول يقارن بينها.',
       linkText: 'ملف CSV أكبر من Excel',
     },
     '/json-unexpected-token': {
@@ -635,9 +635,9 @@ export const pageSeo: Record<Locale, Record<string, PageSeo>> = {
     },
     '/open-txt-file': {
       title: 'كيف تفتح ملف TXT النصي: أي برنامج تستخدم على أي جهاز',
-      description: 'أي برنامج يفتح ملف txt: المفكرة على ويندوز، وTextEdit على الماك، و«الملفات» على الآيفون، وتطبيقات أندرويد، وأي متصفح، وكيف تصلح النص الذي يظهر برموز غريبة.',
+      description: 'أي برنامج يفتح ملف txt على ويندوز والماك ولينكس وChromeOS والآيفون وأندرويد أو في المتصفح، وكيف تصلح النص الذي يظهر برموز غريبة بسبب ترميز خاطئ عند الفتح.',
       heading: 'كيف تفتح ملف TXT: أي برنامج تستخدم على أي جهاز',
-      intro: 'البرنامج الذي يفتح الملف النصي على ويندوز والماك والآيفون وأندرويد، وكيف تقرؤه في المتصفح، وكيف تصلح النص الذي يظهر برموز غريبة.',
+      intro: 'البرنامج الذي يفتح الملف النصي على ويندوز والماك ولينكس وChromeOS والآيفون وأندرويد، وكيف تقرؤه في المتصفح، وكيف تصلح النص الذي يظهر برموز غريبة.',
       linkText: 'كيف تفتح ملف TXT',
     },
     '/open-csv-without-excel': {

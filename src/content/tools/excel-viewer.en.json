@@ -1,7 +1,7 @@
 {
-  "title": "Excel Viewer Online – Open and Edit XLSX, XLS, ODS",
-  "description": "Excel viewer online: open XLSX, XLS and ODS files without Excel, switch between sheet tabs, and edit cells with formulas that recalculate. Free, no upload.",
-  "heading": "Excel Viewer Online: Open and Edit XLSX Files",
+  "title": "Open XLSX File Online – Free Excel Viewer, No Upload",
+  "description": "Open an XLSX file online without uploading it: view every sheet, edit cells with formulas that recalculate, and save the workbook. XLS and ODS work too.",
+  "heading": "Open an XLSX File Online, Without Uploading It",
   "subtitle": "Drop an Excel file to view every sheet, edit cells and save it; nothing is uploaded.",
   "intro": "A free Excel viewer online: open an XLSX file without Excel, with all its sheets, formats and merged cells, edit cells and formulas, and save the workbook in the same format. XLS, XLSM and ODS files open too, and your file never leaves your device.",
   "features": [
@@ -18,27 +18,19 @@
       "text": "After you have used it once, it keeps working without an internet connection."
     }
   ],
-  "stepsTitle": "How it works: view an Excel file in your browser and edit it",
+  "stepsTitle": "How to open an XLSX file online",
   "steps": [
     {
-      "title": "Drop your workbook on the page",
-      "text": "Choose an .xlsx, .xls, .xlsm or .ods file. It is read in your browser and never uploaded."
+      "title": "Drop your XLSX file on the page",
+      "text": "Choose an .xlsx file, or an .xls, .xlsm or .ods one. Your browser reads it on your device, so it is never uploaded."
     },
     {
       "title": "Move between sheets",
       "text": "Every sheet is a tab at the bottom, like in Excel. Dates, percentages and currencies are shown as formatted in the file, and merged cells are drawn as one cell."
     },
     {
-      "title": "Switch to Edit",
-      "text": "Click a cell and type a value, or a formula such as =SUM(B2:B10). Formulas recalculate as you edit, and the cells that depend on them update."
-    },
-    {
-      "title": "Format your data",
-      "text": "Use the toolbar to change number formats and currencies, insert or delete rows, columns and sheets, merge cells and, in .xlsx files, set bold, colours, fonts and borders."
-    },
-    {
-      "title": "Save the workbook",
-      "text": "Use the save icon to download the workbook in the same format. The original file on your device is never changed."
+      "title": "Edit and save",
+      "text": "Switch to Edit and type values or formulas such as =SUM(B2:B10), which recalculate as you go. The toolbar changes number formats, rows, columns and sheets and, in .xlsx files, bold, colours and borders. The save icon downloads the workbook in the same format; the original file is never changed."
     }
   ],
   "handlesTitle": "What the free XLSX viewer handles: XLSX, XLS, XLSM and ODS",
@@ -121,6 +113,14 @@
       }
     },
     {
+      "question": "How do I open an XLSX file online without Excel?",
+      "answer": "An XLSX file opens online without Excel in OpenAnyDoc's Excel viewer: drop the .xlsx file on the page. It opens in your browser with its sheets, formatting and merged cells, and you can edit it and save it again, with no Excel, no account and no upload. For the other free ways, and what each keeps, read how to open an XLSX file without Excel.",
+      "link": {
+        "text": "how to open an XLSX file without Excel",
+        "path": "/open-xlsx-without-excel"
+      }
+    },
+    {
       "question": "Can I edit and save it?",
       "answer": "Yes. Switch to Edit to change cells and formulas, insert or delete rows, columns and sheets, merge cells and change number formats, then save the workbook in its own format: .xlsx, .xls, .xlsm or .ods."
     },
@@ -145,14 +145,6 @@
       "answer": "Yes. The source code is public on GitHub. Build it and serve the folder it produces from any web server on your network, and the files people open still never leave their devices. Questions: support@openanydoc.com."
     },
     {
-      "question": "How do I open an XLSX file online without Excel?",
-      "answer": "An XLSX file opens online without Excel in OpenAnyDoc's Excel viewer: drop the .xlsx file on the page. It opens in your browser with its sheets, formatting and merged cells, and you can edit it and save it again, with no Excel, no account and no upload. For the other free ways, and what each keeps, read how to open an XLSX file without Excel.",
-      "link": {
-        "text": "how to open an XLSX file without Excel",
-        "path": "/open-xlsx-without-excel"
-      }
-    },
-    {
       "question": "Do formulas recalculate when I edit a cell?",
       "answer": "Yes. After you change a cell, formulas that depend on it show the new result, including common functions such as SUM, AVERAGE, IF, COUNTIF, SUMIF, VLOOKUP and INDEX/MATCH. If a formula uses a function that is not supported, it keeps the result saved in the file."
     },
@@ -170,6 +162,14 @@
       "link": {
         "text": "Unprotect Excel",
         "path": "/unprotect-excel"
+      }
+    },
+    {
+      "question": "Why won't my XLSX file open?",
+      "answer": "Three causes cover most files. If it asks for a password to open, the workbook is encrypted and can't be opened without that password; protection on sheets alone is different and can be removed with Unprotect Excel. If the file is damaged, for example by a download that stopped, Repair Excel reads what it can and saves the data in a new, clean workbook. If the file was renamed to .xlsx but is really something else, such as a CSV or a web page, give it back its real extension and open it with the matching program.",
+      "link": {
+        "text": "Repair Excel",
+        "path": "/repair-excel"
       }
     },
     {
